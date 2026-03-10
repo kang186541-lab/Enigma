@@ -67,19 +67,21 @@ function webSpeak(text: string, lang: string) {
   }
 }
 
-async function speak(text: string, lang: string, muted: boolean, voiceUnlocked = true) {
+function speak(text: string, lang: string, muted: boolean, voiceUnlocked = true) {
   if (muted) return;
   if (Platform.OS === "web") {
-    if (!voiceUnlocked) return; // iOS Safari blocks auto-speech without user gesture
+    if (!voiceUnlocked) return;
     webSpeak(text, lang);
   } else {
-    // Always stop first, then wait, then speak — avoids isSpeakingAsync flakiness
+    // On native: stop any current speech, then speak immediately
     try { Speech.stop(); } catch {}
-    await new Promise((r) => setTimeout(r, 120));
     try {
       Speech.speak(text, { language: lang, rate: 0.9 });
     } catch (e) {
-      console.error("[Speech] speak() failed:", e);
+      // Retry without language override if the language code isn't available
+      try {
+        Speech.speak(text, { rate: 0.9 });
+      } catch {}
     }
   }
 }
