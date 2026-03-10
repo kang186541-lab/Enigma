@@ -7,6 +7,7 @@ import {
   TextInput,
   Pressable,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,13 +17,25 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
 import { getTutor, Tutor } from "@/constants/tutors";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
 
 interface Message {
   id: string;
   text: string;
   isUser: boolean;
 }
+
+const LANG_CODES: Record<NativeLanguage, string> = {
+  english: "en",
+  spanish: "es",
+  korean: "ko",
+};
+
+const TUTOR_LANG_CODES: Record<string, string> = {
+  english: "en",
+  spanish: "es",
+  korean: "ko",
+};
 
 async function speak(text: string, lang: string, muted: boolean) {
   if (muted) return;
@@ -40,10 +53,24 @@ function stopSpeech() {
   try { Speech.stop(); } catch {}
 }
 
+async function fetchTranslation(
+  text: string,
+  sourceLang: string,
+  targetLang: string
+): Promise<string> {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  const translated = data?.responseData?.translatedText;
+  if (!translated || typeof translated !== "string") throw new Error("No translation");
+  if (translated.toLowerCase().includes("mymemory warning")) throw new Error("Quota hit");
+  return translated;
+}
+
 export default function ChatRoomScreen() {
   const { tutorId } = useLocalSearchParams<{ tutorId: string }>();
   const insets = useSafeAreaInsets();
-  const { t } = useLanguage();
+  const { t, nativeLanguage } = useLanguage();
 
   const tutor = getTutor(tutorId ?? "") as Tutor | undefined;
 
@@ -55,16 +82,22 @@ export default function ChatRoomScreen() {
   const [isTyping, setIsTyping] = useState(false);
   const [muted, setMuted] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
+  const [shownTranslations, setShownTranslations] = useState<Set<string>>(new Set());
   const inputRef = useRef<TextInput>(null);
 
-  // Send greeting on mount
+  const userNativeLang = nativeLanguage ?? "english";
+  const userLangCode = LANG_CODES[userNativeLang];
+  const tutorLangCode = tutor ? TUTOR_LANG_CODES[tutor.language] ?? "en" : "en";
+  const canTranslate = tutorLangCode !== userLangCode;
+
   useEffect(() => {
     if (!tutor) return;
     const timer = setTimeout(() => {
       const id = "greeting";
-      const greeting = tutor.greeting;
-      setMessages([{ id, text: greeting, isUser: false }]);
-      speak(greeting, tutor.speechLang, false);
+      setMessages([{ id, text: tutor.greeting, isUser: false }]);
+      speak(tutor.greeting, tutor.speechLang, false);
     }, 400);
     return () => clearTimeout(timer);
   }, []);
@@ -79,6 +112,41 @@ export default function ChatRoomScreen() {
       setTimeout(() => setSpeakingId(null), 3000);
     },
     [tutor, muted]
+  );
+
+  const handleTranslate = useCallback(
+    async (msg: Message) => {
+      if (!canTranslate) return;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      if (shownTranslations.has(msg.id)) {
+        setShownTranslations((prev) => {
+          const next = new Set(prev);
+          next.delete(msg.id);
+          return next;
+        });
+        return;
+      }
+
+      setShownTranslations((prev) => new Set(prev).add(msg.id));
+
+      if (translations[msg.id]) return;
+
+      setTranslatingIds((prev) => new Set(prev).add(msg.id));
+      try {
+        const result = await fetchTranslation(msg.text, tutorLangCode, userLangCode);
+        setTranslations((prev) => ({ ...prev, [msg.id]: result }));
+      } catch {
+        setTranslations((prev) => ({ ...prev, [msg.id]: "Translation unavailable." }));
+      } finally {
+        setTranslatingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(msg.id);
+          return next;
+        });
+      }
+    },
+    [canTranslate, shownTranslations, translations, tutorLangCode, userLangCode]
   );
 
   const toggleMute = () => {
@@ -117,33 +185,82 @@ export default function ChatRoomScreen() {
     }, delay);
   };
 
-  const renderItem = ({ item }: { item: Message }) => (
-    <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowAI]}>
-      {!item.isUser && (
-        <View style={styles.tutorAvatar}>
-          <Text style={styles.tutorAvatarEmoji}>{tutor?.emoji ?? "👩"}</Text>
-        </View>
-      )}
-      <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleAI]}>
-        <Text style={[styles.bubbleText, item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI]}>
-          {item.text}
-        </Text>
+  const renderItem = ({ item }: { item: Message }) => {
+    const showingTranslation = shownTranslations.has(item.id);
+    const translationText = translations[item.id];
+    const isTranslating = translatingIds.has(item.id);
+
+    return (
+      <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowAI]}>
         {!item.isUser && (
-          <Pressable
-            onPress={() => handleReplay(item)}
-            style={({ pressed }) => [styles.replayBtn, pressed && { opacity: 0.7 }]}
-            hitSlop={8}
-          >
-            <Ionicons
-              name={speakingId === item.id ? "volume-high" : "volume-medium-outline"}
-              size={15}
-              color={speakingId === item.id ? "#FF6B9D" : "#C4B5BF"}
-            />
-          </Pressable>
+          <View style={styles.tutorAvatar}>
+            <Text style={styles.tutorAvatarEmoji}>{tutor?.emoji ?? "👩"}</Text>
+          </View>
         )}
+
+        <View style={styles.bubbleColumn}>
+          <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleAI]}>
+            <Text style={[styles.bubbleText, item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI]}>
+              {item.text}
+            </Text>
+
+            {!item.isUser && (
+              <View style={styles.bubbleActions}>
+                <Pressable
+                  onPress={() => handleReplay(item)}
+                  style={({ pressed }) => [styles.bubbleActionBtn, pressed && { opacity: 0.65 }]}
+                  hitSlop={6}
+                >
+                  <Ionicons
+                    name={speakingId === item.id ? "volume-high" : "volume-medium-outline"}
+                    size={14}
+                    color={speakingId === item.id ? "#FF6B9D" : "#C4B5BF"}
+                  />
+                </Pressable>
+
+                {canTranslate && (
+                  <Pressable
+                    onPress={() => handleTranslate(item)}
+                    style={({ pressed }) => [
+                      styles.bubbleActionBtn,
+                      showingTranslation && styles.bubbleActionBtnActive,
+                      pressed && { opacity: 0.65 },
+                    ]}
+                    hitSlop={6}
+                  >
+                    <Ionicons
+                      name="language-outline"
+                      size={14}
+                      color={showingTranslation ? "#FF6B9D" : "#C4B5BF"}
+                    />
+                  </Pressable>
+                )}
+              </View>
+            )}
+          </View>
+
+          {!item.isUser && showingTranslation && (
+            <View style={styles.translationBox}>
+              {isTranslating ? (
+                <View style={styles.translationLoading}>
+                  <ActivityIndicator size="small" color="#FF6B9D" />
+                  <Text style={styles.translationLoadingText}>Translating...</Text>
+                </View>
+              ) : (
+                <>
+                  <View style={styles.translationHeader}>
+                    <Ionicons name="language" size={11} color="#FF6B9D" />
+                    <Text style={styles.translationHeaderText}>{userNativeLang.charAt(0).toUpperCase() + userNativeLang.slice(1)}</Text>
+                  </View>
+                  <Text style={styles.translationText}>{translationText}</Text>
+                </>
+              )}
+            </View>
+          )}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   if (!tutor) {
     return (
@@ -199,15 +316,22 @@ export default function ChatRoomScreen() {
             {tutor.personality}
           </Text>
         </View>
+
+        {canTranslate && (
+          <View style={styles.translateHint}>
+            <Ionicons name="language-outline" size={11} color="#A08090" />
+            <Text style={styles.translateHintText}>Tap 🌐 under any message to translate</Text>
+          </View>
+        )}
       </View>
 
-      {/* KAV wraps messages + input */}
       <KeyboardAvoidingView style={styles.flex} behavior="padding" keyboardVerticalOffset={0}>
         <FlatList
           data={messages}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           inverted
+          extraData={{ translations, shownTranslations, translatingIds, speakingId }}
           style={styles.flex}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
@@ -231,7 +355,6 @@ export default function ChatRoomScreen() {
           }
         />
 
-        {/* Input bar — outside tabs so bottomPad = safe area only */}
         <View style={[styles.inputBar, { paddingBottom: Math.max(bottomPad + 4, 16) }]}>
           <View style={styles.inputRow}>
             <TextInput
@@ -274,7 +397,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   flex: { flex: 1 },
 
-  /* ── Header ── */
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -303,31 +425,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#FFB3CE",
   },
-  tutorAvatarHeaderEmoji: {
-    fontSize: 22,
-  },
-  headerCenter: {
-    flex: 1,
-  },
-  headerNameRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  headerName: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
-  },
-  headerFlag: {
-    fontSize: 16,
-  },
-  headerRegion: {
-    fontSize: 11,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
-    marginTop: 1,
-  },
+  tutorAvatarHeaderEmoji: { fontSize: 22 },
+  headerCenter: { flex: 1 },
+  headerNameRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  headerName: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#1A1A2E" },
+  headerFlag: { fontSize: 16 },
+  headerRegion: { fontSize: 11, fontFamily: "Inter_400Regular", color: "#A08090", marginTop: 1 },
   muteBtn: {
     width: 36,
     height: 36,
@@ -337,13 +440,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  /* ── Style badge ── */
   styleBadgeRow: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 7,
     backgroundColor: "rgba(255,248,251,0.95)",
     borderBottomWidth: 1,
     borderBottomColor: "#F9ECF3",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    flexWrap: "wrap",
   },
   styleBadge: {
     flexDirection: "row",
@@ -352,16 +458,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 10,
-    alignSelf: "flex-start",
   },
-  styleBadgeText: {
+  styleBadgeText: { fontSize: 11, fontFamily: "Inter_500Medium", lineHeight: 15, flexShrink: 1 },
+  translateHint: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  translateHintText: {
     fontSize: 11,
-    fontFamily: "Inter_500Medium",
-    lineHeight: 15,
-    flexShrink: 1,
+    fontFamily: "Inter_400Regular",
+    color: "#A08090",
   },
 
-  /* ── Messages ── */
   listContent: {
     paddingHorizontal: 14,
     paddingVertical: 14,
@@ -375,6 +484,7 @@ const styles = StyleSheet.create({
   },
   msgRowUser: { justifyContent: "flex-end" },
   msgRowAI: { justifyContent: "flex-start" },
+
   tutorAvatar: {
     width: 32,
     height: 32,
@@ -385,10 +495,15 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: "#FFB3CE",
     flexShrink: 0,
+    alignSelf: "flex-end",
   },
   tutorAvatarEmoji: { fontSize: 16 },
-  bubble: {
+
+  bubbleColumn: {
     maxWidth: "75%",
+    gap: 6,
+  },
+  bubble: {
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -409,11 +524,56 @@ const styles = StyleSheet.create({
   bubbleText: { fontSize: 15, lineHeight: 21 },
   bubbleTextUser: { fontFamily: "Inter_400Regular", color: "#FFFFFF" },
   bubbleTextAI: { fontFamily: "Inter_400Regular", color: "#1A1A2E" },
-  replayBtn: {
-    alignSelf: "flex-end",
-    marginTop: 4,
+
+  bubbleActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 5,
+  },
+  bubbleActionBtn: {
     padding: 2,
   },
+  bubbleActionBtnActive: {},
+
+  translationBox: {
+    backgroundColor: "#FFF0F6",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#FFB3CE",
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    gap: 4,
+  },
+  translationLoading: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  translationLoadingText: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: "#A08090",
+  },
+  translationHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  translationHeaderText: {
+    fontSize: 10,
+    fontFamily: "Inter_600SemiBold",
+    color: "#FF6B9D",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+  },
+  translationText: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    color: "#5A4A54",
+    lineHeight: 20,
+  },
+
   typingBubble: { paddingVertical: 14 },
   typingDots: { flexDirection: "row", gap: 5, alignItems: "center" },
   dot: {
@@ -423,7 +583,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#C4B5BF",
   },
 
-  /* ── Input bar ── */
   inputBar: {
     paddingHorizontal: 12,
     paddingTop: 8,
@@ -455,11 +614,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     maxHeight: 100,
   },
-  sendBtn: {
-    borderRadius: 20,
-    overflow: "hidden",
-    marginBottom: 2,
-  },
+  sendBtn: { borderRadius: 20, overflow: "hidden", marginBottom: 2 },
   sendBtnDisabled: { opacity: 0.55 },
   sendBtnGradient: {
     width: 36,
