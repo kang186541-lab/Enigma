@@ -31,12 +31,19 @@ const AI_RESPONSES: string[] = [
   "You're making great progress! Want to practice some common daily phrases?",
 ];
 
+// iOS tab bar = 49pt (items) + safe-area bottom. Android = ~56pt.
+// We push the whole screen up by this amount so the tab bar never covers content.
+const TAB_BAR_HEIGHT = 49;
+
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useLanguage();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
-  const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
+  // On web the tab bar has an explicit height of 84. On native we offset by
+  // TAB_BAR_HEIGHT + bottom safe-area so content lives above the absolute tab bar.
+  const tabBarOffset =
+    Platform.OS === "web" ? 84 : TAB_BAR_HEIGHT + insets.bottom;
 
   const [messages, setMessages] = useState<Message[]>([
     { id: "0", text: t("ai_greeting"), isUser: false },
@@ -60,7 +67,8 @@ export default function ChatScreen() {
     setIsTyping(true);
 
     setTimeout(() => {
-      const aiText = AI_RESPONSES[Math.floor(Math.random() * AI_RESPONSES.length)];
+      const aiText =
+        AI_RESPONSES[Math.floor(Math.random() * AI_RESPONSES.length)];
       const aiMsg: Message = {
         id: Date.now().toString() + "a",
         text: aiText,
@@ -74,15 +82,33 @@ export default function ChatScreen() {
   };
 
   const renderItem = ({ item }: { item: Message }) => (
-    <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowAI]}>
+    <View
+      style={[
+        styles.msgRow,
+        item.isUser ? styles.msgRowUser : styles.msgRowAI,
+      ]}
+    >
       {!item.isUser && (
         <View style={styles.aiAvatar}>
-          <LinearGradient colors={["#FF6B9D", "#FF8FB3"]} style={StyleSheet.absoluteFill} />
+          <LinearGradient
+            colors={["#FF6B9D", "#FF8FB3"]}
+            style={StyleSheet.absoluteFill}
+          />
           <Text style={styles.aiAvatarEmoji}>✨</Text>
         </View>
       )}
-      <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleAI]}>
-        <Text style={[styles.bubbleText, item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI]}>
+      <View
+        style={[
+          styles.bubble,
+          item.isUser ? styles.bubbleUser : styles.bubbleAI,
+        ]}
+      >
+        <Text
+          style={[
+            styles.bubbleText,
+            item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI,
+          ]}
+        >
           {item.text}
         </Text>
       </View>
@@ -90,14 +116,21 @@ export default function ChatScreen() {
   );
 
   return (
-    <View style={[styles.screen, { paddingTop: topPad }]}>
-      <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
+    // paddingBottom lifts ALL content above the absolute-positioned tab bar.
+    <View style={[styles.screen, { paddingTop: topPad, paddingBottom: tabBarOffset }]}>
+      <LinearGradient
+        colors={["#FFF0F6", "#FFF8FB"]}
+        style={StyleSheet.absoluteFill}
+      />
 
       {/* Compact header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.aiAvatar}>
-            <LinearGradient colors={["#FF6B9D", "#FF8FB3"]} style={StyleSheet.absoluteFill} />
+            <LinearGradient
+              colors={["#FF6B9D", "#FF8FB3"]}
+              style={StyleSheet.absoluteFill}
+            />
             <Text style={styles.aiAvatarEmoji}>✨</Text>
           </View>
           <View>
@@ -113,13 +146,12 @@ export default function ChatScreen() {
         </Pressable>
       </View>
 
-      {/* Keyboard-aware wrapper for messages + input */}
+      {/* KAV lifts content above keyboard when it opens */}
       <KeyboardAvoidingView
         style={styles.flex}
         behavior="padding"
         keyboardVerticalOffset={0}
       >
-        {/* Message list — inverted so newest is at bottom */}
         <FlatList
           data={messages}
           renderItem={renderItem}
@@ -134,7 +166,10 @@ export default function ChatScreen() {
             isTyping ? (
               <View style={[styles.msgRow, styles.msgRowAI]}>
                 <View style={styles.aiAvatar}>
-                  <LinearGradient colors={["#FF6B9D", "#FF8FB3"]} style={StyleSheet.absoluteFill} />
+                  <LinearGradient
+                    colors={["#FF6B9D", "#FF8FB3"]}
+                    style={StyleSheet.absoluteFill}
+                  />
                   <Text style={styles.aiAvatarEmoji}>✨</Text>
                 </View>
                 <View style={[styles.bubble, styles.bubbleAI, styles.typingBubble]}>
@@ -149,13 +184,8 @@ export default function ChatScreen() {
           }
         />
 
-        {/* Input bar — pinned above keyboard and tab bar */}
-        <View
-          style={[
-            styles.inputBar,
-            { paddingBottom: bottomPad > 0 ? bottomPad + 4 : 16 },
-          ]}
-        >
+        {/* Input — always visible above the tab bar */}
+        <View style={styles.inputBar}>
           <View style={styles.inputRow}>
             <TextInput
               ref={inputRef}
@@ -174,13 +204,21 @@ export default function ChatScreen() {
               style={({ pressed }) => [
                 styles.sendBtn,
                 !inputText.trim() && styles.sendBtnDisabled,
-                pressed && !!inputText.trim() && { opacity: 0.82, transform: [{ scale: 0.94 }] },
+                pressed &&
+                  !!inputText.trim() && {
+                    opacity: 0.82,
+                    transform: [{ scale: 0.94 }],
+                  },
               ]}
               onPress={sendMessage}
               disabled={!inputText.trim()}
             >
               <LinearGradient
-                colors={inputText.trim() ? ["#FF6B9D", "#FF4081"] : ["#E8D5DC", "#E8D5DC"]}
+                colors={
+                  inputText.trim()
+                    ? ["#FF6B9D", "#FF4081"]
+                    : ["#E8D5DC", "#E8D5DC"]
+                }
                 style={styles.sendBtnGradient}
               >
                 <Ionicons name="arrow-up" size={20} color="#FFFFFF" />
@@ -328,6 +366,7 @@ const styles = StyleSheet.create({
   inputBar: {
     paddingHorizontal: 12,
     paddingTop: 8,
+    paddingBottom: 10,
     backgroundColor: "rgba(255,248,251,0.98)",
     borderTopWidth: 1,
     borderTopColor: "#F0D6E4",
