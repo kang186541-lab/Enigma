@@ -61,9 +61,10 @@ async function fetchTranslation(
   const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`;
   const res = await fetch(url);
   const data = await res.json();
-  const translated = data?.responseData?.translatedText;
+  let translated = data?.responseData?.translatedText;
   if (!translated || typeof translated !== "string") throw new Error("No translation");
   if (translated.toLowerCase().includes("mymemory warning")) throw new Error("Quota hit");
+  try { translated = decodeURIComponent(translated); } catch {}
   return translated;
 }
 
