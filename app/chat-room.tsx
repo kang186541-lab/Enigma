@@ -42,19 +42,22 @@ function stopSpeech() {
   }
 }
 
-async function speak(text: string, lang: string, muted: boolean) {
+async function speak(text: string, lang: string, muted: boolean, voiceUnlocked = true) {
   if (muted) return;
   if (Platform.OS === "web") {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
+    if (!voiceUnlocked) return; // iOS Safari blocks auto-speech without user gesture
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
-    utterance.rate = 0.88;
-    // Some browsers need voices to load first
+    utterance.rate = 0.9;
     const doSpeak = () => {
       const voices = window.speechSynthesis.getVoices();
-      const match = voices.find((v) => v.lang.startsWith(lang.split("-")[0]));
+      const match =
+        voices.find((v) => v.lang === lang) ??
+        voices.find((v) => v.lang.startsWith(lang.split("-")[0]));
       if (match) utterance.voice = match;
+      window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
     };
     if (window.speechSynthesis.getVoices().length > 0) {
@@ -72,7 +75,7 @@ async function speak(text: string, lang: string, muted: boolean) {
         Speech.stop();
         await new Promise((r) => setTimeout(r, 80));
       }
-      Speech.speak(text, { language: lang, rate: 0.88 });
+      Speech.speak(text, { language: lang, rate: 0.9 });
     } catch {}
   }
 }
@@ -111,6 +114,8 @@ export default function ChatRoomScreen() {
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
   const [shownTranslations, setShownTranslations] = useState<Set<string>>(new Set());
+  // Web/iOS Safari requires a user gesture before speechSynthesis will play
+  const [voiceUnlocked, setVoiceUnlocked] = useState(Platform.OS !== "web");
   const inputRef = useRef<TextInput>(null);
   const conversationHistoryRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
 
@@ -125,10 +130,28 @@ export default function ChatRoomScreen() {
       const id = "greeting";
       setMessages([{ id, text: tutor.greeting, isUser: false }]);
       conversationHistoryRef.current = [{ role: "assistant", content: tutor.greeting }];
-      speak(tutor.greeting, tutor.speechLang, false);
+      // voiceUnlocked is false on web initially, so greeting won't auto-play
+      // until the user taps the unlock banner (handleUnlockVoice speaks it after)
+      speak(tutor.greeting, tutor.speechLang, false, Platform.OS !== "web");
     }, 400);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleUnlockVoice = useCallback(() => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Speak a silent utterance to unlock iOS Safari speech synthesis
+    window.speechSynthesis.cancel();
+    const unlock = new SpeechSynthesisUtterance(" ");
+    unlock.volume = 0;
+    window.speechSynthesis.speak(unlock);
+    setVoiceUnlocked(true);
+    // Replay the last tutor message now that voice is unlocked
+    const lastAI = messages.find((m) => !m.isUser);
+    if (lastAI && tutor && !muted) {
+      setTimeout(() => speak(lastAI.text, tutor.speechLang, false, true), 300);
+    }
+  }, [messages, tutor, muted]);
 
   const handleReplay = useCallback(
     (msg: Message) => {
@@ -136,7 +159,8 @@ export default function ChatRoomScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       stopSpeech();
       setSpeakingId(msg.id);
-      speak(msg.text, tutor.speechLang, muted);
+      // Replay is always user-triggered so pass true to bypass unlock guard
+      speak(msg.text, tutor.speechLang, muted, true);
       setTimeout(() => setSpeakingId(null), 3000);
     },
     [tutor, muted]
@@ -225,7 +249,7 @@ export default function ChatRoomScreen() {
       ];
       setMessages((prev) => [aiMsg, ...prev]);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      speak(responseText, tutor.speechLang, muted);
+      speak(responseText, tutor.speechLang, muted, voiceUnlocked);
       setSpeakingId(aiId);
       setTimeout(() => setSpeakingId(null), 5000);
       inputRef.current?.focus();
@@ -233,7 +257,7 @@ export default function ChatRoomScreen() {
       const fallback = tutor.responses[Math.floor(Math.random() * tutor.responses.length)];
       const aiId = Date.now().toString() + "a";
       setMessages((prev) => [{ id: aiId, text: fallback, isUser: false }, ...prev]);
-      speak(fallback, tutor.speechLang, muted);
+      speak(fallback, tutor.speechLang, muted, voiceUnlocked);
     } finally {
       setIsTyping(false);
     }
@@ -379,6 +403,17 @@ export default function ChatRoomScreen() {
         )}
       </View>
 
+      {/* iOS Safari voice unlock banner — web only, disappears once tapped */}
+      {Platform.OS === "web" && !voiceUnlocked && !muted && (
+        <Pressable
+          style={({ pressed }) => [styles.voiceUnlockBanner, pressed && { opacity: 0.8 }]}
+          onPress={handleUnlockVoice}
+        >
+          <Ionicons name="volume-medium" size={14} color="#FF6B9D" />
+          <Text style={styles.voiceUnlockText}>Tap to enable tutor voice</Text>
+        </Pressable>
+      )}
+
       <KeyboardAvoidingView style={styles.flex} behavior="padding" keyboardVerticalOffset={0}>
         <FlatList
           data={messages}
@@ -523,6 +558,25 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: "Inter_400Regular",
     color: "#A08090",
+  },
+  voiceUnlockBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    backgroundColor: "#FFF0F6",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#FFB3D1",
+  },
+  voiceUnlockText: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+    color: "#FF6B9D",
   },
 
   listContent: {
