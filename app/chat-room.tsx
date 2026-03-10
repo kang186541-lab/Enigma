@@ -18,6 +18,7 @@ import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
 import { getTutor, Tutor } from "@/constants/tutors";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
+import { getApiUrl } from "@/lib/query-client";
 
 interface Message {
   id: string;
@@ -87,6 +88,7 @@ export default function ChatRoomScreen() {
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
   const [shownTranslations, setShownTranslations] = useState<Set<string>>(new Set());
   const inputRef = useRef<TextInput>(null);
+  const conversationHistoryRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
 
   const userNativeLang = nativeLanguage ?? "english";
   const userLangCode = LANG_CODES[userNativeLang];
@@ -98,6 +100,7 @@ export default function ChatRoomScreen() {
     const timer = setTimeout(() => {
       const id = "greeting";
       setMessages([{ id, text: tutor.greeting, isUser: false }]);
+      conversationHistoryRef.current = [{ role: "assistant", content: tutor.greeting }];
       speak(tutor.greeting, tutor.speechLang, false);
     }, 400);
     return () => clearTimeout(timer);
@@ -156,9 +159,9 @@ export default function ChatRoomScreen() {
     setMuted((m) => !m);
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     const trimmed = inputText.trim();
-    if (!trimmed || !tutor) return;
+    if (!trimmed || !tutor || isTyping) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     const userMsg: Message = {
@@ -168,22 +171,48 @@ export default function ChatRoomScreen() {
     };
     setInputText("");
     setMessages((prev) => [userMsg, ...prev]);
+    conversationHistoryRef.current = [
+      ...conversationHistoryRef.current,
+      { role: "user", content: trimmed },
+    ];
     setIsTyping(true);
 
-    const delay = 1000 + Math.random() * 1000;
-    setTimeout(() => {
-      const pool = tutor.responses;
-      const responseText = pool[Math.floor(Math.random() * pool.length)];
+    try {
+      const apiUrl = new URL("/api/chat", getApiUrl()).toString();
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tutorId: tutor.id,
+          messages: conversationHistoryRef.current,
+        }),
+      });
+
+      const data = await res.json();
+      const responseText: string = res.ok
+        ? (data.reply ?? "...")
+        : (tutor.responses[Math.floor(Math.random() * tutor.responses.length)]);
+
       const aiId = Date.now().toString() + "a";
       const aiMsg: Message = { id: aiId, text: responseText, isUser: false };
+      conversationHistoryRef.current = [
+        ...conversationHistoryRef.current,
+        { role: "assistant", content: responseText },
+      ];
       setMessages((prev) => [aiMsg, ...prev]);
-      setIsTyping(false);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       speak(responseText, tutor.speechLang, muted);
       setSpeakingId(aiId);
-      setTimeout(() => setSpeakingId(null), 4000);
+      setTimeout(() => setSpeakingId(null), 5000);
       inputRef.current?.focus();
-    }, delay);
+    } catch {
+      const fallback = tutor.responses[Math.floor(Math.random() * tutor.responses.length)];
+      const aiId = Date.now().toString() + "a";
+      setMessages((prev) => [{ id: aiId, text: fallback, isUser: false }, ...prev]);
+      speak(fallback, tutor.speechLang, muted);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const renderItem = ({ item }: { item: Message }) => {

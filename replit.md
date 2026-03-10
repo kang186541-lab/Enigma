@@ -10,8 +10,9 @@ The app runs as a hybrid: a React Native frontend (via Expo Router) paired with 
 - Language onboarding (select native language from Korean, English, Spanish)
 - Home dashboard with streak, XP, words learned, and accuracy stats
 - Flashcard deck for vocabulary practice
-- Chat screen with multiple AI tutors (formal/casual, different accents/languages)
-- Pronunciation guide with IPA and text-to-speech playback
+- Chat screen with 6 AI tutors powered by GPT-5.1 (formal/casual, different accents/languages, maintains conversation history)
+- Real-time translation button on tutor messages using MyMemory API
+- Pronunciation guide with IPA phonetics, language tabs, listen + record flow
 - Full i18n support across all 3 languages using a built-in translation map
 
 ---
