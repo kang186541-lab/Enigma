@@ -32,20 +32,49 @@ const LANG_NAMES: Record<string, string> = {
   korean: "Korean",
 };
 
-async function speak(text: string, lang: string, muted: boolean) {
-  if (muted) return;
-  try {
-    const isSpeaking = await Speech.isSpeakingAsync();
-    if (isSpeaking) {
-      Speech.stop();
-      await new Promise((r) => setTimeout(r, 80));
+function stopSpeech() {
+  if (Platform.OS === "web") {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
-    Speech.speak(text, { language: lang, rate: 0.88 });
-  } catch {}
+  } else {
+    try { Speech.stop(); } catch {}
+  }
 }
 
-function stopSpeech() {
-  try { Speech.stop(); } catch {}
+async function speak(text: string, lang: string, muted: boolean) {
+  if (muted) return;
+  if (Platform.OS === "web") {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.88;
+    // Some browsers need voices to load first
+    const doSpeak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const match = voices.find((v) => v.lang.startsWith(lang.split("-")[0]));
+      if (match) utterance.voice = match;
+      window.speechSynthesis.speak(utterance);
+    };
+    if (window.speechSynthesis.getVoices().length > 0) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
+    }
+  } else {
+    try {
+      const isSpeaking = await Speech.isSpeakingAsync();
+      if (isSpeaking) {
+        Speech.stop();
+        await new Promise((r) => setTimeout(r, 80));
+      }
+      Speech.speak(text, { language: lang, rate: 0.88 });
+    } catch {}
+  }
 }
 
 async function fetchTranslation(
