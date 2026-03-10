@@ -54,6 +54,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/translate", async (req: Request, res: Response) => {
+    try {
+      const { text, targetLanguage } = req.body as {
+        text: string;
+        targetLanguage: string;
+      };
+
+      if (!text || !targetLanguage) {
+        return res.status(400).json({ error: "text and targetLanguage are required" });
+      }
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-5.1",
+        max_completion_tokens: 300,
+        messages: [
+          {
+            role: "system",
+            content: `You are a translation assistant. Translate the user's text into ${targetLanguage}. Return ONLY the translated text with no explanation, no quotes, no prefixes.`,
+          },
+          { role: "user", content: text },
+        ],
+      });
+
+      const translation = completion.choices[0]?.message?.content?.trim() ?? "";
+      res.json({ translation });
+    } catch (err) {
+      console.error("Translation error:", err);
+      res.status(500).json({ error: "Failed to translate" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

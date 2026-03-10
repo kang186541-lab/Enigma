@@ -26,16 +26,10 @@ interface Message {
   isUser: boolean;
 }
 
-const LANG_CODES: Record<NativeLanguage, string> = {
-  english: "en",
-  spanish: "es",
-  korean: "ko",
-};
-
-const TUTOR_LANG_CODES: Record<string, string> = {
-  english: "en",
-  spanish: "es",
-  korean: "ko",
+const LANG_NAMES: Record<string, string> = {
+  english: "English",
+  spanish: "Spanish",
+  korean: "Korean",
 };
 
 async function speak(text: string, lang: string, muted: boolean) {
@@ -54,33 +48,20 @@ function stopSpeech() {
   try { Speech.stop(); } catch {}
 }
 
-function robustDecode(str: string): string {
-  // Normalize "% 20" (space after %) → "%20" then decode
-  const normalized = str.replace(/% ([0-9A-Fa-f]{2})/g, "%$1");
-  try {
-    return decodeURIComponent(normalized);
-  } catch {}
-  // Fallback: manually replace the most common sequences
-  return normalized
-    .replace(/%20/gi, " ").replace(/%2C/gi, ",").replace(/%27/gi, "'")
-    .replace(/%3F/gi, "?").replace(/%21/gi, "!").replace(/%2E/gi, ".")
-    .replace(/%3A/gi, ":").replace(/%22/gi, '"').replace(/%26/gi, "&")
-    .replace(/%3B/gi, ";").replace(/%2F/gi, "/").replace(/%28/gi, "(")
-    .replace(/%29/gi, ")").replace(/%C2%A1/gi, "¡").replace(/%C2%BF/gi, "¿");
-}
-
 async function fetchTranslation(
   text: string,
-  sourceLang: string,
-  targetLang: string
+  targetLanguage: string,
+  apiBase: string
 ): Promise<string> {
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`;
-  const res = await fetch(url);
+  const url = new URL("/api/translate", apiBase).toString();
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, targetLanguage }),
+  });
   const data = await res.json();
-  let translated = data?.responseData?.translatedText;
-  if (!translated || typeof translated !== "string") throw new Error("No translation");
-  if (translated.toLowerCase().includes("mymemory warning")) throw new Error("Quota hit");
-  return robustDecode(translated);
+  if (!res.ok || !data.translation) throw new Error("Translation failed");
+  return data.translation;
 }
 
 export default function ChatRoomScreen() {
@@ -105,9 +86,9 @@ export default function ChatRoomScreen() {
   const conversationHistoryRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
 
   const userNativeLang = nativeLanguage ?? "english";
-  const userLangCode = LANG_CODES[userNativeLang];
-  const tutorLangCode = tutor ? TUTOR_LANG_CODES[tutor.language] ?? "en" : "en";
-  const canTranslate = tutorLangCode !== userLangCode;
+  const userLangName = LANG_NAMES[userNativeLang] ?? "English";
+  const tutorLangName = tutor ? (LANG_NAMES[tutor.language.toLowerCase()] ?? tutor.language) : "English";
+  const canTranslate = tutorLangName.toLowerCase() !== userLangName.toLowerCase();
 
   useEffect(() => {
     if (!tutor) return;
@@ -152,7 +133,7 @@ export default function ChatRoomScreen() {
 
       setTranslatingIds((prev) => new Set(prev).add(msg.id));
       try {
-        const result = await fetchTranslation(msg.text, tutorLangCode, userLangCode);
+        const result = await fetchTranslation(msg.text, userLangName, getApiUrl());
         setTranslations((prev) => ({ ...prev, [msg.id]: result }));
       } catch {
         setTranslations((prev) => ({ ...prev, [msg.id]: "Translation unavailable." }));
@@ -164,7 +145,7 @@ export default function ChatRoomScreen() {
         });
       }
     },
-    [canTranslate, shownTranslations, translations, tutorLangCode, userLangCode]
+    [canTranslate, shownTranslations, translations, userLangName]
   );
 
   const toggleMute = () => {
