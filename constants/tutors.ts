@@ -159,15 +159,15 @@ export function getTutor(id: string): Tutor | undefined {
   return TUTORS.find((t) => t.id === id);
 }
 
-export function speakText(text: string, lang: string, muted: boolean) {
+export async function speakText(text: string, lang: string, muted: boolean) {
   if (muted) return;
-  if (typeof window !== "undefined" && "speechSynthesis" in window) {
-    try {
-      const utterance = new window.SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-      utterance.rate = 0.88;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    } catch {}
-  }
+  try {
+    const { isSpeakingAsync, stop, speak } = await import("expo-speech");
+    const isSpeaking = await isSpeakingAsync();
+    if (isSpeaking) {
+      stop();
+      await new Promise((r) => setTimeout(r, 80));
+    }
+    speak(text, { language: lang, rate: 0.88 });
+  } catch {}
 }

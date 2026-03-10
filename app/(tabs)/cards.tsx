@@ -159,18 +159,15 @@ const ADVANCED_CARDS: Record<NativeLanguage, FlashCard[]> = {
   ],
 };
 
-function speakWord(word: string, lang: string) {
-  if (Platform.OS === "web") {
-    try {
-      const utterance = new (window as any).SpeechSynthesisUtterance(word);
-      utterance.lang = lang;
-      utterance.rate = 0.85;
-      (window as any).speechSynthesis.cancel();
-      (window as any).speechSynthesis.speak(utterance);
-    } catch {}
-  } else {
+async function speakWord(word: string, lang: string) {
+  try {
+    const isSpeaking = await Speech.isSpeakingAsync();
+    if (isSpeaking) {
+      Speech.stop();
+      await new Promise((r) => setTimeout(r, 80));
+    }
     Speech.speak(word, { language: lang, rate: 0.85 });
-  }
+  } catch {}
 }
 
 type DeckType = "beginner" | "advanced";

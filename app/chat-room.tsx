@@ -15,7 +15,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
-import { getTutor, speakText, Tutor } from "@/constants/tutors";
+import { getTutor, Tutor } from "@/constants/tutors";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface Message {
@@ -24,21 +24,20 @@ interface Message {
   isUser: boolean;
 }
 
-function speak(text: string, lang: string, muted: boolean) {
+async function speak(text: string, lang: string, muted: boolean) {
   if (muted) return;
-  if (Platform.OS === "web") {
-    speakText(text, lang, false);
-  } else {
+  try {
+    const isSpeaking = await Speech.isSpeakingAsync();
+    if (isSpeaking) {
+      Speech.stop();
+      await new Promise((r) => setTimeout(r, 80));
+    }
     Speech.speak(text, { language: lang, rate: 0.88 });
-  }
+  } catch {}
 }
 
 function stopSpeech() {
-  if (Platform.OS === "web") {
-    try { window.speechSynthesis?.cancel(); } catch {}
-  } else {
-    Speech.stop();
-  }
+  try { Speech.stop(); } catch {}
 }
 
 export default function ChatRoomScreen() {
