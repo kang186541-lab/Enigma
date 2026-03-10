@@ -54,6 +54,21 @@ function stopSpeech() {
   try { Speech.stop(); } catch {}
 }
 
+function robustDecode(str: string): string {
+  // Normalize "% 20" (space after %) → "%20" then decode
+  const normalized = str.replace(/% ([0-9A-Fa-f]{2})/g, "%$1");
+  try {
+    return decodeURIComponent(normalized);
+  } catch {}
+  // Fallback: manually replace the most common sequences
+  return normalized
+    .replace(/%20/gi, " ").replace(/%2C/gi, ",").replace(/%27/gi, "'")
+    .replace(/%3F/gi, "?").replace(/%21/gi, "!").replace(/%2E/gi, ".")
+    .replace(/%3A/gi, ":").replace(/%22/gi, '"').replace(/%26/gi, "&")
+    .replace(/%3B/gi, ";").replace(/%2F/gi, "/").replace(/%28/gi, "(")
+    .replace(/%29/gi, ")").replace(/%C2%A1/gi, "¡").replace(/%C2%BF/gi, "¿");
+}
+
 async function fetchTranslation(
   text: string,
   sourceLang: string,
@@ -65,8 +80,7 @@ async function fetchTranslation(
   let translated = data?.responseData?.translatedText;
   if (!translated || typeof translated !== "string") throw new Error("No translation");
   if (translated.toLowerCase().includes("mymemory warning")) throw new Error("Quota hit");
-  try { translated = decodeURIComponent(translated); } catch {}
-  return translated;
+  return robustDecode(translated);
 }
 
 export default function ChatRoomScreen() {
