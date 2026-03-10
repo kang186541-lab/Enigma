@@ -1,413 +1,256 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
-  TextInput,
+  ScrollView,
   Pressable,
   Platform,
 } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useLanguage } from "@/context/LanguageContext";
+import { TUTORS, TUTOR_GROUPS, Tutor, TutorLanguage } from "@/constants/tutors";
 
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-}
-
-const AI_RESPONSES: string[] = [
-  "That's great! Let me help you practice. Can you try using that word in a sentence?",
-  "Excellent effort! In Korean, we say '잘했어요' (Jal haesseoyo) which means 'Well done!'",
-  "Let's try a different phrase. How would you say 'Where is the restaurant?' in Korean?",
-  "Perfect! You're really improving. Let's move to the next topic.",
-  "Very good! Remember, Korean sentence structure is Subject-Object-Verb. Try again!",
-  "Interesting! Would you like me to explain more about this grammar point?",
-  "You're making great progress! Want to practice some common daily phrases?",
-];
-
-// iOS tab bar = 49pt (items) + safe-area bottom. Android = ~56pt.
-// We push the whole screen up by this amount so the tab bar never covers content.
 const TAB_BAR_HEIGHT = 49;
 
-export default function ChatScreen() {
-  const insets = useSafeAreaInsets();
-  const { t } = useLanguage();
+const LANG_GRADIENT: Record<TutorLanguage, [string, string]> = {
+  english: ["#4A90D9", "#6BB3F0"],
+  spanish: ["#E85D3A", "#F2896D"],
+  korean: ["#FF6B9D", "#FF4081"],
+};
 
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
-  // On web the tab bar has an explicit height of 84. On native we offset by
-  // TAB_BAR_HEIGHT + bottom safe-area so content lives above the absolute tab bar.
-  const tabBarOffset =
-    Platform.OS === "web" ? 84 : TAB_BAR_HEIGHT + insets.bottom;
+const LANG_LIGHT: Record<TutorLanguage, string> = {
+  english: "#EBF4FD",
+  spanish: "#FDF0ED",
+  korean: "#FFF0F6",
+};
 
-  const [messages, setMessages] = useState<Message[]>([
-    { id: "0", text: t("ai_greeting"), isUser: false },
-  ]);
-  const [inputText, setInputText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const inputRef = useRef<TextInput>(null);
-
-  const sendMessage = () => {
-    const trimmed = inputText.trim();
-    if (!trimmed) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-    const userMsg: Message = {
-      id: Date.now().toString() + "u",
-      text: trimmed,
-      isUser: true,
-    };
-    setInputText("");
-    setMessages((prev) => [userMsg, ...prev]);
-    setIsTyping(true);
-
-    setTimeout(() => {
-      const aiText =
-        AI_RESPONSES[Math.floor(Math.random() * AI_RESPONSES.length)];
-      const aiMsg: Message = {
-        id: Date.now().toString() + "a",
-        text: aiText,
-        isUser: false,
-      };
-      setMessages((prev) => [aiMsg, ...prev]);
-      setIsTyping(false);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      inputRef.current?.focus();
-    }, 1200 + Math.random() * 800);
-  };
-
-  const renderItem = ({ item }: { item: Message }) => (
-    <View
-      style={[
-        styles.msgRow,
-        item.isUser ? styles.msgRowUser : styles.msgRowAI,
-      ]}
-    >
-      {!item.isUser && (
-        <View style={styles.aiAvatar}>
-          <LinearGradient
-            colors={["#FF6B9D", "#FF8FB3"]}
-            style={StyleSheet.absoluteFill}
-          />
-          <Text style={styles.aiAvatarEmoji}>✨</Text>
+function TutorCard({ tutor, onPress }: { tutor: Tutor; onPress: () => void }) {
+  const [g1, g2] = LANG_GRADIENT[tutor.language];
+  return (
+    <View style={styles.tutorCard}>
+      <View style={[styles.avatarWrap, { backgroundColor: LANG_LIGHT[tutor.language] }]}>
+        <Text style={styles.avatarEmoji}>{tutor.emoji}</Text>
+        <View style={[styles.flagBadge, {}]}>
+          <Text style={styles.flagText}>{tutor.flag}</Text>
         </View>
-      )}
-      <View
-        style={[
-          styles.bubble,
-          item.isUser ? styles.bubbleUser : styles.bubbleAI,
-        ]}
-      >
-        <Text
-          style={[
-            styles.bubbleText,
-            item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI,
+      </View>
+
+      <View style={styles.tutorInfo}>
+        <View style={styles.tutorNameRow}>
+          <Text style={styles.tutorName}>{tutor.name}</Text>
+          <View style={[styles.stylePill, { backgroundColor: tutor.style === "formal" ? "#EEF2FF" : "#FFF7ED" }]}>
+            <Text style={[styles.stylePillText, { color: tutor.style === "formal" ? "#6366F1" : "#EA580C" }]}>
+              {tutor.style === "formal" ? "Formal" : "Casual"}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.tutorRegion}>{tutor.region}</Text>
+        <Text style={styles.tutorPersonality}>{tutor.personality}</Text>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.startBtn,
+            pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] },
           ]}
+          onPress={onPress}
         >
-          {item.text}
-        </Text>
+          <LinearGradient colors={[g1, g2]} style={styles.startBtnGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <Text style={styles.startBtnText}>Start Chat</Text>
+          </LinearGradient>
+        </Pressable>
       </View>
     </View>
   );
+}
+
+export default function TutorSelectScreen() {
+  const insets = useSafeAreaInsets();
+  const { t } = useLanguage();
+  const topPad = Platform.OS === "web" ? 67 : insets.top;
+  const bottomPad = Platform.OS === "web" ? 84 : TAB_BAR_HEIGHT + insets.bottom;
+
+  const handleSelect = (tutor: Tutor) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push({ pathname: "/chat-room", params: { tutorId: tutor.id } });
+  };
 
   return (
-    // paddingBottom lifts ALL content above the absolute-positioned tab bar.
-    <View style={[styles.screen, { paddingTop: topPad, paddingBottom: tabBarOffset }]}>
-      <LinearGradient
-        colors={["#FFF0F6", "#FFF8FB"]}
-        style={StyleSheet.absoluteFill}
-      />
+    <View style={[styles.container, { paddingTop: topPad }]}>
+      <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
 
-      {/* Compact header */}
       <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <View style={styles.aiAvatar}>
-            <LinearGradient
-              colors={["#FF6B9D", "#FF8FB3"]}
-              style={StyleSheet.absoluteFill}
-            />
-            <Text style={styles.aiAvatarEmoji}>✨</Text>
-          </View>
-          <View>
-            <Text style={styles.headerTitle}>LinguaAI</Text>
-            <View style={styles.onlineRow}>
-              <View style={styles.onlineDot} />
-              <Text style={styles.onlineText}>Online</Text>
-            </View>
-          </View>
-        </View>
-        <Pressable style={styles.headerBtn}>
-          <Ionicons name="ellipsis-horizontal" size={18} color="#A08090" />
-        </Pressable>
+        <Text style={styles.headerTitle}>Choose Your Tutor</Text>
+        <Text style={styles.headerSub}>Pick the accent and style you want to practice with</Text>
       </View>
 
-      {/* KAV lifts content above keyboard when it opens */}
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior="padding"
-        keyboardVerticalOffset={0}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad + 16 }]}
       >
-        <FlatList
-          data={messages}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          inverted
-          style={styles.flex}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          keyboardDismissMode="interactive"
-          keyboardShouldPersistTaps="handled"
-          ListHeaderComponent={
-            isTyping ? (
-              <View style={[styles.msgRow, styles.msgRowAI]}>
-                <View style={styles.aiAvatar}>
-                  <LinearGradient
-                    colors={["#FF6B9D", "#FF8FB3"]}
-                    style={StyleSheet.absoluteFill}
-                  />
-                  <Text style={styles.aiAvatarEmoji}>✨</Text>
-                </View>
-                <View style={[styles.bubble, styles.bubbleAI, styles.typingBubble]}>
-                  <View style={styles.typingDots}>
-                    <View style={styles.dot} />
-                    <View style={styles.dot} />
-                    <View style={styles.dot} />
-                  </View>
-                </View>
+        {TUTOR_GROUPS.map((group) => {
+          const groupTutors = TUTORS.filter((t) => t.language === group.language);
+          const [g1, g2] = LANG_GRADIENT[group.language];
+          return (
+            <View key={group.language} style={styles.group}>
+              <View style={styles.groupHeader}>
+                <LinearGradient colors={[g1, g2]} style={styles.groupDot} />
+                <Text style={styles.groupLabel}>{group.label}</Text>
+                <Text style={styles.groupFlag}>{group.flag}</Text>
               </View>
-            ) : null
-          }
-        />
-
-        {/* Input — always visible above the tab bar */}
-        <View style={styles.inputBar}>
-          <View style={styles.inputRow}>
-            <TextInput
-              ref={inputRef}
-              style={styles.input}
-              value={inputText}
-              onChangeText={setInputText}
-              placeholder={t("type_message")}
-              placeholderTextColor="#C4B5BF"
-              multiline
-              maxLength={500}
-              returnKeyType="send"
-              onSubmitEditing={sendMessage}
-              blurOnSubmit={false}
-            />
-            <Pressable
-              style={({ pressed }) => [
-                styles.sendBtn,
-                !inputText.trim() && styles.sendBtnDisabled,
-                pressed &&
-                  !!inputText.trim() && {
-                    opacity: 0.82,
-                    transform: [{ scale: 0.94 }],
-                  },
-              ]}
-              onPress={sendMessage}
-              disabled={!inputText.trim()}
-            >
-              <LinearGradient
-                colors={
-                  inputText.trim()
-                    ? ["#FF6B9D", "#FF4081"]
-                    : ["#E8D5DC", "#E8D5DC"]
-                }
-                style={styles.sendBtnGradient}
-              >
-                <Ionicons name="arrow-up" size={20} color="#FFFFFF" />
-              </LinearGradient>
-            </Pressable>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
+              <View style={styles.groupCards}>
+                {groupTutors.map((tutor) => (
+                  <TutorCard key={tutor.id} tutor={tutor} onPress={() => handleSelect(tutor)} />
+                ))}
+              </View>
+            </View>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  flex: {
-    flex: 1,
-  },
-
-  /* ── Header ── */
+  container: { flex: 1 },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0D6E4",
-    backgroundColor: "rgba(255,248,251,0.97)",
-  },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  headerTitle: {
-    fontSize: 15,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
-    lineHeight: 19,
-  },
-  onlineRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingBottom: 12,
     gap: 4,
   },
-  onlineDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#4CAF50",
+  headerTitle: {
+    fontSize: 24,
+    fontFamily: "Inter_700Bold",
+    color: "#1A1A2E",
   },
-  onlineText: {
-    fontSize: 11,
+  headerSub: {
+    fontSize: 14,
     fontFamily: "Inter_400Regular",
-    color: "#4CAF50",
+    color: "#A08090",
+    lineHeight: 20,
   },
-  headerBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "#F5E8F0",
-    justifyContent: "center",
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    gap: 24,
+  },
+  group: {
+    gap: 12,
+  },
+  groupHeader: {
+    flexDirection: "row",
     alignItems: "center",
-  },
-
-  /* ── Messages ── */
-  listContent: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
     gap: 10,
   },
-  msgRow: {
+  groupDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+  },
+  groupLabel: {
+    fontSize: 16,
+    fontFamily: "Inter_700Bold",
+    color: "#1A1A2E",
+    flex: 1,
+  },
+  groupFlag: {
+    fontSize: 20,
+  },
+  groupCards: {
+    gap: 12,
+  },
+  tutorCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 18,
     flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 8,
-    marginBottom: 2,
+    gap: 16,
+    shadowColor: "#FF6B9D",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
-  msgRowUser: {
-    justifyContent: "flex-end",
-  },
-  msgRowAI: {
-    justifyContent: "flex-start",
-  },
-  aiAvatar: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    overflow: "hidden",
+  avatarWrap: {
+    width: 68,
+    height: 68,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     flexShrink: 0,
+    position: "relative",
   },
-  aiAvatarEmoji: {
+  avatarEmoji: {
+    fontSize: 38,
+  },
+  flagBadge: {
+    position: "absolute",
+    bottom: -4,
+    right: -4,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    padding: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  flagText: {
     fontSize: 14,
   },
-  bubble: {
-    maxWidth: "76%",
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  bubbleUser: {
-    backgroundColor: "#FF6B9D",
-    borderBottomRightRadius: 5,
-  },
-  bubbleAI: {
-    backgroundColor: "#FFFFFF",
-    borderBottomLeftRadius: 5,
-    shadowColor: "#FF6B9D",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  bubbleText: {
-    fontSize: 15,
-    lineHeight: 21,
-  },
-  bubbleTextUser: {
-    fontFamily: "Inter_400Regular",
-    color: "#FFFFFF",
-  },
-  bubbleTextAI: {
-    fontFamily: "Inter_400Regular",
-    color: "#1A1A2E",
-  },
-  typingBubble: {
-    paddingVertical: 14,
-  },
-  typingDots: {
-    flexDirection: "row",
-    gap: 5,
-    alignItems: "center",
-  },
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: "#C4B5BF",
-  },
-
-  /* ── Input bar ── */
-  inputBar: {
-    paddingHorizontal: 12,
-    paddingTop: 8,
-    paddingBottom: 10,
-    backgroundColor: "rgba(255,248,251,0.98)",
-    borderTopWidth: 1,
-    borderTopColor: "#F0D6E4",
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 8,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 26,
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderWidth: 1.5,
-    borderColor: "#F0D6E4",
-    shadowColor: "#FF6B9D",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  input: {
+  tutorInfo: {
     flex: 1,
-    fontSize: 15,
-    fontFamily: "Inter_400Regular",
-    color: "#1A1A2E",
-    paddingVertical: 8,
-    maxHeight: 100,
+    gap: 4,
   },
-  sendBtn: {
-    borderRadius: 20,
-    overflow: "hidden",
-    marginBottom: 2,
-  },
-  sendBtnDisabled: {
-    opacity: 0.55,
-  },
-  sendBtnGradient: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: "center",
+  tutorNameRow: {
+    flexDirection: "row",
     alignItems: "center",
+    gap: 8,
+  },
+  tutorName: {
+    fontSize: 18,
+    fontFamily: "Inter_700Bold",
+    color: "#1A1A2E",
+  },
+  stylePill: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  stylePillText: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+  },
+  tutorRegion: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    color: "#A08090",
+  },
+  tutorPersonality: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: "#5A4A54",
+    lineHeight: 18,
+    marginTop: 2,
+    marginBottom: 6,
+  },
+  startBtn: {
+    borderRadius: 14,
+    overflow: "hidden",
+    alignSelf: "flex-start",
+  },
+  startBtnGradient: {
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: 14,
+  },
+  startBtnText: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    color: "#FFFFFF",
   },
 });
