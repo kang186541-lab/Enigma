@@ -7,8 +7,8 @@ import {
   TextInput,
   Pressable,
   Platform,
-  KeyboardAvoidingView,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,63 +19,57 @@ interface Message {
   id: string;
   text: string;
   isUser: boolean;
-  timestamp: Date;
 }
 
 const AI_RESPONSES: string[] = [
   "That's great! Let me help you practice. Can you try using that word in a sentence?",
   "Excellent effort! In Korean, we say '잘했어요' (Jal haesseoyo) which means 'Well done!'",
   "Let's try a different phrase. How would you say 'Where is the restaurant?' in Korean?",
-  "Perfect pronunciation! You're really improving. Let's move to the next topic.",
+  "Perfect! You're really improving. Let's move to the next topic.",
   "Very good! Remember, Korean sentence structure is Subject-Object-Verb. Try again!",
   "Interesting! Would you like me to explain more about this grammar point?",
-  "You're making great progress! Want to practice some common phrases used in everyday life?",
+  "You're making great progress! Want to practice some common daily phrases?",
 ];
 
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useLanguage();
+
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "0",
-      text: t("ai_greeting"),
-      isUser: false,
-      timestamp: new Date(),
-    },
+    { id: "0", text: t("ai_greeting"), isUser: false },
   ]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const flatListRef = useRef<FlatList>(null);
+  const inputRef = useRef<TextInput>(null);
 
-  const sendMessage = async () => {
-    if (!inputText.trim()) return;
+  const sendMessage = () => {
+    const trimmed = inputText.trim();
+    if (!trimmed) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     const userMsg: Message = {
       id: Date.now().toString() + "u",
-      text: inputText.trim(),
+      text: trimmed,
       isUser: true,
-      timestamp: new Date(),
     };
-    const msgText = inputText.trim();
     setInputText("");
     setMessages((prev) => [userMsg, ...prev]);
     setIsTyping(true);
 
     setTimeout(() => {
-      const aiResponse = AI_RESPONSES[Math.floor(Math.random() * AI_RESPONSES.length)];
+      const aiText = AI_RESPONSES[Math.floor(Math.random() * AI_RESPONSES.length)];
       const aiMsg: Message = {
         id: Date.now().toString() + "a",
-        text: aiResponse,
+        text: aiText,
         isUser: false,
-        timestamp: new Date(),
       };
       setMessages((prev) => [aiMsg, ...prev]);
       setIsTyping(false);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      inputRef.current?.focus();
     }, 1200 + Math.random() * 800);
   };
 
@@ -84,7 +78,7 @@ export default function ChatScreen() {
       {!item.isUser && (
         <View style={styles.aiAvatar}>
           <LinearGradient colors={["#FF6B9D", "#FF8FB3"]} style={StyleSheet.absoluteFill} />
-          <Text style={styles.aiAvatarText}>✨</Text>
+          <Text style={styles.aiAvatarEmoji}>✨</Text>
         </View>
       )}
       <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleAI]}>
@@ -96,14 +90,15 @@ export default function ChatScreen() {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: topPad }]}>
+    <View style={[styles.screen, { paddingTop: topPad }]}>
       <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
 
+      {/* Compact header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={styles.aiHeaderAvatar}>
+          <View style={styles.aiAvatar}>
             <LinearGradient colors={["#FF6B9D", "#FF8FB3"]} style={StyleSheet.absoluteFill} />
-            <Text style={styles.aiAvatarText}>✨</Text>
+            <Text style={styles.aiAvatarEmoji}>✨</Text>
           </View>
           <View>
             <Text style={styles.headerTitle}>LinguaAI</Text>
@@ -114,21 +109,23 @@ export default function ChatScreen() {
           </View>
         </View>
         <Pressable style={styles.headerBtn}>
-          <Ionicons name="ellipsis-horizontal" size={20} color="#A08090" />
+          <Ionicons name="ellipsis-horizontal" size={18} color="#A08090" />
         </Pressable>
       </View>
 
+      {/* Keyboard-aware wrapper for messages + input */}
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.flex}
+        behavior="padding"
         keyboardVerticalOffset={0}
       >
+        {/* Message list — inverted so newest is at bottom */}
         <FlatList
-          ref={flatListRef}
           data={messages}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           inverted
+          style={styles.flex}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="interactive"
@@ -138,13 +135,13 @@ export default function ChatScreen() {
               <View style={[styles.msgRow, styles.msgRowAI]}>
                 <View style={styles.aiAvatar}>
                   <LinearGradient colors={["#FF6B9D", "#FF8FB3"]} style={StyleSheet.absoluteFill} />
-                  <Text style={styles.aiAvatarText}>✨</Text>
+                  <Text style={styles.aiAvatarEmoji}>✨</Text>
                 </View>
                 <View style={[styles.bubble, styles.bubbleAI, styles.typingBubble]}>
                   <View style={styles.typingDots}>
-                    <View style={[styles.dot, styles.dot1]} />
-                    <View style={[styles.dot, styles.dot2]} />
-                    <View style={[styles.dot, styles.dot3]} />
+                    <View style={styles.dot} />
+                    <View style={styles.dot} />
+                    <View style={styles.dot} />
                   </View>
                 </View>
               </View>
@@ -152,9 +149,16 @@ export default function ChatScreen() {
           }
         />
 
-        <View style={[styles.inputContainer, { paddingBottom: Math.max(bottomPad + 8, 16) }]}>
+        {/* Input bar — pinned above keyboard and tab bar */}
+        <View
+          style={[
+            styles.inputBar,
+            { paddingBottom: bottomPad > 0 ? bottomPad + 4 : 16 },
+          ]}
+        >
           <View style={styles.inputRow}>
             <TextInput
+              ref={inputRef}
               style={styles.input}
               value={inputText}
               onChangeText={setInputText}
@@ -162,14 +166,15 @@ export default function ChatScreen() {
               placeholderTextColor="#C4B5BF"
               multiline
               maxLength={500}
-              onSubmitEditing={sendMessage}
               returnKeyType="send"
+              onSubmitEditing={sendMessage}
+              blurOnSubmit={false}
             />
             <Pressable
               style={({ pressed }) => [
                 styles.sendBtn,
                 !inputText.trim() && styles.sendBtnDisabled,
-                pressed && inputText.trim() && { opacity: 0.85, transform: [{ scale: 0.95 }] },
+                pressed && !!inputText.trim() && { opacity: 0.82, transform: [{ scale: 0.94 }] },
               ]}
               onPress={sendMessage}
               disabled={!inputText.trim()}
@@ -189,71 +194,71 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
   },
+  flex: {
+    flex: 1,
+  },
+
+  /* ── Header ── */
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#F0D6E4",
-    backgroundColor: "rgba(255,248,251,0.95)",
+    backgroundColor: "rgba(255,248,251,0.97)",
   },
   headerLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-  },
-  aiHeaderAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    overflow: "hidden",
-    justifyContent: "center",
-    alignItems: "center",
+    gap: 10,
   },
   headerTitle: {
-    fontSize: 17,
+    fontSize: 15,
     fontFamily: "Inter_700Bold",
     color: "#1A1A2E",
+    lineHeight: 19,
   },
   onlineRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: 4,
   },
   onlineDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: "#4CAF50",
   },
   onlineText: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: "Inter_400Regular",
     color: "#4CAF50",
   },
   headerBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     backgroundColor: "#F5E8F0",
     justifyContent: "center",
     alignItems: "center",
   },
+
+  /* ── Messages ── */
   listContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 12,
-    gap: 12,
+    gap: 10,
   },
   msgRow: {
     flexDirection: "row",
     alignItems: "flex-end",
     gap: 8,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   msgRowUser: {
     justifyContent: "flex-end",
@@ -262,39 +267,39 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   aiAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
     flexShrink: 0,
   },
-  aiAvatarText: {
-    fontSize: 16,
+  aiAvatarEmoji: {
+    fontSize: 14,
   },
   bubble: {
-    maxWidth: "75%",
+    maxWidth: "76%",
     borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
   bubbleUser: {
     backgroundColor: "#FF6B9D",
-    borderBottomRightRadius: 6,
+    borderBottomRightRadius: 5,
   },
   bubbleAI: {
     backgroundColor: "#FFFFFF",
-    borderBottomLeftRadius: 6,
+    borderBottomLeftRadius: 5,
     shadowColor: "#FF6B9D",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowRadius: 6,
     elevation: 2,
   },
   bubbleText: {
     fontSize: 15,
-    lineHeight: 22,
+    lineHeight: 21,
   },
   bubbleTextUser: {
     fontFamily: "Inter_400Regular",
@@ -306,7 +311,6 @@ const styles = StyleSheet.create({
   },
   typingBubble: {
     paddingVertical: 14,
-    paddingHorizontal: 16,
   },
   typingDots: {
     flexDirection: "row",
@@ -314,36 +318,35 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: "#C4B5BF",
   },
-  dot1: {},
-  dot2: {},
-  dot3: {},
-  inputContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    backgroundColor: "rgba(255,248,251,0.95)",
+
+  /* ── Input bar ── */
+  inputBar: {
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    backgroundColor: "rgba(255,248,251,0.98)",
     borderTopWidth: 1,
     borderTopColor: "#F0D6E4",
   },
   inputRow: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 10,
+    gap: 8,
     backgroundColor: "#FFFFFF",
-    borderRadius: 28,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    shadowColor: "#FF6B9D",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 2,
+    borderRadius: 26,
+    paddingHorizontal: 14,
+    paddingVertical: 5,
     borderWidth: 1.5,
     borderColor: "#F0D6E4",
+    shadowColor: "#FF6B9D",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 2,
   },
   input: {
     flex: 1,
@@ -354,16 +357,17 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   sendBtn: {
-    borderRadius: 22,
+    borderRadius: 20,
     overflow: "hidden",
+    marginBottom: 2,
   },
   sendBtnDisabled: {
-    opacity: 0.6,
+    opacity: 0.55,
   },
   sendBtnGradient: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
   },
