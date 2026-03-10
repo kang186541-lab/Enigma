@@ -42,41 +42,45 @@ function stopSpeech() {
   }
 }
 
+function webSpeak(text: string, lang: string) {
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang;
+  utterance.rate = 0.9;
+  const doSpeak = () => {
+    const voices = window.speechSynthesis.getVoices();
+    const match =
+      voices.find((v) => v.lang === lang) ??
+      voices.find((v) => v.lang.startsWith(lang.split("-")[0]));
+    if (match) utterance.voice = match;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  };
+  if (window.speechSynthesis.getVoices().length > 0) {
+    doSpeak();
+  } else {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      doSpeak();
+    };
+  }
+}
+
 async function speak(text: string, lang: string, muted: boolean, voiceUnlocked = true) {
   if (muted) return;
   if (Platform.OS === "web") {
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
     if (!voiceUnlocked) return; // iOS Safari blocks auto-speech without user gesture
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = 0.9;
-    const doSpeak = () => {
-      const voices = window.speechSynthesis.getVoices();
-      const match =
-        voices.find((v) => v.lang === lang) ??
-        voices.find((v) => v.lang.startsWith(lang.split("-")[0]));
-      if (match) utterance.voice = match;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    };
-    if (window.speechSynthesis.getVoices().length > 0) {
-      doSpeak();
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        doSpeak();
-      };
-    }
+    webSpeak(text, lang);
   } else {
+    // Always stop first, then wait, then speak — avoids isSpeakingAsync flakiness
+    try { Speech.stop(); } catch {}
+    await new Promise((r) => setTimeout(r, 120));
     try {
-      const isSpeaking = await Speech.isSpeakingAsync();
-      if (isSpeaking) {
-        Speech.stop();
-        await new Promise((r) => setTimeout(r, 80));
-      }
       Speech.speak(text, { language: lang, rate: 0.9 });
-    } catch {}
+    } catch (e) {
+      console.error("[Speech] speak() failed:", e);
+    }
   }
 }
 
@@ -140,16 +144,11 @@ export default function ChatRoomScreen() {
   const handleUnlockVoice = useCallback(() => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // Speak a silent utterance to unlock iOS Safari speech synthesis
-    window.speechSynthesis.cancel();
-    const unlock = new SpeechSynthesisUtterance(" ");
-    unlock.volume = 0;
-    window.speechSynthesis.speak(unlock);
     setVoiceUnlocked(true);
-    // Replay the last tutor message now that voice is unlocked
+    // Speak the last tutor message — this tap IS the required user gesture
     const lastAI = messages.find((m) => !m.isUser);
     if (lastAI && tutor && !muted) {
-      setTimeout(() => speak(lastAI.text, tutor.speechLang, false, true), 300);
+      setTimeout(() => webSpeak(lastAI.text, tutor.speechLang), 100);
     }
   }, [messages, tutor, muted]);
 
@@ -157,11 +156,13 @@ export default function ChatRoomScreen() {
     (msg: Message) => {
       if (!tutor) return;
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      stopSpeech();
       setSpeakingId(msg.id);
-      // Replay is always user-triggered so pass true to bypass unlock guard
-      speak(msg.text, tutor.speechLang, muted, true);
-      setTimeout(() => setSpeakingId(null), 3000);
+      if (Platform.OS === "web") {
+        webSpeak(msg.text, tutor.speechLang);
+      } else {
+        speak(msg.text, tutor.speechLang, muted, true);
+      }
+      setTimeout(() => setSpeakingId(null), 4000);
     },
     [tutor, muted]
   );
