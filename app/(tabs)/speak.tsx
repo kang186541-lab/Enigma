@@ -312,7 +312,7 @@ export default function SpeakScreen() {
     if (recordState === "listening" || recordState === "processing") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setRecordState("listening");
-    setScore(null);
+    setScores(null);
     setTranscribedText("");
     setSttError("");
     startPulse();
