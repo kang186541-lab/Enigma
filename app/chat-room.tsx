@@ -8,6 +8,8 @@ import {
   Pressable,
   Platform,
   ActivityIndicator,
+  Modal,
+  ScrollView,
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,6 +34,56 @@ const LANG_NAMES: Record<string, string> = {
   korean: "Korean",
 };
 
+interface VoiceOption {
+  id: string;
+  name: string;
+  lang: string;
+}
+
+const TUTOR_GENDER: Record<string, "female" | "male"> = {
+  sarah: "female",
+  jake: "male",
+  jane: "female",
+  alex: "male",
+  jisu: "female",
+  minjun: "male",
+};
+
+function guessGender(name: string): "female" | "male" | "neutral" {
+  const lc = name.toLowerCase();
+  const femaleHints = [
+    "female", "woman", "samantha", "karen", "moira", "tessa", "fiona",
+    "victoria", "alice", "anna", "nora", "sara", "yuna", "luciana",
+    "mei", "ting", "yu-shu", "sinji", "lara", "laura", "joana", "helena",
+    "amelie", "aurelie", "virginie", "alva", "felicia", "sinji", "sin-ji",
+    "seoyeon", "mia", "kate", "kathy",
+  ];
+  const maleHints = [
+    "male", "man", "daniel", "fred", "tom", "oliver", "rishi",
+    "jorge", "juan", "carlos", "diego", "jae-woo", "yuna-male",
+  ];
+  if (femaleHints.some((h) => lc.includes(h))) return "female";
+  if (maleHints.some((h) => lc.includes(h))) return "male";
+  return "neutral";
+}
+
+function pickBestVoice(
+  voices: VoiceOption[],
+  lang: string,
+  preferredGender: "female" | "male" | undefined
+): string | null {
+  const langBase = lang.split("-")[0];
+  const byExactLang = voices.filter((v) => v.lang === lang);
+  const byBaseLang = voices.filter((v) => v.lang.startsWith(langBase));
+  const pool = byExactLang.length > 0 ? byExactLang : byBaseLang;
+  if (pool.length === 0) return null;
+  if (preferredGender) {
+    const genderMatch = pool.find((v) => guessGender(v.name) === preferredGender);
+    if (genderMatch) return genderMatch.id;
+  }
+  return pool[0].id;
+}
+
 function stopSpeech() {
   if (Platform.OS === "web") {
     if (typeof window !== "undefined" && window.speechSynthesis) {
@@ -42,18 +94,33 @@ function stopSpeech() {
   }
 }
 
-function webSpeak(text: string, lang: string) {
+interface SpeakSettings {
+  rate: number;
+  pitch: number;
+  voiceId: string | null;
+}
+
+const DEFAULT_SETTINGS: SpeakSettings = { rate: 0.85, pitch: 1.0, voiceId: null };
+
+function webSpeak(text: string, lang: string, settings: SpeakSettings = DEFAULT_SETTINGS) {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
-  utterance.rate = 0.9;
+  utterance.rate = settings.rate;
+  utterance.pitch = settings.pitch;
   const doSpeak = () => {
     const voices = window.speechSynthesis.getVoices();
-    const match =
-      voices.find((v) => v.lang === lang) ??
-      voices.find((v) => v.lang.startsWith(lang.split("-")[0]));
-    if (match) utterance.voice = match;
+    let chosen: SpeechSynthesisVoice | undefined;
+    if (settings.voiceId) {
+      chosen = voices.find((v) => v.voiceURI === settings.voiceId);
+    }
+    if (!chosen) {
+      chosen =
+        voices.find((v) => v.lang === lang) ??
+        voices.find((v) => v.lang.startsWith(lang.split("-")[0]));
+    }
+    if (chosen) utterance.voice = chosen;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   };
@@ -67,21 +134,28 @@ function webSpeak(text: string, lang: string) {
   }
 }
 
-function speak(text: string, lang: string, muted: boolean, voiceUnlocked = true) {
+function speak(
+  text: string,
+  lang: string,
+  muted: boolean,
+  voiceUnlocked = true,
+  settings: SpeakSettings = DEFAULT_SETTINGS
+) {
   if (muted) return;
   if (Platform.OS === "web") {
     if (!voiceUnlocked) return;
-    webSpeak(text, lang);
+    webSpeak(text, lang, settings);
   } else {
-    // On native: stop any current speech, then speak immediately
     try { Speech.stop(); } catch {}
     try {
-      Speech.speak(text, { language: lang, rate: 0.9 });
-    } catch (e) {
-      // Retry without language override if the language code isn't available
-      try {
-        Speech.speak(text, { rate: 0.9 });
-      } catch {}
+      Speech.speak(text, {
+        language: lang,
+        rate: settings.rate,
+        pitch: settings.pitch,
+        ...(settings.voiceId ? { voice: settings.voiceId } : {}),
+      });
+    } catch {
+      try { Speech.speak(text, { rate: settings.rate, pitch: settings.pitch }); } catch {}
     }
   }
 }
@@ -120,8 +194,15 @@ export default function ChatRoomScreen() {
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
   const [shownTranslations, setShownTranslations] = useState<Set<string>>(new Set());
-  // Web/iOS Safari requires a user gesture before speechSynthesis will play
   const [voiceUnlocked, setVoiceUnlocked] = useState(Platform.OS !== "web");
+
+  // Voice settings
+  const [rate, setRate] = useState(0.85);
+  const [pitch, setPitch] = useState(1.0);
+  const [selectedVoiceId, setSelectedVoiceId] = useState<string | null>(null);
+  const [availableVoices, setAvailableVoices] = useState<VoiceOption[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
+
   const inputRef = useRef<TextInput>(null);
   const conversationHistoryRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
 
@@ -130,29 +211,69 @@ export default function ChatRoomScreen() {
   const tutorLangName = tutor ? (LANG_NAMES[tutor.language.toLowerCase()] ?? tutor.language) : "English";
   const canTranslate = tutorLangName.toLowerCase() !== userLangName.toLowerCase();
 
+  // Load available voices and pick the best default for this tutor
+  useEffect(() => {
+    if (!tutor) return;
+    const preferred = TUTOR_GENDER[tutor.id];
+
+    if (Platform.OS === "web") {
+      if (typeof window === "undefined" || !window.speechSynthesis) return;
+      const load = () => {
+        const raw = window.speechSynthesis.getVoices();
+        const langBase = tutor.speechLang.split("-")[0];
+        const filtered: VoiceOption[] = raw
+          .filter((v) => v.lang.startsWith(langBase))
+          .map((v) => ({ id: v.voiceURI, name: v.name, lang: v.lang }));
+        setAvailableVoices(filtered);
+        const best = pickBestVoice(filtered, tutor.speechLang, preferred);
+        setSelectedVoiceId(best);
+      };
+      if (window.speechSynthesis.getVoices().length > 0) {
+        load();
+      } else {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.onvoiceschanged = null;
+          load();
+        };
+      }
+    } else {
+      Speech.getAvailableVoicesAsync()
+        .then((raw) => {
+          const langBase = tutor.speechLang.split("-")[0];
+          const filtered: VoiceOption[] = raw
+            .filter((v) => v.language?.startsWith(langBase))
+            .map((v) => ({ id: v.identifier, name: v.name ?? v.identifier, lang: v.language }));
+          setAvailableVoices(filtered);
+          const best = pickBestVoice(filtered, tutor.speechLang, preferred);
+          setSelectedVoiceId(best);
+        })
+        .catch(() => {});
+    }
+  }, [tutor?.id]);
+
   useEffect(() => {
     if (!tutor) return;
     const timer = setTimeout(() => {
       const id = "greeting";
       setMessages([{ id, text: tutor.greeting, isUser: false }]);
       conversationHistoryRef.current = [{ role: "assistant", content: tutor.greeting }];
-      // voiceUnlocked is false on web initially, so greeting won't auto-play
-      // until the user taps the unlock banner (handleUnlockVoice speaks it after)
-      speak(tutor.greeting, tutor.speechLang, false, Platform.OS !== "web");
+      speak(tutor.greeting, tutor.speechLang, false, Platform.OS !== "web",
+        { rate, pitch, voiceId: selectedVoiceId });
     }, 400);
     return () => clearTimeout(timer);
   }, []);
+
+  const settings: SpeakSettings = { rate, pitch, voiceId: selectedVoiceId };
 
   const handleUnlockVoice = useCallback(() => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setVoiceUnlocked(true);
-    // Speak the last tutor message — this tap IS the required user gesture
     const lastAI = messages.find((m) => !m.isUser);
     if (lastAI && tutor && !muted) {
-      setTimeout(() => webSpeak(lastAI.text, tutor.speechLang), 100);
+      setTimeout(() => webSpeak(lastAI.text, tutor.speechLang, settings), 100);
     }
-  }, [messages, tutor, muted]);
+  }, [messages, tutor, muted, settings]);
 
   const handleReplay = useCallback(
     (msg: Message) => {
@@ -160,13 +281,13 @@ export default function ChatRoomScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setSpeakingId(msg.id);
       if (Platform.OS === "web") {
-        webSpeak(msg.text, tutor.speechLang);
+        webSpeak(msg.text, tutor.speechLang, settings);
       } else {
-        speak(msg.text, tutor.speechLang, muted, true);
+        speak(msg.text, tutor.speechLang, muted, true, settings);
       }
       setTimeout(() => setSpeakingId(null), 4000);
     },
-    [tutor, muted]
+    [tutor, muted, settings]
   );
 
   const handleTranslate = useCallback(
@@ -252,7 +373,7 @@ export default function ChatRoomScreen() {
       ];
       setMessages((prev) => [aiMsg, ...prev]);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      speak(responseText, tutor.speechLang, muted, voiceUnlocked);
+      speak(responseText, tutor.speechLang, muted, voiceUnlocked, settings);
       setSpeakingId(aiId);
       setTimeout(() => setSpeakingId(null), 5000);
       inputRef.current?.focus();
@@ -260,7 +381,7 @@ export default function ChatRoomScreen() {
       const fallback = tutor.responses[Math.floor(Math.random() * tutor.responses.length)];
       const aiId = Date.now().toString() + "a";
       setMessages((prev) => [{ id: aiId, text: fallback, isUser: false }, ...prev]);
-      speak(fallback, tutor.speechLang, muted, voiceUnlocked);
+      speak(fallback, tutor.speechLang, muted, voiceUnlocked, settings);
     } finally {
       setIsTyping(false);
     }
@@ -383,6 +504,13 @@ export default function ChatRoomScreen() {
             color={muted ? "#A08090" : "#FF6B9D"}
           />
         </Pressable>
+
+        <Pressable
+          style={({ pressed }) => [styles.muteBtn, pressed && { opacity: 0.75 }]}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowSettings(true); }}
+        >
+          <Ionicons name="settings-outline" size={19} color="#A08090" />
+        </Pressable>
       </View>
 
       {/* Style badge */}
@@ -416,6 +544,99 @@ export default function ChatRoomScreen() {
           <Text style={styles.voiceUnlockText}>Tap to enable tutor voice</Text>
         </Pressable>
       )}
+
+      {/* Voice Settings Modal */}
+      <Modal
+        visible={showSettings}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowSettings(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setShowSettings(false)}>
+          <Pressable style={styles.settingsPanel} onPress={() => {}}>
+            <View style={styles.settingsHandle} />
+
+            <View style={styles.settingsHeaderRow}>
+              <Text style={styles.settingsTitle}>Voice Settings</Text>
+              <Pressable onPress={() => setShowSettings(false)} hitSlop={10}>
+                <Ionicons name="close" size={20} color="#A08090" />
+              </Pressable>
+            </View>
+
+            {/* Speed */}
+            <Text style={styles.settingLabel}>Speed</Text>
+            <View style={styles.segmentRow}>
+              {([
+                { label: "🐢 Slow", value: 0.6 },
+                { label: "Normal", value: 0.85 },
+                { label: "🐇 Fast", value: 1.2 },
+              ] as { label: string; value: number }[]).map((opt) => (
+                <Pressable
+                  key={opt.value}
+                  style={[styles.segmentBtn, rate === opt.value && styles.segmentBtnActive]}
+                  onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setRate(opt.value); }}
+                >
+                  <Text style={[styles.segmentBtnText, rate === opt.value && styles.segmentBtnTextActive]}>
+                    {opt.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            {/* Pitch */}
+            <Text style={styles.settingLabel}>Pitch</Text>
+            <View style={styles.segmentRow}>
+              {([
+                { label: "Low", value: 0.7 },
+                { label: "Normal", value: 1.0 },
+                { label: "High", value: 1.4 },
+              ] as { label: string; value: number }[]).map((opt) => (
+                <Pressable
+                  key={opt.value}
+                  style={[styles.segmentBtn, pitch === opt.value && styles.segmentBtnActive]}
+                  onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setPitch(opt.value); }}
+                >
+                  <Text style={[styles.segmentBtnText, pitch === opt.value && styles.segmentBtnTextActive]}>
+                    {opt.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            {/* Voice selection */}
+            {availableVoices.length > 0 && (
+              <>
+                <Text style={styles.settingLabel}>Voice</Text>
+                <ScrollView style={styles.voiceList} showsVerticalScrollIndicator={false}>
+                  {availableVoices.map((v) => (
+                    <Pressable
+                      key={v.id}
+                      style={[styles.voiceRow, selectedVoiceId === v.id && styles.voiceRowActive]}
+                      onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSelectedVoiceId(v.id); }}
+                    >
+                      <View style={[styles.radioCircle, selectedVoiceId === v.id && styles.radioCircleActive]}>
+                        {selectedVoiceId === v.id && <View style={styles.radioDot} />}
+                      </View>
+                      <View style={styles.voiceInfo}>
+                        <Text style={[styles.voiceName, selectedVoiceId === v.id && styles.voiceNameActive]} numberOfLines={1}>
+                          {v.name}
+                        </Text>
+                        <Text style={styles.voiceLang}>{v.lang}</Text>
+                      </View>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </>
+            )}
+
+            {availableVoices.length === 0 && (
+              <View style={styles.noVoicesBox}>
+                <Text style={styles.noVoicesText}>No voices found for this language on your device.</Text>
+              </View>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       <KeyboardAvoidingView style={styles.flex} behavior="padding" keyboardVerticalOffset={0}>
         <FlatList
@@ -580,6 +801,137 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_500Medium",
     color: "#FF6B9D",
+  },
+
+  // Settings modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    justifyContent: "flex-end",
+  },
+  settingsPanel: {
+    backgroundColor: "#FFF8FB",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    paddingTop: 12,
+    maxHeight: "80%",
+  },
+  settingsHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: "#E0C8D8",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginBottom: 16,
+  },
+  settingsHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  settingsTitle: {
+    fontSize: 17,
+    fontFamily: "Inter_700Bold",
+    color: "#1A1A2E",
+  },
+  settingLabel: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    color: "#A08090",
+    marginBottom: 8,
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  segmentRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 20,
+  },
+  segmentBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: "center",
+    backgroundColor: "#F5E8F0",
+    borderWidth: 1.5,
+    borderColor: "transparent",
+  },
+  segmentBtnActive: {
+    backgroundColor: "#FFF0F6",
+    borderColor: "#FF6B9D",
+  },
+  segmentBtnText: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+    color: "#A08090",
+  },
+  segmentBtnTextActive: {
+    color: "#FF6B9D",
+    fontFamily: "Inter_600SemiBold",
+  },
+  voiceList: {
+    maxHeight: 200,
+    marginBottom: 8,
+  },
+  voiceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    marginBottom: 4,
+    backgroundColor: "transparent",
+  },
+  voiceRowActive: {
+    backgroundColor: "#FFF0F6",
+  },
+  radioCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#D4B5C8",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  radioCircleActive: {
+    borderColor: "#FF6B9D",
+  },
+  radioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#FF6B9D",
+  },
+  voiceInfo: { flex: 1 },
+  voiceName: {
+    fontSize: 14,
+    fontFamily: "Inter_500Medium",
+    color: "#3D2C35",
+  },
+  voiceNameActive: {
+    color: "#FF6B9D",
+    fontFamily: "Inter_600SemiBold",
+  },
+  voiceLang: {
+    fontSize: 11,
+    fontFamily: "Inter_400Regular",
+    color: "#A08090",
+    marginTop: 1,
+  },
+  noVoicesBox: {
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  noVoicesText: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: "#A08090",
+    textAlign: "center",
   },
 
   listContent: {
