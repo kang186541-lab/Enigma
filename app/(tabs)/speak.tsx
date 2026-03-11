@@ -142,6 +142,25 @@ function buildWavBuffer(pcm16: Int16Array, sampleRate: number): ArrayBuffer {
  *     We resume() the context first to avoid the iOS "suspended" state bug.
  */
 async function recordWebAudio(durationMs: number): Promise<{ base64: string; mimeType: string }> {
+  // ── Explicit permission request first (required on iOS Safari) ────────────
+  // Calling getUserMedia upfront lets the browser surface the permission dialog
+  // before we set up any audio processing nodes.
+  try {
+    const testStream = await (navigator.mediaDevices as any).getUserMedia({ audio: true, video: false });
+    testStream.getTracks().forEach((t: MediaStreamTrack) => t.stop());
+  } catch (permErr: any) {
+    const name = permErr?.name ?? permErr?.message ?? "";
+    if (
+      name.includes("NotAllowed") ||
+      name.includes("PermissionDenied") ||
+      name.includes("Permission") ||
+      name.includes("denied")
+    ) {
+      throw new Error("PERMISSION_DENIED");
+    }
+    throw permErr; // device not found or other hard error
+  }
+
   const MR = (window as any).MediaRecorder as typeof MediaRecorder;
 
   // ── Path 1: webm/opus via MediaRecorder ──────────────────────────────────
@@ -424,15 +443,16 @@ export default function SpeakScreen() {
         data.pronScore === null ||
         data.pronScore === undefined
       ) {
-        // Azure couldn't assess — show meaningful error
+        // Azure couldn't assess — show meaningful error with actual status
         const statusMsg: Record<string, string> = {
-          InitialSilenceTimeout: "No speech detected — speak clearly after tapping the mic",
-          BabbleTimeout: "Too much background noise — find a quieter spot",
-          NoMatch: "Couldn't match your speech — try speaking more clearly",
+          InitialSilenceTimeout: "음성이 감지되지 않았습니다. 마이크 버튼을 누른 후 바로 말씀해 주세요.",
+          BabbleTimeout: "배경 소음이 너무 큽니다. 조용한 곳에서 다시 시도해 주세요.",
+          NoMatch: "음성을 인식하지 못했습니다. 더 천천히 명확하게 말씀해 주세요.",
+          Error: data.error ? `Azure 오류: ${data.error}` : "Azure 처리 오류 — 다시 시도해 주세요.",
         };
         setSttError(
           statusMsg[data.status] ??
-          "Couldn't hear you — try again in a quieter place"
+          `인식 실패 (${data.status ?? "알 수 없는 오류"}) — 다시 시도해 주세요.`
         );
       } else {
         setScores({
@@ -443,11 +463,21 @@ export default function SpeakScreen() {
         });
       }
     } catch (err: any) {
-      const msg = String(err?.message ?? "");
-      if (msg.includes("permission") || msg.includes("Permission")) {
-        setSttError("Microphone access denied — enable it in your browser/device settings");
+      const msg = String(err?.message ?? err ?? "");
+      if (
+        msg.includes("PERMISSION_DENIED") ||
+        msg.includes("NotAllowed") ||
+        msg.includes("permission") ||
+        msg.includes("Permission")
+      ) {
+        setSttError("마이크 권한을 허용해주세요\n(브라우저 설정에서 마이크를 허용한 후 다시 시도하세요)");
+      } else if (msg.includes("silent") || msg.includes("Silent")) {
+        setSttError("소리가 녹음되지 않았습니다. 마이크에 가까이 대고 다시 말씀해 주세요.");
+      } else if (msg.includes("No audio") || msg.includes("no audio")) {
+        setSttError("오디오를 캡처하지 못했습니다. 마이크 연결을 확인해 주세요.");
       } else {
-        setSttError("Something went wrong — please try again");
+        // Show the actual error so we can diagnose issues — not "Couldn't hear you"
+        setSttError(msg || "Something went wrong — please try again");
       }
     } finally {
       stopPulse();
@@ -671,15 +701,20 @@ export default function SpeakScreen() {
                 </Pressable>
               </Animated.View>
 
-              <Text style={styles.micHint}>
-                {isRecording
-                  ? "Listening for 4 seconds…"
-                  : isProcessing
-                  ? "Analysing with Azure…"
-                  : hasListened
-                  ? "Now tap to record yourself"
-                  : "Tap 🔊 to listen first, then record"}
-              </Text>
+              {isRecording ? (
+                <View style={styles.recordingBadge}>
+                  <View style={styles.redDot} />
+                  <Text style={styles.recordingBadgeText}>녹음 중...</Text>
+                </View>
+              ) : (
+                <Text style={styles.micHint}>
+                  {isProcessing
+                    ? "Azure로 분석 중…"
+                    : hasListened
+                    ? "Now tap to record yourself"
+                    : "Tap 🔊 to listen first, then record"}
+                </Text>
+              )}
 
               {!hasListened && recordState === "idle" && (
                 <View style={styles.listenHintRow}>
@@ -906,6 +941,30 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
     color: "#A08090",
     textAlign: "center",
+  },
+  recordingBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#FFF0F0",
+    borderColor: "#FF4444",
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginTop: 4,
+  },
+  redDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#FF2020",
+  },
+  recordingBadgeText: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    color: "#CC2020",
+    letterSpacing: 0.3,
   },
   listenHintRow: {
     flexDirection: "row",
