@@ -90,6 +90,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ── OpenAI Neural TTS ─────────────────────────────────────────────────────
+  // Each tutor maps to the most fitting OpenAI voice character.
+  // fable = British inflection (Sarah), onyx = authoritative male (Jake),
+  // nova = warm Latina female (Jane), echo = energetic male (Alex),
+  // shimmer = gentle female (Jisu), alloy = balanced male (Minjun)
+  const TUTOR_TTS_VOICES: Record<string, string> = {
+    sarah:  "fable",
+    jake:   "onyx",
+    jane:   "nova",
+    alex:   "echo",
+    jisu:   "shimmer",
+    minjun: "alloy",
+  };
+
+  app.get("/api/tts", async (req: Request, res: Response) => {
+    try {
+      const { text, tutorId, speed } = req.query as {
+        text: string;
+        tutorId: string;
+        speed?: string;
+      };
+
+      if (!text || !tutorId) {
+        return res.status(400).json({ error: "text and tutorId required" });
+      }
+
+      const voice = (TUTOR_TTS_VOICES[tutorId] ?? "alloy") as any;
+      const speechSpeed = Math.min(4.0, Math.max(0.25, parseFloat(speed ?? "0.9")));
+
+      const response = await openai.audio.speech.create({
+        model: "tts-1-hd",
+        voice,
+        input: text.slice(0, 4000),
+        speed: speechSpeed,
+      });
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      res.set("Content-Type", "audio/mpeg");
+      res.set("Cache-Control", "public, max-age=300");
+      res.send(buffer);
+    } catch (err) {
+      console.error("TTS error:", err);
+      res.status(500).json({ error: "TTS generation failed" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

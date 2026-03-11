@@ -9,7 +9,6 @@ import {
   Platform,
   ActivityIndicator,
   Modal,
-  ScrollView,
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,7 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import * as Speech from "expo-speech";
+import { Audio } from "expo-av";
 import { getTutor, Tutor } from "@/constants/tutors";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
@@ -34,147 +33,62 @@ const LANG_NAMES: Record<string, string> = {
   korean: "Korean",
 };
 
-interface VoiceOption {
-  id: string;
-  name: string;
-  lang: string;
-}
+// ── OpenAI Neural TTS ────────────────────────────────────────────────────────
+// Module-level singletons so we can stop audio from anywhere.
+let _webAudio: HTMLAudioElement | null = null;
+let _nativeSound: Audio.Sound | null = null;
 
-const TUTOR_GENDER: Record<string, "female" | "male"> = {
-  sarah: "female",
-  jake: "male",
-  jane: "female",
-  alex: "male",
-  jisu: "female",
-  minjun: "male",
-};
-
-function guessGender(name: string): "female" | "male" | "neutral" {
-  const lc = name.toLowerCase();
-  const femaleHints = [
-    "female", "woman", "samantha", "karen", "moira", "tessa", "fiona",
-    "victoria", "alice", "anna", "nora", "sara", "yuna", "luciana",
-    "mei", "ting", "yu-shu", "sinji", "lara", "laura", "joana", "helena",
-    "amelie", "aurelie", "virginie", "alva", "felicia", "sinji", "sin-ji",
-    "seoyeon", "mia", "kate", "kathy",
-  ];
-  const maleHints = [
-    "male", "man", "daniel", "fred", "tom", "oliver", "rishi",
-    "jorge", "juan", "carlos", "diego", "jae-woo", "yuna-male",
-  ];
-  if (femaleHints.some((h) => lc.includes(h))) return "female";
-  if (maleHints.some((h) => lc.includes(h))) return "male";
-  return "neutral";
-}
-
-function pickBestVoice(
-  voices: VoiceOption[],
-  lang: string,
-  preferredGender: "female" | "male" | undefined
-): string | null {
-  const langBase = lang.split("-")[0];
-  const byExactLang = voices.filter((v) => v.lang === lang);
-  const byBaseLang = voices.filter((v) => v.lang.startsWith(langBase));
-  const pool = byExactLang.length > 0 ? byExactLang : byBaseLang;
-  if (pool.length === 0) return null;
-  if (preferredGender) {
-    const genderMatch = pool.find((v) => guessGender(v.name) === preferredGender);
-    if (genderMatch) return genderMatch.id;
-  }
-  return pool[0].id;
-}
-
-function stopSpeech() {
+function stopTTS() {
   if (Platform.OS === "web") {
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
+    if (_webAudio) {
+      _webAudio.pause();
+      _webAudio.src = "";
+      _webAudio = null;
     }
   } else {
-    try { Speech.stop(); } catch {}
+    if (_nativeSound) {
+      _nativeSound.stopAsync().catch(() => {});
+      _nativeSound.unloadAsync().catch(() => {});
+      _nativeSound = null;
+    }
   }
 }
 
-interface SpeakSettings {
-  rate: number;
-  pitch: number;
-  voiceId: string | null;
-}
-
-const DEFAULT_SETTINGS: SpeakSettings = { rate: 0.85, pitch: 1.0, voiceId: null };
-
-function webSpeak(
+async function ttsSpeak(
   text: string,
-  lang: string,
-  settings: SpeakSettings = DEFAULT_SETTINGS,
-  onWord?: (idx: number) => void,
+  tutorId: string,
+  apiBase: string,
+  speed = 0.9,
   onEnd?: () => void
 ) {
-  if (typeof window === "undefined" || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang;
-  utterance.rate = settings.rate;
-  utterance.pitch = settings.pitch;
-  if (onWord) {
-    (utterance as any).onboundary = (e: any) => {
-      if (e.name === "word") {
-        const before = text.slice(0, e.charIndex);
-        const idx = before.trim() === "" ? 0 : before.trim().split(/\s+/).length;
-        onWord(idx);
-      }
-    };
-  }
-  if (onEnd) utterance.onend = onEnd;
-  const doSpeak = () => {
-    const voices = window.speechSynthesis.getVoices();
-    let chosen: SpeechSynthesisVoice | undefined;
-    if (settings.voiceId) {
-      chosen = voices.find((v) => v.voiceURI === settings.voiceId);
-    }
-    if (!chosen) {
-      chosen =
-        voices.find((v) => v.lang === lang) ??
-        voices.find((v) => v.lang.startsWith(lang.split("-")[0]));
-    }
-    if (chosen) utterance.voice = chosen;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  };
-  if (window.speechSynthesis.getVoices().length > 0) {
-    doSpeak();
-  } else {
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.onvoiceschanged = null;
-      doSpeak();
-    };
-  }
-}
+  stopTTS();
+  const url = new URL("/api/tts", apiBase);
+  url.searchParams.set("text", text.slice(0, 4000));
+  url.searchParams.set("tutorId", tutorId);
+  url.searchParams.set("speed", speed.toString());
 
-function speak(
-  text: string,
-  lang: string,
-  muted: boolean,
-  voiceUnlocked = true,
-  settings: SpeakSettings = DEFAULT_SETTINGS,
-  onEnd?: () => void
-) {
-  if (muted) return;
   if (Platform.OS === "web") {
-    if (!voiceUnlocked) return;
-    webSpeak(text, lang, settings, undefined, onEnd);
+    if (typeof window === "undefined") { onEnd?.(); return; }
+    const audio = new Audio(url.toString());
+    _webAudio = audio;
+    audio.onended = () => { _webAudio = null; onEnd?.(); };
+    audio.onerror = () => { _webAudio = null; onEnd?.(); };
+    try { await audio.play(); } catch { _webAudio = null; onEnd?.(); }
   } else {
-    try { Speech.stop(); } catch {}
     try {
-      Speech.speak(text, {
-        language: lang,
-        rate: settings.rate,
-        pitch: settings.pitch,
-        ...(settings.voiceId ? { voice: settings.voiceId } : {}),
-        onDone: onEnd,
-        onError: onEnd,
-      });
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: url.toString() },
+        { shouldPlay: true },
+        (status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            _nativeSound = null;
+            onEnd?.();
+          }
+        }
+      );
+      _nativeSound = sound;
     } catch {
-      try { Speech.speak(text, { rate: settings.rate, pitch: settings.pitch, onDone: onEnd }); } catch {}
+      onEnd?.();
     }
   }
 }
@@ -214,11 +128,8 @@ export default function ChatRoomScreen() {
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
   const [voiceUnlocked, setVoiceUnlocked] = useState(Platform.OS !== "web");
 
-  // Voice settings
-  const [rate, setRate] = useState(0.85);
-  const [pitch, setPitch] = useState(1.0);
-  const [selectedVoiceId, setSelectedVoiceId] = useState<string | null>(null);
-  const [availableVoices, setAvailableVoices] = useState<VoiceOption[]>([]);
+  // Voice settings (speed only — OpenAI TTS handles pitch/voice per tutor)
+  const [rate, setRate] = useState(0.9);
   const [showSettings, setShowSettings] = useState(false);
 
   // Subtitle state
@@ -236,45 +147,16 @@ export default function ChatRoomScreen() {
   const tutorLangName = tutor ? (LANG_NAMES[tutor.language.toLowerCase()] ?? tutor.language) : "English";
   const canTranslate = tutorLangName.toLowerCase() !== userLangName.toLowerCase();
 
-  // Load available voices and pick the best default for this tutor
+  // Set up audio session for native (enables playback in silent mode)
   useEffect(() => {
-    if (!tutor) return;
-    const preferred = TUTOR_GENDER[tutor.id];
-
-    if (Platform.OS === "web") {
-      if (typeof window === "undefined" || !window.speechSynthesis) return;
-      const load = () => {
-        const raw = window.speechSynthesis.getVoices();
-        const langBase = tutor.speechLang.split("-")[0];
-        const filtered: VoiceOption[] = raw
-          .filter((v) => v.lang.startsWith(langBase))
-          .map((v) => ({ id: v.voiceURI, name: v.name, lang: v.lang }));
-        setAvailableVoices(filtered);
-        const best = pickBestVoice(filtered, tutor.speechLang, preferred);
-        setSelectedVoiceId(best);
-      };
-      if (window.speechSynthesis.getVoices().length > 0) {
-        load();
-      } else {
-        window.speechSynthesis.onvoiceschanged = () => {
-          window.speechSynthesis.onvoiceschanged = null;
-          load();
-        };
-      }
-    } else {
-      Speech.getAvailableVoicesAsync()
-        .then((raw) => {
-          const langBase = tutor.speechLang.split("-")[0];
-          const filtered: VoiceOption[] = raw
-            .filter((v) => v.language?.startsWith(langBase))
-            .map((v) => ({ id: v.identifier, name: v.name ?? v.identifier, lang: v.language }));
-          setAvailableVoices(filtered);
-          const best = pickBestVoice(filtered, tutor.speechLang, preferred);
-          setSelectedVoiceId(best);
-        })
-        .catch(() => {});
+    if (Platform.OS !== "web") {
+      Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        allowsRecordingIOS: false,
+      }).catch(() => {});
     }
-  }, [tutor?.id]);
+    return () => { stopTTS(); };
+  }, []);
 
   useEffect(() => {
     if (!tutor) return;
@@ -289,8 +171,6 @@ export default function ChatRoomScreen() {
     }, 400);
     return () => clearTimeout(timer);
   }, []);  // eslint-disable-line react-hooks/exhaustive-deps
-
-  const settings: SpeakSettings = { rate, pitch, voiceId: selectedVoiceId };
 
   // ── Subtitle helpers ──────────────────────────────────────────────────────
   const clearSubtitle = useCallback(() => {
@@ -319,7 +199,7 @@ export default function ChatRoomScreen() {
     }, msPerWord);
   }, [clearSubtitle]);
 
-  // Central speak helper — handles subtitles + speakingId for all call sites
+  // Central speak helper — all platforms now use OpenAI neural TTS via backend
   const speakMsg = useCallback((text: string, msgId: string, _muted: boolean, _voiceUnlocked: boolean) => {
     if (_muted) return;
     if (Platform.OS === "web" && !_voiceUnlocked) return;
@@ -328,22 +208,15 @@ export default function ChatRoomScreen() {
     clearSubtitle();
     setSpeakingId(msgId);
     setSubtitleWordIdx(0);
+    startNativeSubtitle(text, rate); // timer-based word highlight on all platforms
 
     const onEnd = () => {
       clearSubtitle();
       setSpeakingId(null);
     };
 
-    if (Platform.OS === "web") {
-      webSpeak(text, tutor.speechLang, settings,
-        (idx) => setSubtitleWordIdx(idx),
-        onEnd
-      );
-    } else {
-      startNativeSubtitle(text, settings.rate);
-      speak(text, tutor.speechLang, false, true, settings, onEnd);
-    }
-  }, [tutor, settings, clearSubtitle, startNativeSubtitle]);
+    ttsSpeak(text, tutor.id, getApiUrl(), rate, onEnd);
+  }, [tutor, rate, clearSubtitle, startNativeSubtitle]);
 
   // ── Auto-translation effect ───────────────────────────────────────────────
   useEffect(() => {
@@ -363,7 +236,6 @@ export default function ChatRoomScreen() {
   }, [messages, canTranslate]);
 
   const handleUnlockVoice = useCallback(() => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setVoiceUnlocked(true);
     const lastAI = messages.find((m) => !m.isUser);
@@ -383,7 +255,7 @@ export default function ChatRoomScreen() {
 
   const toggleMute = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (!muted) stopSpeech();
+    if (!muted) stopTTS();
     setMuted((m) => !m);
   };
 
@@ -626,8 +498,8 @@ export default function ChatRoomScreen() {
             <Text style={styles.settingLabel}>Speed</Text>
             <View style={styles.segmentRow}>
               {([
-                { label: "🐢 Slow", value: 0.6 },
-                { label: "Normal", value: 0.85 },
+                { label: "🐢 Slow", value: 0.65 },
+                { label: "Normal", value: 0.9 },
                 { label: "🐇 Fast", value: 1.2 },
               ] as { label: string; value: number }[]).map((opt) => (
                 <Pressable
@@ -642,57 +514,13 @@ export default function ChatRoomScreen() {
               ))}
             </View>
 
-            {/* Pitch */}
-            <Text style={styles.settingLabel}>Pitch</Text>
-            <View style={styles.segmentRow}>
-              {([
-                { label: "Low", value: 0.7 },
-                { label: "Normal", value: 1.0 },
-                { label: "High", value: 1.4 },
-              ] as { label: string; value: number }[]).map((opt) => (
-                <Pressable
-                  key={opt.value}
-                  style={[styles.segmentBtn, pitch === opt.value && styles.segmentBtnActive]}
-                  onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setPitch(opt.value); }}
-                >
-                  <Text style={[styles.segmentBtnText, pitch === opt.value && styles.segmentBtnTextActive]}>
-                    {opt.label}
-                  </Text>
-                </Pressable>
-              ))}
+            {/* Neural voice info */}
+            <View style={styles.noVoicesBox}>
+              <Ionicons name="sparkles" size={14} color="#FF6B9D" style={{ marginBottom: 4 }} />
+              <Text style={styles.noVoicesText}>
+                Each tutor uses a unique AI neural voice — Sarah speaks in a British accent, Jake in American English, and so on.
+              </Text>
             </View>
-
-            {/* Voice selection */}
-            {availableVoices.length > 0 && (
-              <>
-                <Text style={styles.settingLabel}>Voice</Text>
-                <ScrollView style={styles.voiceList} showsVerticalScrollIndicator={false}>
-                  {availableVoices.map((v) => (
-                    <Pressable
-                      key={v.id}
-                      style={[styles.voiceRow, selectedVoiceId === v.id && styles.voiceRowActive]}
-                      onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSelectedVoiceId(v.id); }}
-                    >
-                      <View style={[styles.radioCircle, selectedVoiceId === v.id && styles.radioCircleActive]}>
-                        {selectedVoiceId === v.id && <View style={styles.radioDot} />}
-                      </View>
-                      <View style={styles.voiceInfo}>
-                        <Text style={[styles.voiceName, selectedVoiceId === v.id && styles.voiceNameActive]} numberOfLines={1}>
-                          {v.name}
-                        </Text>
-                        <Text style={styles.voiceLang}>{v.lang}</Text>
-                      </View>
-                    </Pressable>
-                  ))}
-                </ScrollView>
-              </>
-            )}
-
-            {availableVoices.length === 0 && (
-              <View style={styles.noVoicesBox}>
-                <Text style={styles.noVoicesText}>No voices found for this language on your device.</Text>
-              </View>
-            )}
           </Pressable>
         </Pressable>
       </Modal>
