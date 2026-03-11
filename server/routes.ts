@@ -239,7 +239,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const audioBuffer = Buffer.from(audio, "base64");
-      const contentType = mimeType ?? "audio/webm";
+      // Azure STT requires the exact content-type including codec info for WAV
+      const rawMime = mimeType ?? "audio/webm";
+      const contentType = rawMime === "audio/wav"
+        ? "audio/wav; codecs=audio/pcm; samplerate=16000"
+        : rawMime;
 
       const azureUrl =
         `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation` +

@@ -92,6 +92,84 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+/**
+ * Build a WAV (PCM 16-bit mono) ArrayBuffer from Int16 samples.
+ * Azure Speech REST API reliably handles audio/wav.
+ */
+function buildWavBuffer(pcm16: Int16Array, sampleRate: number): ArrayBuffer {
+  const numCh = 1, bps = 16;
+  const dataBytes = pcm16.length * 2;
+  const buf = new ArrayBuffer(44 + dataBytes);
+  const v = new DataView(buf);
+  const str = (s: string, o: number) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  str("RIFF", 0);
+  v.setUint32(4, 36 + dataBytes, true);
+  str("WAVE", 8);
+  str("fmt ", 12);
+  v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true);
+  v.setUint16(22, numCh, true);
+  v.setUint32(24, sampleRate, true);
+  v.setUint32(28, sampleRate * numCh * bps / 8, true);
+  v.setUint16(32, numCh * bps / 8, true);
+  v.setUint16(34, bps, true);
+  str("data", 36);
+  v.setUint32(40, dataBytes, true);
+  for (let i = 0; i < pcm16.length; i++) v.setInt16(44 + i * 2, pcm16[i], true);
+  return buf;
+}
+
+/**
+ * Record audio via AudioContext → 16 kHz mono PCM → WAV base64.
+ * Works on iOS Safari, Chrome, Firefox — avoids MediaRecorder's mp4/webm format issues.
+ * Azure Speech REST API always accepts audio/wav.
+ */
+async function recordWebAudio(durationMs: number): Promise<string> {
+  const stream = await (navigator.mediaDevices as any).getUserMedia({
+    audio: { channelCount: 1, sampleRate: 16000, echoCancellation: true, noiseSuppression: true },
+    video: false,
+  });
+  // Request 16kHz but use ctx.sampleRate (iOS Safari may ignore the request)
+  const ctx = new (window as any).AudioContext({ sampleRate: 16000 }) as AudioContext;
+  const actualRate = ctx.sampleRate;
+  const source = ctx.createMediaStreamSource(stream);
+  const chunks: Float32Array[] = [];
+
+  // ScriptProcessor is deprecated but works on all browsers including old iOS Safari
+  const processor = ctx.createScriptProcessor(4096, 1, 1);
+  processor.onaudioprocess = (e: AudioProcessingEvent) => {
+    chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+  };
+  source.connect(processor);
+  processor.connect(ctx.destination);
+
+  await new Promise<void>((resolve) => setTimeout(resolve, durationMs));
+
+  source.disconnect();
+  processor.disconnect();
+  stream.getTracks().forEach((t: MediaStreamTrack) => t.stop());
+  await ctx.close();
+
+  // Flatten PCM chunks
+  const total = chunks.reduce((n, c) => n + c.length, 0);
+  const flat = new Float32Array(total);
+  let offset = 0;
+  for (const c of chunks) { flat.set(c, offset); offset += c.length; }
+
+  // Float32 → Int16, use actual sample rate in WAV header
+  const pcm16 = new Int16Array(flat.length);
+  for (let i = 0; i < flat.length; i++) {
+    pcm16[i] = Math.round(Math.max(-1, Math.min(1, flat[i])) * 32767);
+  }
+
+  // WAV → base64 (use actualRate so Azure gets the right format)
+  const wavBuf = buildWavBuffer(pcm16, actualRate);
+  const bytes = new Uint8Array(wavBuf);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
 /** Levenshtein-based similarity score 0–100. */
 function scoreTranscription(transcribed: string, expected: string): number {
   const normalize = (s: string) =>
@@ -254,26 +332,11 @@ export default function SpeakScreen() {
       let mimeType = "audio/webm";
 
       if (Platform.OS === "web") {
-        // ── Web: MediaRecorder ──────────────────────────────────────────────
-        const stream = await (navigator.mediaDevices as any).getUserMedia({ audio: true });
-        const recorder = new (window as any).MediaRecorder(stream) as MediaRecorder;
-        const chunks: BlobPart[] = [];
-
-        await new Promise<void>((resolve, reject) => {
-          recorder.ondataavailable = (e: BlobEvent) => {
-            if (e.data.size > 0) chunks.push(e.data);
-          };
-          recorder.onstop = () => resolve();
-          recorder.onerror = () => reject(new Error("MediaRecorder error"));
-          recorder.start();
-          setTimeout(() => recorder.stop(), 4000);
-        });
-
-        stream.getTracks().forEach((tr: MediaStreamTrack) => tr.stop());
-
-        const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
-        mimeType = recorder.mimeType || "audio/webm";
-        audioBase64 = await blobToBase64(blob);
+        // ── Web: AudioContext → 16kHz PCM → WAV ────────────────────────────
+        // MediaRecorder on iOS Safari produces video/mp4 which Azure STT
+        // does NOT accept via REST API. AudioContext WAV works everywhere.
+        audioBase64 = await recordWebAudio(4000);
+        mimeType = "audio/wav";
       } else {
         // ── Native: expo-av ─────────────────────────────────────────────────
         const { granted } = await Audio.requestPermissionsAsync();
