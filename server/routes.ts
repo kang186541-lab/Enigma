@@ -93,12 +93,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ── ElevenLabs Neural TTS ──────────────────────────────────────────────────
   // Each tutor maps to a specific ElevenLabs voice ID.
   const TUTOR_XI_VOICES: Record<string, string> = {
-    sarah:  "21m00Tcm4TlvDq8ikWAM", // Rachel — British female
-    jake:   "TxGEqnHWrfWFTfGW9XjX", // Josh   — American male
-    jane:   "EXAVITQu4vr4xnSDxMaL", // Bella  — Spanish female
-    alex:   "ErXwobaYiN019PkySvjV",  // Antoni — Latin male
-    jisu:   "21m00Tcm4TlvDq8ikWAM", // Rachel — Korean female
-    minjun: "TxGEqnHWrfWFTfGW9XjX", // Josh   — Korean male
+    sarah:  "XB0fDUnXU5powFXDhCwa", // Charlotte — British female (genuine UK accent)
+    jake:   "TxGEqnHWrfWFTfGW9XjX", // Josh      — American male
+    jane:   "EXAVITQu4vr4xnSDxMaL", // Bella     — Spanish female
+    alex:   "ErXwobaYiN019PkySvjV",  // Antoni    — Latin male
+    jisu:   "21m00Tcm4TlvDq8ikWAM", // Rachel    — Korean female
+    minjun: "TxGEqnHWrfWFTfGW9XjX", // Josh      — Korean male
   };
 
   app.get("/api/tts", async (req: Request, res: Response) => {
