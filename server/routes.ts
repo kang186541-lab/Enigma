@@ -295,10 +295,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }>;
       };
 
-      console.log("Azure PA status:", data.RecognitionStatus, "NBest count:", data.NBest?.length ?? 0);
+      // Log the full first NBest entry to diagnose missing PronunciationAssessment
+      const best0 = data.NBest?.[0];
+      console.log("Azure PA status:", data.RecognitionStatus,
+        "| NBest:", data.NBest?.length ?? 0,
+        "| Display:", best0?.Display,
+        "| PA:", JSON.stringify(best0?.PronunciationAssessment ?? null));
 
       if (data.RecognitionStatus !== "Success" || !data.NBest?.length) {
-        // No speech detected or recognition failed — return status so frontend can show error
         return res.json({
           status: data.RecognitionStatus,
           transcribedText: data.DisplayText ?? "",
@@ -311,6 +315,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const best = data.NBest[0];
       const pa = best.PronunciationAssessment;
+
+      // If PronunciationAssessment is missing entirely, log the full best item for diagnosis
+      if (!pa) {
+        console.warn("PronunciationAssessment missing from NBest[0]. Full item:", JSON.stringify(best));
+      }
 
       res.json({
         status: data.RecognitionStatus,

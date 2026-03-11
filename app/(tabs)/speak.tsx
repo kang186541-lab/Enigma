@@ -134,25 +134,61 @@ function buildWavBuffer(pcm16: Int16Array, sampleRate: number): ArrayBuffer {
 }
 
 /**
- * Record audio via AudioContext → 16 kHz mono PCM → WAV base64.
- * Works on iOS Safari, Chrome, Firefox — avoids MediaRecorder's mp4/webm format issues.
- * Azure Speech REST API always accepts audio/wav.
+ * Record from the microphone and return { base64, mimeType }.
+ * Strategy:
+ *  1. If MediaRecorder supports audio/webm;codecs=opus → use it (Chrome/Firefox/Edge).
+ *     Azure STT accepts webm/opus directly — most reliable path.
+ *  2. Otherwise (iOS Safari) → AudioContext + ScriptProcessor → WAV (PCM 16-bit).
+ *     We resume() the context first to avoid the iOS "suspended" state bug.
  */
-async function recordWebAudio(durationMs: number): Promise<string> {
+async function recordWebAudio(durationMs: number): Promise<{ base64: string; mimeType: string }> {
+  const MR = (window as any).MediaRecorder as typeof MediaRecorder;
+
+  // ── Path 1: webm/opus via MediaRecorder ──────────────────────────────────
+  const opusMime =
+    MR?.isTypeSupported?.("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" :
+    MR?.isTypeSupported?.("audio/ogg;codecs=opus")  ? "audio/ogg;codecs=opus"  : null;
+
+  if (opusMime) {
+    const stream = await (navigator.mediaDevices as any).getUserMedia({ audio: true, video: false });
+    const recorder = new MR(stream, { mimeType: opusMime });
+    const chunks: BlobPart[] = [];
+
+    await new Promise<void>((resolve, reject) => {
+      recorder.ondataavailable = (e: BlobEvent) => { if (e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = () => resolve();
+      recorder.onerror = () => reject(new Error("MediaRecorder error"));
+      recorder.start(200); // timeslice ensures chunks arrive on all browsers
+      setTimeout(() => recorder.stop(), durationMs);
+    });
+    stream.getTracks().forEach((t: MediaStreamTrack) => t.stop());
+
+    if (!chunks.length) throw new Error("No audio captured — check microphone permission");
+
+    const blob = new Blob(chunks, { type: opusMime });
+    const base64 = await blobToBase64(blob);
+    return { base64, mimeType: opusMime };
+  }
+
+  // ── Path 2: iOS Safari — AudioContext → WAV (PCM 16-bit mono) ────────────
   const stream = await (navigator.mediaDevices as any).getUserMedia({
     audio: { channelCount: 1, sampleRate: 16000, echoCancellation: true, noiseSuppression: true },
     video: false,
   });
-  // Request 16kHz but use ctx.sampleRate (iOS Safari may ignore the request)
   const ctx = new (window as any).AudioContext({ sampleRate: 16000 }) as AudioContext;
+
+  // iOS Safari creates AudioContext in "suspended" state — resume before connecting nodes
+  if ((ctx as any).state !== "running") {
+    await ctx.resume();
+  }
+
   const actualRate = ctx.sampleRate;
   const source = ctx.createMediaStreamSource(stream);
-  const chunks: Float32Array[] = [];
+  const pcmChunks: Float32Array[] = [];
 
-  // ScriptProcessor is deprecated but works on all browsers including old iOS Safari
   const processor = ctx.createScriptProcessor(4096, 1, 1);
   processor.onaudioprocess = (e: AudioProcessingEvent) => {
-    chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+    pcmChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
   };
   source.connect(processor);
   processor.connect(ctx.destination);
@@ -164,24 +200,29 @@ async function recordWebAudio(durationMs: number): Promise<string> {
   stream.getTracks().forEach((t: MediaStreamTrack) => t.stop());
   await ctx.close();
 
-  // Flatten PCM chunks
-  const total = chunks.reduce((n, c) => n + c.length, 0);
-  const flat = new Float32Array(total);
-  let offset = 0;
-  for (const c of chunks) { flat.set(c, offset); offset += c.length; }
+  if (!pcmChunks.length) throw new Error("No audio captured — microphone may be blocked");
 
-  // Float32 → Int16, use actual sample rate in WAV header
+  // Flatten chunks
+  const total = pcmChunks.reduce((n, c) => n + c.length, 0);
+  const flat = new Float32Array(total);
+  let off = 0;
+  for (const c of pcmChunks) { flat.set(c, off); off += c.length; }
+
+  // Silence check — if RMS is near zero the mic captured nothing
+  const rms = Math.sqrt(flat.reduce((s, v) => s + v * v, 0) / flat.length);
+  if (rms < 0.001) throw new Error("Recording was silent — speak louder or check microphone");
+
+  // Float32 → Int16 PCM
   const pcm16 = new Int16Array(flat.length);
   for (let i = 0; i < flat.length; i++) {
     pcm16[i] = Math.round(Math.max(-1, Math.min(1, flat[i])) * 32767);
   }
 
-  // WAV → base64 (use actualRate so Azure gets the right format)
   const wavBuf = buildWavBuffer(pcm16, actualRate);
   const bytes = new Uint8Array(wavBuf);
-  let binary = "";
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  return btoa(binary);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return { base64: btoa(bin), mimeType: "audio/wav" };
 }
 
 
@@ -322,11 +363,10 @@ export default function SpeakScreen() {
       let mimeType = "audio/webm";
 
       if (Platform.OS === "web") {
-        // ── Web: AudioContext → 16kHz PCM → WAV ────────────────────────────
-        // MediaRecorder on iOS Safari produces video/mp4 which Azure STT
-        // does NOT accept via REST API. AudioContext WAV works everywhere.
-        audioBase64 = await recordWebAudio(4000);
-        mimeType = "audio/wav";
+        // ── Web: smart recording (webm/opus on Chrome, WAV on iOS Safari) ──
+        const rec = await recordWebAudio(4000);
+        audioBase64 = rec.base64;
+        mimeType = rec.mimeType;
       } else {
         // ── Native: expo-av ─────────────────────────────────────────────────
         const { granted } = await Audio.requestPermissionsAsync();
