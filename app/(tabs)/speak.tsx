@@ -107,6 +107,26 @@ function blobToBase64(blob: Blob): Promise<string> {
 }
 
 /**
+ * Downsample Float32 PCM to 16 kHz using linear interpolation.
+ * iOS Safari AudioContext ignores the requested sampleRate and runs at the
+ * hardware rate (44100 or 48000 Hz). Downsampling before building the WAV
+ * ensures Azure receives clean 16 kHz audio for Pronunciation Assessment.
+ */
+function downsampleTo16k(samples: Float32Array, fromRate: number): Float32Array {
+  if (fromRate === 16000) return samples;
+  const ratio = fromRate / 16000;
+  const outLen = Math.floor(samples.length / ratio);
+  const out = new Float32Array(outLen);
+  for (let i = 0; i < outLen; i++) {
+    const pos = i * ratio;
+    const lo = Math.floor(pos);
+    const hi = Math.min(lo + 1, samples.length - 1);
+    out[i] = samples[lo] + (samples[hi] - samples[lo]) * (pos - lo);
+  }
+  return out;
+}
+
+/**
  * Build a WAV (PCM 16-bit mono) ArrayBuffer from Int16 samples.
  * Azure Speech REST API reliably handles audio/wav.
  */
@@ -231,13 +251,17 @@ async function recordWebAudio(durationMs: number): Promise<{ base64: string; mim
   const rms = Math.sqrt(flat.reduce((s, v) => s + v * v, 0) / flat.length);
   if (rms < 0.001) throw new Error("Recording was silent — speak louder or check microphone");
 
+  // Downsample to 16 kHz (iOS Safari often locks to 44100/48000 Hz)
+  const resampled = downsampleTo16k(flat, actualRate);
+  const outRate = 16000;
+
   // Float32 → Int16 PCM
-  const pcm16 = new Int16Array(flat.length);
-  for (let i = 0; i < flat.length; i++) {
-    pcm16[i] = Math.round(Math.max(-1, Math.min(1, flat[i])) * 32767);
+  const pcm16 = new Int16Array(resampled.length);
+  for (let i = 0; i < resampled.length; i++) {
+    pcm16[i] = Math.round(Math.max(-1, Math.min(1, resampled[i])) * 32767);
   }
 
-  const wavBuf = buildWavBuffer(pcm16, actualRate);
+  const wavBuf = buildWavBuffer(pcm16, outRate);
   const bytes = new Uint8Array(wavBuf);
   let bin = "";
   for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);

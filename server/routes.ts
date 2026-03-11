@@ -301,11 +301,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const assessmentHeader = Buffer.from(JSON.stringify(assessmentConfig)).toString("base64");
 
       const audioBuffer = Buffer.from(audio, "base64");
-      // WAV needs explicit codec info; other formats pass through as-is
+      // For WAV files: just send "audio/wav" so Azure reads sample rate from the
+      // WAV header itself. Sending "audio/wav; codecs=audio/pcm; samplerate=16000"
+      // would tell Azure to ignore the header and treat it as raw 16 kHz PCM —
+      // which corrupts audio recorded at 44100/48000 Hz (common on iOS Safari).
       const rawMime = mimeType ?? "audio/wav";
-      const contentType = rawMime === "audio/wav"
-        ? "audio/wav; codecs=audio/pcm; samplerate=16000"
-        : rawMime;
+      const contentType = rawMime.startsWith("audio/wav") ? "audio/wav" : rawMime;
 
       // Must use format=detailed to get NBest with PronunciationAssessment
       const azureUrl =
@@ -328,30 +329,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(502).json({ error: "Azure Pronunciation Assessment failed", detail: errText });
       }
 
+      // Azure's response shape — scores can appear either nested under
+      // PronunciationAssessment or directly on the NBest item depending on
+      // the API version / content-type used.
+      type PaScores = {
+        AccuracyScore?: number;
+        FluencyScore?: number;
+        CompletenessScore?: number;
+        PronScore?: number;
+      };
+      type NBestItem = PaScores & {
+        Display?: string;
+        PronunciationAssessment?: PaScores;
+        Words?: Array<{
+          Word: string;
+          PronunciationAssessment?: { AccuracyScore: number; ErrorType: string };
+        }>;
+      };
       const data = (await azureRes.json()) as {
         RecognitionStatus: string;
         DisplayText?: string;
-        NBest?: Array<{
-          Display?: string;
-          PronunciationAssessment?: {
-            AccuracyScore: number;
-            FluencyScore: number;
-            CompletenessScore: number;
-            PronScore: number;
-          };
-          Words?: Array<{
-            Word: string;
-            PronunciationAssessment?: { AccuracyScore: number; ErrorType: string };
-          }>;
-        }>;
+        NBest?: NBestItem[];
       };
 
-      // Log the full first NBest entry to diagnose missing PronunciationAssessment
       const best0 = data.NBest?.[0];
-      console.log("Azure PA status:", data.RecognitionStatus,
+      // Scores can live in a nested PronunciationAssessment object OR directly
+      // on the NBest item — coalesce both shapes.
+      const paScores: PaScores = best0?.PronunciationAssessment ?? best0 ?? {};
+      console.log(
+        "Azure PA status:", data.RecognitionStatus,
         "| NBest:", data.NBest?.length ?? 0,
         "| Display:", best0?.Display,
-        "| PA:", JSON.stringify(best0?.PronunciationAssessment ?? null));
+        "| AccuracyScore:", paScores.AccuracyScore,
+        "| PronScore:", paScores.PronScore
+      );
 
       if (data.RecognitionStatus !== "Success" || !data.NBest?.length) {
         return res.json({
@@ -365,20 +376,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const best = data.NBest[0];
-      const pa = best.PronunciationAssessment;
 
-      // If PronunciationAssessment is missing entirely, log the full best item for diagnosis
-      if (!pa) {
-        console.warn("PronunciationAssessment missing from NBest[0]. Full item:", JSON.stringify(best));
+      // Coalesce nested + top-level score locations
+      const scores: PaScores = best.PronunciationAssessment ?? best;
+      const hasScores =
+        scores.AccuracyScore !== undefined &&
+        scores.PronScore !== undefined &&
+        scores.PronScore !== null;
+
+      if (!hasScores) {
+        console.warn("No pronunciation scores in NBest[0]. Full item:", JSON.stringify(best));
       }
 
       res.json({
         status: data.RecognitionStatus,
         transcribedText: best.Display ?? data.DisplayText ?? "",
-        accuracyScore: pa ? Math.round(pa.AccuracyScore) : null,
-        fluencyScore: pa ? Math.round(pa.FluencyScore) : null,
-        completenessScore: pa ? Math.round(pa.CompletenessScore) : null,
-        pronScore: pa ? Math.round(pa.PronScore) : null,
+        accuracyScore: hasScores ? Math.round(scores.AccuracyScore!) : null,
+        fluencyScore: hasScores ? Math.round(scores.FluencyScore ?? 0) : null,
+        completenessScore: hasScores ? Math.round(scores.CompletenessScore ?? 0) : null,
+        pronScore: hasScores ? Math.round(scores.PronScore!) : null,
         words: best.Words ?? [],
       });
     } catch (err) {
