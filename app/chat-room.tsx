@@ -34,23 +34,14 @@ const LANG_NAMES: Record<string, string> = {
 };
 
 // ── OpenAI Neural TTS ────────────────────────────────────────────────────────
-// Module-level singletons so we can stop audio from anywhere.
-let _webAudio: HTMLAudioElement | null = null;
+// Module-level singleton — expo-av Audio.Sound works on all platforms.
 let _nativeSound: Audio.Sound | null = null;
 
 function stopTTS() {
-  if (Platform.OS === "web") {
-    if (_webAudio) {
-      _webAudio.pause();
-      _webAudio.src = "";
-      _webAudio = null;
-    }
-  } else {
-    if (_nativeSound) {
-      _nativeSound.stopAsync().catch(() => {});
-      _nativeSound.unloadAsync().catch(() => {});
-      _nativeSound = null;
-    }
+  if (_nativeSound) {
+    _nativeSound.stopAsync().catch(() => {});
+    _nativeSound.unloadAsync().catch(() => {});
+    _nativeSound = null;
   }
 }
 
@@ -67,29 +58,20 @@ async function ttsSpeak(
   url.searchParams.set("tutorId", tutorId);
   url.searchParams.set("speed", speed.toString());
 
-  if (Platform.OS === "web") {
-    if (typeof window === "undefined") { onEnd?.(); return; }
-    const audio = new Audio(url.toString());
-    _webAudio = audio;
-    audio.onended = () => { _webAudio = null; onEnd?.(); };
-    audio.onerror = () => { _webAudio = null; onEnd?.(); };
-    try { await audio.play(); } catch { _webAudio = null; onEnd?.(); }
-  } else {
-    try {
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: url.toString() },
-        { shouldPlay: true },
-        (status) => {
-          if (status.isLoaded && status.didJustFinish) {
-            _nativeSound = null;
-            onEnd?.();
-          }
+  try {
+    const { sound } = await Audio.Sound.createAsync(
+      { uri: url.toString() },
+      { shouldPlay: true },
+      (status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          _nativeSound = null;
+          onEnd?.();
         }
-      );
-      _nativeSound = sound;
-    } catch {
-      onEnd?.();
-    }
+      }
+    );
+    _nativeSound = sound;
+  } catch {
+    onEnd?.();
   }
 }
 
