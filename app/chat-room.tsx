@@ -33,50 +33,69 @@ const LANG_NAMES: Record<string, string> = {
   korean: "Korean",
 };
 
-// ── Speech helpers ────────────────────────────────────────────────────────────
-// iOS Safari rule: speechSynthesis.speak() MUST be called synchronously inside
-// a user-gesture handler. No async/await or setTimeout before the call.
+// ── ElevenLabs TTS helpers ───────────────────────────────────────────────────
+// Strategy:
+//  - Web: fetch /api/tts → MP3 blob → HTML5 Audio element (no gesture restriction
+//    because we are playing a fetched blob, not SpeechSynthesis)
+//  - Native (Expo Go): expo-speech as fallback (ElevenLabs audio via fetch not
+//    reliable in Expo Go; proper native build would use expo-av)
+
+let _webAudioEl: HTMLAudioElement | null = null;
 
 function stopSpeech() {
   if (Platform.OS !== "web") {
     try { Speech.stop(); } catch {}
-  } else if (typeof window !== "undefined" && window.speechSynthesis) {
-    window.speechSynthesis.cancel();
+  } else {
+    if (_webAudioEl) {
+      _webAudioEl.pause();
+      _webAudioEl.src = "";
+      _webAudioEl = null;
+    }
   }
 }
 
-/**
- * Speak text using the Web Speech API. Safe to call from onPress directly.
- * Picks the best available voice for the given BCP-47 lang tag.
- */
-function webSpeakSync(
+async function elevenLabsPlay(
   text: string,
-  lang: string,
-  rate: number,
+  tutorId: string,
+  apiBase: string,
+  speed: number,
+  onStart?: () => void,
   onEnd?: () => void
 ) {
-  if (typeof window === "undefined" || !window.speechSynthesis) {
+  try {
+    const url = new URL("/api/tts", apiBase);
+    url.searchParams.set("text", text.slice(0, 5000));
+    url.searchParams.set("tutorId", tutorId);
+    url.searchParams.set("speed", speed.toString());
+
+    onStart?.();
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error(`TTS ${res.status}`);
+
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+
+    // Stop previous playback
+    if (_webAudioEl) {
+      _webAudioEl.pause();
+      _webAudioEl.src = "";
+    }
+    const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
+    _webAudioEl = audio;
+    audio.onended = () => {
+      URL.revokeObjectURL(objectUrl);
+      _webAudioEl = null;
+      onEnd?.();
+    };
+    audio.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      _webAudioEl = null;
+      onEnd?.();
+    };
+    await audio.play();
+  } catch {
     onEnd?.();
-    return;
   }
-  // Cancel first — then speak. Both must happen synchronously.
-  window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang;
-  utterance.rate = rate;
-  utterance.onend = () => onEnd?.();
-  utterance.onerror = () => onEnd?.();
-
-  // Try to pick the best voice for the language (best-effort; not async)
-  const voices = window.speechSynthesis.getVoices();
-  const langBase = lang.split("-")[0];
-  const chosen =
-    voices.find((v) => v.lang === lang) ??
-    voices.find((v) => v.lang.startsWith(langBase));
-  if (chosen) utterance.voice = chosen;
-
-  window.speechSynthesis.speak(utterance);
 }
 
 async function fetchTranslation(
@@ -113,9 +132,10 @@ export default function ChatRoomScreen() {
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
   const [voiceUnlocked, setVoiceUnlocked] = useState(Platform.OS !== "web");
+  const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
 
-  // Voice settings (speed only — OpenAI TTS handles pitch/voice per tutor)
-  const [rate, setRate] = useState(0.9);
+  // Voice settings — speed only
+  const [rate, setRate] = useState(1.0);
   const [showSettings, setShowSettings] = useState(false);
 
   // Subtitle state
@@ -179,13 +199,13 @@ export default function ChatRoomScreen() {
     }, msPerWord);
   }, [clearSubtitle]);
 
-  // Central speak helper — synchronous so iOS Safari's gesture rule is met.
-  // Must be called directly inside onPress; no async/await or setTimeout before it.
+  // Central speak helper
   const speakMsg = useCallback((text: string, msgId: string, _muted: boolean, _voiceUnlocked: boolean) => {
     if (_muted) return;
     if (Platform.OS === "web" && !_voiceUnlocked) return;
     if (!tutor) return;
 
+    stopSpeech();
     clearSubtitle();
     setSpeakingId(msgId);
     setSubtitleWordIdx(0);
@@ -194,12 +214,21 @@ export default function ChatRoomScreen() {
     const onEnd = () => {
       clearSubtitle();
       setSpeakingId(null);
+      setLoadingAudioId(null);
     };
 
     if (Platform.OS === "web") {
-      // Synchronous — speak() fires immediately in this call stack
-      webSpeakSync(text, tutor.speechLang, rate, onEnd);
+      // ElevenLabs via fetch — no gesture lock on blob playback
+      elevenLabsPlay(
+        text,
+        tutor.id,
+        getApiUrl(),
+        rate,
+        () => setLoadingAudioId(msgId),
+        onEnd
+      );
     } else {
+      // Native: expo-speech fallback (works in Expo Go without native build)
       try { Speech.stop(); } catch {}
       Speech.speak(text, {
         language: tutor.speechLang,
@@ -230,19 +259,27 @@ export default function ChatRoomScreen() {
   const handleUnlockVoice = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setVoiceUnlocked(true);
-    // iOS Safari: speak() MUST fire synchronously in this user-gesture handler.
-    // Do NOT use setTimeout or any async before this call.
+    // After unlocking, immediately play the greeting / last AI message
     if (!muted && tutor) {
       const lastAI = messages.find((m) => !m.isUser);
       if (lastAI) {
+        // Use a ref to avoid stale closure — call speakMsg in next tick
+        // (setVoiceUnlocked is queued, so pass true explicitly)
+        const text = lastAI.text;
+        const id = lastAI.id;
+        stopSpeech();
         clearSubtitle();
-        setSpeakingId(lastAI.id);
+        setSpeakingId(id);
         setSubtitleWordIdx(0);
-        startNativeSubtitle(lastAI.text, rate);
-        webSpeakSync(lastAI.text, tutor.speechLang, rate, () => {
-          clearSubtitle();
-          setSpeakingId(null);
-        });
+        startNativeSubtitle(text, rate);
+        elevenLabsPlay(
+          text,
+          tutor.id,
+          getApiUrl(),
+          rate,
+          () => setLoadingAudioId(id),
+          () => { clearSubtitle(); setSpeakingId(null); setLoadingAudioId(null); }
+        );
       }
     }
   }, [messages, muted, tutor, rate, clearSubtitle, startNativeSubtitle]);
