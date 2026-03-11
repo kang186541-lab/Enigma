@@ -152,6 +152,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ── Azure Speech-to-Text ──────────────────────────────────────────────────
+  // Accepts a base64-encoded audio blob + MIME type + BCP-47 language code.
+  // Forwards to Azure Cognitive Services Speech REST API and returns the
+  // recognised text.
+  app.post("/api/stt", async (req: Request, res: Response) => {
+    try {
+      const { audio, mimeType, language } = req.body as {
+        audio?: string;
+        mimeType?: string;
+        language?: string;
+      };
+
+      if (!audio || !language) {
+        return res.status(400).json({ error: "audio (base64) and language required" });
+      }
+
+      const key = process.env.AZURE_SPEECH_KEY;
+      const region = process.env.AZURE_SPEECH_REGION;
+      if (!key || !region) {
+        return res.status(500).json({ error: "Azure Speech credentials not configured" });
+      }
+
+      const audioBuffer = Buffer.from(audio, "base64");
+      const contentType = mimeType ?? "audio/webm";
+
+      const azureUrl =
+        `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation` +
+        `/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=simple`;
+
+      const azureRes = await fetch(azureUrl, {
+        method: "POST",
+        headers: {
+          "Ocp-Apim-Subscription-Key": key,
+          "Content-Type": contentType,
+          "Accept-Language": language,
+        },
+        body: audioBuffer,
+      });
+
+      if (!azureRes.ok) {
+        const errText = await azureRes.text();
+        console.error("Azure STT error:", azureRes.status, errText);
+        return res.status(502).json({ error: "Azure STT failed", detail: errText });
+      }
+
+      const data = (await azureRes.json()) as { RecognitionStatus: string; DisplayText?: string };
+      const text = data.DisplayText ?? "";
+      res.json({ text, status: data.RecognitionStatus });
+    } catch (err) {
+      console.error("STT error:", err);
+      res.status(500).json({ error: "STT failed" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
