@@ -1,6 +1,60 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "node:http";
 import { openai } from "./openai";
+import { spawn } from "node:child_process";
+
+/**
+ * Convert any audio buffer to 16 kHz, 16-bit, mono WAV using ffmpeg.
+ * Azure Pronunciation Assessment works most reliably with WAV; webm/opus and
+ * other formats can produce "Display: ." (silence) even when audio is present.
+ */
+function convertToWav16k(inputBuffer: Buffer, inputMime: string): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    // Determine a file extension hint so ffmpeg picks the right demuxer
+    const extMap: Record<string, string> = {
+      "audio/webm": "webm",
+      "audio/webm;codecs=opus": "webm",
+      "audio/ogg": "ogg",
+      "audio/ogg;codecs=opus": "ogg",
+      "audio/mp4": "mp4",
+      "video/mp4": "mp4",
+      "audio/x-m4a": "m4a",
+      "audio/wav": "wav",
+      "audio/x-wav": "wav",
+    };
+    const ext = extMap[inputMime] ?? "webm";
+
+    const args = [
+      "-f", ext,          // input format hint
+      "-i", "pipe:0",     // read from stdin
+      "-ar", "16000",     // resample to 16 kHz
+      "-ac", "1",         // mono
+      "-acodec", "pcm_s16le", // 16-bit signed PCM
+      "-f", "wav",        // output format
+      "pipe:1",           // write to stdout
+    ];
+
+    const ff = spawn("ffmpeg", args, { stdio: ["pipe", "pipe", "pipe"] });
+    const chunks: Buffer[] = [];
+    const errChunks: Buffer[] = [];
+
+    ff.stdout.on("data", (d: Buffer) => chunks.push(d));
+    ff.stderr.on("data", (d: Buffer) => errChunks.push(d));
+
+    ff.on("close", (code) => {
+      if (code !== 0) {
+        const errMsg = Buffer.concat(errChunks).toString().slice(-500);
+        reject(new Error(`ffmpeg exited ${code}: ${errMsg}`));
+      } else {
+        resolve(Buffer.concat(chunks));
+      }
+    });
+    ff.on("error", reject);
+
+    ff.stdin.write(inputBuffer);
+    ff.stdin.end();
+  });
+}
 
 /**
  * Map browser-reported MIME types to what Azure STT actually accepts.
@@ -309,16 +363,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       const assessmentHeader = Buffer.from(JSON.stringify(assessmentConfig)).toString("base64");
 
-      const audioBuffer = Buffer.from(audio, "base64");
-      const contentType = normalizeAudioMime(mimeType ?? "audio/wav");
+      const rawBuffer = Buffer.from(audio, "base64");
+      const rawMime = mimeType ?? "audio/wav";
 
-      // Debug: confirm audio actually arrived with content
-      const header4 = audioBuffer.slice(0, 4).toString("ascii");
+      // Convert to 16 kHz WAV regardless of input format.
+      // Azure Pronunciation Assessment returns "Display: ." (no scores) for
+      // webm/opus and other compressed formats even when the audio contains
+      // real speech. WAV (PCM) is the only reliably supported format for PA.
+      let audioBuffer: Buffer;
+      try {
+        audioBuffer = await convertToWav16k(rawBuffer, rawMime);
+      } catch (convErr) {
+        console.error("[PA] ffmpeg conversion failed:", convErr);
+        return res.status(500).json({ error: "Audio conversion failed" });
+      }
+
       console.log(
-        `[PA] mimeType=${mimeType} → contentType=${contentType}`,
-        `bufferBytes=${audioBuffer.length}`,
-        `first4="${header4}"`
+        `[PA] input=${rawMime} ${rawBuffer.length}B → wav ${audioBuffer.length}B`
       );
+
+      const contentType = "audio/wav";
 
       // Must use format=detailed to get NBest with PronunciationAssessment
       const azureUrl =
