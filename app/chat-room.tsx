@@ -62,7 +62,8 @@ async function elevenLabsPlay(
   apiBase: string,
   speed: number,
   onStart?: () => void,
-  onEnd?: () => void
+  onEnd?: () => void,
+  onPlaybackStart?: (durationSecs: number) => void
 ) {
   try {
     const url = new URL("/api/tts", apiBase);
@@ -84,6 +85,12 @@ async function elevenLabsPlay(
     }
     const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
     _webAudioEl = audio;
+
+    // Fire once the audio actually begins playing — duration is now reliable
+    audio.onplay = () => {
+      const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : null;
+      if (dur !== null) onPlaybackStart?.(dur);
+    };
     audio.onended = () => {
       URL.revokeObjectURL(objectUrl);
       _webAudioEl = null;
@@ -188,6 +195,34 @@ export default function ChatRoomScreen() {
     setSubtitleWordIdx(-1);
   }, []);
 
+  /**
+   * Audio-synced word highlight: driven by the actual MP3 duration reported by
+   * the HTMLAudioElement once playback begins. Each word gets an equal share of
+   * the total play time so highlights track the real audio instead of a guess.
+   */
+  const startAudioSyncedSubtitle = useCallback((text: string, audioDurationSecs: number) => {
+    clearSubtitle();
+    const words = text.trim().split(/\s+/);
+    if (!words.length) return;
+
+    const msPerWord = (audioDurationSecs * 1000) / words.length;
+    let idx = 0;
+    setSubtitleWordIdx(0); // highlight the first word immediately on audio.onplay
+
+    subtitleTimerRef.current = setInterval(() => {
+      idx++;
+      if (idx >= words.length) {
+        if (subtitleTimerRef.current) clearInterval(subtitleTimerRef.current);
+        subtitleTimerRef.current = null;
+        setSubtitleWordIdx(-1);
+      } else {
+        setSubtitleWordIdx(idx);
+      }
+    }, msPerWord);
+  }, [clearSubtitle]);
+
+  /** Native (Expo Speech) subtitle — still uses estimated wpm because expo-speech
+   *  gives no duration information. */
   const startNativeSubtitle = useCallback((text: string, speechRate: number) => {
     clearSubtitle();
     const words = text.trim().split(/\s+/);
@@ -215,8 +250,6 @@ export default function ChatRoomScreen() {
     stopSpeech();
     clearSubtitle();
     setSpeakingId(msgId);
-    setSubtitleWordIdx(0);
-    startNativeSubtitle(text, rate);
 
     const onEnd = () => {
       clearSubtitle();
@@ -225,17 +258,21 @@ export default function ChatRoomScreen() {
     };
 
     if (Platform.OS === "web") {
-      // ElevenLabs via fetch — no gesture lock on blob playback
+      // ElevenLabs via fetch — no gesture lock on blob playback.
+      // Word highlights start inside onPlaybackStart (audio.onplay) using the
+      // real audio duration, so they stay perfectly in sync.
       elevenLabsPlay(
         text,
         tutor.id,
         getApiUrl(),
         rate,
         () => setLoadingAudioId(msgId),
-        onEnd
+        onEnd,
+        (durationSecs) => startAudioSyncedSubtitle(text, durationSecs)
       );
     } else {
       // Native: expo-speech fallback (works in Expo Go without native build)
+      startNativeSubtitle(text, rate);
       try { Speech.stop(); } catch {}
       Speech.speak(text, {
         language: tutor.speechLang,
@@ -244,7 +281,7 @@ export default function ChatRoomScreen() {
         onError: onEnd,
       });
     }
-  }, [tutor, rate, clearSubtitle, startNativeSubtitle]);
+  }, [tutor, rate, clearSubtitle, startAudioSyncedSubtitle, startNativeSubtitle]);
 
   // ── Auto-translation effect ───────────────────────────────────────────────
   useEffect(() => {
