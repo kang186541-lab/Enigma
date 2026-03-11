@@ -152,16 +152,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ── Azure Neural TTS (Pronunciation screen) ───────────────────────────────
-  // Uses Azure Cognitive Services TTS REST API with Neural voices so the
-  // correct accent is always used regardless of the user's OS voice library.
-  // Voice mapping keyed by BCP-47 language tag (first segment match).
-  const AZURE_TTS_VOICES: Record<string, string> = {
-    "ko-KR": "ko-KR-SunHiNeural",
-    "en-US": "en-US-JennyNeural",
-    "en-GB": "en-GB-SoniaNeural",
-    "es-ES": "es-ES-ElviraNeural",
-    "es-MX": "es-MX-DaliaNeural",
+  // ── Pronunciation TTS (ElevenLabs, language-specific voices) ─────────────
+  // Maps BCP-47 language tag → ElevenLabs voice ID chosen for that language.
+  // eleven_multilingual_v2 correctly pronounces all three languages.
+  const PRONUNCIATION_XI_VOICES: Record<string, string> = {
+    "ko-KR": "21m00Tcm4TlvDq8ikWAM", // Rachel  — clear Korean pronunciation
+    "en-US": "TxGEqnHWrfWFTfGW9XjX", // Josh    — American English
+    "en-GB": "XB0fDUnXU5powFXDhCwa", // Charlotte — British English
+    "es-ES": "EXAVITQu4vr4xnSDxMaL", // Bella   — Spanish (Spain)
+    "es-MX": "ErXwobaYiN019PkySvjV",  // Antoni  — Spanish (Latin)
   };
 
   app.get("/api/pronunciation-tts", async (req: Request, res: Response) => {
@@ -171,38 +170,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "text and lang required" });
       }
 
-      const key = process.env.AZURE_SPEECH_KEY;
-      const region = process.env.AZURE_SPEECH_REGION;
-      if (!key || !region) {
-        return res.status(500).json({ error: "Azure credentials not configured" });
+      const xiKey = process.env.ELEVENLABS_API_KEY;
+      if (!xiKey) {
+        return res.status(500).json({ error: "ElevenLabs API key not configured" });
       }
 
-      const voiceName = AZURE_TTS_VOICES[lang] ?? "en-US-JennyNeural";
-      const ssml = `<speak version='1.0' xml:lang='${lang}'>` +
-        `<voice xml:lang='${lang}' name='${voiceName}'>` +
-        `<prosody rate='slow'>${text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</prosody>` +
-        `</voice></speak>`;
+      const voiceId = PRONUNCIATION_XI_VOICES[lang] ?? PRONUNCIATION_XI_VOICES["en-US"];
 
-      const azureRes = await fetch(
-        `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`,
+      const xiRes = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`,
         {
           method: "POST",
           headers: {
-            "Ocp-Apim-Subscription-Key": key,
-            "Content-Type": "application/ssml+xml",
-            "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+            "xi-api-key": xiKey,
+            "Content-Type": "application/json",
+            Accept: "audio/mpeg",
           },
-          body: ssml,
+          body: JSON.stringify({
+            text: text.slice(0, 500),
+            model_id: "eleven_multilingual_v2",
+            voice_settings: { stability: 0.6, similarity_boost: 0.8, speaking_rate: 0.75 },
+          }),
         }
       );
 
-      if (!azureRes.ok) {
-        const errText = await azureRes.text();
-        console.error("Azure TTS error:", azureRes.status, errText);
-        return res.status(502).json({ error: "Azure TTS failed" });
+      if (!xiRes.ok) {
+        const errBody = await xiRes.text();
+        console.error("ElevenLabs pronunciation TTS error:", xiRes.status, errBody);
+        return res.status(502).json({ error: "Pronunciation TTS failed" });
       }
 
-      const buf = Buffer.from(await azureRes.arrayBuffer());
+      const buf = Buffer.from(await xiRes.arrayBuffer());
       res.set("Content-Type", "audio/mpeg");
       res.set("Cache-Control", "public, max-age=600");
       res.send(buf);
