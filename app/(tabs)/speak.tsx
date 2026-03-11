@@ -68,265 +68,38 @@ const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] 
   { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#FF9D6B" },
 ];
 
-interface PronScores {
-  accuracy: number;
-  fluency: number;
-  completeness: number;
-  overall: number;
+function getScoreLabel(score: number): { text: string; color: string } {
+  if (score >= 90) return { text: "완벽해요! 🎉", color: "#10B981" };
+  if (score >= 70) return { text: "잘 했어요! 😊", color: "#3B82F6" };
+  if (score >= 50) return { text: "조금 더 연습해봐요 💪", color: "#F59E0B" };
+  return { text: "다시 해봐요! 🔄", color: "#EF4444" };
 }
 
-interface FeedbackInfo { emoji: string; text: string; color: string }
-
-function getFeedback(score: number): FeedbackInfo {
-  if (score >= 90) return { emoji: "🌟", text: "Outstanding!", color: "#10B981" };
-  if (score >= 75) return { emoji: "🎯", text: "Great job!", color: "#3B82F6" };
-  if (score >= 55) return { emoji: "👍", text: "Good effort!", color: "#F59E0B" };
-  if (score >= 30) return { emoji: "💪", text: "Keep practising", color: "#EF4444" };
-  return { emoji: "🔁", text: "Try again", color: "#EF4444" };
-}
-
-function scoreColor(s: number) {
-  if (s >= 80) return "#10B981";
-  if (s >= 60) return "#3B82F6";
-  if (s >= 40) return "#F59E0B";
-  return "#EF4444";
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const dataUrl = reader.result as string;
-      resolve(dataUrl.split(",")[1]);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
-/**
- * Downsample Float32 PCM to 16 kHz using linear interpolation.
- * iOS Safari AudioContext ignores the requested sampleRate and runs at the
- * hardware rate (44100 or 48000 Hz). Downsampling before building the WAV
- * ensures Azure receives clean 16 kHz audio for Pronunciation Assessment.
- */
-function downsampleTo16k(samples: Float32Array, fromRate: number): Float32Array {
-  if (fromRate === 16000) return samples;
-  const ratio = fromRate / 16000;
-  const outLen = Math.floor(samples.length / ratio);
-  const out = new Float32Array(outLen);
-  for (let i = 0; i < outLen; i++) {
-    const pos = i * ratio;
-    const lo = Math.floor(pos);
-    const hi = Math.min(lo + 1, samples.length - 1);
-    out[i] = samples[lo] + (samples[hi] - samples[lo]) * (pos - lo);
-  }
-  return out;
-}
-
-/**
- * Build a WAV (PCM 16-bit mono) ArrayBuffer from Int16 samples.
- * Azure Speech REST API reliably handles audio/wav.
- */
-function buildWavBuffer(pcm16: Int16Array, sampleRate: number): ArrayBuffer {
-  const numCh = 1, bps = 16;
-  const dataBytes = pcm16.length * 2;
-  const buf = new ArrayBuffer(44 + dataBytes);
-  const v = new DataView(buf);
-  const str = (s: string, o: number) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
-  str("RIFF", 0);
-  v.setUint32(4, 36 + dataBytes, true);
-  str("WAVE", 8);
-  str("fmt ", 12);
-  v.setUint32(16, 16, true);
-  v.setUint16(20, 1, true);
-  v.setUint16(22, numCh, true);
-  v.setUint32(24, sampleRate, true);
-  v.setUint32(28, sampleRate * numCh * bps / 8, true);
-  v.setUint16(32, numCh * bps / 8, true);
-  v.setUint16(34, bps, true);
-  str("data", 36);
-  v.setUint32(40, dataBytes, true);
-  for (let i = 0; i < pcm16.length; i++) v.setInt16(44 + i * 2, pcm16[i], true);
-  return buf;
-}
-
-/**
- * Record from the microphone and return { base64, mimeType }.
- * Strategy:
- *  1. If MediaRecorder supports audio/webm;codecs=opus → use it (Chrome/Firefox/Edge).
- *     Azure STT accepts webm/opus directly — most reliable path.
- *  2. Otherwise (iOS Safari) → AudioContext + ScriptProcessor → WAV (PCM 16-bit).
- *     We resume() the context first to avoid the iOS "suspended" state bug.
- */
-async function recordWebAudio(durationMs: number): Promise<{ base64: string; mimeType: string }> {
-  // ── Get microphone stream (and trigger permission dialog) ─────────────────
-  // IMPORTANT: We reuse this SAME stream for the actual recording.
-  // On iOS Safari, stopping mic tracks releases the hardware; a second
-  // getUserMedia call immediately after can return a silent stream even though
-  // no error is thrown. Keeping the stream alive avoids this.
-  let stream: MediaStream;
-  try {
-    stream = await (navigator.mediaDevices as any).getUserMedia({
-      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
-      video: false,
-    });
-  } catch (permErr: any) {
-    const name = permErr?.name ?? permErr?.message ?? "";
-    if (
-      name.includes("NotAllowed") ||
-      name.includes("PermissionDenied") ||
-      name.includes("Permission") ||
-      name.includes("denied")
-    ) {
-      throw new Error("PERMISSION_DENIED");
-    }
-    throw permErr;
-  }
-
-  const MR = (window as any).MediaRecorder as typeof MediaRecorder;
-
-  // ── Path 1: MediaRecorder (Chrome/Firefox → webm/opus; iOS 14.5+ → mp4) ─
-  const opusMime =
-    MR?.isTypeSupported?.("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" :
-    MR?.isTypeSupported?.("audio/ogg;codecs=opus")  ? "audio/ogg;codecs=opus"  :
-    MR?.isTypeSupported?.("audio/mp4")              ? "audio/mp4"              :
-    MR?.isTypeSupported?.("video/mp4")              ? "video/mp4"              : null;
-
-  if (opusMime) {
-    // Reuse the already-open stream — do NOT call getUserMedia again
-    const recorder = new MR(stream, { mimeType: opusMime });
-    const chunks: BlobPart[] = [];
-
-    await new Promise<void>((resolve, reject) => {
-      recorder.ondataavailable = (e: BlobEvent) => { if (e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => resolve();
-      recorder.onerror = () => reject(new Error("MediaRecorder error"));
-      recorder.start(200); // timeslice ensures chunks arrive on all browsers
-      setTimeout(() => recorder.stop(), durationMs);
-    });
-    stream.getTracks().forEach((t: MediaStreamTrack) => t.stop());
-
-    if (!chunks.length) throw new Error("No audio captured — check microphone permission");
-
-    const blob = new Blob(chunks, { type: opusMime });
-    const base64 = await blobToBase64(blob);
-    return { base64, mimeType: opusMime };
-  }
-
-  // ── Path 2: AudioContext → WAV (PCM 16-bit mono) — older iOS / fallback ──
-  // Reuse the same stream from above; create AudioContext after stream is live.
-  const ctx = new (window as any).AudioContext() as AudioContext;
-
-  // iOS Safari creates AudioContext in "suspended" state — resume before connecting nodes
-  if ((ctx as any).state !== "running") {
-    await ctx.resume();
-  }
-
-  const actualRate = ctx.sampleRate;
-  const source = ctx.createMediaStreamSource(stream);
-  const pcmChunks: Float32Array[] = [];
-
-  const processor = ctx.createScriptProcessor(4096, 1, 1);
-  processor.onaudioprocess = (e: AudioProcessingEvent) => {
-    pcmChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
-  };
-  // Connect through a silent gain node so ScriptProcessor fires without routing
-  // mic audio to the speaker (which iOS may block, preventing onaudioprocess).
-  const silentGain = ctx.createGain();
-  silentGain.gain.value = 0;
-  source.connect(processor);
-  processor.connect(silentGain);
-  silentGain.connect(ctx.destination);
-
-  await new Promise<void>((resolve) => setTimeout(resolve, durationMs));
-
-  source.disconnect();
-  processor.disconnect();
-  stream.getTracks().forEach((t: MediaStreamTrack) => t.stop());
-  await ctx.close();
-
-  if (!pcmChunks.length) throw new Error("No audio captured — microphone may be blocked");
-
-  // Flatten chunks
-  const total = pcmChunks.reduce((n, c) => n + c.length, 0);
-  const flat = new Float32Array(total);
-  let off = 0;
-  for (const c of pcmChunks) { flat.set(c, off); off += c.length; }
-
-  // Silence check — if RMS is near zero the mic captured nothing
-  const rms = Math.sqrt(flat.reduce((s, v) => s + v * v, 0) / flat.length);
-  if (rms < 0.001) throw new Error("Recording was silent — speak louder or check microphone");
-
-  // Downsample to 16 kHz (iOS Safari often locks to 44100/48000 Hz)
-  const resampled = downsampleTo16k(flat, actualRate);
-  const outRate = 16000;
-
-  // Float32 → Int16 PCM
-  const pcm16 = new Int16Array(resampled.length);
-  for (let i = 0; i < resampled.length; i++) {
-    pcm16[i] = Math.round(Math.max(-1, Math.min(1, resampled[i])) * 32767);
-  }
-
-  const wavBuf = buildWavBuffer(pcm16, outRate);
-  // Use FileReader via blobToBase64 — the manual btoa string-concat loop can
-  // silently truncate or corrupt large buffers on iOS Safari.
-  const wavBlob = new Blob([wavBuf], { type: "audio/wav" });
-  return { base64: await blobToBase64(wavBlob), mimeType: "audio/wav" };
-}
-
-
-// Singleton audio element so we can stop previous playback
+// Singleton audio element so previous playback stops on new tap
 let _pronunciationAudio: HTMLAudioElement | null = null;
 
-/**
- * Play pronunciation audio using Azure Neural TTS via the backend.
- * This guarantees the correct language voice (e.g. es-ES-ElviraNeural)
- * regardless of what voices the OS/browser has installed.
- */
-async function playPronunciationTTS(
-  text: string,
-  lang: string,
-  apiBase: string
-) {
+async function playPronunciationTTS(text: string, lang: string, apiBase: string) {
   try {
-    // Stop any currently playing pronunciation
     if (Platform.OS === "web" && _pronunciationAudio) {
       _pronunciationAudio.pause();
       _pronunciationAudio.src = "";
       _pronunciationAudio = null;
     }
-
     const url = new URL("/api/pronunciation-tts", apiBase);
     url.searchParams.set("text", text);
     url.searchParams.set("lang", lang);
-
     const res = await fetch(url.toString());
-    if (!res.ok) throw new Error(`Azure TTS ${res.status}`);
-
+    if (!res.ok) throw new Error(`TTS ${res.status}`);
     const blob = await res.blob();
     const objectUrl = URL.createObjectURL(blob);
-
     if (Platform.OS === "web") {
       const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
       _pronunciationAudio = audio;
-      audio.onended = () => {
-        URL.revokeObjectURL(objectUrl);
-        _pronunciationAudio = null;
-      };
-      audio.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        _pronunciationAudio = null;
-      };
+      audio.onended = () => { URL.revokeObjectURL(objectUrl); _pronunciationAudio = null; };
+      audio.onerror = () => { URL.revokeObjectURL(objectUrl); _pronunciationAudio = null; };
       await audio.play();
     } else {
-      // Native: play blob via expo-av Sound
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: objectUrl },
-        { shouldPlay: true }
-      );
+      const { sound } = await Audio.Sound.createAsync({ uri: objectUrl }, { shouldPlay: true });
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
           sound.unloadAsync();
@@ -350,13 +123,15 @@ export default function SpeakScreen() {
   const [activeLang, setActiveLang] = useState<LangTab>("korean");
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [recordState, setRecordState] = useState<RecordState>("idle");
-  const [scores, setScores] = useState<PronScores | null>(null);
-  const [hasListened, setHasListened] = useState(false);
-  const [transcribedText, setTranscribedText] = useState("");
+  const [score, setScore] = useState<number | null>(null);
+  const [gptFeedback, setGptFeedback] = useState("");
+  const [recognizedText, setRecognizedText] = useState("");
   const [sttError, setSttError] = useState("");
+  const [hasListened, setHasListened] = useState(false);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
+  const recordStateRef = useRef<RecordState>("idle");
 
   const phrases = PHRASE_SETS[activeLang];
   const phrase = phrases[phraseIdx];
@@ -371,10 +146,12 @@ export default function SpeakScreen() {
 
   const resetState = () => {
     setRecordState("idle");
-    setScores(null);
-    setHasListened(false);
-    setTranscribedText("");
+    recordStateRef.current = "idle";
+    setScore(null);
+    setGptFeedback("");
+    setRecognizedText("");
     setSttError("");
+    setHasListened(false);
     pulseLoop.current?.stop();
     Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
   };
@@ -382,7 +159,6 @@ export default function SpeakScreen() {
   const handleListen = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setHasListened(true);
-    // Use Azure Neural TTS — correct language voice guaranteed (e.g. es-ES-ElviraNeural)
     playPronunciationTTS(phrase.word, phrase.speechLang, getApiUrl());
   };
 
@@ -401,124 +177,99 @@ export default function SpeakScreen() {
     Animated.timing(pulseAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
   };
 
-  const handleRecord = async () => {
+  const handleRecord = () => {
     if (recordState === "listening" || recordState === "processing") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+
+    if (Platform.OS !== "web") {
+      setSttError("발음 평가는 현재 웹 브라우저에서만 지원됩니다.");
+      setRecordState("done");
+      recordStateRef.current = "done";
+      return;
+    }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setSttError("이 브라우저는 음성 인식을 지원하지 않습니다.\nSafari 또는 Chrome을 사용해 주세요.");
+      setRecordState("done");
+      recordStateRef.current = "done";
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = phrase.speechLang;
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
     setRecordState("listening");
-    setScores(null);
-    setTranscribedText("");
+    recordStateRef.current = "listening";
+    setScore(null);
+    setGptFeedback("");
+    setRecognizedText("");
     setSttError("");
     startPulse();
 
-    try {
-      let audioBase64 = "";
-      let mimeType = "audio/webm";
+    let resultReceived = false;
 
-      if (Platform.OS === "web") {
-        // ── Web: smart recording (webm/opus on Chrome, WAV on iOS Safari) ──
-        const rec = await recordWebAudio(4000);
-        audioBase64 = rec.base64;
-        mimeType = rec.mimeType;
-      } else {
-        // ── Native: expo-av ─────────────────────────────────────────────────
-        const { granted } = await Audio.requestPermissionsAsync();
-        if (!granted) throw new Error("Microphone permission denied");
-
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.HIGH_QUALITY
-        );
-
-        await new Promise((r) => setTimeout(r, 4000));
-        await recording.stopAndUnloadAsync();
-
-        await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
-
-        const uri = recording.getURI();
-        if (!uri) throw new Error("No recording URI");
-
-        mimeType = "audio/x-m4a";
-        const res = await fetch(uri);
-        const blob = await res.blob();
-        audioBase64 = await blobToBase64(blob);
-      }
-
-      // ── Processing: send to Azure Pronunciation Assessment ────────────────
+    recognition.onresult = async (event: any) => {
+      resultReceived = true;
       stopPulse();
       setRecordState("processing");
+      recordStateRef.current = "processing";
 
-      const apiUrl = new URL("/api/pronunciation-assessment", getApiUrl()).toString();
-      const apiRes = await fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          audio: audioBase64,
-          mimeType,
-          language: phrase.speechLang,
-          referenceText: phrase.word,
-        }),
-      });
+      const transcript: string = event.results[0][0].transcript;
+      setRecognizedText(transcript);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-      if (!apiRes.ok) {
-        const errData = await apiRes.json().catch(() => ({}));
-        throw new Error(errData.error ?? `HTTP ${apiRes.status}`);
-      }
-
-      const data = await apiRes.json();
-      setTranscribedText(data.transcribedText ?? "");
-
-      if (
-        data.status !== "Success" ||
-        data.pronScore === null ||
-        data.pronScore === undefined
-      ) {
-        // Azure couldn't assess — show meaningful error with actual status
-        const statusMsg: Record<string, string> = {
-          InitialSilenceTimeout: "음성이 감지되지 않았습니다. 마이크 버튼을 누른 후 바로 말씀해 주세요.",
-          BabbleTimeout: "배경 소음이 너무 큽니다. 조용한 곳에서 다시 시도해 주세요.",
-          NoMatch: "음성을 인식하지 못했습니다. 더 천천히 명확하게 말씀해 주세요.",
-          Error: data.error ? `Azure 오류: ${data.error}` : "Azure 처리 오류 — 다시 시도해 주세요.",
-        };
-        // When status is "Success" but scores are missing, Azure heard something
-        // (e.g. background noise) but couldn't match it to the reference text.
-        const fallback = data.status === "Success"
-          ? "발음을 인식하지 못했습니다. 마이크에 가까이 대고 또렷하게 말씀해 주세요."
-          : `인식 실패 (${data.status ?? "알 수 없는 오류"}) — 다시 시도해 주세요.`;
-        setSttError(statusMsg[data.status] ?? fallback);
-      } else {
-        setScores({
-          accuracy: data.accuracyScore ?? 0,
-          fluency: data.fluencyScore ?? 0,
-          completeness: data.completenessScore ?? 0,
-          overall: data.pronScore ?? 0,
+      try {
+        const apiUrl = new URL("/api/gpt-score", getApiUrl()).toString();
+        const apiRes = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word: phrase.word, recognized: transcript }),
         });
+        if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
+        const data = await apiRes.json();
+        setScore(data.score ?? 0);
+        setGptFeedback(data.feedback ?? "");
+      } catch {
+        setSttError("채점 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      } finally {
+        setRecordState("done");
+        recordStateRef.current = "done";
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
-    } catch (err: any) {
-      const msg = String(err?.message ?? err ?? "");
-      if (
-        msg.includes("PERMISSION_DENIED") ||
-        msg.includes("NotAllowed") ||
-        msg.includes("permission") ||
-        msg.includes("Permission")
-      ) {
-        setSttError("마이크 권한을 허용해주세요\n(브라우저 설정에서 마이크를 허용한 후 다시 시도하세요)");
-      } else if (msg.includes("silent") || msg.includes("Silent")) {
-        setSttError("소리가 녹음되지 않았습니다. 마이크에 가까이 대고 다시 말씀해 주세요.");
-      } else if (msg.includes("No audio") || msg.includes("no audio")) {
-        setSttError("오디오를 캡처하지 못했습니다. 마이크 연결을 확인해 주세요.");
-      } else {
-        // Show the actual error so we can diagnose issues — not "Couldn't hear you"
-        setSttError(msg || "Something went wrong — please try again");
-      }
-    } finally {
+    };
+
+    recognition.onerror = (event: any) => {
+      resultReceived = true;
       stopPulse();
+      const errMap: Record<string, string> = {
+        "not-allowed": "마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)",
+        "no-speech": "음성이 감지되지 않았습니다. 다시 시도해 주세요.",
+        "network": "네트워크 오류가 발생했습니다.",
+        "aborted": "녹음이 취소되었습니다.",
+        "audio-capture": "마이크를 찾을 수 없습니다.",
+        "service-not-allowed": "마이크 권한을 허용해주세요.",
+      };
+      setSttError(errMap[event.error] ?? `오류: ${event.error}`);
       setRecordState("done");
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
+      recordStateRef.current = "done";
+    };
+
+    recognition.onend = () => {
+      stopPulse();
+      if (!resultReceived && recordStateRef.current === "listening") {
+        setSttError("음성이 감지되지 않았습니다. 다시 시도해 주세요.");
+        setRecordState("done");
+        recordStateRef.current = "done";
+      }
+    };
+
+    recognition.start();
   };
 
   const navigate = (dir: "prev" | "next") => {
@@ -574,7 +325,6 @@ export default function SpeakScreen() {
         {/* Phrase card */}
         <View style={styles.phraseCard}>
           <View style={styles.phraseCardInner}>
-            {/* Level + listen row */}
             <View style={styles.phraseTopRow}>
               <View style={[styles.levelBadge, { backgroundColor: tabInfo.color + "18" }]}>
                 <Text style={[styles.levelText, { color: tabInfo.color }]}>{phrase.level}</Text>
@@ -593,22 +343,17 @@ export default function SpeakScreen() {
               </Pressable>
             </View>
 
-            {/* Word */}
             <Text style={styles.phraseWord}>{phrase.word}</Text>
 
-            {/* IPA */}
             <View style={styles.ipaRow}>
               <Text style={styles.ipaLabel}>IPA</Text>
               <Text style={styles.ipaText}>{phrase.ipa}</Text>
             </View>
 
-            {/* Divider */}
             <View style={styles.divider} />
 
-            {/* Meaning */}
             <Text style={styles.phraseMeaning}>{phrase.meaning}</Text>
 
-            {/* Tip */}
             <View style={styles.tipBox}>
               <Ionicons name="bulb-outline" size={13} color="#F59E0B" />
               <Text style={styles.tipText}>{phrase.tip}</Text>
@@ -634,82 +379,93 @@ export default function SpeakScreen() {
           </View>
         </View>
 
-        {/* Mic / Score section */}
+        {/* Mic / Result section */}
         <View style={styles.micSection}>
           {recordState === "done" ? (
-            <View style={styles.scoreWrap}>
-              {scores ? (
+            /* ── Results ─────────────────────────────────────────────────── */
+            <View style={styles.resultWrap}>
+              {score !== null ? (
                 <>
-                  {/* Overall score header */}
+                  {/* Score circle */}
                   {(() => {
-                    const feedback = getFeedback(scores.overall);
+                    const { text, color } = getScoreLabel(score);
                     return (
-                      <View style={styles.overallRow}>
-                        <View style={[styles.overallCircle, { borderColor: feedback.color }]}>
-                          <Text style={[styles.overallNumber, { color: feedback.color }]}>{scores.overall}</Text>
-                          <Text style={styles.overallLabel}>overall</Text>
+                      <View style={styles.scoreBlock}>
+                        <View style={[styles.scoreCircle, { borderColor: color }]}>
+                          <Text style={[styles.scoreNumber, { color }]}>{score}</Text>
                         </View>
-                        <View style={styles.overallMeta}>
-                          <Text style={styles.overallEmoji}>{feedback.emoji}</Text>
-                          <Text style={[styles.overallFeedback, { color: feedback.color }]}>{feedback.text}</Text>
-                        </View>
+                        <Text style={[styles.scoreLabel, { color }]}>{text}</Text>
                       </View>
                     );
                   })()}
 
-                  {/* 4 score bars */}
-                  <View style={styles.scoreBars}>
-                    {[
-                      { label: "Accuracy", value: scores.accuracy },
-                      { label: "Fluency", value: scores.fluency },
-                      { label: "Completeness", value: scores.completeness },
-                    ].map(({ label, value }) => (
-                      <View key={label} style={styles.scoreBarRow}>
-                        <Text style={styles.scoreBarLabel}>{label}</Text>
-                        <View style={styles.scoreBarTrack}>
-                          <View
-                            style={[
-                              styles.scoreBarFill,
-                              { width: `${value}%` as any, backgroundColor: scoreColor(value) },
-                            ]}
-                          />
-                        </View>
-                        <Text style={[styles.scoreBarValue, { color: scoreColor(value) }]}>{value}</Text>
-                      </View>
-                    ))}
-                  </View>
+                  {/* GPT feedback */}
+                  {gptFeedback ? (
+                    <View style={styles.feedbackBox}>
+                      <Text style={styles.feedbackText}>{gptFeedback}</Text>
+                    </View>
+                  ) : null}
 
-                  {/* What Azure heard */}
-                  {transcribedText ? (
-                    <View style={styles.transcriptBox}>
-                      <Text style={styles.transcriptLabel}>Azure heard:</Text>
-                      <Text style={styles.transcriptText}>"{transcribedText}"</Text>
+                  {/* What was heard */}
+                  {recognizedText ? (
+                    <View style={styles.heardBox}>
+                      <Text style={styles.heardLabel}>인식된 발음</Text>
+                      <Text style={styles.heardText}>"{recognizedText}"</Text>
                     </View>
                   ) : null}
                 </>
               ) : (
-                /* No scores — show error */
+                /* Error */
                 <View style={styles.errorBox}>
                   <Ionicons name="warning-outline" size={18} color="#EF4444" />
                   <Text style={styles.errorText}>
-                    {sttError || "Couldn't assess pronunciation — please try again"}
+                    {sttError || "음성 인식에 실패했습니다. 다시 시도해 주세요."}
                   </Text>
                 </View>
               )}
 
-              <Pressable
-                style={({ pressed }) => [styles.retryBtn, pressed && { opacity: 0.8 }]}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  resetState();
-                }}
-                testID="retry-button"
-              >
-                <Ionicons name="refresh" size={16} color={tabInfo.color} />
-                <Text style={[styles.retryBtnText, { color: tabInfo.color }]}>{t("try_again")}</Text>
-              </Pressable>
+              {/* Action buttons */}
+              <View style={styles.actionRow}>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.actionBtn,
+                    styles.retryBtn,
+                    pressed && { opacity: 0.8 },
+                  ]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setRecordState("idle");
+                    recordStateRef.current = "idle";
+                    setScore(null);
+                    setGptFeedback("");
+                    setRecognizedText("");
+                    setSttError("");
+                    pulseLoop.current?.stop();
+                    Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+                  }}
+                  testID="retry-button"
+                >
+                  <Ionicons name="refresh" size={16} color={tabInfo.color} />
+                  <Text style={[styles.actionBtnText, { color: tabInfo.color }]}>다시 시도</Text>
+                </Pressable>
+
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.actionBtn,
+                    styles.nextWordBtn,
+                    { backgroundColor: tabInfo.color },
+                    pressed && { opacity: 0.85 },
+                  ]}
+                  onPress={() => navigate("next")}
+                  testID="next-word-button"
+                >
+                  <Text style={styles.nextWordBtnText}>다음 단어</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                </Pressable>
+              </View>
             </View>
           ) : (
+            /* ── Mic button ───────────────────────────────────────────────── */
             <View style={styles.micWrap}>
               <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
                 <Pressable
@@ -744,42 +500,49 @@ export default function SpeakScreen() {
               ) : (
                 <Text style={styles.micHint}>
                   {isProcessing
-                    ? "Azure로 분석 중…"
+                    ? "GPT로 채점 중…"
                     : hasListened
-                    ? "Now tap to record yourself"
-                    : "Tap 🔊 to listen first, then record"}
+                    ? "마이크를 탭해서 따라 말해보세요"
+                    : "🔊 먼저 듣고, 따라 말해보세요"}
                 </Text>
               )}
 
               {!hasListened && recordState === "idle" && (
                 <View style={styles.listenHintRow}>
                   <Ionicons name="arrow-up-outline" size={13} color="#C4B5BF" />
-                  <Text style={styles.listenHintText}>Tap Listen above to hear the pronunciation</Text>
+                  <Text style={styles.listenHintText}>위의 듣기 버튼을 먼저 눌러보세요</Text>
                 </View>
               )}
             </View>
           )}
         </View>
 
-        {/* Prev / Next */}
-        <View style={styles.navRow}>
-          <Pressable
-            style={({ pressed }) => [styles.navBtn, styles.prevBtn, pressed && { opacity: 0.8 }]}
-            onPress={() => navigate("prev")}
-            testID="prev-button"
-          >
-            <Ionicons name="arrow-back" size={18} color="#FF6B9D" />
-            <Text style={styles.prevBtnText}>Prev</Text>
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [styles.navBtn, styles.nextBtn, { backgroundColor: tabInfo.color }, pressed && { opacity: 0.85 }]}
-            onPress={() => navigate("next")}
-            testID="next-button"
-          >
-            <Text style={styles.nextBtnText}>{t("next")}</Text>
-            <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
-          </Pressable>
-        </View>
+        {/* Prev / Next navigation */}
+        {recordState !== "done" && (
+          <View style={styles.navRow}>
+            <Pressable
+              style={({ pressed }) => [styles.navBtn, styles.prevBtn, pressed && { opacity: 0.8 }]}
+              onPress={() => navigate("prev")}
+              testID="prev-button"
+            >
+              <Ionicons name="arrow-back" size={18} color="#FF6B9D" />
+              <Text style={styles.prevBtnText}>Prev</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.navBtn,
+                styles.nextBtn,
+                { backgroundColor: tabInfo.color },
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={() => navigate("next")}
+              testID="next-button"
+            >
+              <Text style={styles.nextBtnText}>{t("next")}</Text>
+              <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+            </Pressable>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -951,7 +714,7 @@ const styles = StyleSheet.create({
   micSection: {
     alignItems: "center",
     paddingVertical: 8,
-    minHeight: 200,
+    minHeight: 220,
     justifyContent: "center",
   },
   micWrap: {
@@ -1012,107 +775,74 @@ const styles = StyleSheet.create({
     color: "#C4B5BF",
   },
 
-  scoreWrap: {
+  resultWrap: {
     alignSelf: "stretch",
-    gap: 12,
-  },
-  overallRow: {
-    flexDirection: "row",
+    gap: 14,
     alignItems: "center",
-    gap: 16,
-    justifyContent: "center",
   },
-  overallCircle: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    borderWidth: 3,
+  scoreBlock: {
+    alignItems: "center",
+    gap: 10,
+  },
+  scoreCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 4,
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  overallNumber: {
-    fontSize: 28,
+  scoreNumber: {
+    fontSize: 36,
     fontFamily: "Inter_700Bold",
-    lineHeight: 32,
+    lineHeight: 40,
   },
-  overallLabel: {
-    fontSize: 10,
-    fontFamily: "Inter_500Medium",
-    color: "#A08090",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
+  scoreLabel: {
+    fontSize: 20,
+    fontFamily: "Inter_700Bold",
+    textAlign: "center",
   },
-  overallMeta: {
-    gap: 4,
-    alignItems: "flex-start",
-  },
-  overallEmoji: { fontSize: 22 },
-  overallFeedback: {
-    fontSize: 18,
-    fontFamily: "Inter_600SemiBold",
-  },
-  scoreBars: {
-    gap: 10,
+  feedbackBox: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
-    padding: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    alignSelf: "stretch",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
-  scoreBarRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  scoreBarLabel: {
-    width: 100,
-    fontSize: 13,
+  feedbackText: {
+    fontSize: 15,
     fontFamily: "Inter_500Medium",
-    color: "#5A4A5A",
+    color: "#1A1A2E",
+    textAlign: "center",
+    lineHeight: 22,
   },
-  scoreBarTrack: {
-    flex: 1,
-    height: 8,
-    backgroundColor: "#F0E8F0",
-    borderRadius: 4,
-    overflow: "hidden",
-  },
-  scoreBarFill: {
-    height: "100%",
-    borderRadius: 4,
-  },
-  scoreBarValue: {
-    width: 30,
-    fontSize: 13,
-    fontFamily: "Inter_700Bold",
-    textAlign: "right",
-  },
-
-  transcriptBox: {
+  heardBox: {
     alignItems: "center",
     gap: 2,
     backgroundColor: "#F0F7FF",
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    marginTop: 2,
+    alignSelf: "stretch",
   },
-  transcriptLabel: {
+  heardLabel: {
     fontSize: 11,
     fontFamily: "Inter_500Medium",
     color: "#6B9DFF",
     letterSpacing: 0.5,
   },
-  transcriptText: {
+  heardText: {
     fontSize: 15,
     fontFamily: "Inter_600SemiBold",
     color: "#1A1A2E",
@@ -1120,35 +850,57 @@ const styles = StyleSheet.create({
   },
   errorBox: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
+    alignItems: "flex-start",
+    gap: 8,
     backgroundColor: "#FEF2F2",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    alignSelf: "stretch",
   },
   errorText: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: "Inter_400Regular",
     color: "#EF4444",
+    lineHeight: 20,
   },
 
-  retryBtn: {
+  actionRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: "#FF6B9D50",
-    backgroundColor: "#FFFFFF",
+    gap: 10,
+    alignSelf: "stretch",
     marginTop: 4,
   },
-  retryBtnText: {
-    fontSize: 14,
+  actionBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 14,
+    borderRadius: 18,
+  },
+  retryBtn: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: "#FF6B9D50",
+  },
+  actionBtnText: {
+    fontSize: 15,
     fontFamily: "Inter_600SemiBold",
+  },
+  nextWordBtn: {
+    shadowColor: "#FF6B9D",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  nextWordBtnText: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+    color: "#FFFFFF",
   },
 
   navRow: {

@@ -1,60 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "node:http";
 import { openai } from "./openai";
-import { spawn } from "node:child_process";
-
-/**
- * Convert any audio buffer to 16 kHz, 16-bit, mono WAV using ffmpeg.
- * Azure Pronunciation Assessment works most reliably with WAV; webm/opus and
- * other formats can produce "Display: ." (silence) even when audio is present.
- */
-function convertToWav16k(inputBuffer: Buffer, inputMime: string): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    // Determine a file extension hint so ffmpeg picks the right demuxer
-    const extMap: Record<string, string> = {
-      "audio/webm": "webm",
-      "audio/webm;codecs=opus": "webm",
-      "audio/ogg": "ogg",
-      "audio/ogg;codecs=opus": "ogg",
-      "audio/mp4": "mp4",
-      "video/mp4": "mp4",
-      "audio/x-m4a": "m4a",
-      "audio/wav": "wav",
-      "audio/x-wav": "wav",
-    };
-    const ext = extMap[inputMime] ?? "webm";
-
-    const args = [
-      "-f", ext,          // input format hint
-      "-i", "pipe:0",     // read from stdin
-      "-ar", "16000",     // resample to 16 kHz
-      "-ac", "1",         // mono
-      "-acodec", "pcm_s16le", // 16-bit signed PCM
-      "-f", "wav",        // output format
-      "pipe:1",           // write to stdout
-    ];
-
-    const ff = spawn("ffmpeg", args, { stdio: ["pipe", "pipe", "pipe"] });
-    const chunks: Buffer[] = [];
-    const errChunks: Buffer[] = [];
-
-    ff.stdout.on("data", (d: Buffer) => chunks.push(d));
-    ff.stderr.on("data", (d: Buffer) => errChunks.push(d));
-
-    ff.on("close", (code) => {
-      if (code !== 0) {
-        const errMsg = Buffer.concat(errChunks).toString().slice(-500);
-        reject(new Error(`ffmpeg exited ${code}: ${errMsg}`));
-      } else {
-        resolve(Buffer.concat(chunks));
-      }
-    });
-    ff.on("error", reject);
-
-    ff.stdin.write(inputBuffer);
-    ff.stdin.end();
-  });
-}
 
 /**
  * Map browser-reported MIME types to what Azure STT actually accepts.
@@ -330,152 +276,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ── Azure Pronunciation Assessment ───────────────────────────────────────
-  // Accepts base64 audio + language + referenceText.
-  // Returns real AccuracyScore, FluencyScore, CompletenessScore, PronScore
-  // from Azure Cognitive Services Pronunciation Assessment API.
-  app.post("/api/pronunciation-assessment", async (req: Request, res: Response) => {
+  // ── GPT Pronunciation Scoring ─────────────────────────────────────────────
+  // Receives the target word and what the speech recogniser heard, then asks
+  // GPT to give a 0-100 score and short Korean feedback.
+  app.post("/api/gpt-score", async (req: Request, res: Response) => {
     try {
-      const { audio, mimeType, language, referenceText } = req.body as {
-        audio?: string;
-        mimeType?: string;
-        language?: string;
-        referenceText?: string;
-      };
-
-      if (!audio || !language || !referenceText) {
-        return res.status(400).json({ error: "audio, language, and referenceText are required" });
+      const { word, recognized } = req.body as { word?: string; recognized?: string };
+      if (!word || recognized === undefined) {
+        return res.status(400).json({ error: "word and recognized are required" });
       }
 
-      const key = process.env.AZURE_SPEECH_KEY;
-      const region = process.env.AZURE_SPEECH_REGION;
-      if (!key || !region) {
-        return res.status(500).json({ error: "Azure Speech credentials not configured" });
-      }
-
-      // Build Pronunciation-Assessment header (base64-encoded JSON)
-      const assessmentConfig = {
-        ReferenceText: referenceText,
-        GradingSystem: "HundredMark",
-        Granularity: "Phoneme",
-        EnableMiscue: true,
-        NBestPhonemeCount: 5,
-      };
-      const assessmentHeader = Buffer.from(JSON.stringify(assessmentConfig)).toString("base64");
-
-      const rawBuffer = Buffer.from(audio, "base64");
-      const rawMime = mimeType ?? "audio/wav";
-
-      // Convert to 16 kHz WAV regardless of input format.
-      // Azure Pronunciation Assessment returns "Display: ." (no scores) for
-      // webm/opus and other compressed formats even when the audio contains
-      // real speech. WAV (PCM) is the only reliably supported format for PA.
-      let audioBuffer: Buffer;
-      try {
-        audioBuffer = await convertToWav16k(rawBuffer, rawMime);
-      } catch (convErr) {
-        console.error("[PA] ffmpeg conversion failed:", convErr);
-        return res.status(500).json({ error: "Audio conversion failed" });
-      }
-
-      console.log(
-        `[PA] input=${rawMime} ${rawBuffer.length}B → wav ${audioBuffer.length}B`
-      );
-
-      const contentType = "audio/wav";
-
-      // Must use format=detailed to get NBest with PronunciationAssessment
-      const azureUrl =
-        `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation` +
-        `/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed&profanity=masked`;
-
-      const azureRes = await fetch(azureUrl, {
-        method: "POST",
-        headers: {
-          "Ocp-Apim-Subscription-Key": key,
-          "Content-Type": contentType,
-          "Pronunciation-Assessment": assessmentHeader,
-        },
-        body: audioBuffer,
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content:
+              'You are a language pronunciation coach. ' +
+              'The user will give you a target word and what a speech recogniser heard. ' +
+              'Reply ONLY with a JSON object with two keys: ' +
+              '"score" (integer 0-100 reflecting pronunciation accuracy) ' +
+              'and "feedback" (one short encouraging sentence in Korean with a specific tip). ' +
+              'Do not copy the example; evaluate the actual input.',
+          },
+          {
+            role: "user",
+            content:
+              `Target word: "${word}"\n` +
+              `Speech recogniser heard: "${recognized}"\n` +
+              'Give your score and Korean feedback.',
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 120,
+        response_format: { type: "json_object" },
       });
 
-      if (!azureRes.ok) {
-        const errText = await azureRes.text();
-        console.error("Azure Pronunciation Assessment error:", azureRes.status, errText);
-        return res.status(502).json({ error: "Azure Pronunciation Assessment failed", detail: errText });
-      }
-
-      // Azure's response shape — scores can appear either nested under
-      // PronunciationAssessment or directly on the NBest item depending on
-      // the API version / content-type used.
-      type PaScores = {
-        AccuracyScore?: number;
-        FluencyScore?: number;
-        CompletenessScore?: number;
-        PronScore?: number;
-      };
-      type NBestItem = PaScores & {
-        Display?: string;
-        PronunciationAssessment?: PaScores;
-        Words?: Array<{
-          Word: string;
-          PronunciationAssessment?: { AccuracyScore: number; ErrorType: string };
-        }>;
-      };
-      const data = (await azureRes.json()) as {
-        RecognitionStatus: string;
-        DisplayText?: string;
-        NBest?: NBestItem[];
-      };
-
-      const best0 = data.NBest?.[0];
-      // Scores can live in a nested PronunciationAssessment object OR directly
-      // on the NBest item — coalesce both shapes.
-      const paScores: PaScores = best0?.PronunciationAssessment ?? best0 ?? {};
-      console.log(
-        "Azure PA status:", data.RecognitionStatus,
-        "| NBest:", data.NBest?.length ?? 0,
-        "| Display:", best0?.Display,
-        "| AccuracyScore:", paScores.AccuracyScore,
-        "| PronScore:", paScores.PronScore
-      );
-
-      if (data.RecognitionStatus !== "Success" || !data.NBest?.length) {
-        return res.json({
-          status: data.RecognitionStatus,
-          transcribedText: data.DisplayText ?? "",
-          accuracyScore: null,
-          fluencyScore: null,
-          completenessScore: null,
-          pronScore: null,
-        });
-      }
-
-      const best = data.NBest[0];
-
-      // Coalesce nested + top-level score locations
-      const scores: PaScores = best.PronunciationAssessment ?? best;
-      const hasScores =
-        scores.AccuracyScore !== undefined &&
-        scores.PronScore !== undefined &&
-        scores.PronScore !== null;
-
-      if (!hasScores) {
-        console.warn("No pronunciation scores in NBest[0]. Full item:", JSON.stringify(best));
-      }
+      const raw = completion.choices[0]?.message?.content ?? "{}";
+      const parsed = JSON.parse(raw) as { score?: number; feedback?: string };
 
       res.json({
-        status: data.RecognitionStatus,
-        transcribedText: best.Display ?? data.DisplayText ?? "",
-        accuracyScore: hasScores ? Math.round(scores.AccuracyScore!) : null,
-        fluencyScore: hasScores ? Math.round(scores.FluencyScore ?? 0) : null,
-        completenessScore: hasScores ? Math.round(scores.CompletenessScore ?? 0) : null,
-        pronScore: hasScores ? Math.round(scores.PronScore!) : null,
-        words: best.Words ?? [],
+        score: Math.round(Math.max(0, Math.min(100, parsed.score ?? 0))),
+        feedback: parsed.feedback ?? "",
       });
     } catch (err) {
-      console.error("Pronunciation assessment error:", err);
-      res.status(500).json({ error: "Pronunciation assessment failed" });
+      console.error("GPT score error:", err);
+      res.status(500).json({ error: "Scoring failed" });
     }
   });
 
