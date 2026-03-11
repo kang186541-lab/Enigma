@@ -8,12 +8,14 @@ import {
   ScrollView,
   Animated,
 } from "react-native";
+import { Audio } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
 import { useLanguage } from "@/context/LanguageContext";
+import { getApiUrl } from "@/lib/query-client";
 
 const TAB_BAR_HEIGHT = 49;
 
@@ -52,34 +54,68 @@ const PHRASE_SETS: Record<LangTab, Phrase[]> = {
   spanish: [
     { word: "gracias", ipa: "/ˈɡɾa.sjas/", meaning: "Thank you", level: "A1", speechLang: "es-ES", tip: "The 'r' is a single tap (ɾ), not a rolled 'rr'." },
     { word: "murciélago", ipa: "/muɾ.ˈθje.la.ɣo/", meaning: "Bat (the animal)", level: "B1", speechLang: "es-ES", tip: "Contains all 5 vowels! The θ is a 'th' sound in Spain Spanish." },
-    { word: "desarrollar", ipa: "/de.sa.ɾo.ˈʎaɾ/", meaning: "To develop", level: "B1", speechLang: "es-ES", tip: "The 'll' is a palatal sound — like 'y' in 'yes' in Latin America." },
-    { word: "ferrocarril", ipa: "/fe.ro.ka.ˈril/", meaning: "Railway / railroad", level: "B2", speechLang: "es-ES", tip: "Two rolled 'rr' sounds. Practice each separately first." },
-    { word: "lluvia", ipa: "/ˈʎu.bja/", meaning: "Rain", level: "A1", speechLang: "es-ES", tip: "In Latin America 'll' sounds like 'y'. In Spain it's more like 'zh'." },
-    { word: "relajarse", ipa: "/re.la.ˈxaɾ.se/", meaning: "To relax (oneself)", level: "A2", speechLang: "es-ES", tip: "The 'j' is a guttural sound from the back of the throat." },
-    { word: "hermoso", ipa: "/eɾ.ˈmo.so/", meaning: "Beautiful / handsome", level: "A1", speechLang: "es-ES", tip: "The 'h' is always silent in Spanish. Start with the 'e' vowel." },
-    { word: "aburrido", ipa: "/a.βu.ˈri.ðo/", meaning: "Boring / bored", level: "A2", speechLang: "es-ES", tip: "Between vowels, 'b' softens to a β (lips almost touching, not fully)." },
+    { word: "desarrollar", ipa: "/de.za.ro.ˈʎaɾ/", meaning: "To develop", level: "B1", speechLang: "es-ES", tip: "The 'll' is a palatal lateral — like the 'y' in 'yes' in many dialects." },
+    { word: "extraordinario", ipa: "/eks.tɾa.oɾ.ðiˈna.ɾjo/", meaning: "Extraordinary", level: "B2", speechLang: "es-ES", tip: "7 syllables! Break it down slowly before building to full speed." },
+    { word: "ferrocarril", ipa: "/fe.ro.kaˈril/", meaning: "Railway / railroad", level: "B2", speechLang: "es-ES", tip: "Two rolling 'rr' sounds. Practice the trill separately first." },
+    { word: "subjuntivo", ipa: "/sub.xunˈti.βo/", meaning: "Subjunctive (grammar mood)", level: "B2", speechLang: "es-ES", tip: "The 'j' in Spanish is like a raspy 'h' from the throat." },
+    { word: "churrigueresco", ipa: "/tʃu.ri.ɣeˈɾes.ko/", meaning: "Extravagantly ornamented style", level: "C1", speechLang: "es-ES", tip: "Tongue-twister level! The 'rr' is the tricky part." },
+    { word: "otorrinolaringólogo", ipa: "/o.to.ri.no.la.ɾiŋˈɡo.lo.ɣo/", meaning: "Ear/nose/throat doctor", level: "C2", speechLang: "es-ES", tip: "10 syllables — the Spanish word for ENT. Take it one chunk at a time." },
   ],
 };
 
 const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] = [
   { key: "korean", label: "Korean", flag: "🇰🇷", color: "#FF6B9D" },
-  { key: "english", label: "English", flag: "🇺🇸", color: "#4A90D9" },
-  { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#E85D3A" },
+  { key: "english", label: "English", flag: "🇬🇧", color: "#6B9DFF" },
+  { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#FF9D6B" },
 ];
 
-const FEEDBACK: { min: number; emoji: string; text: string; color: string }[] = [
-  { min: 92, emoji: "🏆", text: "Native-level! Perfect!", color: "#4CAF50" },
-  { min: 80, emoji: "🌟", text: "Excellent pronunciation!", color: "#4CAF50" },
-  { min: 68, emoji: "👍", text: "Good effort! Keep going.", color: "#FF9800" },
-  { min: 50, emoji: "💪", text: "Getting there! Try again.", color: "#FF9800" },
-  { min: 0, emoji: "🎯", text: "Keep practicing — you'll get it!", color: "#F44336" },
-];
+interface FeedbackInfo { emoji: string; text: string; color: string }
 
-function getFeedback(score: number) {
-  return FEEDBACK.find((f) => score >= f.min) ?? FEEDBACK[FEEDBACK.length - 1];
+function getFeedback(score: number): FeedbackInfo {
+  if (score >= 90) return { emoji: "🌟", text: "Outstanding!", color: "#10B981" };
+  if (score >= 75) return { emoji: "🎯", text: "Great job!", color: "#3B82F6" };
+  if (score >= 55) return { emoji: "👍", text: "Good effort!", color: "#F59E0B" };
+  if (score >= 30) return { emoji: "💪", text: "Keep practising", color: "#EF4444" };
+  return { emoji: "🔁", text: "Try again", color: "#EF4444" };
 }
 
-type RecordState = "idle" | "listening" | "done";
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const dataUrl = reader.result as string;
+      resolve(dataUrl.split(",")[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+/** Levenshtein-based similarity score 0–100. */
+function scoreTranscription(transcribed: string, expected: string): number {
+  const normalize = (s: string) =>
+    s.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, "").trim();
+  const t = normalize(transcribed);
+  const e = normalize(expected);
+  if (!t) return 0;
+  if (t === e) return 100;
+  const m = e.length;
+  const n = t.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) =>
+    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+  );
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] =
+        e[i - 1] === t[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return Math.max(0, Math.round((1 - dp[m][n] / Math.max(m, n)) * 100));
+}
 
 async function speakPhrase(text: string, lang: string) {
   try {
@@ -92,6 +128,8 @@ async function speakPhrase(text: string, lang: string) {
   } catch {}
 }
 
+type RecordState = "idle" | "listening" | "processing" | "done";
+
 export default function SpeakScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useLanguage();
@@ -103,13 +141,15 @@ export default function SpeakScreen() {
   const [recordState, setRecordState] = useState<RecordState>("idle");
   const [score, setScore] = useState<number | null>(null);
   const [hasListened, setHasListened] = useState(false);
+  const [transcribedText, setTranscribedText] = useState("");
+  const [sttError, setSttError] = useState("");
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
 
   const phrases = PHRASE_SETS[activeLang];
   const phrase = phrases[phraseIdx];
-  const tabInfo = LANG_TABS.find((t) => t.key === activeLang)!;
+  const tabInfo = LANG_TABS.find((tab) => tab.key === activeLang)!;
   const feedback = score !== null ? getFeedback(score) : null;
 
   const switchLang = (lang: LangTab) => {
@@ -123,6 +163,8 @@ export default function SpeakScreen() {
     setRecordState("idle");
     setScore(null);
     setHasListened(false);
+    setTranscribedText("");
+    setSttError("");
     pulseLoop.current?.stop();
     Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
   };
@@ -143,26 +185,111 @@ export default function SpeakScreen() {
     pulseLoop.current.start();
   };
 
-  const handleRecord = () => {
-    if (recordState === "listening") return;
+  const stopPulse = () => {
+    pulseLoop.current?.stop();
+    Animated.timing(pulseAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+  };
+
+  const handleRecord = async () => {
+    if (recordState === "listening" || recordState === "processing") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setRecordState("listening");
     setScore(null);
+    setTranscribedText("");
+    setSttError("");
     startPulse();
-    const delay = 2200 + Math.random() * 800;
-    setTimeout(() => {
-      pulseLoop.current?.stop();
-      Animated.timing(pulseAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
-      const baseScore = hasListened ? 68 : 55;
-      const randomScore = Math.floor(baseScore + Math.random() * (100 - baseScore));
-      setScore(randomScore);
+
+    try {
+      let audioBase64 = "";
+      let mimeType = "audio/webm";
+
+      if (Platform.OS === "web") {
+        // ── Web: MediaRecorder ──────────────────────────────────────────────
+        const stream = await (navigator.mediaDevices as any).getUserMedia({ audio: true });
+        const recorder = new (window as any).MediaRecorder(stream) as MediaRecorder;
+        const chunks: BlobPart[] = [];
+
+        await new Promise<void>((resolve, reject) => {
+          recorder.ondataavailable = (e: BlobEvent) => {
+            if (e.data.size > 0) chunks.push(e.data);
+          };
+          recorder.onstop = () => resolve();
+          recorder.onerror = () => reject(new Error("MediaRecorder error"));
+          recorder.start();
+          setTimeout(() => recorder.stop(), 4000);
+        });
+
+        stream.getTracks().forEach((tr: MediaStreamTrack) => tr.stop());
+
+        const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+        mimeType = recorder.mimeType || "audio/webm";
+        audioBase64 = await blobToBase64(blob);
+      } else {
+        // ── Native: expo-av ─────────────────────────────────────────────────
+        const { granted } = await Audio.requestPermissionsAsync();
+        if (!granted) throw new Error("Microphone permission denied");
+
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+
+        const { recording } = await Audio.Recording.createAsync(
+          Audio.RecordingOptionsPresets.HIGH_QUALITY
+        );
+
+        await new Promise((r) => setTimeout(r, 4000));
+        await recording.stopAndUnloadAsync();
+
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+
+        const uri = recording.getURI();
+        if (!uri) throw new Error("No recording URI");
+
+        mimeType = "audio/x-m4a";
+        const res = await fetch(uri);
+        const blob = await res.blob();
+        audioBase64 = await blobToBase64(blob);
+      }
+
+      // ── Processing: send to Azure via backend ──────────────────────────────
+      stopPulse();
+      setRecordState("processing");
+
+      const apiUrl = new URL("/api/stt", getApiUrl()).toString();
+      const apiRes = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          audio: audioBase64,
+          mimeType,
+          language: phrase.speechLang,
+        }),
+      });
+
+      const data = await apiRes.json();
+      const heard = (data.text ?? "") as string;
+      setTranscribedText(heard);
+
+      if (!heard) {
+        setSttError("Couldn't hear you — try again in a quieter place");
+        setScore(0);
+      } else {
+        setScore(scoreTranscription(heard, phrase.word));
+      }
+    } catch (err: any) {
+      const msg = String(err?.message ?? "");
+      if (msg.includes("permission") || msg.includes("Permission")) {
+        setSttError("Microphone access denied — enable it in your browser/device settings");
+      } else {
+        setSttError("Something went wrong — please try again");
+      }
+      setScore(0);
+    } finally {
+      stopPulse();
       setRecordState("done");
-      Haptics.notificationAsync(
-        randomScore >= 80
-          ? Haptics.NotificationFeedbackType.Success
-          : Haptics.NotificationFeedbackType.Warning
-      );
-    }, delay);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
   };
 
   const navigate = (dir: "prev" | "next") => {
@@ -173,6 +300,10 @@ export default function SpeakScreen() {
     });
     resetState();
   };
+
+  const isRecording = recordState === "listening";
+  const isProcessing = recordState === "processing";
+  const isBusy = isRecording || isProcessing;
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
@@ -284,6 +415,20 @@ export default function SpeakScreen() {
               </View>
               <Text style={styles.scoreFeedbackEmoji}>{feedback.emoji}</Text>
               <Text style={[styles.scoreFeedbackText, { color: feedback.color }]}>{feedback.text}</Text>
+
+              {/* What Azure heard */}
+              {transcribedText ? (
+                <View style={styles.transcriptBox}>
+                  <Text style={styles.transcriptLabel}>Azure heard:</Text>
+                  <Text style={styles.transcriptText}>"{transcribedText}"</Text>
+                </View>
+              ) : sttError ? (
+                <View style={styles.errorBox}>
+                  <Ionicons name="warning-outline" size={14} color="#EF4444" />
+                  <Text style={styles.errorText}>{sttError}</Text>
+                </View>
+              ) : null}
+
               <Pressable
                 style={({ pressed }) => [styles.retryBtn, pressed && { opacity: 0.8 }]}
                 onPress={() => {
@@ -302,12 +447,12 @@ export default function SpeakScreen() {
                 <Pressable
                   style={({ pressed }) => [styles.micBtn, pressed && { opacity: 0.88 }]}
                   onPress={handleRecord}
-                  disabled={recordState === "listening"}
+                  disabled={isBusy}
                   testID="mic-button"
                 >
                   <LinearGradient
                     colors={
-                      recordState === "listening"
+                      isRecording
                         ? ["#FF4081", "#E91E63"]
                         : [tabInfo.color, tabInfo.color + "CC"]
                     }
@@ -316,7 +461,7 @@ export default function SpeakScreen() {
                     end={{ x: 0.8, y: 1 }}
                   />
                   <Ionicons
-                    name={recordState === "listening" ? "radio-button-on" : "mic"}
+                    name={isRecording ? "radio-button-on" : isProcessing ? "hourglass" : "mic"}
                     size={46}
                     color="#FFFFFF"
                   />
@@ -324,11 +469,13 @@ export default function SpeakScreen() {
               </Animated.View>
 
               <Text style={styles.micHint}>
-                {recordState === "idle"
-                  ? hasListened
-                    ? "Now tap to record yourself"
-                    : "Tap 🔊 to listen first, then record"
-                  : "Listening..."}
+                {isRecording
+                  ? "Listening for 4 seconds…"
+                  : isProcessing
+                  ? "Analysing with Azure…"
+                  : hasListened
+                  ? "Now tap to record yourself"
+                  : "Tap 🔊 to listen first, then record"}
               </Text>
 
               {!hasListened && recordState === "idle" && (
@@ -531,7 +678,7 @@ const styles = StyleSheet.create({
   micSection: {
     alignItems: "center",
     paddingVertical: 8,
-    minHeight: 180,
+    minHeight: 200,
     justifyContent: "center",
   },
   micWrap: {
@@ -603,6 +750,44 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily: "Inter_600SemiBold",
   },
+
+  transcriptBox: {
+    alignItems: "center",
+    gap: 2,
+    backgroundColor: "#F0F7FF",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginTop: 2,
+  },
+  transcriptLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
+    color: "#6B9DFF",
+    letterSpacing: 0.5,
+  },
+  transcriptText: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+    color: "#1A1A2E",
+    textAlign: "center",
+  },
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#FEF2F2",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: "#EF4444",
+  },
+
   retryBtn: {
     flexDirection: "row",
     alignItems: "center",
