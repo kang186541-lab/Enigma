@@ -216,6 +216,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ── Azure Speech-to-Text (plain transcription, no assessment) ────────────
+  // Used by the chat screen mic button to transcribe user speech to text.
+  app.post("/api/stt", async (req: Request, res: Response) => {
+    try {
+      const { audio, mimeType, language } = req.body as {
+        audio?: string;
+        mimeType?: string;
+        language?: string;
+      };
+      if (!audio || !language) {
+        return res.status(400).json({ error: "audio and language required" });
+      }
+      const key = process.env.AZURE_SPEECH_KEY;
+      const region = process.env.AZURE_SPEECH_REGION;
+      if (!key || !region) {
+        return res.status(500).json({ error: "Azure credentials not configured" });
+      }
+
+      const audioBuffer = Buffer.from(audio, "base64");
+      const rawMime = mimeType ?? "audio/wav";
+      const contentType = rawMime === "audio/wav"
+        ? "audio/wav; codecs=audio/pcm; samplerate=16000"
+        : rawMime;
+
+      const azureUrl =
+        `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation` +
+        `/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=simple`;
+
+      const azureRes = await fetch(azureUrl, {
+        method: "POST",
+        headers: {
+          "Ocp-Apim-Subscription-Key": key,
+          "Content-Type": contentType,
+        },
+        body: audioBuffer,
+      });
+
+      if (!azureRes.ok) {
+        const errText = await azureRes.text();
+        console.error("Azure STT error:", azureRes.status, errText);
+        return res.status(502).json({ error: "STT failed" });
+      }
+
+      const data = (await azureRes.json()) as { RecognitionStatus: string; DisplayText?: string };
+      res.json({ text: data.DisplayText ?? "", status: data.RecognitionStatus });
+    } catch (err) {
+      console.error("STT error:", err);
+      res.status(500).json({ error: "STT failed" });
+    }
+  });
+
   // ── Azure Pronunciation Assessment ───────────────────────────────────────
   // Accepts base64 audio + language + referenceText.
   // Returns real AccuracyScore, FluencyScore, CompletenessScore, PronScore

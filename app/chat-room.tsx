@@ -9,6 +9,7 @@ import {
   Platform,
   ActivityIndicator,
   Modal,
+  Animated,
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,6 +21,7 @@ import * as Speech from "expo-speech";
 import { getTutor, Tutor } from "@/constants/tutors";
 import { useLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
+import { recordAudio } from "@/lib/audio";
 
 interface Message {
   id: string;
@@ -141,6 +143,11 @@ export default function ChatRoomScreen() {
   // Subtitle state
   const [subtitleWordIdx, setSubtitleWordIdx] = useState(-1);
   const subtitleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Voice input state
+  const [isRecording, setIsRecording] = useState(false);
+  const micPulse = useRef(new Animated.Value(1)).current;
+  const micPulseLoop = useRef<Animated.CompositeAnimation | null>(null);
 
   // Auto-translation tracking (ref so we never double-fetch)
   const translatedIdsRef = useRef<Set<string>>(new Set());
@@ -297,6 +304,53 @@ export default function ChatRoomScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (!muted) stopSpeech();
     setMuted((m) => !m);
+  };
+
+  const handleVoiceInput = async () => {
+    if (isRecording || isTyping) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setIsRecording(true);
+
+    // Pulse animation while recording
+    micPulseLoop.current = Animated.loop(
+      Animated.sequence([
+        Animated.timing(micPulse, { toValue: 1.25, duration: 500, useNativeDriver: true }),
+        Animated.timing(micPulse, { toValue: 1, duration: 500, useNativeDriver: true }),
+      ])
+    );
+    micPulseLoop.current.start();
+
+    try {
+      const { base64, mimeType } = await recordAudio(4000);
+
+      const apiUrl = new URL("/api/stt", getApiUrl()).toString();
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          audio: base64,
+          mimeType,
+          language: tutor?.speechLang ?? "en-US",
+        }),
+      });
+
+      const data = await res.json();
+      const transcribed = (data.text ?? "").trim();
+      if (transcribed) {
+        setInputText(transcribed);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        // Focus input so user can review/edit before sending
+        setTimeout(() => inputRef.current?.focus(), 100);
+      } else {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      }
+    } catch {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      micPulseLoop.current?.stop();
+      Animated.timing(micPulse, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+      setIsRecording(false);
+    }
   };
 
   const sendMessage = async () => {
@@ -597,18 +651,38 @@ export default function ChatRoomScreen() {
 
         <View style={[styles.inputBar, { paddingBottom: Math.max(bottomPad + 4, 16) }]}>
           <View style={styles.inputRow}>
+            {/* Mic button — records voice, transcribes via Azure STT */}
+            <Animated.View style={{ transform: [{ scale: micPulse }] }}>
+              <Pressable
+                onPress={handleVoiceInput}
+                disabled={isRecording || isTyping}
+                style={({ pressed }) => [
+                  styles.micInputBtn,
+                  isRecording && styles.micInputBtnActive,
+                  pressed && !isRecording && { opacity: 0.75 },
+                ]}
+              >
+                <Ionicons
+                  name={isRecording ? "radio-button-on" : "mic"}
+                  size={18}
+                  color={isRecording ? "#FFFFFF" : "#FF6B9D"}
+                />
+              </Pressable>
+            </Animated.View>
+
             <TextInput
               ref={inputRef}
               style={styles.input}
               value={inputText}
               onChangeText={setInputText}
-              placeholder={t("type_message")}
-              placeholderTextColor="#C4B5BF"
+              placeholder={isRecording ? "Listening…" : t("type_message")}
+              placeholderTextColor={isRecording ? "#FF6B9D" : "#C4B5BF"}
               multiline
               maxLength={500}
               returnKeyType="send"
               onSubmitEditing={sendMessage}
               blurOnSubmit={false}
+              editable={!isRecording}
             />
             <Pressable
               style={({ pressed }) => [
@@ -617,7 +691,7 @@ export default function ChatRoomScreen() {
                 pressed && !!inputText.trim() && { opacity: 0.82, transform: [{ scale: 0.94 }] },
               ]}
               onPress={sendMessage}
-              disabled={!inputText.trim()}
+              disabled={!inputText.trim() || isRecording}
             >
               <LinearGradient
                 colors={inputText.trim() ? ["#FF6B9D", "#FF4081"] : ["#E8D5DC", "#E8D5DC"]}
@@ -1005,6 +1079,21 @@ const styles = StyleSheet.create({
     color: "#1A1A2E",
     paddingVertical: 8,
     maxHeight: 100,
+  },
+  micInputBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 1.5,
+    borderColor: "#FF6B9D50",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
+    backgroundColor: "#FFF0F6",
+  },
+  micInputBtnActive: {
+    backgroundColor: "#FF6B9D",
+    borderColor: "#FF6B9D",
   },
   sendBtn: { borderRadius: 20, overflow: "hidden", marginBottom: 2 },
   sendBtnDisabled: { opacity: 0.55 },
