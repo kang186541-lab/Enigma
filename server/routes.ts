@@ -90,11 +90,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ── OpenAI Neural TTS ─────────────────────────────────────────────────────
-  // Each tutor maps to the most fitting OpenAI voice character.
-  // fable = British inflection (Sarah), onyx = authoritative male (Jake),
-  // nova = warm Latina female (Jane), echo = energetic male (Alex),
-  // shimmer = gentle female (Jisu), alloy = balanced male (Minjun)
+  // ── OpenAI Neural TTS via gpt-audio (chat completions — proxy-supported) ──
+  // The Replit OpenAI proxy supports /chat/completions but NOT /audio/speech.
+  // We use the gpt-audio model with audio modalities to generate speech, then
+  // wrap the returned PCM16 bytes in a WAV container for playback.
+  //
+  // Voice mapping: each tutor gets a unique character voice.
+  // fable = British inflection (Sarah), onyx = deep male (Jake),
+  // nova  = warm female (Jane),         echo  = energetic male (Alex),
+  // shimmer = gentle female (Jisu),     alloy = balanced male (Minjun)
   const TUTOR_TTS_VOICES: Record<string, string> = {
     sarah:  "fable",
     jake:   "onyx",
@@ -104,32 +108,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     minjun: "alloy",
   };
 
+  /** Wrap raw PCM16 LE mono bytes in a standard WAV container. */
+  function buildWav(pcm16: Buffer, sampleRate = 24000): Buffer {
+    const numCh = 1, bits = 16;
+    const byteRate = sampleRate * numCh * (bits / 8);
+    const blockAlign = numCh * (bits / 8);
+    const hdr = Buffer.alloc(44);
+    hdr.write("RIFF", 0, "ascii");
+    hdr.writeUInt32LE(36 + pcm16.length, 4);
+    hdr.write("WAVE", 8, "ascii");
+    hdr.write("fmt ", 12, "ascii");
+    hdr.writeUInt32LE(16, 16);          // PCM chunk size
+    hdr.writeUInt16LE(1, 20);           // PCM format
+    hdr.writeUInt16LE(numCh, 22);
+    hdr.writeUInt32LE(sampleRate, 24);
+    hdr.writeUInt32LE(byteRate, 28);
+    hdr.writeUInt16LE(blockAlign, 32);
+    hdr.writeUInt16LE(bits, 34);
+    hdr.write("data", 36, "ascii");
+    hdr.writeUInt32LE(pcm16.length, 40);
+    return Buffer.concat([hdr, pcm16]);
+  }
+
   app.get("/api/tts", async (req: Request, res: Response) => {
     try {
-      const { text, tutorId, speed } = req.query as {
-        text: string;
-        tutorId: string;
-        speed?: string;
-      };
+      const { text, tutorId } = req.query as { text: string; tutorId: string };
 
       if (!text || !tutorId) {
         return res.status(400).json({ error: "text and tutorId required" });
       }
 
       const voice = (TUTOR_TTS_VOICES[tutorId] ?? "alloy") as any;
-      const speechSpeed = Math.min(4.0, Math.max(0.25, parseFloat(speed ?? "0.9")));
+      const inputText = text.slice(0, 4000);
 
-      const response = await openai.audio.speech.create({
-        model: "tts-1-hd",
-        voice,
-        input: text.slice(0, 4000),
-        speed: speechSpeed,
+      // gpt-audio uses chat/completions with audio modalities — supported by proxy
+      const response = await (openai.chat.completions.create as any)({
+        model: "gpt-audio",
+        modalities: ["text", "audio"],
+        audio: { voice, format: "pcm16" },
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a text-to-speech engine. Read the user's message aloud verbatim — every word, exactly as written, in your natural voice. Do not add, change, or summarise anything.",
+          },
+          { role: "user", content: inputText },
+        ],
       });
 
-      const buffer = Buffer.from(await response.arrayBuffer());
-      res.set("Content-Type", "audio/mpeg");
+      const audioB64: string | undefined =
+        response.choices?.[0]?.message?.audio?.data;
+
+      if (!audioB64) {
+        console.error("TTS: no audio data in response", JSON.stringify(response).slice(0, 300));
+        return res.status(500).json({ error: "No audio data returned" });
+      }
+
+      const wav = buildWav(Buffer.from(audioB64, "base64"));
+      res.set("Content-Type", "audio/wav");
       res.set("Cache-Control", "public, max-age=300");
-      res.send(buffer);
+      res.send(wav);
     } catch (err) {
       console.error("TTS error:", err);
       res.status(500).json({ error: "TTS generation failed" });
