@@ -70,6 +70,23 @@ export async function recordAudio(
 }
 
 async function recordWeb(durationMs: number): Promise<{ base64: string; mimeType: string }> {
+  // Get stream once — reuse it for both MediaRecorder and AudioContext paths.
+  // On iOS Safari, stopping tracks and calling getUserMedia again can return a
+  // silent stream even when no error is thrown.
+  let stream: MediaStream;
+  try {
+    stream = await (navigator.mediaDevices as any).getUserMedia({
+      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
+      video: false,
+    });
+  } catch (err: any) {
+    const name = err?.name ?? err?.message ?? "";
+    if (name.includes("NotAllowed") || name.includes("PermissionDenied") || name.includes("denied")) {
+      throw new Error("PERMISSION_DENIED");
+    }
+    throw err;
+  }
+
   const MR = (window as any).MediaRecorder as typeof MediaRecorder;
 
   // Path 1: MediaRecorder — Chrome/Firefox → webm/opus; iOS Safari 14.5+ → mp4
@@ -80,7 +97,7 @@ async function recordWeb(durationMs: number): Promise<{ base64: string; mimeType
     MR?.isTypeSupported?.("video/mp4")              ? "video/mp4"              : null;
 
   if (opusMime) {
-    const stream = await (navigator.mediaDevices as any).getUserMedia({ audio: true, video: false });
+    // Reuse the already-open stream
     const recorder = new MR(stream, { mimeType: opusMime });
     const chunks: BlobPart[] = [];
 
@@ -99,12 +116,9 @@ async function recordWeb(durationMs: number): Promise<{ base64: string; mimeType
     return { base64: await blobToBase64(blob), mimeType: opusMime };
   }
 
-  // Path 2: iOS Safari — AudioContext → 16-bit mono WAV
-  const stream = await (navigator.mediaDevices as any).getUserMedia({
-    audio: { channelCount: 1, sampleRate: 16000, echoCancellation: true, noiseSuppression: true },
-    video: false,
-  });
-  const ctx = new (window as any).AudioContext({ sampleRate: 16000 }) as AudioContext;
+  // Path 2: AudioContext → 16-bit mono WAV (old iOS / no MediaRecorder)
+  // Reuse the same stream from above.
+  const ctx = new (window as any).AudioContext() as AudioContext;
   if ((ctx as any).state !== "running") await ctx.resume();
 
   const actualRate = ctx.sampleRate;
@@ -115,8 +129,13 @@ async function recordWeb(durationMs: number): Promise<{ base64: string; mimeType
   processor.onaudioprocess = (e: AudioProcessingEvent) => {
     pcmChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
   };
+  // Silent gain node: ScriptProcessor needs a destination to fire, but we don't
+  // want to route mic audio to the speaker (iOS may block this, silencing onaudioprocess).
+  const silentGain = ctx.createGain();
+  silentGain.gain.value = 0;
   source.connect(processor);
-  processor.connect(ctx.destination);
+  processor.connect(silentGain);
+  silentGain.connect(ctx.destination);
 
   await new Promise<void>((r) => setTimeout(r, durationMs));
 

@@ -312,6 +312,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const audioBuffer = Buffer.from(audio, "base64");
       const contentType = normalizeAudioMime(mimeType ?? "audio/wav");
 
+      // Debug: confirm audio actually arrived with content
+      const header4 = audioBuffer.slice(0, 4).toString("ascii");
+      console.log(
+        `[PA] mimeType=${mimeType} → contentType=${contentType}`,
+        `bufferBytes=${audioBuffer.length}`,
+        `first4="${header4}"`
+      );
+
       // Must use format=detailed to get NBest with PronunciationAssessment
       const azureUrl =
         `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation` +

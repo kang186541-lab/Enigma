@@ -162,12 +162,17 @@ function buildWavBuffer(pcm16: Int16Array, sampleRate: number): ArrayBuffer {
  *     We resume() the context first to avoid the iOS "suspended" state bug.
  */
 async function recordWebAudio(durationMs: number): Promise<{ base64: string; mimeType: string }> {
-  // ── Explicit permission request first (required on iOS Safari) ────────────
-  // Calling getUserMedia upfront lets the browser surface the permission dialog
-  // before we set up any audio processing nodes.
+  // ── Get microphone stream (and trigger permission dialog) ─────────────────
+  // IMPORTANT: We reuse this SAME stream for the actual recording.
+  // On iOS Safari, stopping mic tracks releases the hardware; a second
+  // getUserMedia call immediately after can return a silent stream even though
+  // no error is thrown. Keeping the stream alive avoids this.
+  let stream: MediaStream;
   try {
-    const testStream = await (navigator.mediaDevices as any).getUserMedia({ audio: true, video: false });
-    testStream.getTracks().forEach((t: MediaStreamTrack) => t.stop());
+    stream = await (navigator.mediaDevices as any).getUserMedia({
+      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
+      video: false,
+    });
   } catch (permErr: any) {
     const name = permErr?.name ?? permErr?.message ?? "";
     if (
@@ -178,14 +183,12 @@ async function recordWebAudio(durationMs: number): Promise<{ base64: string; mim
     ) {
       throw new Error("PERMISSION_DENIED");
     }
-    throw permErr; // device not found or other hard error
+    throw permErr;
   }
 
   const MR = (window as any).MediaRecorder as typeof MediaRecorder;
 
   // ── Path 1: MediaRecorder (Chrome/Firefox → webm/opus; iOS 14.5+ → mp4) ─
-  // iOS Safari 14.5+ supports MediaRecorder with audio/mp4 — much more reliable
-  // than the AudioContext/ScriptProcessor fallback.
   const opusMime =
     MR?.isTypeSupported?.("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" :
     MR?.isTypeSupported?.("audio/ogg;codecs=opus")  ? "audio/ogg;codecs=opus"  :
@@ -193,7 +196,7 @@ async function recordWebAudio(durationMs: number): Promise<{ base64: string; mim
     MR?.isTypeSupported?.("video/mp4")              ? "video/mp4"              : null;
 
   if (opusMime) {
-    const stream = await (navigator.mediaDevices as any).getUserMedia({ audio: true, video: false });
+    // Reuse the already-open stream — do NOT call getUserMedia again
     const recorder = new MR(stream, { mimeType: opusMime });
     const chunks: BlobPart[] = [];
 
@@ -213,12 +216,9 @@ async function recordWebAudio(durationMs: number): Promise<{ base64: string; mim
     return { base64, mimeType: opusMime };
   }
 
-  // ── Path 2: iOS Safari — AudioContext → WAV (PCM 16-bit mono) ────────────
-  const stream = await (navigator.mediaDevices as any).getUserMedia({
-    audio: { channelCount: 1, sampleRate: 16000, echoCancellation: true, noiseSuppression: true },
-    video: false,
-  });
-  const ctx = new (window as any).AudioContext({ sampleRate: 16000 }) as AudioContext;
+  // ── Path 2: AudioContext → WAV (PCM 16-bit mono) — older iOS / fallback ──
+  // Reuse the same stream from above; create AudioContext after stream is live.
+  const ctx = new (window as any).AudioContext() as AudioContext;
 
   // iOS Safari creates AudioContext in "suspended" state — resume before connecting nodes
   if ((ctx as any).state !== "running") {
@@ -233,8 +233,13 @@ async function recordWebAudio(durationMs: number): Promise<{ base64: string; mim
   processor.onaudioprocess = (e: AudioProcessingEvent) => {
     pcmChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
   };
+  // Connect through a silent gain node so ScriptProcessor fires without routing
+  // mic audio to the speaker (which iOS may block, preventing onaudioprocess).
+  const silentGain = ctx.createGain();
+  silentGain.gain.value = 0;
   source.connect(processor);
-  processor.connect(ctx.destination);
+  processor.connect(silentGain);
+  silentGain.connect(ctx.destination);
 
   await new Promise<void>((resolve) => setTimeout(resolve, durationMs));
 
