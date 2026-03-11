@@ -152,6 +152,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ── Azure Neural TTS (Pronunciation screen) ───────────────────────────────
+  // Uses Azure Cognitive Services TTS REST API with Neural voices so the
+  // correct accent is always used regardless of the user's OS voice library.
+  // Voice mapping keyed by BCP-47 language tag (first segment match).
+  const AZURE_TTS_VOICES: Record<string, string> = {
+    "ko-KR": "ko-KR-SunHiNeural",
+    "en-US": "en-US-JennyNeural",
+    "en-GB": "en-GB-SoniaNeural",
+    "es-ES": "es-ES-ElviraNeural",
+    "es-MX": "es-MX-DaliaNeural",
+  };
+
+  app.get("/api/pronunciation-tts", async (req: Request, res: Response) => {
+    try {
+      const { text, lang } = req.query as { text?: string; lang?: string };
+      if (!text || !lang) {
+        return res.status(400).json({ error: "text and lang required" });
+      }
+
+      const key = process.env.AZURE_SPEECH_KEY;
+      const region = process.env.AZURE_SPEECH_REGION;
+      if (!key || !region) {
+        return res.status(500).json({ error: "Azure credentials not configured" });
+      }
+
+      const voiceName = AZURE_TTS_VOICES[lang] ?? "en-US-JennyNeural";
+      const ssml = `<speak version='1.0' xml:lang='${lang}'>` +
+        `<voice xml:lang='${lang}' name='${voiceName}'>` +
+        `<prosody rate='slow'>${text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</prosody>` +
+        `</voice></speak>`;
+
+      const azureRes = await fetch(
+        `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`,
+        {
+          method: "POST",
+          headers: {
+            "Ocp-Apim-Subscription-Key": key,
+            "Content-Type": "application/ssml+xml",
+            "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+          },
+          body: ssml,
+        }
+      );
+
+      if (!azureRes.ok) {
+        const errText = await azureRes.text();
+        console.error("Azure TTS error:", azureRes.status, errText);
+        return res.status(502).json({ error: "Azure TTS failed" });
+      }
+
+      const buf = Buffer.from(await azureRes.arrayBuffer());
+      res.set("Content-Type", "audio/mpeg");
+      res.set("Cache-Control", "public, max-age=600");
+      res.send(buf);
+    } catch (err) {
+      console.error("Pronunciation TTS error:", err);
+      res.status(500).json({ error: "TTS failed" });
+    }
+  });
+
   // ── Azure Speech-to-Text ──────────────────────────────────────────────────
   // Accepts a base64-encoded audio blob + MIME type + BCP-47 language code.
   // Forwards to Azure Cognitive Services Speech REST API and returns the

@@ -13,7 +13,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import * as Speech from "expo-speech";
 import { useLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 
@@ -117,15 +116,65 @@ function scoreTranscription(transcribed: string, expected: string): number {
   return Math.max(0, Math.round((1 - dp[m][n] / Math.max(m, n)) * 100));
 }
 
-async function speakPhrase(text: string, lang: string) {
+// Singleton audio element so we can stop previous playback
+let _pronunciationAudio: HTMLAudioElement | null = null;
+
+/**
+ * Play pronunciation audio using Azure Neural TTS via the backend.
+ * This guarantees the correct language voice (e.g. es-ES-ElviraNeural)
+ * regardless of what voices the OS/browser has installed.
+ */
+async function playPronunciationTTS(
+  text: string,
+  lang: string,
+  apiBase: string
+) {
   try {
-    const isSpeaking = await Speech.isSpeakingAsync();
-    if (isSpeaking) {
-      Speech.stop();
-      await new Promise((r) => setTimeout(r, 80));
+    // Stop any currently playing pronunciation
+    if (Platform.OS === "web" && _pronunciationAudio) {
+      _pronunciationAudio.pause();
+      _pronunciationAudio.src = "";
+      _pronunciationAudio = null;
     }
-    Speech.speak(text, { language: lang, rate: 0.78 });
-  } catch {}
+
+    const url = new URL("/api/pronunciation-tts", apiBase);
+    url.searchParams.set("text", text);
+    url.searchParams.set("lang", lang);
+
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error(`Azure TTS ${res.status}`);
+
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+
+    if (Platform.OS === "web") {
+      const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
+      _pronunciationAudio = audio;
+      audio.onended = () => {
+        URL.revokeObjectURL(objectUrl);
+        _pronunciationAudio = null;
+      };
+      audio.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        _pronunciationAudio = null;
+      };
+      await audio.play();
+    } else {
+      // Native: play blob via expo-av Sound
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: objectUrl },
+        { shouldPlay: true }
+      );
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+          URL.revokeObjectURL(objectUrl);
+        }
+      });
+    }
+  } catch (err) {
+    console.warn("Pronunciation TTS error:", err);
+  }
 }
 
 type RecordState = "idle" | "listening" | "processing" | "done";
@@ -172,7 +221,8 @@ export default function SpeakScreen() {
   const handleListen = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setHasListened(true);
-    speakPhrase(phrase.word, phrase.speechLang);
+    // Use Azure Neural TTS — correct language voice guaranteed (e.g. es-ES-ElviraNeural)
+    playPronunciationTTS(phrase.word, phrase.speechLang, getApiUrl());
   };
 
   const startPulse = () => {
