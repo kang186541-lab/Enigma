@@ -68,6 +68,13 @@ const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] 
   { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#FF9D6B" },
 ];
 
+interface PronScores {
+  accuracy: number;
+  fluency: number;
+  completeness: number;
+  overall: number;
+}
+
 interface FeedbackInfo { emoji: string; text: string; color: string }
 
 function getFeedback(score: number): FeedbackInfo {
@@ -76,6 +83,13 @@ function getFeedback(score: number): FeedbackInfo {
   if (score >= 55) return { emoji: "👍", text: "Good effort!", color: "#F59E0B" };
   if (score >= 30) return { emoji: "💪", text: "Keep practising", color: "#EF4444" };
   return { emoji: "🔁", text: "Try again", color: "#EF4444" };
+}
+
+function scoreColor(s: number) {
+  if (s >= 80) return "#10B981";
+  if (s >= 60) return "#3B82F6";
+  if (s >= 40) return "#F59E0B";
+  return "#EF4444";
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -170,29 +184,6 @@ async function recordWebAudio(durationMs: number): Promise<string> {
   return btoa(binary);
 }
 
-/** Levenshtein-based similarity score 0–100. */
-function scoreTranscription(transcribed: string, expected: string): number {
-  const normalize = (s: string) =>
-    s.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, "").trim();
-  const t = normalize(transcribed);
-  const e = normalize(expected);
-  if (!t) return 0;
-  if (t === e) return 100;
-  const m = e.length;
-  const n = t.length;
-  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) =>
-    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
-  );
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      dp[i][j] =
-        e[i - 1] === t[j - 1]
-          ? dp[i - 1][j - 1]
-          : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
-    }
-  }
-  return Math.max(0, Math.round((1 - dp[m][n] / Math.max(m, n)) * 100));
-}
 
 // Singleton audio element so we can stop previous playback
 let _pronunciationAudio: HTMLAudioElement | null = null;
@@ -266,7 +257,7 @@ export default function SpeakScreen() {
   const [activeLang, setActiveLang] = useState<LangTab>("korean");
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [recordState, setRecordState] = useState<RecordState>("idle");
-  const [score, setScore] = useState<number | null>(null);
+  const [scores, setScores] = useState<PronScores | null>(null);
   const [hasListened, setHasListened] = useState(false);
   const [transcribedText, setTranscribedText] = useState("");
   const [sttError, setSttError] = useState("");
@@ -277,7 +268,6 @@ export default function SpeakScreen() {
   const phrases = PHRASE_SETS[activeLang];
   const phrase = phrases[phraseIdx];
   const tabInfo = LANG_TABS.find((tab) => tab.key === activeLang)!;
-  const feedback = score !== null ? getFeedback(score) : null;
 
   const switchLang = (lang: LangTab) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -288,7 +278,7 @@ export default function SpeakScreen() {
 
   const resetState = () => {
     setRecordState("idle");
-    setScore(null);
+    setScores(null);
     setHasListened(false);
     setTranscribedText("");
     setSttError("");
@@ -365,11 +355,11 @@ export default function SpeakScreen() {
         audioBase64 = await blobToBase64(blob);
       }
 
-      // ── Processing: send to Azure via backend ──────────────────────────────
+      // ── Processing: send to Azure Pronunciation Assessment ────────────────
       stopPulse();
       setRecordState("processing");
 
-      const apiUrl = new URL("/api/stt", getApiUrl()).toString();
+      const apiUrl = new URL("/api/pronunciation-assessment", getApiUrl()).toString();
       const apiRes = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -377,18 +367,40 @@ export default function SpeakScreen() {
           audio: audioBase64,
           mimeType,
           language: phrase.speechLang,
+          referenceText: phrase.word,
         }),
       });
 
-      const data = await apiRes.json();
-      const heard = (data.text ?? "") as string;
-      setTranscribedText(heard);
+      if (!apiRes.ok) {
+        const errData = await apiRes.json().catch(() => ({}));
+        throw new Error(errData.error ?? `HTTP ${apiRes.status}`);
+      }
 
-      if (!heard) {
-        setSttError("Couldn't hear you — try again in a quieter place");
-        setScore(0);
+      const data = await apiRes.json();
+      setTranscribedText(data.transcribedText ?? "");
+
+      if (
+        data.status !== "Success" ||
+        data.pronScore === null ||
+        data.pronScore === undefined
+      ) {
+        // Azure couldn't assess — show meaningful error
+        const statusMsg: Record<string, string> = {
+          InitialSilenceTimeout: "No speech detected — speak clearly after tapping the mic",
+          BabbleTimeout: "Too much background noise — find a quieter spot",
+          NoMatch: "Couldn't match your speech — try speaking more clearly",
+        };
+        setSttError(
+          statusMsg[data.status] ??
+          "Couldn't hear you — try again in a quieter place"
+        );
       } else {
-        setScore(scoreTranscription(heard, phrase.word));
+        setScores({
+          accuracy: data.accuracyScore ?? 0,
+          fluency: data.fluencyScore ?? 0,
+          completeness: data.completenessScore ?? 0,
+          overall: data.pronScore ?? 0,
+        });
       }
     } catch (err: any) {
       const msg = String(err?.message ?? "");
@@ -397,7 +409,6 @@ export default function SpeakScreen() {
       } else {
         setSttError("Something went wrong — please try again");
       }
-      setScore(0);
     } finally {
       stopPulse();
       setRecordState("done");
@@ -520,27 +531,66 @@ export default function SpeakScreen() {
 
         {/* Mic / Score section */}
         <View style={styles.micSection}>
-          {recordState === "done" && score !== null && feedback ? (
+          {recordState === "done" ? (
             <View style={styles.scoreWrap}>
-              <View style={[styles.scoreCircle, { borderColor: feedback.color }]}>
-                <Text style={[styles.scoreNumber, { color: feedback.color }]}>{score}</Text>
-                <Text style={styles.scorePercent}>%</Text>
-              </View>
-              <Text style={styles.scoreFeedbackEmoji}>{feedback.emoji}</Text>
-              <Text style={[styles.scoreFeedbackText, { color: feedback.color }]}>{feedback.text}</Text>
+              {scores ? (
+                <>
+                  {/* Overall score header */}
+                  {(() => {
+                    const feedback = getFeedback(scores.overall);
+                    return (
+                      <View style={styles.overallRow}>
+                        <View style={[styles.overallCircle, { borderColor: feedback.color }]}>
+                          <Text style={[styles.overallNumber, { color: feedback.color }]}>{scores.overall}</Text>
+                          <Text style={styles.overallLabel}>overall</Text>
+                        </View>
+                        <View style={styles.overallMeta}>
+                          <Text style={styles.overallEmoji}>{feedback.emoji}</Text>
+                          <Text style={[styles.overallFeedback, { color: feedback.color }]}>{feedback.text}</Text>
+                        </View>
+                      </View>
+                    );
+                  })()}
 
-              {/* What Azure heard */}
-              {transcribedText ? (
-                <View style={styles.transcriptBox}>
-                  <Text style={styles.transcriptLabel}>Azure heard:</Text>
-                  <Text style={styles.transcriptText}>"{transcribedText}"</Text>
-                </View>
-              ) : sttError ? (
+                  {/* 4 score bars */}
+                  <View style={styles.scoreBars}>
+                    {[
+                      { label: "Accuracy", value: scores.accuracy },
+                      { label: "Fluency", value: scores.fluency },
+                      { label: "Completeness", value: scores.completeness },
+                    ].map(({ label, value }) => (
+                      <View key={label} style={styles.scoreBarRow}>
+                        <Text style={styles.scoreBarLabel}>{label}</Text>
+                        <View style={styles.scoreBarTrack}>
+                          <View
+                            style={[
+                              styles.scoreBarFill,
+                              { width: `${value}%` as any, backgroundColor: scoreColor(value) },
+                            ]}
+                          />
+                        </View>
+                        <Text style={[styles.scoreBarValue, { color: scoreColor(value) }]}>{value}</Text>
+                      </View>
+                    ))}
+                  </View>
+
+                  {/* What Azure heard */}
+                  {transcribedText ? (
+                    <View style={styles.transcriptBox}>
+                      <Text style={styles.transcriptLabel}>Azure heard:</Text>
+                      <Text style={styles.transcriptText}>"{transcribedText}"</Text>
+                    </View>
+                  ) : null}
+                </>
+              ) : (
+                /* No scores — show error */
                 <View style={styles.errorBox}>
-                  <Ionicons name="warning-outline" size={14} color="#EF4444" />
-                  <Text style={styles.errorText}>{sttError}</Text>
+                  <Ionicons name="warning-outline" size={18} color="#EF4444" />
+                  <Text style={styles.errorText}>
+                    {sttError || "Couldn't assess pronunciation — please try again"}
+                  </Text>
                 </View>
-              ) : null}
+              )}
 
               <Pressable
                 style={({ pressed }) => [styles.retryBtn, pressed && { opacity: 0.8 }]}
@@ -829,39 +879,88 @@ const styles = StyleSheet.create({
   },
 
   scoreWrap: {
+    alignSelf: "stretch",
+    gap: 12,
+  },
+  overallRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    justifyContent: "center",
+  },
+  overallCircle: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    borderWidth: 3,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  overallNumber: {
+    fontSize: 28,
+    fontFamily: "Inter_700Bold",
+    lineHeight: 32,
+  },
+  overallLabel: {
+    fontSize: 10,
+    fontFamily: "Inter_500Medium",
+    color: "#A08090",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  overallMeta: {
+    gap: 4,
+    alignItems: "flex-start",
+  },
+  overallEmoji: { fontSize: 22 },
+  overallFeedback: {
+    fontSize: 18,
+    fontFamily: "Inter_600SemiBold",
+  },
+  scoreBars: {
+    gap: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  scoreBarRow: {
+    flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
-  scoreCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    borderWidth: 4,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    alignItems: "baseline" as any,
-    gap: 1,
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  scoreNumber: {
-    fontSize: 30,
-    fontFamily: "Inter_700Bold",
-  },
-  scorePercent: {
-    fontSize: 16,
+  scoreBarLabel: {
+    width: 100,
+    fontSize: 13,
     fontFamily: "Inter_500Medium",
-    color: "#A08090",
+    color: "#5A4A5A",
   },
-  scoreFeedbackEmoji: { fontSize: 24 },
-  scoreFeedbackText: {
-    fontSize: 17,
-    fontFamily: "Inter_600SemiBold",
+  scoreBarTrack: {
+    flex: 1,
+    height: 8,
+    backgroundColor: "#F0E8F0",
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  scoreBarFill: {
+    height: "100%",
+    borderRadius: 4,
+  },
+  scoreBarValue: {
+    width: 30,
+    fontSize: 13,
+    fontFamily: "Inter_700Bold",
+    textAlign: "right",
   },
 
   transcriptBox: {

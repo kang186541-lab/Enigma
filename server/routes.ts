@@ -216,20 +216,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ── Azure Speech-to-Text ──────────────────────────────────────────────────
-  // Accepts a base64-encoded audio blob + MIME type + BCP-47 language code.
-  // Forwards to Azure Cognitive Services Speech REST API and returns the
-  // recognised text.
-  app.post("/api/stt", async (req: Request, res: Response) => {
+  // ── Azure Pronunciation Assessment ───────────────────────────────────────
+  // Accepts base64 audio + language + referenceText.
+  // Returns real AccuracyScore, FluencyScore, CompletenessScore, PronScore
+  // from Azure Cognitive Services Pronunciation Assessment API.
+  app.post("/api/pronunciation-assessment", async (req: Request, res: Response) => {
     try {
-      const { audio, mimeType, language } = req.body as {
+      const { audio, mimeType, language, referenceText } = req.body as {
         audio?: string;
         mimeType?: string;
         language?: string;
+        referenceText?: string;
       };
 
-      if (!audio || !language) {
-        return res.status(400).json({ error: "audio (base64) and language required" });
+      if (!audio || !language || !referenceText) {
+        return res.status(400).json({ error: "audio, language, and referenceText are required" });
       }
 
       const key = process.env.AZURE_SPEECH_KEY;
@@ -238,39 +239,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: "Azure Speech credentials not configured" });
       }
 
+      // Build Pronunciation-Assessment header (base64-encoded JSON)
+      const assessmentConfig = {
+        ReferenceText: referenceText,
+        GradingSystem: "HundredMark",
+        Granularity: "Phoneme",
+        EnableMiscue: true,
+        NBestPhonemeCount: 5,
+      };
+      const assessmentHeader = Buffer.from(JSON.stringify(assessmentConfig)).toString("base64");
+
       const audioBuffer = Buffer.from(audio, "base64");
-      // Azure STT requires the exact content-type including codec info for WAV
-      const rawMime = mimeType ?? "audio/webm";
+      // WAV needs explicit codec info; other formats pass through as-is
+      const rawMime = mimeType ?? "audio/wav";
       const contentType = rawMime === "audio/wav"
         ? "audio/wav; codecs=audio/pcm; samplerate=16000"
         : rawMime;
 
+      // Must use format=detailed to get NBest with PronunciationAssessment
       const azureUrl =
         `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation` +
-        `/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=simple`;
+        `/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed&profanity=masked`;
 
       const azureRes = await fetch(azureUrl, {
         method: "POST",
         headers: {
           "Ocp-Apim-Subscription-Key": key,
           "Content-Type": contentType,
-          "Accept-Language": language,
+          "Pronunciation-Assessment": assessmentHeader,
         },
         body: audioBuffer,
       });
 
       if (!azureRes.ok) {
         const errText = await azureRes.text();
-        console.error("Azure STT error:", azureRes.status, errText);
-        return res.status(502).json({ error: "Azure STT failed", detail: errText });
+        console.error("Azure Pronunciation Assessment error:", azureRes.status, errText);
+        return res.status(502).json({ error: "Azure Pronunciation Assessment failed", detail: errText });
       }
 
-      const data = (await azureRes.json()) as { RecognitionStatus: string; DisplayText?: string };
-      const text = data.DisplayText ?? "";
-      res.json({ text, status: data.RecognitionStatus });
+      const data = (await azureRes.json()) as {
+        RecognitionStatus: string;
+        DisplayText?: string;
+        NBest?: Array<{
+          Display?: string;
+          PronunciationAssessment?: {
+            AccuracyScore: number;
+            FluencyScore: number;
+            CompletenessScore: number;
+            PronScore: number;
+          };
+          Words?: Array<{
+            Word: string;
+            PronunciationAssessment?: { AccuracyScore: number; ErrorType: string };
+          }>;
+        }>;
+      };
+
+      console.log("Azure PA status:", data.RecognitionStatus, "NBest count:", data.NBest?.length ?? 0);
+
+      if (data.RecognitionStatus !== "Success" || !data.NBest?.length) {
+        // No speech detected or recognition failed — return status so frontend can show error
+        return res.json({
+          status: data.RecognitionStatus,
+          transcribedText: data.DisplayText ?? "",
+          accuracyScore: null,
+          fluencyScore: null,
+          completenessScore: null,
+          pronScore: null,
+        });
+      }
+
+      const best = data.NBest[0];
+      const pa = best.PronunciationAssessment;
+
+      res.json({
+        status: data.RecognitionStatus,
+        transcribedText: best.Display ?? data.DisplayText ?? "",
+        accuracyScore: pa ? Math.round(pa.AccuracyScore) : null,
+        fluencyScore: pa ? Math.round(pa.FluencyScore) : null,
+        completenessScore: pa ? Math.round(pa.CompletenessScore) : null,
+        pronScore: pa ? Math.round(pa.PronScore) : null,
+        words: best.Words ?? [],
+      });
     } catch (err) {
-      console.error("STT error:", err);
-      res.status(500).json({ error: "STT failed" });
+      console.error("Pronunciation assessment error:", err);
+      res.status(500).json({ error: "Pronunciation assessment failed" });
     }
   });
 
