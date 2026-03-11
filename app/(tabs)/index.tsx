@@ -12,6 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 
 const { width } = Dimensions.get("window");
@@ -37,9 +38,9 @@ export default function HomeScreen() {
   ];
 
   const quickItems = [
-    { icon: "albums", color: "#FF6B9D", label: t("flashcards"), desc: t("flashcards_desc") },
-    { icon: "chatbubbles", color: "#4ECDC4", label: t("conversation"), desc: t("conversation_desc") },
-    { icon: "mic", color: "#45B7D1", label: t("pronunciation"), desc: t("pronunciation_desc") },
+    { icon: "albums", color: "#FF6B9D", label: t("flashcards"), desc: t("flashcards_desc"), route: "/(tabs)/cards" },
+    { icon: "chatbubbles", color: "#4ECDC4", label: t("conversation"), desc: t("conversation_desc"), route: "/(tabs)/chat" },
+    { icon: "mic", color: "#45B7D1", label: t("pronunciation"), desc: t("pronunciation_desc"), route: "/(tabs)/speak" },
   ];
 
   return (
@@ -122,7 +123,10 @@ export default function HomeScreen() {
                 styles.quickCard,
                 pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] },
               ]}
-              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push(item.route as any);
+              }}
             >
               <View style={[styles.quickIconBg, { backgroundColor: item.color + "15" }]}>
                 <Ionicons name={item.icon as any} size={28} color={item.color} />
