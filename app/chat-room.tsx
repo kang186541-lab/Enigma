@@ -102,13 +102,29 @@ interface SpeakSettings {
 
 const DEFAULT_SETTINGS: SpeakSettings = { rate: 0.85, pitch: 1.0, voiceId: null };
 
-function webSpeak(text: string, lang: string, settings: SpeakSettings = DEFAULT_SETTINGS) {
+function webSpeak(
+  text: string,
+  lang: string,
+  settings: SpeakSettings = DEFAULT_SETTINGS,
+  onWord?: (idx: number) => void,
+  onEnd?: () => void
+) {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
   utterance.rate = settings.rate;
   utterance.pitch = settings.pitch;
+  if (onWord) {
+    (utterance as any).onboundary = (e: any) => {
+      if (e.name === "word") {
+        const before = text.slice(0, e.charIndex);
+        const idx = before.trim() === "" ? 0 : before.trim().split(/\s+/).length;
+        onWord(idx);
+      }
+    };
+  }
+  if (onEnd) utterance.onend = onEnd;
   const doSpeak = () => {
     const voices = window.speechSynthesis.getVoices();
     let chosen: SpeechSynthesisVoice | undefined;
@@ -139,12 +155,13 @@ function speak(
   lang: string,
   muted: boolean,
   voiceUnlocked = true,
-  settings: SpeakSettings = DEFAULT_SETTINGS
+  settings: SpeakSettings = DEFAULT_SETTINGS,
+  onEnd?: () => void
 ) {
   if (muted) return;
   if (Platform.OS === "web") {
     if (!voiceUnlocked) return;
-    webSpeak(text, lang, settings);
+    webSpeak(text, lang, settings, undefined, onEnd);
   } else {
     try { Speech.stop(); } catch {}
     try {
@@ -153,9 +170,11 @@ function speak(
         rate: settings.rate,
         pitch: settings.pitch,
         ...(settings.voiceId ? { voice: settings.voiceId } : {}),
+        onDone: onEnd,
+        onError: onEnd,
       });
     } catch {
-      try { Speech.speak(text, { rate: settings.rate, pitch: settings.pitch }); } catch {}
+      try { Speech.speak(text, { rate: settings.rate, pitch: settings.pitch, onDone: onEnd }); } catch {}
     }
   }
 }
@@ -193,7 +212,6 @@ export default function ChatRoomScreen() {
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
-  const [shownTranslations, setShownTranslations] = useState<Set<string>>(new Set());
   const [voiceUnlocked, setVoiceUnlocked] = useState(Platform.OS !== "web");
 
   // Voice settings
@@ -202,6 +220,13 @@ export default function ChatRoomScreen() {
   const [selectedVoiceId, setSelectedVoiceId] = useState<string | null>(null);
   const [availableVoices, setAvailableVoices] = useState<VoiceOption[]>([]);
   const [showSettings, setShowSettings] = useState(false);
+
+  // Subtitle state
+  const [subtitleWordIdx, setSubtitleWordIdx] = useState(-1);
+  const subtitleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Auto-translation tracking (ref so we never double-fetch)
+  const translatedIdsRef = useRef<Set<string>>(new Set());
 
   const inputRef = useRef<TextInput>(null);
   const conversationHistoryRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
@@ -257,73 +282,104 @@ export default function ChatRoomScreen() {
       const id = "greeting";
       setMessages([{ id, text: tutor.greeting, isUser: false }]);
       conversationHistoryRef.current = [{ role: "assistant", content: tutor.greeting }];
-      speak(tutor.greeting, tutor.speechLang, false, Platform.OS !== "web",
-        { rate, pitch, voiceId: selectedVoiceId });
+      if (Platform.OS !== "web") {
+        speakMsg(tutor.greeting, id, false, true);
+      }
+      // Web: voice unlocked after first gesture — handled by handleUnlockVoice
     }, 400);
     return () => clearTimeout(timer);
-  }, []);
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const settings: SpeakSettings = { rate, pitch, voiceId: selectedVoiceId };
+
+  // ── Subtitle helpers ──────────────────────────────────────────────────────
+  const clearSubtitle = useCallback(() => {
+    if (subtitleTimerRef.current) {
+      clearInterval(subtitleTimerRef.current);
+      subtitleTimerRef.current = null;
+    }
+    setSubtitleWordIdx(-1);
+  }, []);
+
+  const startNativeSubtitle = useCallback((text: string, speechRate: number) => {
+    clearSubtitle();
+    const words = text.trim().split(/\s+/);
+    setSubtitleWordIdx(0);
+    const msPerWord = Math.max(180, 60000 / (150 * speechRate));
+    let idx = 0;
+    subtitleTimerRef.current = setInterval(() => {
+      idx++;
+      if (idx >= words.length) {
+        if (subtitleTimerRef.current) clearInterval(subtitleTimerRef.current);
+        subtitleTimerRef.current = null;
+        setSubtitleWordIdx(-1);
+      } else {
+        setSubtitleWordIdx(idx);
+      }
+    }, msPerWord);
+  }, [clearSubtitle]);
+
+  // Central speak helper — handles subtitles + speakingId for all call sites
+  const speakMsg = useCallback((text: string, msgId: string, _muted: boolean, _voiceUnlocked: boolean) => {
+    if (_muted) return;
+    if (Platform.OS === "web" && !_voiceUnlocked) return;
+    if (!tutor) return;
+
+    clearSubtitle();
+    setSpeakingId(msgId);
+    setSubtitleWordIdx(0);
+
+    const onEnd = () => {
+      clearSubtitle();
+      setSpeakingId(null);
+    };
+
+    if (Platform.OS === "web") {
+      webSpeak(text, tutor.speechLang, settings,
+        (idx) => setSubtitleWordIdx(idx),
+        onEnd
+      );
+    } else {
+      startNativeSubtitle(text, settings.rate);
+      speak(text, tutor.speechLang, false, true, settings, onEnd);
+    }
+  }, [tutor, settings, clearSubtitle, startNativeSubtitle]);
+
+  // ── Auto-translation effect ───────────────────────────────────────────────
+  useEffect(() => {
+    if (!canTranslate) return;
+    messages.forEach((msg) => {
+      if (!msg.isUser && !translatedIdsRef.current.has(msg.id)) {
+        translatedIdsRef.current.add(msg.id);
+        setTranslatingIds((prev) => new Set(prev).add(msg.id));
+        fetchTranslation(msg.text, userLangName, getApiUrl())
+          .then((result) => setTranslations((prev) => ({ ...prev, [msg.id]: result })))
+          .catch(() => {})
+          .finally(() => setTranslatingIds((prev) => {
+            const n = new Set(prev); n.delete(msg.id); return n;
+          }));
+      }
+    });
+  }, [messages, canTranslate]);
 
   const handleUnlockVoice = useCallback(() => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setVoiceUnlocked(true);
     const lastAI = messages.find((m) => !m.isUser);
-    if (lastAI && tutor && !muted) {
-      setTimeout(() => webSpeak(lastAI.text, tutor.speechLang, settings), 100);
+    if (lastAI && !muted) {
+      setTimeout(() => speakMsg(lastAI.text, lastAI.id, false, true), 100);
     }
-  }, [messages, tutor, muted, settings]);
+  }, [messages, muted, speakMsg]);
 
   const handleReplay = useCallback(
     (msg: Message) => {
-      if (!tutor) return;
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setSpeakingId(msg.id);
-      if (Platform.OS === "web") {
-        webSpeak(msg.text, tutor.speechLang, settings);
-      } else {
-        speak(msg.text, tutor.speechLang, muted, true, settings);
-      }
-      setTimeout(() => setSpeakingId(null), 4000);
+      speakMsg(msg.text, msg.id, muted, voiceUnlocked || Platform.OS !== "web");
     },
-    [tutor, muted, settings]
+    [muted, voiceUnlocked, speakMsg]
   );
 
-  const handleTranslate = useCallback(
-    async (msg: Message) => {
-      if (!canTranslate) return;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-      if (shownTranslations.has(msg.id)) {
-        setShownTranslations((prev) => {
-          const next = new Set(prev);
-          next.delete(msg.id);
-          return next;
-        });
-        return;
-      }
-
-      setShownTranslations((prev) => new Set(prev).add(msg.id));
-
-      if (translations[msg.id]) return;
-
-      setTranslatingIds((prev) => new Set(prev).add(msg.id));
-      try {
-        const result = await fetchTranslation(msg.text, userLangName, getApiUrl());
-        setTranslations((prev) => ({ ...prev, [msg.id]: result }));
-      } catch {
-        setTranslations((prev) => ({ ...prev, [msg.id]: "Translation unavailable." }));
-      } finally {
-        setTranslatingIds((prev) => {
-          const next = new Set(prev);
-          next.delete(msg.id);
-          return next;
-        });
-      }
-    },
-    [canTranslate, shownTranslations, translations, userLangName]
-  );
 
   const toggleMute = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -373,24 +429,50 @@ export default function ChatRoomScreen() {
       ];
       setMessages((prev) => [aiMsg, ...prev]);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      speak(responseText, tutor.speechLang, muted, voiceUnlocked, settings);
-      setSpeakingId(aiId);
-      setTimeout(() => setSpeakingId(null), 5000);
+      speakMsg(responseText, aiId, muted, voiceUnlocked || Platform.OS !== "web");
       inputRef.current?.focus();
     } catch {
       const fallback = tutor.responses[Math.floor(Math.random() * tutor.responses.length)];
       const aiId = Date.now().toString() + "a";
       setMessages((prev) => [{ id: aiId, text: fallback, isUser: false }, ...prev]);
-      speak(fallback, tutor.speechLang, muted, voiceUnlocked, settings);
+      speakMsg(fallback, aiId, muted, voiceUnlocked || Platform.OS !== "web");
     } finally {
       setIsTyping(false);
     }
   };
 
   const renderItem = ({ item }: { item: Message }) => {
-    const showingTranslation = shownTranslations.has(item.id);
     const translationText = translations[item.id];
     const isTranslating = translatingIds.has(item.id);
+    const isSpeakingThis = speakingId === item.id && subtitleWordIdx >= 0;
+
+    // Render AI bubble text with per-word highlight when speaking
+    const renderBubbleText = () => {
+      if (!item.isUser && isSpeakingThis) {
+        let wordCount = 0;
+        return (
+          <Text style={[styles.bubbleText, styles.bubbleTextAI]}>
+            {item.text.split(/(\s+)/).map((token, i) => {
+              if (/^\s+$/.test(token)) return <Text key={i}>{token}</Text>;
+              const myIdx = wordCount++;
+              return (
+                <Text
+                  key={i}
+                  style={myIdx === subtitleWordIdx ? styles.subtitleHighlight : undefined}
+                >
+                  {token}
+                </Text>
+              );
+            })}
+          </Text>
+        );
+      }
+      return (
+        <Text style={[styles.bubbleText, item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI]}>
+          {item.text}
+        </Text>
+      );
+    };
 
     return (
       <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowAI]}>
@@ -402,9 +484,7 @@ export default function ChatRoomScreen() {
 
         <View style={styles.bubbleColumn}>
           <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleAI]}>
-            <Text style={[styles.bubbleText, item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI]}>
-              {item.text}
-            </Text>
+            {renderBubbleText()}
 
             {!item.isUser && (
               <View style={styles.bubbleActions}>
@@ -419,44 +499,24 @@ export default function ChatRoomScreen() {
                     color={speakingId === item.id ? "#FF6B9D" : "#C4B5BF"}
                   />
                 </Pressable>
-
-                {canTranslate && (
-                  <Pressable
-                    onPress={() => handleTranslate(item)}
-                    style={({ pressed }) => [
-                      styles.bubbleActionBtn,
-                      showingTranslation && styles.bubbleActionBtnActive,
-                      pressed && { opacity: 0.65 },
-                    ]}
-                    hitSlop={6}
-                  >
-                    <Ionicons
-                      name="language-outline"
-                      size={14}
-                      color={showingTranslation ? "#FF6B9D" : "#C4B5BF"}
-                    />
-                  </Pressable>
-                )}
               </View>
             )}
           </View>
 
-          {!item.isUser && showingTranslation && (
+          {/* Auto-translation — always shown for AI messages when languages differ */}
+          {!item.isUser && canTranslate && (
             <View style={styles.translationBox}>
-              {isTranslating ? (
+              {isTranslating && !translationText ? (
                 <View style={styles.translationLoading}>
                   <ActivityIndicator size="small" color="#FF6B9D" />
-                  <Text style={styles.translationLoadingText}>Translating...</Text>
+                  <Text style={styles.translationLoadingText}>Translating…</Text>
                 </View>
-              ) : (
-                <>
-                  <View style={styles.translationHeader}>
-                    <Ionicons name="language" size={11} color="#FF6B9D" />
-                    <Text style={styles.translationHeaderText}>{userNativeLang.charAt(0).toUpperCase() + userNativeLang.slice(1)}</Text>
-                  </View>
-                  <Text style={styles.translationText}>{translationText}</Text>
-                </>
-              )}
+              ) : translationText ? (
+                <View style={styles.autoTranslationRow}>
+                  <Text style={styles.autoTranslationGlobe}>🌐</Text>
+                  <Text style={styles.autoTranslationText}>{translationText}</Text>
+                </View>
+              ) : null}
             </View>
           )}
         </View>
@@ -528,8 +588,7 @@ export default function ChatRoomScreen() {
 
         {canTranslate && (
           <View style={styles.translateHint}>
-            <Ionicons name="language-outline" size={11} color="#A08090" />
-            <Text style={styles.translateHintText}>Tap 🌐 under any message to translate</Text>
+            <Text style={styles.translateHintText}>🌐 Auto-translation on</Text>
           </View>
         )}
       </View>
@@ -644,7 +703,7 @@ export default function ChatRoomScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           inverted
-          extraData={{ translations, shownTranslations, translatingIds, speakingId }}
+          extraData={{ translations, translatingIds, speakingId, subtitleWordIdx }}
           style={styles.flex}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
@@ -999,14 +1058,18 @@ const styles = StyleSheet.create({
   },
   bubbleActionBtnActive: {},
 
+  // Subtitle word highlight
+  subtitleHighlight: {
+    color: "#FF6B9D",
+    fontFamily: "Inter_700Bold",
+  },
+
+  // Auto-translation
   translationBox: {
-    backgroundColor: "#FFF0F6",
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#FFB3CE",
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    gap: 4,
+    backgroundColor: "#F8F0F5",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
   },
   translationLoading: {
     flexDirection: "row",
@@ -1018,23 +1081,21 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     color: "#A08090",
   },
-  translationHeader: {
+  autoTranslationRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
+    alignItems: "flex-start",
+    gap: 5,
   },
-  translationHeaderText: {
-    fontSize: 10,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FF6B9D",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
+  autoTranslationGlobe: {
+    fontSize: 12,
+    marginTop: 1,
   },
-  translationText: {
-    fontSize: 14,
+  autoTranslationText: {
+    fontSize: 13,
     fontFamily: "Inter_400Regular",
-    color: "#5A4A54",
-    lineHeight: 20,
+    color: "#8A7080",
+    lineHeight: 18,
+    flex: 1,
   },
 
   typingBubble: { paddingVertical: 14 },
