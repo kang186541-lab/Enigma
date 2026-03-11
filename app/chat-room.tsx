@@ -16,9 +16,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { Audio } from "expo-av";
+import * as Speech from "expo-speech";
 import { getTutor, Tutor } from "@/constants/tutors";
-import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 
 interface Message {
@@ -33,46 +33,50 @@ const LANG_NAMES: Record<string, string> = {
   korean: "Korean",
 };
 
-// ── OpenAI Neural TTS ────────────────────────────────────────────────────────
-// Module-level singleton — expo-av Audio.Sound works on all platforms.
-let _nativeSound: Audio.Sound | null = null;
+// ── Speech helpers ────────────────────────────────────────────────────────────
+// iOS Safari rule: speechSynthesis.speak() MUST be called synchronously inside
+// a user-gesture handler. No async/await or setTimeout before the call.
 
-function stopTTS() {
-  if (_nativeSound) {
-    _nativeSound.stopAsync().catch(() => {});
-    _nativeSound.unloadAsync().catch(() => {});
-    _nativeSound = null;
+function stopSpeech() {
+  if (Platform.OS !== "web") {
+    try { Speech.stop(); } catch {}
+  } else if (typeof window !== "undefined" && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
   }
 }
 
-async function ttsSpeak(
+/**
+ * Speak text using the Web Speech API. Safe to call from onPress directly.
+ * Picks the best available voice for the given BCP-47 lang tag.
+ */
+function webSpeakSync(
   text: string,
-  tutorId: string,
-  apiBase: string,
-  speed = 0.9,
+  lang: string,
+  rate: number,
   onEnd?: () => void
 ) {
-  stopTTS();
-  const url = new URL("/api/tts", apiBase);
-  url.searchParams.set("text", text.slice(0, 4000));
-  url.searchParams.set("tutorId", tutorId);
-  url.searchParams.set("speed", speed.toString());
-
-  try {
-    const { sound } = await Audio.Sound.createAsync(
-      { uri: url.toString() },
-      { shouldPlay: true },
-      (status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          _nativeSound = null;
-          onEnd?.();
-        }
-      }
-    );
-    _nativeSound = sound;
-  } catch {
+  if (typeof window === "undefined" || !window.speechSynthesis) {
     onEnd?.();
+    return;
   }
+  // Cancel first — then speak. Both must happen synchronously.
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang;
+  utterance.rate = rate;
+  utterance.onend = () => onEnd?.();
+  utterance.onerror = () => onEnd?.();
+
+  // Try to pick the best voice for the language (best-effort; not async)
+  const voices = window.speechSynthesis.getVoices();
+  const langBase = lang.split("-")[0];
+  const chosen =
+    voices.find((v) => v.lang === lang) ??
+    voices.find((v) => v.lang.startsWith(langBase));
+  if (chosen) utterance.voice = chosen;
+
+  window.speechSynthesis.speak(utterance);
 }
 
 async function fetchTranslation(
@@ -129,15 +133,9 @@ export default function ChatRoomScreen() {
   const tutorLangName = tutor ? (LANG_NAMES[tutor.language.toLowerCase()] ?? tutor.language) : "English";
   const canTranslate = tutorLangName.toLowerCase() !== userLangName.toLowerCase();
 
-  // Set up audio session for native (enables playback in silent mode)
+  // Stop any speech when screen unmounts
   useEffect(() => {
-    if (Platform.OS !== "web") {
-      Audio.setAudioModeAsync({
-        playsInSilentModeIOS: true,
-        allowsRecordingIOS: false,
-      }).catch(() => {});
-    }
-    return () => { stopTTS(); };
+    return () => { stopSpeech(); };
   }, []);
 
   useEffect(() => {
@@ -181,7 +179,8 @@ export default function ChatRoomScreen() {
     }, msPerWord);
   }, [clearSubtitle]);
 
-  // Central speak helper — all platforms now use OpenAI neural TTS via backend
+  // Central speak helper — synchronous so iOS Safari's gesture rule is met.
+  // Must be called directly inside onPress; no async/await or setTimeout before it.
   const speakMsg = useCallback((text: string, msgId: string, _muted: boolean, _voiceUnlocked: boolean) => {
     if (_muted) return;
     if (Platform.OS === "web" && !_voiceUnlocked) return;
@@ -190,14 +189,25 @@ export default function ChatRoomScreen() {
     clearSubtitle();
     setSpeakingId(msgId);
     setSubtitleWordIdx(0);
-    startNativeSubtitle(text, rate); // timer-based word highlight on all platforms
+    startNativeSubtitle(text, rate);
 
     const onEnd = () => {
       clearSubtitle();
       setSpeakingId(null);
     };
 
-    ttsSpeak(text, tutor.id, getApiUrl(), rate, onEnd);
+    if (Platform.OS === "web") {
+      // Synchronous — speak() fires immediately in this call stack
+      webSpeakSync(text, tutor.speechLang, rate, onEnd);
+    } else {
+      try { Speech.stop(); } catch {}
+      Speech.speak(text, {
+        language: tutor.speechLang,
+        rate,
+        onDone: onEnd,
+        onError: onEnd,
+      });
+    }
   }, [tutor, rate, clearSubtitle, startNativeSubtitle]);
 
   // ── Auto-translation effect ───────────────────────────────────────────────
@@ -220,11 +230,22 @@ export default function ChatRoomScreen() {
   const handleUnlockVoice = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setVoiceUnlocked(true);
-    const lastAI = messages.find((m) => !m.isUser);
-    if (lastAI && !muted) {
-      setTimeout(() => speakMsg(lastAI.text, lastAI.id, false, true), 100);
+    // iOS Safari: speak() MUST fire synchronously in this user-gesture handler.
+    // Do NOT use setTimeout or any async before this call.
+    if (!muted && tutor) {
+      const lastAI = messages.find((m) => !m.isUser);
+      if (lastAI) {
+        clearSubtitle();
+        setSpeakingId(lastAI.id);
+        setSubtitleWordIdx(0);
+        startNativeSubtitle(lastAI.text, rate);
+        webSpeakSync(lastAI.text, tutor.speechLang, rate, () => {
+          clearSubtitle();
+          setSpeakingId(null);
+        });
+      }
     }
-  }, [messages, muted, speakMsg]);
+  }, [messages, muted, tutor, rate, clearSubtitle, startNativeSubtitle]);
 
   const handleReplay = useCallback(
     (msg: Message) => {
@@ -237,7 +258,7 @@ export default function ChatRoomScreen() {
 
   const toggleMute = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (!muted) stopTTS();
+    if (!muted) stopSpeech();
     setMuted((m) => !m);
   };
 
