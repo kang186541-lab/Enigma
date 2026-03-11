@@ -183,10 +183,14 @@ async function recordWebAudio(durationMs: number): Promise<{ base64: string; mim
 
   const MR = (window as any).MediaRecorder as typeof MediaRecorder;
 
-  // ── Path 1: webm/opus via MediaRecorder ──────────────────────────────────
+  // ── Path 1: MediaRecorder (Chrome/Firefox → webm/opus; iOS 14.5+ → mp4) ─
+  // iOS Safari 14.5+ supports MediaRecorder with audio/mp4 — much more reliable
+  // than the AudioContext/ScriptProcessor fallback.
   const opusMime =
     MR?.isTypeSupported?.("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" :
-    MR?.isTypeSupported?.("audio/ogg;codecs=opus")  ? "audio/ogg;codecs=opus"  : null;
+    MR?.isTypeSupported?.("audio/ogg;codecs=opus")  ? "audio/ogg;codecs=opus"  :
+    MR?.isTypeSupported?.("audio/mp4")              ? "audio/mp4"              :
+    MR?.isTypeSupported?.("video/mp4")              ? "video/mp4"              : null;
 
   if (opusMime) {
     const stream = await (navigator.mediaDevices as any).getUserMedia({ audio: true, video: false });
@@ -262,10 +266,10 @@ async function recordWebAudio(durationMs: number): Promise<{ base64: string; mim
   }
 
   const wavBuf = buildWavBuffer(pcm16, outRate);
-  const bytes = new Uint8Array(wavBuf);
-  let bin = "";
-  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-  return { base64: btoa(bin), mimeType: "audio/wav" };
+  // Use FileReader via blobToBase64 — the manual btoa string-concat loop can
+  // silently truncate or corrupt large buffers on iOS Safari.
+  const wavBlob = new Blob([wavBuf], { type: "audio/wav" });
+  return { base64: await blobToBase64(wavBlob), mimeType: "audio/wav" };
 }
 
 
@@ -474,10 +478,12 @@ export default function SpeakScreen() {
           NoMatch: "음성을 인식하지 못했습니다. 더 천천히 명확하게 말씀해 주세요.",
           Error: data.error ? `Azure 오류: ${data.error}` : "Azure 처리 오류 — 다시 시도해 주세요.",
         };
-        setSttError(
-          statusMsg[data.status] ??
-          `인식 실패 (${data.status ?? "알 수 없는 오류"}) — 다시 시도해 주세요.`
-        );
+        // When status is "Success" but scores are missing, Azure heard something
+        // (e.g. background noise) but couldn't match it to the reference text.
+        const fallback = data.status === "Success"
+          ? "발음을 인식하지 못했습니다. 마이크에 가까이 대고 또렷하게 말씀해 주세요."
+          : `인식 실패 (${data.status ?? "알 수 없는 오류"}) — 다시 시도해 주세요.`;
+        setSttError(statusMsg[data.status] ?? fallback);
       } else {
         setScores({
           accuracy: data.accuracyScore ?? 0,

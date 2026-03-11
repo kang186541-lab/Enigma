@@ -72,10 +72,12 @@ export async function recordAudio(
 async function recordWeb(durationMs: number): Promise<{ base64: string; mimeType: string }> {
   const MR = (window as any).MediaRecorder as typeof MediaRecorder;
 
-  // Path 1: webm/opus — Chrome, Firefox, Edge (Azure accepts directly)
+  // Path 1: MediaRecorder — Chrome/Firefox → webm/opus; iOS Safari 14.5+ → mp4
   const opusMime =
     MR?.isTypeSupported?.("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" :
-    MR?.isTypeSupported?.("audio/ogg;codecs=opus")  ? "audio/ogg;codecs=opus"  : null;
+    MR?.isTypeSupported?.("audio/ogg;codecs=opus")  ? "audio/ogg;codecs=opus"  :
+    MR?.isTypeSupported?.("audio/mp4")              ? "audio/mp4"              :
+    MR?.isTypeSupported?.("video/mp4")              ? "video/mp4"              : null;
 
   if (opusMime) {
     const stream = await (navigator.mediaDevices as any).getUserMedia({ audio: true, video: false });
@@ -143,10 +145,10 @@ async function recordWeb(durationMs: number): Promise<{ base64: string; mimeType
   }
 
   const wavBuf = buildWavBuffer(pcm16, outRate);
-  const bytes = new Uint8Array(wavBuf);
-  let bin = "";
-  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-  return { base64: btoa(bin), mimeType: "audio/wav" };
+  // Use FileReader via blobToBase64 — the manual btoa loop can corrupt large
+  // buffers on iOS Safari (stack overflow / silent string truncation).
+  const wavBlob = new Blob([wavBuf], { type: "audio/wav" });
+  return { base64: await blobToBase64(wavBlob), mimeType: "audio/wav" };
 }
 
 async function recordNative(durationMs: number): Promise<{ base64: string; mimeType: string }> {

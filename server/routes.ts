@@ -2,6 +2,18 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "node:http";
 import { openai } from "./openai";
 
+/**
+ * Map browser-reported MIME types to what Azure STT actually accepts.
+ *   audio/mp4 / video/mp4  → audio/x-m4a  (iOS Safari MediaRecorder output)
+ *   audio/wav              → audio/wav     (WAV with RIFF header, no codec annotation)
+ *   anything else          → pass through  (webm/opus, ogg/opus, etc.)
+ */
+function normalizeAudioMime(mime: string): string {
+  if (mime === "audio/mp4" || mime === "video/mp4") return "audio/x-m4a";
+  if (mime.startsWith("audio/wav")) return "audio/wav";
+  return mime;
+}
+
 interface TutorInfo {
   id: string;
   name: string;
@@ -235,10 +247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const audioBuffer = Buffer.from(audio, "base64");
-      const rawMime = mimeType ?? "audio/wav";
-      const contentType = rawMime === "audio/wav"
-        ? "audio/wav; codecs=audio/pcm; samplerate=16000"
-        : rawMime;
+      const contentType = normalizeAudioMime(mimeType ?? "audio/wav");
 
       const azureUrl =
         `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation` +
@@ -301,12 +310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const assessmentHeader = Buffer.from(JSON.stringify(assessmentConfig)).toString("base64");
 
       const audioBuffer = Buffer.from(audio, "base64");
-      // For WAV files: just send "audio/wav" so Azure reads sample rate from the
-      // WAV header itself. Sending "audio/wav; codecs=audio/pcm; samplerate=16000"
-      // would tell Azure to ignore the header and treat it as raw 16 kHz PCM —
-      // which corrupts audio recorded at 44100/48000 Hz (common on iOS Safari).
-      const rawMime = mimeType ?? "audio/wav";
-      const contentType = rawMime.startsWith("audio/wav") ? "audio/wav" : rawMime;
+      const contentType = normalizeAudioMime(mimeType ?? "audio/wav");
 
       // Must use format=detailed to get NBest with PronunciationAssessment
       const azureUrl =
