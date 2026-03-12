@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
 import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
+import { getApiUrl } from "@/lib/query-client";
 
 const { width } = Dimensions.get("window");
 
@@ -505,14 +506,36 @@ const ADVANCED_CARDS: Record<NativeLanguage, FlashCard[]> = {
   ],
 };
 
+let _cardAudio: HTMLAudioElement | null = null;
+
 async function speakWord(word: string, lang: string) {
   try {
-    const isSpeaking = await Speech.isSpeakingAsync();
-    if (isSpeaking) {
-      Speech.stop();
-      await new Promise((r) => setTimeout(r, 80));
+    if (Platform.OS === "web") {
+      if (_cardAudio) {
+        _cardAudio.pause();
+        _cardAudio.src = "";
+        _cardAudio = null;
+      }
+      const url = new URL("/api/pronunciation-tts", getApiUrl());
+      url.searchParams.set("text", word);
+      url.searchParams.set("lang", lang);
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error(`TTS ${res.status}`);
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
+      _cardAudio = audio;
+      audio.onended = () => { URL.revokeObjectURL(objectUrl); _cardAudio = null; };
+      audio.onerror = () => { URL.revokeObjectURL(objectUrl); _cardAudio = null; };
+      await audio.play();
+    } else {
+      const isSpeaking = await Speech.isSpeakingAsync();
+      if (isSpeaking) {
+        Speech.stop();
+        await new Promise((r) => setTimeout(r, 80));
+      }
+      Speech.speak(word, { language: lang, rate: 0.85 });
     }
-    Speech.speak(word, { language: lang, rate: 0.85 });
   } catch {}
 }
 
