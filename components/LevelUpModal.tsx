@@ -112,10 +112,12 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
             </View>
 
             {/* Lingo bouncing */}
-            <Animated.Image
-              source={lingoImg}
-              style={[styles.lingo, { transform: [{ translateY: bounceAnim }] }]}
-            />
+            <View style={styles.lingoCircle}>
+              <Animated.Image
+                source={lingoImg}
+                style={[styles.lingo, { transform: [{ translateY: bounceAnim }] }]}
+              />
+            </View>
 
             <Text style={styles.title}>{title}</Text>
 
@@ -154,7 +156,21 @@ const styles = StyleSheet.create({
   },
   card: { width: "100%", borderRadius: 28, overflow: "hidden" },
   gradient: { padding: 28, alignItems: "center", gap: 10, overflow: "hidden" },
-  lingo: { width: 130, height: 130, resizeMode: "contain", marginBottom: 4 },
+  lingoCircle: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  lingo: { width: 130, height: 130, resizeMode: "contain" },
   title: { fontSize: 32, fontFamily: "Inter_700Bold", color: "#FFFFFF" },
   badge: {
     flexDirection: "row",

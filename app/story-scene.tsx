@@ -79,7 +79,7 @@ const STORIES: Record<string, Story> = {
         personalityKo: "재치있는 여우 탐정 가이드",
         personalityEs: "Tu astuto guía detective zorro",
         side: "left",
-        avatarBg: "#2A3020",
+        avatarBg: "#FFE8D0",
         isLingo: true,
       },
       {
@@ -311,7 +311,7 @@ const STORIES: Record<string, Story> = {
         personalityKo: "K-드라마 세계의 가이드!",
         personalityEs: "¡Tu guía al mundo K-Drama!",
         side: "left",
-        avatarBg: "#1A1030",
+        avatarBg: "#FFE8D0",
         isLingo: true,
       },
       {
@@ -712,7 +712,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatarEmoji: { fontSize: 68 },
-  lingoAvatar: { width: 118, height: 118, resizeMode: "contain" },
+  lingoAvatar: {
+    width: 118,
+    height: 118,
+    resizeMode: "contain",
+    backgroundColor: "transparent",
+    ...(Platform.OS === "web" ? { mixBlendMode: "multiply" } as any : {}),
+  },
   avatarRing: {
     position: "absolute",
     top: -6, left: -6,

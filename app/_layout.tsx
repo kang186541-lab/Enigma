@@ -36,10 +36,12 @@ function LingoLoadingScreen() {
 
   return (
     <Animated.View style={[loadingStyles.root, { opacity: fadeAnim }]}>
-      <Animated.Image
-        source={lingoImg}
-        style={[loadingStyles.lingo, { transform: [{ translateY: bounceAnim }] }]}
-      />
+      <View style={loadingStyles.lingoCircle}>
+        <Animated.Image
+          source={lingoImg}
+          style={[loadingStyles.lingo, { transform: [{ translateY: bounceAnim }] }]}
+        />
+      </View>
       <Text style={loadingStyles.title}>LinguaAI</Text>
       <Text style={loadingStyles.sub}>🦊 Loading your language journey...</Text>
       <View style={loadingStyles.dots}>
@@ -56,6 +58,19 @@ const loadingStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 12,
+  },
+  lingoCircle: {
+    width: 210,
+    height: 210,
+    borderRadius: 105,
+    backgroundColor: "#FFE8D6",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#FF6B9D",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
   },
   lingo: { width: 180, height: 180, resizeMode: "contain" },
   title: { fontSize: 30, fontWeight: "800", color: "#FF6B9D", letterSpacing: -0.5 },

@@ -160,11 +160,12 @@ export default function HomeScreen() {
             <Text style={styles.headerTitle}>LinguaAI ✨</Text>
           </View>
           <LingoMascot
-            size={90}
+            size={110}
             mood={lingoMood}
             showBubble
             bubbleText={lingoGreeting}
             bubblePosition="left"
+            showCircle
             style={{ alignItems: "flex-end" }}
           />
         </View>
@@ -197,7 +198,7 @@ export default function HomeScreen() {
         <View style={styles.streakCard}>
           <View style={styles.streakHeader}>
             <View style={styles.streakLeft}>
-              <LingoMascot size={56} mood={lingoMood} />
+              <LingoMascot size={70} mood={lingoMood} showCircle />
               <View>
                 <Text style={styles.streakCount}>{stats.streak}</Text>
                 <Text style={styles.streakLabel}>
