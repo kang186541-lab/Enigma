@@ -216,7 +216,7 @@ export default function HomeScreen() {
         <View style={styles.streakCard}>
           <View style={styles.streakHeader}>
             <View style={styles.streakLeft}>
-              <LingoMascot size={70} mood={lingoMood} />
+              <LingoMascot size={110} mood={lingoMood} />
               <Animated.View style={{ transform: [{ scale: fireScale }] }}>
                 <Animated.Text
                   style={[

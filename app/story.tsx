@@ -108,7 +108,7 @@ export default function StoryScreen() {
 
       {/* Lingo guide banner */}
       <View style={styles.lingoBanner}>
-        <LingoMascot size={64} mood="excited" />
+        <LingoMascot size={100} mood="excited" />
         <View style={styles.lingoSpeech}>
           <Text style={styles.lingoSpeechText}>
             {lang === "korean"
