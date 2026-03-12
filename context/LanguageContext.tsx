@@ -3,6 +3,35 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type NativeLanguage = "korean" | "english" | "spanish";
 
+export interface Level {
+  num: number;
+  emoji: string;
+  name: string;
+  minXP: number;
+  maxXP: number;
+}
+
+export const LEVELS: Level[] = [
+  { num: 1, emoji: "🌱", name: "입문자",  minXP: 0,    maxXP: 100  },
+  { num: 2, emoji: "📚", name: "초보자",  minXP: 101,  maxXP: 300  },
+  { num: 3, emoji: "⭐", name: "중급자",  minXP: 301,  maxXP: 600  },
+  { num: 4, emoji: "🔥", name: "고급자",  minXP: 601,  maxXP: 1000 },
+  { num: 5, emoji: "👑", name: "마스터",  minXP: 1001, maxXP: Infinity },
+];
+
+export function getLevel(xp: number): Level {
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].minXP) return LEVELS[i];
+  }
+  return LEVELS[0];
+}
+
+export function getLevelProgress(xp: number): number {
+  const lvl = getLevel(xp);
+  if (lvl.num === 5) return 1;
+  return Math.min(1, (xp - lvl.minXP) / (lvl.maxXP - lvl.minXP));
+}
+
 export interface UserStats {
   streak: number;
   wordsLearned: number;
