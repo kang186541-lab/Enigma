@@ -129,6 +129,7 @@ async function elevenLabsPlay(
     url.searchParams.set("tutorId", tutorId);
     url.searchParams.set("speed", speed.toString());
     // mode deliberately excluded — see comment above
+    console.log("TTS called with speed:", speed);
 
     onStart?.();
     const res = await fetch(url.toString());
@@ -223,6 +224,7 @@ export default function ChatRoomScreen() {
 
   const handleSpeedChange = (val: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    console.log("Speed changed to:", val);
     setRate(val);
     AsyncStorage.setItem("speed_pref", val.toString());
   };

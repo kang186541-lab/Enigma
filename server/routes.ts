@@ -220,8 +220,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-      // Pass tutorId only — mode is excluded so voice stays consistent across modes.
-      const ssml = buildSsml(azureFallback.voice, azureFallback.lang, safeText, tutorId);
+      // Convert client speed multiplier (0.8-1.4) to Azure prosody rate string.
+      // e.g. 0.8 → "-20%", 1.0 → "+0%", 1.2 → "+20%", 1.4 → "+40%"
+      const speedPct = Math.round((speaking_rate - 1) * 100);
+      const speedRate = (speedPct >= 0 ? "+" : "") + speedPct + "%";
+      console.log(`TTS called with speed: ${speaking_rate} → Azure prosody rate: ${speedRate}`);
+
+      // Pass tutorId and speedRate — mode excluded so voice stays consistent across modes.
+      const ssml = buildSsml(azureFallback.voice, azureFallback.lang, safeText, tutorId, undefined, speedRate);
 
       const azureRes = await fetch(
         `https://${azureRegion}.tts.speech.microsoft.com/cognitiveservices/v1`,
@@ -293,7 +299,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "친절": { style: "friendly", degree: "1.5", rate: "+5%",  pitch: "0%"   },
   };
 
-  function buildSsml(voiceName: string, lang: string, safeText: string, tutorId?: string, mode?: string): string {
+  // speedRate: explicit prosody rate string (e.g. "+20%") derived from the client's
+  // speed multiplier. Takes highest priority so button taps always reflect in audio.
+  function buildSsml(voiceName: string, lang: string, safeText: string, tutorId?: string, mode?: string, speedRate?: string): string {
     const modeStyle = mode ? MODE_SSML_STYLES[mode] : undefined;
 
     // Mode takes highest priority, then tutorId override, then voice default.
@@ -303,7 +311,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : (VOICE_SSML_STYLES[voiceName] ?? { style: "friendly", degree: "1.5" })
     );
 
-    const rate  = modeStyle?.rate  ?? "+20%";
+    // speedRate (from client multiplier) > modeStyle rate > neutral default "+0%"
+    const rate  = speedRate ?? modeStyle?.rate ?? "+0%";
     const pitch = modeStyle?.pitch ?? "0%";
 
     return [
