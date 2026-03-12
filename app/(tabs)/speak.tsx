@@ -370,8 +370,12 @@ export default function SpeakScreen() {
 
   const [recordState, setRecordState] = useState<RecordState>("idle");
   const [score, setScore] = useState<number | null>(null);
+  const [accuracyScore, setAccuracyScore] = useState<number | null>(null);
+  const [fluencyScore, setFluencyScore] = useState<number | null>(null);
+  const [completenessScore, setCompletenessScore] = useState<number | null>(null);
   const [gptFeedback, setGptFeedback] = useState("");
   const [recognizedText, setRecognizedText] = useState("");
+  const [wordResults, setWordResults] = useState<{ word: string; score: number; errorType: string }[]>([]);
   const [sttError, setSttError] = useState("");
   const [hasListened, setHasListened] = useState(false);
 
@@ -379,16 +383,25 @@ export default function SpeakScreen() {
   const scoreAnim = useRef(new Animated.Value(0)).current;
   const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
   const recordStateRef = useRef<RecordState>("idle");
+  const mediaRecorderRef = useRef<any>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const autoStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const weakKey = `speak_weak_words_${activeLang}`;
   const lastSeenKey = `speak_last_seen_${activeLang}`;
 
   const resetPracticeState = useCallback(() => {
+    if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
+    if (mediaRecorderRef.current?.state === "recording") { mediaRecorderRef.current.stop(); }
     setRecordState("idle");
     recordStateRef.current = "idle";
     setScore(null);
+    setAccuracyScore(null);
+    setFluencyScore(null);
+    setCompletenessScore(null);
     setGptFeedback("");
     setRecognizedText("");
+    setWordResults([]);
     setSttError("");
     setHasListened(false);
     pulseLoop.current?.stop();
@@ -477,8 +490,15 @@ export default function SpeakScreen() {
   };
 
   const handleRecord = () => {
-    if (!phrase || recordState === "listening" || recordState === "processing") return;
+    if (!phrase || recordState === "processing") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+
+    // Second tap while recording → stop early
+    if (recordState === "listening" && mediaRecorderRef.current?.state === "recording") {
+      if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
+      mediaRecorderRef.current.stop();
+      return;
+    }
 
     if (Platform.OS !== "web") {
       setSttError("발음 평가는 현재 웹 브라우저에서만 지원됩니다.");
@@ -487,92 +507,110 @@ export default function SpeakScreen() {
       return;
     }
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setSttError("이 브라우저는 음성 인식을 지원하지 않습니다.\nChrome을 사용해 주세요.");
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      setSttError("이 브라우저는 마이크 녹음을 지원하지 않습니다.\nChrome을 사용해 주세요.");
       setRecordState("done");
       recordStateRef.current = "done";
       return;
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = phrase.speechLang;
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      audioChunksRef.current = [];
 
-    setRecordState("listening");
-    recordStateRef.current = "listening";
-    setScore(null);
-    setGptFeedback("");
-    setRecognizedText("");
-    setSttError("");
-    startPulse();
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "";
+      const recorder = new (window as any).MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      mediaRecorderRef.current = recorder;
 
-    let resultReceived = false;
-
-    recognition.onresult = async (event: any) => {
-      resultReceived = true;
-      stopPulse();
-      setRecordState("processing");
-      recordStateRef.current = "processing";
-      const transcript: string = event.results[0][0].transcript;
-      setRecognizedText(transcript);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      try {
-        const apiUrl = new URL("/api/gpt-score", getApiUrl()).toString();
-        const apiRes = await fetch(apiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word: phrase.word, recognized: transcript }),
-        });
-        if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
-        const data = await apiRes.json();
-        const scoreVal = data.score ?? 0;
-        setScore(scoreVal);
-        setGptFeedback(data.feedback ?? "");
-        Animated.timing(scoreAnim, { toValue: scoreVal / 100, duration: 900, useNativeDriver: false }).start();
-        if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase.word); }
-        else { await removeWeakWord(phrase.word); }
-        const xpEarned = scoreVal >= 90 ? 30 : 15;
-        setXpGain(xpEarned);
-        updateStats({ xp: statsRef.current.xp + xpEarned });
-      } catch {
-        setSttError("채점 중 오류가 발생했습니다. 다시 시도해 주세요.");
-      } finally {
-        setRecordState("done");
-        recordStateRef.current = "done";
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      }
-    };
-
-    recognition.onerror = (event: any) => {
-      resultReceived = true;
-      stopPulse();
-      const errMap: Record<string, string> = {
-        "not-allowed": "마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)",
-        "no-speech": "음성이 감지되지 않았습니다. 다시 시도해 주세요.",
-        "network": "네트워크 오류가 발생했습니다.",
-        "aborted": "녹음이 취소되었습니다.",
-        "audio-capture": "마이크를 찾을 수 없습니다.",
-        "service-not-allowed": "마이크 권한을 허용해주세요.",
+      recorder.ondataavailable = (e: any) => {
+        if (e.data && e.data.size > 0) audioChunksRef.current.push(e.data);
       };
-      setSttError(errMap[event.error] ?? `오류: ${event.error}`);
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t: any) => t.stop());
+        stopPulse();
+        setRecordState("processing");
+        recordStateRef.current = "processing";
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+        const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType || "audio/webm" });
+
+        // Reliable base64 encoding via FileReader
+        const base64: string = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const dataUrl = reader.result as string;
+            resolve(dataUrl.split(",")[1] ?? "");
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+
+        try {
+          const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+          const apiRes = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              word: phrase.word,
+              lang: phrase.speechLang,
+              audio: base64,
+              mimeType: recorder.mimeType || "audio/webm",
+            }),
+          });
+          if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
+          const data = await apiRes.json();
+
+          const scoreVal = data.score ?? 0;
+          setScore(scoreVal);
+          setAccuracyScore(data.accuracyScore ?? null);
+          setFluencyScore(data.fluencyScore ?? null);
+          setCompletenessScore(data.completenessScore ?? null);
+          setGptFeedback(data.feedback ?? "");
+          setRecognizedText(data.recognizedText ?? "");
+          setWordResults(data.words ?? []);
+          Animated.timing(scoreAnim, { toValue: scoreVal / 100, duration: 900, useNativeDriver: false }).start();
+          if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase.word); }
+          else { await removeWeakWord(phrase.word); }
+          const xpEarned = scoreVal >= 90 ? 30 : 15;
+          setXpGain(xpEarned);
+          updateStats({ xp: statsRef.current.xp + xpEarned });
+        } catch {
+          setSttError("채점 중 오류가 발생했습니다. 다시 시도해 주세요.");
+        } finally {
+          setRecordState("done");
+          recordStateRef.current = "done";
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+      };
+
+      recorder.start(100); // collect chunks every 100ms
+      setRecordState("listening");
+      recordStateRef.current = "listening";
+      setScore(null);
+      setAccuracyScore(null);
+      setFluencyScore(null);
+      setCompletenessScore(null);
+      setGptFeedback("");
+      setRecognizedText("");
+      setWordResults([]);
+      setSttError("");
+      startPulse();
+
+      // Auto-stop after 8 seconds
+      autoStopTimerRef.current = setTimeout(() => {
+        if (mediaRecorderRef.current?.state === "recording") {
+          mediaRecorderRef.current.stop();
+        }
+      }, 8000);
+    }).catch(() => {
+      setSttError("마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)");
       setRecordState("done");
       recordStateRef.current = "done";
-    };
-
-    recognition.onend = () => {
-      stopPulse();
-      if (!resultReceived && recordStateRef.current === "listening") {
-        setSttError("음성이 감지되지 않았습니다. 다시 시도해 주세요.");
-        setRecordState("done");
-        recordStateRef.current = "done";
-      }
-    };
-
-    recognition.start();
+    });
   };
 
   const goNextWord = async () => {
@@ -759,34 +797,75 @@ export default function SpeakScreen() {
               showsVerticalScrollIndicator={false}
             >
               {score !== null && scoreInfo ? (
-                <View style={styles.resultRow}>
-                  <View style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}>
-                    <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
-                    <Text style={styles.scoreDenom}>/100</Text>
-                  </View>
-
-                  <View style={styles.resultRight}>
-                    <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>
-                      {scoreInfo.emoji} {scoreInfo.label}
-                    </Text>
-
-                    <View style={styles.scoreBarTrack}>
-                      <Animated.View
-                        style={[styles.scoreBarFill, {
-                          width: scoreAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] }),
-                          backgroundColor: scoreInfo.color,
-                        }]}
-                      />
+                <View>
+                  <View style={styles.resultRow}>
+                    <View style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}>
+                      <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
+                      <Text style={styles.scoreDenom}>/100</Text>
                     </View>
 
-                    {recognizedText ? (
-                      <Text style={styles.heardText}>"{recognizedText}"</Text>
-                    ) : null}
+                    <View style={styles.resultRight}>
+                      <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>
+                        {scoreInfo.emoji} {scoreInfo.label}
+                      </Text>
 
-                    {gptFeedback ? (
-                      <Text style={styles.feedbackText} numberOfLines={3}>{gptFeedback}</Text>
-                    ) : null}
+                      <View style={styles.scoreBarTrack}>
+                        <Animated.View
+                          style={[styles.scoreBarFill, {
+                            width: scoreAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] }),
+                            backgroundColor: scoreInfo.color,
+                          }]}
+                        />
+                      </View>
+
+                      {recognizedText ? (
+                        <Text style={styles.heardText}>"{recognizedText}"</Text>
+                      ) : null}
+                    </View>
                   </View>
+
+                  {/* Sub-scores row */}
+                  {(accuracyScore !== null || fluencyScore !== null || completenessScore !== null) && (
+                    <View style={styles.subScoreRow}>
+                      {accuracyScore !== null && (
+                        <View style={styles.subScoreBox}>
+                          <Text style={[styles.subScoreNum, { color: accuracyScore >= 75 ? "#10B981" : accuracyScore >= 50 ? "#F59E0B" : "#EF4444" }]}>{accuracyScore}</Text>
+                          <Text style={styles.subScoreLabel}>정확도</Text>
+                        </View>
+                      )}
+                      {fluencyScore !== null && (
+                        <View style={styles.subScoreBox}>
+                          <Text style={[styles.subScoreNum, { color: fluencyScore >= 75 ? "#10B981" : fluencyScore >= 50 ? "#F59E0B" : "#EF4444" }]}>{fluencyScore}</Text>
+                          <Text style={styles.subScoreLabel}>유창성</Text>
+                        </View>
+                      )}
+                      {completenessScore !== null && (
+                        <View style={styles.subScoreBox}>
+                          <Text style={[styles.subScoreNum, { color: completenessScore >= 75 ? "#10B981" : completenessScore >= 50 ? "#F59E0B" : "#EF4444" }]}>{completenessScore}</Text>
+                          <Text style={styles.subScoreLabel}>완성도</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+
+                  {/* Word-level chips */}
+                  {wordResults.length > 0 && (
+                    <View style={styles.wordChipsRow}>
+                      {wordResults.map((w, i) => {
+                        const chipColor = w.score >= 80 ? "#10B981" : w.score >= 55 ? "#F59E0B" : "#EF4444";
+                        return (
+                          <View key={i} style={[styles.wordChip, { borderColor: chipColor }]}>
+                            <Text style={[styles.wordChipText, { color: chipColor }]}>{w.word}</Text>
+                            <Text style={[styles.wordChipScore, { color: chipColor }]}>{w.score}</Text>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  )}
+
+                  {gptFeedback ? (
+                    <Text style={styles.feedbackText}>{gptFeedback}</Text>
+                  ) : null}
                 </View>
               ) : (
                 <View style={styles.errorRow}>
@@ -812,7 +891,7 @@ export default function SpeakScreen() {
                 <Pressable
                   style={({ pressed }) => [styles.micBtn, pressed && { opacity: 0.88 }]}
                   onPress={handleRecord}
-                  disabled={isBusy}
+                  disabled={isProcessing}
                   testID="mic-button"
                 >
                   <LinearGradient
@@ -828,7 +907,7 @@ export default function SpeakScreen() {
               </Animated.View>
 
               <Text style={styles.micHint}>
-                {isRecording ? "듣고 있어요…" : isProcessing ? "분석 중…" : hasListened ? "탭하여 발음하기" : "먼저 듣기를 눌러보세요"}
+                {isRecording ? "녹음 중… 탭하여 정지" : isProcessing ? "Azure 분석 중…" : hasListened ? "탭하여 발음 녹음" : "먼저 듣기를 눌러보세요"}
               </Text>
             </View>
           )}
@@ -1026,7 +1105,15 @@ const styles = StyleSheet.create({
   },
   scoreBarFill: { height: "100%", borderRadius: 3 },
   heardText: { fontSize: 12, fontFamily: F.body, color: C.parchment, fontStyle: "italic" },
-  feedbackText: { fontSize: 12, fontFamily: F.body, color: C.goldDim, lineHeight: 17 },
+  feedbackText: { fontSize: 12, fontFamily: F.body, color: C.goldDim, lineHeight: 17, marginTop: 6 },
+  subScoreRow: { flexDirection: "row", justifyContent: "center", gap: 12, marginTop: 8, marginBottom: 2 },
+  subScoreBox: { alignItems: "center", backgroundColor: "rgba(201,162,39,0.08)", borderRadius: 8, paddingHorizontal: 12, paddingVertical: 4, minWidth: 60 },
+  subScoreNum: { fontSize: 18, fontFamily: F.header, letterSpacing: 0.5 },
+  subScoreLabel: { fontSize: 10, fontFamily: F.label, color: C.goldDim, marginTop: 1 },
+  wordChipsRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 8 },
+  wordChip: { flexDirection: "row", alignItems: "center", gap: 4, borderWidth: 1, borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3 },
+  wordChipText: { fontSize: 12, fontFamily: F.bodySemi },
+  wordChipScore: { fontSize: 11, fontFamily: F.label },
   retryChip: {
     flexDirection: "row", alignItems: "center", gap: 5,
     alignSelf: "center", paddingHorizontal: 14, paddingVertical: 6,
