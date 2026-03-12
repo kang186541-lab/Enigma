@@ -14,63 +14,106 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { useLanguage, getLevel, getLevelProgress } from "@/context/LanguageContext";
+import { useLanguage, getLevel, getLevelProgress, NativeLanguage } from "@/context/LanguageContext";
 
 const { width } = Dimensions.get("window");
 
 function getGreeting(t: (k: string) => string) {
-  const hour = new Date().getHours();
-  if (hour < 12) return t("good_morning");
-  if (hour < 18) return t("good_afternoon");
+  const h = new Date().getHours();
+  if (h < 12) return t("good_morning");
+  if (h < 18) return t("good_afternoon");
   return t("good_evening");
+}
+
+function getWeekStreakData(streak: number, nativeLang: NativeLanguage) {
+  const today = new Date();
+  const todayMonIdx = (today.getDay() + 6) % 7; // Mon=0 … Sun=6
+
+  const dayLabels: Record<NativeLanguage, string[]> = {
+    korean:  ["월", "화", "수", "목", "금", "토", "일"],
+    english: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    spanish: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+  };
+  const labels = dayLabels[nativeLang] ?? dayLabels.english;
+
+  return labels.map((label, i) => {
+    const daysAgo = todayMonIdx - i;
+    let status: "fire" | "missed" | "future";
+    if (daysAgo === 0)        status = "fire";
+    else if (daysAgo > 0)     status = daysAgo < streak ? "fire" : "missed";
+    else                      status = "future";
+    return { label, status, isToday: i === todayMonIdx };
+  });
+}
+
+function getStreakText(streak: number, lang: NativeLanguage): string {
+  const msgs: Record<NativeLanguage, [string, string, string, string]> = {
+    korean:  [
+      "오늘 학습으로 연속 기록을 시작하세요! 💪",
+      `${streak}일 연속! 오늘도 학습하세요! 🔥`,
+      `${streak}일 연속! 멈추지 마세요! 🚀`,
+      `${streak}일 연속! 정말 대단해요! 🏆`,
+    ],
+    english: [
+      "Study today to start your streak! 💪",
+      `${streak}-day streak! Keep going! 🔥`,
+      `${streak}-day streak! You're on fire! 🚀`,
+      `${streak}-day streak! Incredible! 🏆`,
+    ],
+    spanish: [
+      "¡Estudia hoy para iniciar tu racha! 💪",
+      `¡${streak} días seguidos! ¡Sigue así! 🔥`,
+      `¡${streak} días seguidos! ¡En llamas! 🚀`,
+      `¡${streak} días seguidos! ¡Increíble! 🏆`,
+    ],
+  };
+  const m = msgs[lang] ?? msgs.english;
+  if (streak === 0) return m[0];
+  if (streak < 3)   return m[1];
+  if (streak < 7)   return m[2];
+  return m[3];
 }
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { t, stats } = useLanguage();
+  const { t, stats, nativeLanguage } = useLanguage();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
+  const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
 
-  const level = getLevel(stats.xp);
+  const level    = getLevel(stats.xp);
   const progress = getLevelProgress(stats.xp);
-  const nextLevel = level.num < 5 ? level.maxXP : null;
-  const xpInLevel = level.num < 5 ? stats.xp - level.minXP : stats.xp - level.minXP;
-  const xpForLevel = level.num < 5 ? level.maxXP - level.minXP : 1;
+  const xpInLvl  = stats.xp - level.minXP;
+  const xpForLvl = level.num < 5 ? level.maxXP - level.minXP : 1;
 
-  const xpBarAnim = useRef(new Animated.Value(progress)).current;
-
+  const xpAnim = useRef(new Animated.Value(progress)).current;
   useEffect(() => {
-    Animated.spring(xpBarAnim, {
-      toValue: progress,
-      useNativeDriver: false,
-      tension: 40,
-      friction: 8,
-    }).start();
+    Animated.spring(xpAnim, { toValue: progress, useNativeDriver: false, tension: 40, friction: 8 }).start();
   }, [stats.xp]);
 
-  const statItems = [
-    { icon: "flame", color: "#FF6B35", label: t("streak"), value: `${stats.streak}`, suffix: "" },
-    { icon: "book", color: "#4ECDC4", label: t("words"), value: `${stats.wordsLearned}`, suffix: "" },
-    { icon: "checkmark-circle", color: "#45B7D1", label: t("accuracy"), value: `${stats.accuracy}`, suffix: "%" },
-    { icon: "flash", color: "#9C27B0", label: t("xp"), value: `${stats.xp}`, suffix: "" },
-  ];
+  const barW = xpAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] });
+
+  const weekData   = getWeekStreakData(stats.streak, nativeLang);
+  const streakText = getStreakText(stats.streak, nativeLang);
 
   const quickItems = [
-    { icon: "albums", color: "#FF6B9D", label: t("flashcards"), desc: t("flashcards_desc"), route: "/(tabs)/cards" },
-    { icon: "chatbubbles", color: "#4ECDC4", label: t("conversation"), desc: t("conversation_desc"), route: "/(tabs)/chat" },
-    { icon: "mic", color: "#45B7D1", label: t("pronunciation"), desc: t("pronunciation_desc"), route: "/(tabs)/speak" },
+    { icon: "albums",      color: "#FF6B9D", label: t("flashcards"),   desc: t("flashcards_desc"),   route: "/(tabs)/cards" },
+    { icon: "chatbubbles", color: "#4ECDC4", label: t("conversation"), desc: t("conversation_desc"), route: "/(tabs)/chat"  },
+    { icon: "mic",         color: "#45B7D1", label: t("pronunciation"),desc: t("pronunciation_desc"),route: "/(tabs)/speak" },
   ];
 
-  const barWidth = xpBarAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0%", "100%"],
-  });
+  const bottomStatItems = [
+    { label: t("words"),    value: `${stats.wordsLearned}`, color: "#4ECDC4", icon: "book"             },
+    { label: t("accuracy"), value: `${stats.accuracy}%`,   color: "#45B7D1", icon: "checkmark-circle"  },
+    { label: t("xp"),       value: `${stats.xp}`,          color: "#9C27B0", icon: "flash"             },
+  ];
 
   return (
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={false}
-      contentInsetAdjustmentBehavior="automatic"
+      contentInsetAdjustmentBehavior="never"
     >
+      {/* ── HEADER ────────────────────────────────────── */}
       <LinearGradient
         colors={["#FF6B9D", "#FF8FB3", "#FFB3CE"]}
         style={[styles.header, { paddingTop: topPad + 16 }]}
@@ -82,96 +125,165 @@ export default function HomeScreen() {
             <Text style={styles.greeting}>{getGreeting(t)}</Text>
             <Text style={styles.headerTitle}>LinguaAI ✨</Text>
           </View>
-          <Pressable style={styles.avatarBtn}>
-            <LinearGradient colors={["#FFFFFF", "#FFE0EF"]} style={styles.avatar}>
-              <Text style={styles.avatarText}>{level.emoji}</Text>
-            </LinearGradient>
-          </Pressable>
+          <View style={styles.avatarCircle}>
+            <Text style={styles.avatarEmoji}>{level.emoji}</Text>
+          </View>
         </View>
 
+        {/* Level badge */}
         <View style={styles.levelRow}>
           <View style={styles.levelBadge}>
             <Text style={styles.levelEmoji}>{level.emoji}</Text>
-            <Text style={styles.levelText}>{level.name} · {t("level")} {level.num}</Text>
+            <Text style={styles.levelName}>{level.name}</Text>
+            <View style={styles.levelDot} />
+            <Text style={styles.levelNum}>{t("level")} {level.num}</Text>
           </View>
         </View>
 
-        <View style={styles.xpBarContainer}>
+        {/* XP bar */}
+        <View style={styles.xpSection}>
           <View style={styles.xpTrack}>
-            <Animated.View style={[styles.xpFill, { width: barWidth }]} />
+            <Animated.View style={[styles.xpFill, { width: barW }]} />
           </View>
           <Text style={styles.xpLabel}>
             {level.num < 5
-              ? `${xpInLevel} / ${xpForLevel} XP`
-              : `${stats.xp} XP · 마스터 👑`}
+              ? `${xpInLvl} / ${xpForLvl} XP`
+              : `${stats.xp} XP · ${level.name} ${level.emoji}`}
           </Text>
         </View>
       </LinearGradient>
 
-      <View style={styles.statsContainer}>
-        {statItems.map((item, idx) => (
-          <View key={idx} style={styles.statCard}>
-            <View style={[styles.statIconBg, { backgroundColor: item.color + "18" }]}>
-              <Ionicons name={item.icon as any} size={22} color={item.color} />
+      {/* ── STREAK CARD ───────────────────────────────── */}
+      <View style={styles.pad}>
+        <View style={styles.streakCard}>
+          <View style={styles.streakHeader}>
+            <View style={styles.streakLeft}>
+              <View style={styles.fireCircle}>
+                <Text style={styles.fireEmoji}>🔥</Text>
+              </View>
+              <View>
+                <Text style={styles.streakCount}>{stats.streak}</Text>
+                <Text style={styles.streakLabel}>
+                  {nativeLang === "korean" ? "일 연속 학습" : nativeLang === "spanish" ? "días seguidos" : "day streak"}
+                </Text>
+              </View>
             </View>
-            <Text style={styles.statValue}>{item.value}{item.suffix}</Text>
-            <Text style={styles.statLabel}>{item.label}</Text>
+            <View style={styles.streakBadge}>
+              <Ionicons name="trophy" size={14} color="#FF6B35" />
+              <Text style={styles.streakBadgeText}>
+                {nativeLang === "korean" ? "최고 기록" : nativeLang === "spanish" ? "Récord" : "Best"}
+              </Text>
+            </View>
           </View>
-        ))}
+
+          {/* Weekly calendar */}
+          <View style={styles.weekRow}>
+            {weekData.map((d, i) => (
+              <View key={i} style={styles.dayCol}>
+                <Text style={[styles.dayLabel, d.isToday && styles.dayLabelToday]}>{d.label}</Text>
+                {d.status === "fire" ? (
+                  <View style={[styles.dayCircle, styles.dayCircleFire]}>
+                    <Text style={styles.dayEmoji}>🔥</Text>
+                  </View>
+                ) : d.status === "missed" ? (
+                  <View style={[styles.dayCircle, styles.dayCircleMissed]}>
+                    <Text style={styles.dayEmojiSmall}>❌</Text>
+                  </View>
+                ) : (
+                  <View style={[styles.dayCircle, styles.dayCircleFuture]} />
+                )}
+              </View>
+            ))}
+          </View>
+
+          {/* Motivational text */}
+          <View style={styles.streakMotivation}>
+            <Text style={styles.streakMotivationText}>{streakText}</Text>
+          </View>
+        </View>
       </View>
 
-      <View style={styles.section}>
-        <View style={[styles.dailyCard]}>
+      {/* ── DAILY LESSON CARD ─────────────────────────── */}
+      <View style={[styles.pad, { marginTop: 4 }]}>
+        <Pressable
+          style={({ pressed }) => [styles.dailyCard, pressed && { transform: [{ scale: 0.985 }] }]}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            router.push("/daily-lesson" as any);
+          }}
+        >
           <LinearGradient
-            colors={["#FF6B9D", "#FF4081"]}
+            colors={["#FF6B9D", "#FF4081", "#E8316E"]}
             style={styles.dailyGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
             <View style={styles.dailyContent}>
-              <View>
-                <Text style={styles.dailyLabel}>{t("daily_lesson")}</Text>
-                <Text style={styles.dailyDesc}>{t("daily_desc")}</Text>
+              <View style={styles.dailyTopRow}>
+                <View style={styles.dailyPill}>
+                  <Ionicons name="star" size={10} color="#FF6B9D" />
+                  <Text style={styles.dailyPillText}>
+                    {nativeLang === "korean" ? "오늘의 수업" : nativeLang === "spanish" ? "Lección de hoy" : "Today's Lesson"}
+                  </Text>
+                </View>
+                <View style={styles.xpPill}>
+                  <Text style={styles.xpPillText}>+50 XP ⚡</Text>
+                </View>
               </View>
-              <Pressable
-                style={({ pressed }) => [styles.startBtn, pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] }]}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  router.push("/daily-lesson" as any);
-                }}
-              >
-                <Text style={styles.startBtnText}>{t("start_lesson")}</Text>
-                <Ionicons name="arrow-forward" size={16} color="#FF6B9D" />
-              </Pressable>
+              <Text style={styles.dailyTitle}>{t("daily_desc")}</Text>
+              <View style={styles.dailyBtn}>
+                <Text style={styles.dailyBtnText}>{t("start_lesson")}</Text>
+                <Ionicons name="arrow-forward" size={15} color="#FF6B9D" />
+              </View>
             </View>
-            <View style={styles.dailyDecor}>
-              <Text style={styles.dailyEmoji}>📖</Text>
-            </View>
+            <Text style={styles.dailyBookEmoji}>📖</Text>
           </LinearGradient>
-        </View>
+        </Pressable>
       </View>
 
-      <View style={styles.section}>
+      {/* ── QUICK PRACTICE ────────────────────────────── */}
+      <View style={[styles.pad, { marginTop: 20 }]}>
         <Text style={styles.sectionTitle}>{t("quick_practice")}</Text>
-        <View style={styles.quickGrid}>
+        <View style={styles.quickList}>
           {quickItems.map((item, idx) => (
             <Pressable
               key={idx}
-              style={({ pressed }) => [
-                styles.quickCard,
-                pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] },
-              ]}
+              style={({ pressed }) => [styles.quickCard, pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] }]}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 router.push(item.route as any);
               }}
             >
-              <View style={[styles.quickIconBg, { backgroundColor: item.color + "15" }]}>
-                <Ionicons name={item.icon as any} size={28} color={item.color} />
+              <LinearGradient
+                colors={[item.color + "22", item.color + "08"]}
+                style={styles.quickIcon}
+              >
+                <Ionicons name={item.icon as any} size={26} color={item.color} />
+              </LinearGradient>
+              <View style={styles.quickText}>
+                <Text style={styles.quickLabel}>{item.label}</Text>
+                <Text style={styles.quickDesc}>{item.desc}</Text>
               </View>
-              <Text style={styles.quickLabel}>{item.label}</Text>
-              <Text style={styles.quickDesc}>{item.desc}</Text>
+              <Ionicons name="chevron-forward" size={16} color="#D0B0C0" />
             </Pressable>
+          ))}
+        </View>
+      </View>
+
+      {/* ── STATS ─────────────────────────────────────── */}
+      <View style={[styles.pad, { marginTop: 20 }]}>
+        <Text style={styles.sectionTitle}>
+          {nativeLang === "korean" ? "내 통계" : nativeLang === "spanish" ? "Mis estadísticas" : "My Stats"}
+        </Text>
+        <View style={styles.statsRow}>
+          {bottomStatItems.map((s, i) => (
+            <View key={i} style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: s.color + "18" }]}>
+                <Ionicons name={s.icon as any} size={20} color={s.color} />
+              </View>
+              <Text style={styles.statValue}>{s.value}</Text>
+              <Text style={styles.statLabel}>{s.label}</Text>
+            </View>
           ))}
         </View>
       </View>
@@ -181,229 +293,122 @@ export default function HomeScreen() {
   );
 }
 
+const DAY_COL_W = Math.floor((width - 48 - 12) / 7);
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFF8FB",
+  container: { flex: 1, backgroundColor: "#FFF8FB" },
+
+  /* ─ HEADER ─ */
+  header: { paddingHorizontal: 20, paddingBottom: 22 },
+  headerTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 },
+  greeting: { fontSize: 13, fontFamily: "Inter_400Regular", color: "rgba(255,255,255,0.85)", marginBottom: 2 },
+  headerTitle: { fontSize: 28, fontFamily: "Inter_700Bold", color: "#FFFFFF", letterSpacing: -0.5 },
+  avatarCircle: {
+    width: 46, height: 46, borderRadius: 23,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    justifyContent: "center", alignItems: "center",
+    borderWidth: 2, borderColor: "rgba(255,255,255,0.5)",
   },
-  header: {
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-  },
-  headerTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 14,
-  },
-  greeting: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: "rgba(255,255,255,0.85)",
-    marginBottom: 2,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
-    letterSpacing: -0.5,
-  },
-  avatarBtn: {},
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  avatarText: {
-    fontSize: 22,
-  },
-  levelRow: {
-    marginBottom: 10,
-  },
+  avatarEmoji: { fontSize: 22 },
+  levelRow: { marginBottom: 10 },
   levelBadge: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "row", alignItems: "center", gap: 5,
     backgroundColor: "rgba(255,255,255,0.22)",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
-    alignSelf: "flex-start",
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, alignSelf: "flex-start",
   },
-  levelEmoji: {
-    fontSize: 14,
+  levelEmoji: { fontSize: 13 },
+  levelName: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#FFFFFF" },
+  levelDot: { width: 3, height: 3, borderRadius: 1.5, backgroundColor: "rgba(255,255,255,0.6)" },
+  levelNum: { fontSize: 12, fontFamily: "Inter_500Medium", color: "rgba(255,255,255,0.9)" },
+  xpSection: { gap: 5 },
+  xpTrack: { height: 7, backgroundColor: "rgba(255,255,255,0.28)", borderRadius: 4, overflow: "hidden" },
+  xpFill: { height: "100%", backgroundColor: "#FFFFFF", borderRadius: 4 },
+  xpLabel: { fontSize: 11, fontFamily: "Inter_500Medium", color: "rgba(255,255,255,0.85)" },
+
+  /* ─ SHARED ─ */
+  pad: { paddingHorizontal: 16, marginTop: 16 },
+  sectionTitle: { fontSize: 18, fontFamily: "Inter_700Bold", color: "#1A1A2E", marginBottom: 12 },
+
+  /* ─ STREAK CARD ─ */
+  streakCard: {
+    backgroundColor: "#FFFFFF", borderRadius: 22, padding: 18,
+    shadowColor: "#FF6B35", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 14, elevation: 4,
   },
-  levelText: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
+  streakHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 18 },
+  streakLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  fireCircle: {
+    width: 52, height: 52, borderRadius: 26,
+    backgroundColor: "#FFF0E6",
+    justifyContent: "center", alignItems: "center",
   },
-  xpBarContainer: {
-    gap: 6,
+  fireEmoji: { fontSize: 28 },
+  streakCount: { fontSize: 32, fontFamily: "Inter_700Bold", color: "#FF6B35", lineHeight: 36 },
+  streakLabel: { fontSize: 12, fontFamily: "Inter_500Medium", color: "#A08090", marginTop: 1 },
+  streakBadge: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    backgroundColor: "#FFF0E6", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12,
   },
-  xpTrack: {
-    height: 6,
-    backgroundColor: "rgba(255,255,255,0.25)",
-    borderRadius: 3,
-    overflow: "hidden",
+  streakBadgeText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: "#FF6B35" },
+  weekRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 16 },
+  dayCol: { width: DAY_COL_W, alignItems: "center", gap: 6 },
+  dayLabel: { fontSize: 10, fontFamily: "Inter_500Medium", color: "#B0A0AA" },
+  dayLabelToday: { color: "#FF6B9D", fontFamily: "Inter_700Bold" },
+  dayCircle: { width: 32, height: 32, borderRadius: 16, justifyContent: "center", alignItems: "center" },
+  dayCircleFire: { backgroundColor: "#FFF0E6" },
+  dayCircleMissed: { backgroundColor: "#F5F0F3" },
+  dayCircleFuture: { backgroundColor: "#F5F0F3", borderWidth: 1.5, borderColor: "#E8DCE4", borderStyle: "dashed" as any },
+  dayEmoji: { fontSize: 18 },
+  dayEmojiSmall: { fontSize: 13 },
+  streakMotivation: {
+    backgroundColor: "#FFF8FB", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10,
   },
-  xpFill: {
-    height: "100%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 3,
-  },
-  xpLabel: {
-    fontSize: 11,
-    fontFamily: "Inter_500Medium",
-    color: "rgba(255,255,255,0.8)",
-  },
-  statsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    paddingHorizontal: 16,
-    marginTop: -20,
-    marginBottom: 8,
-  },
-  statCard: {
-    flex: 1,
-    minWidth: (width - 64) / 2,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 16,
-    alignItems: "center",
-    gap: 6,
-    shadowColor: "#FF6B9D",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
-  },
-  statIconBg: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  statValue: {
-    fontSize: 22,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
-    letterSpacing: -0.5,
-  },
-  statLabel: {
-    fontSize: 11,
-    fontFamily: "Inter_500Medium",
-    color: "#A08090",
-    textAlign: "center",
-  },
-  section: {
-    paddingHorizontal: 16,
-    marginTop: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
-    marginBottom: 14,
-    paddingHorizontal: 4,
-  },
+  streakMotivationText: { fontSize: 13, fontFamily: "Inter_500Medium", color: "#6B5060", textAlign: "center" },
+
+  /* ─ DAILY LESSON ─ */
   dailyCard: {
-    borderRadius: 24,
-    overflow: "hidden",
-    shadowColor: "#FF6B9D",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 6,
+    borderRadius: 24, overflow: "hidden",
+    shadowColor: "#FF6B9D", shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 20, elevation: 8,
   },
-  dailyGradient: {
-    padding: 24,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  dailyGradient: { padding: 24, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  dailyContent: { flex: 1, gap: 14 },
+  dailyTopRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  dailyPill: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    backgroundColor: "rgba(255,255,255,0.25)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12,
   },
-  dailyContent: {
-    flex: 1,
-    gap: 16,
+  dailyPillText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: "#FFFFFF" },
+  xpPill: {
+    backgroundColor: "rgba(255,255,255,0.2)", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10,
   },
-  dailyLabel: {
-    fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
-    color: "rgba(255,255,255,0.8)",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 4,
+  xpPillText: { fontSize: 11, fontFamily: "Inter_700Bold", color: "#FFFFFF" },
+  dailyTitle: { fontSize: 18, fontFamily: "Inter_700Bold", color: "#FFFFFF", lineHeight: 26, maxWidth: 195 },
+  dailyBtn: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    backgroundColor: "#FFFFFF", paddingHorizontal: 16, paddingVertical: 10, borderRadius: 14, alignSelf: "flex-start",
   },
-  dailyDesc: {
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
-    lineHeight: 22,
-    maxWidth: 180,
-  },
-  startBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 14,
-    alignSelf: "flex-start",
-  },
-  startBtnText: {
-    fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FF6B9D",
-  },
-  dailyDecor: {
-    marginLeft: 16,
-  },
-  dailyEmoji: {
-    fontSize: 52,
-  },
-  quickGrid: {
-    gap: 12,
-  },
+  dailyBtnText: { fontSize: 14, fontFamily: "Inter_700Bold", color: "#FF6B9D" },
+  dailyBookEmoji: { fontSize: 58, marginLeft: 8 },
+
+  /* ─ QUICK PRACTICE ─ */
+  quickList: { gap: 10 },
   quickCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    shadowColor: "#FF6B9D",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: "#FFFFFF", borderRadius: 18, padding: 16,
+    flexDirection: "row", alignItems: "center", gap: 14,
+    shadowColor: "#FF6B9D", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
-  quickIconBg: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
+  quickIcon: { width: 52, height: 52, borderRadius: 16, justifyContent: "center", alignItems: "center" },
+  quickText: { flex: 1 },
+  quickLabel: { fontSize: 15, fontFamily: "Inter_700Bold", color: "#1A1A2E", marginBottom: 2 },
+  quickDesc: { fontSize: 12, fontFamily: "Inter_400Regular", color: "#A08090" },
+
+  /* ─ STATS ─ */
+  statsRow: { flexDirection: "row", gap: 10 },
+  statCard: {
+    flex: 1, backgroundColor: "#FFFFFF", borderRadius: 18, padding: 14,
+    alignItems: "center", gap: 6,
+    shadowColor: "#FF6B9D", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 2,
   },
-  quickLabel: {
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
-    color: "#1A1A2E",
-    marginBottom: 2,
-  },
-  quickDesc: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
-    flex: 1,
-    flexWrap: "wrap",
-  },
+  statIcon: { width: 40, height: 40, borderRadius: 12, justifyContent: "center", alignItems: "center" },
+  statValue: { fontSize: 20, fontFamily: "Inter_700Bold", color: "#1A1A2E" },
+  statLabel: { fontSize: 10, fontFamily: "Inter_500Medium", color: "#A08090", textAlign: "center" },
 });
