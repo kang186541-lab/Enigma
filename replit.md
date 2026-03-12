@@ -1,19 +1,31 @@
-# LinguaAI - Replit.md
+# LingoFox - Replit.md
 
 ## Overview
 
-LinguaAI is a mobile-first language learning app built with Expo (React Native). It helps users learn Korean, English, and Spanish through four core activities: flashcard-based vocabulary, AI tutor chat conversations, pronunciation practice, and a home dashboard showing learning stats.
-
-The app runs as a hybrid: a React Native frontend (via Expo Router) paired with a Node.js/Express backend. User preferences (onboarding, language selection, stats) are stored locally on-device using AsyncStorage. The backend uses PostgreSQL via Drizzle ORM, though it currently only defines a basic users table and has no active routes beyond the placeholder.
+LingoFox is a mobile-first AI language learning app built with Expo (React Native) featuring a vintage detective / Professor Layton visual theme. Dark brown, gold (#c9a227), and parchment (#f4e8c1) palette with Cinzel + CrimsonText fonts.
 
 **Key features:**
-- Language onboarding (select native language from Korean, English, Spanish)
-- Home dashboard with streak, XP, words learned, and accuracy stats
-- Flashcard deck for vocabulary practice
-- Chat screen with 6 AI tutors powered by GPT-5.1 (formal/casual, different accents/languages, maintains conversation history)
-- Real-time translation button on tutor messages using MyMemory API
-- Pronunciation guide with IPA phonetics, language tabs, listen + record flow
-- Full i18n support across all 3 languages using a built-in translation map
+- 2-step onboarding (select native + learning language from Korean, English, Spanish)
+- Home dashboard with streak, XP, words learned, accuracy stats
+- Flashcard deck (173 cards) with 3D flip animation and swipe gestures
+- AI Chat with 6 GPT-powered tutors (formal/casual styles, different languages)
+- Pronunciation practice screen with IPA phonetics, listen + record
+- Daily Lesson flow with XP rewards
+- **Story Mode — "The Language Conspiracy"** (see below)
+
+### The Language Conspiracy — Story Mode
+
+Mystery visual novel adventure with Lingo the Fox as detective guide. Three full chapters:
+
+- **Chapter 1: The London Cipher 🇬🇧** — Foggy Victorian London, ∆LX symbol, hidden library  
+- **Chapter 2: The Madrid Disappearance 🇪🇸** — Flamenco theatre, Carlos vanishes, "El lenguaje es poder"  
+- **Chapter 3: The Seoul Secret 🇰🇷** — Modern skyscraper, Project Erase, Lexicon Society HQ
+
+Each chapter has a sequence of: cinematic narrations → character dialogues → puzzles → clue discoveries → chapter completion (+150 XP).
+
+5 puzzle types: `word-match`, `fill-blank`, `dialogue-choice`, `sentence-builder`, `investigation`. Each puzzle awards +20 XP on solve. Clue reveals show ∆LX / key story artifacts with dramatic animations.
+
+**Villain:** Mr. Black, leader of the Lexicon Society (∆LX symbol). Story progresses London → Madrid → Seoul.
 
 ---
 

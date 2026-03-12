@@ -32,36 +32,36 @@ const CHAPTERS = [
     num: 1,
     flag: "🇬🇧",
     gradient: ["#0D1117", "#1A1A2E", "#16213E"] as const,
-    accentColor: "#E94560",
-    titleEn: "London Mystery",
-    titleKo: "런던 미스터리",
-    titleEs: "Misterio en Londres",
-    descEn: "Decode a mysterious letter in foggy London",
-    descKo: "안개 낀 런던에서 수수께끼의 편지를 해독하라",
-    descEs: "Descifra una misteriosa carta en la neblinosa Londres",
-    characters: ["🕵️", "👩", "🦹"],
-    scenes: 9,
-    missionEn: "Match 5 words",
-    missionKo: "단어 5개 매칭",
-    missionEs: "Relaciona 5 palabras",
+    accentColor: C.gold,
+    titleEn: "The London Cipher",
+    titleKo: "런던의 암호",
+    titleEs: "El Cifrado de Londres",
+    descEn: "Decode the ∆LX symbol before Mr. Black erases London's words",
+    descKo: "블랙 씨가 런던의 단어들을 지우기 전에 ∆LX 기호를 해독하라",
+    descEs: "Descifra el símbolo ∆LX antes de que Mr. Black borre las palabras de Londres",
+    characters: ["🕵️", "👩‍💼", "🕴️"],
+    scenes: 17,
+    missionEn: "4 puzzles + 2 clues",
+    missionKo: "퍼즐 4개 + 단서 2개",
+    missionEs: "4 puzzles + 2 pistas",
   },
   {
     id: "madrid",
     num: 2,
     flag: "🇪🇸",
-    gradient: ["#8B1A1A", "#C41E3A", "#FF6B35"] as const,
-    accentColor: "#FFCD3C",
-    titleEn: "Madrid Secret",
-    titleKo: "마드리드의 비밀",
-    titleEs: "El Secreto de Madrid",
-    descEn: "Help Carlos find the missing Isabella",
-    descKo: "카를로스가 사라진 이사벨라를 찾도록 도와줘",
-    descEs: "Ayuda a Carlos a encontrar a la desaparecida Isabella",
-    characters: ["💃", "👨", "👵"],
-    scenes: 9,
-    missionEn: "Fill in 3 blanks",
-    missionKo: "빈칸 3개 채우기",
-    missionEs: "Completa 3 espacios",
+    gradient: ["#1A0500", "#3A0A0A", "#6B1A10"] as const,
+    accentColor: C.gold,
+    titleEn: "The Madrid Disappearance",
+    titleKo: "마드리드의 실종",
+    titleEs: "La Desaparición de Madrid",
+    descEn: "Carlos vanished from the flamenco theatre — 'El lenguaje es poder'",
+    descKo: "플라멩코 극장에서 카를로스가 사라졌다 — '언어는 힘이다'",
+    descEs: "Carlos desapareció del teatro flamenco — 'El lenguaje es poder'",
+    characters: ["💃", "🕺", "👵"],
+    scenes: 16,
+    missionEn: "4 puzzles + 1 clue",
+    missionKo: "퍼즐 4개 + 단서 1개",
+    missionEs: "4 puzzles + 1 pista",
   },
   {
     id: "seoul",
@@ -69,17 +69,17 @@ const CHAPTERS = [
     flag: "🇰🇷",
     gradient: ["#050510", "#0A0A20", "#10103A"] as const,
     accentColor: C.gold,
-    titleEn: "Chaebol's Secret",
-    titleKo: "재벌가의 비밀",
-    titleEs: "El Secreto del Chaebol",
-    descEn: "You wake with no memory. K-Drama twists await!",
-    descKo: "기억을 잃은 채 눈을 떴다. 극적인 반전이 기다린다!",
-    descEs: "Despiertas sin memoria. ¡Los giros del K-Drama te esperan!",
-    characters: ["👨‍💼", "👩", "👩‍⚕️"],
-    scenes: 9,
-    missionEn: "Choose 3 correct words",
-    missionKo: "올바른 단어 3개 고르기",
-    missionEs: "Elige 3 palabras correctas",
+    titleEn: "The Seoul Secret",
+    titleKo: "서울의 비밀",
+    titleEs: "El Secreto de Seúl",
+    descEn: "Project Erase — the Lexicon Society's plan to delete all world languages",
+    descKo: "이레이즈 프로젝트 — Lexicon Society의 전 세계 언어 삭제 계획",
+    descEs: "Proyecto Borrado — el plan de la Sociedad Lexicon para eliminar todos los idiomas",
+    characters: ["👨‍💼", "👩‍⚕️", "🕴️"],
+    scenes: 15,
+    missionEn: "4 puzzles + 1 clue",
+    missionKo: "퍼즐 4개 + 단서 1개",
+    missionEs: "4 puzzles + 1 pista",
   },
   {
     id: "paris",
@@ -175,10 +175,10 @@ export default function StoryTab() {
 
   const lingoMsg =
     lang === "korean"
-      ? "안녕! 저는 링고예요! 🦊\n이야기로 함께 언어를 배워봐요!"
+      ? "견습생, 어서 와요! 🦊\nLexicon Society가 언어를 훔치고 있어요. 함께 막아봐요!"
       : lang === "spanish"
-      ? "¡Hola! ¡Soy Lingo! 🦊\n¡Aprendamos idiomas con historias!"
-      : "Hi! I'm Lingo! 🦊\nLet's learn languages through stories!";
+      ? "¡Bienvenido, Aprendiz! 🦊\nLa Sociedad Lexicon roba idiomas. ¡Detengámoslos juntos!"
+      : "Welcome, Apprentice! 🦊\nThe Lexicon Society is stealing languages. Let's stop them!";
 
   const chapterLabel =
     lang === "korean"
@@ -203,19 +203,20 @@ export default function StoryTab() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
+        <Text style={styles.headerEyebrow}>🦊 {lang === "korean" ? "링고 탐정의" : lang === "spanish" ? "Detective Lingo presenta" : "Detective Lingo presents"}</Text>
         <Text style={styles.headerTitle}>
           {lang === "korean"
-            ? "스토리 모드"
+            ? "언어 음모"
             : lang === "spanish"
-            ? "Modo Historia"
-            : "Story Mode"}
+            ? "La Conspiración del Lenguaje"
+            : "The Language Conspiracy"}
         </Text>
         <Text style={styles.headerSub}>
           {lang === "korean"
-            ? "이야기로 언어를 배워요"
+            ? "∆LX — Lexicon Society의 비밀을 밝혀라"
             : lang === "spanish"
-            ? "Aprende con historias"
-            : "Learn languages through stories"}
+            ? "∆LX — Descubre el secreto de la Sociedad Lexicon"
+            : "∆LX — Uncover the secrets of the Lexicon Society"}
         </Text>
       </LinearGradient>
 
@@ -386,7 +387,7 @@ export default function StoryTab() {
                     </View>
                     <View style={styles.metaPill}>
                       <Ionicons
-                        name="puzzle"
+                        name="compass-outline"
                         size={11}
                         color={
                           isLocked
@@ -445,8 +446,16 @@ export default function StoryTab() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.bg1 },
   header: { paddingHorizontal: 20, paddingTop: 14, paddingBottom: 18 },
+  headerEyebrow: {
+    fontSize: 11,
+    fontFamily: F.label,
+    color: C.goldDim,
+    letterSpacing: 2,
+    textTransform: "uppercase" as const,
+    marginBottom: 4,
+  },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: F.title,
     color: C.gold,
     marginBottom: 4,

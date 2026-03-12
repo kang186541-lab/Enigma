@@ -1,0 +1,197 @@
+Create a story-driven puzzle adventure mode for the language learning app.
+
+The experience should feel like a mystery visual novel game similar to a puzzle detective adventure.
+
+Main character:
+Lingo the Fox – a clever language detective professor.
+
+Player role:
+Apprentice Linguist.
+
+The story revolves around a secret organization manipulating languages around the world.
+
+Title of the main storyline:
+"The Language Conspiracy"
+
+----------------------------------------------------
+
+STORY STYLE
+
+• Mystery detective atmosphere  
+• Short cinematic dialogue scenes  
+• Dramatic descriptions in parentheses  
+
+Examples:
+
+"(안개 낀 런던 거리… 가스등이 희미하게 빛난다…)"
+
+"(긴장감 있는 음악이 흐른다…)"
+
+Dialogue format:
+
+Character Name  
+Dialogue text
+
+Scenes should feel like a visual novel.
+
+----------------------------------------------------
+
+STORY STRUCTURE
+
+Each chapter contains:
+
+• 8–10 story scenes
+• 4–5 language puzzles
+• clue discoveries
+• chapter ending reward
+
+Game flow:
+
+Story Scene  
+→ Puzzle  
+→ Clue discovered  
+→ Story continues
+
+----------------------------------------------------
+
+MAIN STORY
+
+Languages around the world are changing mysteriously.
+
+Words are disappearing.
+Meanings are being altered.
+
+A secret organization called "Lexicon Society" is manipulating languages.
+
+Lingo the Fox and the player must travel around the world solving language puzzles to uncover the truth.
+
+----------------------------------------------------
+
+CHAPTER STRUCTURE
+
+Chapter 1 – The London Cipher 🇬🇧
+
+Setting:
+Foggy Victorian London.
+
+Detective James asks for help solving a mysterious coded letter connected to a disappearance.
+
+Story scenes include:
+
+• foggy London street introduction  
+• meeting Detective James  
+• visiting a mysterious mansion  
+• discovering a hidden library  
+• finding a strange symbol
+
+Clue discovered:
+Symbol ∆LX
+
+Chapter reward:
++150 XP
+
+----------------------------------------------------
+
+Chapter 2 – The Madrid Disappearance 🇪🇸
+
+Setting:
+Flamenco theatre in Madrid.
+
+A dancer named Carlos disappears after leaving a mysterious phrase.
+
+Story scenes include:
+
+• flamenco theatre backstage  
+• conversation with Isabella  
+• meeting Abuela Rosa  
+• discovering a coded message  
+• uncovering a connection to the London symbol
+
+----------------------------------------------------
+
+Chapter 3 – The Seoul Secret 🇰🇷
+
+Setting:
+Modern Seoul skyscraper.
+
+A man with amnesia is discovered with notes about language experiments.
+
+Story scenes include:
+
+• waking up in a mysterious room  
+• meeting Junhyuk  
+• hospital conversation with Minji  
+• discovering language research documents  
+• first reference to Lexicon Society
+
+----------------------------------------------------
+
+PUZZLE INTEGRATION
+
+During story scenes puzzles appear naturally.
+
+Puzzle types:
+
+1. Word Matching
+2. Sentence Builder
+3. Listening Puzzle
+4. Dialogue Choice
+5. Investigation Puzzle
+
+Puzzle UI should appear as:
+
+🧩 PUZZLE XXX
+
+After solving:
+
+"Puzzle Solved!"
+"+20 XP"
+
+----------------------------------------------------
+
+CHARACTERS
+
+Lingo the Fox
+Language detective professor
+
+Player
+Apprentice Linguist
+
+Detective James
+London investigator
+
+Isabella
+Flamenco dancer in Madrid
+
+Junhyuk
+Seoul businessman with secrets
+
+Mr Black
+Leader of Lexicon Society
+
+----------------------------------------------------
+
+VISUAL NOVEL PRESENTATION
+
+Story scenes should include:
+
+• cinematic descriptions
+• character dialogue
+• fade transitions between scenes
+• atmospheric tone
+
+Scene display:
+
+Scene 1 / 8
+
+Button:
+
+"다음 ▶"
+
+----------------------------------------------------
+
+GOAL
+
+The story mode should feel like a puzzle mystery adventure game rather than a traditional learning app.
+
+Users progress through the story by solving language puzzle
