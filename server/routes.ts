@@ -152,7 +152,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const voiceId = TUTOR_XI_VOICES[tutorId] ?? "21m00Tcm4TlvDq8ikWAM";
       const stability = 0.5;
       const similarity_boost = 0.75;
-      const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.0")));
+      const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.1")));
 
       const xiRes = await fetch(
         `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`,
