@@ -13,10 +13,17 @@ export interface UserStats {
 export interface LanguageContextType {
   nativeLanguage: NativeLanguage | null;
   setNativeLanguage: (lang: NativeLanguage) => Promise<void>;
+  learningLanguage: NativeLanguage | null;
+  setLearningLanguage: (lang: NativeLanguage) => Promise<void>;
   hasOnboarded: boolean;
   stats: UserStats;
   updateStats: (updates: Partial<UserStats>) => Promise<void>;
   t: (key: string) => string;
+}
+
+export function getDefaultLearning(native: NativeLanguage): NativeLanguage {
+  const all: NativeLanguage[] = ["english", "korean", "spanish"];
+  return all.find((l) => l !== native) ?? "english";
 }
 
 const translations: Record<NativeLanguage, Record<string, string>> = {
@@ -185,6 +192,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [nativeLanguage, setNativeLanguageState] = useState<NativeLanguage | null>(null);
+  const [learningLanguage, setLearningLanguageState] = useState<NativeLanguage | null>(null);
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [stats, setStats] = useState<UserStats>({
     streak: 7,
@@ -197,10 +205,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         const lang = await AsyncStorage.getItem("@lingua_language");
+        const ll = await AsyncStorage.getItem("@lingua_learning_language");
         const statsStr = await AsyncStorage.getItem("@lingua_stats");
         if (lang) {
           setNativeLanguageState(lang as NativeLanguage);
           setHasOnboarded(true);
+          if (ll) {
+            setLearningLanguageState(ll as NativeLanguage);
+          } else {
+            setLearningLanguageState(getDefaultLearning(lang as NativeLanguage));
+          }
         }
         if (statsStr) {
           setStats(JSON.parse(statsStr));
@@ -213,6 +227,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.setItem("@lingua_language", lang);
     setNativeLanguageState(lang);
     setHasOnboarded(true);
+    const currentLL = await AsyncStorage.getItem("@lingua_learning_language");
+    if (!currentLL) {
+      const defaultLL = getDefaultLearning(lang);
+      await AsyncStorage.setItem("@lingua_learning_language", defaultLL);
+      setLearningLanguageState(defaultLL);
+    }
+  };
+
+  const setLearningLanguage = async (lang: NativeLanguage) => {
+    await AsyncStorage.setItem("@lingua_learning_language", lang);
+    setLearningLanguageState(lang);
   };
 
   const updateStats = async (updates: Partial<UserStats>) => {
@@ -227,7 +252,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, hasOnboarded, stats, updateStats, t }}>
+    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, stats, updateStats, t }}>
       {children}
     </LanguageContext.Provider>
   );

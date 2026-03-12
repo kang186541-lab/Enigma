@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, getDefaultLearning, NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 
 const TAB_BAR_HEIGHT = 49;
@@ -117,11 +117,18 @@ type RecordState = "idle" | "listening" | "processing" | "done";
 
 export default function SpeakScreen() {
   const insets = useSafeAreaInsets();
-  const { t } = useLanguage();
+  const { t, nativeLanguage, learningLanguage } = useLanguage();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 84 : TAB_BAR_HEIGHT + insets.bottom;
 
-  const [activeLang, setActiveLang] = useState<LangTab>("korean");
+  const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
+  const visibleTabs = LANG_TABS.filter((tab) => tab.key !== nativeLang);
+
+  const [activeLang, setActiveLang] = useState<LangTab>(() => {
+    const ll = learningLanguage as LangTab | null;
+    if (ll && ll !== nativeLang) return ll;
+    return (visibleTabs[0]?.key ?? "english") as LangTab;
+  });
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [recordState, setRecordState] = useState<RecordState>("idle");
   const [score, setScore] = useState<number | null>(null);
@@ -133,6 +140,13 @@ export default function SpeakScreen() {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
   const recordStateRef = useRef<RecordState>("idle");
+
+  useEffect(() => {
+    if (learningLanguage && learningLanguage !== nativeLang) {
+      setActiveLang(learningLanguage as LangTab);
+      setPhraseIdx(0);
+    }
+  }, [learningLanguage]);
 
   const phrases = PHRASE_SETS[activeLang];
   const phrase = phrases[phraseIdx];
@@ -302,7 +316,7 @@ export default function SpeakScreen() {
 
         {/* Language tabs */}
         <View style={styles.langTabs}>
-          {LANG_TABS.map((tab) => {
+          {visibleTabs.map((tab) => {
             const active = activeLang === tab.key;
             return (
               <Pressable

@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
-import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
+import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
 
 const { width } = Dimensions.get("window");
 
@@ -27,56 +27,158 @@ interface FlashCard {
   speechLang: string;
 }
 
-const BEGINNER_CARDS: FlashCard[] = [
-  {
-    word: "Apple",
-    emoji: "🍎",
-    pronunciation: "AE-pul",
-    meaning: "A round fruit with red, yellow, or green skin and a white interior.",
-    example: '"I eat an apple every morning for breakfast."',
-    speechLang: "en-US",
-  },
-  {
-    word: "Water",
-    emoji: "💧",
-    pronunciation: "WAW-ter",
-    meaning: "A clear, colorless liquid essential for all living things.",
-    example: '"Please drink eight glasses of water every day."',
-    speechLang: "en-US",
-  },
-  {
-    word: "Hello",
-    emoji: "👋",
-    pronunciation: "heh-LOW",
-    meaning: "A greeting used when meeting someone or starting a conversation.",
-    example: '"Hello! My name is Sarah. Nice to meet you."',
-    speechLang: "en-US",
-  },
-  {
-    word: "Thank you",
-    emoji: "🙏",
-    pronunciation: "THANGK yoo",
-    meaning: "An expression of gratitude used to show appreciation.",
-    example: '"Thank you so much for your help today!"',
-    speechLang: "en-US",
-  },
-  {
-    word: "House",
-    emoji: "🏠",
-    pronunciation: "HOWSS",
-    meaning: "A building where people live; a home.",
-    example: '"Their house has a beautiful garden in the backyard."',
-    speechLang: "en-US",
-  },
-  {
-    word: "Dog",
-    emoji: "🐶",
-    pronunciation: "DAWG",
-    meaning: "A domesticated animal kept as a pet or for work.",
-    example: '"My dog loves to run in the park every evening."',
-    speechLang: "en-US",
-  },
-];
+const BEGINNER_CARDS_BY_LANG: Record<NativeLanguage, FlashCard[]> = {
+  english: [
+    {
+      word: "Apple",
+      emoji: "🍎",
+      pronunciation: "AE-pul",
+      meaning: "A round fruit with red, yellow, or green skin and a white interior.",
+      example: '"I eat an apple every morning for breakfast."',
+      speechLang: "en-US",
+    },
+    {
+      word: "Water",
+      emoji: "💧",
+      pronunciation: "WAW-ter",
+      meaning: "A clear, colorless liquid essential for all living things.",
+      example: '"Please drink eight glasses of water every day."',
+      speechLang: "en-US",
+    },
+    {
+      word: "Hello",
+      emoji: "👋",
+      pronunciation: "heh-LOW",
+      meaning: "A greeting used when meeting someone or starting a conversation.",
+      example: '"Hello! My name is Sarah. Nice to meet you."',
+      speechLang: "en-US",
+    },
+    {
+      word: "Thank you",
+      emoji: "🙏",
+      pronunciation: "THANGK yoo",
+      meaning: "An expression of gratitude used to show appreciation.",
+      example: '"Thank you so much for your help today!"',
+      speechLang: "en-US",
+    },
+    {
+      word: "House",
+      emoji: "🏠",
+      pronunciation: "HOWSS",
+      meaning: "A building where people live; a home.",
+      example: '"Their house has a beautiful garden in the backyard."',
+      speechLang: "en-US",
+    },
+    {
+      word: "Dog",
+      emoji: "🐶",
+      pronunciation: "DAWG",
+      meaning: "A domesticated animal kept as a pet or for work.",
+      example: '"My dog loves to run in the park every evening."',
+      speechLang: "en-US",
+    },
+  ],
+  korean: [
+    {
+      word: "안녕하세요",
+      emoji: "👋",
+      pronunciation: "an-nyeong-ha-se-yo",
+      meaning: "Hello / Good day — the standard polite greeting in Korean.",
+      example: '"안녕하세요! 저는 민준이에요." (Hello! I\'m Minjun.)',
+      speechLang: "ko-KR",
+    },
+    {
+      word: "감사합니다",
+      emoji: "🙏",
+      pronunciation: "gam-sa-ham-ni-da",
+      meaning: "Thank you very much — formal expression of gratitude.",
+      example: '"도와주셔서 감사합니다." (Thank you for your help.)',
+      speechLang: "ko-KR",
+    },
+    {
+      word: "사랑해요",
+      emoji: "❤️",
+      pronunciation: "sa-rang-hae-yo",
+      meaning: "I love you — a warm, polite way to express love.",
+      example: '"엄마, 사랑해요." (Mom, I love you.)',
+      speechLang: "ko-KR",
+    },
+    {
+      word: "맛있어요",
+      emoji: "😋",
+      pronunciation: "ma-si-sseo-yo",
+      meaning: "It's delicious — used to compliment food.",
+      example: '"이 김치찌개 정말 맛있어요!" (This kimchi stew is really delicious!)',
+      speechLang: "ko-KR",
+    },
+    {
+      word: "화이팅",
+      emoji: "💪",
+      pronunciation: "hwa-i-ting",
+      meaning: "You can do it! / Go for it! — Korean motivational cheer.",
+      example: '"시험 잘 봐! 화이팅!" (Good luck on your test! Fighting!)',
+      speechLang: "ko-KR",
+    },
+    {
+      word: "괜찮아요",
+      emoji: "😊",
+      pronunciation: "gwaen-chan-a-yo",
+      meaning: "It's okay / I'm fine — used to reassure or accept something.",
+      example: '"걱정 마세요, 괜찮아요." (Don\'t worry, it\'s okay.)',
+      speechLang: "ko-KR",
+    },
+  ],
+  spanish: [
+    {
+      word: "Hola",
+      emoji: "👋",
+      pronunciation: "OH-lah",
+      meaning: "Hello — the universal greeting in Spanish.",
+      example: '"¡Hola! ¿Cómo estás?" (Hello! How are you?)',
+      speechLang: "es-ES",
+    },
+    {
+      word: "Gracias",
+      emoji: "🙏",
+      pronunciation: "GRA-syas",
+      meaning: "Thank you — expressing appreciation in Spanish.",
+      example: '"Muchas gracias por tu ayuda." (Thank you so much for your help.)',
+      speechLang: "es-ES",
+    },
+    {
+      word: "Por favor",
+      emoji: "🤝",
+      pronunciation: "por fa-VOR",
+      meaning: "Please — used to make polite requests.",
+      example: '"Un café con leche, por favor." (A coffee with milk, please.)',
+      speechLang: "es-ES",
+    },
+    {
+      word: "Te quiero",
+      emoji: "❤️",
+      pronunciation: "teh KYEH-ro",
+      meaning: "I love you — commonly used for friends and family.",
+      example: '"Te quiero mucho, mamá." (I love you so much, mom.)',
+      speechLang: "es-ES",
+    },
+    {
+      word: "Buenos días",
+      emoji: "☀️",
+      pronunciation: "BWEH-nos DEE-as",
+      meaning: "Good morning — a cheerful morning greeting.",
+      example: '"¡Buenos días! ¿Dormiste bien?" (Good morning! Did you sleep well?)',
+      speechLang: "es-ES",
+    },
+    {
+      word: "Delicioso",
+      emoji: "😋",
+      pronunciation: "de-li-SYOH-so",
+      meaning: "Delicious — used to express that food tastes amazing.",
+      example: '"Esta paella está deliciosa." (This paella is delicious.)',
+      speechLang: "es-ES",
+    },
+  ],
+};
 
 const ADVANCED_CARDS: Record<NativeLanguage, FlashCard[]> = {
   english: [
@@ -174,9 +276,10 @@ type DeckType = "beginner" | "advanced";
 
 export default function CardsScreen() {
   const insets = useSafeAreaInsets();
-  const { t, nativeLanguage } = useLanguage();
+  const { t, nativeLanguage, learningLanguage } = useLanguage();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
-  const lang = nativeLanguage ?? "english";
+  const nativeLang = nativeLanguage ?? "english";
+  const lang: NativeLanguage = learningLanguage ?? getDefaultLearning(nativeLang as NativeLanguage);
 
   const [deckType, setDeckType] = useState<DeckType>("beginner");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -190,7 +293,7 @@ export default function CardsScreen() {
   const slideAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  const cards = deckType === "beginner" ? BEGINNER_CARDS : ADVANCED_CARDS[lang];
+  const cards = deckType === "beginner" ? BEGINNER_CARDS_BY_LANG[lang] : ADVANCED_CARDS[lang];
   const card = cards[currentIndex];
   const progress = cards.length > 0 ? (currentIndex / cards.length) * 100 : 0;
 

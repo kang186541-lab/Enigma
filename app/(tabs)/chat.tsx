@@ -74,12 +74,13 @@ function TutorCard({ tutor, onPress }: { tutor: Tutor; onPress: () => void }) {
 
 export default function TutorSelectScreen() {
   const insets = useSafeAreaInsets();
-  const { t } = useLanguage();
+  const { t, setLearningLanguage } = useLanguage();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 84 : TAB_BAR_HEIGHT + insets.bottom;
 
   const handleSelect = (tutor: Tutor) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setLearningLanguage(tutor.language as any);
     router.push({ pathname: "/chat-room", params: { tutorId: tutor.id } });
   };
 
