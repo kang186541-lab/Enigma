@@ -22,8 +22,9 @@ interface FlashCard {
   word: string;
   emoji: string;
   pronunciation?: string;
-  meaning: string;
+  meanings: Record<NativeLanguage, string>;
   example: string;
+  exampleTranslation: Record<NativeLanguage, string>;
   speechLang: string;
 }
 
@@ -33,48 +34,102 @@ const BEGINNER_CARDS_BY_LANG: Record<NativeLanguage, FlashCard[]> = {
       word: "Apple",
       emoji: "🍎",
       pronunciation: "AE-pul",
-      meaning: "A round fruit with red, yellow, or green skin and a white interior.",
+      meanings: {
+        korean: "빨간색, 노란색, 또는 초록색 껍질에 흰 속을 가진 둥근 과일이에요.",
+        english: "A round fruit with red, yellow, or green skin and a white interior.",
+        spanish: "Una fruta redonda con piel roja, amarilla o verde e interior blanco.",
+      },
       example: '"I eat an apple every morning for breakfast."',
+      exampleTranslation: {
+        korean: "저는 매일 아침 사과를 먹어요.",
+        english: "I eat an apple every morning for breakfast.",
+        spanish: "Como una manzana cada mañana en el desayuno.",
+      },
       speechLang: "en-US",
     },
     {
       word: "Water",
       emoji: "💧",
       pronunciation: "WAW-ter",
-      meaning: "A clear, colorless liquid essential for all living things.",
+      meanings: {
+        korean: "모든 생명체에 필수적인 맑고 무색의 액체예요.",
+        english: "A clear, colorless liquid essential for all living things.",
+        spanish: "Líquido transparente e incoloro esencial para todos los seres vivos.",
+      },
       example: '"Please drink eight glasses of water every day."',
+      exampleTranslation: {
+        korean: "매일 물 여덟 잔을 마셔주세요.",
+        english: "Please drink eight glasses of water every day.",
+        spanish: "Por favor, bebe ocho vasos de agua cada día.",
+      },
       speechLang: "en-US",
     },
     {
       word: "Hello",
       emoji: "👋",
       pronunciation: "heh-LOW",
-      meaning: "A greeting used when meeting someone or starting a conversation.",
+      meanings: {
+        korean: "누군가를 만나거나 대화를 시작할 때 사용하는 인사말이에요.",
+        english: "A greeting used when meeting someone or starting a conversation.",
+        spanish: "Saludo usado al conocer a alguien o iniciar una conversación.",
+      },
       example: '"Hello! My name is Sarah. Nice to meet you."',
+      exampleTranslation: {
+        korean: "안녕하세요! 제 이름은 사라예요. 만나서 반가워요.",
+        english: "Hello! My name is Sarah. Nice to meet you.",
+        spanish: "¡Hola! Me llamo Sarah. Mucho gusto en conocerte.",
+      },
       speechLang: "en-US",
     },
     {
       word: "Thank you",
       emoji: "🙏",
       pronunciation: "THANGK yoo",
-      meaning: "An expression of gratitude used to show appreciation.",
+      meanings: {
+        korean: "감사함을 표현하기 위해 사용하는 말이에요.",
+        english: "An expression of gratitude used to show appreciation.",
+        spanish: "Expresión de gratitud para mostrar apreciación.",
+      },
       example: '"Thank you so much for your help today!"',
+      exampleTranslation: {
+        korean: "오늘 도움을 주셔서 정말 감사합니다!",
+        english: "Thank you so much for your help today!",
+        spanish: "¡Muchas gracias por tu ayuda de hoy!",
+      },
       speechLang: "en-US",
     },
     {
       word: "House",
       emoji: "🏠",
       pronunciation: "HOWSS",
-      meaning: "A building where people live; a home.",
+      meanings: {
+        korean: "사람들이 사는 건물이에요.",
+        english: "A building where people live; a home.",
+        spanish: "Un edificio donde vive la gente; un hogar.",
+      },
       example: '"Their house has a beautiful garden in the backyard."',
+      exampleTranslation: {
+        korean: "그들의 집 뒤뜰에는 아름다운 정원이 있어요.",
+        english: "Their house has a beautiful garden in the backyard.",
+        spanish: "Su casa tiene un bello jardín en el patio trasero.",
+      },
       speechLang: "en-US",
     },
     {
       word: "Dog",
       emoji: "🐶",
       pronunciation: "DAWG",
-      meaning: "A domesticated animal kept as a pet or for work.",
+      meanings: {
+        korean: "반려동물 또는 일을 위해 기르는 가축이에요.",
+        english: "A domesticated animal kept as a pet or for work.",
+        spanish: "Animal doméstico criado como mascota o para trabajar.",
+      },
       example: '"My dog loves to run in the park every evening."',
+      exampleTranslation: {
+        korean: "제 강아지는 매일 저녁 공원에서 뛰는 것을 좋아해요.",
+        english: "My dog loves to run in the park every evening.",
+        spanish: "Mi perro adora correr en el parque cada tarde.",
+      },
       speechLang: "en-US",
     },
   ],
@@ -83,48 +138,102 @@ const BEGINNER_CARDS_BY_LANG: Record<NativeLanguage, FlashCard[]> = {
       word: "안녕하세요",
       emoji: "👋",
       pronunciation: "an-nyeong-ha-se-yo",
-      meaning: "Hello / Good day — the standard polite greeting in Korean.",
-      example: '"안녕하세요! 저는 민준이에요." (Hello! I\'m Minjun.)',
+      meanings: {
+        korean: "한국어에서 가장 일반적인 공손한 인사말이에요.",
+        english: "Hello / Good day — the standard polite greeting in Korean.",
+        spanish: "Hola / Buenos días — el saludo cortés estándar en coreano.",
+      },
+      example: "안녕하세요! 저는 민준이에요.",
+      exampleTranslation: {
+        korean: "안녕하세요! 저는 민준이에요.",
+        english: "Hello! My name is Minjun.",
+        spanish: "¡Hola! Me llamo Minjun.",
+      },
       speechLang: "ko-KR",
     },
     {
       word: "감사합니다",
       emoji: "🙏",
       pronunciation: "gam-sa-ham-ni-da",
-      meaning: "Thank you very much — formal expression of gratitude.",
-      example: '"도와주셔서 감사합니다." (Thank you for your help.)',
+      meanings: {
+        korean: "정중하게 감사를 표현하는 말이에요.",
+        english: "Thank you very much — a formal expression of gratitude.",
+        spanish: "Muchas gracias — expresión formal de gratitud en coreano.",
+      },
+      example: "도와주셔서 감사합니다.",
+      exampleTranslation: {
+        korean: "도와주셔서 감사합니다.",
+        english: "Thank you for helping me.",
+        spanish: "Gracias por ayudarme.",
+      },
       speechLang: "ko-KR",
     },
     {
       word: "사랑해요",
       emoji: "❤️",
       pronunciation: "sa-rang-hae-yo",
-      meaning: "I love you — a warm, polite way to express love.",
-      example: '"엄마, 사랑해요." (Mom, I love you.)',
+      meanings: {
+        korean: "따뜻하고 공손하게 사랑을 표현하는 말이에요.",
+        english: "I love you — a warm, polite way to express love.",
+        spanish: "Te amo — una manera cálida y cortés de expresar amor en coreano.",
+      },
+      example: "엄마, 사랑해요.",
+      exampleTranslation: {
+        korean: "엄마, 사랑해요.",
+        english: "Mom, I love you.",
+        spanish: "Mamá, te quiero.",
+      },
       speechLang: "ko-KR",
     },
     {
       word: "맛있어요",
       emoji: "😋",
       pronunciation: "ma-si-sseo-yo",
-      meaning: "It's delicious — used to compliment food.",
-      example: '"이 김치찌개 정말 맛있어요!" (This kimchi stew is really delicious!)',
+      meanings: {
+        korean: "음식을 칭찬할 때 사용하는 표현이에요.",
+        english: "It's delicious — used to compliment food.",
+        spanish: "Está delicioso — se usa para elogiar la comida.",
+      },
+      example: "이 김치찌개 정말 맛있어요!",
+      exampleTranslation: {
+        korean: "이 김치찌개 정말 맛있어요!",
+        english: "This kimchi stew is really delicious!",
+        spanish: "¡Este estofado de kimchi está delicioso!",
+      },
       speechLang: "ko-KR",
     },
     {
       word: "화이팅",
       emoji: "💪",
       pronunciation: "hwa-i-ting",
-      meaning: "You can do it! / Go for it! — Korean motivational cheer.",
-      example: '"시험 잘 봐! 화이팅!" (Good luck on your test! Fighting!)',
+      meanings: {
+        korean: "응원할 때 사용하는 한국식 격려 표현이에요.",
+        english: "You can do it! — a popular Korean motivational cheer.",
+        spanish: "¡Tú puedes! — expresión de aliento coreana muy popular.",
+      },
+      example: "시험 잘 봐! 화이팅!",
+      exampleTranslation: {
+        korean: "시험 잘 봐! 화이팅!",
+        english: "Good luck on your test! You've got this!",
+        spanish: "¡Buena suerte en tu examen! ¡Tú puedes!",
+      },
       speechLang: "ko-KR",
     },
     {
       word: "괜찮아요",
       emoji: "😊",
       pronunciation: "gwaen-chan-a-yo",
-      meaning: "It's okay / I'm fine — used to reassure or accept something.",
-      example: '"걱정 마세요, 괜찮아요." (Don\'t worry, it\'s okay.)',
+      meanings: {
+        korean: "상대방을 안심시키거나 괜찮다고 말할 때 사용해요.",
+        english: "It's okay / I'm fine — used to reassure or accept something.",
+        spanish: "Está bien / Estoy bien — para tranquilizar o aceptar algo.",
+      },
+      example: "걱정 마세요, 괜찮아요.",
+      exampleTranslation: {
+        korean: "걱정 마세요, 괜찮아요.",
+        english: "Don't worry, it's okay.",
+        spanish: "No te preocupes, está bien.",
+      },
       speechLang: "ko-KR",
     },
   ],
@@ -133,48 +242,102 @@ const BEGINNER_CARDS_BY_LANG: Record<NativeLanguage, FlashCard[]> = {
       word: "Hola",
       emoji: "👋",
       pronunciation: "OH-lah",
-      meaning: "Hello — the universal greeting in Spanish.",
-      example: '"¡Hola! ¿Cómo estás?" (Hello! How are you?)',
+      meanings: {
+        korean: "스페인어에서 가장 흔한 인사말이에요.",
+        english: "Hello — the universal greeting in Spanish.",
+        spanish: "Hola — el saludo universal en español.",
+      },
+      example: "¡Hola! ¿Cómo estás?",
+      exampleTranslation: {
+        korean: "안녕하세요! 어떻게 지내세요?",
+        english: "Hello! How are you?",
+        spanish: "¡Hola! ¿Cómo estás?",
+      },
       speechLang: "es-ES",
     },
     {
       word: "Gracias",
       emoji: "🙏",
       pronunciation: "GRA-syas",
-      meaning: "Thank you — expressing appreciation in Spanish.",
-      example: '"Muchas gracias por tu ayuda." (Thank you so much for your help.)',
+      meanings: {
+        korean: "스페인어로 감사를 표현하는 말이에요.",
+        english: "Thank you — expressing appreciation in Spanish.",
+        spanish: "Gracias — expresar agradecimiento en español.",
+      },
+      example: "Muchas gracias por tu ayuda.",
+      exampleTranslation: {
+        korean: "도와주셔서 정말 감사합니다.",
+        english: "Thank you so much for your help.",
+        spanish: "Muchas gracias por tu ayuda.",
+      },
       speechLang: "es-ES",
     },
     {
       word: "Por favor",
       emoji: "🤝",
       pronunciation: "por fa-VOR",
-      meaning: "Please — used to make polite requests.",
-      example: '"Un café con leche, por favor." (A coffee with milk, please.)',
+      meanings: {
+        korean: "정중한 부탁을 할 때 사용하는 표현이에요.",
+        english: "Please — used to make polite requests.",
+        spanish: "Por favor — se usa para hacer peticiones corteses.",
+      },
+      example: "Un café con leche, por favor.",
+      exampleTranslation: {
+        korean: "카페라떼 한 잔 부탁해요.",
+        english: "A coffee with milk, please.",
+        spanish: "Un café con leche, por favor.",
+      },
       speechLang: "es-ES",
     },
     {
       word: "Te quiero",
       emoji: "❤️",
       pronunciation: "teh KYEH-ro",
-      meaning: "I love you — commonly used for friends and family.",
-      example: '"Te quiero mucho, mamá." (I love you so much, mom.)',
+      meanings: {
+        korean: "친구나 가족에게 흔히 사용하는 사랑 표현이에요.",
+        english: "I love you — commonly used for friends and family.",
+        spanish: "Te quiero — comúnmente usado entre amigos y familia.",
+      },
+      example: "Te quiero mucho, mamá.",
+      exampleTranslation: {
+        korean: "엄마, 정말 사랑해요.",
+        english: "I love you so much, mom.",
+        spanish: "Te quiero mucho, mamá.",
+      },
       speechLang: "es-ES",
     },
     {
       word: "Buenos días",
       emoji: "☀️",
       pronunciation: "BWEH-nos DEE-as",
-      meaning: "Good morning — a cheerful morning greeting.",
-      example: '"¡Buenos días! ¿Dormiste bien?" (Good morning! Did you sleep well?)',
+      meanings: {
+        korean: "활기찬 스페인어 아침 인사예요.",
+        english: "Good morning — a cheerful morning greeting in Spanish.",
+        spanish: "Buenos días — un alegre saludo matutino en español.",
+      },
+      example: "¡Buenos días! ¿Dormiste bien?",
+      exampleTranslation: {
+        korean: "좋은 아침이에요! 잘 잤어요?",
+        english: "Good morning! Did you sleep well?",
+        spanish: "¡Buenos días! ¿Dormiste bien?",
+      },
       speechLang: "es-ES",
     },
     {
       word: "Delicioso",
       emoji: "😋",
       pronunciation: "de-li-SYOH-so",
-      meaning: "Delicious — used to express that food tastes amazing.",
-      example: '"Esta paella está deliciosa." (This paella is delicious.)',
+      meanings: {
+        korean: "음식이 정말 맛있다고 표현할 때 사용해요.",
+        english: "Delicious — used to express that food tastes amazing.",
+        spanish: "Delicioso — se usa para expresar que la comida está muy rica.",
+      },
+      example: "Esta paella está deliciosa.",
+      exampleTranslation: {
+        korean: "이 파에야 정말 맛있어요.",
+        english: "This paella is delicious.",
+        spanish: "Esta paella está deliciosa.",
+      },
       speechLang: "es-ES",
     },
   ],
@@ -186,24 +349,51 @@ const ADVANCED_CARDS: Record<NativeLanguage, FlashCard[]> = {
       word: "Serendipity",
       emoji: "✨",
       pronunciation: "sair-en-DIP-i-tee",
-      meaning: "The occurrence of happy events by chance; a pleasant surprise.",
+      meanings: {
+        korean: "우연히 일어난 즐거운 사건; 기분 좋은 놀라움이에요.",
+        english: "The occurrence of happy events by chance; a pleasant surprise.",
+        spanish: "La ocurrencia de eventos felices por casualidad; una grata sorpresa.",
+      },
       example: '"Finding my best friend at that café was pure serendipity."',
+      exampleTranslation: {
+        korean: "그 카페에서 가장 친한 친구를 만난 건 순전한 세렌디피티였어요.",
+        english: "Finding my best friend at that café was pure serendipity.",
+        spanish: "Encontrar a mi mejor amigo en ese café fue pura serendipia.",
+      },
       speechLang: "en-US",
     },
     {
       word: "Ephemeral",
       emoji: "🌿",
       pronunciation: "eh-FEM-er-ul",
-      meaning: "Lasting for a very short time; transitory.",
+      meanings: {
+        korean: "아주 짧은 시간 동안만 지속되는 것; 덧없다는 뜻이에요.",
+        english: "Lasting for a very short time; fleeting and transitory.",
+        spanish: "Que dura muy poco tiempo; pasajero y transitorio.",
+      },
       example: '"Cherry blossoms are ephemeral — they bloom for just two weeks."',
+      exampleTranslation: {
+        korean: "벚꽃은 덧없어요 — 단 2주 동안만 피어요.",
+        english: "Cherry blossoms are ephemeral — they bloom for just two weeks.",
+        spanish: "Los cerezos en flor son efímeros — florecen solo dos semanas.",
+      },
       speechLang: "en-US",
     },
     {
       word: "Wanderlust",
       emoji: "🌍",
       pronunciation: "WON-der-lust",
-      meaning: "A strong desire to travel and explore the world.",
+      meanings: {
+        korean: "세상을 여행하고 탐험하고 싶은 강한 욕구예요.",
+        english: "A strong desire to travel and explore the world.",
+        spanish: "Un fuerte deseo de viajar y explorar el mundo.",
+      },
       example: '"Her wanderlust led her to visit 40 countries before turning 30."',
+      exampleTranslation: {
+        korean: "그녀의 방랑벽 때문에 30세가 되기 전에 40개국을 여행했어요.",
+        english: "Her wanderlust led her to visit 40 countries before turning 30.",
+        spanish: "Su espíritu viajero la llevó a visitar 40 países antes de los 30.",
+      },
       speechLang: "en-US",
     },
   ],
@@ -212,24 +402,51 @@ const ADVANCED_CARDS: Record<NativeLanguage, FlashCard[]> = {
       word: "Mariposa",
       emoji: "🦋",
       pronunciation: "mah-ree-POH-sah",
-      meaning: "Butterfly — also used poetically for someone graceful and free-spirited.",
+      meanings: {
+        korean: "나비 — 우아하고 자유로운 사람을 시적으로 표현할 때도 사용해요.",
+        english: "Butterfly — also used poetically for someone graceful and free-spirited.",
+        spanish: "Mariposa — también se usa poéticamente para alguien grácil y libre.",
+      },
       example: '"Eres como una mariposa — siempre libre y llena de color."',
+      exampleTranslation: {
+        korean: "당신은 나비 같아요 — 언제나 자유롭고 색깔이 넘쳐요.",
+        english: "You are like a butterfly — always free and full of color.",
+        spanish: "Eres como una mariposa — siempre libre y llena de color.",
+      },
       speechLang: "es-ES",
     },
     {
       word: "Alegría",
       emoji: "😄",
       pronunciation: "ah-leh-GREE-ah",
-      meaning: "A deep, vibrant joy — beyond happiness, an exuberance of spirit.",
+      meanings: {
+        korean: "깊고 생동감 넘치는 기쁨 — 행복을 넘어선 넘치는 활기예요.",
+        english: "A deep, vibrant joy — beyond happiness, an exuberance of spirit.",
+        spanish: "Una alegría profunda y vibrante — más que felicidad, exuberancia.",
+      },
       example: '"La alegría de los niños llenó toda la casa de luz."',
+      exampleTranslation: {
+        korean: "아이들의 기쁨이 온 집 안을 빛으로 가득 채웠어요.",
+        english: "The children's joy filled the whole house with light.",
+        spanish: "La alegría de los niños llenó toda la casa de luz.",
+      },
       speechLang: "es-ES",
     },
     {
       word: "Sobremesa",
       emoji: "☕",
       pronunciation: "so-breh-MEH-sah",
-      meaning: "The time spent lingering at the table after a meal, talking and connecting.",
+      meanings: {
+        korean: "식사 후 테이블에서 이야기하며 느긋하게 보내는 시간이에요.",
+        english: "The time spent lingering at the table after a meal, talking and connecting.",
+        spanish: "El tiempo que se pasa en la mesa después de comer, conversando.",
+      },
       example: '"La sobremesa duró tres horas — nadie quería irse."',
+      exampleTranslation: {
+        korean: "식후 담소가 세 시간이나 계속됐어요 — 아무도 자리를 뜨고 싶지 않았어요.",
+        english: "The after-dinner conversation lasted three hours — nobody wanted to leave.",
+        spanish: "La sobremesa duró tres horas — nadie quería irse.",
+      },
       speechLang: "es-ES",
     },
   ],
@@ -238,24 +455,51 @@ const ADVANCED_CARDS: Record<NativeLanguage, FlashCard[]> = {
       word: "눈치",
       emoji: "👁",
       pronunciation: "nun-chi",
-      meaning: "The subtle art of reading a room — sensing unspoken emotions and social cues.",
-      example: '"그는 눈치가 빨라서 아무것도 말하지 않아도 다 알아."',
+      meanings: {
+        korean: "분위기를 읽는 미묘한 기술 — 말하지 않아도 감정과 사회적 신호를 감지해요.",
+        english: "The subtle art of reading a room — sensing unspoken emotions and social cues.",
+        spanish: "El arte sutil de leer el ambiente — percibir emociones y señales sociales.",
+      },
+      example: "그는 눈치가 빨라서 아무것도 말하지 않아도 다 알아.",
+      exampleTranslation: {
+        korean: "그는 눈치가 빨라서 아무것도 말하지 않아도 다 알아.",
+        english: "He reads the room so well — he knows everything without being told.",
+        spanish: "Él es tan perceptivo que lo entiende todo sin que nadie le diga nada.",
+      },
       speechLang: "ko-KR",
     },
     {
       word: "정",
       emoji: "❤️",
       pronunciation: "jeong",
-      meaning: "A deep emotional bond that forms over time through shared experiences.",
-      example: '"오랫동안 함께해서 정이 많이 들었어요."',
+      meanings: {
+        korean: "오랜 시간 함께한 경험을 통해 형성되는 깊은 정서적 유대감이에요.",
+        english: "A deep emotional bond that forms over time through shared experiences.",
+        spanish: "Un vínculo emocional profundo que se forma con el tiempo a través de experiencias.",
+      },
+      example: "오랫동안 함께해서 정이 많이 들었어요.",
+      exampleTranslation: {
+        korean: "오랫동안 함께해서 정이 많이 들었어요.",
+        english: "We've been together so long that a deep bond has formed between us.",
+        spanish: "Hemos estado juntos tanto tiempo que se ha formado un vínculo muy profundo.",
+      },
       speechLang: "ko-KR",
     },
     {
       word: "한",
       emoji: "🌑",
       pronunciation: "han",
-      meaning: "A uniquely Korean feeling of collective sorrow, longing, and resilience.",
-      example: '"그 노래에는 우리 민족의 한이 담겨 있다."',
+      meanings: {
+        korean: "집단적 슬픔, 그리움, 그리고 회복력이 담긴 독특한 한국의 정서예요.",
+        english: "A uniquely Korean feeling of collective sorrow, longing, and resilience.",
+        spanish: "Un sentimiento únicamente coreano de tristeza colectiva, nostalgia y resiliencia.",
+      },
+      example: "그 노래에는 우리 민족의 한이 담겨 있다.",
+      exampleTranslation: {
+        korean: "그 노래에는 우리 민족의 한이 담겨 있다.",
+        english: "That song carries the deep sorrow and longing of our people.",
+        spanish: "Esa canción lleva el profundo dolor y nostalgia de nuestro pueblo.",
+      },
       speechLang: "ko-KR",
     },
   ],
@@ -510,10 +754,18 @@ export default function CardsScreen() {
                     <Text style={styles.cardEmojiBack}>{card?.emoji}</Text>
                     <Text style={styles.cardWordBack}>{card?.word}</Text>
                     <View style={styles.divider} />
-                    <Text style={styles.cardMeaning}>{card?.meaning}</Text>
+                    <Text style={styles.cardMeaning}>{card?.meanings[nativeLang as NativeLanguage]}</Text>
                     <View style={styles.exampleBox}>
-                      <Text style={styles.exampleLabel}>Example</Text>
+                      <Text style={styles.exampleLabel}>
+                        {nativeLang === "korean" ? "예문" : nativeLang === "spanish" ? "Ejemplo" : "Example"}
+                      </Text>
                       <Text style={styles.exampleText}>{card?.example}</Text>
+                      {card?.exampleTranslation[nativeLang as NativeLanguage] &&
+                        card.exampleTranslation[nativeLang as NativeLanguage] !== card.example && (
+                        <Text style={styles.exampleTranslationText}>
+                          {card.exampleTranslation[nativeLang as NativeLanguage]}
+                        </Text>
+                      )}
                     </View>
                     <Pressable
                       style={({ pressed }) => [styles.speakerBtnBack, pressed && { opacity: 0.75 }]}
@@ -806,6 +1058,14 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     lineHeight: 20,
     fontStyle: "italic",
+  },
+  exampleTranslationText: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: "rgba(255,255,255,0.65)",
+    lineHeight: 17,
+    marginTop: 6,
+    fontStyle: "normal",
   },
   flipPromptRow: {
     paddingHorizontal: 20,
