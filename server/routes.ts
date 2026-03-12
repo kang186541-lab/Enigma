@@ -137,12 +137,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     minjun: "TxGEqnHWrfWFTfGW9XjX", // Josh      — Korean male
   };
 
+  // Azure voice fallback map — used when ElevenLabs quota is exhausted.
+  const TUTOR_AZURE_FALLBACK: Record<string, { voice: string; lang: string }> = {
+    sarah:  { voice: "en-GB-SoniaNeural",  lang: "en-GB" },
+    jake:   { voice: "en-US-JennyNeural",  lang: "en-US" },
+    jane:   { voice: "es-ES-ElviraNeural", lang: "es-ES" },
+    alex:   { voice: "es-MX-DaliaNeural",  lang: "es-MX" },
+    jisu:   { voice: "ko-KR-SunHiNeural",  lang: "ko-KR" },
+    minjun: { voice: "ko-KR-SunHiNeural",  lang: "ko-KR" },
+  };
+
   app.get("/api/tts", async (req: Request, res: Response) => {
     try {
-      const { text, tutorId, speed } = req.query as {
+      const { text, tutorId, speed, mode } = req.query as {
         text?: string;
         tutorId?: string;
         speed?: string;
+        mode?: string;
       };
 
       if (!text || !tutorId) {
@@ -171,17 +182,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       );
 
-      if (!xiRes.ok) {
-        const errBody = await xiRes.text();
-        console.error("ElevenLabs error:", xiRes.status, errBody);
-        return res.status(502).json({ error: "ElevenLabs TTS failed" });
+      if (xiRes.ok) {
+        res.set("Content-Type", "audio/mpeg");
+        res.set("Cache-Control", "public, max-age=300");
+        const buf = Buffer.from(await xiRes.arrayBuffer());
+        return res.send(buf);
+      }
+
+      // ElevenLabs failed (quota exceeded, auth error, etc.) — fall back to Azure Neural TTS
+      const errBody = await xiRes.text();
+      console.warn(`ElevenLabs unavailable (${xiRes.status}), falling back to Azure TTS:`, errBody);
+
+      const azureFallback = TUTOR_AZURE_FALLBACK[tutorId];
+      if (!azureFallback) {
+        return res.status(502).json({ error: "TTS unavailable" });
+      }
+
+      const azureKey = process.env.AZURE_SPEECH_KEY;
+      const azureRegion = process.env.AZURE_SPEECH_REGION;
+      if (!azureKey || !azureRegion) {
+        return res.status(502).json({ error: "TTS unavailable — no fallback credentials" });
+      }
+
+      const safeText = text.slice(0, 5000)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      const ssml = buildSsml(azureFallback.voice, azureFallback.lang, safeText, tutorId, mode);
+
+      const azureRes = await fetch(
+        `https://${azureRegion}.tts.speech.microsoft.com/cognitiveservices/v1`,
+        {
+          method: "POST",
+          headers: {
+            "Ocp-Apim-Subscription-Key": azureKey,
+            "Content-Type": "application/ssml+xml",
+            "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+          },
+          body: ssml,
+        }
+      );
+
+      if (!azureRes.ok) {
+        const azureErr = await azureRes.text();
+        console.error("Azure TTS fallback error:", azureRes.status, azureErr);
+        return res.status(502).json({ error: "TTS failed" });
       }
 
       res.set("Content-Type", "audio/mpeg");
       res.set("Cache-Control", "public, max-age=300");
-      // Stream the MP3 bytes directly to the client
-      const buf = Buffer.from(await xiRes.arrayBuffer());
-      res.send(buf);
+      const buf = Buffer.from(await azureRes.arrayBuffer());
+      return res.send(buf);
     } catch (err) {
       console.error("TTS error:", err);
       res.status(500).json({ error: "TTS generation failed" });

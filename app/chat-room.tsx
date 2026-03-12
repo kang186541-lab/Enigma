@@ -85,13 +85,15 @@ async function elevenLabsPlay(
   speed: number,
   onStart?: () => void,
   onEnd?: () => void,
-  onPlaybackStart?: (durationSecs: number) => void
+  onPlaybackStart?: (durationSecs: number) => void,
+  mode?: string
 ) {
   try {
     const url = new URL("/api/tts", apiBase);
     url.searchParams.set("text", text.slice(0, 5000));
     url.searchParams.set("tutorId", tutorId);
     url.searchParams.set("speed", speed.toString());
+    if (mode) url.searchParams.set("mode", mode);
 
     onStart?.();
     const res = await fetch(url.toString());
@@ -294,7 +296,8 @@ export default function ChatRoomScreen() {
         rate,
         () => setLoadingAudioId(msgId),
         onEnd,
-        (durationSecs) => startAudioSyncedSubtitle(text, durationSecs)
+        (durationSecs) => startAudioSyncedSubtitle(text, durationSecs),
+        mode
       );
     } else {
       // Native: expo-speech fallback (works in Expo Go without native build)
