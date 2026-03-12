@@ -153,7 +153,6 @@ export default function ChatRoomScreen() {
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
-  const [voiceUnlocked, setVoiceUnlocked] = useState(Platform.OS !== "web");
   const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
 
   // Voice settings — speed only
@@ -197,10 +196,9 @@ export default function ChatRoomScreen() {
       const id = "greeting";
       setMessages([{ id, text: tutor.greeting, isUser: false }]);
       conversationHistoryRef.current = [{ role: "assistant", content: tutor.greeting }];
-      if (Platform.OS !== "web") {
-        speakMsg(tutor.greeting, id, false, true);
-      }
-      // Web: voice unlocked after first gesture — handled by handleUnlockVoice
+      // Always attempt to speak — on web the browser may silently block autoplay
+      // before any user interaction, but it will succeed once the user taps/types.
+      speakMsg(tutor.greeting, id, false);
     }, 400);
     return () => clearTimeout(timer);
   }, []);  // eslint-disable-line react-hooks/exhaustive-deps
@@ -260,10 +258,10 @@ export default function ChatRoomScreen() {
     }, msPerWord);
   }, [clearSubtitle]);
 
-  // Central speak helper
-  const speakMsg = useCallback((text: string, msgId: string, _muted: boolean, _voiceUnlocked: boolean) => {
+  // Central speak helper — always attempts to play; browser silently blocks
+  // autoplay before any user interaction, then permits it after the first tap/send.
+  const speakMsg = useCallback((text: string, msgId: string, _muted: boolean) => {
     if (_muted) return;
-    if (Platform.OS === "web" && !_voiceUnlocked) return;
     if (!tutor) return;
 
     stopSpeech();
@@ -319,40 +317,12 @@ export default function ChatRoomScreen() {
     });
   }, [messages, canTranslate]);
 
-  const handleUnlockVoice = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setVoiceUnlocked(true);
-    // After unlocking, immediately play the greeting / last AI message
-    if (!muted && tutor) {
-      const lastAI = messages.find((m) => !m.isUser);
-      if (lastAI) {
-        // Use a ref to avoid stale closure — call speakMsg in next tick
-        // (setVoiceUnlocked is queued, so pass true explicitly)
-        const text = lastAI.text;
-        const id = lastAI.id;
-        stopSpeech();
-        clearSubtitle();
-        setSpeakingId(id);
-        setSubtitleWordIdx(0);
-        startNativeSubtitle(text, rate);
-        elevenLabsPlay(
-          text,
-          tutor.id,
-          getApiUrl(),
-          rate,
-          () => setLoadingAudioId(id),
-          () => { clearSubtitle(); setSpeakingId(null); setLoadingAudioId(null); }
-        );
-      }
-    }
-  }, [messages, muted, tutor, rate, clearSubtitle, startNativeSubtitle]);
-
   const handleReplay = useCallback(
     (msg: Message) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      speakMsg(msg.text, msg.id, muted, voiceUnlocked || Platform.OS !== "web");
+      speakMsg(msg.text, msg.id, muted);
     },
-    [muted, voiceUnlocked, speakMsg]
+    [muted, speakMsg]
   );
 
 
@@ -472,13 +442,13 @@ export default function ChatRoomScreen() {
       ];
       setMessages((prev) => [aiMsg, ...prev]);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      speakMsg(responseText, aiId, muted, voiceUnlocked || Platform.OS !== "web");
+      speakMsg(responseText, aiId, muted);
       inputRef.current?.focus();
     } catch {
       const fallback = tutor.responses[Math.floor(Math.random() * tutor.responses.length)];
       const aiId = Date.now().toString() + "a";
       setMessages((prev) => [{ id: aiId, text: fallback, isUser: false }, ...prev]);
-      speakMsg(fallback, aiId, muted, voiceUnlocked || Platform.OS !== "web");
+      speakMsg(fallback, aiId, muted);
     } finally {
       setIsTyping(false);
     }
@@ -669,16 +639,6 @@ export default function ChatRoomScreen() {
         </Animated.View>
       )}
 
-      {/* iOS Safari voice unlock banner — web only, disappears once tapped */}
-      {Platform.OS === "web" && !voiceUnlocked && !muted && (
-        <Pressable
-          style={({ pressed }) => [styles.voiceUnlockBanner, pressed && { opacity: 0.8 }]}
-          onPress={handleUnlockVoice}
-        >
-          <Ionicons name="volume-medium" size={14} color="#FF6B9D" />
-          <Text style={styles.voiceUnlockText}>Tap to enable tutor voice</Text>
-        </Pressable>
-      )}
 
       {/* Voice Settings Modal */}
       <Modal
@@ -893,25 +853,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: "Inter_400Regular",
     color: "#A08090",
-  },
-  voiceUnlockBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    marginHorizontal: 16,
-    marginBottom: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    backgroundColor: "#FFF0F6",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#FFB3D1",
-  },
-  voiceUnlockText: {
-    fontSize: 13,
-    fontFamily: "Inter_500Medium",
-    color: "#FF6B9D",
   },
 
   // Settings modal
