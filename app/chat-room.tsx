@@ -57,6 +57,15 @@ const LANG_NAMES: Record<string, string> = {
 
 let _webAudioEl: HTMLAudioElement | null = null;
 
+/** Strip common markdown formatting so tutor messages render as plain text. */
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/gs, "$1") // **bold**
+    .replace(/\*(.+?)\*/gs, "$1")      // *italic*
+    .replace(/__(.+?)__/gs, "$1")      // __underline__
+    .replace(/_(.+?)_/gs, "$1");       // _italic_
+}
+
 function stopSpeech() {
   if (Platform.OS !== "web") {
     try { Speech.stop(); } catch {}
@@ -461,11 +470,12 @@ export default function ChatRoomScreen() {
 
     // Render AI bubble text with per-word highlight when speaking
     const renderBubbleText = () => {
+      const displayText = item.isUser ? item.text : stripMarkdown(item.text);
       if (!item.isUser && isSpeakingThis) {
         let wordCount = 0;
         return (
           <Text style={[styles.bubbleText, styles.bubbleTextAI]}>
-            {item.text.split(/(\s+)/).map((token, i) => {
+            {displayText.split(/(\s+)/).map((token, i) => {
               if (/^\s+$/.test(token)) return <Text key={i}>{token}</Text>;
               const myIdx = wordCount++;
               return (
@@ -482,7 +492,7 @@ export default function ChatRoomScreen() {
       }
       return (
         <Text style={[styles.bubbleText, item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI]}>
-          {item.text}
+          {displayText}
         </Text>
       );
     };
