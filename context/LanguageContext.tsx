@@ -79,6 +79,8 @@ const translations: Record<NativeLanguage, Record<string, string>> = {
     try_again: "Try Again",
     great_job: "Great job!",
     score: "Score",
+    chat_pick_tutor: "Choose Your Tutor",
+    chat_pick_sub: "Pick the accent and style you want to practice with",
   },
   korean: {
     select_language: "언어를 선택하세요",
@@ -132,6 +134,8 @@ const translations: Record<NativeLanguage, Record<string, string>> = {
     try_again: "다시 시도",
     great_job: "잘했어요!",
     score: "점수",
+    chat_pick_tutor: "튜터를 선택하세요",
+    chat_pick_sub: "연습할 튜터를 골라보세요",
   },
   spanish: {
     select_language: "Selecciona tu idioma",
@@ -185,6 +189,8 @@ const translations: Record<NativeLanguage, Record<string, string>> = {
     try_again: "Intentar de nuevo",
     great_job: "¡Excelente trabajo!",
     score: "Puntuación",
+    chat_pick_tutor: "Elige tu tutor",
+    chat_pick_sub: "Selecciona el acento y estilo que quieres practicar",
   },
 };
 

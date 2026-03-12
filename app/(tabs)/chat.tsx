@@ -74,7 +74,7 @@ function TutorCard({ tutor, onPress }: { tutor: Tutor; onPress: () => void }) {
 
 export default function TutorSelectScreen() {
   const insets = useSafeAreaInsets();
-  const { t, setLearningLanguage } = useLanguage();
+  const { t, setLearningLanguage, learningLanguage } = useLanguage();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 84 : TAB_BAR_HEIGHT + insets.bottom;
 
@@ -89,15 +89,15 @@ export default function TutorSelectScreen() {
       <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Choose Your Tutor</Text>
-        <Text style={styles.headerSub}>Pick the accent and style you want to practice with</Text>
+        <Text style={styles.headerTitle}>{t("chat_pick_tutor")}</Text>
+        <Text style={styles.headerSub}>{t("chat_pick_sub")}</Text>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad + 16 }]}
       >
-        {TUTOR_GROUPS.map((group) => {
+        {TUTOR_GROUPS.filter((g) => !learningLanguage || g.language === learningLanguage).map((group) => {
           const groupTutors = TUTORS.filter((t) => t.language === group.language);
           const [g1, g2] = LANG_GRADIENT[group.language];
           return (

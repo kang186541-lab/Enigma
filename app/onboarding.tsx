@@ -5,75 +5,117 @@ import {
   StyleSheet,
   Pressable,
   Platform,
-  Dimensions,
+  Animated,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
+import { Ionicons } from "@expo/vector-icons";
 
-const { width } = Dimensions.get("window");
+type Step = 1 | 2;
 
-const LANGUAGES: { id: NativeLanguage; flag: string; nameMap: Record<NativeLanguage, string> }[] = [
-  {
-    id: "korean",
-    flag: "🇰🇷",
-    nameMap: { korean: "한국어", english: "Korean", spanish: "Coreano" },
-  },
-  {
-    id: "english",
-    flag: "🇺🇸",
-    nameMap: { korean: "영어", english: "English", spanish: "Inglés" },
-  },
-  {
-    id: "spanish",
-    flag: "🇪🇸",
-    nameMap: { korean: "스페인어", english: "Spanish", spanish: "Español" },
-  },
+const ALL_LANGS: { id: NativeLanguage; flag: string; nameMap: Record<NativeLanguage, string> }[] = [
+  { id: "korean",  flag: "🇰🇷", nameMap: { korean: "한국어",    english: "Korean",  spanish: "Coreano" } },
+  { id: "english", flag: "🇺🇸", nameMap: { korean: "영어",      english: "English", spanish: "Inglés"  } },
+  { id: "spanish", flag: "🇪🇸", nameMap: { korean: "스페인어",  english: "Spanish", spanish: "Español" } },
 ];
 
-const UI_TEXT: Record<NativeLanguage, { title: string; subtitle: string; cta: string }> = {
+const UI: Record<NativeLanguage, {
+  step1Title: string;
+  step1Sub: string;
+  step2Title: string;
+  step2Sub: string;
+  cta1: string;
+  cta2: string;
+  back: string;
+}> = {
   korean: {
-    title: "언어를 선택하세요",
-    subtitle: "맞춤 학습 경험을 위해 모국어를 선택하세요",
-    cta: "계속하기",
+    step1Title: "모국어를 선택해주세요",
+    step1Sub: "더 나은 학습 경험을 위해 모국어를 알려주세요",
+    step2Title: "어떤 언어를 배우고 싶으세요?",
+    step2Sub: "학습할 언어를 선택하세요",
+    cta1: "다음",
+    cta2: "시작하기 🚀",
+    back: "뒤로",
   },
   english: {
-    title: "Select Your Language",
-    subtitle: "Choose your native language to personalize your learning",
-    cta: "Continue",
+    step1Title: "What's your native language?",
+    step1Sub: "Choose the language you speak at home",
+    step2Title: "What do you want to learn?",
+    step2Sub: "Pick the language you'd like to master",
+    cta1: "Next",
+    cta2: "Let's go 🚀",
+    back: "Back",
   },
   spanish: {
-    title: "Selecciona tu idioma",
-    subtitle: "Elige tu idioma nativo para personalizar tu aprendizaje",
-    cta: "Continuar",
+    step1Title: "¿Cuál es tu idioma nativo?",
+    step1Sub: "Elige el idioma que hablas en casa",
+    step2Title: "¿Qué idioma quieres aprender?",
+    step2Sub: "Selecciona el idioma que quieres dominar",
+    cta1: "Siguiente",
+    cta2: "¡Vamos! 🚀",
+    back: "Atrás",
   },
 };
 
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
-  const { setNativeLanguage } = useLanguage();
-  const [selected, setSelected] = useState<NativeLanguage | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { setNativeLanguage, setLearningLanguage } = useLanguage();
 
-  const uiLang = selected ?? "english";
-  const ui = UI_TEXT[uiLang];
+  const [step, setStep] = useState<Step>(1);
+  const [nativeSel, setNativeSel] = useState<NativeLanguage | null>(null);
+  const [learnSel,  setLearnSel]  = useState<NativeLanguage | null>(null);
+  const [loading,   setLoading]   = useState(false);
 
-  const handleSelect = (lang: NativeLanguage) => {
+  const uiLang: NativeLanguage = nativeSel ?? "english";
+  const ui = UI[uiLang];
+
+  const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel);
+
+  const topPad    = Platform.OS === "web" ? 67 : insets.top;
+  const bottomPad = Math.max((Platform.OS === "web" ? 34 : insets.bottom) + 16, 34);
+
+  const handleNativePick = (lang: NativeLanguage) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setSelected(lang);
+    setNativeSel(lang);
+    setLearnSel(null);
   };
 
-  const handleContinue = async () => {
-    if (!selected) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  const handleLearnPick = (lang: NativeLanguage) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setLearnSel(lang);
+  };
+
+  const handleNext = () => {
+    if (step === 1 && nativeSel) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      setStep(2);
+    }
+  };
+
+  const handleBack = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setStep(1);
+    setLearnSel(null);
+  };
+
+  const handleFinish = async () => {
+    if (!nativeSel || !learnSel) return;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setLoading(true);
-    await setNativeLanguage(selected);
+    await setNativeLanguage(nativeSel);
+    await setLearningLanguage(learnSel);
     router.replace("/(tabs)");
   };
 
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
+  const stepDots = (
+    <View style={styles.dots}>
+      <View style={[styles.dot, step === 1 && styles.dotActive]} />
+      <View style={[styles.dot, step === 2 && styles.dotActive]} />
+    </View>
+  );
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
@@ -84,52 +126,109 @@ export default function OnboardingScreen() {
         end={{ x: 1, y: 1 }}
       />
 
-      <View style={styles.topSection}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoEmoji}>✨</Text>
-          <Text style={styles.logoText}>LinguaAI</Text>
-        </View>
-
-        <Text style={styles.title}>{ui.title}</Text>
-        <Text style={styles.subtitle}>{ui.subtitle}</Text>
+      {/* Logo */}
+      <View style={styles.logoRow}>
+        <Text style={styles.logoEmoji}>✨</Text>
+        <Text style={styles.logoText}>LinguaAI</Text>
       </View>
 
-      <View style={styles.cardsContainer}>
-        {LANGUAGES.map((lang) => {
-          const isSelected = selected === lang.id;
-          return (
+      {/* Step dots */}
+      {stepDots}
+
+      {/* ── STEP 1 ── */}
+      {step === 1 && (
+        <>
+          <View style={styles.textBlock}>
+            <Text style={styles.title}>{ui.step1Title}</Text>
+            <Text style={styles.subtitle}>{ui.step1Sub}</Text>
+          </View>
+
+          <View style={styles.cards}>
+            {ALL_LANGS.map((lang) => {
+              const sel = nativeSel === lang.id;
+              return (
+                <Pressable
+                  key={lang.id}
+                  style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
+                  onPress={() => handleNativePick(lang.id)}
+                >
+                  <Text style={styles.flag}>{lang.flag}</Text>
+                  <Text style={[styles.cardName, sel && styles.cardNameSel]}>
+                    {lang.nameMap[uiLang]}
+                  </Text>
+                  {sel && (
+                    <View style={styles.check}>
+                      <Ionicons name="checkmark" size={16} color="#FFF" />
+                    </View>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <View style={[styles.bottom, { paddingBottom: bottomPad }]}>
             <Pressable
-              key={lang.id}
-              style={({ pressed }) => [
-                styles.langCard,
-                isSelected && styles.langCardSelected,
-                pressed && styles.langCardPressed,
-              ]}
-              onPress={() => handleSelect(lang.id)}
+              style={({ pressed }) => [styles.cta, !nativeSel && styles.ctaDim, pressed && nativeSel && styles.ctaPress]}
+              onPress={handleNext}
+              disabled={!nativeSel}
             >
-              <Text style={styles.flag}>{lang.flag}</Text>
-              <Text style={[styles.langName, isSelected && styles.langNameSelected]}>
-                {lang.nameMap[uiLang]}
-              </Text>
-              {isSelected && <View style={styles.checkDot} />}
+              <Text style={styles.ctaText}>{ui.cta1}</Text>
+              <Ionicons name="arrow-forward" size={20} color="#FF6B9D" />
             </Pressable>
-          );
-        })}
-      </View>
+          </View>
+        </>
+      )}
 
-      <View style={[styles.bottomSection, { paddingBottom: Math.max(insets.bottom + 16, 34) }]}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.ctaButton,
-            !selected && styles.ctaButtonDisabled,
-            pressed && selected && styles.ctaButtonPressed,
-          ]}
-          onPress={handleContinue}
-          disabled={!selected || loading}
-        >
-          <Text style={styles.ctaText}>{ui.cta}</Text>
-        </Pressable>
-      </View>
+      {/* ── STEP 2 ── */}
+      {step === 2 && (
+        <>
+          <View style={styles.textBlock}>
+            <Text style={styles.title}>{ui.step2Title}</Text>
+            <Text style={styles.subtitle}>{ui.step2Sub}</Text>
+          </View>
+
+          <View style={styles.cards}>
+            {learningOptions.map((lang) => {
+              const sel = learnSel === lang.id;
+              return (
+                <Pressable
+                  key={lang.id}
+                  style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
+                  onPress={() => handleLearnPick(lang.id)}
+                >
+                  <Text style={styles.flag}>{lang.flag}</Text>
+                  <Text style={[styles.cardName, sel && styles.cardNameSel]}>
+                    {lang.nameMap[uiLang]}
+                  </Text>
+                  {sel && (
+                    <View style={styles.check}>
+                      <Ionicons name="checkmark" size={16} color="#FFF" />
+                    </View>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <View style={[styles.bottom, { paddingBottom: bottomPad }]}>
+            <Pressable
+              style={styles.backBtn}
+              onPress={handleBack}
+            >
+              <Ionicons name="chevron-back" size={18} color="rgba(255,255,255,0.9)" />
+              <Text style={styles.backText}>{ui.back}</Text>
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [styles.cta, styles.ctaFlex, !learnSel && styles.ctaDim, pressed && learnSel && styles.ctaPress]}
+              onPress={handleFinish}
+              disabled={!learnSel || loading}
+            >
+              <Text style={styles.ctaText}>{ui.cta2}</Text>
+            </Pressable>
+          </View>
+        </>
+      )}
     </View>
   );
 }
@@ -138,103 +237,142 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  topSection: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 32,
-    paddingTop: 20,
-  },
-  logoContainer: {
+  logoRow: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 8,
-    marginBottom: 32,
+    marginTop: 16,
+    marginBottom: 8,
   },
   logoEmoji: {
-    fontSize: 32,
+    fontSize: 28,
   },
   logoText: {
-    fontSize: 36,
+    fontSize: 32,
     fontFamily: "Inter_700Bold",
     color: "#FFFFFF",
     letterSpacing: -0.5,
   },
+  dots: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+    marginBottom: 28,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "rgba(255,255,255,0.35)",
+  },
+  dotActive: {
+    width: 24,
+    backgroundColor: "#FFFFFF",
+  },
+  textBlock: {
+    alignItems: "center",
+    paddingHorizontal: 32,
+    marginBottom: 28,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: "Inter_700Bold",
     color: "#FFFFFF",
     textAlign: "center",
-    marginBottom: 12,
-    lineHeight: 36,
+    marginBottom: 10,
+    lineHeight: 34,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: "Inter_400Regular",
-    color: "rgba(255,255,255,0.85)",
+    color: "rgba(255,255,255,0.82)",
     textAlign: "center",
-    lineHeight: 24,
+    lineHeight: 22,
   },
-  cardsContainer: {
+  cards: {
     paddingHorizontal: 24,
     gap: 14,
+    flex: 1,
   },
-  langCard: {
+  card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.25)",
-    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.22)",
+    borderRadius: 22,
     padding: 20,
     gap: 16,
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.4)",
+    borderColor: "rgba(255,255,255,0.35)",
   },
-  langCardSelected: {
+  cardSel: {
     backgroundColor: "#FFFFFF",
     borderColor: "#FFFFFF",
   },
-  langCardPressed: {
+  cardPress: {
     opacity: 0.85,
     transform: [{ scale: 0.98 }],
   },
   flag: {
-    fontSize: 36,
+    fontSize: 34,
   },
-  langName: {
+  cardName: {
     flex: 1,
-    fontSize: 20,
+    fontSize: 19,
     fontFamily: "Inter_600SemiBold",
     color: "#FFFFFF",
   },
-  langNameSelected: {
+  cardNameSel: {
     color: "#FF6B9D",
   },
-  checkDot: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  check: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: "#FF6B9D",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  bottomSection: {
+  bottom: {
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 20,
+    gap: 12,
   },
-  ctaButton: {
+  backBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    alignSelf: "flex-start",
+    paddingVertical: 4,
+    paddingHorizontal: 2,
+  },
+  backText: {
+    fontSize: 15,
+    fontFamily: "Inter_500Medium",
+    color: "rgba(255,255,255,0.9)",
+  },
+  cta: {
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
     paddingVertical: 18,
     alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
     shadowColor: "#FF6B9D",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
     elevation: 8,
   },
-  ctaButtonDisabled: {
-    backgroundColor: "rgba(255,255,255,0.5)",
+  ctaFlex: {
+    flex: 0,
+  },
+  ctaDim: {
+    backgroundColor: "rgba(255,255,255,0.45)",
     shadowOpacity: 0,
   },
-  ctaButtonPressed: {
+  ctaPress: {
     transform: [{ scale: 0.98 }],
     opacity: 0.9,
   },
