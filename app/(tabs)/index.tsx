@@ -95,10 +95,14 @@ export default function HomeScreen() {
   const weekData   = getWeekStreakData(stats.streak, nativeLang);
   const streakText = getStreakText(stats.streak, nativeLang);
 
+  const storyLabel = nativeLang === "korean" ? "스토리 모드" : nativeLang === "spanish" ? "Modo Historia" : "Story Mode";
+  const storyDesc  = nativeLang === "korean" ? "이야기로 자연스럽게 배우기" : nativeLang === "spanish" ? "Aprende con historias inmersivas" : "Learn through immersive stories";
+
   const quickItems = [
     { icon: "albums",      color: "#FF6B9D", label: t("flashcards"),   desc: t("flashcards_desc"),   route: "/(tabs)/cards" },
     { icon: "chatbubbles", color: "#4ECDC4", label: t("conversation"), desc: t("conversation_desc"), route: "/(tabs)/chat"  },
     { icon: "mic",         color: "#45B7D1", label: t("pronunciation"),desc: t("pronunciation_desc"),route: "/(tabs)/speak" },
+    { icon: "book",        color: "#9C59D1", label: storyLabel,        desc: storyDesc,               route: "/story"       },
   ];
 
   const bottomStatItems = [
