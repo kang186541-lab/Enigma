@@ -218,10 +218,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     minjun: { style: "excited",           degree: "2"   },
   };
 
-  function buildSsml(voiceName: string, lang: string, safeText: string, tutorId?: string): string {
-    const ssmlStyle = (tutorId && TUTOR_SSML_OVERRIDES[tutorId])
-      ? TUTOR_SSML_OVERRIDES[tutorId]
-      : (VOICE_SSML_STYLES[voiceName] ?? { style: "friendly", degree: "1.5" });
+  // Mode overrides apply on top of tutor/voice defaults.
+  // Each mode sets its own express-as style, styledegree, prosody rate and pitch.
+  const MODE_SSML_STYLES: Record<string, { style: string; degree: string; rate: string; pitch: string }> = {
+    "독설": { style: "excited",  degree: "2",   rate: "+10%", pitch: "+20%" },
+    "개그": { style: "cheerful", degree: "2",   rate: "+15%", pitch: "+10%" },
+    "친절": { style: "friendly", degree: "1.5", rate: "+5%",  pitch: "0%"   },
+  };
+
+  function buildSsml(voiceName: string, lang: string, safeText: string, tutorId?: string, mode?: string): string {
+    const modeStyle = mode ? MODE_SSML_STYLES[mode] : undefined;
+
+    // Mode takes highest priority, then tutorId override, then voice default.
+    const ssmlStyle = modeStyle ?? (
+      (tutorId && TUTOR_SSML_OVERRIDES[tutorId])
+        ? TUTOR_SSML_OVERRIDES[tutorId]
+        : (VOICE_SSML_STYLES[voiceName] ?? { style: "friendly", degree: "1.5" })
+    );
+
+    const rate  = modeStyle?.rate  ?? "+20%";
+    const pitch = modeStyle?.pitch ?? "0%";
 
     return [
       `<speak version="1.0"`,
@@ -230,7 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ` xml:lang="${lang}">`,
       `<voice name="${voiceName}">`,
       `<mstts:express-as style="${ssmlStyle.style}" styledegree="${ssmlStyle.degree}">`,
-      `<prosody rate="+20%">${safeText}</prosody>`,
+      `<prosody rate="${rate}" pitch="${pitch}">${safeText}</prosody>`,
       `</mstts:express-as>`,
       `</voice>`,
       `</speak>`,
@@ -239,7 +255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/pronunciation-tts", async (req: Request, res: Response) => {
     try {
-      const { text, lang, tutorId } = req.query as { text?: string; lang?: string; tutorId?: string };
+      const { text, lang, tutorId, mode } = req.query as { text?: string; lang?: string; tutorId?: string; mode?: string };
       if (!text || !lang) {
         return res.status(400).json({ error: "text and lang required" });
       }
@@ -256,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-      const ssml = buildSsml(voiceName, lang, safeText, tutorId);
+      const ssml = buildSsml(voiceName, lang, safeText, tutorId, mode);
 
       const azureRes = await fetch(
         `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`,
