@@ -199,6 +199,7 @@ export default function ChatRoomScreen() {
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
+  const [hiddenTranslationIds, setHiddenTranslationIds] = useState<Set<string>>(new Set());
   const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
 
   // Voice settings — speed (persisted)
@@ -381,7 +382,7 @@ export default function ChatRoomScreen() {
         setTranslatingIds((prev) => new Set(prev).add(msg.id));
         fetchTranslation(msg.text, userLangName, getApiUrl())
           .then((result) => setTranslations((prev) => ({ ...prev, [msg.id]: result })))
-          .catch(() => {})
+          .catch(() => setTranslations((prev) => ({ ...prev, [msg.id]: "번역 실패" })))
           .finally(() => setTranslatingIds((prev) => {
             const n = new Set(prev); n.delete(msg.id); return n;
           }));
@@ -593,21 +594,35 @@ export default function ChatRoomScreen() {
             )}
           </View>
 
-          {/* Auto-translation — always shown for AI messages when languages differ */}
+          {/* Translation bubble — separate from main bubble, tap to toggle */}
           {!item.isUser && canTranslate && (
-            <View style={styles.translationBox}>
-              {isTranslating && !translationText ? (
-                <View style={styles.translationLoading}>
-                  <ActivityIndicator size="small" color="#FF6B9D" />
-                  <Text style={styles.translationLoadingText}>Translating…</Text>
-                </View>
-              ) : translationText ? (
-                <View style={styles.autoTranslationRow}>
-                  <Text style={styles.autoTranslationGlobe}>🌐</Text>
-                  <Text style={styles.autoTranslationText}>{translationText}</Text>
-                </View>
-              ) : null}
-            </View>
+            isTranslating && !translationText ? (
+              <View style={styles.translBubble}>
+                <Text style={styles.translGlobe}>🌐</Text>
+                <ActivityIndicator size="small" color="#C4A8BE" style={{ marginLeft: 2 }} />
+              </View>
+            ) : translationText ? (
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setHiddenTranslationIds((prev) => {
+                    const n = new Set(prev);
+                    if (n.has(item.id)) n.delete(item.id);
+                    else n.add(item.id);
+                    return n;
+                  });
+                }}
+                style={({ pressed }) => [styles.translBubble, pressed && { opacity: 0.75 }]}
+              >
+                <Text style={styles.translGlobe}>🌐</Text>
+                {!hiddenTranslationIds.has(item.id) && (
+                  <Text style={styles.translText}>{translationText}</Text>
+                )}
+                {hiddenTranslationIds.has(item.id) && (
+                  <Text style={styles.translHiddenHint}>번역 보기</Text>
+                )}
+              </Pressable>
+            ) : null
           )}
         </View>
       </View>
@@ -775,7 +790,7 @@ export default function ChatRoomScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           inverted
-          extraData={{ translations, translatingIds, speakingId, subtitleWordIdx }}
+          extraData={{ translations, translatingIds, hiddenTranslationIds, speakingId, subtitleWordIdx }}
           style={styles.flex}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
@@ -1137,32 +1152,39 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
   },
 
-  // Auto-translation
-  translationBox: {
-    backgroundColor: "#F8F0F5",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  translationLoading: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 7,
-  },
-  translationLoadingText: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
-  },
-  autoTranslationRow: {
+  // Translation bubble — separate card below tutor message
+  translBubble: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 5,
+    gap: 6,
+    backgroundColor: "rgba(240, 232, 244, 0.75)",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#EDD9EA",
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    alignSelf: "flex-start",
   },
-  autoTranslationGlobe: {
-    fontSize: 12,
+  translGlobe: {
+    fontSize: 13,
     marginTop: 1,
+    opacity: 0.7,
   },
+  translText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: "#8A6A82",
+    lineHeight: 18,
+    opacity: 0.9,
+  },
+  translHiddenHint: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: "#B89AB0",
+    fontStyle: "italic",
+  },
+  // keep for any lingering references
   autoTranslationText: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
