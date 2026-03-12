@@ -100,7 +100,10 @@ export default function HomeScreen() {
               </View>
               <Pressable
                 style={({ pressed }) => [styles.startBtn, pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] }]}
-                onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  router.push("/daily-lesson" as any);
+                }}
               >
                 <Text style={styles.startBtnText}>{t("start_lesson")}</Text>
                 <Ionicons name="arrow-forward" size={16} color="#FF6B9D" />
