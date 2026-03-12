@@ -447,14 +447,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: "Azure credentials not configured" });
       }
 
-      const { convertToWav } = await import("./replit_integrations/audio/client");
-      const rawBuffer = Buffer.from(audio, "base64");
+      const { detectAudioFormat } = await import("./replit_integrations/audio/client");
+      const { spawn } = await import("child_process");
+      const { writeFile, unlink, readFile } = await import("fs/promises");
+      const { randomUUID } = await import("crypto");
+      const { tmpdir } = await import("os");
+      const { join } = await import("path");
 
+      const rawBuffer = Buffer.from(audio, "base64");
+      const detectedFormat = detectAudioFormat(rawBuffer);
+      console.log(`[assess] raw=${rawBuffer.length}B  fmt=${detectedFormat}  mime=${mimeType}  lang=${lang}  word="${word}"`);
+
+      // Convert to speech-optimised 16kHz WAV with normalisation + silence trim
+      const inputPath = join(tmpdir(), `pa-in-${randomUUID()}`);
+      const outputPath = join(tmpdir(), `pa-out-${randomUUID()}.wav`);
       let wavBuffer: Buffer;
       try {
-        wavBuffer = await convertToWav(rawBuffer);
-      } catch {
+        await writeFile(inputPath, rawBuffer);
+        const ffmpegArgs = [
+          "-i", inputPath,
+          "-vn",
+          "-af", "highpass=f=80,loudnorm=I=-16:LRA=11:TP=-1.5,silenceremove=start_periods=1:start_silence=0.1:start_threshold=-40dB",
+          "-ar", "16000",
+          "-ac", "1",
+          "-acodec", "pcm_s16le",
+          "-y",
+          outputPath,
+        ];
+        const stderrLines: string[] = [];
+        await new Promise<void>((resolve, reject) => {
+          const ff = spawn("ffmpeg", ffmpegArgs);
+          ff.stderr.on("data", (d: Buffer) => stderrLines.push(d.toString()));
+          ff.on("close", (code: number) => {
+            if (code === 0) resolve();
+            else reject(new Error(`ffmpeg exit ${code}: ${stderrLines.slice(-3).join(" ")}`));
+          });
+          ff.on("error", reject);
+        });
+        wavBuffer = await readFile(outputPath);
+        console.log(`[assess] ffmpeg ok → ${wavBuffer.length}B`);
+      } catch (convErr) {
+        console.error("[assess] ffmpeg failed:", convErr);
+        // Fall back — send raw buffer and hope Azure can handle it
         wavBuffer = rawBuffer;
+      } finally {
+        await unlink(inputPath).catch(() => {});
+        await unlink(outputPath).catch(() => {});
       }
 
       const assessmentConfig = Buffer.from(
@@ -466,8 +504,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       ).toString("base64");
 
+      // Use "interactive" mode — designed for short words/phrases, lower silence threshold
       const azureRes = await fetch(
-        `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${lang}&format=detailed`,
+        `https://${region}.stt.speech.microsoft.com/speech/recognition/interactive/cognitiveservices/v1?language=${lang}&format=detailed`,
         {
           method: "POST",
           headers: {
@@ -481,44 +520,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!azureRes.ok) {
         const errText = await azureRes.text();
-        console.error("Azure Pronunciation Assessment error:", azureRes.status, errText);
+        console.error("[assess] Azure HTTP error:", azureRes.status, errText);
         return res.status(500).json({ error: "Azure assessment failed" });
       }
 
+      // Azure returns scores FLAT on NBest[0] (not in a nested PronunciationAssessment sub-object)
       const data = (await azureRes.json()) as {
         RecognitionStatus: string;
         DisplayText?: string;
         NBest?: Array<{
-          PronunciationAssessment?: {
-            AccuracyScore: number;
-            FluencyScore: number;
-            CompletenessScore: number;
-            PronScore: number;
-          };
+          AccuracyScore?: number;
+          FluencyScore?: number;
+          CompletenessScore?: number;
+          PronScore?: number;
           Words?: Array<{
             Word: string;
-            PronunciationAssessment?: { AccuracyScore: number; ErrorType: string };
+            AccuracyScore?: number;
+            ErrorType?: string;
           }>;
         }>;
       };
 
-      if (data.RecognitionStatus !== "Success" || !data.NBest?.[0]?.PronunciationAssessment) {
+      const nb0 = data.NBest?.[0];
+      const hasPronScore = nb0 != null && nb0.PronScore != null;
+      console.log(`[assess] Azure status=${data.RecognitionStatus}  display="${data.DisplayText}"  hasPronScore=${hasPronScore}  PronScore=${nb0?.PronScore}`);
+
+      if (data.RecognitionStatus !== "Success" || !hasPronScore) {
         return res.json({
           score: 0,
           accuracyScore: 0,
           fluencyScore: 0,
           completenessScore: 0,
           recognizedText: data.DisplayText ?? "",
-          feedback: "음성이 인식되지 않았습니다. 더 크고 명확하게 말해 주세요.",
+          feedback: `음성 인식 실패 (${data.RecognitionStatus}). 더 크고 명확하게 말해 주세요.`,
           words: [],
         });
       }
 
-      const pa = data.NBest[0].PronunciationAssessment!;
-      const pronScore = Math.round(pa.PronScore);
-      const accuracyScore = Math.round(pa.AccuracyScore);
-      const fluencyScore = Math.round(pa.FluencyScore);
-      const completenessScore = Math.round(pa.CompletenessScore);
+      const pronScore = Math.round(nb0!.PronScore!);
+      const accuracyScore = Math.round(nb0!.AccuracyScore ?? 0);
+      const fluencyScore = Math.round(nb0!.FluencyScore ?? 0);
+      const completenessScore = Math.round(nb0!.CompletenessScore ?? 0);
 
       let feedback: string;
       if (pronScore >= 90) {
@@ -538,10 +580,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completenessScore,
         recognizedText: data.DisplayText ?? "",
         feedback,
-        words: (data.NBest[0].Words ?? []).map((w) => ({
+        words: (nb0!.Words ?? []).map((w) => ({
           word: w.Word,
-          score: Math.round(w.PronunciationAssessment?.AccuracyScore ?? 0),
-          errorType: w.PronunciationAssessment?.ErrorType ?? "None",
+          score: Math.round(w.AccuracyScore ?? 0),
+          errorType: w.ErrorType ?? "None",
         })),
       });
     } catch (err) {
