@@ -179,7 +179,7 @@ export default function HomeScreen() {
         <View style={styles.headerTop}>
           <View style={{ flex: 1 }}>
             <Text style={styles.greeting} numberOfLines={1}>{lingoGreeting}</Text>
-            <Text style={styles.headerTitle} numberOfLines={1}>LingoFox ✨</Text>
+            <Text style={styles.headerTitle} numberOfLines={1}>LingoFox</Text>
           </View>
           <Image
             source={lingoImg}
@@ -382,10 +382,11 @@ const styles = StyleSheet.create({
   greeting: { fontSize: 13, fontFamily: "Inter_400Regular", color: "rgba(255,255,255,0.88)", marginBottom: 4 },
   headerTitle: { fontSize: 32, fontFamily: "Inter_700Bold", color: "#FFFFFF", letterSpacing: -0.5 },
   lingoHeader: {
-    width: 100,
-    height: 120,
-    marginLeft: 8,
-    marginTop: -8,
+    width: 140,
+    height: 160,
+    marginLeft: 4,
+    marginTop: -12,
+    marginRight: -4,
     backgroundColor: "transparent",
     ...(Platform.OS === "web" ? { mixBlendMode: "multiply" } as any : {}),
   },
