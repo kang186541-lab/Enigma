@@ -39,6 +39,7 @@ interface Phrase {
 
 const PHRASE_SETS: Record<LangTab, Phrase[]> = {
   english: [
+    // ── A1 Beginner ──────────────────────────────────────────────────────────
     { word: "Hello", ipa: "/həˈloʊ/", meaning: "안녕하세요", level: "A1", speechLang: "en-US", tip: "Stress the second syllable: heh-LO." },
     { word: "Thank you", ipa: "/ˈθæŋk juː/", meaning: "감사합니다", level: "A1", speechLang: "en-US", tip: "The 'th' needs tongue between teeth." },
     { word: "Sorry", ipa: "/ˈsɒr.i/", meaning: "죄송합니다", level: "A1", speechLang: "en-US", tip: "First syllable is stressed: SOR-ee." },
@@ -56,14 +57,64 @@ const PHRASE_SETS: Record<LangTab, Phrase[]> = {
     { word: "Help", ipa: "/hɛlp/", meaning: "도움", level: "A1", speechLang: "en-US", tip: "Say all four sounds: H-EL-P." },
     { word: "Good morning", ipa: "/ɡʊd ˈmɔːr.nɪŋ/", meaning: "좋은 아침이에요", level: "A1", speechLang: "en-US", tip: "Link the words together smoothly." },
     { word: "How are you?", ipa: "/haʊ ɑːr juː/", meaning: "어떻게 지내세요?", level: "A1", speechLang: "en-US", tip: "Often spoken quickly: 'How-ar-yuh?'" },
+    { word: "Name", ipa: "/neɪm/", meaning: "이름", level: "A1", speechLang: "en-US", tip: "The 'a' vowel glides from 'eh' to 'ee'." },
+    { word: "Book", ipa: "/bʊk/", meaning: "책", level: "A1", speechLang: "en-US", tip: "Short 'oo' like 'foot', not 'boot'." },
+    { word: "Time", ipa: "/taɪm/", meaning: "시간", level: "A1", speechLang: "en-US", tip: "The 'i' is a diphthong: slides from 'ah' to 'ee'." },
+    { word: "Day", ipa: "/deɪ/", meaning: "날", level: "A1", speechLang: "en-US", tip: "The 'a' glides upward — like 'deh-ee'." },
+    // ── A2 Elementary ────────────────────────────────────────────────────────
     { word: "Beautiful", ipa: "/ˈbjuː.tɪ.fəl/", meaning: "아름다운", level: "A2", speechLang: "en-US", tip: "Three syllables: BYOO-tih-ful." },
     { word: "Comfortable", ipa: "/ˈkʌm.fər.tə.bəl/", meaning: "편안한", level: "A2", speechLang: "en-US", tip: "Often said as 3 syllables: KUMF-ter-bul." },
-    { word: "Thoroughly", ipa: "/ˈθʌr.ə.li/", meaning: "완전히", level: "B1", speechLang: "en-US", tip: "The 'th' needs tongue between teeth, not a 'd' or 't'." },
     { word: "Squirrel", ipa: "/ˈskwɪr.əl/", meaning: "다람쥐", level: "A2", speechLang: "en-US", tip: "The 'r' colors the vowel before it." },
+    { word: "Travel", ipa: "/ˈtræv.əl/", meaning: "여행", level: "A2", speechLang: "en-US", tip: "Open 'a' vowel in the first syllable: TRAV-ul." },
+    { word: "Airport", ipa: "/ˈɛər.pɔːrt/", meaning: "공항", level: "A2", speechLang: "en-US", tip: "Two distinct syllables: AIR-port. Don't drop the 't'." },
+    { word: "Hotel", ipa: "/hoʊˈtɛl/", meaning: "호텔", level: "A2", speechLang: "en-US", tip: "Stress on the second syllable: hoh-TEL." },
+    { word: "Weather", ipa: "/ˈwɛð.ər/", meaning: "날씨", level: "A2", speechLang: "en-US", tip: "The 'th' here is voiced — like the 'th' in 'this'." },
+    { word: "Ticket", ipa: "/ˈtɪk.ɪt/", meaning: "티켓", level: "A2", speechLang: "en-US", tip: "Two short syllables: TIK-it. The second 't' is often flapped." },
+    { word: "Important", ipa: "/ɪmˈpɔːr.tənt/", meaning: "중요한", level: "A2", speechLang: "en-US", tip: "Stress on second syllable: im-POR-tant." },
+    { word: "Different", ipa: "/ˈdɪf.ər.ənt/", meaning: "다른", level: "A2", speechLang: "en-US", tip: "Often pronounced as 2 syllables in fast speech: DIF-rent." },
+    { word: "Family", ipa: "/ˈfæm.ɪ.li/", meaning: "가족", level: "A2", speechLang: "en-US", tip: "Three syllables: FAM-ih-lee. Open 'a' like 'cat'." },
+    { word: "School", ipa: "/skuːl/", meaning: "학교", level: "A2", speechLang: "en-US", tip: "Long 'oo' sound. The 'sch' cluster blends smoothly." },
+    { word: "Music", ipa: "/ˈmjuː.zɪk/", meaning: "음악", level: "A2", speechLang: "en-US", tip: "The 'u' starts with a 'y' glide: MYOO-zik." },
+    { word: "Together", ipa: "/təˈɡɛð.ər/", meaning: "함께", level: "A2", speechLang: "en-US", tip: "Stress on second syllable. Voiced 'th' like 'this'." },
+    { word: "Remember", ipa: "/rɪˈmɛm.bər/", meaning: "기억하다", level: "A2", speechLang: "en-US", tip: "Stress on second syllable: re-MEM-ber." },
+    { word: "Interesting", ipa: "/ˈɪn.trɪ.stɪŋ/", meaning: "흥미로운", level: "A2", speechLang: "en-US", tip: "3 syllables in natural speech: IN-tre-sting." },
+    { word: "Possible", ipa: "/ˈpɒs.ɪ.bəl/", meaning: "가능한", level: "A2", speechLang: "en-US", tip: "Three syllables: POS-ih-bul. Schwa on the final syllable." },
+    // ── B1 Intermediate ──────────────────────────────────────────────────────
+    { word: "Thoroughly", ipa: "/ˈθʌr.ə.li/", meaning: "완전히", level: "B1", speechLang: "en-US", tip: "The 'th' needs tongue between teeth, not a 'd' or 't'." },
     { word: "Rural", ipa: "/ˈrʊr.əl/", meaning: "시골의", level: "B1", speechLang: "en-US", tip: "Two 'r' sounds in a row. Relax the tongue for both." },
+    { word: "Conversation", ipa: "/ˌkɒn.vəˈseɪ.ʃən/", meaning: "대화", level: "B1", speechLang: "en-US", tip: "Stress on the third syllable: con-ver-SAY-shun." },
+    { word: "Experience", ipa: "/ɪkˈspɪər.i.əns/", meaning: "경험", level: "B1", speechLang: "en-US", tip: "4 syllables: ex-PEER-ee-ence. The 'sp' cluster is key." },
+    { word: "Opportunity", ipa: "/ˌɒp.əˈtʃuː.nɪ.ti/", meaning: "기회", level: "B1", speechLang: "en-US", tip: "5 syllables. Stress on 'TU': op-er-TYU-ni-tee." },
+    { word: "Knowledge", ipa: "/ˈnɒl.ɪdʒ/", meaning: "지식", level: "B1", speechLang: "en-US", tip: "Silent 'k'. Two syllables: NOL-ij." },
+    { word: "Environment", ipa: "/ɪnˈvaɪ.rən.mənt/", meaning: "환경", level: "B1", speechLang: "en-US", tip: "Often said as 4 syllables: en-VY-ron-ment." },
+    { word: "Communicate", ipa: "/kəˈmjuː.nɪ.keɪt/", meaning: "소통하다", level: "B1", speechLang: "en-US", tip: "Stress on second syllable: com-MYU-ni-kate." },
+    { word: "Pronunciation", ipa: "/prəˌnʌn.siˈeɪ.ʃən/", meaning: "발음", level: "B1", speechLang: "en-US", tip: "5 syllables. Note: it's pro-NUN-ciation, not pro-NOUN-ciation." },
+    { word: "Particularly", ipa: "/pəˈtɪk.jʊ.lə.li/", meaning: "특히", level: "B1", speechLang: "en-US", tip: "5 syllables. Stress on second: par-TIC-you-lar-lee." },
+    { word: "Challenge", ipa: "/ˈtʃæl.ɪndʒ/", meaning: "도전", level: "B1", speechLang: "en-US", tip: "The 'ch' is like in 'church'. Two syllables: CHAL-inj." },
+    // ── B2 Upper Intermediate ─────────────────────────────────────────────────
+    { word: "Responsibility", ipa: "/rɪˌspɒn.sɪˈbɪl.ɪ.ti/", meaning: "책임감", level: "B2", speechLang: "en-US", tip: "6 syllables. Stress on 'BIL': re-spon-si-BIL-i-tee." },
+    { word: "Achievement", ipa: "/əˈtʃiːv.mənt/", meaning: "성취", level: "B2", speechLang: "en-US", tip: "3 syllables: a-CHEEV-ment. The 'ch' is like in 'cheese'." },
+    { word: "Independence", ipa: "/ˌɪn.dɪˈpɛn.dəns/", meaning: "독립", level: "B2", speechLang: "en-US", tip: "4 syllables. Stress on PEN: in-di-PEN-dence." },
+    { word: "Significant", ipa: "/sɪɡˈnɪf.ɪ.kənt/", meaning: "중요한", level: "B2", speechLang: "en-US", tip: "4 syllables. Stress on NIF: sig-NIF-i-cant." },
+    { word: "Sophisticated", ipa: "/səˈfɪs.tɪ.keɪ.tɪd/", meaning: "세련된", level: "B2", speechLang: "en-US", tip: "5 syllables. Stress on FIS: so-FIS-ti-kay-tid." },
+    { word: "Approximately", ipa: "/əˈprɒk.sɪ.mɪt.li/", meaning: "대략", level: "B2", speechLang: "en-US", tip: "5 syllables. Stress on PROX: a-PROX-i-mit-lee." },
+    { word: "Representative", ipa: "/ˌrɛp.rɪˈzɛn.tə.tɪv/", meaning: "대표자", level: "B2", speechLang: "en-US", tip: "5 syllables. Stress on ZEN: rep-ri-ZEN-ta-tiv." },
+    { word: "Occasionally", ipa: "/əˈkeɪ.ʒən.ə.li/", meaning: "가끔", level: "B2", speechLang: "en-US", tip: "5 syllables. The 'si' sounds like 'zh': a-KAY-zhun-a-lee." },
+    // ── C1 Advanced ───────────────────────────────────────────────────────────
     { word: "Entrepreneur", ipa: "/ˌɒn.trə.prəˈnɜːr/", meaning: "기업가", level: "C1", speechLang: "en-US", tip: "French origin. The stress is on the final syllable." },
+    { word: "Consequently", ipa: "/ˈkɒn.sɪ.kwənt.li/", meaning: "결과적으로", level: "C1", speechLang: "en-US", tip: "4 syllables. Stress on CON: CON-se-kwent-lee." },
+    { word: "Nevertheless", ipa: "/ˌnɛv.ə.ðəˈlɛs/", meaning: "그럼에도", level: "C1", speechLang: "en-US", tip: "4 syllables. Stress at the end: nev-er-the-LESS." },
+    { word: "Unprecedented", ipa: "/ʌnˈprɛs.ɪ.dɛn.tɪd/", meaning: "전례 없는", level: "C1", speechLang: "en-US", tip: "5 syllables. Stress on PRES: un-PRES-i-den-tid." },
+    { word: "Contemporary", ipa: "/kənˈtɛm.pə.rɛr.i/", meaning: "현대적인", level: "C1", speechLang: "en-US", tip: "5 syllables. Stress on TEM: con-TEM-po-rer-ee." },
+    // ── C2 Mastery ────────────────────────────────────────────────────────────
+    { word: "Worcestershire", ipa: "/ˈwʊs.tər.ʃɪər/", meaning: "우스터셔 (지명)", level: "C2", speechLang: "en-US", tip: "Only 3 syllables despite spelling: WOOS-ter-sheer." },
+    { word: "Conscientious", ipa: "/ˌkɒn.ʃiˈɛn.ʃəs/", meaning: "양심적인", level: "C2", speechLang: "en-US", tip: "4 syllables. Stress on EN: con-shee-EN-shus." },
+    { word: "Onomatopoeia", ipa: "/ˌɒn.ə.ˌmæt.əˈpiː.ə/", meaning: "의성어", level: "C2", speechLang: "en-US", tip: "6 syllables. Stress on PEE: on-o-mat-o-PEE-a." },
+    { word: "Epitome", ipa: "/ɪˈpɪt.ə.mi/", meaning: "전형", level: "C2", speechLang: "en-US", tip: "4 syllables — NOT 'epi-tome'. Stress on PIT: e-PIT-o-mee." },
+    { word: "Camaraderie", ipa: "/ˌkæm.əˈrɑː.də.ri/", meaning: "동료 의식", level: "C2", speechLang: "en-US", tip: "5 syllables. French origin. Stress on RAH: cam-a-RAH-de-ree." },
   ],
   spanish: [
+    // ── A1 Beginner ──────────────────────────────────────────────────────────
     { word: "Hola", ipa: "/ˈo.la/", meaning: "안녕하세요", level: "A1", speechLang: "es-ES", tip: "The 'h' is silent in Spanish." },
     { word: "Gracias", ipa: "/ˈɡɾa.sjas/", meaning: "감사합니다", level: "A1", speechLang: "es-ES", tip: "The 'r' is a single tap (ɾ), not a rolled 'rr'." },
     { word: "Perdón", ipa: "/peɾˈðon/", meaning: "죄송합니다", level: "A1", speechLang: "es-ES", tip: "The 'd' between vowels becomes a soft 'ð' sound." },
@@ -81,12 +132,47 @@ const PHRASE_SETS: Record<LangTab, Phrase[]> = {
     { word: "Ayuda", ipa: "/aˈju.ða/", meaning: "도움", level: "A1", speechLang: "es-ES", tip: "Three syllables: a-YU-da." },
     { word: "Buenos días", ipa: "/ˈbwe.nos ˈdi.as/", meaning: "좋은 아침이에요", level: "A1", speechLang: "es-ES", tip: "Link the words smoothly as one phrase." },
     { word: "¿Cómo estás?", ipa: "/ˈko.mo esˈtas/", meaning: "어떻게 지내세요?", level: "A1", speechLang: "es-ES", tip: "Stress on 'tás' — the accent tells you!" },
+    { word: "Nombre", ipa: "/ˈnom.bɾe/", meaning: "이름", level: "A1", speechLang: "es-ES", tip: "Two syllables: NOM-bre. Tap the 'r' lightly." },
+    { word: "Libro", ipa: "/ˈli.βɾo/", meaning: "책", level: "A1", speechLang: "es-ES", tip: "The 'b' between vowels softens to a gentle 'β' sound." },
+    { word: "Día", ipa: "/ˈdi.a/", meaning: "날", level: "A1", speechLang: "es-ES", tip: "Two syllables: DEE-a. The accent on 'i' keeps them separate." },
+    // ── A2 Elementary ────────────────────────────────────────────────────────
+    { word: "Viaje", ipa: "/ˈbja.xe/", meaning: "여행", level: "A2", speechLang: "es-ES", tip: "The 'j' sounds like a breathy 'kh'. BYAH-khe." },
+    { word: "Aeropuerto", ipa: "/ˌa.e.ɾoˈpweɾ.to/", meaning: "공항", level: "A2", speechLang: "es-ES", tip: "5 syllables. Stress on PWER: a-e-ro-PWER-to." },
+    { word: "Hotel", ipa: "/oˈtel/", meaning: "호텔", level: "A2", speechLang: "es-ES", tip: "Stress on second syllable: o-TEL. No 'h' sound." },
+    { word: "Restaurante", ipa: "/res.tawˈɾan.te/", meaning: "식당", level: "A2", speechLang: "es-ES", tip: "4 syllables. Stress on RAN: res-tau-RAN-te." },
+    { word: "Tiempo", ipa: "/ˈtjem.po/", meaning: "날씨 / 시간", level: "A2", speechLang: "es-ES", tip: "The 'ie' is a diphthong — TYEM-po." },
+    { word: "Importante", ipa: "/im.poɾˈtan.te/", meaning: "중요한", level: "A2", speechLang: "es-ES", tip: "4 syllables. Stress on TAN: im-por-TAN-te." },
+    { word: "Diferente", ipa: "/di.feˈɾen.te/", meaning: "다른", level: "A2", speechLang: "es-ES", tip: "4 syllables. Stress on REN: di-fe-REN-te." },
+    { word: "Familia", ipa: "/faˈmi.lja/", meaning: "가족", level: "A2", speechLang: "es-ES", tip: "3 syllables. The 'lia' ends with a palatal glide: fa-MI-lya." },
+    { word: "Escuela", ipa: "/esˈkwe.la/", meaning: "학교", level: "A2", speechLang: "es-ES", tip: "3 syllables. The 'ue' is a diphthong: es-KWEH-la." },
+    { word: "Música", ipa: "/ˈmu.si.ka/", meaning: "음악", level: "A2", speechLang: "es-ES", tip: "3 syllables. Stress on first: MU-si-ca (rare stressed ending)." },
+    { word: "Siempre", ipa: "/ˈsjem.pɾe/", meaning: "항상", level: "A2", speechLang: "es-ES", tip: "The 'ie' diphthong: SYEM-pre. Tap the 'r'." },
+    { word: "Nunca", ipa: "/ˈnuŋ.ka/", meaning: "절대", level: "A2", speechLang: "es-ES", tip: "Two syllables: NUNG-ka. The 'n' nasalizes before 'k'." },
+    // ── B1 Intermediate ──────────────────────────────────────────────────────
     { word: "Murciélago", ipa: "/muɾˈθje.la.ɣo/", meaning: "박쥐", level: "B1", speechLang: "es-ES", tip: "Contains all 5 vowels! The θ is a 'th' sound in Spain Spanish." },
     { word: "Desarrollar", ipa: "/de.za.ro.ˈʎaɾ/", meaning: "개발하다", level: "B1", speechLang: "es-ES", tip: "The 'll' sounds like 'y' in many dialects." },
+    { word: "Conversación", ipa: "/kom.beɾ.saˈθjon/", meaning: "대화", level: "B1", speechLang: "es-ES", tip: "4 syllables. Stress on CION: con-ver-sa-THYON." },
+    { word: "Experiencia", ipa: "/eks.peˈɾjen.θja/", meaning: "경험", level: "B1", speechLang: "es-ES", tip: "5 syllables. The 'rie' is a triphthong: eks-pe-RYEN-thya." },
+    { word: "Oportunidad", ipa: "/o.poɾ.tu.niˈðað/", meaning: "기회", level: "B1", speechLang: "es-ES", tip: "6 syllables. Stress on DAD. Final 'd' is very soft or silent." },
+    { word: "Conocimiento", ipa: "/ko.no.θiˈmjen.to/", meaning: "지식", level: "B1", speechLang: "es-ES", tip: "5 syllables. Stress on MIEN. The 'c' before 'i' = 'θ'." },
+    { word: "Pronunciación", ipa: "/pɾo.nun.θjaˈθjon/", meaning: "발음", level: "B1", speechLang: "es-ES", tip: "5 syllables. Two 'θ' sounds! pro-nun-thya-THYON." },
+    { word: "Desafío", ipa: "/de.saˈfi.o/", meaning: "도전", level: "B1", speechLang: "es-ES", tip: "4 syllables. Stress on FI: de-sa-FI-o. The accent keeps vowels separate." },
+    // ── B2 Upper Intermediate ─────────────────────────────────────────────────
     { word: "Ferrocarril", ipa: "/fe.ro.kaˈril/", meaning: "철도", level: "B2", speechLang: "es-ES", tip: "Two rolling 'rr' sounds. Practice the trill separately first." },
     { word: "Extraordinario", ipa: "/eks.tɾa.oɾ.ðiˈna.ɾjo/", meaning: "특별한", level: "B2", speechLang: "es-ES", tip: "7 syllables! Break it down slowly before building to full speed." },
+    { word: "Responsabilidad", ipa: "/res.pon.sa.βi.liˈðað/", meaning: "책임감", level: "B2", speechLang: "es-ES", tip: "6 syllables. Stress on DAD. The final 'd' softens almost to silence." },
+    { word: "Independencia", ipa: "/in.de.penˈden.θja/", meaning: "독립", level: "B2", speechLang: "es-ES", tip: "5 syllables. Stress on DEN: in-de-pen-DEN-thya." },
+    { word: "Significativo", ipa: "/siɣ.ni.fi.kaˈti.βo/", meaning: "중요한", level: "B2", speechLang: "es-ES", tip: "6 syllables. Stress on TI: sig-ni-fi-ca-TI-vo." },
+    // ── C1 Advanced ───────────────────────────────────────────────────────────
+    { word: "Consecuentemente", ipa: "/kon.se.kwen.teˈmen.te/", meaning: "결과적으로", level: "C1", speechLang: "es-ES", tip: "6 syllables. Stress on MEN: con-se-kwen-te-MEN-te." },
+    { word: "Indiscutiblemente", ipa: "/in.dis.ku.ti.βle.ˈmen.te/", meaning: "의심할 여지 없이", level: "C1", speechLang: "es-ES", tip: "7 syllables. The 'bl' cluster flows smoothly in Spanish." },
+    { word: "Contemporáneo", ipa: "/kon.tem.poˈɾa.ne.o/", meaning: "현대적인", level: "C1", speechLang: "es-ES", tip: "6 syllables. Stress on RA: con-tem-po-RA-ne-o." },
+    // ── C2 Mastery ────────────────────────────────────────────────────────────
+    { word: "Otorrinolaringólogo", ipa: "/o.to.ri.no.la.ɾiŋˈɡo.lo.ɣo/", meaning: "이비인후과 의사", level: "C2", speechLang: "es-ES", tip: "9 syllables! 'rr' and 'r' need careful distinction. Go slow first." },
+    { word: "Esternocleidomastoideo", ipa: "/es.ter.no.klei.ðo.mas.toiˈðe.o/", meaning: "흉쇄유돌근 (근육)", level: "C2", speechLang: "es-ES", tip: "10 syllables. A famous Spanish tongue twister word. Master it slowly." },
   ],
   korean: [
+    // ── A1 Beginner ──────────────────────────────────────────────────────────
     { word: "안녕하세요", ipa: "/an.njʌŋ.ha.se.jo/", meaning: "Hello (formal)", level: "A1", speechLang: "ko-KR", tip: "Rise slightly in pitch on the last syllable." },
     { word: "감사합니다", ipa: "/kam.sa.ham.ni.da/", meaning: "Thank you (formal)", level: "A1", speechLang: "ko-KR", tip: "Keep each syllable even. No stress accent like English." },
     { word: "죄송합니다", ipa: "/tɕø.soŋ.ham.ni.da/", meaning: "I'm sorry (formal)", level: "A1", speechLang: "ko-KR", tip: "The 죄 vowel is like a rounded 'e'. Lips forward." },
@@ -99,13 +185,46 @@ const PHRASE_SETS: Record<LangTab, Phrase[]> = {
     { word: "좋아요", ipa: "/tɕo.a.jo/", meaning: "Good / I like it", level: "A1", speechLang: "ko-KR", tip: "The 좋 + 아 merge: 조아요. The ㅎ is silent between vowels." },
     { word: "집", ipa: "/tɕip/", meaning: "Home / House", level: "A1", speechLang: "ko-KR", tip: "The final consonant ㅂ is unreleased at the end." },
     { word: "음식", ipa: "/ɯm.sik/", meaning: "Food", level: "A1", speechLang: "ko-KR", tip: "The ㅡ vowel is key: lips unrounded, back of mouth." },
+    { word: "반갑습니다", ipa: "/pan.gap.sɯm.ni.da/", meaning: "Nice to meet you", level: "A1", speechLang: "ko-KR", tip: "The 반 is lower in pitch, 갑 rises slightly." },
+    { word: "이름", ipa: "/i.ɾɯm/", meaning: "Name", level: "A1", speechLang: "ko-KR", tip: "The ㄹ between vowels is a flap — like a soft 'r'." },
+    { word: "책", ipa: "/tɕʰɛk/", meaning: "Book", level: "A1", speechLang: "ko-KR", tip: "Aspirated ㅊ (ch) — push air out firmly." },
+    { word: "날씨", ipa: "/nal.s͈i/", meaning: "Weather", level: "A1", speechLang: "ko-KR", tip: "The ㅆ is a tensed consonant — tense your throat slightly." },
+    // ── A2 Elementary ────────────────────────────────────────────────────────
     { word: "도와주세요", ipa: "/to.wa.dʑu.se.jo/", meaning: "Please help me", level: "A2", speechLang: "ko-KR", tip: "The 와 smoothly follows 도 — link them together." },
     { word: "사랑해요", ipa: "/sa.ɾaŋ.hɛ.jo/", meaning: "I love you", level: "A2", speechLang: "ko-KR", tip: "The ɾ is a flap — similar to the 'd' in 'ladder'." },
     { word: "맛있어요", ipa: "/ma.si.sʌ.jo/", meaning: "It's delicious", level: "A2", speechLang: "ko-KR", tip: "The ㅅ before a vowel becomes an 's' sound." },
     { word: "어디에 있어요?", ipa: "/ʌ.di.e i.sʌ.jo/", meaning: "Where is it?", level: "A2", speechLang: "ko-KR", tip: "The ʌ vowel is in the back of the mouth, not the front." },
-    { word: "반갑습니다", ipa: "/pan.gap.sɯm.ni.da/", meaning: "Nice to meet you", level: "A1", speechLang: "ko-KR", tip: "The 반 is lower in pitch, 갑 rises slightly." },
     { word: "얼마예요?", ipa: "/ʌl.ma.je.jo/", meaning: "How much is it?", level: "A2", speechLang: "ko-KR", tip: "Raise pitch at the end to signal a question." },
+    { word: "여행", ipa: "/jʌ.hɛŋ/", meaning: "Travel", level: "A2", speechLang: "ko-KR", tip: "The ㅇ before ㅎ links vowels: yuh-HENG." },
+    { word: "공항", ipa: "/koŋ.haŋ/", meaning: "Airport", level: "A2", speechLang: "ko-KR", tip: "Two syllables, both ending in ŋ: KONG-HANG." },
+    { word: "음악", ipa: "/ɯ.mak/", meaning: "Music", level: "A2", speechLang: "ko-KR", tip: "The ㄱ at the end is unreleased: uh-MAK." },
+    { word: "가족", ipa: "/ka.dʑok/", meaning: "Family", level: "A2", speechLang: "ko-KR", tip: "The ㅈ between vowels softens to dʑ." },
+    { word: "학교", ipa: "/hak.k͈jo/", meaning: "School", level: "A2", speechLang: "ko-KR", tip: "The ㄱ+ㄱ creates a tensed 'kk' sound: HAK-KKYO." },
+    { word: "같이", ipa: "/ka.tʰi/", meaning: "Together", level: "A2", speechLang: "ko-KR", tip: "The 같 + 이 liaison: the ㅌ shifts to the next syllable: GA-thi." },
+    { word: "기억하다", ipa: "/ki.ʌk.ha.da/", meaning: "To remember", level: "A2", speechLang: "ko-KR", tip: "The ㄱ+ㅎ liaison creates aspiration: ki-AK-ha-da." },
+    // ── B1 Intermediate ──────────────────────────────────────────────────────
     { word: "잘 부탁드립니다", ipa: "/tɕal pu.tʰak.tɯ.rim.ni.da/", meaning: "Please look after me", level: "B1", speechLang: "ko-KR", tip: "Common phrase when meeting someone new. Say it warmly." },
+    { word: "대화", ipa: "/tɛ.ɦwa/", meaning: "Conversation", level: "B1", speechLang: "ko-KR", tip: "The ㅎ weakens between vowels to a breathy 'ɦ': TEH-hwa." },
+    { word: "경험", ipa: "/kjʌŋ.hʌm/", meaning: "Experience", level: "B1", speechLang: "ko-KR", tip: "The ㄱ+ㅎ creates aspiration: KYUNG-hum." },
+    { word: "기회", ipa: "/ki.hwe/", meaning: "Opportunity", level: "B1", speechLang: "ko-KR", tip: "The ㅎ links smoothly: ki-HWE. Practice the 'wh' glide." },
+    { word: "지식", ipa: "/tɕi.sik/", meaning: "Knowledge", level: "B1", speechLang: "ko-KR", tip: "The ㅈ is palatalized before ㅣ: CHI-sik." },
+    { word: "환경", ipa: "/ɦwan.gjʌŋ/", meaning: "Environment", level: "B1", speechLang: "ko-KR", tip: "The 'hw' glide at the start is a rounded labial sound: HWAN-gyung." },
+    { word: "소통하다", ipa: "/so.tʰoŋ.ha.da/", meaning: "To communicate", level: "B1", speechLang: "ko-KR", tip: "4 syllables. The ㅎ in 하 links with ŋ: so-TONG-ha-da." },
+    { word: "발음", ipa: "/pa.ɾɯm/", meaning: "Pronunciation", level: "B1", speechLang: "ko-KR", tip: "The ㄹ flap links 발 to 음: PA-rum." },
+    { word: "도전하다", ipa: "/to.dʑʌn.ha.da/", meaning: "To challenge oneself", level: "B1", speechLang: "ko-KR", tip: "4 syllables. The ㅎ in 하 provides a breathy transition." },
+    // ── B2 Upper Intermediate ─────────────────────────────────────────────────
+    { word: "책임감", ipa: "/tɕʰɛ.gim.kam/", meaning: "Sense of responsibility", level: "B2", speechLang: "ko-KR", tip: "3 syllables. The ㄱ+ㅇ link creates voiced stop: CHEK-im-gam." },
+    { word: "독립심", ipa: "/toŋ.nip.sim/", meaning: "Independent spirit", level: "B2", speechLang: "ko-KR", tip: "3 syllables. ㄱ+ㄹ nasalizes: DONG-nip-sim." },
+    { word: "중요하다", ipa: "/tɕuŋ.jo.ha.da/", meaning: "To be important", level: "B2", speechLang: "ko-KR", tip: "4 syllables. The ㅇ+ㅎ liaison: JUNG-yo-ha-da." },
+    { word: "성취감", ipa: "/sʌŋ.tɕʰwi.gam/", meaning: "Sense of achievement", level: "B2", speechLang: "ko-KR", tip: "3 syllables. The ㅊ is aspirated: SUNG-chwi-gam." },
+    { word: "의사소통", ipa: "/ɯi.sa.so.tʰoŋ/", meaning: "Communication", level: "B2", speechLang: "ko-KR", tip: "4 syllables. The 의 vowel: lips spread, tongue back — ɯi." },
+    // ── C1 Advanced ───────────────────────────────────────────────────────────
+    { word: "그럼에도 불구하고", ipa: "/kɯ.ɾʌ.me.do pul.gu.ha.go/", meaning: "Nevertheless", level: "C1", speechLang: "ko-KR", tip: "8 syllables. Two phrases linked: GEU-rum-e-do BOUL-gu-ha-go." },
+    { word: "전례 없는", ipa: "/tɕʌl.lje ʌm.nɯn/", meaning: "Unprecedented", level: "C1", speechLang: "ko-KR", tip: "The 례+없 junction: LL liaison sounds like 녤: JULL-ye UMN-nun." },
+    { word: "현대적인", ipa: "/hjʌn.dɛ.dʑʌ.gin/", meaning: "Contemporary / Modern", level: "C1", speechLang: "ko-KR", tip: "4 syllables. ㄷ+ㅈ liaison: HYUN-deh-JUK-in." },
+    // ── C2 Mastery ────────────────────────────────────────────────────────────
+    { word: "국제화", ipa: "/kuk.tɕe.ɦwa/", meaning: "Internationalization", level: "C2", speechLang: "ko-KR", tip: "3 syllables but with complex liaisons: KUK-je-hwa." },
+    { word: "민주주의", ipa: "/min.dʑu.dʑu.ɯi/", meaning: "Democracy", level: "C2", speechLang: "ko-KR", tip: "4 syllables. Two ㅈ sounds: MIN-ju-ju-ui. The final 의 is subtle." },
   ],
 };
 
@@ -157,27 +276,69 @@ async function playPronunciationTTS(text: string, lang: string, apiBase: string)
   }
 }
 
-function buildSession(lang: LangTab, weakWords: string[], lastSeenWords: string[]): Phrase[] {
+const CEFR_ORDER: Phrase["level"][] = ["A1", "A2", "B1", "B2", "C1", "C2"];
+
+function xpToCefr(xp: number): Phrase["level"] {
+  if (xp < 101) return "A1";
+  if (xp < 301) return "A2";
+  if (xp < 601) return "B1";
+  if (xp < 1001) return "B2";
+  return "C1";
+}
+
+function buildSession(
+  lang: LangTab,
+  weakWords: string[],
+  lastSeenWords: string[],
+  userXp: number
+): Phrase[] {
   const all = PHRASE_SETS[lang];
   const weakSet = new Set(weakWords);
   const lastSet = new Set(lastSeenWords);
   const shuffle = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5);
-  const lastFirst = (arr: Phrase[]) => {
+
+  const freshFirst = (arr: Phrase[]) => {
     const notSeen = arr.filter((p) => !lastSet.has(p.word));
     const seen = arr.filter((p) => lastSet.has(p.word));
     return [...shuffle(notSeen), ...shuffle(seen)];
   };
-  const a1 = all.filter((p) => p.level === "A1" && !weakSet.has(p.word));
-  const a2 = all.filter((p) => p.level === "A2" && !weakSet.has(p.word));
-  const harder = all.filter((p) => !["A1", "A2"].includes(p.level) && !weakSet.has(p.word));
-  const weak = all.filter((p) => weakSet.has(p.word));
-  const pool = [...shuffle(weak).slice(0, 3), ...lastFirst(a1), ...lastFirst(a2), ...lastFirst(harder)];
+
+  const userCefr = xpToCefr(userXp);
+  const userIdx = CEFR_ORDER.indexOf(userCefr);
+  const reviewLevel = userIdx > 0 ? CEFR_ORDER[userIdx - 1] : null;
+
+  const weakPool = shuffle(all.filter((p) => weakSet.has(p.word)));
+  const primaryPool = freshFirst(all.filter((p) => p.level === userCefr && !weakSet.has(p.word)));
+  const reviewPool = reviewLevel
+    ? freshFirst(all.filter((p) => p.level === reviewLevel && !weakSet.has(p.word)))
+    : [];
+
+  const weakSlots = Math.min(weakPool.length, 2);
+  const remaining = SESSION_SIZE - weakSlots;
+  const reviewSlots = Math.min(reviewPool.length, Math.max(1, Math.round(remaining * 0.2)));
+  const primarySlots = remaining - reviewSlots;
+
+  const pool = [
+    ...weakPool.slice(0, weakSlots),
+    ...primaryPool.slice(0, primarySlots),
+    ...reviewPool.slice(0, reviewSlots),
+  ];
+
   const seenSet = new Set<string>();
   const unique: Phrase[] = [];
-  for (const p of pool) {
+  for (const p of shuffle(pool)) {
     if (!seenSet.has(p.word)) { seenSet.add(p.word); unique.push(p); }
     if (unique.length >= SESSION_SIZE) break;
   }
+
+  if (unique.length < SESSION_SIZE) {
+    const fallback = freshFirst(all.filter((p) => !weakSet.has(p.word) && !seenSet.has(p.word)));
+    for (const p of fallback) {
+      if (!seenSet.has(p.word)) { seenSet.add(p.word); unique.push(p); }
+      if (unique.length >= SESSION_SIZE) break;
+    }
+  }
+
   return unique;
 }
 
@@ -244,7 +405,7 @@ export default function SpeakScreen() {
       const weak: string[] = weakRaw ? JSON.parse(weakRaw) : [];
       const last: string[] = lastRaw ? JSON.parse(lastRaw) : [];
       setWeakWords(weak);
-      const session = buildSession(lang, weak, last);
+      const session = buildSession(lang, weak, last, statsRef.current.xp);
       setSessionWords(session);
       setSessionIdx(0);
       setSessionComplete(false);
