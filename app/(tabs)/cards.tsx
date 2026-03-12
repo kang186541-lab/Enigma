@@ -1,4 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useFocusEffect } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
   Text,
@@ -948,6 +950,23 @@ async function speakWord(word: string, lang: string) {
   } catch {}
 }
 
+const DAILY_GOAL = 10;
+
+function getTodayKey() {
+  return `cards_daily_${new Date().toISOString().slice(0, 10)}`;
+}
+
+function pickSessionCards(allCards: FlashCard[], count: number, lastSeenWords: string[]): FlashCard[] {
+  if (allCards.length === 0) return [];
+  const lastSet = new Set(lastSeenWords);
+  const fresh = allCards.filter((c) => !lastSet.has(c.word));
+  const recent = allCards.filter((c) => lastSet.has(c.word));
+  const shuffleFresh = [...fresh].sort(() => Math.random() - 0.5);
+  const shuffleRecent = [...recent].sort(() => Math.random() - 0.5);
+  const merged = [...shuffleFresh, ...shuffleRecent];
+  return merged.slice(0, Math.min(count, merged.length));
+}
+
 type DeckType = "beginner" | "advanced";
 
 export default function CardsScreen() {
@@ -958,11 +977,13 @@ export default function CardsScreen() {
   const lang: NativeLanguage = learningLanguage ?? getDefaultLearning(nativeLang as NativeLanguage);
 
   const [deckType, setDeckType] = useState<DeckType>("beginner");
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [sessionCards, setSessionCards] = useState<FlashCard[]>([]);
+  const [sessionIndex, setSessionIndex] = useState(0);
+  const [dailyCount, setDailyCount] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [gotIt, setGotIt] = useState(0);
   const [again, setAgain] = useState(0);
-  const [completed, setCompleted] = useState(false);
+  const [dailyComplete, setDailyComplete] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [xpGain, setXpGain] = useState(0);
   const statsRef = useRef(stats);
@@ -972,9 +993,40 @@ export default function CardsScreen() {
   const slideAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  const cards = deckType === "beginner" ? BEGINNER_CARDS_BY_LANG[lang] : ADVANCED_CARDS[lang];
-  const card = cards[currentIndex];
-  const progress = cards.length > 0 ? (currentIndex / cards.length) * 100 : 0;
+  const allCards = deckType === "beginner" ? BEGINNER_CARDS_BY_LANG[lang] : ADVANCED_CARDS[lang];
+  const card = sessionCards[sessionIndex] ?? sessionCards[0];
+  const dailyProgress = Math.min(dailyCount, DAILY_GOAL);
+  const progressPct = (dailyProgress / DAILY_GOAL) * 100;
+
+  const loadSession = useCallback(async () => {
+    try {
+      const todayKey = getTodayKey();
+      const raw = await AsyncStorage.getItem(todayKey);
+      const saved = raw ? JSON.parse(raw) : { count: 0 };
+      const count: number = saved.count ?? 0;
+      setDailyCount(count);
+      setDailyComplete(count >= DAILY_GOAL);
+
+      const lastSeenRaw = await AsyncStorage.getItem("cards_last_seen_words");
+      const lastSeen: string[] = lastSeenRaw ? JSON.parse(lastSeenRaw) : [];
+      const picked = pickSessionCards(allCards, DAILY_GOAL, lastSeen);
+      setSessionCards(picked);
+      setSessionIndex(0);
+      setIsFlipped(false);
+      setGotIt(0);
+      setAgain(0);
+      flipAnim.setValue(0);
+      slideAnim.setValue(0);
+    } catch {}
+  }, [deckType, lang]);
+
+  useFocusEffect(useCallback(() => {
+    loadSession();
+  }, [loadSession]));
+
+  useEffect(() => {
+    loadSession();
+  }, [deckType, lang]);
 
   const frontRotate = flipAnim.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "180deg"] });
   const backRotate = flipAnim.interpolate({ inputRange: [0, 1], outputRange: ["180deg", "360deg"] });
@@ -985,23 +1037,25 @@ export default function CardsScreen() {
     if (type === deckType) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setDeckType(type);
-    resetState();
   };
 
   const resetState = () => {
-    setCurrentIndex(0);
+    setSessionIndex(0);
     setIsFlipped(false);
     setGotIt(0);
     setAgain(0);
-    setCompleted(false);
+    setDailyCount(0);
+    setDailyComplete(false);
+    AsyncStorage.removeItem(getTodayKey()).catch(() => {});
     Animated.parallel([
       Animated.timing(flipAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
     ]).start();
+    loadSession();
   };
 
   const handleFlip = () => {
-    if (completed) return;
+    if (dailyComplete) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const toValue = isFlipped ? 0 : 1;
 
@@ -1033,15 +1087,28 @@ export default function CardsScreen() {
       setAgain((a) => a + 1);
     }
 
+    const newCount = dailyCount + 1;
+    setDailyCount(newCount);
+    const todayKey = getTodayKey();
+    AsyncStorage.setItem(todayKey, JSON.stringify({ count: newCount })).catch(() => {});
+
+    const currentWords = sessionCards.map((c) => c.word);
+    AsyncStorage.setItem("cards_last_seen_words", JSON.stringify(currentWords)).catch(() => {});
+
     Animated.timing(slideAnim, { toValue: knew ? -width : width, duration: 230, useNativeDriver: true }).start(() => {
       slideAnim.setValue(knew ? width : -width);
       flipAnim.setValue(0);
       setIsFlipped(false);
-      if (currentIndex + 1 >= cards.length) {
-        setCompleted(true);
+      if (newCount >= DAILY_GOAL) {
+        setDailyComplete(true);
+        slideAnim.setValue(0);
+      } else if (sessionIndex + 1 >= sessionCards.length) {
+        const nextPicked = pickSessionCards(allCards, DAILY_GOAL, currentWords);
+        setSessionCards(nextPicked);
+        setSessionIndex(0);
         slideAnim.setValue(0);
       } else {
-        setCurrentIndex((i) => i + 1);
+        setSessionIndex((i) => i + 1);
         Animated.spring(slideAnim, { toValue: 0, useNativeDriver: true, tension: 70, friction: 10 }).start();
       }
     });
@@ -1079,24 +1146,26 @@ export default function CardsScreen() {
           </Pressable>
         </View>
 
-        {!completed && (
+        {!dailyComplete && (
           <View style={styles.progressRow}>
             <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: `${progress}%` }]} />
+              <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
             </View>
-            <Text style={styles.progressLabel}>{currentIndex + 1}/{cards.length}</Text>
+            <Text style={styles.progressLabel}>{dailyProgress} / {DAILY_GOAL}</Text>
           </View>
         )}
       </View>
 
-      {completed ? (
+      {dailyComplete ? (
         <ScrollView
           contentContainerStyle={styles.completedContainer}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.completedEmoji}>🎉</Text>
-          <Text style={styles.completedTitle}>{t("well_done")}</Text>
-          <Text style={styles.completedSub}>You finished the {deckType} deck!</Text>
+          <Text style={styles.completedEmoji}>🏆</Text>
+          <Text style={styles.completedTitle}>Daily Goal Complete!</Text>
+          <Text style={styles.completedSub}>
+            You've reviewed {DAILY_GOAL} cards today.{"\n"}Come back tomorrow for new words!
+          </Text>
           <View style={styles.scoreRow}>
             <View style={[styles.scoreCard, { backgroundColor: "rgba(90,153,90,0.15)" }]}>
               <Text style={styles.scoreEmoji}>✅</Text>
@@ -1114,7 +1183,7 @@ export default function CardsScreen() {
             onPress={resetState}
           >
             <Ionicons name="refresh" size={18} color={C.bg1} />
-            <Text style={styles.resetBtnText}>{t("try_again")}</Text>
+            <Text style={styles.resetBtnText}>Practice More</Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [styles.switchBtn, pressed && { opacity: 0.85 }]}
