@@ -106,7 +106,7 @@ function getStreakText(streak: number, lang: NativeLanguage): string {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { t, stats, nativeLanguage, pendingLevelUp, clearLevelUp } = useLanguage();
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
+  const topPad = Platform.OS === "web" ? 20 : insets.top;
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
   const lingoGreeting = getLingoGreeting(nativeLang);
   const lingoMood = stats.streak === 0 ? "sad" : stats.streak >= 7 ? "excited" : "happy";
@@ -352,6 +352,8 @@ const styles = StyleSheet.create({
     height: 120,
     marginLeft: 8,
     marginTop: -8,
+    backgroundColor: "transparent",
+    ...(Platform.OS === "web" ? { mixBlendMode: "multiply" } as any : {}),
   },
   levelRow: { marginBottom: 10 },
   levelBadge: {
@@ -369,7 +371,7 @@ const styles = StyleSheet.create({
   xpLabel: { fontSize: 11, fontFamily: "Inter_500Medium", color: "rgba(255,255,255,0.85)" },
 
   /* ─ SHARED ─ */
-  pad: { paddingHorizontal: 16, marginTop: 16 },
+  pad: { paddingHorizontal: 16, marginTop: 12 },
   sectionTitle: { fontSize: 18, fontFamily: "Inter_700Bold", color: "#1A1A2E", marginBottom: 12 },
 
   /* ─ STREAK CARD ─ */
