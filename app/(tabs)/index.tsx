@@ -116,10 +116,30 @@ export default function HomeScreen() {
   const xpInLvl  = stats.xp - level.minXP;
   const xpForLvl = level.num < 5 ? level.maxXP - level.minXP : 1;
 
-  const xpAnim = useRef(new Animated.Value(progress)).current;
+  const xpAnim   = useRef(new Animated.Value(progress)).current;
+  const fireScale = useRef(new Animated.Value(1)).current;
+  const fireGlow  = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     Animated.spring(xpAnim, { toValue: progress, useNativeDriver: false, tension: 40, friction: 8 }).start();
   }, [stats.xp]);
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(fireScale, { toValue: 1.14, duration: 600, useNativeDriver: true }),
+          Animated.timing(fireGlow,  { toValue: 1,    duration: 600, useNativeDriver: false }),
+        ]),
+        Animated.parallel([
+          Animated.timing(fireScale, { toValue: 1,    duration: 600, useNativeDriver: true }),
+          Animated.timing(fireGlow,  { toValue: 0,    duration: 600, useNativeDriver: false }),
+        ]),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, []);
 
   const barW = xpAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] });
 
@@ -197,12 +217,26 @@ export default function HomeScreen() {
           <View style={styles.streakHeader}>
             <View style={styles.streakLeft}>
               <LingoMascot size={70} mood={lingoMood} />
-              <View>
-                <Text style={styles.streakCount}>{stats.streak}</Text>
+              <Animated.View style={{ transform: [{ scale: fireScale }] }}>
+                <Animated.Text
+                  style={[
+                    styles.streakCount,
+                    {
+                      textShadowColor: fireGlow.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["rgba(255,107,53,0)", "rgba(255,107,53,0.7)"],
+                      }),
+                      textShadowOffset: { width: 0, height: 0 },
+                      textShadowRadius: 10,
+                    },
+                  ]}
+                >
+                  {stats.streak}
+                </Animated.Text>
                 <Text style={styles.streakLabel}>
                   {nativeLang === "korean" ? "일 연속 학습" : nativeLang === "spanish" ? "días seguidos" : "day streak"}
                 </Text>
-              </View>
+              </Animated.View>
             </View>
             <View style={styles.streakBadge}>
               <Ionicons name="trophy" size={14} color="#FF6B35" />

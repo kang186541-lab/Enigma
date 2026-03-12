@@ -17,6 +17,7 @@ import * as Speech from "expo-speech";
 import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
+import { RippleButton } from "@/components/RippleButton";
 
 const { width } = Dimensions.get("window");
 
@@ -732,7 +733,7 @@ export default function CardsScreen() {
                   style={[
                     styles.card,
                     styles.cardFront,
-                    { transform: [{ rotateY: frontRotate }], opacity: frontOpacity },
+                    { transform: [{ perspective: 1200 }, { rotateY: frontRotate }], opacity: frontOpacity },
                   ]}
                 >
                   <LinearGradient
@@ -774,7 +775,7 @@ export default function CardsScreen() {
                   style={[
                     styles.card,
                     styles.cardBack,
-                    { transform: [{ rotateY: backRotate }], opacity: backOpacity },
+                    { transform: [{ perspective: 1200 }, { rotateY: backRotate }], opacity: backOpacity },
                   ]}
                 >
                   <LinearGradient
@@ -820,28 +821,26 @@ export default function CardsScreen() {
 
           {isFlipped ? (
             <View style={styles.actionRow}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.actionBtn,
-                  styles.againBtn,
-                  pressed && { opacity: 0.85, transform: [{ scale: 0.96 }] },
-                ]}
+              <RippleButton
+                style={[styles.actionBtn, styles.againBtn]}
                 onPress={() => advanceCard(false)}
+                rippleColor="rgba(255,152,0,0.35)"
               >
-                <Text style={styles.againBtnEmoji}>😅</Text>
-                <Text style={[styles.actionLabel, { color: "#FF9800" }]}>Again</Text>
-              </Pressable>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.actionBtn,
-                  styles.gotItBtn,
-                  pressed && { opacity: 0.85, transform: [{ scale: 0.96 }] },
-                ]}
+                <View style={styles.actionBtnInner}>
+                  <Text style={styles.againBtnEmoji}>😅</Text>
+                  <Text style={[styles.actionLabel, { color: "#FF9800" }]}>Again</Text>
+                </View>
+              </RippleButton>
+              <RippleButton
+                style={[styles.actionBtn, styles.gotItBtn]}
                 onPress={() => advanceCard(true)}
+                rippleColor="rgba(76,175,80,0.35)"
               >
-                <Text style={styles.gotItBtnEmoji}>✅</Text>
-                <Text style={[styles.actionLabel, { color: "#4CAF50" }]}>Got it!</Text>
-              </Pressable>
+                <View style={styles.actionBtnInner}>
+                  <Text style={styles.gotItBtnEmoji}>✅</Text>
+                  <Text style={[styles.actionLabel, { color: "#4CAF50" }]}>Got it!</Text>
+                </View>
+              </RippleButton>
             </View>
           ) : (
             <View style={styles.flipPromptRow}>
@@ -1129,12 +1128,15 @@ const styles = StyleSheet.create({
   },
   actionBtn: {
     flex: 1,
+    borderRadius: 22,
+    overflow: "hidden",
+  },
+  actionBtnInner: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
     paddingVertical: 18,
-    borderRadius: 22,
   },
   againBtn: {
     backgroundColor: "#FFF3E0",
