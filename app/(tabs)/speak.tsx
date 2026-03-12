@@ -277,20 +277,31 @@ async function playPronunciationTTS(text: string, lang: string, apiBase: string)
 }
 
 const CEFR_ORDER: Phrase["level"][] = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const PRON_LEVELS: Phrase["level"][] = ["A1", "A2", "B1", "B2"];
+const PRON_LEVEL_THRESHOLDS = [0, 30, 60, 90]; // assessments needed to reach each level
 
-function xpToCefr(xp: number): Phrase["level"] {
-  if (xp < 101) return "A1";
-  if (xp < 301) return "A2";
-  if (xp < 601) return "B1";
-  if (xp < 1001) return "B2";
-  return "C1";
+function countToPronLevel(count: number): Phrase["level"] {
+  if (count >= 90) return "B2";
+  if (count >= 60) return "B1";
+  if (count >= 30) return "A2";
+  return "A1";
+}
+
+function pronLevelProgress(count: number): { current: Phrase["level"]; next: Phrase["level"] | null; done: number; total: number } {
+  const current = countToPronLevel(count);
+  const idx = PRON_LEVELS.indexOf(current);
+  if (idx >= PRON_LEVELS.length - 1) return { current, next: null, done: count - 90, total: 0 };
+  const baseCount = PRON_LEVEL_THRESHOLDS[idx];
+  const nextCount = PRON_LEVEL_THRESHOLDS[idx + 1];
+  return { current, next: PRON_LEVELS[idx + 1], done: count - baseCount, total: nextCount - baseCount };
 }
 
 function buildSession(
   lang: LangTab,
   weakWords: string[],
   lastSeenWords: string[],
-  userXp: number
+  pronLevel: Phrase["level"],
+  lastWord?: string
 ): Phrase[] {
   const all = PHRASE_SETS[lang];
   const weakSet = new Set(weakWords);
@@ -303,7 +314,8 @@ function buildSession(
     return [...shuffle(notSeen), ...shuffle(seen)];
   };
 
-  const userCefr = xpToCefr(userXp);
+  // Cap pronunciation level at B2 for word selection
+  const userCefr: Phrase["level"] = PRON_LEVELS.includes(pronLevel) ? pronLevel : "B2";
   const userIdx = CEFR_ORDER.indexOf(userCefr);
   const reviewLevel = userIdx > 0 ? CEFR_ORDER[userIdx - 1] : null;
 
@@ -332,11 +344,22 @@ function buildSession(
   }
 
   if (unique.length < SESSION_SIZE) {
-    const fallback = freshFirst(all.filter((p) => !weakSet.has(p.word) && !seenSet.has(p.word)));
+    // Fallback: only use words at or below the current pronunciation level
+    const allowedLevels = PRON_LEVELS.slice(0, PRON_LEVELS.indexOf(userCefr) + 1);
+    const fallback = freshFirst(all.filter((p) =>
+      allowedLevels.includes(p.level as Phrase["level"]) && !weakSet.has(p.word) && !seenSet.has(p.word)
+    ));
     for (const p of fallback) {
       if (!seenSet.has(p.word)) { seenSet.add(p.word); unique.push(p); }
       if (unique.length >= SESSION_SIZE) break;
     }
+  }
+
+  // Anti-repetition: if the first word equals the last practiced word, rotate it to second position
+  if (lastWord && unique.length > 1 && unique[0].word === lastWord) {
+    const [first, ...rest] = unique;
+    unique.length = 0;
+    unique.push(...rest, first);
   }
 
   return unique;
@@ -362,6 +385,13 @@ export default function SpeakScreen() {
     if (ll && ll !== nativeLang) return ll;
     return (visibleTabs[0]?.key ?? "english") as LangTab;
   });
+
+  const [pronLevel, setPronLevel] = useState<Phrase["level"]>("A1");
+  const [pronCount, setPronCount] = useState(0);
+  const [levelUpShow, setLevelUpShow] = useState(false);
+  const [levelUpNewLevel, setLevelUpNewLevel] = useState<Phrase["level"]>("A2");
+  const pronLevelRef = useRef<Phrase["level"]>("A1");
+  const pronCountRef = useRef(0);
 
   const [sessionWords, setSessionWords] = useState<Phrase[]>([]);
   const [sessionIdx, setSessionIdx] = useState(0);
@@ -411,14 +441,23 @@ export default function SpeakScreen() {
 
   const loadSession = useCallback(async (lang: LangTab) => {
     try {
-      const [weakRaw, lastRaw] = await Promise.all([
+      const [weakRaw, lastRaw, countRaw, lastWordRaw] = await Promise.all([
         AsyncStorage.getItem(`speak_weak_words_${lang}`),
         AsyncStorage.getItem(`speak_last_seen_${lang}`),
+        AsyncStorage.getItem(`pron_count_${lang}`),
+        AsyncStorage.getItem(`pron_last_word_${lang}`),
       ]);
       const weak: string[] = weakRaw ? JSON.parse(weakRaw) : [];
       const last: string[] = lastRaw ? JSON.parse(lastRaw) : [];
+      const count = countRaw ? parseInt(countRaw, 10) : 0;
+      const lastWord: string | undefined = lastWordRaw ?? undefined;
+      const level = countToPronLevel(count);
       setWeakWords(weak);
-      const session = buildSession(lang, weak, last, statsRef.current.xp);
+      setPronCount(count);
+      setPronLevel(level);
+      pronLevelRef.current = level;
+      pronCountRef.current = count;
+      const session = buildSession(lang, weak, last, level, lastWord);
       setSessionWords(session);
       setSessionIdx(0);
       setSessionComplete(false);
@@ -578,6 +617,20 @@ export default function SpeakScreen() {
           const xpEarned = scoreVal >= 90 ? 30 : 15;
           setXpGain(xpEarned);
           updateStats({ xp: statsRef.current.xp + xpEarned });
+
+          // Pronunciation level progression
+          const newCount = pronCountRef.current + 1;
+          pronCountRef.current = newCount;
+          setPronCount(newCount);
+          await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch(() => {});
+          await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase.word).catch(() => {});
+          const newLevel = countToPronLevel(newCount);
+          if (newLevel !== pronLevelRef.current) {
+            pronLevelRef.current = newLevel;
+            setPronLevel(newLevel);
+            setLevelUpNewLevel(newLevel);
+            setLevelUpShow(true);
+          }
         } catch {
           setSttError("채점 중 오류가 발생했습니다. 다시 시도해 주세요.");
         } finally {
@@ -648,6 +701,21 @@ export default function SpeakScreen() {
           <Text style={styles.completeTrophy}>🏆</Text>
           <Text style={styles.completeTitle}>Pronunciation Practice{"\n"}Complete!</Text>
           <Text style={styles.completeSub}>You practiced {sessionWords.length} words this session.</Text>
+          {(() => {
+            const prog = pronLevelProgress(pronCount);
+            return (
+              <View style={styles.pronLevelRow}>
+                <View style={styles.pronLevelBadge}>
+                  <Text style={styles.pronLevelBadgeText}>{prog.current}</Text>
+                </View>
+                {prog.next ? (
+                  <Text style={styles.pronLevelHint}>{prog.done}/{prog.total} practices to {prog.next}</Text>
+                ) : (
+                  <Text style={styles.pronLevelHint}>Max Level Reached 🏆</Text>
+                )}
+              </View>
+            );
+          })()}
           {weakWords.length > 0 && (
             <View style={styles.weakBox}>
               <View style={styles.weakBoxHeader}>
@@ -690,12 +758,48 @@ export default function SpeakScreen() {
 
       <View style={[styles.screen, { paddingBottom: TAB_BAR_HEIGHT + bottomPad }]}>
 
+        {/* ── LEVEL UP OVERLAY ─────────────────────────────────────────────── */}
+        {levelUpShow && (
+          <Pressable
+            style={styles.levelUpOverlay}
+            onPress={() => setLevelUpShow(false)}
+          >
+            <View style={styles.levelUpCard}>
+              <Text style={styles.levelUpEmoji}>🎉</Text>
+              <Text style={styles.levelUpTitle}>Level Up!</Text>
+              <Text style={styles.levelUpSub}>You've reached</Text>
+              <View style={styles.levelUpBadge}>
+                <Text style={styles.levelUpBadgeText}>{levelUpNewLevel}</Text>
+              </View>
+              <Text style={styles.levelUpHint}>Harder words unlocked!</Text>
+              <Text style={styles.levelUpDismiss}>Tap to continue</Text>
+            </View>
+          </Pressable>
+        )}
+
         {/* ── SECTION 1: HEADER (15%) ─────────────────────────────────────── */}
         <View style={styles.headerSection}>
           <View style={styles.headerTop}>
             <View style={styles.headerText}>
               <Text style={styles.title}>{t("speak_title")}</Text>
-              <Text style={styles.subtitle}>Tap the mic and say the word</Text>
+              {/* Pronunciation level row */}
+              {(() => {
+                const prog = pronLevelProgress(pronCount);
+                return (
+                  <View style={styles.pronLevelRow}>
+                    <View style={styles.pronLevelBadge}>
+                      <Text style={styles.pronLevelBadgeText}>{prog.current}</Text>
+                    </View>
+                    {prog.next ? (
+                      <Text style={styles.pronLevelHint}>
+                        {prog.done}/{prog.total} → {prog.next}
+                      </Text>
+                    ) : (
+                      <Text style={styles.pronLevelHint}>Max Level 🏆</Text>
+                    )}
+                  </View>
+                );
+              })()}
             </View>
 
             {visibleTabs.length > 1 && (
@@ -720,7 +824,7 @@ export default function SpeakScreen() {
             )}
           </View>
 
-          {/* Progress bar */}
+          {/* Session progress bar */}
           <View style={styles.progressRow}>
             <View style={styles.progressTrack}>
               <View style={[styles.progressFill, { width: `${progressPct}%`, backgroundColor: tabInfo.color }]} />
@@ -1175,4 +1279,41 @@ const styles = StyleSheet.create({
     borderRadius: 18, overflow: "hidden",
   },
   newSessionBtnText: { fontSize: 15, fontFamily: F.header, color: C.bg1, letterSpacing: 1 },
+
+  // ── Pronunciation level indicator ────────────────────────────────────────
+  pronLevelRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2 },
+  pronLevelBadge: {
+    backgroundColor: "rgba(201,162,39,0.18)", borderRadius: 8,
+    paddingHorizontal: 7, paddingVertical: 2,
+    borderWidth: 1, borderColor: "rgba(201,162,39,0.4)",
+  },
+  pronLevelBadgeText: { fontSize: 11, fontFamily: F.header, color: C.gold, letterSpacing: 0.5 },
+  pronLevelHint: { fontSize: 11, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
+
+  // ── Level-up overlay ────────────────────────────────────────────────────
+  levelUpOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(26,10,5,0.88)",
+    zIndex: 999,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  levelUpCard: {
+    backgroundColor: C.bg2, borderRadius: 28,
+    padding: 32, alignItems: "center", gap: 12,
+    borderWidth: 1.5, borderColor: C.gold,
+    shadowColor: C.gold, shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35, shadowRadius: 24, elevation: 16,
+    minWidth: 260,
+  },
+  levelUpEmoji: { fontSize: 48, textAlign: "center" },
+  levelUpTitle: { fontSize: 28, fontFamily: F.title, color: C.gold, letterSpacing: 2 },
+  levelUpSub: { fontSize: 14, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
+  levelUpBadge: {
+    backgroundColor: C.gold, borderRadius: 14,
+    paddingHorizontal: 22, paddingVertical: 8, marginVertical: 4,
+  },
+  levelUpBadgeText: { fontSize: 24, fontFamily: F.header, color: C.bg1, letterSpacing: 2 },
+  levelUpHint: { fontSize: 13, fontFamily: F.bodySemi, color: C.parchment },
+  levelUpDismiss: { fontSize: 11, fontFamily: F.body, color: C.goldDim, fontStyle: "italic", marginTop: 4 },
 });
