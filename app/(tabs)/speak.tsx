@@ -209,15 +209,10 @@ export default function SpeakScreen() {
 
   const [recordState, setRecordState] = useState<RecordState>("idle");
   const [score, setScore] = useState<number | null>(null);
-  const [accuracyScore, setAccuracyScore] = useState<number | null>(null);
-  const [fluencyScore, setFluencyScore] = useState<number | null>(null);
-  const [completenessScore, setCompletenessScore] = useState<number | null>(null);
-  const [wordResults, setWordResults] = useState<{ word: string; score: number; errorType: string }[]>([]);
   const [gptFeedback, setGptFeedback] = useState("");
   const [recognizedText, setRecognizedText] = useState("");
   const [sttError, setSttError] = useState("");
   const [hasListened, setHasListened] = useState(false);
-  const [countdown, setCountdown] = useState(0);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const scoreAnim = useRef(new Animated.Value(0)).current;
@@ -231,15 +226,10 @@ export default function SpeakScreen() {
     setRecordState("idle");
     recordStateRef.current = "idle";
     setScore(null);
-    setAccuracyScore(null);
-    setFluencyScore(null);
-    setCompletenessScore(null);
-    setWordResults([]);
     setGptFeedback("");
     setRecognizedText("");
     setSttError("");
     setHasListened(false);
-    setCountdown(0);
     pulseLoop.current?.stop();
     Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
     scoreAnim.setValue(0);
@@ -325,7 +315,7 @@ export default function SpeakScreen() {
     Animated.timing(pulseAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
   };
 
-  const handleRecord = async () => {
+  const handleRecord = () => {
     if (!phrase || recordState === "listening" || recordState === "processing") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
@@ -336,96 +326,54 @@ export default function SpeakScreen() {
       return;
     }
 
-    let stream: MediaStream;
-    try {
-      stream = await (navigator as any).mediaDevices.getUserMedia({ audio: true });
-    } catch {
-      setSttError("마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)");
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setSttError("이 브라우저는 음성 인식을 지원하지 않습니다.\nChrome을 사용해 주세요.");
       setRecordState("done");
       recordStateRef.current = "done";
       return;
     }
 
-    const chunks: Blob[] = [];
-    const recorder = new (window as any).MediaRecorder(stream) as {
-      mimeType: string;
-      start: () => void;
-      stop: () => void;
-      ondataavailable: ((e: any) => void) | null;
-      onstop: (() => void) | null;
-    };
-
-    recorder.ondataavailable = (e: any) => { if (e.data?.size > 0) chunks.push(e.data); };
+    const recognition = new SpeechRecognition();
+    recognition.lang = phrase.speechLang;
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
     setRecordState("listening");
     recordStateRef.current = "listening";
     setScore(null);
-    setAccuracyScore(null);
-    setFluencyScore(null);
-    setCompletenessScore(null);
-    setWordResults([]);
     setGptFeedback("");
     setRecognizedText("");
     setSttError("");
-    setCountdown(4);
     startPulse();
-    recorder.start();
 
-    const countInterval = setInterval(() => {
-      setCountdown((c) => (c <= 1 ? (clearInterval(countInterval), 0) : c - 1));
-    }, 1000);
+    let resultReceived = false;
 
-    const stopTimeout = setTimeout(() => {
-      clearInterval(countInterval);
-      recorder.stop();
-    }, 4000);
-
-    recorder.onstop = async () => {
-      clearTimeout(stopTimeout);
-      clearInterval(countInterval);
+    recognition.onresult = async (event: any) => {
+      resultReceived = true;
       stopPulse();
-      (stream as any).getTracks().forEach((t: any) => t.stop());
       setRecordState("processing");
       recordStateRef.current = "processing";
-      setCountdown(0);
+      const transcript: string = event.results[0][0].transcript;
+      setRecognizedText(transcript);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
       try {
-        const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
-        const arrayBuffer = await blob.arrayBuffer();
-        const uint8 = new Uint8Array(arrayBuffer);
-        let binary = "";
-        for (let i = 0; i < uint8.length; i++) binary += String.fromCharCode(uint8[i]);
-        const base64 = btoa(binary);
-
-        const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+        const apiUrl = new URL("/api/gpt-score", getApiUrl()).toString();
         const apiRes = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            word: phrase.word,
-            lang: phrase.speechLang,
-            audio: base64,
-            mimeType: recorder.mimeType,
-          }),
+          body: JSON.stringify({ word: phrase.word, recognized: transcript }),
         });
         if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
         const data = await apiRes.json();
-
-        const scoreVal: number = data.score ?? 0;
+        const scoreVal = data.score ?? 0;
         setScore(scoreVal);
-        setAccuracyScore(data.accuracyScore ?? 0);
-        setFluencyScore(data.fluencyScore ?? 0);
-        setCompletenessScore(data.completenessScore ?? 0);
         setGptFeedback(data.feedback ?? "");
-        setRecognizedText(data.recognizedText ?? "");
-        setWordResults(data.words ?? []);
-
         Animated.timing(scoreAnim, { toValue: scoreVal / 100, duration: 900, useNativeDriver: false }).start();
-
         if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase.word); }
         else { await removeWeakWord(phrase.word); }
-
         const xpEarned = scoreVal >= 90 ? 30 : 15;
         setXpGain(xpEarned);
         updateStats({ xp: statsRef.current.xp + xpEarned });
@@ -437,6 +385,33 @@ export default function SpeakScreen() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     };
+
+    recognition.onerror = (event: any) => {
+      resultReceived = true;
+      stopPulse();
+      const errMap: Record<string, string> = {
+        "not-allowed": "마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)",
+        "no-speech": "음성이 감지되지 않았습니다. 다시 시도해 주세요.",
+        "network": "네트워크 오류가 발생했습니다.",
+        "aborted": "녹음이 취소되었습니다.",
+        "audio-capture": "마이크를 찾을 수 없습니다.",
+        "service-not-allowed": "마이크 권한을 허용해주세요.",
+      };
+      setSttError(errMap[event.error] ?? `오류: ${event.error}`);
+      setRecordState("done");
+      recordStateRef.current = "done";
+    };
+
+    recognition.onend = () => {
+      stopPulse();
+      if (!resultReceived && recordStateRef.current === "listening") {
+        setSttError("음성이 감지되지 않았습니다. 다시 시도해 주세요.");
+        setRecordState("done");
+        recordStateRef.current = "done";
+      }
+    };
+
+    recognition.start();
   };
 
   const goNextWord = async () => {
@@ -623,70 +598,35 @@ export default function SpeakScreen() {
               showsVerticalScrollIndicator={false}
             >
               {score !== null && scoreInfo ? (
-                <>
-                  <View style={styles.resultRow}>
-                    {/* Overall score circle */}
-                    <View style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}>
-                      <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
-                      <Text style={styles.scoreDenom}>/100</Text>
-                    </View>
-
-                    <View style={styles.resultRight}>
-                      <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>
-                        {scoreInfo.emoji} {scoreInfo.label}
-                      </Text>
-
-                      {/* Three Azure sub-scores */}
-                      {accuracyScore !== null && (
-                        <View style={styles.subScoreRow}>
-                          <Text style={styles.subScoreLabel}>정확도</Text>
-                          <View style={styles.subScoreTrack}>
-                            <View style={[styles.subScoreFill, { width: `${accuracyScore}%`, backgroundColor: accuracyScore >= 75 ? "#10B981" : accuracyScore >= 50 ? "#F59E0B" : "#EF4444" }]} />
-                          </View>
-                          <Text style={styles.subScoreNum}>{accuracyScore}</Text>
-                        </View>
-                      )}
-                      {fluencyScore !== null && (
-                        <View style={styles.subScoreRow}>
-                          <Text style={styles.subScoreLabel}>유창성</Text>
-                          <View style={styles.subScoreTrack}>
-                            <View style={[styles.subScoreFill, { width: `${fluencyScore}%`, backgroundColor: fluencyScore >= 75 ? "#10B981" : fluencyScore >= 50 ? "#F59E0B" : "#EF4444" }]} />
-                          </View>
-                          <Text style={styles.subScoreNum}>{fluencyScore}</Text>
-                        </View>
-                      )}
-                      {completenessScore !== null && (
-                        <View style={styles.subScoreRow}>
-                          <Text style={styles.subScoreLabel}>완성도</Text>
-                          <View style={styles.subScoreTrack}>
-                            <View style={[styles.subScoreFill, { width: `${completenessScore}%`, backgroundColor: completenessScore >= 75 ? "#10B981" : completenessScore >= 50 ? "#F59E0B" : "#EF4444" }]} />
-                          </View>
-                          <Text style={styles.subScoreNum}>{completenessScore}</Text>
-                        </View>
-                      )}
-                    </View>
+                <View style={styles.resultRow}>
+                  <View style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}>
+                    <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
+                    <Text style={styles.scoreDenom}>/100</Text>
                   </View>
 
-                  {/* Per-word breakdown */}
-                  {wordResults.length > 0 && (
-                    <View style={styles.wordRow}>
-                      {wordResults.map((w, i) => (
-                        <View key={i} style={[styles.wordChip, {
-                          backgroundColor: w.score >= 80 ? "rgba(16,185,129,0.12)" : w.score >= 50 ? "rgba(245,158,11,0.12)" : "rgba(239,68,68,0.12)",
-                          borderColor: w.score >= 80 ? "rgba(16,185,129,0.4)" : w.score >= 50 ? "rgba(245,158,11,0.4)" : "rgba(239,68,68,0.4)",
-                        }]}>
-                          <Text style={[styles.wordChipText, {
-                            color: w.score >= 80 ? "#10B981" : w.score >= 50 ? "#F59E0B" : "#EF4444",
-                          }]}>{w.word}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  )}
+                  <View style={styles.resultRight}>
+                    <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>
+                      {scoreInfo.emoji} {scoreInfo.label}
+                    </Text>
 
-                  {gptFeedback ? (
-                    <Text style={styles.feedbackText}>{gptFeedback}</Text>
-                  ) : null}
-                </>
+                    <View style={styles.scoreBarTrack}>
+                      <Animated.View
+                        style={[styles.scoreBarFill, {
+                          width: scoreAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] }),
+                          backgroundColor: scoreInfo.color,
+                        }]}
+                      />
+                    </View>
+
+                    {recognizedText ? (
+                      <Text style={styles.heardText}>"{recognizedText}"</Text>
+                    ) : null}
+
+                    {gptFeedback ? (
+                      <Text style={styles.feedbackText} numberOfLines={3}>{gptFeedback}</Text>
+                    ) : null}
+                  </View>
+                </View>
               ) : (
                 <View style={styles.errorRow}>
                   <Ionicons name="warning-outline" size={16} color="#EF4444" />
@@ -727,13 +667,7 @@ export default function SpeakScreen() {
               </Animated.View>
 
               <Text style={styles.micHint}>
-                {isRecording
-                  ? `녹음 중… ${countdown > 0 ? countdown + "초" : ""}`
-                  : isProcessing
-                  ? "Azure 분석 중…"
-                  : hasListened
-                  ? "탭하여 발음하기 (4초)"
-                  : "먼저 듣기를 눌러보세요"}
+                {isRecording ? "듣고 있어요…" : isProcessing ? "분석 중…" : hasListened ? "탭하여 발음하기" : "먼저 듣기를 눌러보세요"}
               </Text>
             </View>
           )}
@@ -923,23 +857,15 @@ const styles = StyleSheet.create({
   },
   scoreNumber: { fontSize: 26, fontFamily: F.title, lineHeight: 30 },
   scoreDenom: { fontSize: 10, fontFamily: F.body, color: C.goldDim },
-  resultRight: { flex: 1, gap: 5 },
-  scoreLabel: { fontSize: 14, fontFamily: F.bodySemi, marginBottom: 2 },
-  subScoreRow: { flexDirection: "row", alignItems: "center", gap: 5 },
-  subScoreLabel: { fontSize: 10, fontFamily: F.label, color: C.goldDim, width: 34, letterSpacing: 0.3 },
-  subScoreTrack: {
-    flex: 1, height: 5, backgroundColor: "rgba(201,162,39,0.1)",
-    borderRadius: 3, overflow: "hidden",
+  resultRight: { flex: 1, gap: 6 },
+  scoreLabel: { fontSize: 14, fontFamily: F.bodySemi },
+  scoreBarTrack: {
+    height: 6, backgroundColor: "rgba(201,162,39,0.1)",
+    borderRadius: 3, overflow: "hidden", borderWidth: 0.5, borderColor: C.border,
   },
-  subScoreFill: { height: "100%", borderRadius: 3 },
-  subScoreNum: { fontSize: 10, fontFamily: F.bodySemi, color: C.goldDim, width: 22, textAlign: "right" },
-  wordRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  wordChip: {
-    paddingHorizontal: 8, paddingVertical: 3,
-    borderRadius: 10, borderWidth: 1,
-  },
-  wordChipText: { fontSize: 12, fontFamily: F.bodySemi },
-  feedbackText: { fontSize: 12, fontFamily: F.body, color: C.goldDim, lineHeight: 17, fontStyle: "italic" },
+  scoreBarFill: { height: "100%", borderRadius: 3 },
+  heardText: { fontSize: 12, fontFamily: F.body, color: C.parchment, fontStyle: "italic" },
+  feedbackText: { fontSize: 12, fontFamily: F.body, color: C.goldDim, lineHeight: 17 },
   retryChip: {
     flexDirection: "row", alignItems: "center", gap: 5,
     alignSelf: "center", paddingHorizontal: 14, paddingVertical: 6,
