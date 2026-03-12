@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useLanguage, getDefaultLearning, NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
+import { XPToast } from "@/components/XPToast";
 
 const TAB_BAR_HEIGHT = 49;
 
@@ -117,7 +118,10 @@ type RecordState = "idle" | "listening" | "processing" | "done";
 
 export default function SpeakScreen() {
   const insets = useSafeAreaInsets();
-  const { t, nativeLanguage, learningLanguage } = useLanguage();
+  const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
+  const [xpGain, setXpGain] = useState(0);
+  const statsRef = useRef(stats);
+  useEffect(() => { statsRef.current = stats; }, [stats]);
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 84 : TAB_BAR_HEIGHT + insets.bottom;
 
@@ -248,8 +252,12 @@ export default function SpeakScreen() {
         });
         if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
         const data = await apiRes.json();
-        setScore(data.score ?? 0);
+        const scoreVal = data.score ?? 0;
+        setScore(scoreVal);
         setGptFeedback(data.feedback ?? "");
+        const xpEarned = scoreVal >= 90 ? 30 : 15;
+        setXpGain(xpEarned);
+        updateStats({ xp: statsRef.current.xp + xpEarned });
       } catch {
         setSttError("채점 중 오류가 발생했습니다. 다시 시도해 주세요.");
       } finally {
@@ -303,6 +311,7 @@ export default function SpeakScreen() {
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
       <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
+      <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}

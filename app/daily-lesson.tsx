@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { router } from "expo-router";
 import { Audio } from "expo-av";
 import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
+import { XPToast } from "@/components/XPToast";
 
 type LearningLang = "english" | "spanish" | "korean";
 
@@ -327,6 +328,9 @@ export default function DailyLessonScreen() {
   const [done, setDone] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [xpAwarded, setXpAwarded] = useState(false);
+  const [xpGain, setXpGain] = useState(0);
+  const statsRef = useRef(stats);
+  useEffect(() => { statsRef.current = stats; }, [stats]);
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -358,7 +362,8 @@ export default function DailyLessonScreen() {
       animateToNext(() => setDone(true));
       if (!xpAwarded) {
         setXpAwarded(true);
-        updateStats({ xp: stats.xp + 50, wordsLearned: stats.wordsLearned + words.length });
+        setXpGain(50);
+        updateStats({ xp: statsRef.current.xp + 50, wordsLearned: statsRef.current.wordsLearned + words.length });
       }
     }
   };
@@ -432,6 +437,7 @@ export default function DailyLessonScreen() {
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
       <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
+      <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
       {/* Header */}
       <View style={styles.header}>

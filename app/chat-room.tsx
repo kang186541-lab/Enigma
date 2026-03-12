@@ -22,6 +22,7 @@ import * as Speech from "expo-speech";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getTutor, TUTOR_IMAGES, Tutor } from "@/constants/tutors";
 import { useLanguage } from "@/context/LanguageContext";
+import { XPToast } from "@/components/XPToast";
 import { getApiUrl } from "@/lib/query-client";
 import { recordAudio } from "@/lib/audio";
 
@@ -185,7 +186,10 @@ async function fetchTranslation(
 export default function ChatRoomScreen() {
   const { tutorId } = useLocalSearchParams<{ tutorId: string }>();
   const insets = useSafeAreaInsets();
-  const { t, nativeLanguage } = useLanguage();
+  const { t, nativeLanguage, stats, updateStats } = useLanguage();
+  const [xpGain, setXpGain] = useState(0);
+  const statsRef = useRef(stats);
+  useEffect(() => { statsRef.current = stats; }, [stats]);
 
   const tutor = getTutor(tutorId ?? "") as Tutor | undefined;
 
@@ -478,6 +482,8 @@ export default function ChatRoomScreen() {
     const trimmed = inputText.trim();
     if (!trimmed || !tutor || isTyping) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setXpGain(5);
+    updateStats({ xp: statsRef.current.xp + 5 });
 
     const userMsg: Message = {
       id: Date.now().toString() + "u",
@@ -641,6 +647,7 @@ export default function ChatRoomScreen() {
   return (
     <View style={[styles.screen, { paddingTop: topPad, paddingBottom: bottomPad }]}>
       <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
+      <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
       {/* Header */}
       <View style={styles.header}>

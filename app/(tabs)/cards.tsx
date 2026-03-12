@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
 import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
+import { XPToast } from "@/components/XPToast";
 
 const { width } = Dimensions.get("window");
 
@@ -543,7 +544,7 @@ type DeckType = "beginner" | "advanced";
 
 export default function CardsScreen() {
   const insets = useSafeAreaInsets();
-  const { t, nativeLanguage, learningLanguage } = useLanguage();
+  const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const nativeLang = nativeLanguage ?? "english";
   const lang: NativeLanguage = learningLanguage ?? getDefaultLearning(nativeLang as NativeLanguage);
@@ -555,6 +556,9 @@ export default function CardsScreen() {
   const [again, setAgain] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [xpGain, setXpGain] = useState(0);
+  const statsRef = useRef(stats);
+  useEffect(() => { statsRef.current = stats; }, [stats]);
 
   const flipAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -613,8 +617,13 @@ export default function CardsScreen() {
 
   const advanceCard = (knew: boolean) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (knew) setGotIt((g) => g + 1);
-    else setAgain((a) => a + 1);
+    if (knew) {
+      setGotIt((g) => g + 1);
+      setXpGain(10);
+      updateStats({ xp: statsRef.current.xp + 10 });
+    } else {
+      setAgain((a) => a + 1);
+    }
 
     Animated.timing(slideAnim, { toValue: knew ? -width : width, duration: 230, useNativeDriver: true }).start(() => {
       slideAnim.setValue(knew ? width : -width);
@@ -633,6 +642,7 @@ export default function CardsScreen() {
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
       <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
+      <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
       <View style={styles.header}>
         <Text style={styles.title}>{t("card_deck")}</Text>

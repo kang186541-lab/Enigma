@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,16 +7,16 @@ import {
   Pressable,
   Platform,
   Dimensions,
+  Animated,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, getLevel, getLevelProgress } from "@/context/LanguageContext";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = (width - 48 - 12) / 2;
 
 function getGreeting(t: (k: string) => string) {
   const hour = new Date().getHours();
@@ -30,6 +30,23 @@ export default function HomeScreen() {
   const { t, stats } = useLanguage();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
+  const level = getLevel(stats.xp);
+  const progress = getLevelProgress(stats.xp);
+  const nextLevel = level.num < 5 ? level.maxXP : null;
+  const xpInLevel = level.num < 5 ? stats.xp - level.minXP : stats.xp - level.minXP;
+  const xpForLevel = level.num < 5 ? level.maxXP - level.minXP : 1;
+
+  const xpBarAnim = useRef(new Animated.Value(progress)).current;
+
+  useEffect(() => {
+    Animated.spring(xpBarAnim, {
+      toValue: progress,
+      useNativeDriver: false,
+      tension: 40,
+      friction: 8,
+    }).start();
+  }, [stats.xp]);
+
   const statItems = [
     { icon: "flame", color: "#FF6B35", label: t("streak"), value: `${stats.streak}`, suffix: "" },
     { icon: "book", color: "#4ECDC4", label: t("words"), value: `${stats.wordsLearned}`, suffix: "" },
@@ -42,6 +59,11 @@ export default function HomeScreen() {
     { icon: "chatbubbles", color: "#4ECDC4", label: t("conversation"), desc: t("conversation_desc"), route: "/(tabs)/chat" },
     { icon: "mic", color: "#45B7D1", label: t("pronunciation"), desc: t("pronunciation_desc"), route: "/(tabs)/speak" },
   ];
+
+  const barWidth = xpBarAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "100%"],
+  });
 
   return (
     <ScrollView
@@ -62,14 +84,27 @@ export default function HomeScreen() {
           </View>
           <Pressable style={styles.avatarBtn}>
             <LinearGradient colors={["#FFFFFF", "#FFE0EF"]} style={styles.avatar}>
-              <Text style={styles.avatarText}>★</Text>
+              <Text style={styles.avatarText}>{level.emoji}</Text>
             </LinearGradient>
           </Pressable>
         </View>
 
-        <View style={styles.levelBadge}>
-          <Ionicons name="ribbon" size={14} color="#FF6B9D" />
-          <Text style={styles.levelText}>{t("beginner")} · {t("level")} 3</Text>
+        <View style={styles.levelRow}>
+          <View style={styles.levelBadge}>
+            <Text style={styles.levelEmoji}>{level.emoji}</Text>
+            <Text style={styles.levelText}>{level.name} · {t("level")} {level.num}</Text>
+          </View>
+        </View>
+
+        <View style={styles.xpBarContainer}>
+          <View style={styles.xpTrack}>
+            <Animated.View style={[styles.xpFill, { width: barWidth }]} />
+          </View>
+          <Text style={styles.xpLabel}>
+            {level.num < 5
+              ? `${xpInLevel} / ${xpForLevel} XP`
+              : `${stats.xp} XP · 마스터 👑`}
+          </Text>
         </View>
       </LinearGradient>
 
@@ -153,13 +188,13 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 24,
-    paddingBottom: 28,
+    paddingBottom: 24,
   },
   headerTop: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 12,
+    marginBottom: 14,
   },
   greeting: {
     fontSize: 14,
@@ -186,23 +221,47 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   avatarText: {
-    fontSize: 20,
-    color: "#FF6B9D",
+    fontSize: 22,
+  },
+  levelRow: {
+    marginBottom: 10,
   },
   levelBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.25)",
+    backgroundColor: "rgba(255,255,255,0.22)",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
     gap: 6,
     alignSelf: "flex-start",
   },
+  levelEmoji: {
+    fontSize: 14,
+  },
   levelText: {
     fontSize: 13,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Inter_600SemiBold",
     color: "#FFFFFF",
+  },
+  xpBarContainer: {
+    gap: 6,
+  },
+  xpTrack: {
+    height: 6,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  xpFill: {
+    height: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 3,
+  },
+  xpLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
+    color: "rgba(255,255,255,0.8)",
   },
   statsContainer: {
     flexDirection: "row",
