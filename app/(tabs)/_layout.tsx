@@ -22,6 +22,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: "bubble.left", selected: "bubble.left.fill" }} />
         <Label>{t("chat")}</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="story">
+        <Icon sf={{ default: "book", selected: "book.fill" }} />
+        <Label>{t("story")}</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="speak">
         <Icon sf={{ default: "mic", selected: "mic.fill" }} />
         <Label>{t("speak")}</Label>
@@ -91,6 +95,16 @@ function ClassicTabLayout() {
           tabBarIcon: ({ color, size }) => {
             const { Ionicons } = require("@expo/vector-icons");
             return <Ionicons name="chatbubble" size={size} color={color} />;
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="story"
+        options={{
+          title: t("story"),
+          tabBarIcon: ({ color, size }) => {
+            const { Ionicons } = require("@expo/vector-icons");
+            return <Ionicons name="book" size={size} color={color} />;
           },
         }}
       />
