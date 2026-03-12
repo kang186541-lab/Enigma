@@ -1,0 +1,78 @@
+Add more flashcard words for all languages and levels.
+
+ENGLISH - Add these additional words:
+
+Beginner (A1) - Daily Life:
+sun, moon, star, rain, snow, wind, flower, tree, bird, fish,
+chair, table, door, window, bed, phone, car, bus, train, plane,
+shirt, shoes, hat, bag, money, time, day, week, month, year
+
+Beginner (A1) - Actions:
+smile, laugh, cry, jump, sit, stand, open, close, give, take,
+buy, sell, read, write, draw, sing, dance, cook, clean, wash
+
+Intermediate (A2) - Emotions:
+anxious, confident, jealous, ashamed, relieved, disappointed,
+frustrated, overwhelmed, motivated, inspired, curious, bored,
+nervous, satisfied, lonely, hopeful, angry, peaceful, proud
+
+Intermediate (A2) - Descriptions:
+ancient, modern, simple, complex, ordinary, extraordinary,
+natural, artificial, familiar, strange, obvious, hidden,
+typical, unique, perfect, broken, empty, full, heavy, light
+
+Advanced (B1+):
+ambivalent, catharsis, enigmatic, ephemeral, ineffable,
+juxtaposition, labyrinthine, melancholic, nostalgic, obscure,
+paradox, quintessential, rhetoric, surreal, tranquil,
+ubiquitous, venerable, whimsical, xenial, zealous
+
+SPANISH - Add these additional words:
+
+Beginner (A1) - Daily Life:
+sol, luna, estrella, lluvia, nieve, viento, flor, árbol, pájaro, pez,
+silla, mesa, puerta, ventana, cama, teléfono, coche, autobús, tren, avión,
+camisa, zapatos, sombrero, bolsa, dinero, tiempo, día, semana, mes, año
+
+Beginner (A1) - Actions:
+sonreír, reír, llorar, saltar, sentarse, levantarse, abrir, cerrar,
+dar, tomar, comprar, vender, leer, escribir, dibujar, cantar, bailar
+
+Intermediate (A2):
+ansioso, confiado, celoso, avergonzado, aliviado, decepcionado,
+frustrado, motivado, inspirado, curioso, aburrido, nervioso,
+satisfecho, solitario, esperanzador, orgulloso, pacífico
+
+Advanced (B1+):
+añoranza, madrugada, sobremesa, querencia, duende,
+ensimismado, desconcertante, imprescindible, efímero,
+entrañable, vertiginoso, apasionante, melancólico
+
+KOREAN - Add these additional words:
+
+Beginner (A1) - Daily Life:
+태양, 달, 별, 비, 눈, 바람, 꽃, 나무, 새, 물고기,
+의자, 책상, 문, 창문, 침대, 핸드폰, 자동차, 버스, 기차, 비행기,
+셔츠, 신발, 모자, 가방, 돈, 시간, 날, 주, 달, 해
+
+Beginner (A1) - Actions:
+웃다, 울다, 뛰다, 앉다, 서다, 열다, 닫다, 주다, 받다,
+사다, 팔다, 읽다, 쓰다, 그리다, 노래하다, 춤추다, 요리하다
+
+Intermediate (A2) - Korean emotions:
+설레다, 뿌듯하다, 억울하다, 서운하다, 민망하다,
+두근거리다, 그립다, 외롭다, 지치다, 벅차다,
+후련하다, 씁쓸하다, 찡하다, 울컥하다, 간지럽다
+
+Advanced (B1+) - Unique Korean words:
+눈치, 정, 한, 흥, 여운, 미련, 허탈, 애틋하다,
+시원섭섭하다, 홀가분하다, 뭉클하다, 짠하다,
+오글거리다, 아련하다, 답답하다, 어이없다
+
+Each word must include:
+- Word in target language
+- Translation in user's native language
+- Example sentence
+- IPA pronunciation (English and Spanish only)
+- Pronunciation tip
+- Difficulty level (Beginner/Intermediate/Advanced)
