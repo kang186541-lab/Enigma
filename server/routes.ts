@@ -176,8 +176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ── Pronunciation TTS (Azure Neural TTS) ─────────────────────────────────
-  // Uses Azure Cognitive Services neural voices for accurate per-language accent.
+  // ── Pronunciation TTS (Azure Neural TTS with SSML emotional expression) ───
   const AZURE_TTS_VOICES: Record<string, string> = {
     "ko-KR": "ko-KR-SunHiNeural",
     "en-US": "en-US-JennyNeural",
@@ -186,9 +185,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "es-MX": "es-MX-DaliaNeural",
   };
 
+  // SSML express-as style per voice — applied automatically based on voice name.
+  // tutorId override takes precedence when the caller supplies it.
+  const VOICE_SSML_STYLES: Record<string, { style: string; degree: string }> = {
+    "en-GB-SoniaNeural":  { style: "customerservice", degree: "1.5" }, // Sarah
+    "en-US-JennyNeural":  { style: "friendly",         degree: "2"   }, // Jake
+    "es-ES-ElviraNeural": { style: "cheerful",          degree: "1.5" }, // Jane
+    "es-MX-DaliaNeural":  { style: "excited",           degree: "1.5" }, // Alex
+    "ko-KR-SunHiNeural":  { style: "friendly",          degree: "1.5" }, // 지수 default
+  };
+
+  // Per-tutor override for voices shared across tutors (e.g. both Korean tutors
+  // use the same neural voice but 민준 wants "excited").
+  const TUTOR_SSML_OVERRIDES: Record<string, { style: string; degree: string }> = {
+    sarah:  { style: "customerservice", degree: "1.5" },
+    jake:   { style: "friendly",         degree: "2"   },
+    jane:   { style: "cheerful",          degree: "1.5" },
+    alex:   { style: "excited",           degree: "1.5" },
+    jisu:   { style: "friendly",          degree: "1.5" },
+    minjun: { style: "excited",           degree: "2"   },
+  };
+
+  function buildSsml(voiceName: string, lang: string, safeText: string, tutorId?: string): string {
+    const ssmlStyle = (tutorId && TUTOR_SSML_OVERRIDES[tutorId])
+      ? TUTOR_SSML_OVERRIDES[tutorId]
+      : (VOICE_SSML_STYLES[voiceName] ?? { style: "friendly", degree: "1.5" });
+
+    return [
+      `<speak version="1.0"`,
+      ` xmlns="http://www.w3.org/2001/10/synthesis"`,
+      ` xmlns:mstts="http://www.w3.org/2001/mstts"`,
+      ` xml:lang="${lang}">`,
+      `<voice name="${voiceName}">`,
+      `<mstts:express-as style="${ssmlStyle.style}" styledegree="${ssmlStyle.degree}">`,
+      `<prosody rate="slow">${safeText}</prosody>`,
+      `</mstts:express-as>`,
+      `</voice>`,
+      `</speak>`,
+    ].join("");
+  }
+
   app.get("/api/pronunciation-tts", async (req: Request, res: Response) => {
     try {
-      const { text, lang } = req.query as { text?: string; lang?: string };
+      const { text, lang, tutorId } = req.query as { text?: string; lang?: string; tutorId?: string };
       if (!text || !lang) {
         return res.status(400).json({ error: "text and lang required" });
       }
@@ -205,11 +244,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-      const ssml =
-        `<speak version='1.0' xml:lang='${lang}'>` +
-        `<voice xml:lang='${lang}' name='${voiceName}'>` +
-        `<prosody rate='slow'>${safeText}</prosody>` +
-        `</voice></speak>`;
+      const ssml = buildSsml(voiceName, lang, safeText, tutorId);
 
       const azureRes = await fetch(
         `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`,
