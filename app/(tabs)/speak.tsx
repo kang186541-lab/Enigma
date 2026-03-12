@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   Animated,
   ActivityIndicator,
 } from "react-native";
+import { useFocusEffect } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,6 +22,8 @@ import { XPToast } from "@/components/XPToast";
 import { C, F } from "@/constants/theme";
 
 const TAB_BAR_HEIGHT = 49;
+const SESSION_SIZE = 8;
+const WEAK_THRESHOLD = 75;
 
 type LangTab = "korean" | "english" | "spanish";
 
@@ -27,41 +31,81 @@ interface Phrase {
   word: string;
   ipa: string;
   meaning: string;
-  level: string;
+  level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
   speechLang: string;
   tip: string;
 }
 
 const PHRASE_SETS: Record<LangTab, Phrase[]> = {
-  korean: [
-    { word: "안녕하세요", ipa: "/an.njʌŋ.ha.se.jo/", meaning: "Hello / Good day", level: "A1", speechLang: "ko-KR", tip: "Rise slightly in pitch on the last syllable." },
-    { word: "감사합니다", ipa: "/kam.sa.ham.ni.da/", meaning: "Thank you very much (formal)", level: "A1", speechLang: "ko-KR", tip: "Keep each syllable even. No stress accent like English." },
-    { word: "사랑해요", ipa: "/sa.ɾaŋ.hɛ.jo/", meaning: "I love you", level: "A2", speechLang: "ko-KR", tip: "The ɾ is a flap — similar to the 'd' in 'ladder'." },
-    { word: "어디에 있어요?", ipa: "/ʌ.di.e i.sʌ.jo/", meaning: "Where is it?", level: "A2", speechLang: "ko-KR", tip: "The ʌ vowel is in the back of the mouth, not the front." },
-    { word: "맛있어요", ipa: "/ma.si.sʌ.jo/", meaning: "It's delicious", level: "A2", speechLang: "ko-KR", tip: "The ㅅ before a vowel becomes an 's' sound." },
-    { word: "잘 부탁드립니다", ipa: "/tɕal pu.tʰak.tɯ.rim.ni.da/", meaning: "Please look after me", level: "B1", speechLang: "ko-KR", tip: "Common phrase when meeting someone new. Say it warmly." },
-    { word: "반갑습니다", ipa: "/pan.gap.sɯm.ni.da/", meaning: "Nice to meet you (formal)", level: "A1", speechLang: "ko-KR", tip: "The 반 is lower in pitch, 갑 rises slightly." },
-    { word: "얼마예요?", ipa: "/ʌl.ma.je.jo/", meaning: "How much is it?", level: "A2", speechLang: "ko-KR", tip: "Raise pitch at the end to signal a question." },
-  ],
   english: [
-    { word: "thoroughly", ipa: "/ˈθʌr.ə.li/", meaning: "Completely, in every detail", level: "B1", speechLang: "en-US", tip: "The 'th' needs tongue between teeth, not a 'd' or 't' sound." },
-    { word: "squirrel", ipa: "/ˈskwɪr.əl/", meaning: "A small tree-climbing rodent", level: "A2", speechLang: "en-US", tip: "Famously tricky. The 'r' colors the vowel before it." },
-    { word: "rural", ipa: "/ˈrʊr.əl/", meaning: "Relating to the countryside", level: "B1", speechLang: "en-US", tip: "Two 'r' sounds in a row. Relax the tongue for both." },
-    { word: "pronunciation", ipa: "/prəˌnʌn.siˈeɪ.ʃən/", meaning: "The way a word is spoken", level: "B1", speechLang: "en-US", tip: "Note: it's pronunCIation, not pronounciation." },
-    { word: "comfortable", ipa: "/ˈkʌm.fər.tə.bəl/", meaning: "Giving physical ease", level: "A2", speechLang: "en-US", tip: "Often pronounced as 3 syllables: KUMF-ter-bul." },
-    { word: "entrepreneur", ipa: "/ˌɒn.trə.prəˈnɜːr/", meaning: "Someone who starts a business", level: "C1", speechLang: "en-US", tip: "French origin. The stress is on the final syllable." },
-    { word: "particularly", ipa: "/pəˈtɪk.jʊ.lər.li/", meaning: "Especially, more than usual", level: "B2", speechLang: "en-US", tip: "Try to hit all 5 syllables clearly at normal speed." },
-    { word: "worcestershire", ipa: "/ˈwʊs.tər.ʃər/", meaning: "A type of sauce (place name)", level: "C1", speechLang: "en-US", tip: "Only 3 syllables: WUS-tər-shər. Silent letters galore!" },
+    { word: "Hello", ipa: "/həˈloʊ/", meaning: "안녕하세요", level: "A1", speechLang: "en-US", tip: "Stress the second syllable: heh-LO." },
+    { word: "Thank you", ipa: "/ˈθæŋk juː/", meaning: "감사합니다", level: "A1", speechLang: "en-US", tip: "The 'th' needs tongue between teeth." },
+    { word: "Sorry", ipa: "/ˈsɒr.i/", meaning: "죄송합니다", level: "A1", speechLang: "en-US", tip: "First syllable is stressed: SOR-ee." },
+    { word: "Yes", ipa: "/jɛs/", meaning: "네", level: "A1", speechLang: "en-US", tip: "Short and clear. Ends with a light 's' sound." },
+    { word: "No", ipa: "/noʊ/", meaning: "아니요", level: "A1", speechLang: "en-US", tip: "The vowel glides from 'oh' to 'w'." },
+    { word: "Please", ipa: "/pliːz/", meaning: "부탁드려요", level: "A1", speechLang: "en-US", tip: "Long 'ee' sound in the middle." },
+    { word: "Water", ipa: "/ˈwɔː.tər/", meaning: "물", level: "A1", speechLang: "en-US", tip: "In American English: WAW-ter (flapped 't')." },
+    { word: "Coffee", ipa: "/ˈkɒf.i/", meaning: "커피", level: "A1", speechLang: "en-US", tip: "Two syllables: KOF-ee." },
+    { word: "Friend", ipa: "/frɛnd/", meaning: "친구", level: "A1", speechLang: "en-US", tip: "The 'd' at the end can be soft or silent." },
+    { word: "Happy", ipa: "/ˈhæp.i/", meaning: "행복한", level: "A1", speechLang: "en-US", tip: "Stress on first syllable: HAP-ee." },
+    { word: "Good", ipa: "/ɡʊd/", meaning: "좋은", level: "A1", speechLang: "en-US", tip: "Short 'oo' sound, not like 'food'." },
+    { word: "Bad", ipa: "/bæd/", meaning: "나쁜", level: "A1", speechLang: "en-US", tip: "The 'a' is an open front vowel like 'cat'." },
+    { word: "Home", ipa: "/hoʊm/", meaning: "집", level: "A1", speechLang: "en-US", tip: "The vowel glides from 'oh' to 'w'." },
+    { word: "Food", ipa: "/fuːd/", meaning: "음식", level: "A1", speechLang: "en-US", tip: "Long 'oo' sound — like 'mood'." },
+    { word: "Help", ipa: "/hɛlp/", meaning: "도움", level: "A1", speechLang: "en-US", tip: "Say all four sounds: H-EL-P." },
+    { word: "Good morning", ipa: "/ɡʊd ˈmɔːr.nɪŋ/", meaning: "좋은 아침이에요", level: "A1", speechLang: "en-US", tip: "Link the words together smoothly." },
+    { word: "How are you?", ipa: "/haʊ ɑːr juː/", meaning: "어떻게 지내세요?", level: "A1", speechLang: "en-US", tip: "Often spoken quickly: 'How-ar-yuh?'" },
+    { word: "Beautiful", ipa: "/ˈbjuː.tɪ.fəl/", meaning: "아름다운", level: "A2", speechLang: "en-US", tip: "Three syllables: BYOO-tih-ful." },
+    { word: "Comfortable", ipa: "/ˈkʌm.fər.tə.bəl/", meaning: "편안한", level: "A2", speechLang: "en-US", tip: "Often said as 3 syllables: KUMF-ter-bul." },
+    { word: "Thoroughly", ipa: "/ˈθʌr.ə.li/", meaning: "완전히", level: "B1", speechLang: "en-US", tip: "The 'th' needs tongue between teeth, not a 'd' or 't'." },
+    { word: "Squirrel", ipa: "/ˈskwɪr.əl/", meaning: "다람쥐", level: "A2", speechLang: "en-US", tip: "The 'r' colors the vowel before it." },
+    { word: "Rural", ipa: "/ˈrʊr.əl/", meaning: "시골의", level: "B1", speechLang: "en-US", tip: "Two 'r' sounds in a row. Relax the tongue for both." },
+    { word: "Entrepreneur", ipa: "/ˌɒn.trə.prəˈnɜːr/", meaning: "기업가", level: "C1", speechLang: "en-US", tip: "French origin. The stress is on the final syllable." },
   ],
   spanish: [
-    { word: "gracias", ipa: "/ˈɡɾa.sjas/", meaning: "Thank you", level: "A1", speechLang: "es-ES", tip: "The 'r' is a single tap (ɾ), not a rolled 'rr'." },
-    { word: "murciélago", ipa: "/muɾ.ˈθje.la.ɣo/", meaning: "Bat (the animal)", level: "B1", speechLang: "es-ES", tip: "Contains all 5 vowels! The θ is a 'th' sound in Spain Spanish." },
-    { word: "desarrollar", ipa: "/de.za.ro.ˈʎaɾ/", meaning: "To develop", level: "B1", speechLang: "es-ES", tip: "The 'll' is a palatal lateral — like the 'y' in 'yes' in many dialects." },
-    { word: "extraordinario", ipa: "/eks.tɾa.oɾ.ðiˈna.ɾjo/", meaning: "Extraordinary", level: "B2", speechLang: "es-ES", tip: "7 syllables! Break it down slowly before building to full speed." },
-    { word: "ferrocarril", ipa: "/fe.ro.kaˈril/", meaning: "Railway / railroad", level: "B2", speechLang: "es-ES", tip: "Two rolling 'rr' sounds. Practice the trill separately first." },
-    { word: "subjuntivo", ipa: "/sub.xunˈti.βo/", meaning: "Subjunctive (grammar mood)", level: "B2", speechLang: "es-ES", tip: "The 'j' in Spanish is like a raspy 'h' from the throat." },
-    { word: "churrigueresco", ipa: "/tʃu.ri.ɣeˈɾes.ko/", meaning: "Extravagantly ornamented style", level: "C1", speechLang: "es-ES", tip: "Tongue-twister level! The 'rr' is the tricky part." },
-    { word: "otorrinolaringólogo", ipa: "/o.to.ri.no.la.ɾiŋˈɡo.lo.ɣo/", meaning: "Ear/nose/throat doctor", level: "C2", speechLang: "es-ES", tip: "10 syllables — the Spanish word for ENT. Take it one chunk at a time." },
+    { word: "Hola", ipa: "/ˈo.la/", meaning: "안녕하세요", level: "A1", speechLang: "es-ES", tip: "The 'h' is silent in Spanish." },
+    { word: "Gracias", ipa: "/ˈɡɾa.sjas/", meaning: "감사합니다", level: "A1", speechLang: "es-ES", tip: "The 'r' is a single tap (ɾ), not a rolled 'rr'." },
+    { word: "Perdón", ipa: "/peɾˈðon/", meaning: "죄송합니다", level: "A1", speechLang: "es-ES", tip: "The 'd' between vowels becomes a soft 'ð' sound." },
+    { word: "Sí", ipa: "/si/", meaning: "네", level: "A1", speechLang: "es-ES", tip: "Short and crisp. Accent mark just shows it's 'yes', not 'if'." },
+    { word: "No", ipa: "/no/", meaning: "아니요", level: "A1", speechLang: "es-ES", tip: "Pure 'o' vowel — no glide like in English." },
+    { word: "Por favor", ipa: "/poɾ faˈβoɾ/", meaning: "부탁드려요", level: "A1", speechLang: "es-ES", tip: "The 'v' sounds like a soft 'b' (β)." },
+    { word: "Agua", ipa: "/ˈa.ɣwa/", meaning: "물", level: "A1", speechLang: "es-ES", tip: "The 'g' between vowels softens to 'ɣ'." },
+    { word: "Café", ipa: "/kaˈfe/", meaning: "커피", level: "A1", speechLang: "es-ES", tip: "Stress on the second syllable: ka-FEH." },
+    { word: "Amigo", ipa: "/aˈmi.ɣo/", meaning: "친구", level: "A1", speechLang: "es-ES", tip: "Intervocalic 'g' softens to 'ɣ'." },
+    { word: "Feliz", ipa: "/feˈliθ/", meaning: "행복한", level: "A1", speechLang: "es-ES", tip: "In Spain Spanish, 'z' = 'θ' (like English 'th')." },
+    { word: "Bueno", ipa: "/ˈbwe.no/", meaning: "좋은", level: "A1", speechLang: "es-ES", tip: "The 'ue' glides together: BWEH-no." },
+    { word: "Malo", ipa: "/ˈma.lo/", meaning: "나쁜", level: "A1", speechLang: "es-ES", tip: "Two clean syllables: MA-lo." },
+    { word: "Casa", ipa: "/ˈka.sa/", meaning: "집", level: "A1", speechLang: "es-ES", tip: "All vowels are pure and short in Spanish." },
+    { word: "Comida", ipa: "/koˈmi.ða/", meaning: "음식", level: "A1", speechLang: "es-ES", tip: "The 'd' between vowels softens to 'ð'." },
+    { word: "Ayuda", ipa: "/aˈju.ða/", meaning: "도움", level: "A1", speechLang: "es-ES", tip: "Three syllables: a-YU-da." },
+    { word: "Buenos días", ipa: "/ˈbwe.nos ˈdi.as/", meaning: "좋은 아침이에요", level: "A1", speechLang: "es-ES", tip: "Link the words smoothly as one phrase." },
+    { word: "¿Cómo estás?", ipa: "/ˈko.mo esˈtas/", meaning: "어떻게 지내세요?", level: "A1", speechLang: "es-ES", tip: "Stress on 'tás' — the accent tells you!" },
+    { word: "Murciélago", ipa: "/muɾˈθje.la.ɣo/", meaning: "박쥐", level: "B1", speechLang: "es-ES", tip: "Contains all 5 vowels! The θ is a 'th' sound in Spain Spanish." },
+    { word: "Desarrollar", ipa: "/de.za.ro.ˈʎaɾ/", meaning: "개발하다", level: "B1", speechLang: "es-ES", tip: "The 'll' sounds like 'y' in many dialects." },
+    { word: "Ferrocarril", ipa: "/fe.ro.kaˈril/", meaning: "철도", level: "B2", speechLang: "es-ES", tip: "Two rolling 'rr' sounds. Practice the trill separately first." },
+    { word: "Extraordinario", ipa: "/eks.tɾa.oɾ.ðiˈna.ɾjo/", meaning: "특별한", level: "B2", speechLang: "es-ES", tip: "7 syllables! Break it down slowly before building to full speed." },
+  ],
+  korean: [
+    { word: "안녕하세요", ipa: "/an.njʌŋ.ha.se.jo/", meaning: "Hello (formal)", level: "A1", speechLang: "ko-KR", tip: "Rise slightly in pitch on the last syllable." },
+    { word: "감사합니다", ipa: "/kam.sa.ham.ni.da/", meaning: "Thank you (formal)", level: "A1", speechLang: "ko-KR", tip: "Keep each syllable even. No stress accent like English." },
+    { word: "죄송합니다", ipa: "/tɕø.soŋ.ham.ni.da/", meaning: "I'm sorry (formal)", level: "A1", speechLang: "ko-KR", tip: "The 죄 vowel is like a rounded 'e'. Lips forward." },
+    { word: "네", ipa: "/ne/", meaning: "Yes", level: "A1", speechLang: "ko-KR", tip: "Short and clear. Sounds like 'neh'." },
+    { word: "아니요", ipa: "/a.ni.jo/", meaning: "No", level: "A1", speechLang: "ko-KR", tip: "Three syllables: a-ni-yo. Falling tone at the end." },
+    { word: "부탁드려요", ipa: "/pu.tʰak.tɯ.ɾjʌ.jo/", meaning: "Please", level: "A1", speechLang: "ko-KR", tip: "Often used when asking a favor." },
+    { word: "물", ipa: "/mul/", meaning: "Water", level: "A1", speechLang: "ko-KR", tip: "The ㅡ vowel (ɯ) is pronounced in the back of the mouth." },
+    { word: "커피", ipa: "/kʰʌ.pʰi/", meaning: "Coffee", level: "A1", speechLang: "ko-KR", tip: "Both consonants are aspirated: kh and ph." },
+    { word: "친구", ipa: "/tɕʰin.gu/", meaning: "Friend", level: "A1", speechLang: "ko-KR", tip: "The ㅈ (tɕ) is palatalized — like 'ch'." },
+    { word: "행복해요", ipa: "/hɛŋ.bo.kʰɛ.jo/", meaning: "I'm happy", level: "A1", speechLang: "ko-KR", tip: "The ㄱ before ㅎ becomes aspirated: -kh-." },
+    { word: "좋아요", ipa: "/tɕo.a.jo/", meaning: "Good / I like it", level: "A1", speechLang: "ko-KR", tip: "The 좋 + 아 merge: 조아요. The ㅎ is silent between vowels." },
+    { word: "집", ipa: "/tɕip/", meaning: "Home / House", level: "A1", speechLang: "ko-KR", tip: "The final consonant ㅂ is unreleased at the end." },
+    { word: "음식", ipa: "/ɯm.sik/", meaning: "Food", level: "A1", speechLang: "ko-KR", tip: "The ㅡ vowel is key: lips unrounded, back of mouth." },
+    { word: "도와주세요", ipa: "/to.wa.dʑu.se.jo/", meaning: "Please help me", level: "A2", speechLang: "ko-KR", tip: "The 와 smoothly follows 도 — link them together." },
+    { word: "사랑해요", ipa: "/sa.ɾaŋ.hɛ.jo/", meaning: "I love you", level: "A2", speechLang: "ko-KR", tip: "The ɾ is a flap — similar to the 'd' in 'ladder'." },
+    { word: "맛있어요", ipa: "/ma.si.sʌ.jo/", meaning: "It's delicious", level: "A2", speechLang: "ko-KR", tip: "The ㅅ before a vowel becomes an 's' sound." },
+    { word: "어디에 있어요?", ipa: "/ʌ.di.e i.sʌ.jo/", meaning: "Where is it?", level: "A2", speechLang: "ko-KR", tip: "The ʌ vowel is in the back of the mouth, not the front." },
+    { word: "반갑습니다", ipa: "/pan.gap.sɯm.ni.da/", meaning: "Nice to meet you", level: "A1", speechLang: "ko-KR", tip: "The 반 is lower in pitch, 갑 rises slightly." },
+    { word: "얼마예요?", ipa: "/ʌl.ma.je.jo/", meaning: "How much is it?", level: "A2", speechLang: "ko-KR", tip: "Raise pitch at the end to signal a question." },
+    { word: "잘 부탁드립니다", ipa: "/tɕal pu.tʰak.tɯ.rim.ni.da/", meaning: "Please look after me", level: "B1", speechLang: "ko-KR", tip: "Common phrase when meeting someone new. Say it warmly." },
   ],
 };
 
@@ -71,14 +115,12 @@ const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] 
   { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#FF9D6B" },
 ];
 
-function getScoreLabel(score: number): { text: string; color: string } {
-  if (score >= 90) return { text: "완벽해요! 🎉", color: "#10B981" };
-  if (score >= 70) return { text: "잘 했어요! 😊", color: "#3B82F6" };
-  if (score >= 50) return { text: "조금 더 연습해봐요 💪", color: "#F59E0B" };
-  return { text: "다시 해봐요! 🔄", color: "#EF4444" };
+function getScoreInfo(score: number): { label: string; color: string; emoji: string } {
+  if (score >= 90) return { label: "Excellent!", color: "#10B981", emoji: "🎉" };
+  if (score >= 75) return { label: "Good Job!", color: "#F59E0B", emoji: "😊" };
+  return { label: "Keep Practicing", color: "#EF4444", emoji: "💪" };
 }
 
-// Singleton audio element so previous playback stops on new tap
 let _pronunciationAudio: HTMLAudioElement | null = null;
 
 async function playPronunciationTTS(text: string, lang: string, apiBase: string) {
@@ -115,6 +157,43 @@ async function playPronunciationTTS(text: string, lang: string, apiBase: string)
   }
 }
 
+function buildSession(lang: LangTab, weakWords: string[], lastSeenWords: string[]): Phrase[] {
+  const all = PHRASE_SETS[lang];
+  const weakSet = new Set(weakWords);
+  const lastSet = new Set(lastSeenWords);
+
+  const a1 = all.filter((p) => p.level === "A1" && !weakSet.has(p.word));
+  const a2 = all.filter((p) => p.level === "A2" && !weakSet.has(p.word));
+  const harder = all.filter((p) => !["A1","A2"].includes(p.level) && !weakSet.has(p.word));
+  const weak = all.filter((p) => weakSet.has(p.word));
+
+  const shuffle = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5);
+
+  const lastFirst = (arr: Phrase[]) => {
+    const notSeen = arr.filter((p) => !lastSet.has(p.word));
+    const seen = arr.filter((p) => lastSet.has(p.word));
+    return [...shuffle(notSeen), ...shuffle(seen)];
+  };
+
+  const pool = [
+    ...shuffle(weak).slice(0, 3),
+    ...lastFirst(a1),
+    ...lastFirst(a2),
+    ...lastFirst(harder),
+  ];
+
+  const seen = new Set<string>();
+  const unique: Phrase[] = [];
+  for (const p of pool) {
+    if (!seen.has(p.word)) {
+      seen.add(p.word);
+      unique.push(p);
+    }
+    if (unique.length >= SESSION_SIZE) break;
+  }
+  return unique;
+}
+
 type RecordState = "idle" | "listening" | "processing" | "done";
 
 export default function SpeakScreen() {
@@ -134,7 +213,12 @@ export default function SpeakScreen() {
     if (ll && ll !== nativeLang) return ll;
     return (visibleTabs[0]?.key ?? "english") as LangTab;
   });
-  const [phraseIdx, setPhraseIdx] = useState(0);
+
+  const [sessionWords, setSessionWords] = useState<Phrase[]>([]);
+  const [sessionIdx, setSessionIdx] = useState(0);
+  const [sessionComplete, setSessionComplete] = useState(false);
+  const [weakWords, setWeakWords] = useState<string[]>([]);
+
   const [recordState, setRecordState] = useState<RecordState>("idle");
   const [score, setScore] = useState<number | null>(null);
   const [gptFeedback, setGptFeedback] = useState("");
@@ -143,28 +227,51 @@ export default function SpeakScreen() {
   const [hasListened, setHasListened] = useState(false);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const scoreAnim = useRef(new Animated.Value(0)).current;
   const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
   const recordStateRef = useRef<RecordState>("idle");
 
+  const weakKey = `speak_weak_words_${activeLang}`;
+  const lastSeenKey = `speak_last_seen_${activeLang}`;
+
+  const loadSession = useCallback(async (lang: LangTab) => {
+    try {
+      const [weakRaw, lastRaw] = await Promise.all([
+        AsyncStorage.getItem(`speak_weak_words_${lang}`),
+        AsyncStorage.getItem(`speak_last_seen_${lang}`),
+      ]);
+      const weak: string[] = weakRaw ? JSON.parse(weakRaw) : [];
+      const last: string[] = lastRaw ? JSON.parse(lastRaw) : [];
+      setWeakWords(weak);
+      const session = buildSession(lang, weak, last);
+      setSessionWords(session);
+      setSessionIdx(0);
+      setSessionComplete(false);
+      resetPracticeState();
+    } catch {}
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    loadSession(activeLang);
+  }, [activeLang]));
+
   useEffect(() => {
     if (learningLanguage && learningLanguage !== nativeLang) {
-      setActiveLang(learningLanguage as LangTab);
-      setPhraseIdx(0);
+      const ll = learningLanguage as LangTab;
+      setActiveLang(ll);
     }
   }, [learningLanguage]);
 
-  const phrases = PHRASE_SETS[activeLang];
-  const phrase = phrases[phraseIdx];
+  const phrase = sessionWords[sessionIdx];
   const tabInfo = LANG_TABS.find((tab) => tab.key === activeLang)!;
 
   const switchLang = (lang: LangTab) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setActiveLang(lang);
-    setPhraseIdx(0);
-    resetState();
+    loadSession(lang);
   };
 
-  const resetState = () => {
+  const resetPracticeState = () => {
     setRecordState("idle");
     recordStateRef.current = "idle";
     setScore(null);
@@ -174,9 +281,33 @@ export default function SpeakScreen() {
     setHasListened(false);
     pulseLoop.current?.stop();
     Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+    scoreAnim.setValue(0);
+  };
+
+  const saveWeakWord = async (word: string) => {
+    try {
+      const raw = await AsyncStorage.getItem(weakKey);
+      const list: string[] = raw ? JSON.parse(raw) : [];
+      if (!list.includes(word)) {
+        list.push(word);
+        await AsyncStorage.setItem(weakKey, JSON.stringify(list));
+        setWeakWords(list);
+      }
+    } catch {}
+  };
+
+  const removeWeakWord = async (word: string) => {
+    try {
+      const raw = await AsyncStorage.getItem(weakKey);
+      const list: string[] = raw ? JSON.parse(raw) : [];
+      const updated = list.filter((w) => w !== word);
+      await AsyncStorage.setItem(weakKey, JSON.stringify(updated));
+      setWeakWords(updated);
+    } catch {}
   };
 
   const handleListen = () => {
+    if (!phrase) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setHasListened(true);
     playPronunciationTTS(phrase.word, phrase.speechLang, getApiUrl());
@@ -198,7 +329,7 @@ export default function SpeakScreen() {
   };
 
   const handleRecord = () => {
-    if (recordState === "listening" || recordState === "processing") return;
+    if (!phrase || recordState === "listening" || recordState === "processing") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
     if (Platform.OS !== "web") {
@@ -212,7 +343,7 @@ export default function SpeakScreen() {
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      setSttError("이 브라우저는 음성 인식을 지원하지 않습니다.\nSafari 또는 Chrome을 사용해 주세요.");
+      setSttError("이 브라우저는 음성 인식을 지원하지 않습니다.\nChrome을 사용해 주세요.");
       setRecordState("done");
       recordStateRef.current = "done";
       return;
@@ -256,6 +387,19 @@ export default function SpeakScreen() {
         const scoreVal = data.score ?? 0;
         setScore(scoreVal);
         setGptFeedback(data.feedback ?? "");
+
+        Animated.timing(scoreAnim, {
+          toValue: scoreVal / 100,
+          duration: 900,
+          useNativeDriver: false,
+        }).start();
+
+        if (scoreVal < WEAK_THRESHOLD) {
+          await saveWeakWord(phrase.word);
+        } else {
+          await removeWeakWord(phrase.word);
+        }
+
         const xpEarned = scoreVal >= 90 ? 30 : 15;
         setXpGain(xpEarned);
         updateStats({ xp: statsRef.current.xp + xpEarned });
@@ -296,18 +440,77 @@ export default function SpeakScreen() {
     recognition.start();
   };
 
-  const navigate = (dir: "prev" | "next") => {
+  const goNextWord = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setPhraseIdx((i) => {
-      if (dir === "next") return (i + 1) % phrases.length;
-      return (i - 1 + phrases.length) % phrases.length;
-    });
-    resetState();
+    const nextIdx = sessionIdx + 1;
+    if (nextIdx >= sessionWords.length) {
+      const words = sessionWords.map((p) => p.word);
+      await AsyncStorage.setItem(lastSeenKey, JSON.stringify(words)).catch(() => {});
+      setSessionComplete(true);
+    } else {
+      setSessionIdx(nextIdx);
+      resetPracticeState();
+    }
+  };
+
+  const startNewSession = async () => {
+    await loadSession(activeLang);
   };
 
   const isRecording = recordState === "listening";
   const isProcessing = recordState === "processing";
   const isBusy = isRecording || isProcessing;
+
+  const progressPct = sessionWords.length > 0 ? (sessionIdx / sessionWords.length) * 100 : 0;
+
+  if (sessionComplete) {
+    return (
+      <View style={[styles.container, { paddingTop: topPad }]}>
+        <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
+        <ScrollView
+          contentContainerStyle={[styles.completeContainer, { paddingBottom: bottomPad + 20 }]}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.completeTrophy}>🏆</Text>
+          <Text style={styles.completeTitle}>Pronunciation Practice{"\n"}Complete!</Text>
+          <Text style={styles.completeSub}>
+            You practiced {sessionWords.length} words this session.
+          </Text>
+
+          {weakWords.length > 0 && (
+            <View style={styles.weakBox}>
+              <View style={styles.weakBoxHeader}>
+                <Ionicons name="warning-outline" size={15} color="#EF4444" />
+                <Text style={styles.weakBoxTitle}>Weak Words — Keep Practicing</Text>
+              </View>
+              {weakWords.slice(0, 5).map((w) => (
+                <Text key={w} style={styles.weakWord}>• {w}</Text>
+              ))}
+            </View>
+          )}
+
+          <Pressable
+            style={({ pressed }) => [styles.newSessionBtn, pressed && { opacity: 0.85 }]}
+            onPress={startNewSession}
+          >
+            <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} />
+            <Ionicons name="refresh" size={18} color={C.bg1} />
+            <Text style={styles.newSessionBtnText}>New Session</Text>
+          </Pressable>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  if (!phrase) {
+    return (
+      <View style={[styles.container, styles.loadingCenter]}>
+        <ActivityIndicator size="large" color={C.gold} />
+      </View>
+    );
+  }
+
+  const scoreInfo = score !== null ? getScoreInfo(score) : null;
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
@@ -346,24 +549,37 @@ export default function SpeakScreen() {
           })}
         </View>
 
-        {/* Phrase card */}
+        {/* Progress bar */}
+        <View style={styles.progressBarRow}>
+          <View style={styles.progressBarTrack}>
+            <View style={[styles.progressBarFill, { width: `${progressPct}%`, backgroundColor: tabInfo.color }]} />
+          </View>
+          <Text style={[styles.progressBarLabel, { color: tabInfo.color }]}>
+            {sessionIdx + 1} / {sessionWords.length}
+          </Text>
+        </View>
+
+        {/* Word card */}
         <View style={styles.phraseCard}>
+          <LinearGradient
+            colors={[tabInfo.color + "22", "transparent"]}
+            style={styles.cardAccent}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
           <View style={styles.phraseCardInner}>
             <View style={styles.phraseTopRow}>
-              <View style={[styles.levelBadge, { backgroundColor: tabInfo.color + "18" }]}>
+              <View style={[styles.levelBadge, { backgroundColor: tabInfo.color + "20", borderColor: tabInfo.color + "40" }]}>
                 <Text style={[styles.levelText, { color: tabInfo.color }]}>{phrase.level}</Text>
               </View>
               <Pressable
-                style={({ pressed }) => [
-                  styles.listenBtn,
-                  { borderColor: tabInfo.color + "50" },
-                  pressed && { opacity: 0.75 },
-                ]}
+                style={({ pressed }) => [styles.listenBtn, pressed && { opacity: 0.75 }]}
                 onPress={handleListen}
                 testID="listen-button"
               >
-                <Ionicons name="volume-high" size={16} color={tabInfo.color} />
-                <Text style={[styles.listenBtnText, { color: tabInfo.color }]}>{t("listen")}</Text>
+                <LinearGradient colors={[tabInfo.color, tabInfo.color + "BB"]} style={StyleSheet.absoluteFill} />
+                <Ionicons name="volume-high" size={15} color="#fff" />
+                <Text style={styles.listenBtnText}>{t("listen")}</Text>
               </Pressable>
             </View>
 
@@ -386,49 +602,51 @@ export default function SpeakScreen() {
         </View>
 
         {/* Progress dots */}
-        <View style={styles.progressRow}>
-          <Text style={styles.progressCount}>
-            {phraseIdx + 1} / {phrases.length}
-          </Text>
-          <View style={styles.progressDots}>
-            {phrases.map((_, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.dot,
-                  i === phraseIdx && [styles.dotActive, { backgroundColor: tabInfo.color }],
-                ]}
-              />
-            ))}
-          </View>
+        <View style={styles.dotsRow}>
+          {sessionWords.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.dot,
+                i < sessionIdx && styles.dotDone,
+                i === sessionIdx && [styles.dotActive, { backgroundColor: tabInfo.color }],
+              ]}
+            />
+          ))}
         </View>
 
         {/* Mic / Result section */}
         <View style={styles.micSection}>
           {recordState === "done" ? (
-            /* ── Results ─────────────────────────────────────────────────── */
             <View style={styles.resultWrap}>
-              {score !== null ? (
+              {score !== null && scoreInfo ? (
                 <>
                   {/* Score circle */}
-                  {(() => {
-                    const { text, color } = getScoreLabel(score);
-                    return (
-                      <View style={styles.scoreBlock}>
-                        <View style={[styles.scoreCircle, { borderColor: color }]}>
-                          <Text style={[styles.scoreNumber, { color }]}>{score}</Text>
-                        </View>
-                        <Text style={[styles.scoreLabel, { color }]}>{text}</Text>
-                      </View>
-                    );
-                  })()}
-
-                  {/* GPT feedback */}
-                  {gptFeedback ? (
-                    <View style={styles.feedbackBox}>
-                      <Text style={styles.feedbackText}>{gptFeedback}</Text>
+                  <View style={styles.scoreBlock}>
+                    <View style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}>
+                      <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
+                      <Text style={styles.scoreDenom}>/100</Text>
                     </View>
-                  ) : null}
+                    <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>
+                      {scoreInfo.emoji} {scoreInfo.label}
+                    </Text>
+
+                    {/* Color bar */}
+                    <View style={styles.scoreBarTrack}>
+                      <Animated.View
+                        style={[
+                          styles.scoreBarFill,
+                          {
+                            width: scoreAnim.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: ["0%", "100%"],
+                            }),
+                            backgroundColor: scoreInfo.color,
+                          },
+                        ]}
+                      />
+                    </View>
+                  </View>
 
                   {/* What was heard */}
                   {recognizedText ? (
@@ -437,9 +655,25 @@ export default function SpeakScreen() {
                       <Text style={styles.heardText}>"{recognizedText}"</Text>
                     </View>
                   ) : null}
+
+                  {/* GPT feedback */}
+                  {gptFeedback ? (
+                    <View style={[styles.feedbackBox, { borderColor: scoreInfo.color + "40" }]}>
+                      <Ionicons name="chatbubble-ellipses-outline" size={14} color={scoreInfo.color} />
+                      <Text style={[styles.feedbackText, { color: scoreInfo.color === "#EF4444" ? "#EF4444" : C.parchment }]}>
+                        {gptFeedback}
+                      </Text>
+                    </View>
+                  ) : null}
+
+                  {score < WEAK_THRESHOLD && (
+                    <View style={styles.weakAlert}>
+                      <Ionicons name="bookmark-outline" size={13} color="#EF4444" />
+                      <Text style={styles.weakAlertText}>Added to Weak Words — you'll see this again!</Text>
+                    </View>
+                  )}
                 </>
               ) : (
-                /* Error */
                 <View style={styles.errorBox}>
                   <Ionicons name="warning-outline" size={18} color="#EF4444" />
                   <Text style={styles.errorText}>
@@ -451,21 +685,10 @@ export default function SpeakScreen() {
               {/* Action buttons */}
               <View style={styles.actionRow}>
                 <Pressable
-                  style={({ pressed }) => [
-                    styles.actionBtn,
-                    styles.retryBtn,
-                    pressed && { opacity: 0.8 },
-                  ]}
+                  style={({ pressed }) => [styles.actionBtn, styles.retryBtn, pressed && { opacity: 0.8 }]}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setRecordState("idle");
-                    recordStateRef.current = "idle";
-                    setScore(null);
-                    setGptFeedback("");
-                    setRecognizedText("");
-                    setSttError("");
-                    pulseLoop.current?.stop();
-                    Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+                    resetPracticeState();
                   }}
                   testID="retry-button"
                 >
@@ -480,16 +703,21 @@ export default function SpeakScreen() {
                     { backgroundColor: tabInfo.color },
                     pressed && { opacity: 0.85 },
                   ]}
-                  onPress={() => navigate("next")}
+                  onPress={goNextWord}
                   testID="next-word-button"
                 >
-                  <Text style={styles.nextWordBtnText}>다음 단어</Text>
-                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                  <Text style={styles.nextWordBtnText}>
+                    {sessionIdx + 1 >= sessionWords.length ? "완료" : "다음 단어"}
+                  </Text>
+                  <Ionicons
+                    name={sessionIdx + 1 >= sessionWords.length ? "checkmark" : "arrow-forward"}
+                    size={16}
+                    color="#FFFFFF"
+                  />
                 </Pressable>
               </View>
             </View>
           ) : (
-            /* ── Mic button ───────────────────────────────────────────────── */
             <View style={styles.micWrap}>
               <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
                 <Pressable
@@ -523,19 +751,13 @@ export default function SpeakScreen() {
               {isRecording ? (
                 <View style={styles.recordingBadge}>
                   <View style={styles.redDot} />
-                  <Text style={styles.recordingBadgeText}>녹음 중...</Text>
+                  <Text style={styles.recordingText}>듣고 있어요…</Text>
                 </View>
               ) : isProcessing ? (
-                <View style={styles.scoringDots}>
-                  <View style={[styles.scoringDot, { opacity: 1 }]} />
-                  <View style={[styles.scoringDot, { opacity: 0.6 }]} />
-                  <View style={[styles.scoringDot, { opacity: 0.3 }]} />
-                </View>
+                <Text style={styles.processingText}>분석 중…</Text>
               ) : (
-                <Text style={styles.micHint}>
-                  {hasListened
-                    ? "마이크를 탭해서 따라 말해보세요"
-                    : "🔊 먼저 듣고, 따라 말해보세요"}
+                <Text style={styles.micHintText}>
+                  {hasListened ? "탭하여 발음하기" : "먼저 듣기 버튼을 눌러보세요"}
                 </Text>
               )}
 
@@ -549,30 +771,11 @@ export default function SpeakScreen() {
           )}
         </View>
 
-        {/* Prev / Next navigation */}
-        {recordState !== "done" && (
-          <View style={styles.navRow}>
-            <Pressable
-              style={({ pressed }) => [styles.navBtn, styles.prevBtn, pressed && { opacity: 0.8 }]}
-              onPress={() => navigate("prev")}
-              testID="prev-button"
-            >
-              <Ionicons name="arrow-back" size={18} color={C.gold} />
-              <Text style={styles.prevBtnText}>Prev</Text>
-            </Pressable>
-            <Pressable
-              style={({ pressed }) => [
-                styles.navBtn,
-                styles.nextBtn,
-                { backgroundColor: tabInfo.color },
-                pressed && { opacity: 0.85 },
-              ]}
-              onPress={() => navigate("next")}
-              testID="next-button"
-            >
-              <Text style={styles.nextBtnText}>{t("next")}</Text>
-              <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
-            </Pressable>
+        {/* Weak word count badge */}
+        {weakWords.length > 0 && (
+          <View style={styles.weakCountBadge}>
+            <Ionicons name="bookmark" size={12} color="#EF4444" />
+            <Text style={styles.weakCountText}>{weakWords.length} weak word{weakWords.length !== 1 ? "s" : ""} queued for review</Text>
           </View>
         )}
       </ScrollView>
@@ -582,10 +785,11 @@ export default function SpeakScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.bg1 },
+  loadingCenter: { justifyContent: "center", alignItems: "center" },
   scrollContent: {
     paddingHorizontal: 18,
     paddingTop: 4,
-    gap: 18,
+    gap: 16,
   },
   header: { gap: 3 },
   title: { fontSize: 24, fontFamily: F.header, color: C.gold, letterSpacing: 1.5 },
@@ -611,12 +815,33 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   langTabFlag: { fontSize: 15 },
-  langTabLabel: {
+  langTabLabel: { fontSize: 13, fontFamily: F.bodySemi, color: C.goldDark },
+  langTabLabelActive: { color: "#fff" },
+
+  progressBarRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  progressBarTrack: {
+    flex: 1,
+    height: 6,
+    backgroundColor: "rgba(201,162,39,0.15)",
+    borderRadius: 3,
+    overflow: "hidden",
+    borderWidth: 0.5,
+    borderColor: C.border,
+  },
+  progressBarFill: {
+    height: "100%",
+    borderRadius: 3,
+  },
+  progressBarLabel: {
     fontSize: 13,
     fontFamily: F.bodySemi,
-    color: C.goldDark,
+    minWidth: 36,
+    textAlign: "right",
   },
-  langTabLabelActive: { color: C.bg1 },
 
   phraseCard: {
     borderRadius: 28,
@@ -628,7 +853,14 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 5,
     borderWidth: 1,
-    borderColor: C.parchmentDeep,
+    borderColor: "rgba(201,162,39,0.2)",
+  },
+  cardAccent: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 4,
   },
   phraseCardInner: {
     padding: 24,
@@ -643,32 +875,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,
-    backgroundColor: "rgba(201,162,39,0.15)",
     borderWidth: 1,
-    borderColor: C.border,
   },
-  levelText: {
-    fontSize: 12,
-    fontFamily: F.label,
-    letterSpacing: 1,
-    color: C.gold,
-  },
+  levelText: { fontSize: 12, fontFamily: F.label, letterSpacing: 1 },
   listenBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
     paddingHorizontal: 14,
-    paddingVertical: 7,
+    paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1.5,
-    backgroundColor: "transparent",
-    borderColor: C.goldDark,
+    overflow: "hidden",
   },
-  listenBtnText: {
-    fontSize: 13,
-    fontFamily: F.bodySemi,
-    color: C.goldDark,
-  },
+  listenBtnText: { fontSize: 13, fontFamily: F.bodySemi, color: "#fff" },
   phraseWord: {
     fontSize: 36,
     fontFamily: F.title,
@@ -694,17 +913,8 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 5,
   },
-  ipaText: {
-    fontSize: 17,
-    fontFamily: F.body,
-    color: C.goldDark,
-    fontStyle: "italic",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: C.parchmentDeep,
-    marginVertical: 2,
-  },
+  ipaText: { fontSize: 17, fontFamily: F.body, color: C.goldDark, fontStyle: "italic" },
+  divider: { height: 1, backgroundColor: "rgba(44,24,16,0.12)", marginVertical: 2 },
   phraseMeaning: {
     fontSize: 16,
     fontFamily: F.bodySemi,
@@ -720,7 +930,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 2,
     borderWidth: 1,
-    borderColor: C.border,
+    borderColor: "rgba(201,162,39,0.2)",
   },
   tipText: {
     flex: 1,
@@ -731,19 +941,9 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
 
-  progressRow: {
+  dotsRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
-    gap: 12,
-  },
-  progressCount: {
-    fontSize: 12,
-    fontFamily: F.body,
-    color: C.goldDim,
-  },
-  progressDots: {
-    flexDirection: "row",
     gap: 6,
   },
   dot: {
@@ -751,23 +951,25 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 3.5,
     backgroundColor: C.goldDark,
+    opacity: 0.4,
+  },
+  dotDone: {
+    opacity: 1,
+    backgroundColor: C.goldDark,
   },
   dotActive: {
     width: 18,
     borderRadius: 4,
-    backgroundColor: C.gold,
+    opacity: 1,
   },
 
   micSection: {
     alignItems: "center",
     paddingVertical: 8,
-    minHeight: 220,
+    minHeight: 200,
     justifyContent: "center",
   },
-  micWrap: {
-    alignItems: "center",
-    gap: 14,
-  },
+  micWrap: { alignItems: "center", gap: 14 },
   micBtn: {
     width: 96,
     height: 96,
@@ -777,171 +979,109 @@ const styles = StyleSheet.create({
     alignItems: "center",
     shadowColor: C.gold,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  micHint: {
-    fontSize: 14,
-    fontFamily: F.body,
-    color: C.goldDim,
-    textAlign: "center",
-    fontStyle: "italic",
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 8,
   },
   recordingBadge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "rgba(200,50,50,0.12)",
-    borderColor: "#CC3333",
-    borderWidth: 1,
-    borderRadius: 20,
+    backgroundColor: "rgba(255,64,129,0.12)",
     paddingHorizontal: 14,
     paddingVertical: 6,
-    marginTop: 4,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,64,129,0.3)",
   },
-  redDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#CC2020",
-  },
-  scoringDots: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 4,
-    height: 28,
-  },
-  scoringDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: C.gold,
-  },
-  recordingBadgeText: {
-    fontSize: 14,
-    fontFamily: F.bodySemi,
-    color: "#CC2020",
-    letterSpacing: 0.3,
-  },
+  redDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#FF4081" },
+  recordingText: { fontSize: 13, fontFamily: F.bodySemi, color: "#FF4081" },
+  processingText: { fontSize: 13, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
+  micHintText: { fontSize: 13, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
   listenHintRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+    marginTop: 4,
   },
-  listenHintText: {
-    fontSize: 12,
-    fontFamily: F.body,
-    color: C.goldDim,
-    fontStyle: "italic",
-  },
+  listenHintText: { fontSize: 12, fontFamily: F.body, color: "#C4B5BF", fontStyle: "italic" },
 
-  resultWrap: {
-    alignSelf: "stretch",
-    gap: 14,
-    alignItems: "center",
-  },
-  scoreBlock: {
-    alignItems: "center",
-    gap: 10,
-  },
+  resultWrap: { width: "100%", gap: 14, alignItems: "center" },
+  scoreBlock: { alignItems: "center", gap: 10, width: "100%" },
   scoreCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 4,
-    backgroundColor: C.bg2,
-    alignItems: "center",
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    borderWidth: 5,
     justifyContent: "center",
-    shadowColor: C.gold,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  scoreNumber: {
-    fontSize: 36,
-    fontFamily: F.title,
-    lineHeight: 40,
-    color: C.gold,
-  },
-  scoreLabel: {
-    fontSize: 20,
-    fontFamily: F.header,
-    textAlign: "center",
-    color: C.gold,
-  },
-  feedbackBox: {
-    backgroundColor: C.parchment,
-    borderRadius: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    alignSelf: "stretch",
-    borderWidth: 1,
-    borderColor: C.parchmentDeep,
-    shadowColor: C.gold,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  feedbackText: {
-    fontSize: 15,
-    fontFamily: F.body,
-    color: C.textParchment,
-    textAlign: "center",
-    lineHeight: 22,
-  },
-  heardBox: {
     alignItems: "center",
-    gap: 2,
-    backgroundColor: "rgba(201,162,39,0.08)",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    alignSelf: "stretch",
-    borderWidth: 1,
+    backgroundColor: C.bg2,
+  },
+  scoreNumber: { fontSize: 36, fontFamily: F.title, lineHeight: 42 },
+  scoreDenom: { fontSize: 12, fontFamily: F.body, color: C.goldDim },
+  scoreLabel: { fontSize: 16, fontFamily: F.bodySemi, textAlign: "center" },
+  scoreBarTrack: {
+    width: "80%",
+    height: 8,
+    backgroundColor: "rgba(201,162,39,0.12)",
+    borderRadius: 4,
+    overflow: "hidden",
+    borderWidth: 0.5,
     borderColor: C.border,
   },
-  heardLabel: {
-    fontSize: 11,
-    fontFamily: F.label,
-    color: C.goldDim,
-    letterSpacing: 0.5,
+  scoreBarFill: { height: "100%", borderRadius: 4 },
+
+  heardBox: {
+    backgroundColor: C.bg2,
+    borderRadius: 12,
+    padding: 12,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: C.border,
+    gap: 3,
   },
-  heardText: {
-    fontSize: 15,
-    fontFamily: F.bodySemi,
-    color: C.parchment,
-    textAlign: "center",
+  heardLabel: { fontSize: 11, fontFamily: F.label, color: C.goldDim, letterSpacing: 0.5 },
+  heardText: { fontSize: 15, fontFamily: F.bodySemi, color: C.parchment },
+
+  feedbackBox: {
+    backgroundColor: C.bg2,
+    borderRadius: 12,
+    padding: 12,
+    width: "100%",
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "flex-start",
   },
+  feedbackText: { flex: 1, fontSize: 13, fontFamily: F.body, lineHeight: 20, color: C.parchment },
+
+  weakAlert: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "rgba(239,68,68,0.1)",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: "rgba(239,68,68,0.25)",
+  },
+  weakAlertText: { fontSize: 12, fontFamily: F.body, color: "#EF4444" },
+
   errorBox: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 8,
-    backgroundColor: "rgba(204,68,68,0.1)",
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    alignSelf: "stretch",
+    backgroundColor: "rgba(239,68,68,0.08)",
+    borderRadius: 12,
+    padding: 14,
+    width: "100%",
     borderWidth: 1,
-    borderColor: "rgba(204,68,68,0.3)",
+    borderColor: "rgba(239,68,68,0.2)",
   },
-  errorText: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: F.body,
-    color: "#CC4444",
-    lineHeight: 20,
-  },
+  errorText: { flex: 1, fontSize: 13, fontFamily: F.body, color: "#EF4444", lineHeight: 20 },
 
-  actionRow: {
-    flexDirection: "row",
-    gap: 10,
-    alignSelf: "stretch",
-    marginTop: 4,
-  },
+  actionRow: { flexDirection: "row", gap: 12, width: "100%" },
   actionBtn: {
     flex: 1,
     flexDirection: "row",
@@ -949,71 +1089,72 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 6,
     paddingVertical: 14,
-    borderRadius: 18,
+    borderRadius: 16,
   },
   retryBtn: {
     backgroundColor: C.bg2,
     borderWidth: 1.5,
     borderColor: C.border,
   },
-  actionBtnText: {
-    fontSize: 14,
-    fontFamily: F.bodySemi,
-    color: C.parchment,
-  },
-  nextWordBtn: {
-    backgroundColor: C.gold,
-    shadowColor: C.gold,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  nextWordBtnText: {
-    fontSize: 14,
-    fontFamily: F.bodySemi,
-    color: C.bg1,
-  },
+  actionBtnText: { fontSize: 14, fontFamily: F.bodySemi },
+  nextWordBtn: { overflow: "hidden" },
+  nextWordBtnText: { fontSize: 14, fontFamily: F.bodySemi, color: "#fff" },
 
-  navRow: {
+  weakCountBadge: {
     flexDirection: "row",
-    gap: 12,
+    alignItems: "center",
+    gap: 6,
+    justifyContent: "center",
+    paddingVertical: 6,
   },
-  navBtn: {
+  weakCountText: { fontSize: 12, fontFamily: F.body, color: "#EF4444" },
+
+  completeContainer: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 28,
+    gap: 20,
+    paddingTop: 40,
+  },
+  completeTrophy: { fontSize: 72, textAlign: "center" },
+  completeTitle: {
+    fontSize: 26,
+    fontFamily: F.header,
+    color: C.gold,
+    textAlign: "center",
+    letterSpacing: 1,
+    lineHeight: 36,
+  },
+  completeSub: {
+    fontSize: 15,
+    fontFamily: F.body,
+    color: C.goldDim,
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+  weakBox: {
+    backgroundColor: C.bg2,
+    borderRadius: 16,
+    padding: 16,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "rgba(239,68,68,0.25)",
+    gap: 8,
+  },
+  weakBoxHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
+  weakBoxTitle: { fontSize: 13, fontFamily: F.bodySemi, color: "#EF4444" },
+  weakWord: { fontSize: 15, fontFamily: F.body, color: C.parchment, paddingLeft: 4 },
+  newSessionBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 7,
-    paddingVertical: 15,
+    gap: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 40,
     borderRadius: 20,
+    overflow: "hidden",
+    marginTop: 8,
   },
-  prevBtn: {
-    backgroundColor: C.bg2,
-    borderWidth: 2,
-    borderColor: C.gold,
-    shadowColor: C.gold,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  prevBtnText: {
-    fontSize: 14,
-    fontFamily: F.bodySemi,
-    color: C.gold,
-  },
-  nextBtn: {
-    backgroundColor: C.gold,
-    shadowColor: C.gold,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  nextBtnText: {
-    fontSize: 14,
-    fontFamily: F.bodySemi,
-    color: C.bg1,
-  },
+  newSessionBtnText: { fontSize: 16, fontFamily: F.header, color: C.bg1, letterSpacing: 1 },
 });

@@ -1,0 +1,155 @@
+Update and improve the Pronunciation Practice feature with the following functionality and UI improvements.
+
+1. Easier Vocabulary
+Add more beginner-friendly vocabulary (A1–A2 level). Prioritize simple and commonly used words.
+
+Examples:
+hello  
+thank you  
+sorry  
+yes  
+no  
+please  
+water  
+coffee  
+friend  
+happy  
+good  
+bad  
+home  
+food  
+help  
+
+The system should show easier words first before introducing harder vocabulary.
+
+
+2. Random Word Every Time the Screen Opens
+Each time the user enters the Pronunciation Practice screen, display a new random word.
+
+Behavior:
+- When the screen opens → load a random word from the vocabulary list.
+- If the user exits and re-enters the screen → show a different word.
+- Avoid repeating the same word consecutively.
+
+
+3. Language Selection Fix
+Currently Spanish words appear even when English learning is selected.
+
+Fix the filtering logic:
+
+If the user selects English:
+- Only show English pronunciation practice words.
+
+If the user selects Spanish:
+- Only show Spanish pronunciation practice words.
+
+Ensure the vocabulary database is filtered strictly by the selected language.
+
+
+4. Pronunciation Score System
+After the user records their pronunciation, analyze the audio and generate a pronunciation score.
+
+Example:
+
+Word: Comfortable
+
+Your Pronunciation Score: 87 / 100
+
+Feedback Example:
+"Good pronunciation! Try stressing the first syllable more."
+
+
+5. AI Pronunciation Comparison
+Compare the user's pronunciation with the correct AI pronunciation.
+
+Example:
+
+AI pronunciation:
+COMF-ter-bul
+
+Your pronunciation:
+COM-for-ta-bul
+
+AI Feedback:
+"You added an extra syllable. Try pronouncing it in three syllables."
+
+
+6. Weak Word Trainer
+Track words where the user's pronunciation score is low.
+
+If the pronunciation score is below a threshold (for example 75):
+- Mark the word as a weak pronunciation word
+- Automatically include it again in future practice sessions
+
+Example:
+
+Weak pronunciation words:
+comfortable  
+vegetable  
+schedule  
+
+
+7. Word Card Structure
+Each pronunciation card should include:
+
+Word  
+IPA pronunciation  
+Simple meaning  
+Listen button (audio playback)  
+Record button (user pronunciation)
+
+
+Example:
+
+Word: Hello  
+IPA: /həˈloʊ/  
+Meaning: 안녕하세요  
+
+
+8. Improved UI for Pronunciation Practice
+Improve the visual interface to feel more like a game.
+
+Add:
+
+- A pronunciation score meter (0–100)
+- A circular progress indicator
+- Animated feedback after recording
+- Color feedback system
+
+Color system example:
+
+90–100 → Green (Excellent)  
+75–89 → Yellow (Good)  
+Below 75 → Red (Needs Practice)
+
+
+9. Progress System
+Each practiced word counts toward progress.
+
+Example:
+
+1 / 8  
+2 / 8  
+3 / 8  
+
+After completing all words:
+- Show a completion animation
+- Display "Pronunciation Practice Complete"
+- Load a new set of words later.
+
+
+10. Randomization Logic
+Use a random vocabulary selection system based on:
+
+Selected language  
+Difficulty level  
+Recent word history  
+
+Rules:
+- Do not repeat the same word immediately
+- Prioritize beginner vocabulary for beginner users
+- Include weak pronunciation words again for reinforcement
+
+
+Goal:
+Create a more interactive and game-like pronunciation practice experience similar to or better than Duolingo, with AI feedback, pronunciation scoring, and personalized training.
