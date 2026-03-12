@@ -7,7 +7,7 @@ import {
   Platform,
   Dimensions,
   Animated,
-  ScrollView,
+  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,6 +15,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
+
+const lingoImg = require("@/assets/lingo.png");
 
 const { width, height } = Dimensions.get("window");
 
@@ -30,6 +32,7 @@ interface Character {
   personalityEs?: string;
   side: "left" | "right";
   avatarBg: string;
+  isLingo?: boolean;
 }
 
 interface Scene {
@@ -68,6 +71,18 @@ const STORIES: Record<string, Story> = {
     progressColor: "#E94560",
     characters: [
       {
+        id: "lingo",
+        emoji: "🦊",
+        name: "Detective Lingo",
+        nameKo: "링고 탐정",
+        personality: "Your sharp-witted fox detective guide",
+        personalityKo: "재치있는 여우 탐정 가이드",
+        personalityEs: "Tu astuto guía detective zorro",
+        side: "left",
+        avatarBg: "#2A3020",
+        isLingo: true,
+      },
+      {
         id: "james",
         emoji: "🕵️",
         name: "Detective James",
@@ -102,6 +117,12 @@ const STORIES: Record<string, Story> = {
       },
     ],
     scenes: [
+      {
+        charId: "lingo",
+        text: "Ah, a new case! I'm Detective Lingo 🦊 — your guide through foggy London. Shall we solve this mystery together?",
+        textKo: "새 사건이 들어왔어요! 저는 링고 탐정이에요 🦊 — 안개 낀 런던의 가이드. 함께 이 미스터리를 풀어볼까요?",
+        textEs: "¡Un nuevo caso! Soy el Detective Lingo 🦊 — tu guía por la neblinosa Londres. ¿Resolvemos este misterio juntos?",
+      },
       {
         charId: "james",
         text: "*sigh* Another foggy night in London... I've been investigating this case for three long weeks.",
@@ -166,6 +187,18 @@ const STORIES: Record<string, Story> = {
     progressColor: "#FF6B35",
     characters: [
       {
+        id: "lingo",
+        emoji: "🦊",
+        name: "Lingo",
+        nameKo: "링고",
+        personality: "Your friendly guide to Madrid!",
+        personalityKo: "마드리드 여행의 친절한 가이드!",
+        personalityEs: "¡Tu amistoso guía por Madrid!",
+        side: "left",
+        avatarBg: "#FFF0E0",
+        isLingo: true,
+      },
+      {
         id: "isabella",
         emoji: "💃",
         name: "Isabella",
@@ -200,6 +233,12 @@ const STORIES: Record<string, Story> = {
       },
     ],
     scenes: [
+      {
+        charId: "lingo",
+        text: "¡Hola! I'm Lingo 🦊 — your guide to Madrid! Get ready for romance, passion, and the Spanish language!",
+        textKo: "¡Hola! 저는 링고예요 🦊 — 마드리드 가이드! 로맨스, 열정, 그리고 스페인어를 배울 준비가 됐나요?",
+        textEs: "¡Hola! ¡Soy Lingo 🦊 — tu guía en Madrid! ¡Prepárate para el romance, la pasión y el español!",
+      },
       {
         charId: "isabella",
         text: "¡Bienvenido a Madrid! Welcome to my family's restaurant. I am Isabella. And you are...?",
@@ -264,6 +303,18 @@ const STORIES: Record<string, Story> = {
     progressColor: "#7C7CFF",
     characters: [
       {
+        id: "lingo",
+        emoji: "🦊",
+        name: "Lingo",
+        nameKo: "링고",
+        personality: "Your guide to the K-Drama world!",
+        personalityKo: "K-드라마 세계의 가이드!",
+        personalityEs: "¡Tu guía al mundo K-Drama!",
+        side: "left",
+        avatarBg: "#1A1030",
+        isLingo: true,
+      },
+      {
         id: "junhyuk",
         emoji: "👨‍💼",
         name: "이준혁",
@@ -298,6 +349,12 @@ const STORIES: Record<string, Story> = {
       },
     ],
     scenes: [
+      {
+        charId: "lingo",
+        text: "안녕하세요! I'm Lingo 🦊 — your guide to Seoul! Prepare for a K-Drama full of secrets, love, and emotion!",
+        textKo: "안녕하세요! 저는 링고예요 🦊 — 서울 가이드! 비밀, 사랑, 감동이 넘치는 K-드라마를 시작해봐요!",
+        textEs: "¡안녕하세요! ¡Soy Lingo 🦊 — tu guía en Seúl! ¡Prepárate para un K-Drama lleno de secretos, amor y emoción!",
+      },
       {
         charId: "junhyuk",
         text: "...당신은 누구입니까? (Who are you?) This is a private building. Leave at once.",
@@ -525,7 +582,11 @@ export default function StoryScene() {
           {/* Avatar */}
           <View style={[styles.avatarOuter, { shadowColor: story.accentColor }]}>
             <View style={[styles.avatarInner, { backgroundColor: character.avatarBg }]}>
-              <Text style={styles.avatarEmoji}>{character.emoji}</Text>
+              {character.isLingo ? (
+                <Image source={lingoImg} style={styles.lingoAvatar} />
+              ) : (
+                <Text style={styles.avatarEmoji}>{character.emoji}</Text>
+              )}
             </View>
             {/* Accent ring */}
             <View style={[styles.avatarRing, { borderColor: story.accentColor + "60" }]} />
@@ -651,6 +712,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatarEmoji: { fontSize: 68 },
+  lingoAvatar: { width: 118, height: 118, resizeMode: "contain" },
   avatarRing: {
     position: "absolute",
     top: -6, left: -6,

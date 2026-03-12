@@ -15,6 +15,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useLanguage, getLevel, getLevelProgress, NativeLanguage } from "@/context/LanguageContext";
+import { LingoMascot } from "@/components/LingoMascot";
+import { LevelUpModal } from "@/components/LevelUpModal";
 
 const { width } = Dimensions.get("window");
 
@@ -23,6 +25,31 @@ function getGreeting(t: (k: string) => string) {
   if (h < 12) return t("good_morning");
   if (h < 18) return t("good_afternoon");
   return t("good_evening");
+}
+
+function getLingoGreeting(lang: NativeLanguage): string {
+  const h = new Date().getHours();
+  const lines: Record<NativeLanguage, [string, string, string]> = {
+    korean:  [
+      "좋은 아침이에요! 오늘도 같이 공부해요! 🦊",
+      "안녕하세요! 오늘 학습 시작할까요? 🦊",
+      "수고했어요! 오늘의 학습을 마무리해요! 🦊",
+    ],
+    english: [
+      "Good morning! Let's study together! 🦊",
+      "Hello! Ready to learn today? 🦊",
+      "Great work! Let's finish today's lesson! 🦊",
+    ],
+    spanish: [
+      "¡Buenos días! ¡Estudiemos juntos! 🦊",
+      "¡Hola! ¿Listos para aprender hoy? 🦊",
+      "¡Bien hecho! ¡Terminemos la lección! 🦊",
+    ],
+  };
+  const [morning, afternoon, evening] = lines[lang] ?? lines.english;
+  if (h < 12) return morning;
+  if (h < 18) return afternoon;
+  return evening;
 }
 
 function getWeekStreakData(streak: number, nativeLang: NativeLanguage) {
@@ -76,9 +103,11 @@ function getStreakText(streak: number, lang: NativeLanguage): string {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { t, stats, nativeLanguage } = useLanguage();
+  const { t, stats, nativeLanguage, pendingLevelUp, clearLevelUp } = useLanguage();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
+  const lingoGreeting = getLingoGreeting(nativeLang);
+  const lingoMood = stats.streak === 0 ? "sad" : stats.streak >= 7 ? "excited" : "happy";
 
   const level    = getLevel(stats.xp);
   const progress = getLevelProgress(stats.xp);
@@ -125,13 +154,18 @@ export default function HomeScreen() {
         end={{ x: 1, y: 1 }}
       >
         <View style={styles.headerTop}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.greeting}>{getGreeting(t)}</Text>
             <Text style={styles.headerTitle}>LinguaAI ✨</Text>
           </View>
-          <View style={styles.avatarCircle}>
-            <Text style={styles.avatarEmoji}>{level.emoji}</Text>
-          </View>
+          <LingoMascot
+            size={90}
+            mood={lingoMood}
+            showBubble
+            bubbleText={lingoGreeting}
+            bubblePosition="left"
+            style={{ alignItems: "flex-end" }}
+          />
         </View>
 
         {/* Level badge */}
@@ -162,9 +196,7 @@ export default function HomeScreen() {
         <View style={styles.streakCard}>
           <View style={styles.streakHeader}>
             <View style={styles.streakLeft}>
-              <View style={styles.fireCircle}>
-                <Text style={styles.fireEmoji}>🔥</Text>
-              </View>
+              <LingoMascot size={56} mood={lingoMood} />
               <View>
                 <Text style={styles.streakCount}>{stats.streak}</Text>
                 <Text style={styles.streakLabel}>
@@ -294,6 +326,13 @@ export default function HomeScreen() {
 
       <View style={{ height: 120 }} />
     </ScrollView>
+
+    <LevelUpModal
+      visible={!!pendingLevelUp}
+      level={pendingLevelUp ?? { num: 2, emoji: "📚", name: "초보자", minXP: 101, maxXP: 300 }}
+      lang={nativeLang}
+      onClose={clearLevelUp}
+    />
   );
 }
 

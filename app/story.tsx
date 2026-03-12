@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
+import { LingoMascot } from "@/components/LingoMascot";
 
 const { width } = Dimensions.get("window");
 
@@ -95,12 +96,26 @@ export default function StoryScreen() {
         >
           <Ionicons name="arrow-back" size={22} color="#1A1A2E" />
         </Pressable>
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>
             {lang === "korean" ? "스토리 모드 📖" : lang === "spanish" ? "Modo Historia 📖" : "Story Mode 📖"}
           </Text>
           <Text style={styles.headerSub}>
             {lang === "korean" ? "이야기로 언어를 배워요" : lang === "spanish" ? "Aprende con historias" : "Learn through stories"}
+          </Text>
+        </View>
+      </View>
+
+      {/* Lingo guide banner */}
+      <View style={styles.lingoBanner}>
+        <LingoMascot size={64} mood="excited" />
+        <View style={styles.lingoSpeech}>
+          <Text style={styles.lingoSpeechText}>
+            {lang === "korean"
+              ? "안녕! 저는 링고예요 🦊\n이야기로 함께 언어를 배워봐요!"
+              : lang === "spanish"
+              ? "¡Hola! Soy Lingo 🦊\n¡Aprendamos idiomas con historias!"
+              : "Hi! I'm Lingo 🦊\nLet's learn languages through stories!"}
           </Text>
         </View>
       </View>
@@ -187,6 +202,28 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 20, fontFamily: "Inter_700Bold", color: "#1A1A2E" },
   headerSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: "#A08090", marginTop: 2 },
+  lingoBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: "#FFF0F6",
+    borderBottomWidth: 1,
+    borderBottomColor: "#FFD6E8",
+  },
+  lingoSpeech: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    padding: 10,
+    shadowColor: "#FF6B9D",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  lingoSpeechText: { fontSize: 13, color: "#5A2040", lineHeight: 19 },
   scroll: { paddingHorizontal: 16, paddingTop: 16, gap: 16 },
   card: {
     borderRadius: 24,

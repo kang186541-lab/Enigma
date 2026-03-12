@@ -48,6 +48,8 @@ export interface LanguageContextType {
   stats: UserStats;
   updateStats: (updates: Partial<UserStats>) => Promise<void>;
   t: (key: string) => string;
+  pendingLevelUp: Level | null;
+  clearLevelUp: () => void;
 }
 
 export function getDefaultLearning(native: NativeLanguage): NativeLanguage {
@@ -229,6 +231,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [nativeLanguage, setNativeLanguageState] = useState<NativeLanguage | null>(null);
   const [learningLanguage, setLearningLanguageState] = useState<NativeLanguage | null>(null);
   const [hasOnboarded, setHasOnboarded] = useState(false);
+  const [pendingLevelUp, setPendingLevelUp] = useState<Level | null>(null);
   const [stats, setStats] = useState<UserStats>({
     streak: 7,
     wordsLearned: 142,
@@ -276,10 +279,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const updateStats = async (updates: Partial<UserStats>) => {
+    const oldLevel = getLevel(stats.xp);
     const newStats = { ...stats, ...updates };
+    const newLevel = getLevel(newStats.xp);
+    if (newLevel.num > oldLevel.num) {
+      setPendingLevelUp(newLevel);
+    }
     setStats(newStats);
     await AsyncStorage.setItem("@lingua_stats", JSON.stringify(newStats));
   };
+
+  const clearLevelUp = () => setPendingLevelUp(null);
 
   const t = (key: string): string => {
     const lang = nativeLanguage ?? "english";
@@ -287,7 +297,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, stats, updateStats, t }}>
+    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, stats, updateStats, t, pendingLevelUp, clearLevelUp }}>
       {children}
     </LanguageContext.Provider>
   );
