@@ -9,6 +9,7 @@ import {
   Animated,
   ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
@@ -91,7 +92,6 @@ const PHRASE_SETS: Record<LangTab, Phrase[]> = {
     { word: "죄송합니다", ipa: "/tɕø.soŋ.ham.ni.da/", meaning: "I'm sorry (formal)", level: "A1", speechLang: "ko-KR", tip: "The 죄 vowel is like a rounded 'e'. Lips forward." },
     { word: "네", ipa: "/ne/", meaning: "Yes", level: "A1", speechLang: "ko-KR", tip: "Short and clear. Sounds like 'neh'." },
     { word: "아니요", ipa: "/a.ni.jo/", meaning: "No", level: "A1", speechLang: "ko-KR", tip: "Three syllables: a-ni-yo. Falling tone at the end." },
-    { word: "부탁드려요", ipa: "/pu.tʰak.tɯ.ɾjʌ.jo/", meaning: "Please", level: "A1", speechLang: "ko-KR", tip: "Often used when asking a favor." },
     { word: "물", ipa: "/mul/", meaning: "Water", level: "A1", speechLang: "ko-KR", tip: "The ㅡ vowel (ɯ) is pronounced in the back of the mouth." },
     { word: "커피", ipa: "/kʰʌ.pʰi/", meaning: "Coffee", level: "A1", speechLang: "ko-KR", tip: "Both consonants are aspirated: kh and ph." },
     { word: "친구", ipa: "/tɕʰin.gu/", meaning: "Friend", level: "A1", speechLang: "ko-KR", tip: "The ㅈ (tɕ) is palatalized — like 'ch'." },
@@ -161,34 +161,21 @@ function buildSession(lang: LangTab, weakWords: string[], lastSeenWords: string[
   const all = PHRASE_SETS[lang];
   const weakSet = new Set(weakWords);
   const lastSet = new Set(lastSeenWords);
-
-  const a1 = all.filter((p) => p.level === "A1" && !weakSet.has(p.word));
-  const a2 = all.filter((p) => p.level === "A2" && !weakSet.has(p.word));
-  const harder = all.filter((p) => !["A1","A2"].includes(p.level) && !weakSet.has(p.word));
-  const weak = all.filter((p) => weakSet.has(p.word));
-
   const shuffle = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5);
-
   const lastFirst = (arr: Phrase[]) => {
     const notSeen = arr.filter((p) => !lastSet.has(p.word));
     const seen = arr.filter((p) => lastSet.has(p.word));
     return [...shuffle(notSeen), ...shuffle(seen)];
   };
-
-  const pool = [
-    ...shuffle(weak).slice(0, 3),
-    ...lastFirst(a1),
-    ...lastFirst(a2),
-    ...lastFirst(harder),
-  ];
-
-  const seen = new Set<string>();
+  const a1 = all.filter((p) => p.level === "A1" && !weakSet.has(p.word));
+  const a2 = all.filter((p) => p.level === "A2" && !weakSet.has(p.word));
+  const harder = all.filter((p) => !["A1", "A2"].includes(p.level) && !weakSet.has(p.word));
+  const weak = all.filter((p) => weakSet.has(p.word));
+  const pool = [...shuffle(weak).slice(0, 3), ...lastFirst(a1), ...lastFirst(a2), ...lastFirst(harder)];
+  const seenSet = new Set<string>();
   const unique: Phrase[] = [];
   for (const p of pool) {
-    if (!seen.has(p.word)) {
-      seen.add(p.word);
-      unique.push(p);
-    }
+    if (!seenSet.has(p.word)) { seenSet.add(p.word); unique.push(p); }
     if (unique.length >= SESSION_SIZE) break;
   }
   return unique;
@@ -202,8 +189,7 @@ export default function SpeakScreen() {
   const [xpGain, setXpGain] = useState(0);
   const statsRef = useRef(stats);
   useEffect(() => { statsRef.current = stats; }, [stats]);
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
-  const bottomPad = Platform.OS === "web" ? 84 : TAB_BAR_HEIGHT + insets.bottom;
+  const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
   const visibleTabs = learningLanguage && learningLanguage !== nativeLang
@@ -236,6 +222,19 @@ export default function SpeakScreen() {
   const weakKey = `speak_weak_words_${activeLang}`;
   const lastSeenKey = `speak_last_seen_${activeLang}`;
 
+  const resetPracticeState = useCallback(() => {
+    setRecordState("idle");
+    recordStateRef.current = "idle";
+    setScore(null);
+    setGptFeedback("");
+    setRecognizedText("");
+    setSttError("");
+    setHasListened(false);
+    pulseLoop.current?.stop();
+    Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+    scoreAnim.setValue(0);
+  }, [pulseAnim, scoreAnim]);
+
   const loadSession = useCallback(async (lang: LangTab) => {
     try {
       const [weakRaw, lastRaw] = await Promise.all([
@@ -251,7 +250,7 @@ export default function SpeakScreen() {
       setSessionComplete(false);
       resetPracticeState();
     } catch {}
-  }, []);
+  }, [resetPracticeState]);
 
   useFocusEffect(useCallback(() => {
     loadSession(activeLang);
@@ -259,8 +258,7 @@ export default function SpeakScreen() {
 
   useEffect(() => {
     if (learningLanguage && learningLanguage !== nativeLang) {
-      const ll = learningLanguage as LangTab;
-      setActiveLang(ll);
+      setActiveLang(learningLanguage as LangTab);
     }
   }, [learningLanguage]);
 
@@ -271,19 +269,6 @@ export default function SpeakScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setActiveLang(lang);
     loadSession(lang);
-  };
-
-  const resetPracticeState = () => {
-    setRecordState("idle");
-    recordStateRef.current = "idle";
-    setScore(null);
-    setGptFeedback("");
-    setRecognizedText("");
-    setSttError("");
-    setHasListened(false);
-    pulseLoop.current?.stop();
-    Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
-    scoreAnim.setValue(0);
   };
 
   const saveWeakWord = async (word: string) => {
@@ -343,7 +328,6 @@ export default function SpeakScreen() {
 
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
     if (!SpeechRecognition) {
       setSttError("이 브라우저는 음성 인식을 지원하지 않습니다.\nChrome을 사용해 주세요.");
       setRecordState("done");
@@ -372,11 +356,9 @@ export default function SpeakScreen() {
       stopPulse();
       setRecordState("processing");
       recordStateRef.current = "processing";
-
       const transcript: string = event.results[0][0].transcript;
       setRecognizedText(transcript);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
       try {
         const apiUrl = new URL("/api/gpt-score", getApiUrl()).toString();
         const apiRes = await fetch(apiUrl, {
@@ -389,19 +371,9 @@ export default function SpeakScreen() {
         const scoreVal = data.score ?? 0;
         setScore(scoreVal);
         setGptFeedback(data.feedback ?? "");
-
-        Animated.timing(scoreAnim, {
-          toValue: scoreVal / 100,
-          duration: 900,
-          useNativeDriver: false,
-        }).start();
-
-        if (scoreVal < WEAK_THRESHOLD) {
-          await saveWeakWord(phrase.word);
-        } else {
-          await removeWeakWord(phrase.word);
-        }
-
+        Animated.timing(scoreAnim, { toValue: scoreVal / 100, duration: 900, useNativeDriver: false }).start();
+        if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase.word); }
+        else { await removeWeakWord(phrase.word); }
         const xpEarned = scoreVal >= 90 ? 30 : 15;
         setXpGain(xpEarned);
         updateStats({ xp: statsRef.current.xp + xpEarned });
@@ -455,123 +427,121 @@ export default function SpeakScreen() {
     }
   };
 
-  const startNewSession = async () => {
-    await loadSession(activeLang);
+  const goPrevWord = () => {
+    if (sessionIdx === 0) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSessionIdx((i) => i - 1);
+    resetPracticeState();
   };
 
   const isRecording = recordState === "listening";
   const isProcessing = recordState === "processing";
   const isBusy = isRecording || isProcessing;
-
+  const scoreInfo = score !== null ? getScoreInfo(score) : null;
   const progressPct = sessionWords.length > 0 ? (sessionIdx / sessionWords.length) * 100 : 0;
 
+  // ── Session Complete ────────────────────────────────────────────────────────
   if (sessionComplete) {
     return (
-      <View style={[styles.container, { paddingTop: topPad }]}>
+      <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
         <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
-        <ScrollView
-          contentContainerStyle={[styles.completeContainer, { paddingBottom: bottomPad + 20 }]}
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={[styles.completeWrap, { paddingBottom: TAB_BAR_HEIGHT + bottomPad }]}>
           <Text style={styles.completeTrophy}>🏆</Text>
           <Text style={styles.completeTitle}>Pronunciation Practice{"\n"}Complete!</Text>
-          <Text style={styles.completeSub}>
-            You practiced {sessionWords.length} words this session.
-          </Text>
-
+          <Text style={styles.completeSub}>You practiced {sessionWords.length} words this session.</Text>
           {weakWords.length > 0 && (
             <View style={styles.weakBox}>
               <View style={styles.weakBoxHeader}>
-                <Ionicons name="warning-outline" size={15} color="#EF4444" />
-                <Text style={styles.weakBoxTitle}>Weak Words — Keep Practicing</Text>
+                <Ionicons name="warning-outline" size={14} color="#EF4444" />
+                <Text style={styles.weakBoxTitle}>Weak Words for Review</Text>
               </View>
               {weakWords.slice(0, 5).map((w) => (
                 <Text key={w} style={styles.weakWord}>• {w}</Text>
               ))}
             </View>
           )}
-
           <Pressable
             style={({ pressed }) => [styles.newSessionBtn, pressed && { opacity: 0.85 }]}
-            onPress={startNewSession}
+            onPress={() => loadSession(activeLang)}
           >
             <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} />
             <Ionicons name="refresh" size={18} color={C.bg1} />
             <Text style={styles.newSessionBtnText}>New Session</Text>
           </Pressable>
-        </ScrollView>
-      </View>
+        </View>
+      </SafeAreaView>
     );
   }
 
+  // ── Loading ─────────────────────────────────────────────────────────────────
   if (!phrase) {
     return (
-      <View style={[styles.container, styles.loadingCenter]}>
-        <ActivityIndicator size="large" color={C.gold} />
-      </View>
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+        <View style={styles.loadingCenter}>
+          <ActivityIndicator size="large" color={C.gold} />
+        </View>
+      </SafeAreaView>
     );
   }
 
-  const scoreInfo = score !== null ? getScoreInfo(score) : null;
-
+  // ── Main Screen (fixed layout, no scroll) ──────────────────────────────────
   return (
-    <View style={[styles.container, { paddingTop: topPad }]}>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad + 20 }]}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>{t("speak_title")}</Text>
-          <Text style={styles.subtitle}>{t("speak_subtitle")}</Text>
-        </View>
+      <View style={[styles.screen, { paddingBottom: TAB_BAR_HEIGHT + bottomPad }]}>
 
-        {/* Language tabs */}
-        <View style={styles.langTabs}>
-          {visibleTabs.map((tab) => {
-            const active = activeLang === tab.key;
-            return (
-              <Pressable
-                key={tab.key}
-                style={({ pressed }) => [
-                  styles.langTab,
-                  active && { backgroundColor: tab.color },
-                  pressed && { opacity: 0.85 },
-                ]}
-                onPress={() => switchLang(tab.key)}
-              >
-                <Text style={styles.langTabFlag}>{tab.flag}</Text>
-                <Text style={[styles.langTabLabel, active && styles.langTabLabelActive]}>
-                  {tab.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        {/* ── SECTION 1: HEADER (15%) ─────────────────────────────────────── */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerTop}>
+            <View style={styles.headerText}>
+              <Text style={styles.title}>{t("speak_title")}</Text>
+              <Text style={styles.subtitle}>Tap the mic and say the word</Text>
+            </View>
 
-        {/* Progress bar */}
-        <View style={styles.progressBarRow}>
-          <View style={styles.progressBarTrack}>
-            <View style={[styles.progressBarFill, { width: `${progressPct}%`, backgroundColor: tabInfo.color }]} />
+            {visibleTabs.length > 1 && (
+              <View style={styles.langTabsCompact}>
+                {visibleTabs.map((tab) => {
+                  const active = activeLang === tab.key;
+                  return (
+                    <Pressable
+                      key={tab.key}
+                      style={({ pressed }) => [
+                        styles.langTabCompact,
+                        active && { backgroundColor: tab.color },
+                        pressed && { opacity: 0.8 },
+                      ]}
+                      onPress={() => switchLang(tab.key)}
+                    >
+                      <Text style={styles.langTabFlag}>{tab.flag}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
           </View>
-          <Text style={[styles.progressBarLabel, { color: tabInfo.color }]}>
-            {sessionIdx + 1} / {sessionWords.length}
-          </Text>
+
+          {/* Progress bar */}
+          <View style={styles.progressRow}>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progressPct}%`, backgroundColor: tabInfo.color }]} />
+            </View>
+            <Text style={[styles.progressLabel, { color: tabInfo.color }]}>
+              {sessionIdx + 1} / {sessionWords.length}
+            </Text>
+          </View>
         </View>
 
-        {/* Word card */}
-        <View style={styles.phraseCard}>
-          <LinearGradient
-            colors={[tabInfo.color + "22", "transparent"]}
-            style={styles.cardAccent}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
-          <View style={styles.phraseCardInner}>
-            <View style={styles.phraseTopRow}>
-              <View style={[styles.levelBadge, { backgroundColor: tabInfo.color + "20", borderColor: tabInfo.color + "40" }]}>
+        {/* ── SECTION 2: WORD CARD (38%) ──────────────────────────────────── */}
+        <View style={styles.cardSection}>
+          <View style={styles.card}>
+            <LinearGradient
+              colors={[tabInfo.color + "28", "transparent"]}
+              style={styles.cardTopAccent}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+            />
+            <View style={styles.cardTopRow}>
+              <View style={[styles.levelBadge, { backgroundColor: tabInfo.color + "20", borderColor: tabInfo.color + "50" }]}>
                 <Text style={[styles.levelText, { color: tabInfo.color }]}>{phrase.level}</Text>
               </View>
               <Pressable
@@ -579,147 +549,105 @@ export default function SpeakScreen() {
                 onPress={handleListen}
                 testID="listen-button"
               >
-                <LinearGradient colors={[tabInfo.color, tabInfo.color + "BB"]} style={StyleSheet.absoluteFill} />
-                <Ionicons name="volume-high" size={15} color="#fff" />
+                <LinearGradient colors={[tabInfo.color, tabInfo.color + "CC"]} style={StyleSheet.absoluteFill} />
+                <Ionicons name="volume-high" size={14} color="#fff" />
                 <Text style={styles.listenBtnText}>{t("listen")}</Text>
               </Pressable>
             </View>
 
-            <Text style={styles.phraseWord}>{phrase.word}</Text>
+            <Text style={styles.wordText}>{phrase.word}</Text>
 
             <View style={styles.ipaRow}>
-              <Text style={styles.ipaLabel}>IPA</Text>
+              <Text style={styles.ipaTag}>IPA</Text>
               <Text style={styles.ipaText}>{phrase.ipa}</Text>
             </View>
 
-            <View style={styles.divider} />
-
-            <Text style={styles.phraseMeaning}>{phrase.meaning}</Text>
-
-            <View style={styles.tipBox}>
-              <Ionicons name="bulb-outline" size={13} color="#F59E0B" />
-              <Text style={styles.tipText}>{phrase.tip}</Text>
-            </View>
+            <View style={styles.cardDivider} />
+            <Text style={styles.meaningText}>{phrase.meaning}</Text>
           </View>
         </View>
 
-        {/* Progress dots */}
-        <View style={styles.dotsRow}>
-          {sessionWords.map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.dot,
-                i < sessionIdx && styles.dotDone,
-                i === sessionIdx && [styles.dotActive, { backgroundColor: tabInfo.color }],
-              ]}
-            />
-          ))}
+        {/* ── SECTION 3: TIP (12%) ────────────────────────────────────────── */}
+        <View style={styles.tipSection}>
+          <View style={styles.tipBox}>
+            <Ionicons name="bulb-outline" size={14} color="#F59E0B" />
+            <Text style={styles.tipText} numberOfLines={2}>{phrase.tip}</Text>
+          </View>
+
+          {/* Progress dots */}
+          <View style={styles.dotsRow}>
+            {sessionWords.map((_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.dot,
+                  i < sessionIdx && styles.dotDone,
+                  i === sessionIdx && [styles.dotActive, { backgroundColor: tabInfo.color }],
+                ]}
+              />
+            ))}
+          </View>
         </View>
 
-        {/* Mic / Result section */}
-        <View style={styles.micSection}>
+        {/* ── SECTION 4: RECORDING / RESULT (25%) ────────────────────────── */}
+        <View style={styles.recordSection}>
           {recordState === "done" ? (
-            <View style={styles.resultWrap}>
+            /* Result view */
+            <ScrollView
+              contentContainerStyle={styles.resultScroll}
+              showsVerticalScrollIndicator={false}
+            >
               {score !== null && scoreInfo ? (
-                <>
+                <View style={styles.resultRow}>
                   {/* Score circle */}
-                  <View style={styles.scoreBlock}>
-                    <View style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}>
-                      <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
-                      <Text style={styles.scoreDenom}>/100</Text>
-                    </View>
+                  <View style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}>
+                    <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
+                    <Text style={styles.scoreDenom}>/100</Text>
+                  </View>
+
+                  <View style={styles.resultRight}>
                     <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>
                       {scoreInfo.emoji} {scoreInfo.label}
                     </Text>
 
-                    {/* Color bar */}
+                    {/* Score bar */}
                     <View style={styles.scoreBarTrack}>
                       <Animated.View
-                        style={[
-                          styles.scoreBarFill,
-                          {
-                            width: scoreAnim.interpolate({
-                              inputRange: [0, 1],
-                              outputRange: ["0%", "100%"],
-                            }),
-                            backgroundColor: scoreInfo.color,
-                          },
-                        ]}
+                        style={[styles.scoreBarFill, {
+                          width: scoreAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] }),
+                          backgroundColor: scoreInfo.color,
+                        }]}
                       />
                     </View>
-                  </View>
 
-                  {/* What was heard */}
-                  {recognizedText ? (
-                    <View style={styles.heardBox}>
-                      <Text style={styles.heardLabel}>인식된 발음</Text>
+                    {recognizedText ? (
                       <Text style={styles.heardText}>"{recognizedText}"</Text>
-                    </View>
-                  ) : null}
+                    ) : null}
 
-                  {/* GPT feedback */}
-                  {gptFeedback ? (
-                    <View style={[styles.feedbackBox, { borderColor: scoreInfo.color + "40" }]}>
-                      <Ionicons name="chatbubble-ellipses-outline" size={14} color={scoreInfo.color} />
-                      <Text style={[styles.feedbackText, { color: scoreInfo.color === "#EF4444" ? "#EF4444" : C.parchment }]}>
-                        {gptFeedback}
-                      </Text>
-                    </View>
-                  ) : null}
-
-                  {score < WEAK_THRESHOLD && (
-                    <View style={styles.weakAlert}>
-                      <Ionicons name="bookmark-outline" size={13} color="#EF4444" />
-                      <Text style={styles.weakAlertText}>Added to Weak Words — you'll see this again!</Text>
-                    </View>
-                  )}
-                </>
+                    {gptFeedback ? (
+                      <Text style={styles.feedbackText} numberOfLines={3}>{gptFeedback}</Text>
+                    ) : null}
+                  </View>
+                </View>
               ) : (
-                <View style={styles.errorBox}>
-                  <Ionicons name="warning-outline" size={18} color="#EF4444" />
-                  <Text style={styles.errorText}>
-                    {sttError || "음성 인식에 실패했습니다. 다시 시도해 주세요."}
-                  </Text>
+                <View style={styles.errorRow}>
+                  <Ionicons name="warning-outline" size={16} color="#EF4444" />
+                  <Text style={styles.errorText}>{sttError || "음성 인식 실패. 다시 시도해 주세요."}</Text>
                 </View>
               )}
 
-              {/* Action buttons */}
-              <View style={styles.actionRow}>
-                <Pressable
-                  style={({ pressed }) => [styles.actionBtn, styles.retryBtn, pressed && { opacity: 0.8 }]}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    resetPracticeState();
-                  }}
-                  testID="retry-button"
-                >
-                  <Ionicons name="refresh" size={16} color={tabInfo.color} />
-                  <Text style={[styles.actionBtnText, { color: tabInfo.color }]}>다시 시도</Text>
-                </Pressable>
-
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.actionBtn,
-                    styles.nextWordBtn,
-                    { backgroundColor: tabInfo.color },
-                    pressed && { opacity: 0.85 },
-                  ]}
-                  onPress={goNextWord}
-                  testID="next-word-button"
-                >
-                  <Text style={styles.nextWordBtnText}>
-                    {sessionIdx + 1 >= sessionWords.length ? "완료" : "다음 단어"}
-                  </Text>
-                  <Ionicons
-                    name={sessionIdx + 1 >= sessionWords.length ? "checkmark" : "arrow-forward"}
-                    size={16}
-                    color="#FFFFFF"
-                  />
-                </Pressable>
-              </View>
-            </View>
+              {/* Retry inline */}
+              <Pressable
+                style={({ pressed }) => [styles.retryChip, pressed && { opacity: 0.75 }]}
+                onPress={resetPracticeState}
+                testID="retry-button"
+              >
+                <Ionicons name="refresh" size={13} color={tabInfo.color} />
+                <Text style={[styles.retryChipText, { color: tabInfo.color }]}>다시 시도</Text>
+              </Pressable>
+            </ScrollView>
           ) : (
+            /* Mic view */
             <View style={styles.micWrap}>
               <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
                 <Pressable
@@ -729,434 +657,276 @@ export default function SpeakScreen() {
                   testID="mic-button"
                 >
                   <LinearGradient
-                    colors={
-                      isRecording
-                        ? ["#FF4081", "#E91E63"]
-                        : [tabInfo.color, tabInfo.color + "CC"]
-                    }
+                    colors={isRecording ? ["#FF4081", "#E91E63"] : [tabInfo.color, tabInfo.color + "CC"]}
                     style={StyleSheet.absoluteFill}
-                    start={{ x: 0.2, y: 0 }}
-                    end={{ x: 0.8, y: 1 }}
+                    start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }}
                   />
-                  {isProcessing ? (
-                    <ActivityIndicator size="large" color="#FFFFFF" />
-                  ) : (
-                    <Ionicons
-                      name={isRecording ? "radio-button-on" : "mic"}
-                      size={46}
-                      color="#FFFFFF"
-                    />
-                  )}
+                  {isProcessing
+                    ? <ActivityIndicator size="large" color="#fff" />
+                    : <Ionicons name={isRecording ? "radio-button-on" : "mic"} size={40} color="#fff" />
+                  }
                 </Pressable>
               </Animated.View>
 
-              {isRecording ? (
-                <View style={styles.recordingBadge}>
-                  <View style={styles.redDot} />
-                  <Text style={styles.recordingText}>듣고 있어요…</Text>
-                </View>
-              ) : isProcessing ? (
-                <Text style={styles.processingText}>분석 중…</Text>
-              ) : (
-                <Text style={styles.micHintText}>
-                  {hasListened ? "탭하여 발음하기" : "먼저 듣기 버튼을 눌러보세요"}
-                </Text>
-              )}
-
-              {!hasListened && recordState === "idle" && (
-                <View style={styles.listenHintRow}>
-                  <Ionicons name="arrow-up-outline" size={13} color="#C4B5BF" />
-                  <Text style={styles.listenHintText}>위의 듣기 버튼을 먼저 눌러보세요</Text>
-                </View>
-              )}
+              <Text style={styles.micHint}>
+                {isRecording ? "듣고 있어요…" : isProcessing ? "분석 중…" : hasListened ? "탭하여 발음하기" : "먼저 듣기를 눌러보세요"}
+              </Text>
             </View>
           )}
         </View>
 
-        {/* Weak word count badge */}
-        {weakWords.length > 0 && (
-          <View style={styles.weakCountBadge}>
-            <Ionicons name="bookmark" size={12} color="#EF4444" />
-            <Text style={styles.weakCountText}>{weakWords.length} weak word{weakWords.length !== 1 ? "s" : ""} queued for review</Text>
+        {/* ── SECTION 5: NAVIGATION (10%) ─────────────────────────────────── */}
+        <View style={styles.navSection}>
+          <Pressable
+            style={({ pressed }) => [styles.navBtn, styles.prevBtn, sessionIdx === 0 && styles.navBtnDisabled, pressed && { opacity: 0.75 }]}
+            onPress={goPrevWord}
+            disabled={sessionIdx === 0}
+            testID="prev-button"
+          >
+            <Ionicons name="arrow-back" size={16} color={sessionIdx === 0 ? C.goldDark : C.gold} />
+            <Text style={[styles.navBtnText, { color: sessionIdx === 0 ? C.goldDark : C.gold }]}>Prev</Text>
+          </Pressable>
+
+          <View style={styles.navProgress}>
+            <Text style={styles.navProgressText}>{sessionIdx + 1} / {sessionWords.length}</Text>
           </View>
-        )}
-      </ScrollView>
-    </View>
+
+          {recordState === "done" ? (
+            <Pressable
+              style={({ pressed }) => [styles.navBtn, styles.nextBtnActive, { backgroundColor: tabInfo.color }, pressed && { opacity: 0.85 }]}
+              onPress={goNextWord}
+              testID="next-word-button"
+            >
+              <Text style={styles.nextBtnText}>
+                {sessionIdx + 1 >= sessionWords.length ? "완료" : "다음"}
+              </Text>
+              <Ionicons name={sessionIdx + 1 >= sessionWords.length ? "checkmark" : "arrow-forward"} size={16} color="#fff" />
+            </Pressable>
+          ) : (
+            <Pressable
+              style={({ pressed }) => [styles.navBtn, styles.nextBtnInactive, pressed && { opacity: 0.75 }]}
+              onPress={goNextWord}
+              testID="next-button"
+            >
+              <Text style={[styles.navBtnText, { color: C.goldDim }]}>다음</Text>
+              <Ionicons name="arrow-forward" size={16} color={C.goldDim} />
+            </Pressable>
+          )}
+        </View>
+
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.bg1 },
-  loadingCenter: { justifyContent: "center", alignItems: "center" },
-  scrollContent: {
-    paddingHorizontal: 18,
-    paddingTop: 4,
-    gap: 16,
-  },
-  header: { gap: 3 },
-  title: { fontSize: 24, fontFamily: F.header, color: C.gold, letterSpacing: 1.5 },
-  subtitle: { fontSize: 14, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
-
-  langTabs: {
-    flexDirection: "row",
-    gap: 8,
-    backgroundColor: C.bg2,
-    borderRadius: 16,
-    padding: 4,
-    borderWidth: 1,
-    borderColor: C.border,
-  },
-  langTab: {
+  safeArea: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
+    backgroundColor: C.bg1,
+  },
+  loadingCenter: { flex: 1, justifyContent: "center", alignItems: "center" },
+
+  screen: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === "web" ? 8 : 0,
+  },
+
+  // ── Header (flex 2) ──────────────────────────────────────────────────────
+  headerSection: {
+    flex: 2,
     justifyContent: "center",
-    gap: 5,
-    paddingVertical: 10,
-    borderRadius: 13,
-    backgroundColor: "transparent",
+    gap: 8,
+    paddingTop: 4,
   },
-  langTabFlag: { fontSize: 15 },
-  langTabLabel: { fontSize: 13, fontFamily: F.bodySemi, color: C.goldDark },
-  langTabLabelActive: { color: "#fff" },
-
-  progressBarRow: {
+  headerTop: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+    alignItems: "flex-start",
+    justifyContent: "space-between",
   },
-  progressBarTrack: {
-    flex: 1,
-    height: 6,
-    backgroundColor: "rgba(201,162,39,0.15)",
-    borderRadius: 3,
-    overflow: "hidden",
-    borderWidth: 0.5,
-    borderColor: C.border,
+  headerText: { flex: 1, gap: 1 },
+  title: { fontSize: 20, fontFamily: F.header, color: C.gold, letterSpacing: 1 },
+  subtitle: { fontSize: 12, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
+  langTabsCompact: { flexDirection: "row", gap: 6, marginLeft: 8 },
+  langTabCompact: {
+    width: 36, height: 36, borderRadius: 18,
+    alignItems: "center", justifyContent: "center",
+    backgroundColor: C.bg2, borderWidth: 1, borderColor: C.border,
   },
-  progressBarFill: {
-    height: "100%",
-    borderRadius: 3,
+  langTabFlag: { fontSize: 18 },
+  progressRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  progressTrack: {
+    flex: 1, height: 5, backgroundColor: "rgba(201,162,39,0.12)",
+    borderRadius: 3, overflow: "hidden", borderWidth: 0.5, borderColor: C.border,
   },
-  progressBarLabel: {
-    fontSize: 13,
-    fontFamily: F.bodySemi,
-    minWidth: 36,
-    textAlign: "right",
-  },
+  progressFill: { height: "100%", borderRadius: 3 },
+  progressLabel: { fontSize: 11, fontFamily: F.bodySemi, minWidth: 30, textAlign: "right" },
 
-  phraseCard: {
-    borderRadius: 28,
-    overflow: "hidden",
+  // ── Word Card (flex 5) ───────────────────────────────────────────────────
+  cardSection: {
+    flex: 5,
+    justifyContent: "center",
+  },
+  card: {
     backgroundColor: C.parchment,
+    borderRadius: 24,
+    overflow: "hidden",
+    padding: 18,
+    gap: 8,
     shadowColor: C.gold,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 5,
+    shadowRadius: 16,
+    elevation: 4,
     borderWidth: 1,
     borderColor: "rgba(201,162,39,0.2)",
   },
-  cardAccent: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 4,
-  },
-  phraseCardInner: {
-    padding: 24,
-    gap: 10,
-  },
-  phraseTopRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+  cardTopAccent: { position: "absolute", top: 0, left: 0, right: 0, height: 3 },
+  cardTopRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   levelBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
-    borderWidth: 1,
+    paddingHorizontal: 10, paddingVertical: 3,
+    borderRadius: 16, borderWidth: 1,
   },
-  levelText: { fontSize: 12, fontFamily: F.label, letterSpacing: 1 },
+  levelText: { fontSize: 11, fontFamily: F.label, letterSpacing: 1 },
   listenBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    overflow: "hidden",
+    flexDirection: "row", alignItems: "center", gap: 4,
+    paddingHorizontal: 12, paddingVertical: 6,
+    borderRadius: 16, overflow: "hidden",
   },
-  listenBtnText: { fontSize: 13, fontFamily: F.bodySemi, color: "#fff" },
-  phraseWord: {
-    fontSize: 36,
+  listenBtnText: { fontSize: 12, fontFamily: F.bodySemi, color: "#fff" },
+  wordText: {
+    fontSize: 38,
     fontFamily: F.title,
     color: C.textParchment,
     textAlign: "center",
-    marginTop: 4,
     lineHeight: 46,
     letterSpacing: 1,
   },
-  ipaRow: {
-    flexDirection: "row",
-    alignItems: "center",
+  ipaRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
+  ipaTag: {
+    fontSize: 10, fontFamily: F.label, color: C.goldDark,
+    letterSpacing: 1, backgroundColor: "rgba(201,162,39,0.12)",
+    paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4,
+  },
+  ipaText: { fontSize: 16, fontFamily: F.body, color: C.goldDark, fontStyle: "italic" },
+  cardDivider: { height: 1, backgroundColor: "rgba(44,24,16,0.1)", marginVertical: 2 },
+  meaningText: { fontSize: 16, fontFamily: F.bodySemi, color: C.textParchment, textAlign: "center" },
+
+  // ── Tip + dots (flex 1.5) ────────────────────────────────────────────────
+  tipSection: {
+    flex: 1.5,
     justifyContent: "center",
     gap: 8,
-  },
-  ipaLabel: {
-    fontSize: 10,
-    fontFamily: F.label,
-    color: C.goldDark,
-    letterSpacing: 1,
-    backgroundColor: "rgba(201,162,39,0.1)",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 5,
-  },
-  ipaText: { fontSize: 17, fontFamily: F.body, color: C.goldDark, fontStyle: "italic" },
-  divider: { height: 1, backgroundColor: "rgba(44,24,16,0.12)", marginVertical: 2 },
-  phraseMeaning: {
-    fontSize: 16,
-    fontFamily: F.bodySemi,
-    color: C.textParchment,
-    textAlign: "center",
   },
   tipBox: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 6,
-    backgroundColor: "rgba(201,162,39,0.08)",
-    borderRadius: 12,
-    padding: 10,
-    marginTop: 2,
-    borderWidth: 1,
-    borderColor: "rgba(201,162,39,0.2)",
+    flexDirection: "row", alignItems: "flex-start", gap: 6,
+    backgroundColor: "rgba(201,162,39,0.07)",
+    borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8,
+    borderWidth: 1, borderColor: "rgba(201,162,39,0.18)",
   },
   tipText: {
-    flex: 1,
-    fontSize: 12,
-    fontFamily: F.body,
-    color: C.textParchment,
-    lineHeight: 18,
-    fontStyle: "italic",
+    flex: 1, fontSize: 12, fontFamily: F.body,
+    color: C.textParchment, lineHeight: 17, fontStyle: "italic",
   },
+  dotsRow: { flexDirection: "row", justifyContent: "center", gap: 5 },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: C.goldDark, opacity: 0.3 },
+  dotDone: { opacity: 0.8 },
+  dotActive: { width: 16, borderRadius: 4, opacity: 1 },
 
-  dotsRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 6,
-  },
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: C.goldDark,
-    opacity: 0.4,
-  },
-  dotDone: {
-    opacity: 1,
-    backgroundColor: C.goldDark,
-  },
-  dotActive: {
-    width: 18,
-    borderRadius: 4,
-    opacity: 1,
-  },
-
-  micSection: {
-    alignItems: "center",
-    paddingVertical: 8,
-    minHeight: 200,
+  // ── Recording / Result (flex 3) ──────────────────────────────────────────
+  recordSection: {
+    flex: 3,
     justifyContent: "center",
   },
-  micWrap: { alignItems: "center", gap: 14 },
+  micWrap: { alignItems: "center", gap: 10 },
   micBtn: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    overflow: "hidden",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: C.gold,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 8,
+    width: 84, height: 84, borderRadius: 42,
+    overflow: "hidden", justifyContent: "center", alignItems: "center",
+    shadowColor: C.gold, shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3, shadowRadius: 14, elevation: 7,
   },
-  recordingBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: "rgba(255,64,129,0.12)",
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "rgba(255,64,129,0.3)",
+  micHint: {
+    fontSize: 13, fontFamily: F.body, color: C.goldDim,
+    textAlign: "center", fontStyle: "italic",
   },
-  redDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#FF4081" },
-  recordingText: { fontSize: 13, fontFamily: F.bodySemi, color: "#FF4081" },
-  processingText: { fontSize: 13, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
-  micHintText: { fontSize: 13, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
-  listenHintRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginTop: 4,
-  },
-  listenHintText: { fontSize: 12, fontFamily: F.body, color: "#C4B5BF", fontStyle: "italic" },
 
-  resultWrap: { width: "100%", gap: 14, alignItems: "center" },
-  scoreBlock: { alignItems: "center", gap: 10, width: "100%" },
+  resultScroll: { gap: 10, paddingBottom: 4 },
+  resultRow: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
   scoreCircle: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    borderWidth: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: C.bg2,
+    width: 76, height: 76, borderRadius: 38,
+    borderWidth: 4, justifyContent: "center", alignItems: "center",
+    backgroundColor: C.bg2, flexShrink: 0,
   },
-  scoreNumber: { fontSize: 36, fontFamily: F.title, lineHeight: 42 },
-  scoreDenom: { fontSize: 12, fontFamily: F.body, color: C.goldDim },
-  scoreLabel: { fontSize: 16, fontFamily: F.bodySemi, textAlign: "center" },
+  scoreNumber: { fontSize: 26, fontFamily: F.title, lineHeight: 30 },
+  scoreDenom: { fontSize: 10, fontFamily: F.body, color: C.goldDim },
+  resultRight: { flex: 1, gap: 6 },
+  scoreLabel: { fontSize: 14, fontFamily: F.bodySemi },
   scoreBarTrack: {
-    width: "80%",
-    height: 8,
-    backgroundColor: "rgba(201,162,39,0.12)",
-    borderRadius: 4,
-    overflow: "hidden",
-    borderWidth: 0.5,
-    borderColor: C.border,
+    height: 6, backgroundColor: "rgba(201,162,39,0.1)",
+    borderRadius: 3, overflow: "hidden", borderWidth: 0.5, borderColor: C.border,
   },
-  scoreBarFill: { height: "100%", borderRadius: 4 },
-
-  heardBox: {
-    backgroundColor: C.bg2,
-    borderRadius: 12,
-    padding: 12,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: C.border,
-    gap: 3,
+  scoreBarFill: { height: "100%", borderRadius: 3 },
+  heardText: { fontSize: 12, fontFamily: F.body, color: C.parchment, fontStyle: "italic" },
+  feedbackText: { fontSize: 12, fontFamily: F.body, color: C.goldDim, lineHeight: 17 },
+  retryChip: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    alignSelf: "center", paddingHorizontal: 14, paddingVertical: 6,
+    borderRadius: 16, borderWidth: 1, borderColor: C.border, backgroundColor: C.bg2,
   },
-  heardLabel: { fontSize: 11, fontFamily: F.label, color: C.goldDim, letterSpacing: 0.5 },
-  heardText: { fontSize: 15, fontFamily: F.bodySemi, color: C.parchment },
-
-  feedbackBox: {
-    backgroundColor: C.bg2,
-    borderRadius: 12,
-    padding: 12,
-    width: "100%",
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 8,
-    alignItems: "flex-start",
+  retryChipText: { fontSize: 12, fontFamily: F.bodySemi },
+  errorRow: {
+    flexDirection: "row", gap: 6, alignItems: "flex-start",
+    backgroundColor: "rgba(239,68,68,0.08)", borderRadius: 10,
+    paddingHorizontal: 12, paddingVertical: 10,
+    borderWidth: 1, borderColor: "rgba(239,68,68,0.2)",
   },
-  feedbackText: { flex: 1, fontSize: 13, fontFamily: F.body, lineHeight: 20, color: C.parchment },
+  errorText: { flex: 1, fontSize: 12, fontFamily: F.body, color: "#EF4444", lineHeight: 18 },
 
-  weakAlert: {
+  // ── Navigation (flex 1.5) ────────────────────────────────────────────────
+  navSection: {
+    flex: 1.5,
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    backgroundColor: "rgba(239,68,68,0.1)",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderWidth: 1,
-    borderColor: "rgba(239,68,68,0.25)",
+    gap: 10,
+    paddingTop: 4,
   },
-  weakAlertText: { fontSize: 12, fontFamily: F.body, color: "#EF4444" },
+  navBtn: {
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, paddingVertical: 12, borderRadius: 14,
+  },
+  prevBtn: {
+    backgroundColor: C.bg2, borderWidth: 1.5, borderColor: C.border,
+  },
+  navBtnDisabled: { opacity: 0.4 },
+  navBtnText: { fontSize: 14, fontFamily: F.bodySemi },
+  navProgress: { alignItems: "center", minWidth: 44 },
+  navProgressText: { fontSize: 13, fontFamily: F.bodySemi, color: C.goldDim },
+  nextBtnActive: { overflow: "hidden" },
+  nextBtnInactive: { backgroundColor: C.bg2, borderWidth: 1.5, borderColor: C.border },
+  nextBtnText: { fontSize: 14, fontFamily: F.bodySemi, color: "#fff" },
 
-  errorBox: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-    backgroundColor: "rgba(239,68,68,0.08)",
-    borderRadius: 12,
-    padding: 14,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "rgba(239,68,68,0.2)",
+  // ── Completion screen ────────────────────────────────────────────────────
+  completeWrap: {
+    flex: 1, alignItems: "center", justifyContent: "center",
+    paddingHorizontal: 28, gap: 18,
   },
-  errorText: { flex: 1, fontSize: 13, fontFamily: F.body, color: "#EF4444", lineHeight: 20 },
-
-  actionRow: { flexDirection: "row", gap: 12, width: "100%" },
-  actionBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 14,
-    borderRadius: 16,
-  },
-  retryBtn: {
-    backgroundColor: C.bg2,
-    borderWidth: 1.5,
-    borderColor: C.border,
-  },
-  actionBtnText: { fontSize: 14, fontFamily: F.bodySemi },
-  nextWordBtn: { overflow: "hidden" },
-  nextWordBtnText: { fontSize: 14, fontFamily: F.bodySemi, color: "#fff" },
-
-  weakCountBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    justifyContent: "center",
-    paddingVertical: 6,
-  },
-  weakCountText: { fontSize: 12, fontFamily: F.body, color: "#EF4444" },
-
-  completeContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 28,
-    gap: 20,
-    paddingTop: 40,
-  },
-  completeTrophy: { fontSize: 72, textAlign: "center" },
+  completeTrophy: { fontSize: 64, textAlign: "center" },
   completeTitle: {
-    fontSize: 26,
-    fontFamily: F.header,
-    color: C.gold,
-    textAlign: "center",
-    letterSpacing: 1,
-    lineHeight: 36,
+    fontSize: 24, fontFamily: F.header, color: C.gold,
+    textAlign: "center", letterSpacing: 1, lineHeight: 34,
   },
-  completeSub: {
-    fontSize: 15,
-    fontFamily: F.body,
-    color: C.goldDim,
-    textAlign: "center",
-    fontStyle: "italic",
-  },
+  completeSub: { fontSize: 14, fontFamily: F.body, color: C.goldDim, textAlign: "center", fontStyle: "italic" },
   weakBox: {
-    backgroundColor: C.bg2,
-    borderRadius: 16,
-    padding: 16,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "rgba(239,68,68,0.25)",
-    gap: 8,
+    backgroundColor: C.bg2, borderRadius: 14, padding: 14,
+    width: "100%", borderWidth: 1, borderColor: "rgba(239,68,68,0.25)", gap: 6,
   },
   weakBoxHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
-  weakBoxTitle: { fontSize: 13, fontFamily: F.bodySemi, color: "#EF4444" },
-  weakWord: { fontSize: 15, fontFamily: F.body, color: C.parchment, paddingLeft: 4 },
+  weakBoxTitle: { fontSize: 12, fontFamily: F.bodySemi, color: "#EF4444" },
+  weakWord: { fontSize: 14, fontFamily: F.body, color: C.parchment, paddingLeft: 4 },
   newSessionBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 16,
-    paddingHorizontal: 40,
-    borderRadius: 20,
-    overflow: "hidden",
-    marginTop: 8,
+    flexDirection: "row", alignItems: "center", gap: 8,
+    paddingVertical: 14, paddingHorizontal: 36,
+    borderRadius: 18, overflow: "hidden",
   },
-  newSessionBtnText: { fontSize: 16, fontFamily: F.header, color: C.bg1, letterSpacing: 1 },
+  newSessionBtnText: { fontSize: 15, fontFamily: F.header, color: C.bg1, letterSpacing: 1 },
 });
