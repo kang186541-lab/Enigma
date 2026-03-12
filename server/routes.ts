@@ -230,7 +230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ` xml:lang="${lang}">`,
       `<voice name="${voiceName}">`,
       `<mstts:express-as style="${ssmlStyle.style}" styledegree="${ssmlStyle.degree}">`,
-      `<prosody rate="slow">${safeText}</prosody>`,
+      `<prosody rate="+20%">${safeText}</prosody>`,
       `</mstts:express-as>`,
       `</voice>`,
       `</speak>`,
