@@ -18,6 +18,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getTutor, Tutor } from "@/constants/tutors";
 import { useLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
@@ -41,6 +42,13 @@ const MODE_TOASTS: Partial<Record<PersonalityMode, string>> = {
   "독설": "⚠️ 멘탈 단단히 잡으세요! 😈",
   "개그": "🤣 웃음 참으면 지는 거예요!",
 };
+
+const SPEED_OPTIONS: { label: string; value: number }[] = [
+  { label: "🐢 0.8x", value: 0.8 },
+  { label: "1.0x",    value: 1.0 },
+  { label: "1.2x",    value: 1.2 },
+  { label: "🐇 1.4x", value: 1.4 },
+];
 
 const LANG_NAMES: Record<string, string> = {
   english: "English",
@@ -193,9 +201,25 @@ export default function ChatRoomScreen() {
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
   const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
 
-  // Voice settings — speed only
+  // Voice settings — speed (persisted)
   const [rate, setRate] = useState(1.0);
   const [showSettings, setShowSettings] = useState(false);
+
+  // Load persisted speed on mount
+  useEffect(() => {
+    AsyncStorage.getItem("speed_pref").then((val) => {
+      if (val !== null) {
+        const parsed = parseFloat(val);
+        if (!isNaN(parsed)) setRate(parsed);
+      }
+    });
+  }, []);
+
+  const handleSpeedChange = (val: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setRate(val);
+    AsyncStorage.setItem("speed_pref", val.toString());
+  };
 
   // Subtitle state
   const [subtitleWordIdx, setSubtitleWordIdx] = useState(-1);
@@ -676,6 +700,28 @@ export default function ChatRoomScreen() {
         })}
       </View>
 
+      {/* Speed control bar */}
+      <View style={styles.speedRow}>
+        {SPEED_OPTIONS.map((opt) => {
+          const active = rate === opt.value;
+          return (
+            <Pressable
+              key={opt.value}
+              style={({ pressed }) => [
+                styles.speedBtn,
+                active && styles.speedBtnActive,
+                pressed && { opacity: 0.75 },
+              ]}
+              onPress={() => handleSpeedChange(opt.value)}
+            >
+              <Text style={[styles.speedBtnText, active && styles.speedBtnTextActive]}>
+                {opt.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
       {/* Toast notification */}
       {!!toastMsg && (
         <Animated.View
@@ -703,26 +749,6 @@ export default function ChatRoomScreen() {
               <Pressable onPress={() => setShowSettings(false)} hitSlop={10}>
                 <Ionicons name="close" size={20} color="#A08090" />
               </Pressable>
-            </View>
-
-            {/* Speed */}
-            <Text style={styles.settingLabel}>Speed</Text>
-            <View style={styles.segmentRow}>
-              {([
-                { label: "🐢 Slow", value: 0.65 },
-                { label: "Normal", value: 0.9 },
-                { label: "🐇 Fast", value: 1.2 },
-              ] as { label: string; value: number }[]).map((opt) => (
-                <Pressable
-                  key={opt.value}
-                  style={[styles.segmentBtn, rate === opt.value && styles.segmentBtnActive]}
-                  onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setRate(opt.value); }}
-                >
-                  <Text style={[styles.segmentBtnText, rate === opt.value && styles.segmentBtnTextActive]}>
-                    {opt.label}
-                  </Text>
-                </Pressable>
-              ))}
             </View>
 
             {/* Neural voice info */}
@@ -1228,6 +1254,35 @@ const styles = StyleSheet.create({
     color: "#A08090",
   },
   modeBtnLabelActive: {
+    color: "#FFFFFF",
+  },
+
+  speedRow: {
+    flexDirection: "row",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingBottom: 6,
+  },
+  speedBtn: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 5,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: "#F0D6E4",
+    backgroundColor: "#FFFFFF",
+  },
+  speedBtnActive: {
+    backgroundColor: "#FF6B9D",
+    borderColor: "#FF6B9D",
+  },
+  speedBtnText: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    color: "#A08090",
+  },
+  speedBtnTextActive: {
     color: "#FFFFFF",
   },
 
