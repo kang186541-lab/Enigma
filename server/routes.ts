@@ -427,7 +427,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ── GPT Pronunciation Scoring ─────────────────────────────────────────────
   // Receives the target word and what the speech recogniser heard, then asks
-  // GPT to give a 0-100 score and short Korean feedback.
+  // Azure Pronunciation Assessment — sends real audio to Azure's phoneme-level scorer.
+  // Accepts { word, lang, audio (base64), mimeType } and returns detailed pronunciation scores.
+  app.post("/api/pronunciation-assess", async (req: Request, res: Response) => {
+    try {
+      const { word, lang, audio, mimeType } = req.body as {
+        word?: string;
+        lang?: string;
+        audio?: string;
+        mimeType?: string;
+      };
+      if (!word || !lang || !audio) {
+        return res.status(400).json({ error: "word, lang, and audio are required" });
+      }
+
+      const key = process.env.AZURE_SPEECH_KEY;
+      const region = process.env.AZURE_SPEECH_REGION;
+      if (!key || !region) {
+        return res.status(500).json({ error: "Azure credentials not configured" });
+      }
+
+      const { convertToWav } = await import("./replit_integrations/audio/client");
+      const rawBuffer = Buffer.from(audio, "base64");
+
+      let wavBuffer: Buffer;
+      try {
+        wavBuffer = await convertToWav(rawBuffer);
+      } catch {
+        wavBuffer = rawBuffer;
+      }
+
+      const assessmentConfig = Buffer.from(
+        JSON.stringify({
+          ReferenceText: word,
+          GradingSystem: "HundredMark",
+          Dimension: "Comprehensive",
+          EnableProsodyAssessment: false,
+        })
+      ).toString("base64");
+
+      const azureRes = await fetch(
+        `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${lang}&format=detailed`,
+        {
+          method: "POST",
+          headers: {
+            "Ocp-Apim-Subscription-Key": key,
+            "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000",
+            "Pronunciation-Assessment": assessmentConfig,
+          },
+          body: wavBuffer,
+        }
+      );
+
+      if (!azureRes.ok) {
+        const errText = await azureRes.text();
+        console.error("Azure Pronunciation Assessment error:", azureRes.status, errText);
+        return res.status(500).json({ error: "Azure assessment failed" });
+      }
+
+      const data = (await azureRes.json()) as {
+        RecognitionStatus: string;
+        DisplayText?: string;
+        NBest?: Array<{
+          PronunciationAssessment?: {
+            AccuracyScore: number;
+            FluencyScore: number;
+            CompletenessScore: number;
+            PronScore: number;
+          };
+          Words?: Array<{
+            Word: string;
+            PronunciationAssessment?: { AccuracyScore: number; ErrorType: string };
+          }>;
+        }>;
+      };
+
+      if (data.RecognitionStatus !== "Success" || !data.NBest?.[0]?.PronunciationAssessment) {
+        return res.json({
+          score: 0,
+          accuracyScore: 0,
+          fluencyScore: 0,
+          completenessScore: 0,
+          recognizedText: data.DisplayText ?? "",
+          feedback: "음성이 인식되지 않았습니다. 더 크고 명확하게 말해 주세요.",
+          words: [],
+        });
+      }
+
+      const pa = data.NBest[0].PronunciationAssessment!;
+      const pronScore = Math.round(pa.PronScore);
+      const accuracyScore = Math.round(pa.AccuracyScore);
+      const fluencyScore = Math.round(pa.FluencyScore);
+      const completenessScore = Math.round(pa.CompletenessScore);
+
+      let feedback: string;
+      if (pronScore >= 90) {
+        feedback = "완벽한 발음이에요! 정말 훌륭합니다! 🎉";
+      } else if (pronScore >= 75) {
+        feedback = `좋아요! 정확도 ${accuracyScore}점. 조금만 더 연습하면 완벽해질 거예요!`;
+      } else if (pronScore >= 50) {
+        feedback = `연습이 필요해요. 각 음절을 천천히 또렷하게 발음해 보세요. (정확도: ${accuracyScore}점)`;
+      } else {
+        feedback = `다시 도전해 봐요! 먼저 듣기 버튼으로 원어민 발음을 들어보세요.`;
+      }
+
+      res.json({
+        score: pronScore,
+        accuracyScore,
+        fluencyScore,
+        completenessScore,
+        recognizedText: data.DisplayText ?? "",
+        feedback,
+        words: (data.NBest[0].Words ?? []).map((w) => ({
+          word: w.Word,
+          score: Math.round(w.PronunciationAssessment?.AccuracyScore ?? 0),
+          errorType: w.PronunciationAssessment?.ErrorType ?? "None",
+        })),
+      });
+    } catch (err) {
+      console.error("Pronunciation assessment error:", err);
+      res.status(500).json({ error: "Assessment failed" });
+    }
+  });
+
+  // GPT to give a 0-100 score and short Korean feedback (legacy, kept as fallback).
   app.post("/api/gpt-score", async (req: Request, res: Response) => {
     try {
       const { word, recognized } = req.body as { word?: string; recognized?: string };
