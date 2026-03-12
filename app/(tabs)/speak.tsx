@@ -206,7 +206,9 @@ export default function SpeakScreen() {
   const bottomPad = Platform.OS === "web" ? 84 : TAB_BAR_HEIGHT + insets.bottom;
 
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
-  const visibleTabs = LANG_TABS.filter((tab) => tab.key !== nativeLang);
+  const visibleTabs = learningLanguage && learningLanguage !== nativeLang
+    ? LANG_TABS.filter((tab) => tab.key === learningLanguage)
+    : LANG_TABS.filter((tab) => tab.key !== nativeLang);
 
   const [activeLang, setActiveLang] = useState<LangTab>(() => {
     const ll = learningLanguage as LangTab | null;
