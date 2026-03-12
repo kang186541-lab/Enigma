@@ -145,13 +145,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Azure voice fallback map — used when ElevenLabs quota is exhausted.
+  // Male tutors (Jake, Alex, 민준) use Azure male neural voices.
   const TUTOR_AZURE_FALLBACK: Record<string, { voice: string; lang: string }> = {
-    sarah:  { voice: "en-GB-SoniaNeural",  lang: "en-GB" },
-    jake:   { voice: "en-US-JennyNeural",  lang: "en-US" },
-    jane:   { voice: "es-ES-ElviraNeural", lang: "es-ES" },
-    alex:   { voice: "es-MX-DaliaNeural",  lang: "es-MX" },
-    jisu:   { voice: "ko-KR-SunHiNeural",  lang: "ko-KR" },
-    minjun: { voice: "ko-KR-SunHiNeural",  lang: "ko-KR" },
+    sarah:  { voice: "en-GB-SoniaNeural",  lang: "en-GB" }, // female ✓
+    jake:   { voice: "en-US-GuyNeural",    lang: "en-US" }, // male  ✓
+    jane:   { voice: "es-ES-ElviraNeural", lang: "es-ES" }, // female ✓
+    alex:   { voice: "es-MX-JorgeNeural",  lang: "es-MX" }, // male  ✓
+    jisu:   { voice: "ko-KR-SunHiNeural",  lang: "ko-KR" }, // female ✓
+    minjun: { voice: "ko-KR-InJoonNeural", lang: "ko-KR" }, // male  ✓
   };
 
   app.get("/api/tts", async (req: Request, res: Response) => {
@@ -260,10 +261,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // tutorId override takes precedence when the caller supplies it.
   const VOICE_SSML_STYLES: Record<string, { style: string; degree: string }> = {
     "en-GB-SoniaNeural":  { style: "customerservice", degree: "1.5" }, // Sarah
-    "en-US-JennyNeural":  { style: "friendly",         degree: "2"   }, // Jake
+    "en-US-GuyNeural":    { style: "friendly",         degree: "2"   }, // Jake (male fallback)
+    "en-US-JennyNeural":  { style: "friendly",         degree: "2"   }, // Jake legacy
     "es-ES-ElviraNeural": { style: "cheerful",          degree: "1.5" }, // Jane
-    "es-MX-DaliaNeural":  { style: "excited",           degree: "1.5" }, // Alex
-    "ko-KR-SunHiNeural":  { style: "friendly",          degree: "1.5" }, // 지수 default
+    "es-MX-JorgeNeural":  { style: "excited",           degree: "1.5" }, // Alex (male fallback)
+    "es-MX-DaliaNeural":  { style: "excited",           degree: "1.5" }, // Alex legacy
+    "ko-KR-SunHiNeural":  { style: "friendly",          degree: "1.5" }, // 지수
+    "ko-KR-InJoonNeural": { style: "excited",           degree: "2"   }, // 민준 (male fallback)
   };
 
   // Per-tutor override for voices shared across tutors (e.g. both Korean tutors
