@@ -66,6 +66,29 @@ function stripMarkdown(text: string): string {
     .replace(/_(.+?)_/gs, "$1");       // _italic_
 }
 
+/**
+ * Prepare text for TTS — remove anything that sounds unnatural when read aloud:
+ * emojis, Korean internet slang ligatures (ㅋㅋ, ㅎㅎ), bullet chars, markdown.
+ */
+function stripForTTS(text: string): string {
+  return text
+    // Emoji — extended pictographic covers virtually all emoji/symbols
+    .replace(/\p{Extended_Pictographic}/gu, "")
+    // Variation selectors, zero-width joiners, skin-tone modifiers
+    .replace(/[\u{FE00}-\u{FE0F}\u{1F3FB}-\u{1F3FF}\u200D]/gu, "")
+    // Korean informal ligatures that sound odd when TTS pronounces them letter-by-letter
+    .replace(/ㅋ+/g, "")
+    .replace(/ㅎ+/g, "")
+    // Strip markdown (bold/italic/underline markers)
+    .replace(/\*\*(.+?)\*\*/gs, "$1")
+    .replace(/\*(.+?)\*/gs, "$1")
+    .replace(/__(.+?)__/gs, "$1")
+    .replace(/_(.+?)_/gs, "$1")
+    // Collapse leftover whitespace
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function stopSpeech() {
   if (Platform.OS !== "web") {
     try { Speech.stop(); } catch {}
@@ -279,6 +302,10 @@ export default function ChatRoomScreen() {
     clearSubtitle();
     setSpeakingId(msgId);
 
+    // Clean version for TTS — no emojis, ㅋㅋ, ㅎㅎ, or markdown.
+    // The original `text` (with emojis) stays visible in the chat bubble.
+    const ttsText = stripForTTS(text);
+
     const onEnd = () => {
       clearSubtitle();
       setSpeakingId(null);
@@ -290,27 +317,27 @@ export default function ChatRoomScreen() {
       // Word highlights start inside onPlaybackStart (audio.onplay) using the
       // real audio duration, so they stay perfectly in sync.
       elevenLabsPlay(
-        text,
+        ttsText,
         tutor.id,
         getApiUrl(),
         rate,
         () => setLoadingAudioId(msgId),
         onEnd,
-        (durationSecs) => startAudioSyncedSubtitle(text, durationSecs),
+        (durationSecs) => startAudioSyncedSubtitle(ttsText, durationSecs),
         mode
       );
     } else {
       // Native: expo-speech fallback (works in Expo Go without native build)
-      startNativeSubtitle(text, rate);
+      startNativeSubtitle(ttsText, rate);
       try { Speech.stop(); } catch {}
-      Speech.speak(text, {
+      Speech.speak(ttsText, {
         language: tutor.speechLang,
         rate,
         onDone: onEnd,
         onError: onEnd,
       });
     }
-  }, [tutor, rate, clearSubtitle, startAudioSyncedSubtitle, startNativeSubtitle]);
+  }, [tutor, rate, mode, clearSubtitle, startAudioSyncedSubtitle, startNativeSubtitle]);
 
   // ── Auto-translation effect ───────────────────────────────────────────────
   useEffect(() => {
@@ -471,14 +498,17 @@ export default function ChatRoomScreen() {
     const isTranslating = translatingIds.has(item.id);
     const isSpeakingThis = speakingId === item.id && subtitleWordIdx >= 0;
 
-    // Render AI bubble text with per-word highlight when speaking
+    // Render AI bubble text with per-word highlight when speaking.
+    // During speech: use TTS-clean text (no emojis) so word indices match exactly.
+    // At rest: show full display text including emojis in the bubble.
     const renderBubbleText = () => {
       const displayText = item.isUser ? item.text : stripMarkdown(item.text);
       if (!item.isUser && isSpeakingThis) {
+        const speakText = stripForTTS(displayText);
         let wordCount = 0;
         return (
           <Text style={[styles.bubbleText, styles.bubbleTextAI]}>
-            {displayText.split(/(\s+)/).map((token, i) => {
+            {speakText.split(/(\s+)/).map((token, i) => {
               if (/^\s+$/.test(token)) return <Text key={i}>{token}</Text>;
               const myIdx = wordCount++;
               return (

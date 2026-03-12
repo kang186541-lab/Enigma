@@ -71,12 +71,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Unknown tutor" });
       }
 
+      // Prepended to every prompt — keeps responses natural for TTS playback.
+      const TTS_INSTRUCTION =
+        "IMPORTANT: Your responses are spoken aloud via text-to-speech. " +
+        "Never use emojis, bullet points, numbered lists, or markdown symbols like ** or __. " +
+        "Never write 'ㅋㅋㅋ' or 'ㅎㅎㅎ' — use spoken laughter instead (e.g. '하하', '웃기다', 'haha', 'oh wow'). " +
+        "Express all emotion through words, not symbols. Keep responses short and conversational.";
+
       const modePrompt = mode === "독설"
         ? (TUTOR_DOKSEOL_PROMPTS[tutorId] ?? PERSONALITY_MODE_PROMPTS["개그"]) // fallback just in case
         : (mode && PERSONALITY_MODE_PROMPTS[mode]);
       const systemPrompt = modePrompt
-        ? `${baseTutorPrompt}\n\n[PERSONALITY MODE OVERRIDE — apply this interaction style]\n${modePrompt}`
-        : baseTutorPrompt;
+        ? `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}\n\n[PERSONALITY MODE OVERRIDE — apply this interaction style]\n${modePrompt}`
+        : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-5.1",
