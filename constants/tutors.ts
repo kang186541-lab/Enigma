@@ -1,4 +1,15 @@
+import { ImageSourcePropType } from "react-native";
+
 export type TutorLanguage = "english" | "spanish" | "korean";
+
+export const TUTOR_IMAGES: Record<string, ImageSourcePropType> = {
+  sarah:  require("../assets/avatars/sarah.png"),
+  jake:   require("../assets/avatars/jake.png"),
+  jane:   require("../assets/avatars/jane.png"),
+  alex:   require("../assets/avatars/alex.png"),
+  jisu:   require("../assets/avatars/jisu.png"),
+  minjun: require("../assets/avatars/minjun.png"),
+};
 
 export interface Tutor {
   id: string;

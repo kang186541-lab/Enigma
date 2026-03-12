@@ -2,6 +2,7 @@ import React from "react";
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   ScrollView,
   Pressable,
@@ -12,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useLanguage } from "@/context/LanguageContext";
-import { TUTORS, TUTOR_GROUPS, Tutor, TutorLanguage } from "@/constants/tutors";
+import { TUTORS, TUTOR_GROUPS, TUTOR_IMAGES, Tutor, TutorLanguage } from "@/constants/tutors";
 
 const TAB_BAR_HEIGHT = 49;
 
@@ -33,7 +34,11 @@ function TutorCard({ tutor, onPress }: { tutor: Tutor; onPress: () => void }) {
   return (
     <View style={styles.tutorCard}>
       <View style={[styles.avatarWrap, { backgroundColor: LANG_LIGHT[tutor.language] }]}>
-        <Text style={styles.avatarEmoji}>{tutor.emoji}</Text>
+        <Image
+          source={TUTOR_IMAGES[tutor.id]}
+          style={styles.avatarImg}
+          resizeMode="cover"
+        />
         <View style={[styles.flagBadge, {}]}>
           <Text style={styles.flagText}>{tutor.flag}</Text>
         </View>
@@ -183,8 +188,10 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     position: "relative",
   },
-  avatarEmoji: {
-    fontSize: 38,
+  avatarImg: {
+    width: 68,
+    height: 68,
+    borderRadius: 20,
   },
   flagBadge: {
     position: "absolute",

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   FlatList,
   TextInput,
@@ -19,7 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getTutor, Tutor } from "@/constants/tutors";
+import { getTutor, TUTOR_IMAGES, Tutor } from "@/constants/tutors";
 import { useLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { recordAudio } from "@/lib/audio";
@@ -569,9 +570,9 @@ export default function ChatRoomScreen() {
 
     return (
       <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowAI]}>
-        {!item.isUser && (
+        {!item.isUser && tutor && (
           <View style={styles.tutorAvatar}>
-            <Text style={styles.tutorAvatarEmoji}>{tutor?.emoji ?? "👩"}</Text>
+            <Image source={TUTOR_IMAGES[tutor.id]} style={styles.tutorAvatarImg} />
           </View>
         )}
 
@@ -650,7 +651,7 @@ export default function ChatRoomScreen() {
         </Pressable>
 
         <View style={styles.tutorAvatarHeader}>
-          <Text style={styles.tutorAvatarHeaderEmoji}>{tutor.emoji}</Text>
+          <Image source={TUTOR_IMAGES[tutor.id]} style={styles.tutorAvatarHeaderImg} />
         </View>
 
         <View style={styles.headerCenter}>
@@ -802,7 +803,7 @@ export default function ChatRoomScreen() {
             isTyping ? (
               <View style={[styles.msgRow, styles.msgRowAI]}>
                 <View style={styles.tutorAvatar}>
-                  <Text style={styles.tutorAvatarEmoji}>{tutor.emoji}</Text>
+                  <Image source={TUTOR_IMAGES[tutor.id]} style={styles.tutorAvatarImg} />
                 </View>
                 <View style={[styles.bubble, styles.bubbleAI, styles.typingBubble]}>
                   <View style={styles.typingDots}>
@@ -905,8 +906,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 2,
     borderColor: "#FFB3CE",
+    overflow: "hidden",
   },
-  tutorAvatarHeaderEmoji: { fontSize: 22 },
+  tutorAvatarHeaderImg: { width: 40, height: 40, borderRadius: 20 },
   headerCenter: { flex: 1 },
   headerNameRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   headerName: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#1A1A2E" },
@@ -1108,8 +1110,9 @@ const styles = StyleSheet.create({
     borderColor: "#FFB3CE",
     flexShrink: 0,
     alignSelf: "flex-end",
+    overflow: "hidden",
   },
-  tutorAvatarEmoji: { fontSize: 16 },
+  tutorAvatarImg: { width: 32, height: 32, borderRadius: 16 },
 
   bubbleColumn: {
     maxWidth: "75%",
