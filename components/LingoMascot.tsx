@@ -55,7 +55,7 @@ export function LingoMascot({
   }, [mood]);
 
   const rotate = rotateAnim.interpolate({ inputRange: [-1, 1], outputRange: ["-8deg", "8deg"] });
-  const moodBadge = mood === "sad" ? "😢" : mood === "excited" ? "🎉" : null;
+  const moodBadge = mood === "sad" ? "😢" : null;
   const circleSize = size * 1.25;
 
   const bubble = showBubble && bubbleText ? (
