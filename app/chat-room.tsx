@@ -109,14 +109,18 @@ async function elevenLabsPlay(
   onStart?: () => void,
   onEnd?: () => void,
   onPlaybackStart?: (durationSecs: number) => void,
-  mode?: string
+  // NOTE: mode is intentionally NOT sent to /api/tts.
+  // Voice identity is locked to tutorId. Sending mode would create separate
+  // cache entries per mode, allowing ElevenLabs vs Azure fallback to differ
+  // between modes — making the voice sound like it's changing. Mode only
+  // belongs in /api/chat (system prompt). Azure SSML uses per-tutor defaults.
 ) {
   try {
     const url = new URL("/api/tts", apiBase);
     url.searchParams.set("text", text.slice(0, 5000));
     url.searchParams.set("tutorId", tutorId);
     url.searchParams.set("speed", speed.toString());
-    if (mode) url.searchParams.set("mode", mode);
+    // mode deliberately excluded — see comment above
 
     onStart?.();
     const res = await fetch(url.toString());
@@ -324,7 +328,7 @@ export default function ChatRoomScreen() {
         () => setLoadingAudioId(msgId),
         onEnd,
         (durationSecs) => startAudioSyncedSubtitle(ttsText, durationSecs),
-        mode
+        // mode NOT passed — voice identity is locked to tutorId only
       );
     } else {
       // Native: expo-speech fallback (works in Expo Go without native build)
@@ -337,7 +341,7 @@ export default function ChatRoomScreen() {
         onError: onEnd,
       });
     }
-  }, [tutor, rate, mode, clearSubtitle, startAudioSyncedSubtitle, startNativeSubtitle]);
+  }, [tutor, rate, clearSubtitle, startAudioSyncedSubtitle, startNativeSubtitle]);
 
   // ── Auto-translation effect ───────────────────────────────────────────────
   useEffect(() => {

@@ -133,9 +133,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ── ElevenLabs Neural TTS ──────────────────────────────────────────────────
-  // Each tutor maps to a specific ElevenLabs voice ID.
-  const TUTOR_XI_VOICES: Record<string, string> = {
+  // ── Locked voice map — NEVER changes based on mode, language, or personality ──
+  // Voice identity is determined by tutorId ONLY. Adding or reading `mode` here
+  // is forbidden — it must remain irrelevant to voice selection.
+  const TUTOR_VOICES: Record<string, string> = {
     sarah:  "XB0fDUnXU5powFXDhCwa", // Charlotte — British female (genuine UK accent)
     jake:   "TxGEqnHWrfWFTfGW9XjX", // Josh      — American male
     jane:   "EXAVITQu4vr4xnSDxMaL", // Bella     — Spanish female
@@ -157,18 +158,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/tts", async (req: Request, res: Response) => {
     try {
-      const { text, tutorId, speed, mode } = req.query as {
+      // mode is intentionally NOT read here — voice identity is locked to tutorId.
+      // See TUTOR_VOICES above. Mode belongs only in /api/chat (system prompt).
+      const { text, tutorId, speed } = req.query as {
         text?: string;
         tutorId?: string;
         speed?: string;
-        mode?: string;
       };
 
       if (!text || !tutorId) {
         return res.status(400).json({ error: "text and tutorId required" });
       }
 
-      const voiceId = TUTOR_XI_VOICES[tutorId] ?? "21m00Tcm4TlvDq8ikWAM";
+      const voiceId = TUTOR_VOICES[tutorId] ?? "21m00Tcm4TlvDq8ikWAM";
       const stability = 0.5;
       const similarity_boost = 0.75;
       const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.1")));
@@ -217,7 +219,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-      const ssml = buildSsml(azureFallback.voice, azureFallback.lang, safeText, tutorId, mode);
+      // Pass tutorId only — mode is excluded so voice stays consistent across modes.
+      const ssml = buildSsml(azureFallback.voice, azureFallback.lang, safeText, tutorId);
 
       const azureRes = await fetch(
         `https://${azureRegion}.tts.speech.microsoft.com/cognitiveservices/v1`,
