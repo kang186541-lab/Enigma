@@ -11,15 +11,14 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Level } from "@/context/LanguageContext";
+import { C, F } from "@/constants/theme";
 
 const lingoImg = require("@/assets/lingo.png");
 const { width: SCREEN_W } = Dimensions.get("window");
 
-/* ─── Confetti config ─── */
-const EMOJI_CONFETTI  = ["🎉", "🎊", "⭐", "🦊", "✨", "💫", "🎈", "🌟", "👑", "🔥"];
-const COLOR_CONFETTI  = ["#FF6B9D", "#FFFFFF", "#C06FD8", "#FFD700", "#FF4081", "#B388FF"];
+const EMOJI_CONFETTI = ["🔍", "📜", "🕯️", "🦊", "✦", "⭐", "👑", "🗝️", "🔮", "📖"];
+const COLOR_CONFETTI = [C.gold, C.parchment, C.goldDark, "#FFD700", "#ede0aa", "#f4e8c1"];
 
-/* ── Emoji confetti piece ── */
 function EmojiPiece({ emoji, delay, startX }: { emoji: string; delay: number; startX: number }) {
   const yAnim  = useRef(new Animated.Value(-30)).current;
   const opAnim = useRef(new Animated.Value(0)).current;
@@ -30,7 +29,7 @@ function EmojiPiece({ emoji, delay, startX }: { emoji: string; delay: number; st
     Animated.sequence([
       Animated.delay(delay),
       Animated.parallel([
-        Animated.timing(opAnim, { toValue: 1,   duration: 120, useNativeDriver: true }),
+        Animated.timing(opAnim, { toValue: 1,   duration: 120,  useNativeDriver: true }),
         Animated.timing(yAnim,  { toValue: 480, duration: 2200, useNativeDriver: true }),
         Animated.timing(rAnim,  { toValue: 8,   duration: 2200, useNativeDriver: true }),
         Animated.sequence([
@@ -61,7 +60,6 @@ function EmojiPiece({ emoji, delay, startX }: { emoji: string; delay: number; st
   );
 }
 
-/* ── Rect confetti piece ── */
 function RectPiece({ color, delay, startX, w, h }: { color: string; delay: number; startX: number; w: number; h: number }) {
   const yAnim  = useRef(new Animated.Value(-10)).current;
   const opAnim = useRef(new Animated.Value(0)).current;
@@ -101,19 +99,15 @@ function RectPiece({ color, delay, startX, w, h }: { color: string; delay: numbe
   );
 }
 
-/* ── Crown bounce ── */
 function CrownBounce({ anim }: { anim: Animated.Value }) {
   const rotate = anim.interpolate({ inputRange: [-1, 1], outputRange: ["-12deg", "12deg"] });
   return (
-    <Animated.Text
-      style={{ fontSize: 48, transform: [{ translateY: anim }, { rotate }] }}
-    >
+    <Animated.Text style={{ fontSize: 48, transform: [{ translateY: anim }, { rotate }] }}>
       👑
     </Animated.Text>
   );
 }
 
-/* ─── Props ─── */
 interface LevelUpModalProps {
   visible: boolean;
   level: Level;
@@ -122,19 +116,17 @@ interface LevelUpModalProps {
 }
 
 export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProps) {
-  const bounceAnim  = useRef(new Animated.Value(0)).current;
-  const crownAnim   = useRef(new Animated.Value(0)).current;
-  const scaleAnim   = useRef(new Animated.Value(0)).current;
-  const glowAnim    = useRef(new Animated.Value(0)).current;
-  const loopRef     = useRef<Animated.CompositeAnimation | null>(null);
-  const crownLoopRef= useRef<Animated.CompositeAnimation | null>(null);
+  const bounceAnim   = useRef(new Animated.Value(0)).current;
+  const crownAnim    = useRef(new Animated.Value(0)).current;
+  const scaleAnim    = useRef(new Animated.Value(0)).current;
+  const loopRef      = useRef<Animated.CompositeAnimation | null>(null);
+  const crownLoopRef = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
     if (visible) {
       scaleAnim.setValue(0);
       bounceAnim.setValue(0);
       crownAnim.setValue(0);
-      glowAnim.setValue(0);
 
       Animated.spring(scaleAnim, { toValue: 1, tension: 55, friction: 5, useNativeDriver: true }).start();
 
@@ -153,13 +145,6 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
         ])
       );
       crownLoopRef.current.start();
-
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(glowAnim, { toValue: 1, duration: 700, useNativeDriver: false }),
-          Animated.timing(glowAnim, { toValue: 0, duration: 700, useNativeDriver: false }),
-        ])
-      ).start();
     } else {
       loopRef.current?.stop();
       crownLoopRef.current?.stop();
@@ -170,16 +155,15 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
     };
   }, [visible]);
 
-  const title   = lang === "korean" ? "레벨 업! 🎉"        : lang === "spanish" ? "¡Nivel arriba! 🎉" : "Level Up! 🎉";
+  const title   = lang === "korean" ? "레벨 업! 🎉" : lang === "spanish" ? "¡Nivel arriba! 🎉" : "Level Up! 🎉";
   const sub     = lang === "korean" ? `${level.name} 달성!` : lang === "spanish" ? `¡Nivel ${level.name} alcanzado!` : `You reached ${level.name}!`;
-  const btnText = lang === "korean" ? "계속하기 →"           : lang === "spanish" ? "¡Continuar! →"     : "Keep going! →";
+  const btnText = lang === "korean" ? "계속하기 →" : lang === "spanish" ? "¡Continuar! →" : "Keep going! →";
   const lingoLine = lang === "korean"
     ? "축하해요! 계속 열심히 하면 더 잘할 수 있어요! 🦊"
     : lang === "spanish"
     ? "¡Felicidades! ¡Sigue así y llegarás lejos! 🦊"
     : "Congrats! Keep learning and you'll go far! 🦊";
 
-  /* ── Build 40 emoji + 30 rect confetti pieces ── */
   const emojiPieces = Array.from({ length: 40 }, (_, i) => ({
     emoji:  EMOJI_CONFETTI[i % EMOJI_CONFETTI.length],
     delay:  i * 55,
@@ -194,28 +178,23 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
     h: 10 + (i % 4) * 4,
   }));
 
-  const shadowColor = glowAnim.interpolate({ inputRange: [0, 1], outputRange: ["rgba(255,64,129,0.3)", "rgba(255,64,129,0.85)"] });
-
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
       <View style={styles.overlay}>
         <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
           <LinearGradient
-            colors={["#FF6B9D", "#FF4081", "#E8316E"]}
+            colors={[C.bg1, C.bg2, C.bg3]}
             style={styles.gradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            {/* ── Confetti rain ── */}
             <View style={StyleSheet.absoluteFill} pointerEvents="none">
               {emojiPieces.map((c, i) => <EmojiPiece key={`e${i}`} {...c} />)}
               {rectPieces.map((c, i)  => <RectPiece  key={`r${i}`} {...c} />)}
             </View>
 
-            {/* Crown */}
             <CrownBounce anim={crownAnim} />
 
-            {/* Lingo bouncing */}
             <View style={styles.lingoWrap}>
               <Animated.Image
                 source={lingoImg}
@@ -232,7 +211,6 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
 
             <Text style={styles.sub}>{sub}</Text>
 
-            {/* Lingo speech */}
             <View style={styles.lingoSpeech}>
               <Text style={styles.lingoSpeechText}>{lingoLine}</Text>
             </View>
@@ -253,54 +231,59 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: "rgba(0,0,0,0.85)",
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
   },
-  card: { width: "100%", borderRadius: 28, overflow: "hidden" },
+  card: { width: "100%", borderRadius: 28, overflow: "hidden", borderWidth: 2, borderColor: C.gold },
   gradient: { padding: 24, alignItems: "center", gap: 8, overflow: "hidden" },
-
-  lingoWrap: {
-    width: 130,
-    height: 130,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  lingoWrap: { width: 130, height: 130, alignItems: "center", justifyContent: "center" },
   lingo: { width: 120, height: 120, resizeMode: "contain" },
-
-  title: { fontSize: 30, fontFamily: "Inter_700Bold", color: "#FFFFFF", textShadowColor: "rgba(0,0,0,0.2)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
+  title: {
+    fontSize: 28,
+    fontFamily: F.title,
+    color: C.gold,
+    textShadowColor: "rgba(201,162,39,0.4)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+    letterSpacing: 2,
+  },
   badge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: "rgba(255,255,255,0.22)",
+    backgroundColor: "rgba(201,162,39,0.15)",
     paddingHorizontal: 22,
     paddingVertical: 10,
     borderRadius: 22,
+    borderWidth: 1,
+    borderColor: C.gold,
   },
   badgeEmoji: { fontSize: 28 },
-  badgeName:  { fontSize: 22, fontFamily: "Inter_700Bold", color: "#FFFFFF" },
-  sub:        { fontSize: 14, fontFamily: "Inter_500Medium", color: "rgba(255,255,255,0.92)", textAlign: "center" },
+  badgeName:  { fontSize: 20, fontFamily: F.header, color: C.gold },
+  sub:        { fontSize: 15, fontFamily: F.bodySemi, color: C.parchment, textAlign: "center" },
   lingoSpeech: {
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "rgba(201,162,39,0.12)",
     borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.border,
     paddingHorizontal: 16,
     paddingVertical: 10,
     width: "100%",
   },
-  lingoSpeechText: { fontSize: 13, fontFamily: "Inter_400Regular", color: "#FFFFFF", textAlign: "center", lineHeight: 20 },
+  lingoSpeechText: { fontSize: 14, fontFamily: F.body, color: C.parchment, textAlign: "center", lineHeight: 22, fontStyle: "italic" },
   btn: {
     marginTop: 6,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.gold,
     paddingHorizontal: 36,
     paddingVertical: 14,
     borderRadius: 16,
-    shadowColor: "#000",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 4,
   },
-  btnText: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#FF6B9D" },
+  btnText: { fontSize: 16, fontFamily: F.header, color: C.bg1, letterSpacing: 1 },
 });

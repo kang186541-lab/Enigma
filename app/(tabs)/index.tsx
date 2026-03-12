@@ -18,6 +18,7 @@ import { router } from "expo-router";
 import { useLanguage, getLevel, getLevelProgress, NativeLanguage } from "@/context/LanguageContext";
 import { LingoMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
+import { C, F } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
 const lingoImg = require("@/assets/lingo.png");
@@ -56,21 +57,19 @@ function getLingoGreeting(lang: NativeLanguage): string {
 
 function getWeekStreakData(streak: number, nativeLang: NativeLanguage) {
   const today = new Date();
-  const todayMonIdx = (today.getDay() + 6) % 7; // Mon=0 … Sun=6
-
+  const todayMonIdx = (today.getDay() + 6) % 7;
   const dayLabels: Record<NativeLanguage, string[]> = {
     korean:  ["월", "화", "수", "목", "금", "토", "일"],
     english: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     spanish: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
   };
   const labels = dayLabels[nativeLang] ?? dayLabels.english;
-
   return labels.map((label, i) => {
     const daysAgo = todayMonIdx - i;
     let status: "fire" | "missed" | "future";
-    if (daysAgo === 0)        status = "fire";
-    else if (daysAgo > 0)     status = daysAgo < streak ? "fire" : "missed";
-    else                      status = "future";
+    if (daysAgo === 0)       status = "fire";
+    else if (daysAgo > 0)    status = daysAgo < streak ? "fire" : "missed";
+    else                     status = "future";
     return { label, status, isToday: i === todayMonIdx };
   });
 }
@@ -103,6 +102,22 @@ function getStreakText(streak: number, lang: NativeLanguage): string {
   return m[3];
 }
 
+function GoldDivider({ label }: { label: string }) {
+  return (
+    <View style={div.row}>
+      <View style={div.line} />
+      <Text style={div.label}>✦ {label} ✦</Text>
+      <View style={div.line} />
+    </View>
+  );
+}
+
+const div = StyleSheet.create({
+  row: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 16, marginTop: 22, marginBottom: 10 },
+  line: { flex: 1, height: 1, backgroundColor: C.goldDark },
+  label: { fontSize: 11, fontFamily: F.label, color: C.gold, letterSpacing: 1.5 },
+});
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { t, stats, nativeLanguage, pendingLevelUp, clearLevelUp } = useLanguage();
@@ -116,33 +131,46 @@ export default function HomeScreen() {
   const xpInLvl  = stats.xp - level.minXP;
   const xpForLvl = level.num < 5 ? level.maxXP - level.minXP : 1;
 
-  const xpAnim   = useRef(new Animated.Value(progress)).current;
+  const xpAnim    = useRef(new Animated.Value(progress)).current;
+  const shimmerX  = useRef(new Animated.Value(-200)).current;
   const fireScale = useRef(new Animated.Value(1)).current;
-  const fireGlow  = useRef(new Animated.Value(0)).current;
+  const flickerOp = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.spring(xpAnim, { toValue: progress, useNativeDriver: false, tension: 40, friction: 8 }).start();
   }, [stats.xp]);
 
   useEffect(() => {
-    const loop = Animated.loop(
+    const shimmer = Animated.loop(
       Animated.sequence([
-        Animated.parallel([
-          Animated.timing(fireScale, { toValue: 1.14, duration: 600, useNativeDriver: true }),
-          Animated.timing(fireGlow,  { toValue: 1,    duration: 600, useNativeDriver: false }),
-        ]),
-        Animated.parallel([
-          Animated.timing(fireScale, { toValue: 1,    duration: 600, useNativeDriver: true }),
-          Animated.timing(fireGlow,  { toValue: 0,    duration: 600, useNativeDriver: false }),
-        ]),
+        Animated.timing(shimmerX, { toValue: 400, duration: 1600, useNativeDriver: true }),
+        Animated.timing(shimmerX, { toValue: -200, duration: 0, useNativeDriver: true }),
+        Animated.delay(1000),
       ])
     );
-    loop.start();
-    return () => loop.stop();
+    shimmer.start();
+
+    const flicker = Animated.loop(
+      Animated.sequence([
+        Animated.timing(flickerOp, { toValue: 0.5, duration: 80,  useNativeDriver: true }),
+        Animated.timing(flickerOp, { toValue: 1,   duration: 100, useNativeDriver: true }),
+        Animated.timing(flickerOp, { toValue: 0.7, duration: 60,  useNativeDriver: true }),
+        Animated.timing(flickerOp, { toValue: 1,   duration: 1200, useNativeDriver: true }),
+      ])
+    );
+    flicker.start();
+
+    const bounce = Animated.loop(
+      Animated.sequence([
+        Animated.timing(fireScale, { toValue: 1.15, duration: 600, useNativeDriver: true }),
+        Animated.timing(fireScale, { toValue: 1,    duration: 600, useNativeDriver: true }),
+      ])
+    );
+    bounce.start();
+    return () => { shimmer.stop(); flicker.stop(); bounce.stop(); };
   }, []);
 
   const barW = xpAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] });
-
   const weekData   = getWeekStreakData(stats.streak, nativeLang);
   const streakText = getStreakText(stats.streak, nativeLang);
 
@@ -150,17 +178,20 @@ export default function HomeScreen() {
   const storyDesc  = nativeLang === "korean" ? "이야기로 자연스럽게 배우기" : nativeLang === "spanish" ? "Aprende con historias inmersivas" : "Learn through immersive stories";
 
   const quickItems = [
-    { icon: "albums",      color: "#FF6B9D", label: t("flashcards"),   desc: t("flashcards_desc"),   route: "/(tabs)/cards" },
-    { icon: "chatbubbles", color: "#4ECDC4", label: t("conversation"), desc: t("conversation_desc"), route: "/(tabs)/chat"  },
-    { icon: "mic",         color: "#45B7D1", label: t("pronunciation"),desc: t("pronunciation_desc"),route: "/(tabs)/speak" },
-    { icon: "book",        color: "#9C59D1", label: storyLabel,        desc: storyDesc,               route: "/story"       },
+    { icon: "albums",      color: C.gold,    label: t("flashcards"),    desc: t("flashcards_desc"),    route: "/(tabs)/cards"  },
+    { icon: "chatbubbles", color: "#7eb8c9", label: t("conversation"),  desc: t("conversation_desc"),  route: "/(tabs)/chat"   },
+    { icon: "mic",         color: "#9b8bb4", label: t("pronunciation"), desc: t("pronunciation_desc"), route: "/(tabs)/speak"  },
+    { icon: "book",        color: "#c97b27", label: storyLabel,         desc: storyDesc,               route: "/story"         },
   ];
 
-  const bottomStatItems = [
-    { label: t("words"),    value: `${stats.wordsLearned}`, color: "#4ECDC4", icon: "book"             },
-    { label: t("accuracy"), value: `${stats.accuracy}%`,   color: "#45B7D1", icon: "checkmark-circle"  },
-    { label: t("xp"),       value: `${stats.xp}`,          color: "#9C27B0", icon: "flash"             },
+  const statItems = [
+    { label: nativeLang === "korean" ? "연속학습일" : nativeLang === "spanish" ? "Racha" : "Streak",   value: `${stats.streak}🔥`,    },
+    { label: nativeLang === "korean" ? "단어"       : nativeLang === "spanish" ? "Palabras" : "Words", value: `${stats.wordsLearned}` },
+    { label: nativeLang === "korean" ? "정확도"     : nativeLang === "spanish" ? "Exactitud" : "Acc.", value: `${stats.accuracy}%`    },
+    { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
   ];
+
+  const missionLabel = nativeLang === "korean" ? "오늘의 임무" : nativeLang === "spanish" ? "Misión de Hoy" : "Today's Mission";
 
   return (
     <>
@@ -169,12 +200,10 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
       contentInsetAdjustmentBehavior="never"
     >
-      {/* ── HEADER ────────────────────────────────────── */}
+      {/* ── HEADER ─────────────────────────────────────── */}
       <LinearGradient
-        colors={["#FF6B9D", "#FF8FB3", "#FFB3CE"]}
+        colors={[C.bg1, C.bg2]}
         style={[styles.header, { paddingTop: topPad + 16 }]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
       >
         <View style={styles.headerTop}>
           <View style={{ flex: 1 }}>
@@ -198,10 +227,14 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* XP bar */}
+        {/* XP bar with shimmer */}
         <View style={styles.xpSection}>
           <View style={styles.xpTrack}>
-            <Animated.View style={[styles.xpFill, { width: barW }]} />
+            <Animated.View style={[styles.xpFill, { width: barW }]}>
+              <Animated.View
+                style={[styles.shimmer, { transform: [{ translateX: shimmerX }] }]}
+              />
+            </Animated.View>
           </View>
           <Text style={styles.xpLabel}>
             {level.num < 5
@@ -209,37 +242,41 @@ export default function HomeScreen() {
               : `${stats.xp} XP · ${level.name} ${level.emoji}`}
           </Text>
         </View>
+
+        {/* Decorative bottom border */}
+        <View style={styles.headerBorder} />
       </LinearGradient>
 
+      {/* ── STATS ROW ─────────────────────────────────── */}
+      <View style={styles.statsRow}>
+        {statItems.map((s, i) => (
+          <View key={i} style={styles.statCard}>
+            <Text style={styles.statValue}>{s.value}</Text>
+            <Text style={styles.statLabel}>{s.label}</Text>
+          </View>
+        ))}
+      </View>
+
       {/* ── STREAK CARD ───────────────────────────────── */}
+      <GoldDivider label={nativeLang === "korean" ? "연속 학습" : nativeLang === "spanish" ? "RACHA DIARIA" : "DAILY STREAK"} />
       <View style={styles.pad}>
         <View style={styles.streakCard}>
           <View style={styles.streakHeader}>
             <View style={styles.streakLeft}>
-              <LingoMascot size={110} mood={lingoMood} />
-              <Animated.View style={{ transform: [{ scale: fireScale }] }}>
-                <Animated.Text
-                  style={[
-                    styles.streakCount,
-                    {
-                      textShadowColor: fireGlow.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ["rgba(255,107,53,0)", "rgba(255,107,53,0.7)"],
-                      }),
-                      textShadowOffset: { width: 0, height: 0 },
-                      textShadowRadius: 10,
-                    },
-                  ]}
-                >
-                  {stats.streak}
-                </Animated.Text>
+              <LingoMascot size={100} mood={lingoMood} />
+              <View>
+                <Animated.View style={{ transform: [{ scale: fireScale }] }}>
+                  <Animated.Text style={[styles.streakCount, { opacity: flickerOp }]}>
+                    {stats.streak}
+                  </Animated.Text>
+                </Animated.View>
                 <Text style={styles.streakLabel}>
                   {nativeLang === "korean" ? "일 연속 학습" : nativeLang === "spanish" ? "días seguidos" : "day streak"}
                 </Text>
-              </Animated.View>
+              </View>
             </View>
             <View style={styles.streakBadge}>
-              <Ionicons name="trophy" size={14} color="#FF6B35" />
+              <Ionicons name="trophy" size={14} color={C.gold} />
               <Text style={styles.streakBadgeText}>
                 {nativeLang === "korean" ? "최고 기록" : nativeLang === "spanish" ? "Récord" : "Best"}
               </Text>
@@ -253,11 +290,11 @@ export default function HomeScreen() {
                 <Text style={[styles.dayLabel, d.isToday && styles.dayLabelToday]}>{d.label}</Text>
                 {d.status === "fire" ? (
                   <View style={[styles.dayCircle, styles.dayCircleFire]}>
-                    <Text style={styles.dayEmoji}>🔥</Text>
+                    <Animated.Text style={[styles.dayEmoji, { opacity: d.isToday ? flickerOp : 1 }]}>🔥</Animated.Text>
                   </View>
                 ) : d.status === "missed" ? (
                   <View style={[styles.dayCircle, styles.dayCircleMissed]}>
-                    <Text style={styles.dayEmojiSmall}>❌</Text>
+                    <Text style={styles.dayEmojiSmall}>✕</Text>
                   </View>
                 ) : (
                   <View style={[styles.dayCircle, styles.dayCircleFuture]} />
@@ -266,15 +303,15 @@ export default function HomeScreen() {
             ))}
           </View>
 
-          {/* Motivational text */}
           <View style={styles.streakMotivation}>
             <Text style={styles.streakMotivationText}>{streakText}</Text>
           </View>
         </View>
       </View>
 
-      {/* ── DAILY LESSON CARD ─────────────────────────── */}
-      <View style={[styles.pad, { marginTop: 4 }]}>
+      {/* ── DAILY MISSION CARD ────────────────────────── */}
+      <GoldDivider label={missionLabel} />
+      <View style={[styles.pad, { marginTop: 0 }]}>
         <Pressable
           style={({ pressed }) => [styles.dailyCard, pressed && { transform: [{ scale: 0.985 }] }]}
           onPress={() => {
@@ -282,38 +319,31 @@ export default function HomeScreen() {
             router.push("/daily-lesson" as any);
           }}
         >
-          <LinearGradient
-            colors={["#FF6B9D", "#FF4081", "#E8316E"]}
-            style={styles.dailyGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.dailyContent}>
-              <View style={styles.dailyTopRow}>
-                <View style={styles.dailyPill}>
-                  <Ionicons name="star" size={10} color="#FF6B9D" />
-                  <Text style={styles.dailyPillText}>
-                    {nativeLang === "korean" ? "오늘의 수업" : nativeLang === "spanish" ? "Lección de hoy" : "Today's Lesson"}
-                  </Text>
-                </View>
-                <View style={styles.xpPill}>
-                  <Text style={styles.xpPillText}>+50 XP ⚡</Text>
-                </View>
+          <View style={styles.dailyContent}>
+            <View style={styles.dailyTopRow}>
+              <View style={styles.dailyPill}>
+                <Text style={styles.dailyPillText}>🕯️</Text>
+                <Text style={styles.dailyPillLabel}>
+                  {nativeLang === "korean" ? "오늘의 수업" : nativeLang === "spanish" ? "Lección de hoy" : "Today's Lesson"}
+                </Text>
               </View>
-              <Text style={styles.dailyTitle}>{t("daily_desc")}</Text>
-              <View style={styles.dailyBtn}>
-                <Text style={styles.dailyBtnText}>{t("start_lesson")}</Text>
-                <Ionicons name="arrow-forward" size={15} color="#FF6B9D" />
+              <View style={styles.xpPill}>
+                <Text style={styles.xpPillText}>+50 XP</Text>
               </View>
             </View>
-            <Text style={styles.dailyBookEmoji}>📖</Text>
-          </LinearGradient>
+            <Text style={styles.dailyTitle}>{t("daily_desc")}</Text>
+            <View style={styles.dailyBtn}>
+              <Text style={styles.dailyBtnText}>{t("start_lesson")}</Text>
+              <Ionicons name="arrow-forward" size={14} color={C.bg1} />
+            </View>
+          </View>
+          <Text style={styles.dailyBookEmoji}>📜</Text>
         </Pressable>
       </View>
 
       {/* ── QUICK PRACTICE ────────────────────────────── */}
-      <View style={[styles.pad, { marginTop: 20 }]}>
-        <Text style={styles.sectionTitle}>{t("quick_practice")}</Text>
+      <GoldDivider label={nativeLang === "korean" ? "빠른 학습" : nativeLang === "spanish" ? "PRÁCTICA RÁPIDA" : "QUICK PRACTICE"} />
+      <View style={styles.pad}>
         <View style={styles.quickList}>
           {quickItems.map((item, idx) => (
             <Pressable
@@ -324,36 +354,15 @@ export default function HomeScreen() {
                 router.push(item.route as any);
               }}
             >
-              <LinearGradient
-                colors={[item.color + "22", item.color + "08"]}
-                style={styles.quickIcon}
-              >
-                <Ionicons name={item.icon as any} size={26} color={item.color} />
-              </LinearGradient>
+              <View style={[styles.quickIconWrap, { borderColor: item.color + "88" }]}>
+                <Ionicons name={item.icon as any} size={22} color={item.color} />
+              </View>
               <View style={styles.quickText}>
                 <Text style={styles.quickLabel}>{item.label}</Text>
                 <Text style={styles.quickDesc}>{item.desc}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={16} color="#D0B0C0" />
+              <Ionicons name="chevron-forward" size={14} color={C.goldDark} />
             </Pressable>
-          ))}
-        </View>
-      </View>
-
-      {/* ── STATS ─────────────────────────────────────── */}
-      <View style={[styles.pad, { marginTop: 20 }]}>
-        <Text style={styles.sectionTitle}>
-          {nativeLang === "korean" ? "내 통계" : nativeLang === "spanish" ? "Mis estadísticas" : "My Stats"}
-        </Text>
-        <View style={styles.statsRow}>
-          {bottomStatItems.map((s, i) => (
-            <View key={i} style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: s.color + "18" }]}>
-                <Ionicons name={s.icon as any} size={20} color={s.color} />
-              </View>
-              <Text style={styles.statValue}>{s.value}</Text>
-              <Text style={styles.statLabel}>{s.label}</Text>
-            </View>
           ))}
         </View>
       </View>
@@ -374,121 +383,157 @@ export default function HomeScreen() {
 const DAY_COL_W = Math.floor((width - 48 - 12) / 7);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF8FB" },
+  container: { flex: 1, backgroundColor: C.bg1 },
 
   /* ─ HEADER ─ */
   header: { paddingHorizontal: 20, paddingBottom: 22 },
   headerTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 },
-  greeting: { fontSize: 13, fontFamily: "Inter_400Regular", color: "rgba(255,255,255,0.88)", marginBottom: 4 },
-  headerTitle: { fontSize: 32, fontFamily: "Inter_700Bold", color: "#FFFFFF", letterSpacing: -0.5 },
+  greeting: { fontSize: 14, fontFamily: F.body, color: C.goldDim, fontStyle: "italic", marginBottom: 4 },
+  headerTitle: { fontSize: 30, fontFamily: F.title, color: C.gold, letterSpacing: 3 },
   lingoHeader: {
-    width: 180,
-    height: 200,
-    marginLeft: 4,
-    marginTop: -18,
-    marginRight: -8,
+    width: 180, height: 200, marginLeft: 4, marginTop: -18, marginRight: -8,
     backgroundColor: "transparent",
     ...(Platform.OS === "web" ? { mixBlendMode: "multiply" } as any : {}),
   },
   levelRow: { marginBottom: 10 },
   levelBadge: {
     flexDirection: "row", alignItems: "center", gap: 5,
-    backgroundColor: "rgba(255,255,255,0.22)",
-    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, alignSelf: "flex-start",
+    backgroundColor: "rgba(201,162,39,0.12)",
+    borderWidth: 1, borderColor: C.border,
+    paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, alignSelf: "flex-start",
   },
   levelEmoji: { fontSize: 13 },
-  levelName: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#FFFFFF" },
-  levelDot: { width: 3, height: 3, borderRadius: 1.5, backgroundColor: "rgba(255,255,255,0.6)" },
-  levelNum: { fontSize: 12, fontFamily: "Inter_500Medium", color: "rgba(255,255,255,0.9)" },
+  levelName:  { fontSize: 13, fontFamily: F.bodySemi, color: C.gold },
+  levelDot:   { width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.goldDark },
+  levelNum:   { fontSize: 12, fontFamily: F.body, color: C.goldDim },
+
+  /* XP bar */
   xpSection: { gap: 5 },
-  xpTrack: { height: 7, backgroundColor: "rgba(255,255,255,0.28)", borderRadius: 4, overflow: "hidden" },
-  xpFill: { height: "100%", backgroundColor: "#FFFFFF", borderRadius: 4 },
-  xpLabel: { fontSize: 11, fontFamily: "Inter_500Medium", color: "rgba(255,255,255,0.85)" },
+  xpTrack:   { height: 8, backgroundColor: "rgba(201,162,39,0.15)", borderRadius: 4, overflow: "hidden", borderWidth: 0.5, borderColor: C.border },
+  xpFill:    { height: "100%", backgroundColor: C.gold, borderRadius: 4, overflow: "hidden" },
+  shimmer:   {
+    position: "absolute", top: 0, left: 0, width: 80, height: "100%",
+    backgroundColor: "rgba(255,255,255,0.35)",
+    transform: [{ skewX: "-20deg" }],
+  },
+  xpLabel:   { fontSize: 11, fontFamily: F.body, color: C.goldDim },
+  headerBorder: { marginTop: 16, height: 1, backgroundColor: C.gold, opacity: 0.4 },
+
+  /* ─ STATS ─ */
+  statsRow: {
+    flexDirection: "row", paddingHorizontal: 16, paddingTop: 14, gap: 10,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: C.parchment,
+    borderRadius: 14,
+    paddingVertical: 12,
+    alignItems: "center",
+    gap: 2,
+    borderWidth: 1,
+    borderColor: C.parchmentDeep,
+    shadowColor: C.gold,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  statValue: { fontSize: 17, fontFamily: F.bodyBold, color: C.textParchment },
+  statLabel: { fontSize: 10, fontFamily: F.label, color: C.goldDark, letterSpacing: 0.5, textAlign: "center" },
 
   /* ─ SHARED ─ */
-  pad: { paddingHorizontal: 16, marginTop: 12 },
-  sectionTitle: { fontSize: 18, fontFamily: "Inter_700Bold", color: "#1A1A2E", marginBottom: 12 },
+  pad: { paddingHorizontal: 16, marginTop: 4 },
 
   /* ─ STREAK CARD ─ */
   streakCard: {
-    backgroundColor: "#FFFFFF", borderRadius: 22, padding: 18,
-    shadowColor: "#FF6B35", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 14, elevation: 4,
+    backgroundColor: C.parchment,
+    borderRadius: 20,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: C.parchmentDeep,
+    shadowColor: C.gold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  streakHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 18 },
-  streakLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
-  fireCircle: {
-    width: 52, height: 52, borderRadius: 26,
-    backgroundColor: "#FFF0E6",
-    justifyContent: "center", alignItems: "center",
-  },
-  fireEmoji: { fontSize: 28 },
-  streakCount: { fontSize: 32, fontFamily: "Inter_700Bold", color: "#FF6B35", lineHeight: 36 },
-  streakLabel: { fontSize: 12, fontFamily: "Inter_500Medium", color: "#A08090", marginTop: 1 },
-  streakBadge: {
+  streakHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 },
+  streakLeft:   { flexDirection: "row", alignItems: "center", gap: 12 },
+  streakCount:  { fontSize: 36, fontFamily: F.title, color: C.textParchment, lineHeight: 40 },
+  streakLabel:  { fontSize: 13, fontFamily: F.body, color: C.goldDark, marginTop: 2 },
+  streakBadge:  {
     flexDirection: "row", alignItems: "center", gap: 4,
-    backgroundColor: "#FFF0E6", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12,
+    backgroundColor: "rgba(139,105,20,0.12)", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12,
+    borderWidth: 1, borderColor: C.goldDark,
   },
-  streakBadgeText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: "#FF6B35" },
-  weekRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 16 },
-  dayCol: { width: DAY_COL_W, alignItems: "center", gap: 6 },
-  dayLabel: { fontSize: 10, fontFamily: "Inter_500Medium", color: "#B0A0AA" },
-  dayLabelToday: { color: "#FF6B9D", fontFamily: "Inter_700Bold" },
+  streakBadgeText: { fontSize: 11, fontFamily: F.bodySemi, color: C.goldDark },
+  weekRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 14 },
+  dayCol:  { width: DAY_COL_W, alignItems: "center", gap: 5 },
+  dayLabel: { fontSize: 10, fontFamily: F.label, color: "#a08060", letterSpacing: 0.5 },
+  dayLabelToday: { color: C.textParchment, fontFamily: F.bodyBold },
   dayCircle: { width: 32, height: 32, borderRadius: 16, justifyContent: "center", alignItems: "center" },
-  dayCircleFire: { backgroundColor: "#FFF0E6" },
-  dayCircleMissed: { backgroundColor: "#F5F0F3" },
-  dayCircleFuture: { backgroundColor: "#F5F0F3", borderWidth: 1.5, borderColor: "#E8DCE4", borderStyle: "dashed" as any },
-  dayEmoji: { fontSize: 18 },
-  dayEmojiSmall: { fontSize: 13 },
+  dayCircleFire:   { backgroundColor: "rgba(201,162,39,0.2)", borderWidth: 1, borderColor: C.gold },
+  dayCircleMissed: { backgroundColor: "rgba(100,60,30,0.08)" },
+  dayCircleFuture: { backgroundColor: "rgba(100,60,30,0.05)", borderWidth: 1, borderColor: "#c0a060", borderStyle: "dashed" as any },
+  dayEmoji:      { fontSize: 18 },
+  dayEmojiSmall: { fontSize: 12, color: "#b09060" },
   streakMotivation: {
-    backgroundColor: "#FFF8FB", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10,
+    backgroundColor: "rgba(139,105,20,0.08)",
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9,
+    borderWidth: 1, borderColor: "rgba(201,162,39,0.2)",
   },
-  streakMotivationText: { fontSize: 13, fontFamily: "Inter_500Medium", color: "#6B5060", textAlign: "center" },
+  streakMotivationText: { fontSize: 13, fontFamily: F.body, color: C.textParchment, textAlign: "center", fontStyle: "italic" },
 
-  /* ─ DAILY LESSON ─ */
+  /* ─ DAILY MISSION ─ */
   dailyCard: {
-    borderRadius: 24, overflow: "hidden",
-    shadowColor: "#FF6B9D", shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 20, elevation: 8,
+    backgroundColor: C.bg2,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: C.gold,
+    padding: 22,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    shadowColor: C.gold,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
   },
-  dailyGradient: { padding: 24, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  dailyContent: { flex: 1, gap: 14 },
-  dailyTopRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  dailyContent: { flex: 1, gap: 12 },
+  dailyTopRow:  { flexDirection: "row", alignItems: "center", gap: 8 },
   dailyPill: {
-    flexDirection: "row", alignItems: "center", gap: 4,
-    backgroundColor: "rgba(255,255,255,0.25)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12,
+    flexDirection: "row", alignItems: "center", gap: 5,
+    backgroundColor: "rgba(201,162,39,0.12)", paddingHorizontal: 10, paddingVertical: 4,
+    borderRadius: 12, borderWidth: 1, borderColor: C.border,
   },
-  dailyPillText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: "#FFFFFF" },
+  dailyPillText:  { fontSize: 12 },
+  dailyPillLabel: { fontSize: 11, fontFamily: F.bodySemi, color: C.gold },
   xpPill: {
-    backgroundColor: "rgba(255,255,255,0.2)", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10,
+    backgroundColor: "rgba(201,162,39,0.15)", paddingHorizontal: 8, paddingVertical: 4,
+    borderRadius: 10, borderWidth: 1, borderColor: C.border,
   },
-  xpPillText: { fontSize: 11, fontFamily: "Inter_700Bold", color: "#FFFFFF" },
-  dailyTitle: { fontSize: 18, fontFamily: "Inter_700Bold", color: "#FFFFFF", lineHeight: 26, maxWidth: 195 },
+  xpPillText: { fontSize: 11, fontFamily: F.header, color: C.gold },
+  dailyTitle: { fontSize: 17, fontFamily: F.bodyBold, color: C.parchment, lineHeight: 24, maxWidth: 200, fontStyle: "italic" },
   dailyBtn: {
-    flexDirection: "row", alignItems: "center", gap: 8,
-    backgroundColor: "#FFFFFF", paddingHorizontal: 16, paddingVertical: 10, borderRadius: 14, alignSelf: "flex-start",
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: C.gold, paddingHorizontal: 14, paddingVertical: 9,
+    borderRadius: 12, alignSelf: "flex-start",
   },
-  dailyBtnText: { fontSize: 14, fontFamily: "Inter_700Bold", color: "#FF6B9D" },
-  dailyBookEmoji: { fontSize: 58, marginLeft: 8 },
+  dailyBtnText: { fontSize: 13, fontFamily: F.header, color: C.bg1, letterSpacing: 0.5 },
+  dailyBookEmoji: { fontSize: 52, marginLeft: 8 },
 
   /* ─ QUICK PRACTICE ─ */
   quickList: { gap: 10 },
   quickCard: {
-    backgroundColor: "#FFFFFF", borderRadius: 18, padding: 16,
+    backgroundColor: C.bg2,
+    borderRadius: 16, padding: 14,
     flexDirection: "row", alignItems: "center", gap: 14,
-    shadowColor: "#FF6B9D", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    borderWidth: 1, borderColor: C.border,
+    shadowColor: C.gold, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6, elevation: 2,
   },
-  quickIcon: { width: 52, height: 52, borderRadius: 16, justifyContent: "center", alignItems: "center" },
-  quickText: { flex: 1 },
-  quickLabel: { fontSize: 15, fontFamily: "Inter_700Bold", color: "#1A1A2E", marginBottom: 2 },
-  quickDesc: { fontSize: 12, fontFamily: "Inter_400Regular", color: "#A08090" },
-
-  /* ─ STATS ─ */
-  statsRow: { flexDirection: "row", gap: 10 },
-  statCard: {
-    flex: 1, backgroundColor: "#FFFFFF", borderRadius: 18, padding: 14,
-    alignItems: "center", gap: 6,
-    shadowColor: "#FF6B9D", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 2,
-  },
-  statIcon: { width: 40, height: 40, borderRadius: 12, justifyContent: "center", alignItems: "center" },
-  statValue: { fontSize: 20, fontFamily: "Inter_700Bold", color: "#1A1A2E" },
-  statLabel: { fontSize: 10, fontFamily: "Inter_500Medium", color: "#A08090", textAlign: "center" },
+  quickIconWrap: { width: 46, height: 46, borderRadius: 13, justifyContent: "center", alignItems: "center", borderWidth: 1, backgroundColor: "rgba(201,162,39,0.08)" },
+  quickText:     { flex: 1 },
+  quickLabel:    { fontSize: 15, fontFamily: F.bodySemi, color: C.parchment, marginBottom: 2 },
+  quickDesc:     { fontSize: 12, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
 });

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, Image, Animated, StyleSheet, ViewStyle, Platform } from "react-native";
+import { C } from "@/constants/theme";
 
 const lingoImg = require("@/assets/lingo.png");
 
@@ -81,16 +82,7 @@ export function LingoMascot({
       {bubblePosition === "left" && bubble}
       <View style={styles.imgWrap}>
         {showCircle ? (
-          <View
-            style={[
-              styles.circle,
-              {
-                width: circleSize,
-                height: circleSize,
-                borderRadius: circleSize / 2,
-              },
-            ]}
-          >
+          <View style={[styles.circle, { width: circleSize, height: circleSize, borderRadius: circleSize / 2 }]}>
             {imgNode}
           </View>
         ) : (
@@ -112,41 +104,46 @@ const styles = StyleSheet.create({
     ...(Platform.OS === "web" ? { mixBlendMode: "multiply" } as any : {}),
   },
   circle: {
-    backgroundColor: "#FFE8D6",
+    backgroundColor: "rgba(201,162,39,0.15)",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#FF6B9D",
+    borderWidth: 1.5,
+    borderColor: C.gold,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.22,
+    shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 6,
   },
   moodBadge: { position: "absolute", top: -4, right: -4, fontSize: 16 },
-
   bubbleLeft: {
     maxWidth: 190,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.parchment,
     borderRadius: 16,
     borderBottomRightRadius: 4,
     padding: 10,
     marginRight: 8,
-    shadowColor: "#FF6B9D",
+    borderWidth: 1,
+    borderColor: C.goldDark,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.14,
+    shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 4,
     alignSelf: "center",
   },
   bubbleRight: {
     maxWidth: 190,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.parchment,
     borderRadius: 16,
     borderBottomLeftRadius: 4,
     padding: 10,
     marginLeft: 8,
-    shadowColor: "#FF6B9D",
+    borderWidth: 1,
+    borderColor: C.goldDark,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.14,
+    shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 4,
     alignSelf: "center",
@@ -157,7 +154,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     width: 0, height: 0,
     borderLeftWidth: 8, borderTopWidth: 6, borderBottomWidth: 6,
-    borderLeftColor: "#FFFFFF",
+    borderLeftColor: C.parchment,
     borderTopColor: "transparent", borderBottomColor: "transparent",
   },
   tailLeft: {
@@ -166,8 +163,8 @@ const styles = StyleSheet.create({
     bottom: 10,
     width: 0, height: 0,
     borderRightWidth: 8, borderTopWidth: 6, borderBottomWidth: 6,
-    borderRightColor: "#FFFFFF",
+    borderRightColor: C.parchment,
     borderTopColor: "transparent", borderBottomColor: "transparent",
   },
-  bubbleText: { fontSize: 12, color: "#3A2030", lineHeight: 18 },
+  bubbleText: { fontSize: 13, fontFamily: "CrimsonText_400Regular", color: C.textParchment, lineHeight: 18 },
 });

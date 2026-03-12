@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Pressable,
   Platform,
-  Animated,
+  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -13,6 +13,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
 import { Ionicons } from "@expo/vector-icons";
+import { C, F } from "@/constants/theme";
+
+const lingoImg = require("@/assets/lingo.png");
 
 type Step = 1 | 2;
 
@@ -23,40 +26,30 @@ const ALL_LANGS: { id: NativeLanguage; flag: string; nameMap: Record<NativeLangu
 ];
 
 const UI: Record<NativeLanguage, {
-  step1Title: string;
-  step1Sub: string;
-  step2Title: string;
-  step2Sub: string;
-  cta1: string;
-  cta2: string;
-  back: string;
+  step1Title: string; step1Sub: string;
+  step2Title: string; step2Sub: string;
+  cta1: string; cta2: string; back: string;
 }> = {
   korean: {
     step1Title: "모국어를 선택해주세요",
-    step1Sub: "더 나은 학습 경험을 위해 모국어를 알려주세요",
+    step1Sub:   "더 나은 학습 경험을 위해 모국어를 알려주세요",
     step2Title: "어떤 언어를 배우고 싶으세요?",
-    step2Sub: "학습할 언어를 선택하세요",
-    cta1: "다음",
-    cta2: "시작하기 🚀",
-    back: "뒤로",
+    step2Sub:   "학습할 언어를 선택하세요",
+    cta1: "다음", cta2: "시작하기 🚀", back: "뒤로",
   },
   english: {
     step1Title: "What's your native language?",
-    step1Sub: "Choose the language you speak at home",
+    step1Sub:   "Choose the language you speak at home",
     step2Title: "What do you want to learn?",
-    step2Sub: "Pick the language you'd like to master",
-    cta1: "Next",
-    cta2: "Let's go 🚀",
-    back: "Back",
+    step2Sub:   "Pick the language you'd like to master",
+    cta1: "Next", cta2: "Let's go 🚀", back: "Back",
   },
   spanish: {
     step1Title: "¿Cuál es tu idioma nativo?",
-    step1Sub: "Elige el idioma que hablas en casa",
+    step1Sub:   "Elige el idioma que hablas en casa",
     step2Title: "¿Qué idioma quieres aprender?",
-    step2Sub: "Selecciona el idioma que quieres dominar",
-    cta1: "Siguiente",
-    cta2: "¡Vamos! 🚀",
-    back: "Atrás",
+    step2Sub:   "Selecciona el idioma que quieres dominar",
+    cta1: "Siguiente", cta2: "¡Vamos! 🚀", back: "Atrás",
   },
 };
 
@@ -64,14 +57,13 @@ export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const { setNativeLanguage, setLearningLanguage } = useLanguage();
 
-  const [step, setStep] = useState<Step>(1);
+  const [step,      setStep]      = useState<Step>(1);
   const [nativeSel, setNativeSel] = useState<NativeLanguage | null>(null);
   const [learnSel,  setLearnSel]  = useState<NativeLanguage | null>(null);
   const [loading,   setLoading]   = useState(false);
 
   const uiLang: NativeLanguage = nativeSel ?? "english";
   const ui = UI[uiLang];
-
   const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel);
 
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
@@ -79,8 +71,7 @@ export default function OnboardingScreen() {
 
   const handleNativePick = (lang: NativeLanguage) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setNativeSel(lang);
-    setLearnSel(null);
+    setNativeSel(lang); setLearnSel(null);
   };
 
   const handleLearnPick = (lang: NativeLanguage) => {
@@ -97,8 +88,7 @@ export default function OnboardingScreen() {
 
   const handleBack = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setStep(1);
-    setLearnSel(null);
+    setStep(1); setLearnSel(null);
   };
 
   const handleFinish = async () => {
@@ -110,30 +100,24 @@ export default function OnboardingScreen() {
     router.replace("/(tabs)");
   };
 
-  const stepDots = (
-    <View style={styles.dots}>
-      <View style={[styles.dot, step === 1 && styles.dotActive]} />
-      <View style={[styles.dot, step === 2 && styles.dotActive]} />
-    </View>
-  );
-
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
-      <LinearGradient
-        colors={["#FF6B9D", "#FF8FB3", "#FFB3CE"]}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      />
+      <LinearGradient colors={[C.bg1, C.bg2, C.bg1]} style={StyleSheet.absoluteFill} />
+
+      {/* Decorative top border */}
+      <View style={styles.topBorder} />
 
       {/* Logo */}
       <View style={styles.logoRow}>
-        <Text style={styles.logoEmoji}>✨</Text>
-        <Text style={styles.logoText}>LinguaAI</Text>
+        <Image source={lingoImg} style={styles.logoImg} resizeMode="contain" />
+        <Text style={styles.logoText}>LingoFox</Text>
       </View>
 
       {/* Step dots */}
-      {stepDots}
+      <View style={styles.dots}>
+        <View style={[styles.dot, step === 1 && styles.dotActive]} />
+        <View style={[styles.dot, step === 2 && styles.dotActive]} />
+      </View>
 
       {/* ── STEP 1 ── */}
       {step === 1 && (
@@ -158,7 +142,7 @@ export default function OnboardingScreen() {
                   </Text>
                   {sel && (
                     <View style={styles.check}>
-                      <Ionicons name="checkmark" size={16} color="#FFF" />
+                      <Ionicons name="checkmark" size={16} color={C.bg1} />
                     </View>
                   )}
                 </Pressable>
@@ -173,7 +157,7 @@ export default function OnboardingScreen() {
               disabled={!nativeSel}
             >
               <Text style={styles.ctaText}>{ui.cta1}</Text>
-              <Ionicons name="arrow-forward" size={20} color="#FF6B9D" />
+              <Ionicons name="arrow-forward" size={20} color={C.bg1} />
             </Pressable>
           </View>
         </>
@@ -202,7 +186,7 @@ export default function OnboardingScreen() {
                   </Text>
                   {sel && (
                     <View style={styles.check}>
-                      <Ionicons name="checkmark" size={16} color="#FFF" />
+                      <Ionicons name="checkmark" size={16} color={C.bg1} />
                     </View>
                   )}
                 </Pressable>
@@ -211,14 +195,10 @@ export default function OnboardingScreen() {
           </View>
 
           <View style={[styles.bottom, { paddingBottom: bottomPad }]}>
-            <Pressable
-              style={styles.backBtn}
-              onPress={handleBack}
-            >
-              <Ionicons name="chevron-back" size={18} color="rgba(255,255,255,0.9)" />
+            <Pressable style={styles.backBtn} onPress={handleBack}>
+              <Ionicons name="chevron-back" size={18} color={C.gold} />
               <Text style={styles.backText}>{ui.back}</Text>
             </Pressable>
-
             <Pressable
               style={({ pressed }) => [styles.cta, styles.ctaFlex, !learnSel && styles.ctaDim, pressed && learnSel && styles.ctaPress]}
               onPress={handleFinish}
@@ -234,152 +214,60 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+  topBorder: { height: 2, backgroundColor: C.gold, marginHorizontal: 24, marginTop: 8, borderRadius: 1 },
   logoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    marginTop: 16,
-    marginBottom: 8,
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 10, marginTop: 20, marginBottom: 8,
   },
-  logoEmoji: {
-    fontSize: 28,
-  },
-  logoText: {
-    fontSize: 32,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
-    letterSpacing: -0.5,
-  },
-  dots: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-    marginBottom: 28,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "rgba(255,255,255,0.35)",
-  },
-  dotActive: {
-    width: 24,
-    backgroundColor: "#FFFFFF",
-  },
-  textBlock: {
-    alignItems: "center",
-    paddingHorizontal: 32,
-    marginBottom: 28,
-  },
+  logoImg: { width: 52, height: 52 },
+  logoText: { fontSize: 28, fontFamily: F.title, color: C.gold, letterSpacing: 3 },
+  dots: { flexDirection: "row", justifyContent: "center", gap: 8, marginBottom: 28 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.goldDark },
+  dotActive: { width: 26, backgroundColor: C.gold },
+  textBlock: { alignItems: "center", paddingHorizontal: 32, marginBottom: 24 },
   title: {
-    fontSize: 26,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
-    textAlign: "center",
-    marginBottom: 10,
-    lineHeight: 34,
+    fontSize: 22, fontFamily: F.header, color: C.gold,
+    textAlign: "center", marginBottom: 10, lineHeight: 32, letterSpacing: 1,
   },
   subtitle: {
-    fontSize: 15,
-    fontFamily: "Inter_400Regular",
-    color: "rgba(255,255,255,0.82)",
-    textAlign: "center",
-    lineHeight: 22,
+    fontSize: 15, fontFamily: F.body, color: C.goldDim,
+    textAlign: "center", lineHeight: 22, fontStyle: "italic",
   },
-  cards: {
-    paddingHorizontal: 24,
-    gap: 14,
-    flex: 1,
-  },
+  cards: { paddingHorizontal: 24, gap: 14, flex: 1 },
   card: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.22)",
-    borderRadius: 22,
-    padding: 20,
-    gap: 16,
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.35)",
+    flexDirection: "row", alignItems: "center",
+    backgroundColor: C.bg2,
+    borderRadius: 18, padding: 18, gap: 16,
+    borderWidth: 1.5, borderColor: C.border,
   },
   cardSel: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#FFFFFF",
+    backgroundColor: C.parchment, borderColor: C.gold,
   },
-  cardPress: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
-  },
-  flag: {
-    fontSize: 34,
-  },
-  cardName: {
-    flex: 1,
-    fontSize: 19,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
-  },
-  cardNameSel: {
-    color: "#FF6B9D",
-  },
+  cardPress: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  flag:     { fontSize: 34 },
+  cardName: { flex: 1, fontSize: 18, fontFamily: F.bodySemi, color: C.parchment },
+  cardNameSel: { color: C.textParchment },
   check: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#FF6B9D",
-    justifyContent: "center",
-    alignItems: "center",
+    width: 28, height: 28, borderRadius: 14,
+    backgroundColor: C.gold,
+    justifyContent: "center", alignItems: "center",
   },
-  bottom: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    gap: 12,
-  },
+  bottom: { paddingHorizontal: 24, paddingTop: 20, gap: 12 },
   backBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    alignSelf: "flex-start",
-    paddingVertical: 4,
-    paddingHorizontal: 2,
+    flexDirection: "row", alignItems: "center", gap: 4,
+    alignSelf: "flex-start", paddingVertical: 4, paddingHorizontal: 2,
   },
-  backText: {
-    fontSize: 15,
-    fontFamily: "Inter_500Medium",
-    color: "rgba(255,255,255,0.9)",
-  },
+  backText: { fontSize: 15, fontFamily: F.bodySemi, color: C.gold },
   cta: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    paddingVertical: 18,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-    shadowColor: "#FF6B9D",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 8,
+    backgroundColor: C.gold, borderRadius: 18,
+    paddingVertical: 18, alignItems: "center",
+    flexDirection: "row", justifyContent: "center", gap: 8,
+    shadowColor: C.gold, shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35, shadowRadius: 14, elevation: 8,
   },
-  ctaFlex: {
-    flex: 0,
-  },
-  ctaDim: {
-    backgroundColor: "rgba(255,255,255,0.45)",
-    shadowOpacity: 0,
-  },
-  ctaPress: {
-    transform: [{ scale: 0.98 }],
-    opacity: 0.9,
-  },
-  ctaText: {
-    fontSize: 18,
-    fontFamily: "Inter_700Bold",
-    color: "#FF6B9D",
-    letterSpacing: 0.2,
-  },
+  ctaFlex:  { flex: 0 },
+  ctaDim:   { backgroundColor: C.goldDark, shadowOpacity: 0 },
+  ctaPress: { transform: [{ scale: 0.98 }], opacity: 0.9 },
+  ctaText:  { fontSize: 17, fontFamily: F.header, color: C.bg1, letterSpacing: 1 },
 });

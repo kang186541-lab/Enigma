@@ -17,6 +17,7 @@ import * as Haptics from "expo-haptics";
 import { useLanguage, getDefaultLearning, NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
+import { C, F } from "@/constants/theme";
 
 const TAB_BAR_HEIGHT = 49;
 
@@ -65,7 +66,7 @@ const PHRASE_SETS: Record<LangTab, Phrase[]> = {
 };
 
 const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] = [
-  { key: "korean", label: "Korean", flag: "🇰🇷", color: "#FF6B9D" },
+  { key: "korean", label: "Korean", flag: "🇰🇷", color: C.gold },
   { key: "english", label: "English", flag: "🇬🇧", color: "#6B9DFF" },
   { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#FF9D6B" },
 ];
@@ -310,7 +311,6 @@ export default function SpeakScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
-      <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
       <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
       <ScrollView
@@ -557,7 +557,7 @@ export default function SpeakScreen() {
               onPress={() => navigate("prev")}
               testID="prev-button"
             >
-              <Ionicons name="arrow-back" size={18} color="#FF6B9D" />
+              <Ionicons name="arrow-back" size={18} color={C.gold} />
               <Text style={styles.prevBtnText}>Prev</Text>
             </Pressable>
             <Pressable
@@ -581,22 +581,24 @@ export default function SpeakScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: C.bg1 },
   scrollContent: {
     paddingHorizontal: 18,
     paddingTop: 4,
     gap: 18,
   },
   header: { gap: 3 },
-  title: { fontSize: 24, fontFamily: "Inter_700Bold", color: "#1A1A2E" },
-  subtitle: { fontSize: 14, fontFamily: "Inter_400Regular", color: "#A08090" },
+  title: { fontSize: 24, fontFamily: F.header, color: C.gold, letterSpacing: 1.5 },
+  subtitle: { fontSize: 14, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
 
   langTabs: {
     flexDirection: "row",
     gap: 8,
-    backgroundColor: "#F5E8F0",
+    backgroundColor: C.bg2,
     borderRadius: 16,
     padding: 4,
+    borderWidth: 1,
+    borderColor: C.border,
   },
   langTab: {
     flex: 1,
@@ -611,20 +613,22 @@ const styles = StyleSheet.create({
   langTabFlag: { fontSize: 15 },
   langTabLabel: {
     fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    color: "#A08090",
+    fontFamily: F.bodySemi,
+    color: C.goldDark,
   },
-  langTabLabelActive: { color: "#FFFFFF" },
+  langTabLabelActive: { color: C.bg1 },
 
   phraseCard: {
     borderRadius: 28,
     overflow: "hidden",
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#FF6B9D",
+    backgroundColor: C.parchment,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 20,
     elevation: 5,
+    borderWidth: 1,
+    borderColor: C.parchmentDeep,
   },
   phraseCardInner: {
     padding: 24,
@@ -639,11 +643,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,
+    backgroundColor: "rgba(201,162,39,0.15)",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   levelText: {
     fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: F.label,
     letterSpacing: 1,
+    color: C.gold,
   },
   listenBtn: {
     flexDirection: "row",
@@ -654,18 +662,21 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1.5,
     backgroundColor: "transparent",
+    borderColor: C.goldDark,
   },
   listenBtnText: {
     fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: F.bodySemi,
+    color: C.goldDark,
   },
   phraseWord: {
-    fontSize: 38,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
+    fontSize: 36,
+    fontFamily: F.title,
+    color: C.textParchment,
     textAlign: "center",
     marginTop: 4,
-    lineHeight: 48,
+    lineHeight: 46,
+    letterSpacing: 1,
   },
   ipaRow: {
     flexDirection: "row",
@@ -675,46 +686,49 @@ const styles = StyleSheet.create({
   },
   ipaLabel: {
     fontSize: 10,
-    fontFamily: "Inter_600SemiBold",
-    color: "#C4B5BF",
+    fontFamily: F.label,
+    color: C.goldDark,
     letterSpacing: 1,
-    backgroundColor: "#F5E8F0",
+    backgroundColor: "rgba(201,162,39,0.1)",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 5,
   },
   ipaText: {
     fontSize: 17,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDark,
     fontStyle: "italic",
   },
   divider: {
     height: 1,
-    backgroundColor: "#F0D6E4",
+    backgroundColor: C.parchmentDeep,
     marginVertical: 2,
   },
   phraseMeaning: {
     fontSize: 16,
-    fontFamily: "Inter_500Medium",
-    color: "#1A1A2E",
+    fontFamily: F.bodySemi,
+    color: C.textParchment,
     textAlign: "center",
   },
   tipBox: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 6,
-    backgroundColor: "#FFFBEB",
+    backgroundColor: "rgba(201,162,39,0.08)",
     borderRadius: 12,
     padding: 10,
     marginTop: 2,
+    borderWidth: 1,
+    borderColor: C.border,
   },
   tipText: {
     flex: 1,
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: "#92400E",
+    fontFamily: F.body,
+    color: C.textParchment,
     lineHeight: 18,
+    fontStyle: "italic",
   },
 
   progressRow: {
@@ -725,8 +739,8 @@ const styles = StyleSheet.create({
   },
   progressCount: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
-    color: "#C4B5BF",
+    fontFamily: F.body,
+    color: C.goldDim,
   },
   progressDots: {
     flexDirection: "row",
@@ -736,11 +750,12 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    backgroundColor: "#F0D6E4",
+    backgroundColor: C.goldDark,
   },
   dotActive: {
     width: 18,
     borderRadius: 4,
+    backgroundColor: C.gold,
   },
 
   micSection: {
@@ -760,7 +775,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 20,
@@ -768,16 +783,17 @@ const styles = StyleSheet.create({
   },
   micHint: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDim,
     textAlign: "center",
+    fontStyle: "italic",
   },
   recordingBadge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#FFF0F0",
-    borderColor: "#FF4444",
+    backgroundColor: "rgba(200,50,50,0.12)",
+    borderColor: "#CC3333",
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 14,
@@ -788,7 +804,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#FF2020",
+    backgroundColor: "#CC2020",
   },
   scoringDots: {
     flexDirection: "row",
@@ -801,11 +817,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#FF6B9D",
+    backgroundColor: C.gold,
   },
   recordingBadgeText: {
     fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: F.bodySemi,
     color: "#CC2020",
     letterSpacing: 0.3,
   },
@@ -816,8 +832,9 @@ const styles = StyleSheet.create({
   },
   listenHintText: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: "#C4B5BF",
+    fontFamily: F.body,
+    color: C.goldDim,
+    fontStyle: "italic",
   },
 
   resultWrap: {
@@ -834,80 +851,88 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 4,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.bg2,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 4,
   },
   scoreNumber: {
     fontSize: 36,
-    fontFamily: "Inter_700Bold",
+    fontFamily: F.title,
     lineHeight: 40,
+    color: C.gold,
   },
   scoreLabel: {
     fontSize: 20,
-    fontFamily: "Inter_700Bold",
+    fontFamily: F.header,
     textAlign: "center",
+    color: C.gold,
   },
   feedbackBox: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.parchment,
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 14,
     alignSelf: "stretch",
-    shadowColor: "#000",
+    borderWidth: 1,
+    borderColor: C.parchmentDeep,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 2,
   },
   feedbackText: {
     fontSize: 15,
-    fontFamily: "Inter_500Medium",
-    color: "#1A1A2E",
+    fontFamily: F.body,
+    color: C.textParchment,
     textAlign: "center",
     lineHeight: 22,
   },
   heardBox: {
     alignItems: "center",
     gap: 2,
-    backgroundColor: "#F0F7FF",
+    backgroundColor: "rgba(201,162,39,0.08)",
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
     alignSelf: "stretch",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   heardLabel: {
     fontSize: 11,
-    fontFamily: "Inter_500Medium",
-    color: "#6B9DFF",
+    fontFamily: F.label,
+    color: C.goldDim,
     letterSpacing: 0.5,
   },
   heardText: {
     fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-    color: "#1A1A2E",
+    fontFamily: F.bodySemi,
+    color: C.parchment,
     textAlign: "center",
   },
   errorBox: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 8,
-    backgroundColor: "#FEF2F2",
+    backgroundColor: "rgba(204,68,68,0.1)",
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 12,
     alignSelf: "stretch",
+    borderWidth: 1,
+    borderColor: "rgba(204,68,68,0.3)",
   },
   errorText: {
     flex: 1,
     fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: "#EF4444",
+    fontFamily: F.body,
+    color: "#CC4444",
     lineHeight: 20,
   },
 
@@ -927,25 +952,27 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   retryBtn: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.bg2,
     borderWidth: 1.5,
-    borderColor: "#FF6B9D50",
+    borderColor: C.border,
   },
   actionBtnText: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
+    fontSize: 14,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
   },
   nextWordBtn: {
-    shadowColor: "#FF6B9D",
+    backgroundColor: C.gold,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
   },
   nextWordBtnText: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
+    fontSize: 14,
+    fontFamily: F.bodySemi,
+    color: C.bg1,
   },
 
   navRow: {
@@ -962,30 +989,31 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   prevBtn: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.bg2,
     borderWidth: 2,
-    borderColor: "#FF6B9D",
-    shadowColor: "#FF6B9D",
+    borderColor: C.gold,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 2,
   },
   prevBtnText: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FF6B9D",
+    fontSize: 14,
+    fontFamily: F.bodySemi,
+    color: C.gold,
   },
   nextBtn: {
-    shadowColor: "#FF6B9D",
+    backgroundColor: C.gold,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
   },
   nextBtnText: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
+    fontSize: 14,
+    fontFamily: F.bodySemi,
+    color: C.bg1,
   },
 });

@@ -1,0 +1,31 @@
+export const C = {
+  bg1:           "#1a0a05",
+  bg2:           "#2c1810",
+  bg3:           "#3d2418",
+  tabBar:        "#0d0503",
+  gold:          "#c9a227",
+  goldDim:       "#a07d1a",
+  goldDark:      "#8b6914",
+  goldFaint:     "#c9a22722",
+  parchment:     "#f4e8c1",
+  parchmentDark: "#ede0aa",
+  parchmentDeep: "#d4c48a",
+  textDark:      "#c9a227",
+  textParchment: "#2c1810",
+  textMuted:     "#8b6914",
+  border:        "#c9a22755",
+  borderSolid:   "#c9a227",
+  shadow:        "#c9a227",
+  white:         "#FFFFFF",
+  error:         "#c44",
+  success:       "#5a9",
+};
+
+export const F = {
+  title:     "Cinzel_900Black",
+  header:    "Cinzel_700Bold",
+  label:     "Cinzel_400Regular",
+  body:      "CrimsonText_400Regular",
+  bodySemi:  "CrimsonText_600SemiBold",
+  bodyBold:  "CrimsonText_700Bold",
+};

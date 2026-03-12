@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { LingoMascot } from "@/components/LingoMascot";
+import { C, F } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
 export const STORY_PROGRESS_KEY = "lingo_story_progress";
@@ -67,7 +68,7 @@ const CHAPTERS = [
     num: 3,
     flag: "🇰🇷",
     gradient: ["#050510", "#0A0A20", "#10103A"] as const,
-    accentColor: "#FF6B9D",
+    accentColor: C.gold,
     titleEn: "Chaebol's Secret",
     titleKo: "재벌가의 비밀",
     titleEs: "El Secreto del Chaebol",
@@ -197,10 +198,10 @@ export default function StoryTab() {
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
       <LinearGradient
-        colors={["#FF6B9D", "#FF8FB3"]}
+        colors={[C.bg2, C.bg1]}
         style={styles.header}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
         <Text style={styles.headerTitle}>
           {lang === "korean"
@@ -442,18 +443,20 @@ export default function StoryTab() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF8FB" },
+  container: { flex: 1, backgroundColor: C.bg1 },
   header: { paddingHorizontal: 20, paddingTop: 14, paddingBottom: 18 },
   headerTitle: {
-    fontSize: 26,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
-    marginBottom: 2,
+    fontSize: 24,
+    fontFamily: F.title,
+    color: C.gold,
+    marginBottom: 4,
+    letterSpacing: 2,
   },
   headerSub: {
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "rgba(255,255,255,0.85)",
+    fontFamily: F.body,
+    color: C.goldDim,
+    fontStyle: "italic",
   },
   lingoBanner: {
     flexDirection: "row",
@@ -461,36 +464,41 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: "#FFF0F6",
+    backgroundColor: C.bg2,
     borderBottomWidth: 1,
-    borderBottomColor: "#FFD6E8",
+    borderBottomColor: C.border,
   },
   lingoSpeech: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.parchment,
     borderRadius: 14,
     padding: 10,
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: C.parchmentDeep,
   },
   lingoSpeechText: {
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "#5A2040",
+    fontFamily: F.body,
+    color: C.textParchment,
     lineHeight: 20,
+    fontStyle: "italic",
   },
   scroll: { paddingHorizontal: 16, paddingTop: 16, gap: 16 },
   card: {
     borderRadius: 24,
     overflow: "hidden",
-    shadowColor: "#000",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.22,
+    shadowOpacity: 0.18,
     shadowRadius: 20,
     elevation: 8,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.3)",
   },
   cardGradient: { padding: 20 },
   chapterRow: {
@@ -503,18 +511,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
+    backgroundColor: "rgba(201,162,39,0.15)",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   chapterNum: {
     fontSize: 11,
-    fontFamily: "Inter_700Bold",
-    letterSpacing: 0.5,
+    fontFamily: F.label,
+    letterSpacing: 1.2,
     textTransform: "uppercase",
+    color: C.gold,
   },
   doneBadge: { flexDirection: "row", alignItems: "center", gap: 4 },
   doneText: {
     fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
-    color: "#4ADE80",
+    fontFamily: F.bodySemi,
+    color: "#5a9",
   },
   cardMain: {
     flexDirection: "row",
@@ -531,21 +543,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.22)",
+    borderColor: "rgba(201,162,39,0.25)",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
   charEmoji: { fontSize: 20 },
   cardTitle: {
-    fontSize: 22,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontSize: 20,
+    fontFamily: F.header,
+    color: C.parchment,
     marginBottom: 5,
+    letterSpacing: 0.5,
   },
   cardDesc: {
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "rgba(255,255,255,0.7)",
+    fontFamily: F.body,
+    color: "rgba(244,232,193,0.8)",
     marginBottom: 18,
-    lineHeight: 19,
+    lineHeight: 20,
+    fontStyle: "italic",
   },
   cardFooter: {
     flexDirection: "row",
@@ -556,15 +571,20 @@ const styles = StyleSheet.create({
   metaPill: { flexDirection: "row", alignItems: "center", gap: 5 },
   metaText: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
-    color: "rgba(255,255,255,0.7)",
+    fontFamily: F.body,
+    color: "rgba(244,232,193,0.7)",
   },
-  playBtn: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 14 },
-  playBtnText: { fontSize: 14, fontFamily: "Inter_700Bold", color: "#FFFFFF" },
+  playBtn: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 14,
+    backgroundColor: C.gold,
+  },
+  playBtnText: { fontSize: 13, fontFamily: F.header, color: C.bg1 },
   xpRow: { marginTop: 12 },
   xpText: {
     fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
-    color: "rgba(255,255,255,0.55)",
+    fontFamily: F.bodySemi,
+    color: "rgba(201,162,39,0.6)",
   },
 });

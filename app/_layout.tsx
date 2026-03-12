@@ -1,10 +1,15 @@
 import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  useFonts,
-} from "@expo-google-fonts/inter";
+  Cinzel_400Regular,
+  Cinzel_700Bold,
+  Cinzel_900Black,
+  useFonts as useCinzel,
+} from "@expo-google-fonts/cinzel";
+import {
+  CrimsonText_400Regular,
+  CrimsonText_600SemiBold,
+  CrimsonText_700Bold,
+  useFonts as useCrimson,
+} from "@expo-google-fonts/crimson-text";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -15,78 +20,102 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { queryClient } from "@/lib/query-client";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { C } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
 
 const lingoImg = require("@/assets/lingo.png");
 
 function LingoLoadingScreen() {
-  const bounceAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim   = useRef(new Animated.Value(0)).current;
+  const bounceAnim  = useRef(new Animated.Value(0)).current;
+  const fadeAnim    = useRef(new Animated.Value(0)).current;
+  const flickerAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
+    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
     Animated.loop(
       Animated.sequence([
-        Animated.timing(bounceAnim, { toValue: -18, duration: 380, useNativeDriver: true }),
-        Animated.timing(bounceAnim, { toValue: 0,   duration: 380, useNativeDriver: true }),
+        Animated.timing(bounceAnim, { toValue: -16, duration: 420, useNativeDriver: true }),
+        Animated.timing(bounceAnim, { toValue: 0,   duration: 420, useNativeDriver: true }),
+      ])
+    ).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(flickerAnim, { toValue: 0.6, duration: 80,  useNativeDriver: true }),
+        Animated.timing(flickerAnim, { toValue: 1,   duration: 120, useNativeDriver: true }),
+        Animated.timing(flickerAnim, { toValue: 0.8, duration: 60,  useNativeDriver: true }),
+        Animated.timing(flickerAnim, { toValue: 1,   duration: 900, useNativeDriver: true }),
       ])
     ).start();
   }, []);
 
   return (
-    <Animated.View style={[loadingStyles.root, { opacity: fadeAnim }]}>
+    <Animated.View style={[ls.root, { opacity: fadeAnim }]}>
+      <View style={ls.lantern}>
+        <Animated.Text style={[ls.lanternEmoji, { opacity: flickerAnim }]}>🔍</Animated.Text>
+      </View>
       <Animated.Image
         source={lingoImg}
-        style={[loadingStyles.lingo, { transform: [{ translateY: bounceAnim }] }]}
+        style={[ls.lingo, { transform: [{ translateY: bounceAnim }] }]}
       />
-      <Text style={loadingStyles.title}>LingoFox</Text>
-      <Text style={loadingStyles.sub}>🦊 Loading your language journey...</Text>
-      <View style={loadingStyles.dots}>
-        {[0, 1, 2].map((i) => <View key={i} style={loadingStyles.dot} />)}
+      <Text style={ls.title}>LingoFox</Text>
+      <Text style={ls.sub}>Unravelling languages, one clue at a time...</Text>
+      <View style={ls.dots}>
+        {[0, 1, 2].map((i) => <Animated.View key={i} style={[ls.dot, { opacity: flickerAnim }]} />)}
       </View>
     </Animated.View>
   );
 }
 
-const loadingStyles = StyleSheet.create({
+const ls = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#FFF0F6",
+    backgroundColor: C.bg1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 12,
+    gap: 10,
   },
-  lingo: { width: 220, height: 220, resizeMode: "contain" },
-  title: { fontSize: 30, fontWeight: "800", color: "#FF6B9D", letterSpacing: -0.5 },
-  sub:   { fontSize: 14, color: "#C080A0", fontWeight: "500" },
-  dots:  { flexDirection: "row", gap: 8, marginTop: 4 },
-  dot:   { width: 8, height: 8, borderRadius: 4, backgroundColor: "#FF6B9D" },
+  lantern: { marginBottom: 4 },
+  lanternEmoji: { fontSize: 36 },
+  lingo: { width: 200, height: 200, resizeMode: "contain" },
+  title: {
+    fontSize: 30,
+    fontFamily: "Cinzel_900Black",
+    color: C.gold,
+    letterSpacing: 2,
+  },
+  sub: {
+    fontSize: 14,
+    fontFamily: "CrimsonText_400Regular",
+    color: C.goldDim,
+    fontStyle: "italic",
+    textAlign: "center",
+    paddingHorizontal: 40,
+  },
+  dots: { flexDirection: "row", gap: 8, marginTop: 8 },
+  dot:  { width: 7, height: 7, borderRadius: 4, backgroundColor: C.gold },
 });
 
 function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index"      options={{ headerShown: false }} />
-      <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)"     options={{ headerShown: false }} />
-      <Stack.Screen name="chat-room"  options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="index"        options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding"   options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)"       options={{ headerShown: false }} />
+      <Stack.Screen name="chat-room"    options={{ headerShown: false, presentation: "card" }} />
     </Stack>
   );
 }
 
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
+  const [cinzelLoaded,  cinzelError]  = useCinzel({ Cinzel_400Regular, Cinzel_700Bold, Cinzel_900Black });
+  const [crimsonLoaded, crimsonError] = useCrimson({ CrimsonText_400Regular, CrimsonText_600SemiBold, CrimsonText_700Bold });
+
+  const fontsLoaded = cinzelLoaded  && crimsonLoaded;
+  const fontError   = cinzelError   || crimsonError;
 
   useEffect(() => {
-    if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
-    }
+    if (fontsLoaded || fontError) SplashScreen.hideAsync();
   }, [fontsLoaded, fontError]);
 
   if (!fontsLoaded && !fontError) return <LingoLoadingScreen />;

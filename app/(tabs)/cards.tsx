@@ -18,6 +18,7 @@ import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/Langu
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
 import { RippleButton } from "@/components/RippleButton";
+import { C, F } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
 
@@ -1048,7 +1049,6 @@ export default function CardsScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
-      <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
       <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
       <View style={styles.header}>
@@ -1060,7 +1060,7 @@ export default function CardsScreen() {
             onPress={() => switchDeck("beginner")}
           >
             {deckType === "beginner" && (
-              <LinearGradient colors={["#FF6B9D", "#FF4081"]} style={StyleSheet.absoluteFill} borderRadius={14} />
+              <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} borderRadius={14} />
             )}
             <Text style={[styles.deckTabText, deckType === "beginner" && styles.deckTabTextActive]}>
               Beginner
@@ -1071,7 +1071,7 @@ export default function CardsScreen() {
             onPress={() => switchDeck("advanced")}
           >
             {deckType === "advanced" && (
-              <LinearGradient colors={["#FF6B9D", "#FF4081"]} style={StyleSheet.absoluteFill} borderRadius={14} />
+              <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} borderRadius={14} />
             )}
             <Text style={[styles.deckTabText, deckType === "advanced" && styles.deckTabTextActive]}>
               Advanced
@@ -1098,14 +1098,14 @@ export default function CardsScreen() {
           <Text style={styles.completedTitle}>{t("well_done")}</Text>
           <Text style={styles.completedSub}>You finished the {deckType} deck!</Text>
           <View style={styles.scoreRow}>
-            <View style={[styles.scoreCard, { backgroundColor: "#E8F5E9" }]}>
+            <View style={[styles.scoreCard, { backgroundColor: "rgba(90,153,90,0.15)" }]}>
               <Text style={styles.scoreEmoji}>✅</Text>
-              <Text style={[styles.scoreNum, { color: "#4CAF50" }]}>{gotIt}</Text>
+              <Text style={[styles.scoreNum, { color: "#5a9" }]}>{gotIt}</Text>
               <Text style={styles.scoreLabel}>Got it!</Text>
             </View>
-            <View style={[styles.scoreCard, { backgroundColor: "#FFF3E0" }]}>
+            <View style={styles.scoreCard}>
               <Text style={styles.scoreEmoji}>😅</Text>
-              <Text style={[styles.scoreNum, { color: "#FF9800" }]}>{again}</Text>
+              <Text style={styles.scoreNum}>{again}</Text>
               <Text style={styles.scoreLabel}>Again</Text>
             </View>
           </View>
@@ -1113,7 +1113,7 @@ export default function CardsScreen() {
             style={({ pressed }) => [styles.resetBtn, pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] }]}
             onPress={resetState}
           >
-            <Ionicons name="refresh" size={18} color="#FFFFFF" />
+            <Ionicons name="refresh" size={18} color={C.bg1} />
             <Text style={styles.resetBtnText}>{t("try_again")}</Text>
           </Pressable>
           <Pressable
@@ -1143,7 +1143,7 @@ export default function CardsScreen() {
                   ]}
                 >
                   <LinearGradient
-                    colors={["#FF6B9D", "#FF8FB3"]}
+                    colors={[C.gold, C.goldDark]}
                     style={styles.cardAccentBar}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
@@ -1160,13 +1160,13 @@ export default function CardsScreen() {
                       hitSlop={12}
                     >
                       <LinearGradient
-                        colors={isSpeaking ? ["#FF4081", "#FF1744"] : ["#FF6B9D", "#FF8FB3"]}
+                        colors={isSpeaking ? [C.goldDark, C.bg2] : [C.gold, C.goldDark]}
                         style={styles.speakerBtnGradient}
                       >
                         <Ionicons
                           name={isSpeaking ? "volume-high" : "volume-medium"}
                           size={18}
-                          color="#FFFFFF"
+                          color={C.bg1}
                         />
                       </LinearGradient>
                     </Pressable>
@@ -1184,8 +1184,8 @@ export default function CardsScreen() {
                     { transform: [{ perspective: 1200 }, { rotateY: backRotate }], opacity: backOpacity },
                   ]}
                 >
-                  <LinearGradient
-                    colors={["#FF6B9D", "#E8316E"]}
+                    <LinearGradient
+                    colors={[C.bg2, C.bg1]}
                     style={StyleSheet.absoluteFill}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -1215,7 +1215,7 @@ export default function CardsScreen() {
                       <Ionicons
                         name={isSpeaking ? "volume-high" : "volume-medium"}
                         size={16}
-                        color="rgba(255,255,255,0.9)"
+                        color={C.parchment}
                       />
                       <Text style={styles.speakerBtnBackText}>Listen</Text>
                     </Pressable>
@@ -1234,7 +1234,7 @@ export default function CardsScreen() {
               >
                 <View style={styles.actionBtnInner}>
                   <Text style={styles.againBtnEmoji}>😅</Text>
-                  <Text style={[styles.actionLabel, { color: "#FF9800" }]}>Again</Text>
+                  <Text style={[styles.actionLabel, { color: C.gold }]}>Again</Text>
                 </View>
               </RippleButton>
               <RippleButton
@@ -1244,7 +1244,7 @@ export default function CardsScreen() {
               >
                 <View style={styles.actionBtnInner}>
                   <Text style={styles.gotItBtnEmoji}>✅</Text>
-                  <Text style={[styles.actionLabel, { color: "#4CAF50" }]}>Got it!</Text>
+                  <Text style={[styles.actionLabel, { color: "#5a9" }]}>Got it!</Text>
                 </View>
               </RippleButton>
             </View>
@@ -1254,8 +1254,8 @@ export default function CardsScreen() {
                 style={({ pressed }) => [styles.flipPromptBtn, pressed && { opacity: 0.8 }]}
                 onPress={handleFlip}
               >
-                <LinearGradient colors={["#FF6B9D", "#FF4081"]} style={styles.flipPromptGradient}>
-                  <Ionicons name="sync" size={18} color="#FFFFFF" />
+                <LinearGradient colors={[C.gold, C.goldDark]} style={styles.flipPromptGradient}>
+                  <Ionicons name="sync" size={18} color={C.bg1} />
                   <Text style={styles.flipPromptText}>Tap to reveal meaning</Text>
                 </LinearGradient>
               </Pressable>
@@ -1265,7 +1265,7 @@ export default function CardsScreen() {
           <View style={[styles.miniStats, { paddingBottom: Math.max(insets.bottom + 16, 34) }]}>
             <View style={styles.miniStat}>
               <Text style={styles.miniStatEmoji}>✅</Text>
-              <Text style={[styles.miniStatText, { color: "#4CAF50" }]}>{gotIt}</Text>
+              <Text style={[styles.miniStatText, { color: "#5a9" }]}>{gotIt}</Text>
             </View>
             <View style={styles.miniDivider} />
             <View style={styles.miniStat}>
@@ -1282,6 +1282,7 @@ export default function CardsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: C.bg1,
   },
   header: {
     paddingHorizontal: 20,
@@ -1290,15 +1291,18 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
+    fontFamily: F.header,
+    color: C.gold,
+    letterSpacing: 1.5,
   },
   deckSwitcher: {
     flexDirection: "row",
-    backgroundColor: "#F5E6EF",
+    backgroundColor: C.bg2,
     borderRadius: 16,
     padding: 4,
     gap: 4,
+    borderWidth: 1,
+    borderColor: C.border,
   },
   deckTab: {
     flex: 1,
@@ -1310,12 +1314,12 @@ const styles = StyleSheet.create({
   },
   deckTabActive: {},
   deckTabText: {
-    fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
-    color: "#A08090",
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: C.goldDark,
   },
   deckTabTextActive: {
-    color: "#FFFFFF",
+    color: C.bg1,
   },
   progressRow: {
     flexDirection: "row",
@@ -1325,19 +1329,21 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 6,
-    backgroundColor: "#F0D6E4",
+    backgroundColor: "rgba(201,162,39,0.15)",
     borderRadius: 3,
     overflow: "hidden",
+    borderWidth: 0.5,
+    borderColor: C.border,
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#FF6B9D",
+    backgroundColor: C.gold,
     borderRadius: 3,
   },
   progressLabel: {
     fontSize: 13,
-    fontFamily: "Inter_500Medium",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDim,
     minWidth: 32,
     textAlign: "right",
   },
@@ -1356,15 +1362,15 @@ const styles = StyleSheet.create({
   card: {
     width: "100%",
     borderRadius: 28,
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 16 },
-    shadowOpacity: 0.22,
+    shadowOpacity: 0.25,
     shadowRadius: 28,
     elevation: 10,
     backfaceVisibility: "hidden",
   },
   cardFront: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.parchment,
     overflow: "hidden",
   },
   cardBack: {
@@ -1402,22 +1408,23 @@ const styles = StyleSheet.create({
   },
   cardWordFront: {
     fontSize: 36,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
+    fontFamily: F.title,
+    color: C.textParchment,
     textAlign: "center",
-    letterSpacing: -0.5,
+    letterSpacing: 1,
   },
   cardWordBack: {
     fontSize: 24,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontFamily: F.header,
+    color: C.parchment,
     textAlign: "center",
   },
   cardPronunciation: {
     fontSize: 15,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDark,
     textAlign: "center",
+    fontStyle: "italic",
   },
   speakerBtn: {
     borderRadius: 20,
@@ -1435,18 +1442,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "rgba(201,162,39,0.2)",
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
+    borderColor: "rgba(201,162,39,0.4)",
     marginTop: 4,
   },
   speakerBtnBackText: {
     fontSize: 13,
-    fontFamily: "Inter_500Medium",
-    color: "rgba(255,255,255,0.9)",
+    fontFamily: F.bodySemi,
+    color: C.parchment,
   },
   flipHint: {
     flexDirection: "row",
@@ -1456,54 +1463,54 @@ const styles = StyleSheet.create({
   },
   flipHintText: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: "#C4B5BF",
+    fontFamily: F.body,
+    color: C.goldDark,
+    fontStyle: "italic",
   },
   divider: {
     width: 48,
     height: 2,
-    backgroundColor: "rgba(255,255,255,0.35)",
+    backgroundColor: "rgba(201,162,39,0.35)",
     borderRadius: 1,
     marginVertical: 2,
   },
   cardMeaning: {
-    fontSize: 15,
-    fontFamily: "Inter_500Medium",
-    color: "rgba(255,255,255,0.95)",
+    fontSize: 16,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: 24,
     paddingHorizontal: 4,
   },
   exampleBox: {
-    backgroundColor: "rgba(255,255,255,0.15)",
+    backgroundColor: "rgba(201,162,39,0.12)",
     borderRadius: 14,
     padding: 14,
     gap: 4,
     width: "100%",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
+    borderColor: "rgba(201,162,39,0.25)",
   },
   exampleLabel: {
     fontSize: 10,
-    fontFamily: "Inter_600SemiBold",
-    color: "rgba(255,255,255,0.7)",
+    fontFamily: F.label,
+    color: "rgba(201,162,39,0.8)",
     textTransform: "uppercase",
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   exampleText: {
     fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: "#FFFFFF",
+    fontFamily: F.body,
+    color: C.parchment,
     lineHeight: 20,
     fontStyle: "italic",
   },
   exampleTranslationText: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: "rgba(255,255,255,0.65)",
+    fontFamily: F.body,
+    color: C.goldDim,
     lineHeight: 17,
     marginTop: 6,
-    fontStyle: "normal",
   },
   flipPromptRow: {
     paddingHorizontal: 20,
@@ -1522,9 +1529,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   flipPromptText: {
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
+    fontSize: 15,
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 0.5,
   },
   actionRow: {
     flexDirection: "row",
@@ -1545,14 +1553,14 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
   },
   againBtn: {
-    backgroundColor: "#FFF3E0",
+    backgroundColor: C.bg2,
     borderWidth: 2,
-    borderColor: "#FFE0B2",
+    borderColor: "rgba(201,162,39,0.3)",
   },
   gotItBtn: {
-    backgroundColor: "#E8F5E9",
+    backgroundColor: "rgba(90,153,90,0.15)",
     borderWidth: 2,
-    borderColor: "#C8E6C9",
+    borderColor: "rgba(90,153,90,0.35)",
   },
   againBtnEmoji: {
     fontSize: 22,
@@ -1561,8 +1569,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   actionLabel: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
+    fontSize: 15,
+    fontFamily: F.header,
   },
   miniStats: {
     flexDirection: "row",
@@ -1581,12 +1589,13 @@ const styles = StyleSheet.create({
   },
   miniStatText: {
     fontSize: 18,
-    fontFamily: "Inter_700Bold",
+    fontFamily: F.bodyBold,
+    color: C.gold,
   },
   miniDivider: {
     width: 1,
     height: 20,
-    backgroundColor: "#F0D6E4",
+    backgroundColor: C.border,
   },
   completedContainer: {
     flex: 1,
@@ -1595,19 +1604,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     gap: 20,
     paddingVertical: 40,
+    backgroundColor: C.bg1,
   },
   completedEmoji: {
     fontSize: 72,
   },
   completedTitle: {
-    fontSize: 28,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
+    fontSize: 26,
+    fontFamily: F.title,
+    color: C.gold,
+    letterSpacing: 2,
   },
   completedSub: {
     fontSize: 16,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.parchmentDark,
+    fontStyle: "italic",
   },
   scoreRow: {
     flexDirection: "row",
@@ -1620,44 +1632,50 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     gap: 6,
+    backgroundColor: C.bg2,
+    borderWidth: 1,
+    borderColor: C.border,
   },
   scoreEmoji: {
     fontSize: 32,
   },
   scoreNum: {
     fontSize: 32,
-    fontFamily: "Inter_700Bold",
+    fontFamily: F.title,
+    color: C.gold,
   },
   scoreLabel: {
-    fontSize: 13,
-    fontFamily: "Inter_500Medium",
-    color: "#A08090",
+    fontSize: 12,
+    fontFamily: F.label,
+    color: C.goldDark,
   },
   resetBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: "#FF6B9D",
+    backgroundColor: C.gold,
     paddingHorizontal: 36,
     paddingVertical: 16,
     borderRadius: 20,
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 5,
   },
   resetBtnText: {
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
+    fontSize: 15,
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 0.5,
   },
   switchBtn: {
     paddingVertical: 12,
   },
   switchBtnText: {
-    fontSize: 15,
-    fontFamily: "Inter_500Medium",
-    color: "#FF6B9D",
+    fontSize: 14,
+    fontFamily: F.bodySemi,
+    color: C.gold,
+    textDecorationLine: "underline",
   },
 });

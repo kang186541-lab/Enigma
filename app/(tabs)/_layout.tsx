@@ -1,70 +1,35 @@
-import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
-import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs";
-import { BlurView } from "expo-blur";
 import { Platform, StyleSheet, View } from "react-native";
 import React from "react";
 import { useLanguage } from "@/context/LanguageContext";
-
-function NativeTabLayout() {
-  const { t } = useLanguage();
-  return (
-    <NativeTabs>
-      <NativeTabs.Trigger name="index">
-        <Icon sf={{ default: "house", selected: "house.fill" }} />
-        <Label>{t("home")}</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="cards">
-        <Icon sf={{ default: "rectangle.on.rectangle", selected: "rectangle.on.rectangle.fill" }} />
-        <Label>{t("cards")}</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="chat">
-        <Icon sf={{ default: "bubble.left", selected: "bubble.left.fill" }} />
-        <Label>{t("chat")}</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="story">
-        <Icon sf={{ default: "book", selected: "book.fill" }} />
-        <Label>{t("story")}</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="speak">
-        <Icon sf={{ default: "mic", selected: "mic.fill" }} />
-        <Label>{t("speak")}</Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
-  );
-}
+import { C, F } from "@/constants/theme";
 
 function ClassicTabLayout() {
   const { t } = useLanguage();
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
-  const PINK = "#FF6B9D";
-  const INACTIVE = "#C4B5BF";
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: PINK,
-        tabBarInactiveTintColor: INACTIVE,
+        tabBarActiveTintColor:   C.gold,
+        tabBarInactiveTintColor: C.goldDark,
         tabBarStyle: {
           position: "absolute",
-          backgroundColor: isIOS ? "transparent" : "#FFFFFF",
-          borderTopWidth: isWeb ? 1 : 0,
-          borderTopColor: "#F0D6E4",
+          backgroundColor: C.tabBar,
+          borderTopWidth: 1,
+          borderTopColor: C.gold,
           elevation: 0,
           ...(isWeb ? { height: 84 } : {}),
         },
-        tabBarBackground: () =>
-          isIOS ? (
-            <BlurView intensity={100} tint="light" style={StyleSheet.absoluteFill} />
-          ) : isWeb ? (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: "#FFFFFF" }]} />
-          ) : null,
+        tabBarBackground: () => (
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: C.tabBar }]} />
+        ),
         tabBarLabelStyle: {
-          fontFamily: "Inter_500Medium",
-          fontSize: 11,
+          fontFamily: F.label,
+          fontSize: 10,
+          letterSpacing: 0.5,
         },
       }}
     >
@@ -89,22 +54,22 @@ function ClassicTabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chat"
-        options={{
-          title: t("chat"),
-          tabBarIcon: ({ color, size }) => {
-            const { Ionicons } = require("@expo/vector-icons");
-            return <Ionicons name="chatbubble" size={size} color={color} />;
-          },
-        }}
-      />
-      <Tabs.Screen
         name="story"
         options={{
           title: t("story"),
           tabBarIcon: ({ color, size }) => {
             const { Ionicons } = require("@expo/vector-icons");
             return <Ionicons name="book" size={size} color={color} />;
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: t("chat"),
+          tabBarIcon: ({ color, size }) => {
+            const { Ionicons } = require("@expo/vector-icons");
+            return <Ionicons name="chatbubble" size={size} color={color} />;
           },
         }}
       />
@@ -123,8 +88,5 @@ function ClassicTabLayout() {
 }
 
 export default function TabLayout() {
-  if (isLiquidGlassAvailable()) {
-    return <NativeTabLayout />;
-  }
   return <ClassicTabLayout />;
 }

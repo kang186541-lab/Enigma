@@ -25,6 +25,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { XPToast } from "@/components/XPToast";
 import { getApiUrl } from "@/lib/query-client";
 import { recordAudio } from "@/lib/audio";
+import { C, F } from "@/constants/theme";
 
 interface Message {
   id: string;
@@ -594,7 +595,7 @@ export default function ChatRoomScreen() {
                   <Ionicons
                     name={speakingId === item.id ? "volume-high" : "volume-medium-outline"}
                     size={14}
-                    color={speakingId === item.id ? "#FF6B9D" : "#C4B5BF"}
+                    color={speakingId === item.id ? C.gold : C.goldDark}
                   />
                 </Pressable>
               </View>
@@ -639,20 +640,19 @@ export default function ChatRoomScreen() {
   if (!tutor) {
     return (
       <View style={[styles.screen, { paddingTop: topPad, justifyContent: "center", alignItems: "center" }]}>
-        <Text style={{ fontFamily: "Inter_400Regular", color: "#A08090" }}>Tutor not found</Text>
+        <Text style={{ fontFamily: F.body, color: C.goldDim }}>Tutor not found</Text>
       </View>
     );
   }
 
   return (
     <View style={[styles.screen, { paddingTop: topPad, paddingBottom: bottomPad }]}>
-      <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
       <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
       {/* Header */}
       <View style={styles.header}>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={22} color="#1A1A2E" />
+          <Ionicons name="chevron-back" size={22} color={C.gold} />
         </Pressable>
 
         <View style={styles.tutorAvatarHeader}>
@@ -674,7 +674,7 @@ export default function ChatRoomScreen() {
           <Ionicons
             name={muted ? "volume-mute" : "volume-medium"}
             size={20}
-            color={muted ? "#A08090" : "#FF6B9D"}
+            color={muted ? C.goldDark : C.gold}
           />
         </Pressable>
 
@@ -682,19 +682,19 @@ export default function ChatRoomScreen() {
           style={({ pressed }) => [styles.muteBtn, pressed && { opacity: 0.75 }]}
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowSettings(true); }}
         >
-          <Ionicons name="settings-outline" size={19} color="#A08090" />
+          <Ionicons name="settings-outline" size={19} color={C.goldDim} />
         </Pressable>
       </View>
 
       {/* Style badge */}
       <View style={styles.styleBadgeRow}>
-        <View style={[styles.styleBadge, { backgroundColor: tutor.style === "formal" ? "#EEF2FF" : "#FFF7ED" }]}>
+        <View style={styles.styleBadge}>
           <Ionicons
             name={tutor.style === "formal" ? "school-outline" : "happy-outline"}
             size={12}
-            color={tutor.style === "formal" ? "#6366F1" : "#EA580C"}
+            color={C.gold}
           />
-          <Text style={[styles.styleBadgeText, { color: tutor.style === "formal" ? "#6366F1" : "#EA580C" }]}>
+          <Text style={styles.styleBadgeText}>
             {tutor.personality}
           </Text>
         </View>
@@ -753,7 +753,7 @@ export default function ChatRoomScreen() {
             <View style={styles.settingsHeaderRow}>
               <Text style={styles.settingsTitle}>설정</Text>
               <Pressable onPress={() => setShowSettings(false)} hitSlop={10}>
-                <Ionicons name="close" size={20} color="#A08090" />
+                <Ionicons name="close" size={20} color={C.goldDim} />
               </Pressable>
             </View>
 
@@ -783,7 +783,7 @@ export default function ChatRoomScreen() {
 
             {/* Neural voice info */}
             <View style={styles.noVoicesBox}>
-              <Ionicons name="sparkles" size={14} color="#FF6B9D" style={{ marginBottom: 4 }} />
+              <Ionicons name="sparkles" size={14} color={C.gold} style={{ marginBottom: 4 }} />
               <Text style={styles.noVoicesText}>
                 Each tutor uses a unique AI neural voice — Sarah speaks in a British accent, Jake in American English, and so on.
               </Text>
@@ -838,7 +838,7 @@ export default function ChatRoomScreen() {
                 <Ionicons
                   name={isRecording ? "radio-button-on" : "mic"}
                   size={18}
-                  color={isRecording ? "#FFFFFF" : "#FF6B9D"}
+                  color={isRecording ? C.bg1 : C.gold}
                 />
               </Pressable>
             </Animated.View>
@@ -849,7 +849,7 @@ export default function ChatRoomScreen() {
               value={inputText}
               onChangeText={setInputText}
               placeholder={isRecording ? "Listening…" : t("type_message")}
-              placeholderTextColor={isRecording ? "#FF6B9D" : "#C4B5BF"}
+              placeholderTextColor={isRecording ? C.gold : C.goldDark}
               multiline
               maxLength={500}
               returnKeyType="send"
@@ -867,10 +867,10 @@ export default function ChatRoomScreen() {
               disabled={!inputText.trim() || isRecording}
             >
               <LinearGradient
-                colors={inputText.trim() ? ["#FF6B9D", "#FF4081"] : ["#E8D5DC", "#E8D5DC"]}
+                colors={inputText.trim() ? [C.gold, C.goldDark] : [C.bg2, C.bg2]}
                 style={styles.sendBtnGradient}
               >
-                <Ionicons name="arrow-up" size={20} color="#FFFFFF" />
+                <Ionicons name="arrow-up" size={20} color={inputText.trim() ? C.bg1 : C.goldDark} />
               </LinearGradient>
             </Pressable>
           </View>
@@ -881,7 +881,7 @@ export default function ChatRoomScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1 },
+  screen: { flex: 1, backgroundColor: C.bg1 },
   flex: { flex: 1 },
 
   header: {
@@ -890,50 +890,54 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#F0D6E4",
-    backgroundColor: "rgba(255,248,251,0.97)",
+    borderBottomColor: C.border,
+    backgroundColor: C.bg1,
     gap: 10,
   },
   backBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#F5E8F0",
+    backgroundColor: C.bg2,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   tutorAvatarHeader: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#FFF0F6",
+    backgroundColor: C.bg2,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#FFB3CE",
+    borderColor: C.gold,
     overflow: "hidden",
   },
   tutorAvatarHeaderImg: { width: 40, height: 40, borderRadius: 20 },
   headerCenter: { flex: 1 },
   headerNameRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  headerName: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#1A1A2E" },
+  headerName: { fontSize: 16, fontFamily: F.header, color: C.parchment },
   headerFlag: { fontSize: 16 },
-  headerRegion: { fontSize: 11, fontFamily: "Inter_400Regular", color: "#A08090", marginTop: 1 },
+  headerRegion: { fontSize: 11, fontFamily: F.body, color: C.goldDim, marginTop: 1, fontStyle: "italic" },
   muteBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#F5E8F0",
+    backgroundColor: C.bg2,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: C.border,
   },
 
   styleBadgeRow: {
     paddingHorizontal: 16,
     paddingVertical: 7,
-    backgroundColor: "rgba(255,248,251,0.95)",
+    backgroundColor: C.bg2,
     borderBottomWidth: 1,
-    borderBottomColor: "#F9ECF3",
+    borderBottomColor: C.border,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -946,8 +950,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 10,
+    backgroundColor: "rgba(201,162,39,0.1)",
+    borderWidth: 1,
+    borderColor: C.border,
   },
-  styleBadgeText: { fontSize: 11, fontFamily: "Inter_500Medium", lineHeight: 15, flexShrink: 1 },
+  styleBadgeText: { fontSize: 11, fontFamily: F.body, lineHeight: 15, flexShrink: 1, color: C.goldDim },
   translateHint: {
     flexDirection: "row",
     alignItems: "center",
@@ -955,29 +962,31 @@ const styles = StyleSheet.create({
   },
   translateHintText: {
     fontSize: 11,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDim,
+    fontStyle: "italic",
   },
 
-  // Settings modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "flex-end",
   },
   settingsPanel: {
-    backgroundColor: "#FFF8FB",
+    backgroundColor: C.bg2,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
     paddingBottom: 40,
     paddingTop: 12,
     maxHeight: "80%",
+    borderTopWidth: 1,
+    borderColor: C.border,
   },
   settingsHandle: {
     width: 40,
     height: 4,
-    backgroundColor: "#E0C8D8",
+    backgroundColor: C.goldDark,
     borderRadius: 2,
     alignSelf: "center",
     marginBottom: 16,
@@ -989,17 +998,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   settingsTitle: {
-    fontSize: 17,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
+    fontSize: 16,
+    fontFamily: F.header,
+    color: C.gold,
+    letterSpacing: 0.5,
   },
   settingLabel: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    color: "#A08090",
+    fontSize: 11,
+    fontFamily: F.label,
+    color: C.goldDim,
     marginBottom: 8,
     textTransform: "uppercase",
-    letterSpacing: 0.6,
+    letterSpacing: 1,
   },
   segmentRow: {
     flexDirection: "row",
@@ -1011,22 +1021,22 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
     alignItems: "center",
-    backgroundColor: "#F5E8F0",
+    backgroundColor: C.bg1,
     borderWidth: 1.5,
-    borderColor: "transparent",
+    borderColor: C.border,
   },
   segmentBtnActive: {
-    backgroundColor: "#FFF0F6",
-    borderColor: "#FF6B9D",
+    backgroundColor: "rgba(201,162,39,0.12)",
+    borderColor: C.gold,
   },
   segmentBtnText: {
     fontSize: 13,
-    fontFamily: "Inter_500Medium",
-    color: "#A08090",
+    fontFamily: F.bodySemi,
+    color: C.goldDark,
   },
   segmentBtnTextActive: {
-    color: "#FF6B9D",
-    fontFamily: "Inter_600SemiBold",
+    color: C.gold,
+    fontFamily: F.bodySemi,
   },
   voiceList: {
     maxHeight: 200,
@@ -1043,41 +1053,42 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   voiceRowActive: {
-    backgroundColor: "#FFF0F6",
+    backgroundColor: "rgba(201,162,39,0.1)",
   },
   radioCircle: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#D4B5C8",
+    borderColor: C.goldDark,
     alignItems: "center",
     justifyContent: "center",
   },
   radioCircleActive: {
-    borderColor: "#FF6B9D",
+    borderColor: C.gold,
   },
   radioDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#FF6B9D",
+    backgroundColor: C.gold,
   },
   voiceInfo: { flex: 1 },
   voiceName: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
-    color: "#3D2C35",
+    fontFamily: F.bodySemi,
+    color: C.parchment,
   },
   voiceNameActive: {
-    color: "#FF6B9D",
-    fontFamily: "Inter_600SemiBold",
+    color: C.gold,
+    fontFamily: F.bodyBold,
   },
   voiceLang: {
     fontSize: 11,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDim,
     marginTop: 1,
+    fontStyle: "italic",
   },
   noVoicesBox: {
     paddingVertical: 16,
@@ -1085,9 +1096,10 @@ const styles = StyleSheet.create({
   },
   noVoicesText: {
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDim,
     textAlign: "center",
+    fontStyle: "italic",
   },
 
   listContent: {
@@ -1108,11 +1120,11 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#FFF0F6",
+    backgroundColor: C.bg2,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1.5,
-    borderColor: "#FFB3CE",
+    borderColor: C.gold,
     flexShrink: 0,
     alignSelf: "flex-end",
     overflow: "hidden",
@@ -1129,21 +1141,21 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   bubbleUser: {
-    backgroundColor: "#FF6B9D",
+    backgroundColor: C.gold,
     borderBottomRightRadius: 5,
   },
   bubbleAI: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.parchment,
     borderBottomLeftRadius: 5,
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 2,
   },
   bubbleText: { fontSize: 15, lineHeight: 21 },
-  bubbleTextUser: { fontFamily: "Inter_400Regular", color: "#FFFFFF" },
-  bubbleTextAI: { fontFamily: "Inter_400Regular", color: "#1A1A2E" },
+  bubbleTextUser: { fontFamily: F.body, color: C.bg1 },
+  bubbleTextAI: { fontFamily: F.body, color: C.textParchment },
 
   bubbleActions: {
     flexDirection: "row",
@@ -1156,21 +1168,19 @@ const styles = StyleSheet.create({
   },
   bubbleActionBtnActive: {},
 
-  // Subtitle word highlight
   subtitleHighlight: {
-    color: "#FF6B9D",
-    fontFamily: "Inter_700Bold",
+    color: C.gold,
+    fontFamily: F.bodyBold,
   },
 
-  // Translation bubble — separate card below tutor message
   translBubble: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 6,
-    backgroundColor: "rgba(240, 232, 244, 0.75)",
+    backgroundColor: "rgba(201,162,39,0.08)",
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#EDD9EA",
+    borderColor: C.border,
     paddingHorizontal: 10,
     paddingVertical: 7,
     alignSelf: "flex-start",
@@ -1183,22 +1193,21 @@ const styles = StyleSheet.create({
   translText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "#8A6A82",
+    fontFamily: F.body,
+    color: C.goldDim,
     lineHeight: 18,
-    opacity: 0.9,
+    fontStyle: "italic",
   },
   translHiddenHint: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: "#B89AB0",
+    fontFamily: F.body,
+    color: C.goldDark,
     fontStyle: "italic",
   },
-  // keep for any lingering references
   autoTranslationText: {
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "#8A7080",
+    fontFamily: F.body,
+    color: C.goldDim,
     lineHeight: 18,
     flex: 1,
   },
@@ -1209,37 +1218,37 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    backgroundColor: "#C4B5BF",
+    backgroundColor: C.goldDark,
   },
 
   inputBar: {
     paddingHorizontal: 12,
     paddingTop: 8,
-    backgroundColor: "rgba(255,248,251,0.98)",
+    backgroundColor: C.bg1,
     borderTopWidth: 1,
-    borderTopColor: "#F0D6E4",
+    borderTopColor: C.border,
   },
   inputRow: {
     flexDirection: "row",
     alignItems: "flex-end",
     gap: 8,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.bg2,
     borderRadius: 26,
     paddingHorizontal: 14,
     paddingVertical: 5,
     borderWidth: 1.5,
-    borderColor: "#F0D6E4",
-    shadowColor: "#FF6B9D",
+    borderColor: C.border,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
+    shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 2,
   },
   input: {
     flex: 1,
     fontSize: 15,
-    fontFamily: "Inter_400Regular",
-    color: "#1A1A2E",
+    fontFamily: F.body,
+    color: C.parchment,
     paddingVertical: 8,
     maxHeight: 100,
   },
@@ -1248,15 +1257,15 @@ const styles = StyleSheet.create({
     height: 34,
     borderRadius: 17,
     borderWidth: 1.5,
-    borderColor: "#FF6B9D50",
+    borderColor: C.border,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
-    backgroundColor: "#FFF0F6",
+    backgroundColor: C.bg1,
   },
   micInputBtnActive: {
-    backgroundColor: "#FF6B9D",
-    borderColor: "#FF6B9D",
+    backgroundColor: C.gold,
+    borderColor: C.gold,
   },
   sendBtn: { borderRadius: 20, overflow: "hidden", marginBottom: 2 },
   sendBtnDisabled: { opacity: 0.55 },
@@ -1266,6 +1275,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: C.gold,
   },
 
   modeRow: {
@@ -1283,17 +1293,17 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: "#F0D6E4",
-    backgroundColor: "#FFFFFF",
+    borderColor: C.border,
+    backgroundColor: C.bg2,
   },
   modeBtnEmoji: { fontSize: 13 },
   modeBtnLabel: {
     fontSize: 11,
-    fontFamily: "Inter_600SemiBold",
-    color: "#A08090",
+    fontFamily: F.bodySemi,
+    color: C.goldDark,
   },
   modeBtnLabelActive: {
-    color: "#FFFFFF",
+    color: C.bg1,
   },
 
   speedRow: {
@@ -1309,32 +1319,34 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: "#F0D6E4",
-    backgroundColor: "#FFFFFF",
+    borderColor: C.border,
+    backgroundColor: C.bg2,
   },
   speedBtnActive: {
-    backgroundColor: "#FF6B9D",
-    borderColor: "#FF6B9D",
+    backgroundColor: C.gold,
+    borderColor: C.gold,
   },
   speedBtnText: {
     fontSize: 11,
-    fontFamily: "Inter_600SemiBold",
-    color: "#A08090",
+    fontFamily: F.bodySemi,
+    color: C.goldDark,
   },
   speedBtnTextActive: {
-    color: "#FFFFFF",
+    color: C.bg1,
   },
 
   toast: {
     position: "absolute",
     top: 130,
     alignSelf: "center",
-    backgroundColor: "#1A1A2E",
+    backgroundColor: C.bg2,
     borderRadius: 24,
     paddingHorizontal: 20,
     paddingVertical: 10,
     zIndex: 999,
-    shadowColor: "#000",
+    borderWidth: 1,
+    borderColor: C.gold,
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 12,
@@ -1342,8 +1354,8 @@ const styles = StyleSheet.create({
   },
   toastText: {
     fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
+    fontFamily: F.bodySemi,
+    color: C.gold,
     textAlign: "center",
   },
 });

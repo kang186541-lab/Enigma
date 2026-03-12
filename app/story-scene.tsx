@@ -18,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
+import { C, F } from "@/constants/theme";
 
 const lingoImg = require("@/assets/lingo.png");
 const { width, height } = Dimensions.get("window");
@@ -433,10 +434,10 @@ const STORIES: Record<string, Story> = {
     titleKo: "재벌가의 비밀",
     titleEs: "El Secreto del Chaebol",
     gradient: ["#050510", "#0A0A20", "#10103A"],
-    bgAccent: "#FF6B9D",
-    bubbleColor: "#12122A",
-    bubbleText: "#E8E8FF",
-    accentColor: "#FF6B9D",
+    bgAccent: C.gold,
+    bubbleColor: C.bg2,
+    bubbleText: C.parchment,
+    accentColor: C.gold,
     progressColor: "#7C7CFF",
     characters: [
       {
@@ -1055,7 +1056,7 @@ function MultiChoiceMission({
               style={[styles.optionBtn, { backgroundColor: bg }]}
               onPress={() => handleSelect(opt)}
             >
-              <Text style={[styles.optionText, { fontSize: 18, fontFamily: "Inter_700Bold" }]}>{opt}</Text>
+              <Text style={[styles.optionText, { fontSize: 18, fontFamily: F.header }]}>{opt}</Text>
               {confirmed && isAnswer && (
                 <Ionicons name="checkmark-circle" size={18} color="#22C55E" />
               )}
@@ -1399,7 +1400,7 @@ export default function StoryScene() {
 /* ─────────────────── STYLES ─────────────────── */
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#050510" },
+  root: { flex: 1, backgroundColor: C.bg1 },
 
   header: {
     flexDirection: "row",
@@ -1413,27 +1414,31 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: "rgba(201,162,39,0.15)",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   storyTitle: {
     flex: 1,
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-    color: "rgba(255,255,255,0.9)",
+    fontSize: 14,
+    fontFamily: F.bodySemi,
+    color: C.parchmentDark,
   },
   sceneCounter: {
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(201,162,39,0.15)",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: C.border,
   },
-  sceneCountText: { fontSize: 12, fontFamily: "Inter_700Bold" },
+  sceneCountText: { fontSize: 12, fontFamily: F.label, color: C.gold },
 
   progressTrack: {
     height: 3,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(201,162,39,0.15)",
     marginHorizontal: 20,
   },
   progressFill: { height: "100%", borderRadius: 2 },
@@ -1457,15 +1462,16 @@ const styles = StyleSheet.create({
   charInfo: { gap: 2 },
   charPersonality: {
     fontSize: 11,
-    fontFamily: "Inter_400Regular",
-    color: "rgba(255,255,255,0.5)",
+    fontFamily: F.body,
+    color: C.goldDim,
     maxWidth: 180,
     textAlign: "center",
+    fontStyle: "italic",
   },
   charName: {
     fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    color: "rgba(255,255,255,0.95)",
+    fontFamily: F.header,
+    color: C.parchment,
   },
   avatarOuter: {
     shadowOffset: { width: 0, height: 0 },
@@ -1505,9 +1511,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     gap: 14,
     zIndex: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -6 },
-    shadowOpacity: 0.3,
+    backgroundColor: C.bg2,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: C.border,
+    shadowColor: C.gold,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
     shadowRadius: 20,
     elevation: 12,
   },
@@ -1519,17 +1530,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 14,
+    backgroundColor: "rgba(201,162,39,0.15)",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   speakerEmoji: { fontSize: 14 },
-  speakerName: { fontSize: 13, fontFamily: "Inter_700Bold", color: "#FFFFFF" },
+  speakerName: { fontSize: 13, fontFamily: F.bodySemi, color: C.gold },
   dialogueText: {
-    fontSize: 16,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 26,
+    fontSize: 17,
+    fontFamily: F.body,
+    lineHeight: 28,
     minHeight: 78,
+    color: C.parchment,
+    fontStyle: "italic",
   },
   dotsRow: { flexDirection: "row", gap: 5, justifyContent: "center" },
-  dot: { height: 6, width: 6, borderRadius: 3 },
+  dot: { height: 6, width: 6, borderRadius: 3, backgroundColor: C.gold },
   nextBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -1538,8 +1554,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 16,
     marginTop: 2,
+    backgroundColor: C.gold,
   },
-  nextBtnText: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#FFFFFF" },
+  nextBtnText: { fontSize: 15, fontFamily: F.header, color: C.bg1, letterSpacing: 0.5 },
 
   /* ─ Mission ─ */
   missionHeader: {
@@ -1553,12 +1570,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 12,
     zIndex: 100,
-    backgroundColor: "rgba(0,0,0,0.3)",
+    backgroundColor: "rgba(26,10,5,0.8)",
   },
   missionHeaderTitle: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontSize: 15,
+    fontFamily: F.header,
+    color: C.gold,
+    letterSpacing: 0.5,
   },
   missionBg: {
     flex: 1,
@@ -1568,43 +1586,48 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   missionTypeLabel: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    color: "rgba(255,255,255,0.6)",
+    fontSize: 12,
+    fontFamily: F.label,
+    color: C.goldDim,
     textTransform: "uppercase",
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   missionProgress: {
-    fontSize: 28,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontSize: 26,
+    fontFamily: F.title,
+    color: C.gold,
     marginBottom: 8,
   },
   wordCard: {
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: C.bg2,
     borderRadius: 20,
     padding: 20,
     gap: 10,
+    borderWidth: 1,
+    borderColor: C.border,
   },
   wordLabel: {
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "rgba(255,255,255,0.6)",
+    fontFamily: F.body,
+    color: C.goldDim,
+    fontStyle: "italic",
   },
   wordMain: {
-    fontSize: 36,
-    fontFamily: "Inter_700Bold",
-    letterSpacing: -0.5,
+    fontSize: 34,
+    fontFamily: F.header,
+    color: C.parchment,
+    letterSpacing: 0.5,
   },
   wordHint: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: "rgba(255,255,255,0.4)",
+    fontFamily: F.body,
+    color: C.goldDark,
+    fontStyle: "italic",
   },
   sentenceText: {
-    fontSize: 20,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
+    fontSize: 19,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
     lineHeight: 30,
   },
   optionsGrid: { gap: 10 },
@@ -1616,12 +1639,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
+    borderColor: C.border,
+    backgroundColor: C.bg2,
   },
   optionText: {
     fontSize: 15,
-    fontFamily: "Inter_500Medium",
-    color: "#FFFFFF",
+    fontFamily: F.bodySemi,
+    color: C.parchment,
     flex: 1,
   },
   nextMissionBtn: {
@@ -1629,11 +1653,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     marginTop: 8,
+    backgroundColor: C.gold,
   },
   nextMissionBtnText: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontSize: 15,
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 0.5,
   },
 
   /* ─ Completion ─ */
@@ -1646,34 +1672,40 @@ const styles = StyleSheet.create({
   },
   completionEmoji: { fontSize: 72, marginBottom: 8 },
   completionTitle: {
-    fontSize: 30,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontSize: 28,
+    fontFamily: F.title,
+    color: C.gold,
+    letterSpacing: 2,
   },
-  completionSub: { fontSize: 18, fontFamily: "Inter_600SemiBold" },
+  completionSub: { fontSize: 18, fontFamily: F.bodySemi, color: C.parchmentDark },
   xpRewardBadge: {
     borderWidth: 2,
     borderRadius: 50,
     paddingHorizontal: 24,
     paddingVertical: 10,
     marginTop: 4,
+    borderColor: C.gold,
+    backgroundColor: "rgba(201,162,39,0.15)",
   },
-  xpRewardText: { fontSize: 22, fontFamily: "Inter_700Bold" },
+  xpRewardText: { fontSize: 22, fontFamily: F.title, color: C.gold },
   unlockedText: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
-    color: "rgba(255,255,255,0.7)",
+    fontFamily: F.body,
+    color: C.parchmentDark,
     textAlign: "center",
+    fontStyle: "italic",
   },
   completionBtns: { width: "100%", gap: 10, marginTop: 8 },
   completionBtn: {
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: "center",
+    backgroundColor: C.gold,
   },
   completionBtnText: {
     fontSize: 15,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 0.5,
   },
 });

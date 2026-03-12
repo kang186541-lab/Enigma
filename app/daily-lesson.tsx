@@ -18,6 +18,7 @@ import { Audio } from "expo-av";
 import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
+import { C, F } from "@/constants/theme";
 
 type LearningLang = "english" | "spanish" | "korean";
 
@@ -385,7 +386,6 @@ export default function DailyLessonScreen() {
   if (done) {
     return (
       <View style={[styles.container, { paddingTop: topPad }]}>
-        <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
         <ScrollView contentContainerStyle={styles.doneScroll} showsVerticalScrollIndicator={false}>
           <View style={styles.doneCard}>
             <Text style={styles.doneEmoji}>🎉</Text>
@@ -393,8 +393,8 @@ export default function DailyLessonScreen() {
             <Text style={styles.doneSubtitle}>오늘의 수업을 마쳤어요!</Text>
 
             <View style={styles.xpBadge}>
-              <LinearGradient colors={["#FF6B9D", "#FF4081"]} style={styles.xpGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                <Ionicons name="flash" size={18} color="#FFF" />
+              <LinearGradient colors={[C.gold, C.goldDark]} style={styles.xpGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <Ionicons name="flash" size={18} color={C.bg1} />
                 <Text style={styles.xpText}>+50 XP</Text>
               </LinearGradient>
             </View>
@@ -423,8 +423,8 @@ export default function DailyLessonScreen() {
                 router.replace("/(tabs)/");
               }}
             >
-              <LinearGradient colors={["#FF6B9D", "#FF4081"]} style={styles.homeBtnGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                <Ionicons name="home" size={18} color="#FFF" />
+              <LinearGradient colors={[C.gold, C.goldDark]} style={styles.homeBtnGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <Ionicons name="home" size={18} color={C.bg1} />
                 <Text style={styles.homeBtnText}>홈으로 돌아가기</Text>
               </LinearGradient>
             </Pressable>
@@ -436,7 +436,6 @@ export default function DailyLessonScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
-      <LinearGradient colors={["#FFF0F6", "#FFF8FB"]} style={StyleSheet.absoluteFill} />
       <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
       {/* Header */}
@@ -448,7 +447,7 @@ export default function DailyLessonScreen() {
             router.back();
           }}
         >
-          <Ionicons name="chevron-back" size={24} color="#FF6B9D" />
+          <Ionicons name="chevron-back" size={24} color={C.gold} />
         </Pressable>
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>{langLabel[learnLang]}</Text>
@@ -475,8 +474,8 @@ export default function DailyLessonScreen() {
               disabled={isPlaying}
             >
               {isPlaying
-                ? <ActivityIndicator size="small" color="#FF6B9D" />
-                : <Ionicons name="volume-high" size={22} color="#FF6B9D" />}
+                ? <ActivityIndicator size="small" color={C.gold} />
+                : <Ionicons name="volume-high" size={22} color={C.gold} />}
             </Pressable>
           </View>
 
@@ -487,7 +486,7 @@ export default function DailyLessonScreen() {
 
           <View style={styles.translationRow}>
             <View style={styles.transIcon}>
-              <Ionicons name="language" size={16} color="#FF6B9D" />
+              <Ionicons name="language" size={16} color={C.gold} />
             </View>
             <Text style={styles.translationText}>{currentWord.translations[nativeLang]}</Text>
           </View>
@@ -506,14 +505,14 @@ export default function DailyLessonScreen() {
           style={({ pressed }) => [styles.nextBtn, pressed && { opacity: 0.88, transform: [{ scale: 0.97 }] }]}
           onPress={handleNext}
         >
-          <LinearGradient colors={["#FF6B9D", "#FF4081"]} style={styles.nextBtnGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+          <LinearGradient colors={[C.gold, C.goldDark]} style={styles.nextBtnGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
             <Text style={styles.nextBtnText}>
               {wordIndex < words.length - 1 ? "다음" : "완료"}
             </Text>
             <Ionicons
               name={wordIndex < words.length - 1 ? "arrow-forward" : "checkmark"}
               size={20}
-              color="#FFF"
+              color={C.bg1}
             />
           </LinearGradient>
         </Pressable>
@@ -525,21 +524,25 @@ export default function DailyLessonScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8FB",
+    backgroundColor: C.bg1,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
   },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#FFF0F6",
+    backgroundColor: C.bg2,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   headerCenter: {
     flex: 1,
@@ -547,26 +550,30 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 16,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
+    fontFamily: F.header,
+    color: C.gold,
+    letterSpacing: 1,
   },
   headerSub: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDim,
     marginTop: 2,
+    fontStyle: "italic",
   },
   progressTrack: {
     height: 6,
-    backgroundColor: "#FFE0EF",
+    backgroundColor: "rgba(201,162,39,0.15)",
     marginHorizontal: 24,
     borderRadius: 3,
     marginBottom: 24,
     overflow: "hidden",
+    borderWidth: 0.5,
+    borderColor: C.border,
   },
   progressFill: {
     height: 6,
-    backgroundColor: "#FF6B9D",
+    backgroundColor: C.gold,
     borderRadius: 3,
   },
   cardWrap: {
@@ -574,14 +581,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.parchment,
     borderRadius: 28,
     padding: 28,
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.15,
     shadowRadius: 20,
     elevation: 6,
+    borderWidth: 1,
+    borderColor: C.parchmentDeep,
   },
   cardTop: {
     flexDirection: "row",
@@ -590,45 +599,50 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   langBadge: {
-    backgroundColor: "#FFF0F6",
+    backgroundColor: "rgba(201,162,39,0.12)",
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: C.border,
   },
   langBadgeText: {
     fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FF6B9D",
+    fontFamily: F.bodySemi,
+    color: C.gold,
   },
   listenBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#FFF0F6",
+    backgroundColor: "rgba(201,162,39,0.12)",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   listenBtnActive: {
-    backgroundColor: "#FFE0EF",
+    backgroundColor: "rgba(201,162,39,0.25)",
   },
   wordText: {
-    fontSize: 48,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
+    fontSize: 42,
+    fontFamily: F.title,
+    color: C.textParchment,
     textAlign: "center",
-    letterSpacing: -1,
+    letterSpacing: 1,
     marginBottom: 6,
   },
   pronunciation: {
     fontSize: 15,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDark,
     textAlign: "center",
     marginBottom: 20,
+    fontStyle: "italic",
   },
   divider: {
     height: 1,
-    backgroundColor: "#FFE0EF",
+    backgroundColor: C.parchmentDeep,
     marginBottom: 20,
   },
   translationRow: {
@@ -641,39 +655,44 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#FFF0F6",
+    backgroundColor: "rgba(201,162,39,0.12)",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   translationText: {
     fontSize: 22,
-    fontFamily: "Inter_700Bold",
-    color: "#FF6B9D",
+    fontFamily: F.header,
+    color: C.textParchment,
   },
   exampleBox: {
-    backgroundColor: "#FFF8FB",
+    backgroundColor: "rgba(201,162,39,0.08)",
     borderRadius: 16,
     padding: 16,
     gap: 6,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.2)",
   },
   exampleLabel: {
     fontSize: 11,
-    fontFamily: "Inter_600SemiBold",
-    color: "#A08090",
+    fontFamily: F.label,
+    color: C.goldDark,
     textTransform: "uppercase",
-    letterSpacing: 1,
+    letterSpacing: 1.2,
   },
   exampleWord: {
     fontSize: 15,
-    fontFamily: "Inter_500Medium",
-    color: "#1A1A2E",
+    fontFamily: F.bodySemi,
+    color: C.textParchment,
     lineHeight: 22,
   },
   exampleTrans: {
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "#A08090",
+    fontFamily: F.body,
+    color: C.goldDark,
     lineHeight: 20,
+    fontStyle: "italic",
   },
   footer: {
     paddingHorizontal: 24,
@@ -682,7 +701,7 @@ const styles = StyleSheet.create({
   nextBtn: {
     borderRadius: 18,
     overflow: "hidden",
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
@@ -696,9 +715,10 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
   },
   nextBtnText: {
-    fontSize: 17,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 0.5,
   },
   doneScroll: {
     flexGrow: 1,
@@ -706,36 +726,39 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   doneCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: C.bg2,
     borderRadius: 32,
     padding: 36,
     alignItems: "center",
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.2,
     shadowRadius: 24,
     elevation: 8,
     gap: 16,
+    borderWidth: 1.5,
+    borderColor: C.gold,
   },
   doneEmoji: {
     fontSize: 64,
   },
   doneTitle: {
-    fontSize: 32,
-    fontFamily: "Inter_700Bold",
-    color: "#1A1A2E",
-    letterSpacing: -1,
+    fontSize: 30,
+    fontFamily: F.title,
+    color: C.gold,
+    letterSpacing: 2,
   },
   doneSubtitle: {
-    fontSize: 17,
-    fontFamily: "Inter_500Medium",
-    color: "#A08090",
+    fontSize: 16,
+    fontFamily: F.body,
+    color: C.parchmentDark,
     textAlign: "center",
+    fontStyle: "italic",
   },
   xpBadge: {
     borderRadius: 20,
     overflow: "hidden",
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
@@ -750,18 +773,21 @@ const styles = StyleSheet.create({
   },
   xpText: {
     fontSize: 20,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 1,
   },
   statsRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFF0F6",
+    backgroundColor: "rgba(201,162,39,0.1)",
     borderRadius: 20,
     paddingVertical: 20,
     paddingHorizontal: 24,
     gap: 0,
     width: "100%",
+    borderWidth: 1,
+    borderColor: C.border,
   },
   statItem: {
     flex: 1,
@@ -770,24 +796,24 @@ const styles = StyleSheet.create({
   },
   statNum: {
     fontSize: 22,
-    fontFamily: "Inter_700Bold",
-    color: "#FF6B9D",
+    fontFamily: F.title,
+    color: C.gold,
   },
   statLbl: {
     fontSize: 11,
-    fontFamily: "Inter_500Medium",
-    color: "#A08090",
+    fontFamily: F.label,
+    color: C.goldDim,
   },
   statDivider: {
     width: 1,
     height: 36,
-    backgroundColor: "#FFD0E8",
+    backgroundColor: C.border,
   },
   homeBtn: {
     borderRadius: 18,
     overflow: "hidden",
     width: "100%",
-    shadowColor: "#FF6B9D",
+    shadowColor: C.gold,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 12,
@@ -801,8 +827,9 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
   },
   homeBtnText: {
-    fontSize: 17,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 0.5,
   },
 });
