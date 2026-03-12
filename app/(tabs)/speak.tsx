@@ -7,6 +7,7 @@ import {
   Platform,
   ScrollView,
   Animated,
+  ActivityIndicator,
 } from "react-native";
 import { Audio } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
@@ -484,11 +485,15 @@ export default function SpeakScreen() {
                     start={{ x: 0.2, y: 0 }}
                     end={{ x: 0.8, y: 1 }}
                   />
-                  <Ionicons
-                    name={isRecording ? "radio-button-on" : isProcessing ? "hourglass" : "mic"}
-                    size={46}
-                    color="#FFFFFF"
-                  />
+                  {isProcessing ? (
+                    <ActivityIndicator size="large" color="#FFFFFF" />
+                  ) : (
+                    <Ionicons
+                      name={isRecording ? "radio-button-on" : "mic"}
+                      size={46}
+                      color="#FFFFFF"
+                    />
+                  )}
                 </Pressable>
               </Animated.View>
 
@@ -497,11 +502,15 @@ export default function SpeakScreen() {
                   <View style={styles.redDot} />
                   <Text style={styles.recordingBadgeText}>녹음 중...</Text>
                 </View>
+              ) : isProcessing ? (
+                <View style={styles.scoringDots}>
+                  <View style={[styles.scoringDot, { opacity: 1 }]} />
+                  <View style={[styles.scoringDot, { opacity: 0.6 }]} />
+                  <View style={[styles.scoringDot, { opacity: 0.3 }]} />
+                </View>
               ) : (
                 <Text style={styles.micHint}>
-                  {isProcessing
-                    ? "GPT로 채점 중…"
-                    : hasListened
+                  {hasListened
                     ? "마이크를 탭해서 따라 말해보세요"
                     : "🔊 먼저 듣고, 따라 말해보세요"}
                 </Text>
@@ -757,6 +766,19 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: "#FF2020",
+  },
+  scoringDots: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 4,
+    height: 28,
+  },
+  scoringDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#FF6B9D",
   },
   recordingBadgeText: {
     fontSize: 14,
