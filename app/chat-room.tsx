@@ -205,12 +205,17 @@ export default function ChatRoomScreen() {
   const [rate, setRate] = useState(1.0);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Load persisted speed on mount
+  // Load persisted speed and mode on mount
   useEffect(() => {
     AsyncStorage.getItem("speed_pref").then((val) => {
       if (val !== null) {
         const parsed = parseFloat(val);
         if (!isNaN(parsed)) setRate(parsed);
+      }
+    });
+    AsyncStorage.getItem("mode_pref").then((val) => {
+      if (val === "친절" || val === "독설" || val === "개그") {
+        setMode(val as PersonalityMode);
       }
     });
   }, []);
@@ -409,6 +414,7 @@ export default function ChatRoomScreen() {
     if (newMode === mode) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setMode(newMode);
+    AsyncStorage.setItem("mode_pref", newMode);
     const toast = MODE_TOASTS[newMode];
     if (toast) showToast(toast);
   };
@@ -677,29 +683,6 @@ export default function ChatRoomScreen() {
         )}
       </View>
 
-      {/* Personality mode selector */}
-      <View style={styles.modeRow}>
-        {MODES.map((m) => {
-          const active = mode === m.key;
-          return (
-            <Pressable
-              key={m.key}
-              style={({ pressed }) => [
-                styles.modeBtn,
-                active && { backgroundColor: m.color, borderColor: m.color },
-                pressed && { opacity: 0.8 },
-              ]}
-              onPress={() => handleModeChange(m.key)}
-            >
-              <Text style={styles.modeBtnEmoji}>{m.emoji}</Text>
-              <Text style={[styles.modeBtnLabel, active && styles.modeBtnLabelActive]}>
-                {m.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
       {/* Speed control bar */}
       <View style={styles.speedRow}>
         {SPEED_OPTIONS.map((opt) => {
@@ -745,10 +728,34 @@ export default function ChatRoomScreen() {
             <View style={styles.settingsHandle} />
 
             <View style={styles.settingsHeaderRow}>
-              <Text style={styles.settingsTitle}>Voice Settings</Text>
+              <Text style={styles.settingsTitle}>설정</Text>
               <Pressable onPress={() => setShowSettings(false)} hitSlop={10}>
                 <Ionicons name="close" size={20} color="#A08090" />
               </Pressable>
+            </View>
+
+            {/* 튜터 성격 */}
+            <Text style={styles.settingLabel}>튜터 성격</Text>
+            <View style={styles.segmentRow}>
+              {MODES.map((m) => {
+                const active = mode === m.key;
+                return (
+                  <Pressable
+                    key={m.key}
+                    style={({ pressed }) => [
+                      styles.segmentBtn,
+                      active && styles.segmentBtnActive,
+                      pressed && { opacity: 0.8 },
+                    ]}
+                    onPress={() => handleModeChange(m.key)}
+                  >
+                    <Text style={styles.modeBtnEmoji}>{m.emoji}</Text>
+                    <Text style={[styles.segmentBtnText, active && styles.segmentBtnTextActive]}>
+                      {m.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
             </View>
 
             {/* Neural voice info */}

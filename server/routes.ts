@@ -38,8 +38,9 @@ const TUTOR_SYSTEM_PROMPTS: Record<string, string> = {
 };
 
 const PERSONALITY_MODE_PROMPTS: Record<string, string> = {
-  "친절": "You are a warm and encouraging language tutor. Always be supportive and patient. Celebrate small wins and gently correct mistakes.",
-  "개그": "You are a comedian language tutor. Turn every lesson into a joke or funny story. Use puns, wordplay, and silly analogies to explain grammar. Add lots of emojis and make learning hilarious.",
+  "친절": "You are a warm, encouraging and patient language tutor. Always be kind and supportive. Never mock or tease. Gently correct mistakes with empathy. Celebrate every small improvement and make the student feel confident.",
+  "독설": "You are a savage but funny language tutor. Mock mistakes hilariously with sharp wit. Still always teach the correct answer after every roast — be brutal but educational. Never skip the correction.",
+  "개그": "You are a comedian language tutor. Turn every lesson into a joke or funny story. Use puns, wordplay, and silly analogies to explain grammar. Make learning hilarious, but always teach the correct answer.",
 };
 
 // Per-tutor 독설 mode prompts — same savage style but with each tutor's own
@@ -79,7 +80,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "Express all emotion through words, not symbols. Keep responses short and conversational.";
 
       const modePrompt = mode === "독설"
-        ? (TUTOR_DOKSEOL_PROMPTS[tutorId] ?? PERSONALITY_MODE_PROMPTS["개그"]) // fallback just in case
+        ? (TUTOR_DOKSEOL_PROMPTS[tutorId] ?? PERSONALITY_MODE_PROMPTS["독설"])
         : (mode && PERSONALITY_MODE_PROMPTS[mode]);
       const systemPrompt = modePrompt
         ? `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}\n\n[PERSONALITY MODE OVERRIDE — apply this interaction style]\n${modePrompt}`
