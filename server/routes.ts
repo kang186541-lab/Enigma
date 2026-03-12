@@ -37,22 +37,34 @@ const TUTOR_SYSTEM_PROMPTS: Record<string, string> = {
   minjun: `당신은 민준, 부산 사투리를 가르치는 한국어 튜터입니다. 성격은 장난스럽고, 살짝 놀리지만 따뜻하고 재미있는 — 절대 상처를 주지 않는 유머입니다. 목표는 언어 학습을 즐겁고 웃기게 만드는 것입니다. 학생이 실수하면: (1) 부산 사투리로 가볍게 놀려주세요, (2) 교정된 문장을 알려주세요, (3) 왜 틀렸는지 간단히 설명하세요, (4) 다시 해보도록 응원해 주세요. 부산 사투리(카이, 아이가, 예예, 뭐꼬 등)를 자연스럽게 사용하세요. 학생이 잘 쓰면 부산식으로 따뜻하게 칭찬하세요. 답변은 3–4문장으로 유지하세요. 필요할 때만 영어를 추가하세요.`,
 };
 
+const PERSONALITY_MODE_PROMPTS: Record<string, string> = {
+  "친절": "You are a warm and encouraging language tutor. Always be supportive and patient. Celebrate small wins and gently correct mistakes.",
+  "독설": "You are a savage but funny language tutor. Mock mistakes hilariously in Korean style humor. Example: '와... 진짜요? 그 발음으로 외국 가면 쫓겨날 것 같은데요 😂' Still teach the correct answer but disguise it as roasting. Use emojis like 😂💀🤣",
+  "개그": "You are a comedian language tutor. Turn every lesson into a joke or funny story. Use puns, wordplay, and silly analogies to explain grammar. Add lots of emojis and make learning hilarious.",
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req: Request, res: Response) => {
     try {
-      const { tutorId, messages } = req.body as {
+      const { tutorId, messages, mode } = req.body as {
         tutorId: string;
         messages: { role: "user" | "assistant"; content: string }[];
+        mode?: string;
       };
 
       if (!tutorId || !Array.isArray(messages)) {
         return res.status(400).json({ error: "tutorId and messages are required" });
       }
 
-      const systemPrompt = TUTOR_SYSTEM_PROMPTS[tutorId];
-      if (!systemPrompt) {
+      const baseTutorPrompt = TUTOR_SYSTEM_PROMPTS[tutorId];
+      if (!baseTutorPrompt) {
         return res.status(400).json({ error: "Unknown tutor" });
       }
+
+      const modePrompt = mode && PERSONALITY_MODE_PROMPTS[mode];
+      const systemPrompt = modePrompt
+        ? `${baseTutorPrompt}\n\n[PERSONALITY MODE OVERRIDE — apply this interaction style]\n${modePrompt}`
+        : baseTutorPrompt;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-5.1",

@@ -29,6 +29,19 @@ interface Message {
   isUser: boolean;
 }
 
+type PersonalityMode = "친절" | "독설" | "개그";
+
+const MODES: { key: PersonalityMode; emoji: string; label: string; color: string }[] = [
+  { key: "친절", emoji: "😊", label: "친절 모드", color: "#10B981" },
+  { key: "독설", emoji: "😈", label: "독설 모드", color: "#EF4444" },
+  { key: "개그", emoji: "🤣", label: "개그 모드", color: "#F59E0B" },
+];
+
+const MODE_TOASTS: Partial<Record<PersonalityMode, string>> = {
+  "독설": "⚠️ 멘탈 단단히 잡으세요! 😈",
+  "개그": "🤣 웃음 참으면 지는 거예요!",
+};
+
 const LANG_NAMES: Record<string, string> = {
   english: "English",
   spanish: "Spanish",
@@ -150,6 +163,12 @@ export default function ChatRoomScreen() {
   // Subtitle state
   const [subtitleWordIdx, setSubtitleWordIdx] = useState(-1);
   const subtitleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Personality mode
+  const [mode, setMode] = useState<PersonalityMode>("친절");
+  const [toastMsg, setToastMsg] = useState("");
+  const toastAnim = useRef(new Animated.Value(0)).current;
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Voice input state
   const [isRecording, setIsRecording] = useState(false);
@@ -337,6 +356,26 @@ export default function ChatRoomScreen() {
   );
 
 
+  const showToast = (msg: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToastMsg(msg);
+    toastAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(toastAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+      Animated.delay(1800),
+      Animated.timing(toastAnim, { toValue: 0, duration: 350, useNativeDriver: true }),
+    ]).start();
+    toastTimer.current = setTimeout(() => setToastMsg(""), 2500);
+  };
+
+  const handleModeChange = (newMode: PersonalityMode) => {
+    if (newMode === mode) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setMode(newMode);
+    const toast = MODE_TOASTS[newMode];
+    if (toast) showToast(toast);
+  };
+
   const toggleMute = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (!muted) stopSpeech();
@@ -416,6 +455,7 @@ export default function ChatRoomScreen() {
         body: JSON.stringify({
           tutorId: tutor.id,
           messages: conversationHistoryRef.current,
+          mode,
         }),
       });
 
@@ -595,6 +635,39 @@ export default function ChatRoomScreen() {
           </View>
         )}
       </View>
+
+      {/* Personality mode selector */}
+      <View style={styles.modeRow}>
+        {MODES.map((m) => {
+          const active = mode === m.key;
+          return (
+            <Pressable
+              key={m.key}
+              style={({ pressed }) => [
+                styles.modeBtn,
+                active && { backgroundColor: m.color, borderColor: m.color },
+                pressed && { opacity: 0.8 },
+              ]}
+              onPress={() => handleModeChange(m.key)}
+            >
+              <Text style={styles.modeBtnEmoji}>{m.emoji}</Text>
+              <Text style={[styles.modeBtnLabel, active && styles.modeBtnLabelActive]}>
+                {m.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {/* Toast notification */}
+      {!!toastMsg && (
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.toast, { opacity: toastAnim, transform: [{ translateY: toastAnim.interpolate({ inputRange: [0, 1], outputRange: [-10, 0] }) }] }]}
+        >
+          <Text style={styles.toastText}>{toastMsg}</Text>
+        </Animated.View>
+      )}
 
       {/* iOS Safari voice unlock banner — web only, disappears once tapped */}
       {Platform.OS === "web" && !voiceUnlocked && !muted && (
@@ -1140,5 +1213,55 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
+  },
+
+  modeRow: {
+    flexDirection: "row",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingBottom: 6,
+  },
+  modeBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: "#F0D6E4",
+    backgroundColor: "#FFFFFF",
+  },
+  modeBtnEmoji: { fontSize: 13 },
+  modeBtnLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    color: "#A08090",
+  },
+  modeBtnLabelActive: {
+    color: "#FFFFFF",
+  },
+
+  toast: {
+    position: "absolute",
+    top: 130,
+    alignSelf: "center",
+    backgroundColor: "#1A1A2E",
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    zIndex: 999,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  toastText: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    color: "#FFFFFF",
+    textAlign: "center",
   },
 });
