@@ -31,17 +31,15 @@ interface Message {
   isUser: boolean;
 }
 
-type PersonalityMode = "친절" | "독설" | "개그";
+type PersonalityMode = "친절" | "독설";
 
 const MODES: { key: PersonalityMode; emoji: string; label: string; color: string }[] = [
   { key: "친절", emoji: "😊", label: "친절 모드", color: "#10B981" },
-  { key: "독설", emoji: "😈", label: "독설 모드", color: "#EF4444" },
-  { key: "개그", emoji: "🤣", label: "개그 모드", color: "#F59E0B" },
+  { key: "독설", emoji: "😈", label: "독설+개그", color: "#EF4444" },
 ];
 
 const MODE_TOASTS: Partial<Record<PersonalityMode, string>> = {
-  "독설": "⚠️ 멘탈 단단히 잡으세요! 😈",
-  "개그": "🤣 웃음 참으면 지는 거예요!",
+  "독설": "😈 독설+개그 ON! 멘탈 단단히 잡으세요 haha",
 };
 
 const SPEED_OPTIONS: { label: string; value: number }[] = [
@@ -217,7 +215,7 @@ export default function ChatRoomScreen() {
       }
     });
     AsyncStorage.getItem("mode_pref").then((val) => {
-      if (val === "친절" || val === "독설" || val === "개그") {
+      if (val === "친절" || val === "독설") {
         setMode(val as PersonalityMode);
       }
     });
