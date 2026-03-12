@@ -8,6 +8,7 @@ import {
   Platform,
   Dimensions,
   Animated,
+  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -19,6 +20,7 @@ import { LingoMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
 
 const { width } = Dimensions.get("window");
+const lingoImg = require("@/assets/lingo.png");
 
 function getGreeting(t: (k: string) => string) {
   const h = new Date().getHours();
@@ -156,17 +158,13 @@ export default function HomeScreen() {
       >
         <View style={styles.headerTop}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.greeting}>{getGreeting(t)}</Text>
-            <Text style={styles.headerTitle}>LinguaAI ✨</Text>
+            <Text style={styles.greeting} numberOfLines={1}>{lingoGreeting}</Text>
+            <Text style={styles.headerTitle} numberOfLines={1}>LingoFox ✨</Text>
           </View>
-          <LingoMascot
-            size={110}
-            mood={lingoMood}
-            showBubble
-            bubbleText={lingoGreeting}
-            bubblePosition="left"
-            showCircle
-            style={{ alignItems: "flex-end" }}
+          <Image
+            source={lingoImg}
+            style={styles.lingoHeader}
+            resizeMode="contain"
           />
         </View>
 
@@ -198,7 +196,7 @@ export default function HomeScreen() {
         <View style={styles.streakCard}>
           <View style={styles.streakHeader}>
             <View style={styles.streakLeft}>
-              <LingoMascot size={70} mood={lingoMood} showCircle />
+              <LingoMascot size={70} mood={lingoMood} />
               <View>
                 <Text style={styles.streakCount}>{stats.streak}</Text>
                 <Text style={styles.streakLabel}>
@@ -347,15 +345,14 @@ const styles = StyleSheet.create({
   /* ─ HEADER ─ */
   header: { paddingHorizontal: 20, paddingBottom: 22 },
   headerTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 },
-  greeting: { fontSize: 13, fontFamily: "Inter_400Regular", color: "rgba(255,255,255,0.85)", marginBottom: 2 },
-  headerTitle: { fontSize: 28, fontFamily: "Inter_700Bold", color: "#FFFFFF", letterSpacing: -0.5 },
-  avatarCircle: {
-    width: 46, height: 46, borderRadius: 23,
-    backgroundColor: "rgba(255,255,255,0.3)",
-    justifyContent: "center", alignItems: "center",
-    borderWidth: 2, borderColor: "rgba(255,255,255,0.5)",
+  greeting: { fontSize: 13, fontFamily: "Inter_400Regular", color: "rgba(255,255,255,0.88)", marginBottom: 4 },
+  headerTitle: { fontSize: 32, fontFamily: "Inter_700Bold", color: "#FFFFFF", letterSpacing: -0.5 },
+  lingoHeader: {
+    width: 100,
+    height: 120,
+    marginLeft: 8,
+    marginTop: -8,
   },
-  avatarEmoji: { fontSize: 22 },
   levelRow: { marginBottom: 10 },
   levelBadge: {
     flexDirection: "row", alignItems: "center", gap: 5,

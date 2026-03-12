@@ -36,13 +36,11 @@ function LingoLoadingScreen() {
 
   return (
     <Animated.View style={[loadingStyles.root, { opacity: fadeAnim }]}>
-      <View style={loadingStyles.lingoCircle}>
-        <Animated.Image
-          source={lingoImg}
-          style={[loadingStyles.lingo, { transform: [{ translateY: bounceAnim }] }]}
-        />
-      </View>
-      <Text style={loadingStyles.title}>LinguaAI</Text>
+      <Animated.Image
+        source={lingoImg}
+        style={[loadingStyles.lingo, { transform: [{ translateY: bounceAnim }] }]}
+      />
+      <Text style={loadingStyles.title}>LingoFox</Text>
       <Text style={loadingStyles.sub}>🦊 Loading your language journey...</Text>
       <View style={loadingStyles.dots}>
         {[0, 1, 2].map((i) => <View key={i} style={loadingStyles.dot} />)}
@@ -59,20 +57,7 @@ const loadingStyles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
-  lingoCircle: {
-    width: 210,
-    height: 210,
-    borderRadius: 105,
-    backgroundColor: "#FFE8D6",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#FF6B9D",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  lingo: { width: 180, height: 180, resizeMode: "contain" },
+  lingo: { width: 220, height: 220, resizeMode: "contain" },
   title: { fontSize: 30, fontWeight: "800", color: "#FF6B9D", letterSpacing: -0.5 },
   sub:   { fontSize: 14, color: "#C080A0", fontWeight: "500" },
   dots:  { flexDirection: "row", gap: 8, marginTop: 4 },
