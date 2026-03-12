@@ -141,6 +141,7 @@ export default function HomeScreen() {
   ];
 
   return (
+    <>
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={false}
@@ -333,6 +334,7 @@ export default function HomeScreen() {
       lang={nativeLang}
       onClose={clearLevelUp}
     />
+    </>
   );
 }
 
