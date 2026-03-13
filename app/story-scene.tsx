@@ -110,6 +110,12 @@ type PuzzleType =
   | { pType: "cipher"; questions: CipherQ[] }
   | { pType: "word-puzzle"; questions: WordPuzzleQ[] };
 
+/* Puzzle hints */
+interface PuzzleHints {
+  h1: Tri;
+  h2: Tri;
+}
+
 /* Sequence items */
 type SeqScene = {
   kind: "scene";
@@ -129,7 +135,7 @@ type SeqClue = {
   descKo: string;
   descEs: string;
 };
-type SeqPuzzle = { kind: "puzzle"; puzzleNum: number } & PuzzleType;
+type SeqPuzzle = { kind: "puzzle"; puzzleNum: number; hints?: PuzzleHints } & PuzzleType;
 type SeqItem = SeqScene | SeqClue | SeqPuzzle;
 
 interface Story {
@@ -281,6 +287,10 @@ const STORIES: Record<string, Story> = {
             ],
           },
         ],
+        hints: {
+          h1: { ko: "단어의 첫 글자를 보고 뜻을 연결해보게!", en: "Look at the first letter of each word to match its meaning!", es: "¡Mira la primera letra de cada palabra para emparejar su significado!" },
+          h2: { ko: "mysterious=신비로운, cipher=암호, detective=탐정, clue=단서, suspect=용의자", en: "mysterious=strange, cipher=code, detective=investigator, clue=hint, suspect=suspect", es: "mysterious=misterioso, cipher=cifrado, detective=detective, clue=pista, suspect=sospechoso" },
+        },
       },
       {
         kind: "scene",
@@ -363,6 +373,10 @@ const STORIES: Record<string, Story> = {
             ],
           },
         ],
+        hints: {
+          h1: { ko: "알파벳 순서에서 각 글자의 바로 앞 글자를 찾아보게! 예: B→A", en: "Find the letter right before each one in the alphabet! e.g. B→A", es: "¡Encuentra la letra anterior en el alfabeto! ej: B→A" },
+          h2: { ko: "I→H, F→E, M→L, M→L, P→O", en: "I→H, F→E, M→L, M→L, P→O", es: "I→H, F→E, M→L, M→L, P→O" },
+        },
       },
       {
         kind: "scene",
@@ -415,6 +429,10 @@ const STORIES: Record<string, Story> = {
             answerIdx: 2,
           },
         ],
+        hints: {
+          h1: { ko: "천천히 다시 들어보게! 🔊 버튼을 눌러보게", en: "Listen again slowly! Try the 🔊 button", es: "¡Escucha de nuevo despacio! Pulsa el botón 🔊" },
+          h2: { ko: "첫 번째 단어에 집중해보게!", en: "Focus on the first word!", es: "¡Concéntrate en la primera palabra!" },
+        },
       },
       {
         kind: "scene",
@@ -462,6 +480,10 @@ const STORIES: Record<string, Story> = {
             answerOrder: [0, 1, 2, 3, 4, 5, 6],
           },
         ],
+        hints: {
+          h1: { ko: "주어(I/The)로 시작하는 단어를 먼저 찾아보게!", en: "Find the subject (I/The) word first!", es: "¡Encuentra primero la palabra sujeto (I/The)!" },
+          h2: { ko: "The mysterious letter was found in the library.", en: "The mysterious letter was found in the library.", es: "The mysterious letter was found in the library." },
+        },
       },
       {
         kind: "scene",
@@ -482,6 +504,10 @@ const STORIES: Record<string, Story> = {
             sentence: { en: "Language is our greatest weapon.", ko: "언어는 우리의 가장 큰 무기이다.", es: "El lenguaje es nuestra mayor arma." },
           },
         ],
+        hints: {
+          h1: { ko: "천천히 또박또박 말해보게!", en: "Speak slowly and clearly!", es: "¡Habla despacio y claramente!" },
+          h2: { ko: "각 단어를 나눠서 말해보게: mys-te-ri-ous", en: "Break each word apart: mys-te-ri-ous", es: "Separa cada palabra: mys-te-ri-ous" },
+        },
       },
       {
         kind: "scene",
@@ -608,6 +634,10 @@ const STORIES: Record<string, Story> = {
             ],
           },
         ],
+        hints: {
+          h1: { ko: "스페인어와 한국어의 비슷한 느낌을 찾아보게!", en: "Look for familiar sounds between languages!", es: "¡Busca sonidos familiares entre los idiomas!" },
+          h2: { ko: "hola=안녕하세요, gracias=감사합니다, ayuda=도움, desaparecido=실종된, biblioteca=도서관", en: "hola=hello, gracias=thank you, ayuda=help, desaparecido=missing, biblioteca=library", es: "hola=hola, gracias=gracias, ayuda=ayuda, desaparecido=desaparecido, biblioteca=biblioteca" },
+        },
       },
       {
         kind: "scene",
@@ -677,6 +707,10 @@ const STORIES: Record<string, Story> = {
             answerIdx: 2,
           },
         ],
+        hints: {
+          h1: { ko: "스페인어는 적힌 대로 읽어! 발음이 규칙적이야", en: "Spanish is pronounced as written — very regular!", es: "¡El español se pronuncia tal como se escribe!" },
+          h2: { ko: "¿Dónde está? = 어디 있어요?", en: "¿Dónde está? = Where is it?", es: "¿Dónde está? = ¿Dónde está?" },
+        },
       },
       {
         kind: "puzzle",
@@ -708,6 +742,10 @@ const STORIES: Record<string, Story> = {
             ],
           },
         ],
+        hints: {
+          h1: { ko: "문장의 앞뒤 내용을 보고 어울리는 단어를 골라보게!", en: "Read the context around the blank to find the right word!", es: "¡Lee el contexto alrededor del espacio en blanco!" },
+          h2: { ko: "Necesito ___ ayuda → 'más' (더 많은)", en: "Necesito ___ ayuda → 'más' (more)", es: "Necesito ___ ayuda → 'más' (more)" },
+        },
       },
       {
         kind: "scene",
@@ -739,6 +777,10 @@ const STORIES: Record<string, Story> = {
             answerIdx: 1,
           },
         ],
+        hints: {
+          h1: { ko: "수상한 단어나 장소 이름을 주목해보게!", en: "Look for suspicious words or place names!", es: "¡Busca palabras o lugares sospechosos!" },
+          h2: { ko: "'biblioteca' (도서관) 를 탭해보게!", en: "Try tapping 'biblioteca' (the library)!", es: "¡Intenta tocar 'biblioteca' (la biblioteca)!" },
+        },
       },
       {
         kind: "puzzle",
@@ -764,6 +806,10 @@ const STORIES: Record<string, Story> = {
             ],
           },
         ],
+        hints: {
+          h1: { ko: "정중한 표현을 고르는 게 항상 안전해!", en: "Choosing the polite expression is always the safest bet!", es: "¡Elegir la expresión más educada siempre es seguro!" },
+          h2: { ko: "¿Puede ayudarme? = 도와주실 수 있나요?", en: "¿Puede ayudarme? = Can you help me?", es: "¿Puede ayudarme? = ¿Puede ayudarme?" },
+        },
       },
       {
         kind: "scene",
@@ -890,6 +936,10 @@ const STORIES: Record<string, Story> = {
             ],
           },
         ],
+        hints: {
+          h1: { ko: "한국어는 자음+모음 조합이야! ㅎ+ㅏ+ㄴ = 한", en: "Look at the shape of each character to find clues!", es: "¡Mira la forma de cada carácter para encontrar pistas!" },
+          h2: { ko: "비밀 결사의 이름을 기억해보게: Lexicon Society = 언어 조직", en: "Remember the organisation name: Lexicon Society = language organisation", es: "Recuerda el nombre: Sociedad Lexicon = organización lingüística" },
+        },
       },
       {
         kind: "scene",
@@ -947,6 +997,10 @@ const STORIES: Record<string, Story> = {
             ],
           },
         ],
+        hints: {
+          h1: { ko: "탐정으로서 가장 적극적인 대답을 골라보게!", en: "As a detective, pick the most proactive response!", es: "¡Como detective, elige la respuesta más activa!" },
+          h2: { ko: "언어를 지키는 것이 우리의 임무야!", en: "Protecting language is our mission!", es: "¡Proteger el lenguaje es nuestra misión!" },
+        },
       },
       {
         kind: "puzzle",
@@ -966,6 +1020,10 @@ const STORIES: Record<string, Story> = {
             answerOrder: [0, 1, 2, 3, 4, 5],
           },
         ],
+        hints: {
+          h1: { ko: "주어(language/언어는)로 시작해보게!", en: "Start with the subject (language)!", es: "¡Empieza con el sujeto (language)!" },
+          h2: { ko: "Language is the key to freedom.", en: "Language is the key to freedom.", es: "Language is the key to freedom." },
+        },
       },
       {
         kind: "scene",
@@ -997,6 +1055,10 @@ const STORIES: Record<string, Story> = {
             answerIdx: 1,
           },
         ],
+        hints: {
+          h1: { ko: "결정적인 증거를 찾아보게 — 직접 음모를 증명하는 것!", en: "Look for the decisive proof — the one that directly proves the conspiracy!", es: "¡Busca la prueba decisiva — la que prueba directamente la conspiración!" },
+          h2: { ko: "준혁의 연구 파일이 가장 확실한 증거야!", en: "Junhyuk's research files are the strongest evidence!", es: "¡Los archivos de investigación de Junhyuk son la evidencia más sólida!" },
+        },
       },
       {
         kind: "scene",
@@ -2442,6 +2504,8 @@ export default function StoryScene() {
   const [seqIdx, setSeqIdx] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
+  const [sharedHintVisible, setSharedHintVisible] = useState(false);
+  const [sharedHintLevel, setSharedHintLevel] = useState(0);
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -2459,6 +2523,8 @@ export default function StoryScene() {
   }
 
   function advance() {
+    setSharedHintVisible(false);
+    setSharedHintLevel(0);
     fadeTransition(() => {
       if (seqIdx < seq.length - 1) {
         setSeqIdx((i) => i + 1);
@@ -2590,49 +2656,103 @@ export default function StoryScene() {
 
         {/* PUZZLES */}
         {item.kind === "puzzle" && (() => {
-          const headerText = lang === "korean"
+          const ko = lang === "korean";
+          const es = lang === "spanish";
+          const headerText = ko
             ? `🧩 퍼즐 ${item.puzzleNum} — 언어 실력을 증명하세요!`
-            : lang === "spanish"
+            : es
             ? `🧩 Puzzle ${item.puzzleNum} — ¡Demuestra tus habilidades lingüísticas!`
             : `🧩 Puzzle ${item.puzzleNum} — Prove your language skills!`;
+          const hasSharedHints = !!item.hints && item.pType !== "cipher";
+          const h1 = item.hints ? (ko ? item.hints.h1.ko : es ? item.hints.h1.es : item.hints.h1.en) : "";
+          const h2 = item.hints ? (ko ? item.hints.h2.ko : es ? item.hints.h2.es : item.hints.h2.en) : "";
 
           return (
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomPad + 20 }}>
-              <Text style={styles.puzzleHeader}>{headerText}</Text>
-              {item.pType === "word-match" && (
-                <WordMatchPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+            <>
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomPad + 20 }}>
+                <Text style={styles.puzzleHeader}>{headerText}</Text>
+                {item.pType === "word-match" && (
+                  <WordMatchPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                )}
+                {item.pType === "fill-blank" && (
+                  <FillBlankPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                )}
+                {item.pType === "dialogue-choice" && (
+                  <DialogueChoicePuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
+                )}
+                {item.pType === "sentence-builder" && (
+                  <SentenceBuilderPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                )}
+                {item.pType === "investigation" && (
+                  <InvestigationPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
+                )}
+                {item.pType === "cipher" && (
+                  <CipherPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
+                )}
+                {item.pType === "listen-choose" && (
+                  <ListenChoosePuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                )}
+                {item.pType === "pronunciation" && (
+                  <PronunciationPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                )}
+                {item.pType === "writing-mission" && (
+                  <WritingMissionPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                )}
+                {item.pType === "word-puzzle" && (
+                  <WordPuzzlePuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                )}
+                {!["word-match","fill-blank","dialogue-choice","sentence-builder","investigation","cipher","listen-choose","pronunciation","writing-mission","word-puzzle"].includes(item.pType) && (
+                  <FallbackPuzzle lang={lang} onSolved={handlePuzzleSolved} />
+                )}
+                {hasSharedHints && (
+                  <Pressable
+                    style={styles.sharedHintBtn}
+                    onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSharedHintVisible(true); }}
+                  >
+                    <Text style={styles.sharedHintBtnText}>
+                      💡 {ko ? `힌트 보기 (${sharedHintLevel}/2)` : es ? `Ver pistas (${sharedHintLevel}/2)` : `Hints (${sharedHintLevel}/2)`}
+                    </Text>
+                  </Pressable>
+                )}
+              </ScrollView>
+
+              {hasSharedHints && (
+                <Modal visible={sharedHintVisible} transparent animationType="fade" onRequestClose={() => setSharedHintVisible(false)}>
+                  <Pressable style={styles.hintOverlay} onPress={() => setSharedHintVisible(false)}>
+                    <Pressable style={styles.hintNotebook} onPress={() => {}}>
+                      <View style={styles.hintNotebookHeader}>
+                        <Text style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</Text>
+                        <Pressable onPress={() => setSharedHintVisible(false)} style={styles.hintCloseBtn}>
+                          <Text style={styles.hintCloseBtnText}>✕</Text>
+                        </Pressable>
+                      </View>
+                      <View style={styles.hintNotebookRule} />
+                      {[h1, h2].map((hint, i) => (
+                        <View key={i} style={styles.hintRow}>
+                          {sharedHintLevel > i ? (
+                            <View style={styles.hintUnlocked}>
+                              <Text style={styles.hintLabel}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                              <Text style={styles.hintText}>{hint}</Text>
+                            </View>
+                          ) : sharedHintLevel === i ? (
+                            <Pressable style={styles.hintLocked} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setSharedHintLevel(i + 1); }}>
+                              <Text style={styles.hintLockedIcon}>🔒</Text>
+                              <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
+                            </Pressable>
+                          ) : (
+                            <View style={[styles.hintLocked, { opacity: 0.4 }]}>
+                              <Text style={styles.hintLockedIcon}>🔒</Text>
+                              <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                            </View>
+                          )}
+                        </View>
+                      ))}
+                      <Text style={styles.hintFooter}>{ko ? "이전 힌트를 먼저 열어야 해요" : es ? "Desbloquea las pistas en orden" : "Unlock hints in order"}</Text>
+                    </Pressable>
+                  </Pressable>
+                </Modal>
               )}
-              {item.pType === "fill-blank" && (
-                <FillBlankPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
-              )}
-              {item.pType === "dialogue-choice" && (
-                <DialogueChoicePuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
-              )}
-              {item.pType === "sentence-builder" && (
-                <SentenceBuilderPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
-              )}
-              {item.pType === "investigation" && (
-                <InvestigationPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
-              )}
-              {item.pType === "cipher" && (
-                <CipherPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
-              )}
-              {item.pType === "listen-choose" && (
-                <ListenChoosePuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
-              )}
-              {item.pType === "pronunciation" && (
-                <PronunciationPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
-              )}
-              {item.pType === "writing-mission" && (
-                <WritingMissionPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
-              )}
-              {item.pType === "word-puzzle" && (
-                <WordPuzzlePuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
-              )}
-              {!["word-match","fill-blank","dialogue-choice","sentence-builder","investigation","cipher","listen-choose","pronunciation","writing-mission","word-puzzle"].includes(item.pType) && (
-                <FallbackPuzzle lang={lang} onSolved={handlePuzzleSolved} />
-              )}
-            </ScrollView>
+            </>
           );
         })()}
       </Animated.View>
@@ -3250,6 +3370,22 @@ const styles = StyleSheet.create({
   hintBtnCount: {
     fontFamily: F.body,
     fontSize: 12,
+    color: C.goldDim,
+  },
+  sharedHintBtn: {
+    alignSelf: "center",
+    marginTop: 16,
+    marginBottom: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: C.border,
+    backgroundColor: "rgba(201,162,39,0.08)",
+  },
+  sharedHintBtnText: {
+    fontFamily: F.bodySemi,
+    fontSize: 14,
     color: C.goldDim,
   },
   hintOverlay: {
