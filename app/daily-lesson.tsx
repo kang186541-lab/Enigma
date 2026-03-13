@@ -144,33 +144,43 @@ const LESSON_WORDS: Record<LearningLang, LessonWord[]> = {
 };
 
 let _lessonAudio: HTMLAudioElement | null = null;
+let _nativeLessonSound: Audio.Sound | null = null;
 
 async function playWordTTS(text: string, lang: string, apiBase: string) {
   try {
-    if (Platform.OS === "web" && _lessonAudio) {
-      _lessonAudio.pause();
-      _lessonAudio.src = "";
-      _lessonAudio = null;
-    }
     const url = new URL("/api/pronunciation-tts", apiBase);
     url.searchParams.set("text", text);
     url.searchParams.set("lang", lang);
-    const res = await fetch(url.toString());
-    if (!res.ok) throw new Error(`TTS ${res.status}`);
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
+    const urlStr = url.toString();
+
     if (Platform.OS === "web") {
+      if (_lessonAudio) {
+        _lessonAudio.pause();
+        _lessonAudio.src = "";
+        _lessonAudio = null;
+      }
+      const res = await fetch(urlStr);
+      if (!res.ok) throw new Error(`TTS ${res.status}`);
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
       const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
       _lessonAudio = audio;
       audio.onended = () => { URL.revokeObjectURL(objectUrl); _lessonAudio = null; };
       audio.onerror = () => { URL.revokeObjectURL(objectUrl); _lessonAudio = null; };
       await audio.play();
     } else {
-      const { sound } = await Audio.Sound.createAsync({ uri: objectUrl }, { shouldPlay: true });
+      if (_nativeLessonSound) {
+        await _nativeLessonSound.stopAsync().catch(() => {});
+        await _nativeLessonSound.unloadAsync().catch(() => {});
+        _nativeLessonSound = null;
+      }
+      await Audio.setAudioModeAsync({ playsInSilentModeIOS: true, allowsRecordingIOS: false });
+      const { sound } = await Audio.Sound.createAsync({ uri: urlStr }, { shouldPlay: true });
+      _nativeLessonSound = sound;
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
           sound.unloadAsync();
-          URL.revokeObjectURL(objectUrl);
+          _nativeLessonSound = null;
         }
       });
     }
