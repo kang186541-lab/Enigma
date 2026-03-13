@@ -12,6 +12,7 @@ import {
   PanResponder,
   TextInput,
   Modal,
+  AppState,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as FileSystem from "expo-file-system";
@@ -2508,8 +2509,44 @@ export default function StoryScene() {
   const [sharedHintLevel, setSharedHintLevel] = useState(0);
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const bgmRef = useRef<Audio.Sound | null>(null);
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function startBGM() {
+      try {
+        await Audio.setAudioModeAsync({ playsInSilentModeIOS: true, staysActiveInBackground: false });
+        const { sound } = await Audio.Sound.createAsync(
+          require("@/assets/sounds/story_bgm.mp3"),
+          { isLooping: true, volume: 0.4 }
+        );
+        if (!mounted) { sound.unloadAsync(); return; }
+        bgmRef.current = sound;
+        await sound.playAsync();
+      } catch {}
+    }
+
+    startBGM();
+
+    const sub = AppState.addEventListener("change", (state) => {
+      if (!bgmRef.current) return;
+      if (state === "active") { bgmRef.current.playAsync().catch(() => {}); }
+      else { bgmRef.current.pauseAsync().catch(() => {}); }
+    });
+
+    return () => {
+      mounted = false;
+      sub.remove();
+      if (bgmRef.current) {
+        bgmRef.current.stopAsync().catch(() => {});
+        bgmRef.current.unloadAsync().catch(() => {});
+        bgmRef.current = null;
+      }
+    };
+  }, []);
 
   const seq = story.sequence;
   const totalScenes = seq.filter((s) => s.kind === "scene").length;
@@ -2582,7 +2619,14 @@ export default function StoryScene() {
 
       {/* Header */}
       <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
+        <Pressable style={styles.backBtn} onPress={() => {
+          if (bgmRef.current) {
+            bgmRef.current.stopAsync().catch(() => {});
+            bgmRef.current.unloadAsync().catch(() => {});
+            bgmRef.current = null;
+          }
+          router.back();
+        }}>
           <Ionicons name="chevron-back" size={20} color={C.gold} />
         </Pressable>
         <Text style={styles.storyTitle} numberOfLines={1}>{titleLabel}</Text>
