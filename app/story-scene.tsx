@@ -1815,21 +1815,34 @@ function ListenChoosePuzzle({ puzzle, lang, learningLang, onSolved }: {
     })
   );
 
-  async function playWord() {
+  function playWord() {
     if (playing) return;
-    setPlaying(true);
-    try {
-      if (soundRef.current) { await soundRef.current.unloadAsync(); soundRef.current = null; }
-      const url = new URL("/api/tts", getApiUrl());
-      url.searchParams.set("text", wordText);
-      url.searchParams.set("lang", learningLang);
-      const { sound } = await Audio.Sound.createAsync({ uri: url.toString() });
-      soundRef.current = sound;
-      await sound.playAsync();
-      sound.setOnPlaybackStatusUpdate((s) => {
-        if (s.isLoaded && s.didJustFinish) { setPlaying(false); }
-      });
-    } catch { setPlaying(false); }
+    const url = new URL("/api/tts", getApiUrl());
+    url.searchParams.set("text", wordText);
+    url.searchParams.set("lang", learningLang);
+
+    if (Platform.OS === "web") {
+      // Web / iOS Safari: call play() synchronously inside the tap gesture
+      const audio = new (window as any).Audio(url.toString());
+      setPlaying(true);
+      audio.play().catch(() => {});
+      audio.onended = () => setPlaying(false);
+      audio.onerror = () => setPlaying(false);
+    } else {
+      // Native (Expo Go iOS/Android): use expo-av
+      setPlaying(true);
+      (async () => {
+        try {
+          if (soundRef.current) { await soundRef.current.unloadAsync(); soundRef.current = null; }
+          const { sound } = await Audio.Sound.createAsync({ uri: url.toString() });
+          soundRef.current = sound;
+          await sound.playAsync();
+          sound.setOnPlaybackStatusUpdate((s) => {
+            if (s.isLoaded && s.didJustFinish) setPlaying(false);
+          });
+        } catch { setPlaying(false); }
+      })();
+    }
   }
 
   function handleSelect(opt: string) {
@@ -1903,22 +1916,33 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
   const q = puzzle.questions[idx];
   const sentenceText = lang === "korean" ? q.sentence.ko : lang === "spanish" ? q.sentence.es : q.sentence.en;
 
-  async function playAudio() {
+  function playAudio() {
     if (playing) return;
+    const url = new URL("/api/tts", getApiUrl());
+    url.searchParams.set("text", q.sentence.en);
+    url.searchParams.set("lang", learningLang);
+
     setPlaying(true);
     setPlayed(true);
-    try {
-      if (soundRef.current) { await soundRef.current.unloadAsync(); soundRef.current = null; }
-      const url = new URL("/api/tts", getApiUrl());
-      url.searchParams.set("text", q.sentence.en);
-      url.searchParams.set("lang", learningLang);
-      const { sound } = await Audio.Sound.createAsync({ uri: url.toString() });
-      soundRef.current = sound;
-      await sound.playAsync();
-      sound.setOnPlaybackStatusUpdate((s) => {
-        if (s.isLoaded && s.didJustFinish) setPlaying(false);
-      });
-    } catch { setPlaying(false); }
+
+    if (Platform.OS === "web") {
+      const audio = new (window as any).Audio(url.toString());
+      audio.play().catch(() => {});
+      audio.onended = () => setPlaying(false);
+      audio.onerror = () => setPlaying(false);
+    } else {
+      (async () => {
+        try {
+          if (soundRef.current) { await soundRef.current.unloadAsync(); soundRef.current = null; }
+          const { sound } = await Audio.Sound.createAsync({ uri: url.toString() });
+          soundRef.current = sound;
+          await sound.playAsync();
+          sound.setOnPlaybackStatusUpdate((s) => {
+            if (s.isLoaded && s.didJustFinish) setPlaying(false);
+          });
+        } catch { setPlaying(false); }
+      })();
+    }
   }
 
   function handleConfirm() {
