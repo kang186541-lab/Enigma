@@ -1605,7 +1605,7 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
           <View style={styles.cipherLingoRow}>
             <Text style={styles.cipherLingoEmoji}>🦊</Text>
             <View style={styles.cipherLingoBubble}>
-              <Text style={[styles.cipherLingoBubbleText, { color: "#2c1810" }]}>
+              <Text style={styles.cipherLingoBubbleText}>
                 {ko ? "흠… 뭔가 조금 다른 것 같군요, 견습생." : es ? "Hmm… algo no está bien, aprendiz." : "Hmm… something's not quite right, apprentice."}
               </Text>
             </View>
@@ -1691,7 +1691,7 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
         <View style={styles.cipherLingoRow}>
           <Text style={styles.cipherLingoEmoji}>🦊</Text>
           <View style={styles.cipherLingoBubble}>
-            <Text style={[styles.cipherLingoBubbleText, { color: "#2c1810" }]}>
+            <Text style={styles.cipherLingoBubbleText}>
               {ko ? "훌륭하군요, 견습생! 암호를 완벽히 해독했어요." : es ? "¡Brillante, aprendiz! Has descifrado el código perfectamente." : "Brilliant, apprentice! You've decoded the cipher perfectly."}
             </Text>
           </View>
