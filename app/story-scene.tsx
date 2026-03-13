@@ -1288,9 +1288,9 @@ function PuzzleSolvedBadge({ onNext, lang }: { onNext: () => void; lang: string 
   );
 }
 
-function WordMatchPuzzle({ puzzle, lang, learningLang, onSolved }: {
+function WordMatchPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   puzzle: { pType: "word-match"; questions: WordMatchQ[] };
-  lang: string; learningLang: string; onSolved: () => void;
+  lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -1308,7 +1308,7 @@ function WordMatchPuzzle({ puzzle, lang, learningLang, onSolved }: {
     if (opt === correctAnswer) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setTimeout(() => {
-        if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); }
+        if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); onResetHints?.(); }
         else setSolved(true);
       }, 900);
     } else {
@@ -1350,9 +1350,9 @@ function WordMatchPuzzle({ puzzle, lang, learningLang, onSolved }: {
   );
 }
 
-function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved }: {
+function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   puzzle: { pType: "fill-blank"; questions: FillBlankQ[] };
-  lang: string; learningLang: string; onSolved: () => void;
+  lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -1373,7 +1373,7 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved }: {
   }
 
   function handleNext() {
-    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); }
+    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); onResetHints?.(); }
     else setSolved(true);
   }
 
@@ -1422,9 +1422,9 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved }: {
   );
 }
 
-function DialogueChoicePuzzle({ puzzle, lang, onSolved }: {
+function DialogueChoicePuzzle({ puzzle, lang, onSolved, onResetHints }: {
   puzzle: { pType: "dialogue-choice"; questions: DialogueChoiceQ[] };
-  lang: string; onSolved: () => void;
+  lang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -1445,7 +1445,7 @@ function DialogueChoicePuzzle({ puzzle, lang, onSolved }: {
   }
 
   function handleNext() {
-    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); }
+    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); onResetHints?.(); }
     else setSolved(true);
   }
 
@@ -1492,9 +1492,9 @@ function DialogueChoicePuzzle({ puzzle, lang, onSolved }: {
   );
 }
 
-function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved }: {
+function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   puzzle: { pType: "sentence-builder"; questions: SentenceBuilderQ[] };
-  lang: string; learningLang: string; onSolved: () => void;
+  lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [placed, setPlaced] = useState<number[]>([]);
@@ -1526,7 +1526,7 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved }: {
   }
 
   function handleNext() {
-    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setPlaced([]); setConfirmed(false); setIsCorrect(false); }
+    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setPlaced([]); setConfirmed(false); setIsCorrect(false); onResetHints?.(); }
     else setSolved(true);
   }
 
@@ -1587,9 +1587,9 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved }: {
   );
 }
 
-function InvestigationPuzzle({ puzzle, lang, onSolved }: {
+function InvestigationPuzzle({ puzzle, lang, onSolved, onResetHints }: {
   puzzle: { pType: "investigation"; questions: InvestigationQ[] };
-  lang: string; onSolved: () => void;
+  lang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -1611,7 +1611,7 @@ function InvestigationPuzzle({ puzzle, lang, onSolved }: {
   }
 
   function handleNext() {
-    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); }
+    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); onResetHints?.(); }
     else setSolved(true);
   }
 
@@ -1660,9 +1660,9 @@ function InvestigationPuzzle({ puzzle, lang, onSolved }: {
 
 /* ─────────────────── CIPHER PUZZLE ─────────────────── */
 
-function CipherPuzzle({ puzzle, lang, onSolved }: {
+function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
   puzzle: { pType: "cipher"; questions: CipherQ[] };
-  lang: string; onSolved: () => void;
+  lang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -1732,6 +1732,7 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
       setShowResult(false);
       setIsCorrect(false);
       setUnlockedHints(0);
+      onResetHints?.();
     } else {
       setSolved(true);
     }
@@ -2040,9 +2041,9 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
 
 /* ─────────────────── WORD TYPING PUZZLE (replaces listen-choose) ─────────── */
 
-function WordTypingPuzzle({ puzzle, lang, onSolved }: {
+function WordTypingPuzzle({ puzzle, lang, onSolved, onResetHints }: {
   puzzle: { pType: "listen-choose"; questions: ListenChooseQ[] };
-  lang: string; onSolved: () => void;
+  lang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -2072,6 +2073,7 @@ function WordTypingPuzzle({ puzzle, lang, onSolved }: {
       setAnswer("");
       setConfirmed(false);
       setIsCorrect(false);
+      onResetHints?.();
       setTimeout(() => inputRef.current?.focus(), 150);
     } else {
       setSolved(true);
@@ -2141,9 +2143,9 @@ function WordTypingPuzzle({ puzzle, lang, onSolved }: {
 
 /* ─────────────────── PRONUNCIATION PUZZLE ─────────────────── */
 
-function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
+function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   puzzle: { pType: "pronunciation"; questions: PronunciationQ[] };
-  lang: string; learningLang: string; onSolved: () => void;
+  lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -2279,6 +2281,7 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
     setFeedback(null);
     if (idx < puzzle.questions.length - 1) {
       setIdx((i) => i + 1);
+      onResetHints?.();
     } else {
       setSolved(true);
     }
@@ -2371,9 +2374,9 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
 
 /* ─────────────────── WRITING MISSION PUZZLE ─────────────────── */
 
-function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved }: {
+function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   puzzle: { pType: "writing-mission"; questions: WritingMissionQ[] };
-  lang: string; learningLang: string; onSolved: () => void;
+  lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -2396,7 +2399,7 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved }: {
   }
 
   function handleNext() {
-    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setAnswer(""); setConfirmed(false); setIsCorrect(false); }
+    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setAnswer(""); setConfirmed(false); setIsCorrect(false); onResetHints?.(); }
     else setSolved(true);
   }
 
@@ -2449,9 +2452,9 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved }: {
 
 /* ─────────────────── WORD PUZZLE ─────────────────── */
 
-function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved }: {
+function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   puzzle: { pType: "word-puzzle"; questions: WordPuzzleQ[] };
-  lang: string; learningLang: string; onSolved: () => void;
+  lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [tapped, setTapped] = useState<number[]>([]);
@@ -2473,7 +2476,7 @@ function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved }: {
     if (newWord.toLowerCase() === correctWord.toLowerCase()) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setTimeout(() => {
-        if (idx < puzzle.questions.length - 1) { setIdx((n) => n + 1); setTapped([]); }
+        if (idx < puzzle.questions.length - 1) { setIdx((n) => n + 1); setTapped([]); onResetHints?.(); }
         else setSolved(true);
       }, 700);
     }
@@ -2751,6 +2754,11 @@ export default function StoryScene() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }
 
+  function resetSharedHints() {
+    setSharedHintLevel(0);
+    setSharedHintVisible(false);
+  }
+
   function handlePuzzleSolved() {
     try { updateStats({ xp: 20 }); } catch {}
     advance();
@@ -2893,34 +2901,34 @@ export default function StoryScene() {
               <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomPad + 20 }}>
                 <Text style={styles.puzzleHeader}>{headerText}</Text>
                 {item.pType === "word-match" && (
-                  <WordMatchPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                  <WordMatchPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "fill-blank" && (
-                  <FillBlankPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                  <FillBlankPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "dialogue-choice" && (
-                  <DialogueChoicePuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
+                  <DialogueChoicePuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "sentence-builder" && (
-                  <SentenceBuilderPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                  <SentenceBuilderPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "investigation" && (
-                  <InvestigationPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
+                  <InvestigationPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "cipher" && (
-                  <CipherPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
+                  <CipherPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "listen-choose" && (
-                  <WordTypingPuzzle key={seqIdx} puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
+                  <WordTypingPuzzle key={seqIdx} puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "pronunciation" && (
-                  <PronunciationPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                  <PronunciationPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "writing-mission" && (
-                  <WritingMissionPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                  <WritingMissionPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "word-puzzle" && (
-                  <WordPuzzlePuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+                  <WordPuzzlePuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {!["word-match","fill-blank","dialogue-choice","sentence-builder","investigation","cipher","listen-choose","pronunciation","writing-mission","word-puzzle"].includes(item.pType) && (
                   <FallbackPuzzle lang={lang} onSolved={handlePuzzleSolved} />
