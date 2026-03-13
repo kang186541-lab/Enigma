@@ -1,0 +1,167 @@
+Fix all React Native compatibility issues:
+
+1. MICROPHONE PERMISSIONS:
+In app.json add:
+{
+  "expo": {
+    "ios": {
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "발음 연습을 위해 마이크가 필요해요",
+        "NSSpeechRecognitionUsageDescription": "발음 평가를 위해 음성 인식이 필요해요"
+      }
+    },
+    "android": {
+      "permissions": [
+        "RECORD_AUDIO",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    }
+  }
+}
+
+2. INSTALL AUDIO PACKAGES:
+npx expo install expo-av
+npx expo install expo-speech
+npx expo install expo-audio
+npx expo install @react-native-async-storage/async-storage
+
+3. REPLACE WEB SPEECH API with expo-av:
+// Before (Web - doesn't work in React Native):
+const utterance = new SpeechSynthesisUtterance(text)
+window.speechSynthesis.speak(utterance)
+
+// After (React Native):
+import * as Speech from 'expo-speech'
+Speech.speak(text, {
+  language: learningLanguage,
+  rate: 0.9,
+  pitch: 1.0
+})
+
+4. REPLACE AUDIO RECORDING with expo-av:
+import { Audio } from 'expo-av'
+
+const startRecording = async () => {
+  await Audio.requestPermissionsAsync()
+  await Audio.setAudioModeAsync({
+    allowsRecordingIOS: true,
+    playsInSilentModeIOS: true
+  })
+  const recording = new Audio.Recording()
+  await recording.prepareToRecordAsync(
+    Audio.RecordingOptionsPresets.HIGH_QUALITY
+  )
+  await recording.startAsync()
+  return recording
+}
+
+const stopRecording = async (recording) => {
+  await recording.stopAndUnloadAsync()
+  const uri = recording.getURI()
+  return uri
+}
+
+5. REPLACE localStorage with AsyncStorage everywhere:
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+const saveData = async (key, value) => {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(value))
+  } catch (error) {
+    console.error('Save error:', error)
+  }
+}
+
+const loadData = async (key, defaultValue = null) => {
+  try {
+    const value = await AsyncStorage.getItem(key)
+    return value !== null ? JSON.parse(value) : defaultValue
+  } catch (error) {
+    return defaultValue
+  }
+}
+
+Replace ALL localStorage.setItem → saveData
+Replace ALL localStorage.getItem → loadData
+Replace ALL localStorage.removeItem → AsyncStorage.removeItem
+
+6. REPLACE Canvas with react-native-signature-canvas:
+npm install react-native-signature-canvas
+
+import SignatureCanvas from 'react-native-signature-canvas'
+
+<SignatureCanvas
+  ref={sigRef}
+  onOK={handleSignature}
+  descriptionText=""
+  clearText=""
+  confirmText=""
+  backgroundColor="transparent"
+  penColor="#c9a227"
+  strokeWidth={6}
+  style={{flex: 1}}
+/>
+
+Clear canvas: sigRef.current.clearSignature()
+Get image: sigRef.current.readSignature()
+
+7. REPLACE Web Audio TTS with Azure TTS via expo-av:
+import { Audio } from 'expo-av'
+
+const playAzureTTS = async (text, voice) => {
+  const response = await fetch(
+    `https://koreacentral.tts.speech.microsoft.com/cognitiveservices/v1`,
+    {
+      method: 'POST',
+      headers: {
+        'Ocp-Apim-Subscription-Key': AZURE_SPEECH_KEY,
+        'Content-Type': 'application/ssml+xml',
+        'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3'
+      },
+      body: `<speak version='1.0' xml:lang='ko-KR'>
+        <voice name='${voice}'>${text}</voice>
+      </speak>`
+    }
+  )
+  const audioBlob = await response.blob()
+  const audioUri = URL.createObjectURL(audioBlob)
+  const { sound } = await Audio.Sound.createAsync({ uri: audioUri })
+  await sound.playAsync()
+}
+
+8. FIX AZURE PRONUNCIATION ASSESSMENT for React Native:
+Send recorded audio file URI to Azure:
+
+const assessPronunciation = async (audioUri, referenceText) => {
+  const formData = new FormData()
+  formData.append('audio', {
+    uri: audioUri,
+    type: 'audio/wav',
+    name: 'pronunciation.wav'
+  })
+  
+  const response = await fetch(
+    `https://koreacentral.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US`,
+    {
+      method: 'POST',
+      headers: {
+        'Ocp-Apim-Subscription-Key': AZURE_SPEECH_KEY,
+        'Content-Type': 'audio/wav'
+      },
+      body: formData
+    }
+  )
+  return response.json()
+}
+
+9. ADD NETWORK SECURITY (Android):
+In app.json:
+"android": {
+  "usesCleartextTraffic": true
+}
+
+10. WRAP ALL API CALLS in try/catch:
+Always show error message in Korean if API fails:
+"연결에 문제가 생겼어요. 다시 시도해주세요 🔄"
+Never show blank screen on error.

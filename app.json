@@ -15,10 +15,20 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.myapp"
+      "bundleIdentifier": "com.myapp",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "발음 연습을 위해 마이크가 필요해요",
+        "NSSpeechRecognitionUsageDescription": "발음 평가를 위해 음성 인식이 필요해요"
+      }
     },
     "android": {
       "package": "com.myapp",
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "RECORD_AUDIO",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#FF6B9D",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -37,7 +47,13 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-av",
+        {
+          "microphonePermission": "발음 연습을 위해 마이크가 필요해요"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
