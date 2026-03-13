@@ -188,11 +188,12 @@ const PHONETICS: Record<string, string> = {
   X:"ex", Y:"why", Z:"zee",
 };
 
-function speak(text: string, lang: string) {
+function speak(text: string, courseLang: string) {
   try { Speech.stop(); } catch {}
-  const phonetic = PHONETICS[text.toUpperCase()];
+  // Only apply English phonetics when learning English; other languages speak directly
+  const phonetic = courseLang.startsWith("en") ? PHONETICS[text.toUpperCase()] : undefined;
   const toSay = phonetic ?? text;
-  Speech.speak(toSay, { language: lang, rate: 0.8 });
+  Speech.speak(toSay, { language: courseLang, rate: 0.8 });
 }
 
 /* ─────────────────────────────────────────────
@@ -541,13 +542,13 @@ export default function BasicCourseScreen() {
   const frontRotate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["0deg", "180deg"] });
   const backRotate  = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["180deg", "360deg"] });
 
-  const listenLabel  = lang === "korean" ? "발음 듣기" : lang === "spanish" ? "Escuchar" : "Listen";
-  const traceLabel   = lang === "korean" ? "✍️ 따라 써보세요" : lang === "spanish" ? "✍️ Practica" : "✍️ Trace it";
+  const listenLabel  = native === "korean" ? "듣기" : native === "spanish" ? "Escuchar" : "Listen";
+  const traceLabel   = native === "korean" ? "✍️ 따라 써보기" : native === "spanish" ? "✍️ Trazar" : "✍️ Trace it";
   const nextLabel    = step === 3
-    ? (lang === "korean" ? "시작하기 🚀" : lang === "spanish" ? "¡Empezar! 🚀" : "Start Learning 🚀")
+    ? (native === "korean" ? "시작하기 🚀" : native === "spanish" ? "¡Empezar! 🚀" : "Start Learning 🚀")
     : isLastOfStep
-      ? (lang === "korean" ? "다음 단계 →" : lang === "spanish" ? "Siguiente paso →" : "Next Step →")
-      : (lang === "korean" ? "다음 →"      : lang === "spanish" ? "Siguiente →"      : "Next →");
+      ? (native === "korean" ? "다음 단계 →" : native === "spanish" ? "Siguiente paso →" : "Next Step →")
+      : (native === "korean" ? "다음 →"      : native === "spanish" ? "Siguiente →"      : "Next →");
 
   /* ── bottom nav bar ── */
   const NavBar = () => (
@@ -566,7 +567,7 @@ export default function BasicCourseScreen() {
               onPress={handleRetry}
             >
               <Text style={s.retryBtnTxt}>
-                {lang === "korean" ? "🔄  다시 쓸게요" : lang === "spanish" ? "🔄  Otra vez" : "🔄  Try again"}
+                {native === "korean" ? "🔄  다시 해볼게요" : native === "spanish" ? "🔄  Otra vez" : "🔄  Try again"}
               </Text>
             </Pressable>
 
@@ -577,7 +578,7 @@ export default function BasicCourseScreen() {
               disabled={!traced}
             >
               <Text style={s.nextBtnTxt}>
-                {lang === "korean" ? "✅  잘 썼어요!" : lang === "spanish" ? "✅  ¡Bien hecho!" : "✅  Looks good!"}
+                {native === "korean" ? "✅  잘했어요!" : native === "spanish" ? "✅  ¡Bien hecho!" : "✅  Looks good!"}
               </Text>
             </Pressable>
           </View>
@@ -590,8 +591,8 @@ export default function BasicCourseScreen() {
           {!canNext && step < 3 && (
             <Text style={s.nudge}>
               {step === 1
-                ? (lang === "korean" ? "카드를 탭해서 의미를 확인하세요 👆" : "Tap the card to see the meaning 👆")
-                : (lang === "korean" ? "발음 듣기를 먼저 눌러보세요 👆" : "Tap the listen button above 👆")}
+                ? (native === "korean" ? "카드를 탭해서 의미를 확인하세요 👆" : native === "spanish" ? "Toca la tarjeta para ver el significado 👆" : "Tap the card to see the meaning 👆")
+                : (native === "korean" ? "발음 듣기를 먼저 눌러보세요 👆" : native === "spanish" ? "Toca el botón de escuchar arriba 👆" : "Tap the listen button above 👆")}
             </Text>
           )}
           <View style={s.navRow}>
@@ -755,7 +756,7 @@ export default function BasicCourseScreen() {
                   <Animated.View style={[s.flipCard, { transform: [{ perspective: 1200 }, { rotateY: frontRotate }] }]}>
                     <Text style={s.wordEmoji}>{wordItem.emoji}</Text>
                     <Text style={s.wordText}>{wordItem.word}</Text>
-                    <Text style={s.wordHint}>{lang === "korean" ? "탭해서 의미 확인" : lang === "spanish" ? "Toca para ver" : "Tap to reveal"}</Text>
+                    <Text style={s.wordHint}>{native === "korean" ? "탭해서 의미 확인" : native === "spanish" ? "Toca para ver" : "Tap to reveal"}</Text>
                   </Animated.View>
                   <Animated.View style={[s.flipCard, s.flipBack, { transform: [{ perspective: 1200 }, { rotateY: backRotate }] }]}>
                     <Text style={s.wordEmoji}>{wordItem.emoji}</Text>
@@ -781,7 +782,7 @@ export default function BasicCourseScreen() {
                 </View>
                 <Pressable style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]} onPress={() => playAudio(greetItem.phrase)}>
                   <Ionicons name="volume-medium-outline" size={20} color={C.bg1} />
-                  <Text style={s.listenBtnTxt}>{lang === "korean" ? "🎤 듣고 따라하기" : lang === "spanish" ? "🎤 Escuchar y repetir" : "🎤 Listen & Repeat"}</Text>
+                  <Text style={s.listenBtnTxt}>{native === "korean" ? "🎤 듣고 따라하기" : native === "spanish" ? "🎤 Escuchar y repetir" : "🎤 Listen & Repeat"}</Text>
                 </Pressable>
                 <Text style={s.counter}>{subIdx + 1} / {course.greetings.length}</Text>
               </>
@@ -792,10 +793,10 @@ export default function BasicCourseScreen() {
               <View style={s.completionCard}>
                 <Text style={s.bigEmoji}>🎉</Text>
                 <Text style={s.completionTitle}>
-                  {lang === "korean" ? "기초 과정 완료!" : lang === "spanish" ? "¡Curso Básico Completado!" : "Basic Course Complete!"}
+                  {native === "korean" ? "기초 과정 완료!" : native === "spanish" ? "¡Curso Básico Completado!" : "Basic Course Complete!"}
                 </Text>
                 <Text style={s.completionSub}>
-                  {lang === "korean" ? "이제 LingoFox와 함께 본격적인 학습을 시작해봐요!" : lang === "spanish" ? "¡Ahora comienza tu aventura con LingoFox!" : "You're ready to start your full language journey!"}
+                  {native === "korean" ? "이제 LingoFox와 함께 본격적인 학습을 시작해봐요!" : native === "spanish" ? "¡Ahora comienza tu aventura con LingoFox!" : "You're ready to start your full language journey!"}
                 </Text>
                 <Animated.View style={[s.xpBadge, {
                   opacity: xpAnim,
