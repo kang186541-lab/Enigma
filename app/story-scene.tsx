@@ -27,7 +27,7 @@ import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
 
-const rudyBadgeImg = require("@/assets/rudy_badge.png");
+const rudyStoryImg = require("@/assets/rudy_story.png");
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
 // Keyed by "text::lang". Sounds are loaded in advance; on press we just replay.
@@ -2807,20 +2807,23 @@ export default function StoryScene() {
         {item.kind === "scene" && !item.isNarration && (
           <View style={styles.sceneContainer}>
             <View style={styles.characterArea}>
-              <View style={[styles.avatarOuter, { shadowColor: story.accentColor }]}>
-                <View style={[styles.avatarInner, { backgroundColor: character.avatarBg }]}>
-                  {character.isLingo ? (
-                    <Image
-                      source={rudyBadgeImg}
-                      style={styles.lingoAvatar}
-                    />
-                  ) : (
-                    <Text style={styles.avatarEmoji}>{character.emoji}</Text>
-                  )}
-                </View>
-                <View style={[styles.avatarRing, { borderColor: story.accentColor }]} />
-              </View>
-              <Text style={styles.charName}>{getCharName(character)}</Text>
+              {character.isLingo ? (
+                <Image
+                  source={rudyStoryImg}
+                  style={styles.rudyStoryChar}
+                  resizeMode="contain"
+                />
+              ) : (
+                <>
+                  <View style={[styles.avatarOuter, { shadowColor: story.accentColor }]}>
+                    <View style={[styles.avatarInner, { backgroundColor: character.avatarBg }]}>
+                      <Text style={styles.avatarEmoji}>{character.emoji}</Text>
+                    </View>
+                    <View style={[styles.avatarRing, { borderColor: story.accentColor }]} />
+                  </View>
+                  <Text style={styles.charName}>{getCharName(character)}</Text>
+                </>
+              )}
             </View>
 
             <View style={styles.dialogueBox}>
@@ -3063,6 +3066,10 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     resizeMode: "cover",
+  },
+  rudyStoryChar: {
+    width: 180,
+    height: 230,
   },
   avatarEmoji: { fontSize: 56 },
   avatarRing: {
