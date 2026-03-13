@@ -184,6 +184,57 @@ async function fetchTranslation(
   return data.translation;
 }
 
+/**
+ * Web Speech Recognition wrapper.
+ * Uses the browser's built-in API (SpeechRecognition / webkitSpeechRecognition)
+ * which works natively on iOS Safari 14.1+, Chrome, and Edge.
+ * Returns the transcript on success, "" on no-speech, rejects on error.
+ */
+function webSpeechRecognize(lang: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const SR =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      reject(new Error("NOT_SUPPORTED"));
+      return;
+    }
+    const rec = new SR() as any;
+    rec.lang = lang;
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+
+    let settled = false;
+    const settle = (fn: () => void) => {
+      if (!settled) { settled = true; fn(); }
+    };
+
+    rec.onresult = (e: any) => {
+      const transcript = Array.from(e.results as any[])
+        .map((r: any) => r[0].transcript)
+        .join(" ")
+        .trim();
+      settle(() => resolve(transcript));
+    };
+    rec.onerror = (e: any) => {
+      if (e.error === "not-allowed" || e.error === "permission-denied") {
+        settle(() => reject(new Error("PERMISSION_DENIED")));
+      } else if (e.error === "no-speech") {
+        settle(() => resolve(""));
+      } else {
+        settle(() => reject(new Error(e.error ?? "STT_ERROR")));
+      }
+    };
+    rec.onend = () => settle(() => resolve(""));
+    try {
+      rec.start();
+    } catch (err) {
+      settle(() => reject(err));
+    }
+  });
+}
+
 export default function ChatRoomScreen() {
   const { tutorId } = useLocalSearchParams<{ tutorId: string }>();
   const insets = useSafeAreaInsets();
@@ -433,44 +484,55 @@ export default function ChatRoomScreen() {
   };
 
   const handleVoiceInput = async () => {
-    if (isRecording || isTyping) return;
+    if (isRecording) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setIsRecording(true);
 
-    // Pulse animation while recording
     micPulseLoop.current = Animated.loop(
       Animated.sequence([
-        Animated.timing(micPulse, { toValue: 1.25, duration: 500, useNativeDriver: true }),
+        Animated.timing(micPulse, { toValue: 1.3, duration: 500, useNativeDriver: true }),
         Animated.timing(micPulse, { toValue: 1, duration: 500, useNativeDriver: true }),
       ])
     );
     micPulseLoop.current.start();
 
     try {
-      const { base64, mimeType } = await recordAudio(4000);
+      let transcribed = "";
 
-      const apiUrl = new URL("/api/stt", getApiUrl()).toString();
-      const res = await fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          audio: base64,
-          mimeType,
-          language: tutor?.speechLang ?? "en-US",
-        }),
-      });
+      if (Platform.OS === "web") {
+        // Web: use the browser's built-in Speech Recognition API.
+        // Works on iOS Safari 14.1+, Chrome, Edge — no audio wrangling needed.
+        transcribed = await webSpeechRecognize(tutor?.speechLang ?? "en-US");
+      } else {
+        // Native (Expo Go): record 5 s of audio → send to Azure STT backend.
+        const { base64, mimeType } = await recordAudio(5000);
+        const apiUrl = new URL("/api/stt", getApiUrl()).toString();
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ audio: base64, mimeType, language: tutor?.speechLang ?? "en-US" }),
+        });
+        const data = await res.json();
+        transcribed = (data.text ?? "").trim();
+      }
 
-      const data = await res.json();
-      const transcribed = (data.text ?? "").trim();
       if (transcribed) {
         setInputText(transcribed);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        // Focus input so user can review/edit before sending
         setTimeout(() => inputRef.current?.focus(), 100);
       } else {
+        showToast("🎤 말이 감지되지 않았습니다 — 다시 시도하세요");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }
-    } catch {
+    } catch (err: any) {
+      const msg = (err?.message ?? "") as string;
+      if (msg === "PERMISSION_DENIED") {
+        showToast("🚫 마이크 권한을 허용해 주세요");
+      } else if (msg === "NOT_SUPPORTED") {
+        showToast("🎤 이 브라우저에서는 음성 입력이 지원되지 않습니다");
+      } else {
+        showToast("🎤 녹음 중 오류가 발생했습니다 — 다시 시도하세요");
+      }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       micPulseLoop.current?.stop();
