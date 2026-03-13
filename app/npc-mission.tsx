@@ -27,6 +27,19 @@ import { C, F } from "@/constants/theme";
 const REL_KEY = "npcRelationships";
 const EMO_KEY  = "npcEmotions";
 
+const NPC_OPENING: Record<string, Record<string, string>> = {
+  emma:         { english: "Welcome! ☕ What can I get for you today?", korean: "어서오세요! ☕ 오늘 무엇을 드릴까요?", spanish: "¡Bienvenido! ☕ ¿Qué le pongo hoy?" },
+  james:        { english: "Good day! ✈️ How can I assist you with your travel?", korean: "안녕하세요! ✈️ 오늘 여행 도움이 필요하신가요?", spanish: "¡Buen día! ✈️ ¿En qué le puedo ayudar con su viaje?" },
+  officer_park: { english: "Halt. I need to ask you a few questions.", korean: "멈춰요. 몇 가지 질문이 있습니다.", spanish: "Alto. Necesito hacerle unas preguntas." },
+  bar_alex:     { english: "Hey! 🍺 What'll it be tonight?", korean: "어이! 🍺 오늘 밤 뭐 마실 거예요?", spanish: "¡Oye! 🍺 ¿Qué va a ser esta noche?" },
+  sofia:        { english: "Good evening! 🏨 Welcome. Do you have a reservation?", korean: "안녕하세요! 🏨 오신 것을 환영합니다. 예약하셨나요?", spanish: "¡Buenas noches! 🏨 Bienvenido. ¿Tiene reserva?" },
+  mia:          { english: "Hi there! 🛍️ Looking for something special today?", korean: "안녕하세요! 🛍️ 오늘 특별한 것을 찾고 계신가요?", spanish: "¡Hola! 🛍️ ¿Busca algo especial hoy?" },
+  dr_kim:       { english: "Good morning. Please have a seat. What brings you in today?", korean: "좋은 아침입니다. 앉으세요. 오늘 어떻게 오셨나요?", spanish: "Buenos días. Por favor, siéntese. ¿Qué le trae por aquí?" },
+  lisa:         { english: "Thank you for calling! 📞 How may I assist you today?", korean: "전화해 주셔서 감사합니다! 📞 오늘 어떻게 도와드릴까요?", spanish: "¡Gracias por llamar! 📞 ¿En qué puedo ayudarle hoy?" },
+  marco:        { english: "Buongiorno! 🍽️ Welcome! Are you dining alone today?", korean: "어서오세요! 🍽️ 오늘 혼자 오셨나요?", spanish: "¡Buongiorno! 🍽️ ¡Bienvenido! ¿Cena solo hoy?" },
+  tom:          { english: "Hey! 🚕 Where are we headed today?", korean: "안녕하세요! 🚕 오늘 어디로 가세요?", spanish: "¡Hola! 🚕 ¿Adónde vamos hoy?" },
+};
+
 interface NpcMessage {
   id: string;
   text: string;
@@ -98,6 +111,9 @@ export default function NpcMissionScreen() {
 
   useEffect(() => {
     if (!npc) return;
+    const openingText = NPC_OPENING[npc.id]?.[language] ?? NPC_OPENING[npc.id]?.english ?? "Hello!";
+    const openingId   = "opening-" + npc.id;
+
     AsyncStorage.multiGet([REL_KEY, EMO_KEY]).then(([[, relRaw], [, emoRaw]]) => {
       const rels = relRaw ? JSON.parse(relRaw) : {};
       const emos = emoRaw ? JSON.parse(emoRaw) : {};
@@ -105,8 +121,12 @@ export default function NpcMissionScreen() {
       const savedEmo   = emos[npc.id] ?? "neutral";
       setRelationship(savedScore);
       setEmotion(savedEmo);
+      setMessages([{ id: openingId, text: openingText, isUser: false }]);
+      setTimeout(() => playNpcTts(openingText, openingId), 400);
       fetchNpcReply([], true, savedScore);
     }).catch(() => {
+      setMessages([{ id: openingId, text: openingText, isUser: false }]);
+      setTimeout(() => playNpcTts(openingText, openingId), 400);
       fetchNpcReply([], true, 0);
     });
   }, []);  // eslint-disable-line react-hooks/exhaustive-deps
@@ -183,7 +203,7 @@ export default function NpcMissionScreen() {
     relScore: number,
   ) => {
     if (!npc) return;
-    setIsTyping(true);
+    if (!isStart) setIsTyping(true);
     try {
       const res = await fetch(new URL("/api/npc-chat", getApiUrl()).toString(), {
         method: "POST",
@@ -207,6 +227,12 @@ export default function NpcMissionScreen() {
         choices: string[];
       };
 
+      if (isStart) {
+        setChoices(Array.isArray(newChoices) ? newChoices.slice(0, 3) : []);
+        setEmotion(newEmotion ?? "neutral");
+        return;
+      }
+
       const msgId = Date.now().toString() + "npc";
       const npcMsg: NpcMessage = { id: msgId, text: reply, isUser: false };
 
@@ -214,7 +240,7 @@ export default function NpcMissionScreen() {
       conversationRef.current = [...history, { role: "assistant", content: reply }];
       setChoices(Array.isArray(newChoices) ? newChoices.slice(0, 3) : []);
 
-      if (!isStart && scoreChange !== 0) {
+      if (scoreChange !== 0) {
         const newScore = Math.min(100, Math.max(0, relScore + scoreChange));
         setRelationship(newScore);
         setEmotion(newEmotion ?? "neutral");
@@ -228,10 +254,12 @@ export default function NpcMissionScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       playNpcTts(reply, msgId);
     } catch {
-      const fallbackId = Date.now().toString() + "err";
-      setMessages(prev => [{ id: fallbackId, text: "...", isUser: false }, ...prev]);
+      if (!isStart) {
+        const fallbackId = Date.now().toString() + "err";
+        setMessages(prev => [{ id: fallbackId, text: "...", isUser: false }, ...prev]);
+      }
     } finally {
-      setIsTyping(false);
+      if (!isStart) setIsTyping(false);
     }
   }, [npc, language, playNpcTts, saveRelationship, showScoreChange, updateStats]);
 
@@ -1040,9 +1068,9 @@ const styles = StyleSheet.create({
   popupSendLabel: { fontSize: 13, fontFamily: F.bodySemi, color: C.bg1 },
 
   clickableWord: {
-    color: C.parchment,
+    color: "#2c1810",
     textDecorationLine: "underline",
-    textDecorationColor: "rgba(201,162,39,0.45)",
+    textDecorationColor: "rgba(44,24,16,0.4)",
     textDecorationStyle: "dotted",
   },
 
