@@ -503,10 +503,39 @@ export default function BasicCourseScreen() {
     } catch {}
   };
 
-  const playAudio = useCallback((text: string) => {
+  const playAudio = useCallback(async (rawText: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    speak(text, course.lang);
     setAudioPlayed(true);
+
+    // Lowercase single chars for non-English so TTS names them correctly (e.g. "p" → "pe" in Spanish)
+    const text = (!course.lang.startsWith("en") && rawText.length === 1)
+      ? rawText.toLowerCase()
+      : rawText;
+
+    try {
+      const url = new URL("/api/pronunciation-tts", getApiUrl());
+      url.searchParams.set("text", text);
+      url.searchParams.set("lang", course.lang);
+
+      if (Platform.OS === "web") {
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error("tts-fail");
+        const blob = await res.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
+        audio.onended = () => URL.revokeObjectURL(objectUrl);
+        audio.onerror = () => URL.revokeObjectURL(objectUrl);
+        audio.play();
+      } else {
+        const { Audio } = await import("expo-av") as any;
+        await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
+        sound.setOnPlaybackStatusUpdate((st: any) => { if (st.didJustFinish) sound.unloadAsync(); });
+      }
+    } catch {
+      // Fallback to expo-speech only if Azure fails
+      speak(text, course.lang);
+    }
   }, [course.lang]);
 
   const goNext = () => {
