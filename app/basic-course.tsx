@@ -179,96 +179,127 @@ const COURSES: Record<string, CourseData> = {
   },
 };
 
+const PHONETICS: Record<string, string> = {
+  A:"ay", B:"bee", C:"see", D:"dee", E:"ee", F:"ef",
+  G:"jee", H:"aitch", I:"eye", J:"jay", K:"kay", L:"el",
+  M:"em", N:"en", O:"oh", P:"pee", Q:"cue", R:"ar",
+  S:"es", T:"tee", U:"you", V:"vee", W:"double-u",
+  X:"ex", Y:"why", Z:"zee",
+};
+
 function speak(text: string, lang: string) {
   try { Speech.stop(); } catch {}
-  Speech.speak(text, { language: lang, rate: 0.8 });
+  const phonetic = PHONETICS[text.toUpperCase()];
+  const toSay = phonetic ?? text;
+  Speech.speak(toSay, { language: lang, rate: 0.8 });
 }
 
 /* ─────────────────────────────────────────────
-   Tracing Canvas — fixed-layout, no-scroll
+   Tracing Canvas — no auto-pass, self-check UI
    ───────────────────────────────────────────── */
-interface TracingCanvasProps { char: string; onTraced: () => void; }
+const DRAW_THRESHOLD = 20;
 
-function TracingCanvas({ char, onTraced }: TracingCanvasProps) {
-  const [dots,   setDots]   = useState<{ x: number; y: number }[]>([]);
-  const [traced, setTraced] = useState(false);
-  const dotCount   = useRef(0);
-  const tracedRef  = useRef(false);
-  const onTracedRef = useRef(onTraced);
-  onTracedRef.current = onTraced;
+interface TracingCanvasProps { char: string; onConfirmed: () => void; }
+
+function TracingCanvas({ char, onConfirmed }: TracingCanvasProps) {
+  const [dots,      setDots]      = useState<{ x: number; y: number }[]>([]);
+  const [hasDrawn,  setHasDrawn]  = useState(false);   // enough strokes detected
+  const [confirmed, setConfirmed] = useState(false);   // user tapped ✅
+
+  const moveCount     = useRef(0);
+  const hasDrawnRef   = useRef(false);
+  const onConfRef     = useRef(onConfirmed);
+  onConfRef.current   = onConfirmed;
 
   const panResponder = useRef(
     PanResponder.create({
-      // ← Capture BEFORE the parent ScrollView (or any parent) can react
       onStartShouldSetPanResponder:        () => true,
       onStartShouldSetPanResponderCapture: () => true,
       onMoveShouldSetPanResponder:         () => true,
       onMoveShouldSetPanResponderCapture:  () => true,
 
       onPanResponderGrant: (e) => {
+        // Add the initial touch point but do NOT count it toward the draw threshold
         const { locationX, locationY } = e.nativeEvent;
-        setDots(prev => [...prev.slice(-120), { x: locationX, y: locationY }]);
-        dotCount.current += 1;
+        setDots(prev => [...prev.slice(-150), { x: locationX, y: locationY }]);
       },
       onPanResponderMove: (e) => {
         const { locationX, locationY } = e.nativeEvent;
-        setDots(prev => [...prev.slice(-120), { x: locationX, y: locationY }]);
-        dotCount.current += 1;
-        if (dotCount.current >= 6 && !tracedRef.current) {
-          tracedRef.current = true;
-          setTraced(true);
-          onTracedRef.current();
+        setDots(prev => [...prev.slice(-150), { x: locationX, y: locationY }]);
+        moveCount.current += 1;
+        // Only set hasDrawn after real sustained movement
+        if (moveCount.current >= DRAW_THRESHOLD && !hasDrawnRef.current) {
+          hasDrawnRef.current = true;
+          setHasDrawn(true);
         }
       },
     })
   ).current;
 
-  useEffect(() => {
+  const reset = () => {
     setDots([]);
-    setTraced(false);
-    dotCount.current  = 0;
-    tracedRef.current = false;
-  }, [char]);
+    setHasDrawn(false);
+    setConfirmed(false);
+    moveCount.current   = 0;
+    hasDrawnRef.current = false;
+  };
+
+  useEffect(() => { reset(); }, [char]);
+
+  const handleConfirm = () => {
+    setConfirmed(true);
+    onConfRef.current();
+  };
 
   const webExtra = Platform.OS === "web" ? ({ touchAction: "none" } as object) : {};
 
   return (
     <View style={tc.wrapper}>
-      <View
-        style={[tc.grid, webExtra]}
-        {...panResponder.panHandlers}
-      >
+      {/* Drawing area */}
+      <View style={[tc.grid, webExtra, confirmed && tc.gridDone]} {...panResponder.panHandlers}>
         <Text style={tc.guideChar}>{char}</Text>
 
         {dots.map((d, i) => (
           <View key={i} style={[tc.dot, { left: d.x - 7, top: d.y - 7 }]} />
         ))}
 
-        {traced && (
-          <View style={tc.checkOverlay}>
-            <Ionicons name="checkmark-circle" size={64} color={C.gold} />
+        {confirmed && (
+          <View style={tc.confirmOverlay}>
+            <Ionicons name="checkmark-circle" size={72} color={C.gold} />
           </View>
         )}
       </View>
 
-      <Text style={tc.hint}>
-        {traced
-          ? (char >= "A" && char <= "Z") || (char >= "a" && char <= "z")
-            ? "✓ Well done!"
-            : "✓ 잘 하셨어요!"
-          : "✍️  Draw the character in the box"}
-      </Text>
+      {/* State messages + self-check buttons */}
+      {!hasDrawn && !confirmed && (
+        <Text style={tc.hint}>✍️  {char >= "A" && char <= "Z" ? "Draw the letter in the box" : "화면에 글자를 써보세요"}</Text>
+      )}
+
+      {hasDrawn && !confirmed && (
+        <View style={tc.checkRow}>
+          <Pressable style={({ pressed }) => [tc.checkBtn, tc.checkBtnOk, pressed && { opacity: 0.8 }]} onPress={handleConfirm}>
+            <Text style={tc.checkBtnTxt}>✅  {char >= "A" && char <= "Z" ? "Looks good!" : "잘 썼어요!"}</Text>
+          </Pressable>
+          <Pressable style={({ pressed }) => [tc.checkBtn, tc.checkBtnRetry, pressed && { opacity: 0.8 }]} onPress={reset}>
+            <Text style={[tc.checkBtnTxt, { color: C.goldDim }]}>🔄  {char >= "A" && char <= "Z" ? "Try again" : "다시 쓸게요"}</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {confirmed && (
+        <Text style={tc.confirmedHint}>✓  {char >= "A" && char <= "Z" ? "Well done! Tap Next →" : "잘 하셨어요! 다음 →"}</Text>
+      )}
     </View>
   );
 }
 
 const tc = StyleSheet.create({
-  wrapper: { flex: 1, alignItems: "center", gap: 10, justifyContent: "center" },
+  wrapper: { flex: 1, gap: 10 },
   grid: {
     flex: 1,
     width: "100%",
-    minHeight: 300,
-    maxHeight: 380,
+    minHeight: 280,
+    maxHeight: 360,
     borderRadius: 20,
     borderWidth: 1.5,
     borderColor: C.border,
@@ -278,10 +309,11 @@ const tc = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  gridDone: { borderColor: C.gold, borderStyle: "solid", backgroundColor: "rgba(201,162,39,0.07)" },
   guideChar: {
     position: "absolute",
-    fontSize: 140,
-    color: "rgba(201,162,39,0.12)",
+    fontSize: 130,
+    color: "rgba(201,162,39,0.10)",
     fontFamily: F.header,
   },
   dot: {
@@ -289,15 +321,21 @@ const tc = StyleSheet.create({
     width: 14, height: 14,
     borderRadius: 7,
     backgroundColor: C.gold,
-    opacity: 0.75,
+    opacity: 0.8,
   },
-  checkOverlay: {
+  confirmOverlay: {
     position: "absolute",
     width: "100%", height: "100%",
     justifyContent: "center", alignItems: "center",
-    backgroundColor: "rgba(26,10,5,0.55)",
+    backgroundColor: "rgba(26,10,5,0.50)",
   },
-  hint: { fontSize: 13, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
+  hint:          { fontSize: 13, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
+  confirmedHint: { fontSize: 14, fontFamily: F.bodySemi, color: C.gold, textAlign: "center" },
+  checkRow:  { flexDirection: "row", gap: 10 },
+  checkBtn:  { flex: 1, borderRadius: 16, paddingVertical: 12, alignItems: "center", borderWidth: 1.5 },
+  checkBtnOk:    { backgroundColor: C.gold, borderColor: C.gold },
+  checkBtnRetry: { backgroundColor: "transparent", borderColor: C.border },
+  checkBtnTxt:   { fontSize: 14, fontFamily: F.bodySemi, color: C.bg1 },
 });
 
 /* ─────────────────────────────────────────────
@@ -415,7 +453,7 @@ export default function BasicCourseScreen() {
 
   const canNext = step === 3
     ? true
-    : step === 0 ? (audioPlayed || traced)
+    : step === 0 ? traced          // must confirm drawing (✅ tapped)
     : step === 1 ? flipped
     : audioPlayed;
 
@@ -436,7 +474,7 @@ export default function BasicCourseScreen() {
       {!canNext && step < 3 && (
         <Text style={s.nudge}>
           {step === 0
-            ? (lang === "korean" ? "발음을 듣거나 글자를 써보세요 👆" : "Listen or trace the character above 👆")
+            ? (lang === "korean" ? "글자를 쓰고 ✅ 버튼을 눌러주세요" : "Draw in the canvas above, then tap ✅")
             : step === 1
               ? (lang === "korean" ? "카드를 탭해서 의미를 확인하세요 👆" : "Tap the card to see the meaning 👆")
               : (lang === "korean" ? "발음 듣기를 먼저 눌러보세요 👆" : "Tap the listen button above 👆")}
@@ -509,7 +547,7 @@ export default function BasicCourseScreen() {
           </View>
 
           {/* ── CANVAS fills remaining space ── */}
-          <TracingCanvas char={charItem.char} onTraced={() => setTraced(true)} />
+          <TracingCanvas char={charItem.char} onConfirmed={() => setTraced(true)} />
 
           {/* Counter */}
           <Text style={s.counter}>{subIdx + 1} / {course.chars.length}</Text>
