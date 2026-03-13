@@ -1,0 +1,121 @@
+Add all these new puzzle/mission types to Story Mode.
+
+PUZZLE TYPES TO ADD:
+
+1. 📝 빈칸 채우기 (Fill in the Blank):
+- Show sentence with one word missing
+- Example: "I ___ a coffee, please."
+- Show 4 word options below
+- Tap correct word to fill blank
+- Correct: word snaps into blank with gold glow
+- Wrong: red shake + try again
+- Lingo: "문장을 완성해보게!"
+
+2. 🔀 문장 순서 맞추기 (Sentence Order):
+- Show scrambled word cards
+- User drags/taps to arrange in correct order
+- Words snap into place when correct order
+- Correct: green glow + satisfying animation
+- Wrong: gentle shake
+- Lingo: "단어를 올바른 순서로 배열해보게!"
+
+3. 👂 듣고 고르기 (Listen & Choose):
+- Azure TTS plays a word or sentence
+- Show 4 options
+- User selects what they heard
+- 🔊 replay button available
+- Correct: green glow
+- Wrong: red shake
+- Lingo: "잘 듣고 올바른 단어를 고르게!"
+
+4. 🎤 발음 미션 (Pronunciation Mission):
+- Show sentence from story context
+- Character says: "이 문장을 따라 말해보게!"
+- 🎤 record button
+- Azure Speech evaluates pronunciation
+- 85점 이상 → pass + continue story
+- 85점 미만 → show score + retry or skip
+- +15 XP for passing
+- Lingo celebrates if high score
+
+5. ✏️ 쓰기 미션 (Writing Mission):
+- Show target word (big, gold)
+- Canvas for finger writing (no scroll)
+- Self check: ✅ 잘 썼어요 / 🔄 다시 쓸게요
+- +20 XP
+- Lingo: "직접 써보게나, 견습생!"
+
+6. 🔗 단어 매칭 (Word Matching):
+- Show 5 words on left, 5 meanings on right
+- Tap word then tap matching meaning
+- Gold line connects matched pairs
+- All correct: golden glow celebration
+- Wrong match: red flash + try again
+- Lingo: "단어의 뜻을 연결해보게!"
+
+7. 🔍 단서 찾기 (Find the Clue):
+- Show a scene description with hidden words
+- Certain words are highlighted/tappable
+- User taps the correct clue word
+- Example: "The letter was on the [desk]"
+- Tap desk → clue discovered!
+- Atmospheric: "(단서를 발견했다!)"
+- +20 XP per clue found
+
+8. 💬 올바른 대답 고르기 (Choose Correct Response):
+- Show a conversation situation
+- NPC says something
+- User picks correct response from 3 options
+- Wrong responses show why they're incorrect
+- Lingo: "올바른 대답을 골라보게!"
+
+9. 🔐 암호 해독 (Cipher Decode):
+- Show encoded word (letters shifted or symbols)
+- User figures out the real word
+- Example: IFMMP → HELLO (shift by 1)
+- Type answer or select from options
+- Very Layton-style! 🎩
+- Lingo: "이 암호를 해독해보게!"
+- +30 XP (harder puzzle)
+
+10. 🧩 단어 퍼즐 (Word Puzzle):
+- Show scrambled letters
+- User arranges to make correct word
+- Example: FFOCEE → COFFEE
+- Tap letters in correct order
+- Correct: letters glow gold + celebration
+- Lingo: "글자를 조합해서 단어를 만들어보게!"
+
+PUZZLE DISTRIBUTION PER CHAPTER:
+Each chapter has 5 puzzles, mix of different types:
+
+Chapter 1 (London):
+- Puzzle 001: 🔗 단어 매칭
+- Puzzle 002: 🔐 암호 해독 (fits London mystery!)
+- Puzzle 003: 👂 듣고 고르기
+- Puzzle 004: 🔀 문장 순서 맞추기
+- Puzzle 005: 🎤 발음 미션
+
+Chapter 2 (Madrid):
+- Puzzle 006: 🔗 단어 매칭
+- Puzzle 007: 👂 듣고 고르기
+- Puzzle 008: 📝 빈칸 채우기
+- Puzzle 009: 🔍 단서 찾기
+- Puzzle 010: 💬 올바른 대답 고르기
+
+Chapter 3 (Seoul):
+- Puzzle 011: 🧩 단어 퍼즐
+- Puzzle 012: 🔀 문장 순서 맞추기
+- Puzzle 013: 👂 듣고 고르기
+- Puzzle 014: ✏️ 쓰기 미션
+- Puzzle 015: 🎤 발음 미션
+
+PUZZLE UI (all types):
+- Parchment background
+- Show: "🧩 PUZZLE 001"
+- Lingo in corner giving hint
+- 💡 Hint button: first free, second costs 10 XP
+- Correct: green glow + "+20 XP" floating animation
+- Wrong: red shake + try again
+- Cinzel font for titles
+- Smooth animations throughout

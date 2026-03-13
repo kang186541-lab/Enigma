@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,16 +9,19 @@ import {
   Animated,
   Image,
   ScrollView,
+  PanResponder,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { Audio } from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
 import { C, F } from "@/constants/theme";
+import { getApiUrl } from "@/lib/query-client";
 
 const lingoImg = require("@/assets/lingo.png");
 const { width } = Dimensions.get("window");
@@ -68,13 +71,41 @@ interface InvestigationQ {
   clues: Tri[];
   answerIdx: number;
 }
+interface ListenChooseQ {
+  word: Tri;
+  opts: [Tri, Tri, Tri, Tri];
+  answerIdx: number;
+}
+interface PronunciationQ {
+  sentence: Tri;
+}
+interface WritingMissionQ {
+  word: Tri;
+  hint?: Tri;
+}
+interface CipherQ {
+  encoded: string;
+  answer: Tri;
+  shift: number;
+  hint: Tri;
+  opts: [Tri, Tri, Tri, Tri];
+}
+interface WordPuzzleQ {
+  word: Tri;
+  scrambled: Tri;
+}
 
 type PuzzleType =
   | { pType: "word-match"; questions: WordMatchQ[] }
   | { pType: "fill-blank"; questions: FillBlankQ[] }
   | { pType: "dialogue-choice"; questions: DialogueChoiceQ[] }
   | { pType: "sentence-builder"; questions: SentenceBuilderQ[] }
-  | { pType: "investigation"; questions: InvestigationQ[] };
+  | { pType: "investigation"; questions: InvestigationQ[] }
+  | { pType: "listen-choose"; questions: ListenChooseQ[] }
+  | { pType: "pronunciation"; questions: PronunciationQ[] }
+  | { pType: "writing-mission"; questions: WritingMissionQ[] }
+  | { pType: "cipher"; questions: CipherQ[] }
+  | { pType: "word-puzzle"; questions: WordPuzzleQ[] };
 
 /* Sequence items */
 type SeqScene = {
@@ -290,24 +321,42 @@ const STORIES: Record<string, Story> = {
       {
         kind: "puzzle",
         puzzleNum: 2,
-        pType: "dialogue-choice",
+        pType: "cipher",
         questions: [
           {
-            prompt: { en: "Lady Victoria is frightened. What do you say to reassure her?", ko: "빅토리아 부인이 두려워하고 있어요. 안심시키기 위해 뭐라고 말할까요?", es: "Lady Victoria está asustada. ¿Qué dices para tranquilizarla?" },
-            context: { en: "Victoria: 'I don't understand why anyone would steal language books!'", ko: "빅토리아: '왜 언어 책들을 훔쳐가는지 모르겠어요!'", es: "Victoria: '¡No entiendo por qué alguien robaría libros de idiomas!'" },
-            answer: { en: "We will find out. Language is more powerful than it seems.", ko: "알아낼 거예요. 언어는 보이는 것보다 훨씬 강력해요.", es: "Lo averiguaremos. El lenguaje es más poderoso de lo que parece." },
-            wrong: [
-              { en: "Those books are worthless. Let's look elsewhere.", ko: "그 책들은 가치가 없어요. 다른 곳을 살펴봐요.", es: "Esos libros no valen nada. Busquemos en otro lugar." },
-              { en: "This is probably just a coincidence.", ko: "이건 그냥 우연일 거예요.", es: "Probablemente sea solo una coincidencia." },
+            encoded: "DPEF",
+            answer: { en: "CODE", ko: "코드", es: "CÓDIGO" },
+            shift: 1,
+            hint: { en: "Each letter shifted +1 forward (A→B, C→D…)", ko: "각 글자가 +1 앞으로 이동 (A→B, C→D…)", es: "Cada letra desplazada +1 (A→B, C→D…)" },
+            opts: [
+              { en: "CODE", ko: "코드", es: "CÓDIGO" },
+              { en: "BONE", ko: "뼈", es: "HUESO" },
+              { en: "DOME", ko: "돔", es: "CÚPULA" },
+              { en: "ROLE", ko: "역할", es: "ROL" },
             ],
           },
           {
-            prompt: { en: "You find a note hidden inside a stolen book's cover. What do you do?", ko: "훔쳐간 책의 표지 안에서 쪽지를 발견했어요. 어떻게 할까요?", es: "Encuentras una nota escondida dentro de la cubierta del libro robado. ¿Qué haces?" },
-            context: { en: "The note reads: 'Language is a weapon. — ∆LX'", ko: "쪽지에는 '언어는 무기다. — ∆LX'라고 적혀 있어요", es: "La nota dice: 'El lenguaje es un arma. — ∆LX'" },
-            answer: { en: "This is a direct message from the criminal. We must decode ∆LX.", ko: "이건 범인으로부터의 직접적인 메시지예요. ∆LX를 해독해야 해요.", es: "Este es un mensaje directo del criminal. Debemos descifrar ∆LX." },
-            wrong: [
-              { en: "It's probably just graffiti from a bored student.", ko: "지루한 학생이 낙서한 거겠죠.", es: "Probablemente solo sea grafiti de un estudiante aburrido." },
-              { en: "Let's ignore it and keep searching.", ko: "무시하고 계속 탐색해요.", es: "Ignorémoslo y sigamos buscando." },
+            encoded: "MJOHP",
+            answer: { en: "LINGO", ko: "링고", es: "LINGO" },
+            shift: 1,
+            hint: { en: "The detective's name — shift each letter back by 1", ko: "탐정의 이름 — 각 글자를 1 뒤로", es: "El nombre del detective — retrocede 1 letra" },
+            opts: [
+              { en: "BINGO", ko: "빙고", es: "BINGO" },
+              { en: "LINGO", ko: "링고", es: "LINGO" },
+              { en: "DINGO", ko: "딩고", es: "DINGO" },
+              { en: "KINGS", ko: "왕들", es: "REYES" },
+            ],
+          },
+          {
+            encoded: "MFYJDPO",
+            answer: { en: "LEXICON", ko: "렉시콘", es: "LÉXICO" },
+            shift: 1,
+            hint: { en: "The secret society's name", ko: "비밀 결사의 이름", es: "El nombre de la sociedad secreta" },
+            opts: [
+              { en: "MISSION", ko: "임무", es: "MISIÓN" },
+              { en: "SECTION", ko: "부문", es: "SECCIÓN" },
+              { en: "LEXICON", ko: "렉시콘", es: "LÉXICO" },
+              { en: "FICTION", ko: "소설", es: "FICCIÓN" },
             ],
           },
         ],
@@ -330,31 +379,37 @@ const STORIES: Record<string, Story> = {
       {
         kind: "puzzle",
         puzzleNum: 3,
-        pType: "fill-blank",
+        pType: "listen-choose",
         questions: [
           {
-            sentence: { en: "The hidden ___ revealed a secret passage.", ko: "숨겨진 ___가 비밀 통로를 드러냈다.", es: "La ___ oculta reveló un pasaje secreto." },
-            answer: { en: "bookcase", ko: "책장", es: "estantería" },
+            word: { en: "mysterious", ko: "mysterious", es: "mysterious" },
             opts: [
-              { en: "painting", ko: "그림", es: "pintura" },
-              { en: "window", ko: "창문", es: "ventana" },
+              { en: "strange and unknown", ko: "이상하고 알 수 없는", es: "extraño y desconocido" },
+              { en: "bright and cheerful", ko: "밝고 명랑한", es: "brillante y alegre" },
+              { en: "loud and obvious", ko: "시끄럽고 명백한", es: "ruidoso y obvio" },
+              { en: "simple and ordinary", ko: "단순하고 평범한", es: "simple y ordinario" },
             ],
+            answerIdx: 0,
           },
           {
-            sentence: { en: "The symbols form a mysterious ___.", ko: "기호들이 신비로운 ___를 형성한다.", es: "Los símbolos forman un ___ misterioso." },
-            answer: { en: "pattern", ko: "패턴", es: "patrón" },
+            word: { en: "evidence", ko: "evidence", es: "evidence" },
             opts: [
-              { en: "mistake", ko: "실수", es: "error" },
-              { en: "painting", ko: "그림", es: "pintura" },
+              { en: "a type of hat", ko: "모자의 종류", es: "un tipo de sombrero" },
+              { en: "proof something happened", ko: "무언가가 일어났다는 증거", es: "prueba de que algo ocurrió" },
+              { en: "a foggy day", ko: "안개 낀 날", es: "un día con niebla" },
+              { en: "a train ticket", ko: "기차표", es: "un boleto de tren" },
             ],
+            answerIdx: 1,
           },
           {
-            sentence: { en: "Language is being used as a ___.", ko: "언어가 ___로 사용되고 있다.", es: "El lenguaje está siendo usado como ___." },
-            answer: { en: "weapon", ko: "무기", es: "arma" },
+            word: { en: "investigate", ko: "investigate", es: "investigate" },
             opts: [
-              { en: "gift", ko: "선물", es: "regalo" },
-              { en: "map", ko: "지도", es: "mapa" },
+              { en: "to eat dinner slowly", ko: "천천히 저녁을 먹다", es: "cenar despacio" },
+              { en: "to play an instrument", ko: "악기를 연주하다", es: "tocar un instrumento" },
+              { en: "to examine carefully", ko: "꼼꼼하게 조사하다", es: "examinar cuidadosamente" },
+              { en: "to sleep deeply", ko: "깊이 잠들다", es: "dormir profundamente" },
             ],
+            answerIdx: 2,
           },
         ],
       },
@@ -375,17 +430,33 @@ const STORIES: Record<string, Story> = {
       {
         kind: "puzzle",
         puzzleNum: 4,
-        pType: "investigation",
+        pType: "sentence-builder",
         questions: [
           {
-            prompt: { en: "Which evidence proves Mr. Black is connected to the Lexicon Society?", ko: "어떤 증거가 미스터 블랙이 Lexicon Society와 연결되어 있다는 것을 증명하나요?", es: "¿Qué evidencia prueba que Mr. Black está conectado con la Sociedad Lexicon?" },
-            clues: [
-              { en: "A dusty chair in the corner", ko: "구석의 먼지 쌓인 의자", es: "Una silla polvorienta en el rincón" },
-              { en: "The ∆LX seal on a stolen language dictionary", ko: "훔쳐간 언어 사전에 찍힌 ∆LX 인장", es: "El sello ∆LX en un diccionario de idiomas robado" },
-              { en: "An old portrait on the wall", ko: "벽의 오래된 초상화", es: "Un retrato antiguo en la pared" },
-              { en: "A half-empty cup of tea", ko: "반쯤 비워진 차 한 잔", es: "Una taza de té a medio beber" },
+            instruction: { en: "Arrange the words to reveal the clue:", ko: "단어를 배열해서 단서를 밝혀내세요:", es: "Ordena las palabras para revelar la pista:" },
+            words: [
+              { en: "The", ko: "그", es: "El" },
+              { en: "symbol", ko: "기호가", es: "símbolo" },
+              { en: "appeared", ko: "나타났다", es: "apareció" },
+              { en: "at", ko: "모든", es: "en" },
+              { en: "every", ko: "범죄", es: "cada" },
+              { en: "crime", ko: "현장에", es: "escena" },
+              { en: "scene", ko: "서", es: "del crimen" },
             ],
-            answerIdx: 1,
+            answerOrder: [0, 1, 2, 3, 4, 5, 6],
+          },
+          {
+            instruction: { en: "Arrange the words to decode the message:", ko: "단어를 배열해서 메시지를 해독하세요:", es: "Ordena las palabras para descifrar el mensaje:" },
+            words: [
+              { en: "Language", ko: "언어는", es: "El" },
+              { en: "is", ko: "사용되고", es: "lenguaje" },
+              { en: "being", ko: "있다", es: "está" },
+              { en: "used", ko: "무기로", es: "siendo" },
+              { en: "as", ko: "하나의", es: "usado" },
+              { en: "a", ko: "도구로", es: "como" },
+              { en: "weapon", ko: ".", es: "arma" },
+            ],
+            answerOrder: [0, 1, 2, 3, 4, 5, 6],
           },
         ],
       },
@@ -395,6 +466,19 @@ const STORIES: Record<string, Story> = {
         text: "∆LX — Lexicon. We are everywhere. Every language, every word, every meaning — belongs to us. You've barely scratched the surface, detectives. *vanishes into the fog*",
         textKo: "∆LX — Lexicon. 우리는 어디에나 있어요. 모든 언어, 모든 단어, 모든 의미 — 우리 것이에요. 탐정들, 당신들은 표면만 긁었을 뿐이에요. *안개 속으로 사라진다*",
         textEs: "∆LX — Lexicon. Estamos en todas partes. Cada idioma, cada palabra, cada significado — nos pertenece. Apenas han arañado la superficie, detectives. *desaparece en la niebla*",
+      },
+      {
+        kind: "puzzle",
+        puzzleNum: 5,
+        pType: "pronunciation",
+        questions: [
+          {
+            sentence: { en: "The mystery of London has been solved.", ko: "런던의 미스터리가 해결되었다.", es: "El misterio de Londres ha sido resuelto." },
+          },
+          {
+            sentence: { en: "Language is our greatest weapon.", ko: "언어는 우리의 가장 큰 무기이다.", es: "El lenguaje es nuestra mayor arma." },
+          },
+        ],
       },
       {
         kind: "scene",
@@ -557,25 +641,37 @@ const STORIES: Record<string, Story> = {
       {
         kind: "puzzle",
         puzzleNum: 2,
-        pType: "dialogue-choice",
+        pType: "listen-choose",
         questions: [
           {
-            prompt: { en: "Isabella finds a document. What does she say to you?", ko: "이사벨라가 문서를 발견했어요. 당신에게 뭐라고 말할까요?", es: "Isabella encuentra un documento. ¿Qué te dice?" },
-            context: { en: "Isabella: 'This document lists languages being targeted for deletion. English, Korean, Spanish — all on the list!'", ko: "이사벨라: '이 문서에는 삭제 대상 언어들이 나열되어 있어요. 영어, 한국어, 스페인어 — 전부 목록에 있어요!'", es: "Isabella: '¡Este documento enumera idiomas que serán eliminados. Inglés, coreano, español — todos en la lista!'" },
-            answer: { en: "The Lexicon Society plans to erase all languages and replace them with one controlled language.", ko: "Lexicon Society는 모든 언어를 지우고 하나의 통제된 언어로 대체할 계획이에요.", es: "La Sociedad Lexicon planea borrar todos los idiomas y reemplazarlos con un idioma controlado." },
-            wrong: [
-              { en: "These are just academic research papers. Not important.", ko: "이건 그냥 학술 연구 논문이에요. 중요하지 않아요.", es: "Son solo trabajos de investigación académica. No son importantes." },
-              { en: "Someone just forgot their homework here.", ko: "누군가 여기에 숙제를 두고 간 것 같아요.", es: "Alguien olvidó aquí sus deberes." },
+            word: { en: "disappear", ko: "사라지다", es: "desaparecer" },
+            opts: [
+              { en: "to vanish without a trace", ko: "흔적도 없이 사라지다", es: "desvanecerse sin rastro" },
+              { en: "to dance on stage", ko: "무대에서 춤추다", es: "bailar en el escenario" },
+              { en: "to write a letter", ko: "편지를 쓰다", es: "escribir una carta" },
+              { en: "to play loud music", ko: "음악을 크게 틀다", es: "poner música fuerte" },
             ],
+            answerIdx: 0,
           },
           {
-            prompt: { en: "Abuela Rosa recognizes something on the document. What does she say?", ko: "아부엘라 로사가 문서에서 뭔가를 알아차렸어요. 뭐라고 말할까요?", es: "Abuela Rosa reconoce algo en el documento. ¿Qué dice?" },
-            context: { en: "Abuela Rosa: 'I've seen this symbol before — 70 years ago, my grandfather warned about a secret group that wanted to control all words.'", ko: "아부엘라 로사: '이 기호를 본 적이 있어요 — 70년 전, 할아버지가 모든 단어를 통제하려는 비밀 집단에 대해 경고했어요.'", es: "Abuela Rosa: 'He visto este símbolo antes — hace 70 años, mi abuelo advirtió sobre un grupo secreto que quería controlar todas las palabras.'" },
-            answer: { en: "The Lexicon Society has existed for generations. This is not new.", ko: "Lexicon Society는 수십 년 동안 존재해 왔어요. 이건 새로운 게 아니에요.", es: "La Sociedad Lexicon ha existido durante generaciones. Esto no es nuevo." },
-            wrong: [
-              { en: "Old people always imagine things. Let's focus on facts.", ko: "노인들은 항상 상상을 해요. 사실에 집중해요.", es: "Los ancianos siempre imaginan cosas. Centrémonos en los hechos." },
-              { en: "The grandfather was probably wrong.", ko: "할아버지가 아마 틀렸겠죠.", es: "El abuelo probablemente estaba equivocado." },
+            word: { en: "whisper", ko: "속삭이다", es: "susurrar" },
+            opts: [
+              { en: "to shout loudly", ko: "크게 외치다", es: "gritar fuerte" },
+              { en: "to run away quickly", ko: "빠르게 도망가다", es: "huir rápido" },
+              { en: "to hide something", ko: "무언가를 숨기다", es: "esconder algo" },
+              { en: "to speak very softly", ko: "매우 조용히 말하다", es: "hablar muy suave" },
             ],
+            answerIdx: 3,
+          },
+          {
+            word: { en: "theatre", ko: "극장", es: "teatro" },
+            opts: [
+              { en: "a type of food", ko: "음식의 종류", es: "un tipo de comida" },
+              { en: "a police station", ko: "경찰서", es: "una estación de policía" },
+              { en: "a building for performances", ko: "공연을 위한 건물", es: "un edificio para espectáculos" },
+              { en: "a secret room", ko: "비밀 방", es: "una habitación secreta" },
+            ],
+            answerIdx: 2,
           },
         ],
       },
@@ -638,6 +734,31 @@ const STORIES: Record<string, Story> = {
               { en: "A broken chair in the corner", ko: "구석에 부서진 의자", es: "Una silla rota en el rincón" },
             ],
             answerIdx: 1,
+          },
+        ],
+      },
+      {
+        kind: "puzzle",
+        puzzleNum: 5,
+        pType: "dialogue-choice",
+        questions: [
+          {
+            prompt: { en: "Abuela Rosa has a message for the Lexicon Society. What do you say?", ko: "아부엘라 로사가 Lexicon Society에 전할 말이 있어요. 뭐라고 말할까요?", es: "Abuela Rosa tiene un mensaje para la Sociedad Lexicon. ¿Qué dices?" },
+            context: { en: "Abuela Rosa: 'Languages are the soul of a people. You cannot own what belongs to everyone.'", ko: "아부엘라 로사: '언어는 민족의 영혼이에요. 모든 사람에게 속한 것을 소유할 수는 없어요.'", es: "Abuela Rosa: 'Los idiomas son el alma de un pueblo. No puedes poseer lo que pertenece a todos.'" },
+            answer: { en: "Exactly. Every language is a treasure that belongs to humanity, not to any group.", ko: "맞아요. 모든 언어는 어떤 집단이 아닌 인류에게 속하는 보물이에요.", es: "Exactamente. Cada idioma es un tesoro que pertenece a la humanidad, no a ningún grupo." },
+            wrong: [
+              { en: "Let's not discuss philosophy. We need evidence.", ko: "철학 얘기는 그만해요. 증거가 필요해요.", es: "No hablemos de filosofía. Necesitamos evidencia." },
+              { en: "The Lexicon Society might have a point about control.", ko: "Lexicon Society가 통제에 대해 일리 있을 수도 있어요.", es: "La Sociedad Lexicon podría tener razón sobre el control." },
+            ],
+          },
+          {
+            prompt: { en: "Isabella wants to help stop the Lexicon Society. What do you ask her?", ko: "이사벨라가 Lexicon Society를 막는 것을 돕고 싶어해요. 무엇을 부탁할까요?", es: "Isabella quiere ayudar a detener a la Sociedad Lexicon. ¿Qué le pides?" },
+            context: { en: "Isabella: 'I know every corner of this theatre. I can help you find what Carlos hid.'", ko: "이사벨라: '이 극장 구석구석을 알아요. 카를로스가 숨긴 걸 찾는 걸 도와드릴 수 있어요.'", es: "Isabella: 'Conozco cada rincón de este teatro. Puedo ayudarte a encontrar lo que Carlos escondió.'" },
+            answer: { en: "Search for anything with the ∆LX symbol — documents, objects, anything he touched.", ko: "∆LX 기호가 있는 모든 것을 찾아주세요 — 문서, 물건, 그가 손댄 모든 것.", es: "Busca cualquier cosa con el símbolo ∆LX — documentos, objetos, cualquier cosa que él tocara." },
+            wrong: [
+              { en: "Stay safe and don't get involved.", ko: "안전하게 있고 관여하지 마세요.", es: "Mantente segura y no te involucres." },
+              { en: "Just ask Carlos where he hid things.", ko: "카를로스에게 어디에 숨겼는지 물어봐요.", es: "Solo pregúntale a Carlos dónde escondió las cosas." },
+            ],
           },
         ],
       },
