@@ -10,6 +10,7 @@ import {
   Image,
   ScrollView,
   PanResponder,
+  TextInput,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -168,7 +169,7 @@ const STORIES: Record<string, Story> = {
     title: "The London Cipher",
     titleKo: "런던의 암호",
     titleEs: "El Cifrado de Londres",
-    gradient: ["#0D1117", "#1A1A2E", "#16213E"],
+    gradient: ["#1a0a05", "#2c1810", "#1a0a05"],
     accentColor: C.gold,
     nextChapterId: "madrid",
     characters: [
@@ -324,22 +325,22 @@ const STORIES: Record<string, Story> = {
         pType: "cipher",
         questions: [
           {
-            encoded: "DPEF",
-            answer: { en: "CODE", ko: "코드", es: "CÓDIGO" },
+            encoded: "IFMMP",
+            answer: { en: "HELLO", ko: "안녕", es: "HOLA" },
             shift: 1,
-            hint: { en: "Each letter shifted +1 forward (A→B, C→D…)", ko: "각 글자가 +1 앞으로 이동 (A→B, C→D…)", es: "Cada letra desplazada +1 (A→B, C→D…)" },
+            hint: { en: "Shift each letter back by 1 (B→A, C→B…)", ko: "각 글자를 한 칸 앞으로 당겨보게", es: "Retrocede cada letra 1 posición (B→A, C→B…)" },
             opts: [
-              { en: "CODE", ko: "코드", es: "CÓDIGO" },
-              { en: "BONE", ko: "뼈", es: "HUESO" },
-              { en: "DOME", ko: "돔", es: "CÚPULA" },
-              { en: "ROLE", ko: "역할", es: "ROL" },
+              { en: "HELLO", ko: "안녕", es: "HOLA" },
+              { en: "WORLD", ko: "세계", es: "MUNDO" },
+              { en: "GREAT", ko: "훌륭한", es: "GENIAL" },
+              { en: "NEVER", ko: "절대", es: "NUNCA" },
             ],
           },
           {
             encoded: "MJOHP",
             answer: { en: "LINGO", ko: "링고", es: "LINGO" },
             shift: 1,
-            hint: { en: "The detective's name — shift each letter back by 1", ko: "탐정의 이름 — 각 글자를 1 뒤로", es: "El nombre del detective — retrocede 1 letra" },
+            hint: { en: "The detective's name — shift each letter back by 1", ko: "탐정의 이름 — 각 글자를 한 칸 앞으로 당겨보게", es: "El nombre del detective — retrocede 1 letra" },
             opts: [
               { en: "BINGO", ko: "빙고", es: "BINGO" },
               { en: "LINGO", ko: "링고", es: "LINGO" },
@@ -351,7 +352,7 @@ const STORIES: Record<string, Story> = {
             encoded: "MFYJDPO",
             answer: { en: "LEXICON", ko: "렉시콘", es: "LÉXICO" },
             shift: 1,
-            hint: { en: "The secret society's name", ko: "비밀 결사의 이름", es: "El nombre de la sociedad secreta" },
+            hint: { en: "The secret society's name — shift each letter back", ko: "비밀 결사의 이름 — 각 글자를 한 칸 앞으로 당겨보게", es: "El nombre de la sociedad secreta — retrocede cada letra" },
             opts: [
               { en: "MISSION", ko: "임무", es: "MISIÓN" },
               { en: "SECTION", ko: "부문", es: "SECCIÓN" },
@@ -778,7 +779,7 @@ const STORIES: Record<string, Story> = {
     title: "The Seoul Secret",
     titleKo: "서울의 비밀",
     titleEs: "El Secreto de Seúl",
-    gradient: ["#050510", "#0A0A20", "#10103A"],
+    gradient: ["#1a0a05", "#2c1810", "#1a0a05"],
     accentColor: C.gold,
     characters: [
       {
@@ -1410,6 +1411,470 @@ function InvestigationPuzzle({ puzzle, lang, onSolved }: {
   );
 }
 
+/* ─────────────────── CIPHER PUZZLE ─────────────────── */
+
+function CipherPuzzle({ puzzle, lang, onSolved }: {
+  puzzle: { pType: "cipher"; questions: CipherQ[] };
+  lang: string; onSolved: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [solved, setSolved] = useState(false);
+
+  const q = puzzle.questions[idx];
+  const correctAnswer = lang === "korean" ? q.answer.ko : lang === "spanish" ? q.answer.es : q.answer.en;
+  const hintText = lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : q.hint.en;
+
+  const [shuffledOpts] = useState(() =>
+    puzzle.questions.map((qq) => {
+      const opts = qq.opts.map((o) => lang === "korean" ? o.ko : lang === "spanish" ? o.es : o.en);
+      return shuffle(opts);
+    })
+  );
+
+  function handleSelect(opt: string) {
+    if (selected) return;
+    setSelected(opt);
+    if (opt === correctAnswer) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setTimeout(() => {
+        if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); }
+        else setSolved(true);
+      }, 900);
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setTimeout(() => setSelected(null), 900);
+    }
+  }
+
+  if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
+
+  return (
+    <View style={styles.puzzleBox}>
+      <View style={styles.puzzleHeaderRow}>
+        <Text style={styles.puzzleNum}>🔐 {lang === "korean" ? "암호를 해독하라!" : lang === "spanish" ? "¡Descifra el código!" : "Decode the Cipher!"}</Text>
+        <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
+      </View>
+      <View style={styles.cipherLingoRow}>
+        <Text style={styles.cipherLingoEmoji}>🦊</Text>
+        <View style={styles.cipherLingoBubble}>
+          <Text style={styles.cipherLingoBubbleText}>
+            {lang === "korean" ? "이 암호를 해독해보게, 견습생!" : lang === "spanish" ? "¡Descifra este código, aprendiz!" : "Decode this cipher, apprentice!"}
+          </Text>
+        </View>
+      </View>
+      <View style={styles.cipherWordCard}>
+        <Text style={styles.cipherEncoded}>{q.encoded}</Text>
+        <Text style={styles.cipherHint}>💡 {hintText}</Text>
+      </View>
+      <View style={styles.puzzleOptions}>
+        {shuffledOpts[idx].map((opt, i) => {
+          const isSelected = selected === opt;
+          const isCorrect = opt === correctAnswer;
+          let bg = C.bg2; let borderColor = C.border;
+          if (isSelected && isCorrect) { bg = "rgba(90,170,90,0.25)"; borderColor = "#5a9"; }
+          else if (isSelected && !isCorrect) { bg = "rgba(200,70,70,0.25)"; borderColor = "#e55"; }
+          return (
+            <Pressable key={i} style={[styles.puzzleOption, { backgroundColor: bg, borderColor }]} onPress={() => handleSelect(opt)}>
+              <Text style={styles.cipherOptLabel}>{["①", "②", "③", "④"][i]}</Text>
+              <Text style={[styles.puzzleOptionText, { marginLeft: 8 }]}>{opt}</Text>
+              {isSelected && isCorrect && <Ionicons name="checkmark-circle" size={18} color="#5a9" />}
+              {isSelected && !isCorrect && <Ionicons name="close-circle" size={18} color="#e55" />}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+/* ─────────────────── LISTEN-CHOOSE PUZZLE ─────────────────── */
+
+function ListenChoosePuzzle({ puzzle, lang, learningLang, onSolved }: {
+  puzzle: { pType: "listen-choose"; questions: ListenChooseQ[] };
+  lang: string; learningLang: string; onSolved: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [solved, setSolved] = useState(false);
+  const soundRef = useRef<Audio.Sound | null>(null);
+
+  const q = puzzle.questions[idx];
+  const wordText = q.word.en;
+  const correctAnswer = lang === "korean" ? q.opts[q.answerIdx].ko : lang === "spanish" ? q.opts[q.answerIdx].es : q.opts[q.answerIdx].en;
+
+  const [shuffledOpts] = useState(() =>
+    puzzle.questions.map((qq) => {
+      const opts = qq.opts.map((o) => lang === "korean" ? o.ko : lang === "spanish" ? o.es : o.en);
+      return shuffle(opts);
+    })
+  );
+
+  async function playWord() {
+    if (playing) return;
+    setPlaying(true);
+    try {
+      if (soundRef.current) { await soundRef.current.unloadAsync(); soundRef.current = null; }
+      const url = new URL("/api/tts", getApiUrl());
+      url.searchParams.set("text", wordText);
+      url.searchParams.set("lang", learningLang);
+      const { sound } = await Audio.Sound.createAsync({ uri: url.toString() });
+      soundRef.current = sound;
+      await sound.playAsync();
+      sound.setOnPlaybackStatusUpdate((s) => {
+        if (s.isLoaded && s.didJustFinish) { setPlaying(false); }
+      });
+    } catch { setPlaying(false); }
+  }
+
+  function handleSelect(opt: string) {
+    if (selected) return;
+    setSelected(opt);
+    const isCorrect = opt === correctAnswer;
+    if (isCorrect) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setTimeout(() => {
+        if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); }
+        else setSolved(true);
+      }, 900);
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setTimeout(() => setSelected(null), 900);
+    }
+  }
+
+  if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
+
+  return (
+    <View style={styles.puzzleBox}>
+      <View style={styles.puzzleHeaderRow}>
+        <Text style={styles.puzzleNum}>🎧 {lang === "korean" ? "듣고 고르기" : lang === "spanish" ? "Escuchar y elegir" : "Listen & Choose"}</Text>
+        <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
+      </View>
+      <View style={styles.puzzleWordCard}>
+        <Text style={styles.puzzleWordLabel}>
+          {lang === "korean" ? "이 단어의 뜻은?" : lang === "spanish" ? "¿Qué significa esta palabra?" : "What does this word mean?"}
+        </Text>
+        <Pressable style={styles.listenWordRow} onPress={playWord}>
+          <Text style={styles.puzzleWordMain}>{wordText}</Text>
+          <View style={[styles.listenWordBtn, playing && { opacity: 0.6 }]}>
+            <Ionicons name={playing ? "volume-medium" : "volume-high-outline"} size={22} color={C.bg1} />
+          </View>
+        </Pressable>
+      </View>
+      <View style={styles.puzzleOptions}>
+        {shuffledOpts[idx].map((opt, i) => {
+          const isSelected = selected === opt;
+          const isCorrect = opt === correctAnswer;
+          let bg = C.bg2; let borderColor = C.border;
+          if (isSelected && isCorrect) { bg = "rgba(90,170,90,0.25)"; borderColor = "#5a9"; }
+          else if (isSelected && !isCorrect) { bg = "rgba(200,70,70,0.25)"; borderColor = "#e55"; }
+          return (
+            <Pressable key={i} style={[styles.puzzleOption, { backgroundColor: bg, borderColor }]} onPress={() => handleSelect(opt)}>
+              <Text style={styles.puzzleOptionText}>{opt}</Text>
+              {isSelected && isCorrect && <Ionicons name="checkmark-circle" size={18} color="#5a9" />}
+              {isSelected && !isCorrect && <Ionicons name="close-circle" size={18} color="#e55" />}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+/* ─────────────────── PRONUNCIATION PUZZLE ─────────────────── */
+
+function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
+  puzzle: { pType: "pronunciation"; questions: PronunciationQ[] };
+  lang: string; learningLang: string; onSolved: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const [played, setPlayed] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [solved, setSolved] = useState(false);
+  const soundRef = useRef<Audio.Sound | null>(null);
+
+  const q = puzzle.questions[idx];
+  const sentenceText = lang === "korean" ? q.sentence.ko : lang === "spanish" ? q.sentence.es : q.sentence.en;
+
+  async function playAudio() {
+    if (playing) return;
+    setPlaying(true);
+    setPlayed(true);
+    try {
+      if (soundRef.current) { await soundRef.current.unloadAsync(); soundRef.current = null; }
+      const url = new URL("/api/tts", getApiUrl());
+      url.searchParams.set("text", q.sentence.en);
+      url.searchParams.set("lang", learningLang);
+      const { sound } = await Audio.Sound.createAsync({ uri: url.toString() });
+      soundRef.current = sound;
+      await sound.playAsync();
+      sound.setOnPlaybackStatusUpdate((s) => {
+        if (s.isLoaded && s.didJustFinish) setPlaying(false);
+      });
+    } catch { setPlaying(false); }
+  }
+
+  function handleConfirm() {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setConfirmed(true);
+    setTimeout(() => {
+      if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setPlayed(false); setConfirmed(false); }
+      else setSolved(true);
+    }, 700);
+  }
+
+  if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
+
+  return (
+    <View style={styles.puzzleBox}>
+      <View style={styles.puzzleHeaderRow}>
+        <Text style={styles.puzzleNum}>🎤 {lang === "korean" ? "발음 따라하기" : lang === "spanish" ? "Pronuncia esta frase" : "Pronunciation Practice"}</Text>
+        <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
+      </View>
+      <View style={styles.puzzleWordCard}>
+        <Text style={styles.puzzleWordLabel}>
+          {lang === "korean" ? "이 문장을 소리 내어 읽어보세요!" : lang === "spanish" ? "¡Lee esta frase en voz alta!" : "Read this sentence aloud!"}
+        </Text>
+        <Text style={styles.puzzleSentence}>{sentenceText}</Text>
+      </View>
+      <Pressable style={[styles.listenBtn2, playing && { opacity: 0.7 }]} onPress={playAudio} disabled={playing}>
+        <Ionicons name={playing ? "volume-medium" : "volume-high-outline"} size={20} color={C.bg1} />
+        <Text style={styles.listenBtn2Text}>
+          {playing
+            ? (lang === "korean" ? "재생 중..." : lang === "spanish" ? "Reproduciendo..." : "Playing...")
+            : (lang === "korean" ? "🔊  듣기" : lang === "spanish" ? "🔊  Escuchar" : "🔊  Listen")}
+        </Text>
+      </Pressable>
+      {played && !confirmed && (
+        <Pressable style={styles.puzzleConfirmBtn} onPress={handleConfirm}>
+          <Text style={styles.puzzleConfirmText}>
+            {lang === "korean" ? "✅  따라했어요!" : lang === "spanish" ? "✅  ¡Lo repetí!" : "✅  I said it!"}
+          </Text>
+        </Pressable>
+      )}
+      {!played && (
+        <Text style={styles.pronunciationHint}>
+          {lang === "korean" ? "👆 먼저 듣기 버튼을 눌러보세요" : lang === "spanish" ? "👆 Primero escucha el audio" : "👆 Listen first, then repeat aloud"}
+        </Text>
+      )}
+    </View>
+  );
+}
+
+/* ─────────────────── WRITING MISSION PUZZLE ─────────────────── */
+
+function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved }: {
+  puzzle: { pType: "writing-mission"; questions: WritingMissionQ[] };
+  lang: string; learningLang: string; onSolved: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const [answer, setAnswer] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [solved, setSolved] = useState(false);
+
+  const q = puzzle.questions[idx];
+  const targetWord = q.word.en;
+  const displayWord = lang === "korean" ? q.word.ko : lang === "spanish" ? q.word.es : q.word.en;
+  const hintText = q.hint ? (lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : q.hint.en) : null;
+
+  function handleConfirm() {
+    if (!answer.trim()) return;
+    const correct = answer.trim().toLowerCase() === targetWord.toLowerCase();
+    setIsCorrect(correct);
+    setConfirmed(true);
+    if (correct) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+  }
+
+  function handleNext() {
+    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setAnswer(""); setConfirmed(false); setIsCorrect(false); }
+    else setSolved(true);
+  }
+
+  if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
+
+  return (
+    <View style={styles.puzzleBox}>
+      <View style={styles.puzzleHeaderRow}>
+        <Text style={styles.puzzleNum}>✏️ {lang === "korean" ? "쓰기 미션" : lang === "spanish" ? "Misión de escritura" : "Writing Mission"}</Text>
+        <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
+      </View>
+      <View style={styles.puzzleWordCard}>
+        <Text style={styles.puzzleWordLabel}>
+          {lang === "korean" ? `'${displayWord}'을(를) 영어로 써보세요` : lang === "spanish" ? `Escribe '${displayWord}' en inglés` : `Type this word in the target language`}
+        </Text>
+        <Text style={styles.puzzleWordMain}>{displayWord}</Text>
+        {hintText && <Text style={styles.puzzleChooseHint}>💡 {hintText}</Text>}
+      </View>
+      <TextInput
+        style={[styles.writingInput, confirmed && (isCorrect ? styles.writingInputCorrect : styles.writingInputWrong)]}
+        value={answer}
+        onChangeText={setAnswer}
+        placeholder={lang === "korean" ? "여기에 입력하세요..." : lang === "spanish" ? "Escribe aquí..." : "Type here..."}
+        placeholderTextColor={C.goldDim}
+        editable={!confirmed}
+        autoCapitalize="characters"
+        autoCorrect={false}
+      />
+      {confirmed && (
+        <View style={[styles.writingResult, { backgroundColor: isCorrect ? "rgba(90,170,90,0.15)" : "rgba(200,70,70,0.15)" }]}>
+          <Text style={{ fontFamily: F.bodySemi, fontSize: 14, color: isCorrect ? "#5a9" : "#e55" }}>
+            {isCorrect
+              ? (lang === "korean" ? "🎉 정답이에요!" : lang === "spanish" ? "🎉 ¡Correcto!" : "🎉 Correct!")
+              : (lang === "korean" ? `정답: ${targetWord}` : lang === "spanish" ? `Respuesta: ${targetWord}` : `Answer: ${targetWord}`)}
+          </Text>
+        </View>
+      )}
+      {!confirmed ? (
+        <Pressable style={[styles.puzzleConfirmBtn, { opacity: answer.trim() ? 1 : 0.5 }]} onPress={handleConfirm} disabled={!answer.trim()}>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Confirmar ✓" : "Check ✓"}</Text>
+        </Pressable>
+      ) : (
+        <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속 ▶" : lang === "spanish" ? "Continuar ▶" : "Continue ▶"}</Text>
+        </Pressable>
+      )}
+    </View>
+  );
+}
+
+/* ─────────────────── WORD PUZZLE ─────────────────── */
+
+function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved }: {
+  puzzle: { pType: "word-puzzle"; questions: WordPuzzleQ[] };
+  lang: string; learningLang: string; onSolved: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const [tapped, setTapped] = useState<number[]>([]);
+  const [solved, setSolved] = useState(false);
+
+  const q = puzzle.questions[idx];
+  const scrambledText = lang === "korean" ? q.scrambled.ko : lang === "spanish" ? q.scrambled.es : q.scrambled.en;
+  const correctWord = lang === "korean" ? q.word.ko : lang === "spanish" ? q.word.es : q.word.en;
+  const letters = scrambledText.split("");
+
+  const assembled = tapped.map((ti) => letters[ti]).join("");
+  const isCorrect = assembled.toLowerCase() === correctWord.toLowerCase();
+
+  function handleTapLetter(i: number) {
+    if (tapped.includes(i)) return;
+    const next = [...tapped, i];
+    setTapped(next);
+    const newWord = next.map((ti) => letters[ti]).join("");
+    if (newWord.toLowerCase() === correctWord.toLowerCase()) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setTimeout(() => {
+        if (idx < puzzle.questions.length - 1) { setIdx((n) => n + 1); setTapped([]); }
+        else setSolved(true);
+      }, 700);
+    }
+  }
+
+  function handleReset() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setTapped([]);
+  }
+
+  if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
+
+  return (
+    <View style={styles.puzzleBox}>
+      <View style={styles.puzzleHeaderRow}>
+        <Text style={styles.puzzleNum}>🔀 {lang === "korean" ? "단어 맞추기" : lang === "spanish" ? "Ordenar letras" : "Word Unscramble"}</Text>
+        <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
+      </View>
+      <View style={styles.puzzleWordCard}>
+        <Text style={styles.puzzleWordLabel}>
+          {lang === "korean" ? "글자를 순서대로 탭해서 단어를 완성하세요" : lang === "spanish" ? "Toca las letras en orden para formar la palabra" : "Tap letters in order to form the word"}
+        </Text>
+        <View style={styles.wordPuzzleAnswerRow}>
+          {correctWord.split("").map((_, i) => (
+            <View key={i} style={[styles.wordPuzzleSlot, i < assembled.length && styles.wordPuzzleSlotFilled]}>
+              <Text style={styles.wordPuzzleSlotText}>{i < assembled.length ? assembled[i] : "_"}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+      <View style={styles.wordPuzzleLettersRow}>
+        {letters.map((letter, i) => {
+          const used = tapped.includes(i);
+          return (
+            <Pressable
+              key={i}
+              style={[styles.wordPuzzleLetter, used && styles.wordPuzzleLetterUsed]}
+              onPress={() => handleTapLetter(i)}
+              disabled={used}
+            >
+              <Text style={[styles.wordPuzzleLetterText, used && { color: C.goldDim }]}>{letter}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+      {tapped.length > 0 && !isCorrect && (
+        <Pressable style={[styles.puzzleConfirmBtn, { backgroundColor: "rgba(201,162,39,0.2)" }]} onPress={handleReset}>
+          <Text style={[styles.puzzleConfirmText, { color: C.gold }]}>
+            {lang === "korean" ? "🔄 다시 시작" : lang === "spanish" ? "🔄 Reiniciar" : "🔄 Reset"}
+          </Text>
+        </Pressable>
+      )}
+    </View>
+  );
+}
+
+/* ─────────────────── FALLBACK PUZZLE ─────────────────── */
+
+function FallbackPuzzle({ lang, onSolved }: { lang: string; onSolved: () => void }) {
+  const [selected, setSelected] = useState<number | null>(null);
+  const [done, setDone] = useState(false);
+  const questions = [
+    { q: lang === "korean" ? "'Hello'는 무슨 뜻인가요?" : lang === "spanish" ? "¿Qué significa 'Hello'?" : "What does 'Bonjour' mean?",
+      opts: lang === "korean" ? ["안녕하세요", "감사합니다", "죄송합니다", "잘 자요"] : lang === "spanish" ? ["Hola", "Gracias", "Lo siento", "Buenas noches"] : ["Hello", "Thank you", "Sorry", "Good night"],
+      answer: 0 },
+  ];
+  const q = questions[0];
+
+  function handleSelect(i: number) {
+    if (selected !== null) return;
+    setSelected(i);
+    if (i === q.answer) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    setTimeout(() => setDone(true), 900);
+  }
+
+  if (done) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
+
+  return (
+    <View style={styles.puzzleBox}>
+      <View style={styles.puzzleHeaderRow}>
+        <Text style={styles.puzzleNum}>🧩 {lang === "korean" ? "퀴즈" : lang === "spanish" ? "Quiz" : "Quick Quiz"}</Text>
+      </View>
+      <View style={styles.puzzleWordCard}>
+        <Text style={styles.puzzleWordMain}>{q.q}</Text>
+      </View>
+      <View style={styles.puzzleOptions}>
+        {q.opts.map((opt, i) => {
+          const isSelected = selected === i;
+          const isAnswer = i === q.answer;
+          let bg = C.bg2; let borderColor = C.border;
+          if (isSelected && isAnswer) { bg = "rgba(90,170,90,0.25)"; borderColor = "#5a9"; }
+          else if (isSelected && !isAnswer) { bg = "rgba(200,70,70,0.25)"; borderColor = "#e55"; }
+          return (
+            <Pressable key={i} style={[styles.puzzleOption, { backgroundColor: bg, borderColor }]} onPress={() => handleSelect(i)}>
+              <Text style={styles.puzzleOptionText}>{opt}</Text>
+              {isSelected && isAnswer && <Ionicons name="checkmark-circle" size={18} color="#5a9" />}
+              {isSelected && !isAnswer && <Ionicons name="close-circle" size={18} color="#e55" />}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 /* ─────────────────── CLUE REVEAL ─────────────────── */
 
 function ClueReveal({ clue, lang, onNext }: { clue: SeqClue; lang: string; onNext: () => void }) {
@@ -1665,6 +2130,24 @@ export default function StoryScene() {
               )}
               {item.pType === "investigation" && (
                 <InvestigationPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
+              )}
+              {item.pType === "cipher" && (
+                <CipherPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} />
+              )}
+              {item.pType === "listen-choose" && (
+                <ListenChoosePuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+              )}
+              {item.pType === "pronunciation" && (
+                <PronunciationPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+              )}
+              {item.pType === "writing-mission" && (
+                <WritingMissionPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+              )}
+              {item.pType === "word-puzzle" && (
+                <WordPuzzlePuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} />
+              )}
+              {!["word-match","fill-blank","dialogue-choice","sentence-builder","investigation","cipher","listen-choose","pronunciation","writing-mission","word-puzzle"].includes(item.pType) && (
+                <FallbackPuzzle lang={lang} onSolved={handlePuzzleSolved} />
               )}
             </ScrollView>
           );
@@ -2199,4 +2682,165 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(201,162,39,0.08)",
   },
   completionHomeBtnText: { fontFamily: F.bodySemi, fontSize: 14, color: C.goldDim },
+
+  /* ── Cipher Puzzle ── */
+  cipherLingoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  cipherLingoEmoji: { fontSize: 28 },
+  cipherLingoBubble: {
+    flex: 1,
+    backgroundColor: "rgba(201,162,39,0.1)",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.2)",
+    padding: 10,
+  },
+  cipherLingoBubbleText: {
+    fontFamily: F.bodySemi,
+    fontSize: 13,
+    color: C.parchment,
+    fontStyle: "italic",
+  },
+  cipherWordCard: {
+    backgroundColor: C.bg1,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: C.gold,
+    padding: 20,
+    alignItems: "center",
+    gap: 10,
+  },
+  cipherEncoded: {
+    fontSize: 38,
+    fontFamily: F.title,
+    color: C.gold,
+    letterSpacing: 6,
+  },
+  cipherHint: {
+    fontSize: 13,
+    fontFamily: F.body,
+    color: C.goldDim,
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  cipherOptLabel: {
+    fontSize: 16,
+    fontFamily: F.header,
+    color: C.gold,
+    width: 24,
+  },
+
+  /* ── Listen-Choose Puzzle ── */
+  listenWordRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  listenWordBtn: {
+    backgroundColor: C.gold,
+    borderRadius: 10,
+    padding: 8,
+  },
+
+  /* ── Pronunciation Puzzle ── */
+  listenBtn2: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: C.gold,
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
+  listenBtn2Text: {
+    fontFamily: F.header,
+    fontSize: 14,
+    color: C.bg1,
+    letterSpacing: 0.5,
+  },
+  pronunciationHint: {
+    fontSize: 13,
+    fontFamily: F.body,
+    color: C.goldDim,
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+
+  /* ── Writing Mission Puzzle ── */
+  writingInput: {
+    borderWidth: 1.5,
+    borderColor: C.border,
+    borderRadius: 14,
+    padding: 14,
+    fontFamily: F.bodySemi,
+    fontSize: 20,
+    color: C.parchment,
+    backgroundColor: C.bg2,
+    textAlign: "center",
+    letterSpacing: 2,
+  },
+  writingInputCorrect: { borderColor: "#5a9", backgroundColor: "rgba(90,170,90,0.1)" },
+  writingInputWrong: { borderColor: "#e55", backgroundColor: "rgba(200,70,70,0.1)" },
+  writingResult: {
+    borderRadius: 12,
+    padding: 12,
+    alignItems: "center",
+  },
+
+  /* ── Word Puzzle ── */
+  wordPuzzleAnswerRow: {
+    flexDirection: "row",
+    gap: 6,
+    justifyContent: "center",
+    flexWrap: "wrap",
+    marginTop: 8,
+  },
+  wordPuzzleSlot: {
+    width: 36,
+    height: 44,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: "rgba(201,162,39,0.3)",
+    backgroundColor: "rgba(201,162,39,0.05)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  wordPuzzleSlotFilled: {
+    borderColor: C.gold,
+    backgroundColor: "rgba(201,162,39,0.15)",
+  },
+  wordPuzzleSlotText: {
+    fontSize: 18,
+    fontFamily: F.header,
+    color: C.gold,
+  },
+  wordPuzzleLettersRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    justifyContent: "center",
+  },
+  wordPuzzleLetter: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: C.bg2,
+    borderWidth: 1.5,
+    borderColor: C.border,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  wordPuzzleLetterUsed: {
+    backgroundColor: "rgba(201,162,39,0.05)",
+    borderColor: "rgba(201,162,39,0.15)",
+  },
+  wordPuzzleLetterText: {
+    fontSize: 18,
+    fontFamily: F.header,
+    color: C.parchment,
+  },
 });
