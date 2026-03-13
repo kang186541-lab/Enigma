@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "LingoFox",
-    "slug": "lingofox",
+    "name": "Enigma",
+    "slug": "enigma",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "lingofox",
+    "scheme": "enigma",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.lingofox.app",
+      "bundleIdentifier": "com.enigma.app",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "발음 연습을 위해 마이크가 필요해요",
         "NSSpeechRecognitionUsageDescription": "발음 평가를 위해 음성 인식이 필요해요"
       }
     },
     "android": {
-      "package": "com.lingofox.app",
+      "package": "com.enigma.app",
       "usesCleartextTraffic": true,
       "permissions": [
         "RECORD_AUDIO",

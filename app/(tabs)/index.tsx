@@ -17,7 +17,7 @@ import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, getLevel, getLevelProgress, NativeLanguage } from "@/context/LanguageContext";
-import { LingoMascot } from "@/components/LingoMascot";
+import { RudyMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
 import { C, F } from "@/constants/theme";
 
@@ -234,7 +234,7 @@ export default function HomeScreen() {
         <View style={styles.headerTop}>
           <View style={{ flex: 1 }}>
             <Text style={styles.greeting} numberOfLines={1}>{lingoGreeting}</Text>
-            <Text style={styles.headerTitle} numberOfLines={1}>LingoFox</Text>
+            <Text style={styles.headerTitle} numberOfLines={1}>Enigma ✨</Text>
           </View>
           <Image
             source={lingoImg}
@@ -289,7 +289,7 @@ export default function HomeScreen() {
         <View style={styles.streakCard}>
           <View style={styles.streakHeader}>
             <View style={styles.streakLeft}>
-              <LingoMascot size={100} mood={lingoMood} />
+              <RudyMascot size={100} mood={lingoMood} />
               <View>
                 <Animated.View style={{ transform: [{ scale: fireScale }] }}>
                   <Animated.Text style={[styles.streakCount, { opacity: flickerOp }]}>

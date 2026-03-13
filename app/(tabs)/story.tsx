@@ -15,7 +15,7 @@ import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
-import { LingoMascot } from "@/components/LingoMascot";
+import { RudyMascot } from "@/components/LingoMascot";
 import { C, F } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
@@ -203,7 +203,7 @@ export default function StoryTab() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.headerEyebrow}>🦊 {lang === "korean" ? "링고 탐정의" : lang === "spanish" ? "Detective Lingo presenta" : "Detective Lingo presents"}</Text>
+        <Text style={styles.headerEyebrow}>🦊 {lang === "korean" ? "루디 탐정의" : lang === "spanish" ? "Detective Rudy presenta" : "Detective Rudy presents"}</Text>
         <Text style={styles.headerTitle}>
           {lang === "korean"
             ? "언어 음모"
@@ -221,7 +221,7 @@ export default function StoryTab() {
       </LinearGradient>
 
       <View style={styles.lingoBanner}>
-        <LingoMascot size={100} mood="excited" />
+        <RudyMascot size={100} mood="excited" />
         <View style={styles.lingoSpeech}>
           <Text style={styles.lingoSpeechText}>{lingoMsg}</Text>
         </View>

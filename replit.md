@@ -1,8 +1,8 @@
-# LingoFox - Replit.md
+# Enigma - Replit.md
 
 ## Overview
 
-LingoFox is a mobile-first AI language learning app built with Expo (React Native) featuring a vintage detective / Professor Layton visual theme. Dark brown, gold (#c9a227), and parchment (#f4e8c1) palette with Cinzel + CrimsonText fonts.
+Enigma is a mobile-first AI language learning app built with Expo (React Native) featuring a vintage detective / Professor Layton visual theme. Dark brown, gold (#c9a227), and parchment (#f4e8c1) palette with Cinzel + CrimsonText fonts. Mascot: Rudy the fox 🦊 (was: Lingo → rebranded to Rudy).
 
 **Key features:**
 - 2-step onboarding (select native + learning language from Korean, English, Spanish)

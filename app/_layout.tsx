@@ -58,7 +58,7 @@ function LingoLoadingScreen() {
         source={lingoImg}
         style={[ls.lingo, { transform: [{ translateY: bounceAnim }] }]}
       />
-      <Text style={ls.title}>LingoFox</Text>
+      <Text style={ls.title}>Enigma</Text>
       <Text style={ls.sub}>Unravelling languages, one clue at a time...</Text>
       <View style={ls.dots}>
         {[0, 1, 2].map((i) => <Animated.View key={i} style={[ls.dot, { opacity: flickerAnim }]} />)}

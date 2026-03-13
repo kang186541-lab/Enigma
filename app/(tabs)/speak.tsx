@@ -680,7 +680,7 @@ export default function SpeakScreen() {
         try {
           const { granted } = await Audio.requestPermissionsAsync();
           if (!granted) {
-            setSttError("마이크 권한을 허용해주세요.\n(설정 → 앱 → LingoFox → 마이크)");
+            setSttError("마이크 권한을 허용해주세요.\n(설정 → 앱 → Enigma → 마이크)");
             setRecordState("done");
             recordStateRef.current = "done";
             return;

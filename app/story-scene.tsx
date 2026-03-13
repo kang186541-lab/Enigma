@@ -282,8 +282,8 @@ const STORIES: Record<string, Story> = {
       {
         id: "lingo",
         emoji: "🦊",
-        name: "Detective Lingo",
-        nameKo: "링고 탐정",
+        name: "Detective Rudy",
+        nameKo: "루디 탐정",
         side: "left",
         avatarBg: "#2c1810",
         isLingo: true,
@@ -325,9 +325,9 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
-        text: "Apprentice! Welcome to London. I'm Detective Lingo 🦊 — language detective extraordinaire. A mysterious coded letter has arrived. Words are disappearing across the city. This is no ordinary crime.",
-        textKo: "견습생! 런던에 온 걸 환영해요. 저는 링고 탐정이에요 🦊 — 언어 전문 탐정. 수수께끼의 암호 편지가 도착했어요. 도시 전체에서 단어들이 사라지고 있어요. 이건 평범한 범죄가 아니에요.",
-        textEs: "¡Aprendiz! Bienvenido a Londres. Soy el Detective Lingo 🦊 — detective lingüístico extraordinario. Ha llegado una misteriosa carta cifrada. Las palabras están desapareciendo por toda la ciudad. Este no es un crimen ordinario.",
+        text: "Apprentice! Welcome to London. I'm Detective Rudy 🦊 — language detective extraordinaire. A mysterious coded letter has arrived. Words are disappearing across the city. This is no ordinary crime.",
+        textKo: "견습생! 런던에 온 걸 환영해요. 저는 루디 탐정이에요 🦊 — 언어 전문 탐정. 수수께끼의 암호 편지가 도착했어요. 도시 전체에서 단어들이 사라지고 있어요. 이건 평범한 범죄가 아니에요.",
+        textEs: "¡Aprendiz! Bienvenido a Londres. Soy el Detective Rudy 🦊 — detective lingüístico extraordinario. Ha llegado una misteriosa carta cifrada. Las palabras están desapareciendo por toda la ciudad. Este no es un crimen ordinario.",
       },
       {
         kind: "scene",
@@ -448,15 +448,15 @@ const STORIES: Record<string, Story> = {
             ],
           },
           {
-            encoded: "MJOHP",
-            answer: { en: "LINGO", ko: "링고", es: "LINGO" },
+            encoded: "SVEZ",
+            answer: { en: "RUDY", ko: "루디", es: "RUDY" },
             shift: 1,
             hint: { en: "The detective's name — move each letter one step backward", ko: "탐정의 이름 — 각 글자를 한 칸 뒤로 당겨보게", es: "El nombre del detective — retrocede cada letra 1 posición" },
             opts: [
-              { en: "BINGO", ko: "빙고", es: "BINGO" },
-              { en: "LINGO", ko: "링고", es: "LINGO" },
-              { en: "DINGO", ko: "딩고", es: "DINGO" },
-              { en: "KINGS", ko: "왕들", es: "REYES" },
+              { en: "RUBY", ko: "루비", es: "RUBY" },
+              { en: "RUDY", ko: "루디", es: "RUDY" },
+              { en: "DUDE", ko: "듀드", es: "DUDE" },
+              { en: "RUDE", ko: "루드", es: "RUDE" },
             ],
           },
           {
@@ -537,9 +537,9 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "mr_black",
-        text: "How terribly clever of you, Detective Lingo. *steps out of shadow* You've found the library. But can you understand what it means?",
-        textKo: "참 영리하시군요, 링고 탐정. *그림자에서 걸어나오며* 도서관을 찾아냈군요. 하지만 그게 무엇을 의미하는지 이해할 수 있을까요?",
-        textEs: "Qué inteligente eres, Detective Lingo. *sale de las sombras* Encontraron la biblioteca. Pero, ¿pueden entender lo que significa?",
+        text: "How terribly clever of you, Detective Rudy. *steps out of shadow* You've found the library. But can you understand what it means?",
+        textKo: "참 영리하시군요, 루디 탐정. *그림자에서 걸어나오며* 도서관을 찾아냈군요. 하지만 그게 무엇을 의미하는지 이해할 수 있을까요?",
+        textEs: "Qué inteligente eres, Detective Rudy. *sale de las sombras* Encontraron la biblioteca. Pero, ¿pueden entender lo que significa?",
       },
       {
         kind: "scene",
@@ -666,8 +666,8 @@ const STORIES: Record<string, Story> = {
       {
         id: "lingo",
         emoji: "🦊",
-        name: "Detective Lingo",
-        nameKo: "링고 탐정",
+        name: "Detective Rudy",
+        nameKo: "루디 탐정",
         side: "left",
         avatarBg: "#2c1810",
         isLingo: true,
@@ -980,8 +980,8 @@ const STORIES: Record<string, Story> = {
       {
         id: "lingo",
         emoji: "🦊",
-        name: "Detective Lingo",
-        nameKo: "링고 탐정",
+        name: "Detective Rudy",
+        nameKo: "루디 탐정",
         side: "left",
         avatarBg: "#2c1810",
         isLingo: true,
@@ -1037,9 +1037,9 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "minji",
-        text: "이 대표님! *rushes in, urgent* Detective Lingo — I'm Dr. Minji Park. Junhyuk is a victim of the Lexicon Society's language experiments. They erased his memory using a coded language-frequency device.",
-        textKo: "이 대표님! *급하게 들어오며* 링고 탐정님 — 저는 박민지 박사예요. 준혁 씨는 Lexicon Society의 언어 실험 피해자예요. 그들이 암호화된 언어 주파수 장치를 사용해 그의 기억을 지웠어요.",
-        textEs: "이 대표님! *entra urgentemente* Detective Lingo — soy la Dra. Minji Park. Junhyuk es víctima de los experimentos lingüísticos de la Sociedad Lexicon. Borraron su memoria usando un dispositivo de frecuencia lingüística codificada.",
+        text: "이 대표님! *rushes in, urgent* Detective Rudy — I'm Dr. Minji Park. Junhyuk is a victim of the Lexicon Society's language experiments. They erased his memory using a coded language-frequency device.",
+        textKo: "이 대표님! *급하게 들어오며* 루디 탐정님 — 저는 박민지 박사예요. 준혁 씨는 Lexicon Society의 언어 실험 피해자예요. 그들이 암호화된 언어 주파수 장치를 사용해 그의 기억을 지웠어요.",
+        textEs: "이 대표님! *entra urgentemente* Detective Rudy — soy la Dra. Minji Park. Junhyuk es víctima de los experimentos lingüísticos de la Sociedad Lexicon. Borraron su memoria usando un dispositivo de frecuencia lingüística codificada.",
       },
       {
         kind: "puzzle",

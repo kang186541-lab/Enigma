@@ -14,7 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
-import { LingoMascot } from "@/components/LingoMascot";
+import { RudyMascot } from "@/components/LingoMascot";
 
 const { width } = Dimensions.get("window");
 
@@ -108,14 +108,14 @@ export default function StoryScreen() {
 
       {/* Lingo guide banner */}
       <View style={styles.lingoBanner}>
-        <LingoMascot size={100} mood="excited" />
+        <RudyMascot size={100} mood="excited" />
         <View style={styles.lingoSpeech}>
           <Text style={styles.lingoSpeechText}>
             {lang === "korean"
-              ? "안녕! 저는 링고예요 🦊\n이야기로 함께 언어를 배워봐요!"
+              ? "안녕! 저는 루디예요 🦊\n이야기로 함께 언어를 배워봐요!"
               : lang === "spanish"
-              ? "¡Hola! Soy Lingo 🦊\n¡Aprendamos idiomas con historias!"
-              : "Hi! I'm Lingo 🦊\nLet's learn languages through stories!"}
+              ? "¡Hola! Soy Rudy 🦊\n¡Aprendamos idiomas con historias!"
+              : "Hi! I'm Rudy 🦊\nLet's learn languages through stories!"}
           </Text>
         </View>
       </View>

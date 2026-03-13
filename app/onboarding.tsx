@@ -125,7 +125,7 @@ export default function OnboardingScreen() {
         {/* Logo */}
         <View style={styles.logoRow}>
           <Image source={lingoImg} style={styles.logoImg} resizeMode="contain" />
-          <Text style={styles.logoText}>LingoFox</Text>
+          <Text style={styles.logoText}>Enigma</Text>
         </View>
 
         {/* Step dots */}

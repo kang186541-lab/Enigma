@@ -4,7 +4,7 @@ import { C } from "@/constants/theme";
 
 const lingoImg = require("@/assets/lingo.png");
 
-interface LingoMascotProps {
+interface RudyMascotProps {
   size?: number;
   mood?: "happy" | "sad" | "excited" | "normal";
   showBubble?: boolean;
@@ -14,7 +14,7 @@ interface LingoMascotProps {
   showCircle?: boolean;
 }
 
-export function LingoMascot({
+export function RudyMascot({
   size = 80,
   mood = "happy",
   showBubble,
@@ -22,7 +22,7 @@ export function LingoMascot({
   bubblePosition = "left",
   style,
   showCircle = false,
-}: LingoMascotProps) {
+}: RudyMascotProps) {
   const bounceAnim = useRef(new Animated.Value(0)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
