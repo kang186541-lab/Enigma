@@ -1,0 +1,136 @@
+Update the puzzle gameplay UI to feel like a mystery puzzle game similar to a detective adventure game.
+
+GENERAL GOAL
+Make the puzzle experience more immersive and detective-like.  
+Do not reveal the correct answer immediately when the user fails.
+
+------------------------------------
+
+FAIL STATE (WRONG ANSWER)
+
+When the user selects the wrong answer:
+
+Display a red error box with:
+
+❌ 틀렸어요
+
+Fox dialogue:
+"흠… 뭔가 조금 다른 것 같군요, 견습생."
+
+Message:
+"조금만 더 생각해보세요."
+
+IMPORTANT RULES
+
+Do NOT show the correct answer.
+Remove the line that says:
+"정답은: ..."
+
+Remove the "계속하기" button completely.
+
+Instead show two buttons:
+
+Button 1
+Label: "다시 시도"
+Action: Reset the puzzle so the user can try again.
+
+Button 2
+Label: "💡 힌트 보기"
+Action: Open the hint modal.
+
+------------------------------------
+
+HINT SYSTEM
+
+Add a progressive hint system with three levels.
+
+When the user taps "💡 힌트 보기", open a modal styled like a detective notebook.
+
+Hints unlock sequentially.
+
+Hint 1
+"각 글자를 알파벳에서 한 칸 앞 글자로 바꿔보세요."
+
+Hint 2
+"예: B → A"
+
+Hint 3
+"IFMMP 를 한 글자씩 이동하면 단어가 됩니다."
+
+Hints should not immediately reveal the final answer.
+
+Optional rule:
+Each hint reduces XP reward slightly.
+
+------------------------------------
+
+SUCCESS STATE (CORRECT ANSWER)
+
+When the user selects the correct answer:
+
+Play a short celebration animation.
+
+Show text:
+
+✨ 퍼즐 해결!
+
+Fox dialogue:
+"훌륭하군요, 견습생! 암호를 완벽히 해독했어요."
+
+Animate the puzzle card with a soft golden glow.
+
+Show reward:
+
++50 XP
+
+Button:
+"다음 퍼즐 →"
+
+------------------------------------
+
+PUZZLE NUMBER DISPLAY
+
+At the top of the screen show:
+
+퍼즐 2 / 20
+
+Progress bar should animate slightly when puzzle is solved.
+
+------------------------------------
+
+FOX CHARACTER ROLE
+
+Use the Lingo Fox character as the guide.
+
+The fox appears in:
+- puzzle introduction
+- wrong answer feedback
+- success celebration
+
+The fox should feel like a mentor guiding the player.
+
+------------------------------------
+
+UI STYLE
+
+Keep the existing visual style:
+
+- dark brown background
+- gold accents
+- elegant puzzle cards
+- detective / mystery aesthetic
+
+Hint modal should look like a detective notebook or investigation notes.
+
+------------------------------------
+
+EXPERIENCE GOAL
+
+The user should feel like they are solving a mystery puzzle, not just answering a quiz.
+
+Focus on:
+
+- curiosity
+- discovery
+- detective atmosphere
+- playful feedback

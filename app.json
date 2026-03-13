@@ -1,28 +1,28 @@
 {
   "expo": {
-    "name": "LinguaAI",
-    "slug": "lingua-ai",
+    "name": "LingoFox",
+    "slug": "lingofox",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "linguaai",
-    "userInterfaceStyle": "light",
+    "scheme": "lingofox",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFF0F6"
+      "backgroundColor": "#1a0a05"
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.myapp",
+      "bundleIdentifier": "com.lingofox.app",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "발음 연습을 위해 마이크가 필요해요",
         "NSSpeechRecognitionUsageDescription": "발음 평가를 위해 음성 인식이 필요해요"
       }
     },
     "android": {
-      "package": "com.myapp",
+      "package": "com.lingofox.app",
       "usesCleartextTraffic": true,
       "permissions": [
         "RECORD_AUDIO",
@@ -30,10 +30,8 @@
         "READ_EXTERNAL_STORAGE"
       ],
       "adaptiveIcon": {
-        "backgroundColor": "#FF6B9D",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#1a0a05"
       }
     },
     "web": {
