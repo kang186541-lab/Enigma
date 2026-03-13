@@ -2680,6 +2680,18 @@ export default function StoryScene() {
 
   const seq = story.sequence;
   const totalScenes = seq.filter((s) => s.kind === "scene").length;
+
+  /* Duck BGM volume when a listening or pronunciation puzzle is active */
+  const BGM_FULL   = 0.4;
+  const BGM_DUCKED = 0.08; // 20 % of 0.4
+
+  useEffect(() => {
+    const item = seq[seqIdx];
+    const needsDuck =
+      item?.kind === "puzzle" &&
+      (item.pType === "listen-choose" || item.pType === "pronunciation");
+    bgmRef.current?.setVolumeAsync(needsDuck ? BGM_DUCKED : BGM_FULL).catch(() => {});
+  }, [seqIdx]);
   const sceneCount = seq.slice(0, seqIdx).filter((s) => s.kind === "scene").length;
 
   function fadeTransition(cb: () => void) {
