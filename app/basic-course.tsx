@@ -421,18 +421,21 @@ export default function BasicCourseScreen() {
       {/* ── Step 0: canvas self-check buttons replace Next ── */}
       {step === 0 && (
         <>
-          {!traced && (
-            <Text style={s.nudge}>
-              {lang === "korean" ? "✏️ 위 캔버스에 글자를 써보세요" : "✏️ Draw the character in the canvas above"}
-            </Text>
-          )}
+          {/* Counter sits above buttons, never overlapping */}
+          <Text style={s.counter}>{subIdx + 1} / {course.chars.length}</Text>
+
           <View style={s.navRow}>
-            {subIdx > 0 && (
-              <Pressable style={({ pressed }) => [s.prevBtn, pressed && { opacity: 0.7 }]} onPress={goPrev}>
-                <Ionicons name="arrow-back" size={18} color={C.goldDark} />
-              </Pressable>
-            )}
-            {/* ✅ Looks good! — only active after drawing, advances to next letter */}
+            {/* 🔄 Try again — always visible, clears canvas */}
+            <Pressable
+              style={({ pressed }) => [s.retryBtn, { flex: 1 }, pressed && { opacity: 0.7 }]}
+              onPress={handleRetry}
+            >
+              <Text style={s.retryBtnTxt}>
+                {lang === "korean" ? "🔄  다시 쓸게요" : lang === "spanish" ? "🔄  Otra vez" : "🔄  Try again"}
+              </Text>
+            </Pressable>
+
+            {/* ✅ Looks good! — always visible, disabled until drawn */}
             <Pressable
               style={({ pressed }) => [s.nextBtn, !traced && s.nextBtnOff, pressed && traced && { opacity: 0.85 }]}
               onPress={traced ? goNext : undefined}
@@ -442,12 +445,6 @@ export default function BasicCourseScreen() {
                 {lang === "korean" ? "✅  잘 썼어요!" : lang === "spanish" ? "✅  ¡Bien hecho!" : "✅  Looks good!"}
               </Text>
             </Pressable>
-            {/* 🔄 Try again — only shown after drawing */}
-            {traced && (
-              <Pressable style={({ pressed }) => [s.retryBtn, pressed && { opacity: 0.7 }]} onPress={handleRetry}>
-                <Text style={s.retryBtnTxt}>🔄</Text>
-              </Pressable>
-            )}
           </View>
         </>
       )}
@@ -533,9 +530,6 @@ export default function BasicCourseScreen() {
 
           {/* ── CANVAS fills remaining space ── */}
           <TracingCanvas key={canvasKey} char={charItem.char} onDrawn={() => setTraced(true)} />
-
-          {/* Counter */}
-          <Text style={s.counter}>{subIdx + 1} / {course.chars.length}</Text>
         </Animated.View>
       )}
 
@@ -738,9 +732,10 @@ const s = StyleSheet.create({
   nextBtnOff: { backgroundColor: "rgba(201,162,39,0.28)" },
   nextBtnTxt: { fontSize: 15, fontFamily: F.header, color: C.bg1, letterSpacing: 0.3 },
   retryBtn: {
-    width: 52, height: 48, borderRadius: 14,
+    height: 48, borderRadius: 20,
     borderWidth: 1.5, borderColor: C.border,
     backgroundColor: C.bg2, alignItems: "center", justifyContent: "center",
+    paddingHorizontal: 12,
   },
-  retryBtnTxt: { fontSize: 20 },
+  retryBtnTxt: { fontSize: 15, fontFamily: F.header, color: C.goldDim, letterSpacing: 0.3, textAlign: "center" },
 });
