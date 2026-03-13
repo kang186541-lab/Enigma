@@ -9,6 +9,7 @@ import {
   PanResponder,
   ScrollView,
   Dimensions,
+  Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -282,13 +283,15 @@ const tc = StyleSheet.create({
    ───────────────────────────────────────────── */
 export default function BasicCourseScreen() {
   const insets = useSafeAreaInsets();
-  const { learningLanguage, updateStats, stats } = useLanguage();
+  const { learningLanguage, nativeLanguage, updateStats, stats } = useLanguage();
   const lang   = (learningLanguage ?? "english") as string;
+  const native = (nativeLanguage ?? "english") as string;
   const course = COURSES[lang] ?? COURSES.english;
 
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
+  const [showIntro,   setShowIntro]   = useState(true);  // intro screen before course
   const [step,        setStep]        = useState(0);
   const [subIdx,      setSubIdx]      = useState(0);
   const [flipped,     setFlipped]     = useState(false);
@@ -325,6 +328,11 @@ export default function BasicCourseScreen() {
   const handleRetry = () => {
     setTraced(false);
     setCanvasKey(k => k + 1);
+  };
+
+  const handleSkip = async () => {
+    try { await AsyncStorage.setItem(DONE_KEY(lang), "true"); } catch {}
+    router.replace("/(tabs)");
   };
 
   const loadProgress = async () => {
@@ -478,6 +486,74 @@ export default function BasicCourseScreen() {
 
     </View>
   );
+
+  /* ── INTRO SCREEN ── */
+  const introText: Record<string, string[]> = {
+    korean: [
+      "🦊 링고 교수의 기초 과정에 오신 걸 환영해요!",
+      "기초 과정은 알파벳부터 시작됩니다.",
+      "글자를 배우고, 듣고, 직접 써보세요!",
+      "기초 과정을 완료하면 모든 기능이 잠금 해제됩니다.",
+    ],
+    english: [
+      "🦊 Welcome to Lingo's Basic Course!",
+      "The basic course starts with the alphabet.",
+      "Learn each letter, listen to pronunciation, and trace it yourself!",
+      "Complete the basic course to unlock all features.",
+    ],
+    spanish: [
+      "🦊 ¡Bienvenido al Curso Básico de Lingo!",
+      "El curso básico comienza con el alfabeto.",
+      "¡Aprende cada letra, escucha la pronunciación y trázala tú mismo!",
+      "Completa el curso básico para desbloquear todas las funciones.",
+    ],
+  };
+  const introLines = introText[native] ?? introText.english;
+  const startLabel = native === "korean" ? "기초 과정 시작하기" : native === "spanish" ? "Comenzar el curso" : "Start Basic Course";
+  const skipLabel  = native === "korean" ? "건너뛰기" : native === "spanish" ? "Omitir" : "Skip";
+  const skipNote   = native === "korean"
+    ? "(이미 알파벳을 알고 있다면 건너뛰어도 됩니다)"
+    : native === "spanish"
+      ? "(Puedes omitirlo si ya conoces el alfabeto)"
+      : "(You can skip if you already know the alphabet)";
+  const courseTitle = native === "korean" ? "기초 과정" : native === "spanish" ? "Curso Básico" : "Basic Course";
+
+  if (showIntro) {
+    return (
+      <View style={[intro.screen, { paddingTop: topPad, paddingBottom: bottomPad + 8 }]}>
+        {/* Fox image */}
+        <Image source={require("../assets/lingo.png")} style={intro.fox} resizeMode="contain" />
+
+        {/* Title */}
+        <Text style={intro.title}>{courseTitle}</Text>
+
+        {/* Description lines */}
+        <View style={intro.textBox}>
+          {introLines.map((line, i) => (
+            <Text key={i} style={intro.line}>{line}</Text>
+          ))}
+        </View>
+
+        {/* ✅ Start button */}
+        <Pressable
+          style={({ pressed }) => [intro.startBtn, pressed && { opacity: 0.85 }]}
+          onPress={() => setShowIntro(false)}
+        >
+          <Text style={intro.startBtnTxt}>✅  {startLabel}</Text>
+        </Pressable>
+
+        {/* ⏭️ Skip button */}
+        <Pressable
+          style={({ pressed }) => [intro.skipBtn, pressed && { opacity: 0.75 }]}
+          onPress={handleSkip}
+        >
+          <Text style={intro.skipBtnTxt}>⏭️  {skipLabel}</Text>
+        </Pressable>
+
+        <Text style={intro.skipNote}>{skipNote}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={[s.screen, { paddingTop: topPad }]}>
@@ -738,4 +814,81 @@ const s = StyleSheet.create({
     paddingHorizontal: 12,
   },
   retryBtnTxt: { fontSize: 15, fontFamily: F.header, color: C.goldDim, letterSpacing: 0.3, textAlign: "center" },
+});
+
+/* ── Intro screen styles ── */
+const intro = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: C.bg1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 28,
+    gap: 20,
+  },
+  fox: {
+    width: 160,
+    height: 160,
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: F.title,
+    color: C.gold,
+    letterSpacing: 2,
+    textAlign: "center",
+  },
+  textBox: {
+    width: "100%",
+    backgroundColor: C.bg2,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: C.border,
+    padding: 20,
+    gap: 10,
+  },
+  line: {
+    fontSize: 14,
+    fontFamily: F.body,
+    color: C.parchment,
+    lineHeight: 22,
+    textAlign: "center",
+  },
+  startBtn: {
+    width: "100%",
+    backgroundColor: C.gold,
+    borderRadius: 20,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  startBtnTxt: {
+    fontSize: 16,
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 0.5,
+  },
+  skipBtn: {
+    width: "100%",
+    borderRadius: 20,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: C.border,
+    backgroundColor: "transparent",
+  },
+  skipBtnTxt: {
+    fontSize: 15,
+    fontFamily: F.header,
+    color: C.goldDim,
+    letterSpacing: 0.3,
+  },
+  skipNote: {
+    fontSize: 12,
+    fontFamily: F.body,
+    color: "rgba(201,162,39,0.5)",
+    textAlign: "center",
+    lineHeight: 18,
+  },
 });
