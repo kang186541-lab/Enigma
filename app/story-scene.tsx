@@ -328,7 +328,7 @@ const STORIES: Record<string, Story> = {
             encoded: "IFMMP",
             answer: { en: "HELLO", ko: "안녕", es: "HOLA" },
             shift: 1,
-            hint: { en: "Shift each letter back by 1 (B→A, C→B…)", ko: "각 글자를 한 칸 앞으로 당겨보게", es: "Retrocede cada letra 1 posición (B→A, C→B…)" },
+            hint: { en: "Move each letter one step backward (B→A, C→B, D→C)", ko: "각 글자를 한 칸 뒤로 당겨보게 💡 예시: B→A, C→B, D→C", es: "Retrocede cada letra 1 posición 💡 Ejemplo: B→A, C→B, D→C" },
             opts: [
               { en: "HELLO", ko: "안녕", es: "HOLA" },
               { en: "WORLD", ko: "세계", es: "MUNDO" },
@@ -340,7 +340,7 @@ const STORIES: Record<string, Story> = {
             encoded: "MJOHP",
             answer: { en: "LINGO", ko: "링고", es: "LINGO" },
             shift: 1,
-            hint: { en: "The detective's name — shift each letter back by 1", ko: "탐정의 이름 — 각 글자를 한 칸 앞으로 당겨보게", es: "El nombre del detective — retrocede 1 letra" },
+            hint: { en: "The detective's name — move each letter one step backward", ko: "탐정의 이름 — 각 글자를 한 칸 뒤로 당겨보게", es: "El nombre del detective — retrocede cada letra 1 posición" },
             opts: [
               { en: "BINGO", ko: "빙고", es: "BINGO" },
               { en: "LINGO", ko: "링고", es: "LINGO" },
@@ -352,7 +352,7 @@ const STORIES: Record<string, Story> = {
             encoded: "MFYJDPO",
             answer: { en: "LEXICON", ko: "렉시콘", es: "LÉXICO" },
             shift: 1,
-            hint: { en: "The secret society's name — shift each letter back", ko: "비밀 결사의 이름 — 각 글자를 한 칸 앞으로 당겨보게", es: "El nombre de la sociedad secreta — retrocede cada letra" },
+            hint: { en: "The secret society's name — move each letter one step backward", ko: "비밀 결사의 이름 — 각 글자를 한 칸 뒤로 당겨보게", es: "El nombre de la sociedad secreta — retrocede cada letra 1 posición" },
             opts: [
               { en: "MISSION", ko: "임무", es: "MISIÓN" },
               { en: "SECTION", ko: "부문", es: "SECCIÓN" },
