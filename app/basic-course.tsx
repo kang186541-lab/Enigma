@@ -12,7 +12,7 @@ import {
   Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Speech from "expo-speech";
 import * as Haptics from "expo-haptics";
@@ -418,9 +418,23 @@ const tc = StyleSheet.create({
 /* ─────────────────────────────────────────────
    Main Screen
    ───────────────────────────────────────────── */
+type ReviewSection = "write" | "listen" | "speak" | "full";
+const REVIEW_TS_KEY = (section: ReviewSection, lang: string) => `basicReviewTs_${section}_${lang}`;
+
+function daysAgoLabel(ts: number | null, native: string): string {
+  if (!ts) return native === "korean" ? "미복습" : native === "spanish" ? "Sin repasar" : "Not reviewed";
+  const days = Math.floor((Date.now() - ts) / 86400000);
+  if (days === 0) return native === "korean" ? "오늘" : native === "spanish" ? "Hoy" : "Today";
+  if (days === 1) return native === "korean" ? "1일 전" : native === "spanish" ? "Ayer" : "Yesterday";
+  return native === "korean" ? `${days}일 전` : native === "spanish" ? `Hace ${days} días` : `${days} days ago`;
+}
+
 export default function BasicCourseScreen() {
   const insets = useSafeAreaInsets();
   const { learningLanguage, nativeLanguage, updateStats, stats } = useLanguage();
+  const { review } = useLocalSearchParams<{ review?: string }>();
+  const isReviewMode = review === "1";
+
   const lang   = (learningLanguage ?? "english") as string;
   const native = (nativeLanguage ?? "english") as string;
   const course = COURSES[lang] ?? COURSES.english;
@@ -428,7 +442,13 @@ export default function BasicCourseScreen() {
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  const [showIntro,   setShowIntro]   = useState(true);  // intro screen before course
+  const [showReviewMenu, setShowReviewMenu] = useState(isReviewMode);
+  const [reviewSection,  setReviewSection]  = useState<ReviewSection | null>(null);
+  const [reviewTs,       setReviewTs]       = useState<Record<ReviewSection, number | null>>({
+    write: null, listen: null, speak: null, full: null,
+  });
+
+  const [showIntro,   setShowIntro]   = useState(!isReviewMode);  // skip intro in review mode
   const [step,        setStep]        = useState(0);
   const [subIdx,      setSubIdx]      = useState(0);
   const [flipped,     setFlipped]     = useState(false);
@@ -453,7 +473,36 @@ export default function BasicCourseScreen() {
   const totalItems   = currentItems.length || 1;
   const overallPct   = (step * 100 + (subIdx / totalItems) * 100) / totalSteps / 100;
 
-  useEffect(() => { loadProgress(); }, []);
+  useEffect(() => { if (!isReviewMode) loadProgress(); }, []);
+
+  useEffect(() => {
+    if (!isReviewMode) return;
+    const sections: ReviewSection[] = ["write", "listen", "speak", "full"];
+    Promise.all(sections.map(s => AsyncStorage.getItem(REVIEW_TS_KEY(s, lang)))).then(vals => {
+      setReviewTs({
+        write:  vals[0] ? Number(vals[0]) : null,
+        listen: vals[1] ? Number(vals[1]) : null,
+        speak:  vals[2] ? Number(vals[2]) : null,
+        full:   vals[3] ? Number(vals[3]) : null,
+      });
+    });
+  }, [isReviewMode, lang]);
+
+  const startReviewSection = async (section: ReviewSection) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    await AsyncStorage.setItem(REVIEW_TS_KEY(section, lang), String(Date.now()));
+    setReviewSection(section);
+    setSubIdx(0);
+    setFlipped(false); setTraced(false); setAudioPlayed(false);
+    setGreetPhase("listen"); setGreetScore(null);
+    setCanvasKey(k => k + 1);
+    if (section === "speak") {
+      setStep(2);
+    } else {
+      setStep(0);
+    }
+    setShowReviewMenu(false);
+  };
 
   useEffect(() => {
     setSubIdx(0); setFlipped(false); setTraced(false); setAudioPlayed(false);
@@ -542,6 +591,15 @@ export default function BasicCourseScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (step === 3) { finishCourse(); return; }
     if (subIdx >= currentItems.length - 1) {
+      // In review mode: return to section menu after finishing items
+      if (isReviewMode) {
+        Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
+          setShowReviewMenu(true);
+          setReviewSection(null);
+          Animated.timing(fadeAnim, { toValue: 1, duration: 220, useNativeDriver: true }).start();
+        });
+        return;
+      }
       Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
         setStep(s => s + 1);
         Animated.timing(fadeAnim, { toValue: 1, duration: 220, useNativeDriver: true }).start();
@@ -549,7 +607,7 @@ export default function BasicCourseScreen() {
       saveProgress(step + 1, 0);
     } else {
       setSubIdx(i => i + 1);
-      saveProgress(step, subIdx + 1);
+      if (!isReviewMode) saveProgress(step, subIdx + 1);
     }
   };
 
@@ -682,9 +740,10 @@ export default function BasicCourseScreen() {
 
   const canNext = step === 3
     ? true
-    : step === 0 ? traced          // must confirm drawing (✅ tapped)
+    : step === 0
+      ? (isReviewMode && reviewSection === "listen" ? audioPlayed : traced)
     : step === 1 ? flipped
-    : greetPhase === "pass";       // step 2: must pass pronunciation
+    : (isReviewMode ? (greetPhase === "pass" || greetPhase === "fail") : greetPhase === "pass");
 
   const frontRotate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["0deg", "180deg"] });
   const backRotate  = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["180deg", "360deg"] });
@@ -693,6 +752,8 @@ export default function BasicCourseScreen() {
   const traceLabel   = native === "korean" ? "✍️ 따라 써보기" : native === "spanish" ? "✍️ Trazar" : "✍️ Trace it";
   const nextLabel    = step === 3
     ? (native === "korean" ? "시작하기 🚀" : native === "spanish" ? "¡Empezar! 🚀" : "Start Learning 🚀")
+    : isLastOfStep && isReviewMode
+      ? (native === "korean" ? "완료 ✓" : native === "spanish" ? "Listo ✓" : "Done ✓")
     : isLastOfStep
       ? (native === "korean" ? "다음 단계 →" : native === "spanish" ? "Siguiente paso →" : "Next Step →")
       : (native === "korean" ? "다음 →"      : native === "spanish" ? "Siguiente →"      : "Next →");
@@ -793,6 +854,85 @@ export default function BasicCourseScreen() {
       : "(You can skip if you already know the alphabet)";
   const courseTitle = native === "korean" ? "기초 과정" : native === "spanish" ? "Curso Básico" : "Basic Course";
 
+  /* ── REVIEW MENU SCREEN ── */
+  if (showReviewMenu) {
+    const charCount = course.chars.length;
+    const reviewCards: { section: ReviewSection; icon: string; title: string; desc: string; sub: string }[] = [
+      {
+        section: "write",
+        icon: "✏️",
+        title: native === "korean" ? "알파벳 쓰기" : native === "spanish" ? "Escritura" : "Writing",
+        desc:  native === "korean" ? "글자를 보고 직접 써보기" : native === "spanish" ? "Trazar las letras" : "Trace the letters",
+        sub:   `${charCount}${native === "korean" ? "개" : native === "spanish" ? " letras" : " letters"}`,
+      },
+      {
+        section: "listen",
+        icon: "👂",
+        title: native === "korean" ? "듣기 연습" : native === "spanish" ? "Escucha" : "Listening",
+        desc:  native === "korean" ? "발음을 듣고 글자 확인하기" : native === "spanish" ? "Escucha y revisa" : "Listen to pronunciation",
+        sub:   `${charCount}${native === "korean" ? "개" : native === "spanish" ? " letras" : " letters"}`,
+      },
+      {
+        section: "speak",
+        icon: "🎤",
+        title: native === "korean" ? "발음 연습" : native === "spanish" ? "Pronunciación" : "Speaking",
+        desc:  native === "korean" ? "글자를 보고 따라 말하기" : native === "spanish" ? "Repite en voz alta" : "Say the phrase aloud",
+        sub:   `${course.greetings.length}${native === "korean" ? "개" : native === "spanish" ? " frases" : " phrases"}`,
+      },
+      {
+        section: "full",
+        icon: "🔄",
+        title: native === "korean" ? "전체 복습" : native === "spanish" ? "Repaso completo" : "Full Review",
+        desc:  native === "korean" ? "듣기 + 발음 + 쓰기 전체" : native === "spanish" ? "Escucha + pronunciación + escritura" : "Listening + speaking + writing",
+        sub:   native === "korean" ? "전체" : native === "spanish" ? "Todo" : "All",
+      },
+    ];
+    return (
+      <View style={[s.screen, { paddingTop: topPad, paddingBottom: bottomPad + 8 }]}>
+        {/* Header */}
+        <View style={rv.header}>
+          <Pressable style={({ pressed }) => [rv.backBtn, pressed && { opacity: 0.7 }]} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={22} color={C.gold} />
+          </Pressable>
+          <Text style={rv.headerTitle}>
+            {native === "korean" ? "기초 과정 복습" : native === "spanish" ? "Repaso del curso" : "Course Review"}
+          </Text>
+          <View style={{ width: 36 }} />
+        </View>
+
+        <Text style={rv.subtitle}>
+          {native === "korean" ? "복습할 섹션을 선택하세요" : native === "spanish" ? "Elige una sección para repasar" : "Choose a section to review"}
+        </Text>
+
+        <ScrollView contentContainerStyle={rv.list} showsVerticalScrollIndicator={false}>
+          {reviewCards.map(card => (
+            <Pressable
+              key={card.section}
+              style={({ pressed }) => [rv.card, pressed && { opacity: 0.85, transform: [{ scale: 0.985 }] }]}
+              onPress={() => startReviewSection(card.section)}
+            >
+              <View style={rv.cardLeft}>
+                <Text style={rv.cardIcon}>{card.icon}</Text>
+                <View style={rv.cardText}>
+                  <Text style={rv.cardTitle}>{card.title}</Text>
+                  <Text style={rv.cardDesc}>{card.desc}</Text>
+                </View>
+              </View>
+              <View style={rv.cardRight}>
+                <Text style={rv.cardSub}>{card.sub}</Text>
+                <Text style={rv.cardTs}>
+                  {native === "korean" ? "마지막: " : native === "spanish" ? "Último: " : "Last: "}
+                  {daysAgoLabel(reviewTs[card.section], native)}
+                </Text>
+                <Ionicons name="chevron-forward" size={14} color={C.goldDark} style={{ marginTop: 2 }} />
+              </View>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
+
   if (showIntro) {
     return (
       <View style={[intro.screen, { paddingTop: topPad, paddingBottom: bottomPad + 8 }]}>
@@ -835,12 +975,26 @@ export default function BasicCourseScreen() {
 
       {/* ── TOP BAR ── */}
       <View style={s.topBar}>
-        <Text style={s.stepLabel}>{course.stepNames[step]}</Text>
+        {isReviewMode ? (
+          <Pressable style={({ pressed }) => [s.reviewBackBtn, pressed && { opacity: 0.7 }]} onPress={() => setShowReviewMenu(true)}>
+            <Ionicons name="arrow-back" size={18} color={C.goldDark} />
+          </Pressable>
+        ) : (
+          <Text style={s.stepLabel}>{course.stepNames[step]}</Text>
+        )}
         <View style={s.lingoStrip}>
           <Text style={s.lingoStripFox}>🦊</Text>
           <Text style={s.lingoStripText}>{course.lingoTips[step]}</Text>
         </View>
-        <Text style={s.stepNum}>{step + 1}/{totalSteps}</Text>
+        {isReviewMode ? (
+          <Pressable style={({ pressed }) => [s.skipPill, pressed && { opacity: 0.7 }]} onPress={goNext}>
+            <Text style={s.skipPillTxt}>
+              {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+            </Text>
+          </Pressable>
+        ) : (
+          <Text style={s.stepNum}>{step + 1}/{totalSteps}</Text>
+        )}
       </View>
 
       {/* ── PROGRESS BAR ── */}
@@ -1198,6 +1352,17 @@ const s = StyleSheet.create({
     backgroundColor: "rgba(201,162,39,0.12)", borderWidth: 1.5, borderColor: C.border,
   },
   skipSmTxt: { fontSize: 14, fontFamily: F.bodySemi, color: C.gold },
+
+  reviewBackBtn: {
+    width: 34, height: 34, borderRadius: 10,
+    alignItems: "center", justifyContent: "center",
+    backgroundColor: "rgba(201,162,39,0.10)",
+  },
+  skipPill: {
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 14,
+    backgroundColor: "rgba(201,162,39,0.10)",
+  },
+  skipPillTxt: { fontSize: 12, fontFamily: F.bodySemi, color: C.goldDark },
 });
 
 /* ── Intro screen styles ── */
@@ -1275,4 +1440,39 @@ const intro = StyleSheet.create({
     textAlign: "center",
     lineHeight: 18,
   },
+});
+
+/* ── Review menu styles ── */
+const rv = StyleSheet.create({
+  header: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 16, paddingVertical: 12,
+    borderBottomWidth: 1, borderBottomColor: C.border,
+  },
+  backBtn: {
+    width: 36, height: 36, borderRadius: 10,
+    alignItems: "center", justifyContent: "center",
+    backgroundColor: "rgba(201,162,39,0.10)",
+  },
+  headerTitle: { fontSize: 18, fontFamily: F.header, color: C.gold, letterSpacing: 0.5 },
+  subtitle: {
+    fontSize: 13, fontFamily: F.body, color: C.goldDim, fontStyle: "italic",
+    textAlign: "center", paddingVertical: 14,
+  },
+  list: { paddingHorizontal: 16, gap: 12, paddingBottom: 24 },
+  card: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    backgroundColor: C.bg2, borderRadius: 18,
+    paddingHorizontal: 18, paddingVertical: 16,
+    borderWidth: 1.5, borderColor: C.border,
+    shadowColor: C.gold, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.10, shadowRadius: 10, elevation: 4,
+  },
+  cardLeft:  { flexDirection: "row", alignItems: "center", gap: 14, flex: 1 },
+  cardIcon:  { fontSize: 28 },
+  cardText:  { gap: 3, flex: 1 },
+  cardTitle: { fontSize: 15, fontFamily: F.header, color: C.gold },
+  cardDesc:  { fontSize: 12, fontFamily: F.body, color: C.parchment, opacity: 0.8 },
+  cardRight: { alignItems: "flex-end", gap: 2 },
+  cardSub:   { fontSize: 12, fontFamily: F.bodySemi, color: C.goldDim },
+  cardTs:    { fontSize: 11, fontFamily: F.body, color: "rgba(201,162,39,0.5)" },
 });
