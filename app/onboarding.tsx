@@ -7,6 +7,7 @@ import {
   Platform,
   Image,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -19,7 +20,9 @@ import { C, F } from "@/constants/theme";
 
 const DONE_KEY = (lang: string) => `basicCourseCompleted_${lang}`;
 
-const lingoImg = require("@/assets/lingo.png");
+const rudySplashImg = require("@/assets/rudy_splash.png");
+const { width: SCREEN_W } = Dimensions.get("window");
+const SPLASH_SIZE = Math.min(SCREEN_W - 48, 300);
 
 type Step = 1 | 2;
 
@@ -122,10 +125,9 @@ export default function OnboardingScreen() {
         {/* Decorative top border */}
         <View style={styles.topBorder} />
 
-        {/* Logo */}
-        <View style={styles.logoRow}>
-          <Image source={lingoImg} style={styles.logoImg} resizeMode="contain" />
-          <Text style={styles.logoText}>Enigma</Text>
+        {/* Rudy splash illustration */}
+        <View style={styles.splashWrap}>
+          <Image source={rudySplashImg} style={styles.splashImg} resizeMode="contain" />
         </View>
 
         {/* Step dots */}
@@ -233,12 +235,15 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { flexGrow: 1 },
   topBorder: { height: 2, backgroundColor: C.gold, marginHorizontal: 24, marginTop: 8, borderRadius: 1 },
-  logoRow: {
-    flexDirection: "column", alignItems: "center", justifyContent: "center",
-    gap: 4, marginTop: 8, marginBottom: 2,
+  splashWrap: {
+    alignItems: "center", justifyContent: "center",
+    marginTop: 4, marginBottom: 4,
   },
-  logoImg: { width: 140, height: 140 },
-  logoText: { fontSize: 28, fontFamily: F.title, color: C.gold, letterSpacing: 3 },
+  splashImg: {
+    width: SPLASH_SIZE,
+    height: SPLASH_SIZE,
+    borderRadius: 14,
+  },
   dots: { flexDirection: "row", justifyContent: "center", gap: 8, marginBottom: 16 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.goldDark },
   dotActive: { width: 26, backgroundColor: C.gold },

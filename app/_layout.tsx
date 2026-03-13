@@ -14,7 +14,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef } from "react";
-import { View, Text, Image, Animated, StyleSheet } from "react-native";
+import { View, Text, Image, Animated, StyleSheet, Dimensions } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -24,19 +24,21 @@ import { C } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
 
-const lingoImg = require("@/assets/lingo.png");
+const rudySplashImg = require("@/assets/rudy_splash.png");
+const { width: SCREEN_W } = Dimensions.get("window");
+const IMG_SIZE = Math.min(SCREEN_W - 40, 360);
 
-function LingoLoadingScreen() {
-  const bounceAnim  = useRef(new Animated.Value(0)).current;
+function LoadingScreen() {
   const fadeAnim    = useRef(new Animated.Value(0)).current;
   const flickerAnim = useRef(new Animated.Value(1)).current;
+  const floatAnim   = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
     Animated.loop(
       Animated.sequence([
-        Animated.timing(bounceAnim, { toValue: -16, duration: 420, useNativeDriver: true }),
-        Animated.timing(bounceAnim, { toValue: 0,   duration: 420, useNativeDriver: true }),
+        Animated.timing(floatAnim, { toValue: -8, duration: 1800, useNativeDriver: true }),
+        Animated.timing(floatAnim, { toValue: 0,  duration: 1800, useNativeDriver: true }),
       ])
     ).start();
     Animated.loop(
@@ -51,17 +53,17 @@ function LingoLoadingScreen() {
 
   return (
     <Animated.View style={[ls.root, { opacity: fadeAnim }]}>
-      <View style={ls.lantern}>
-        <Animated.Text style={[ls.lanternEmoji, { opacity: flickerAnim }]}>🔍</Animated.Text>
-      </View>
       <Animated.Image
-        source={lingoImg}
-        style={[ls.lingo, { transform: [{ translateY: bounceAnim }] }]}
+        source={rudySplashImg}
+        style={[ls.illustration, { transform: [{ translateY: floatAnim }] }]}
+        resizeMode="contain"
       />
       <Text style={ls.title}>Enigma Language Adventure</Text>
       <Text style={ls.sub}>Unravelling languages, one clue at a time...</Text>
       <View style={ls.dots}>
-        {[0, 1, 2].map((i) => <Animated.View key={i} style={[ls.dot, { opacity: flickerAnim }]} />)}
+        {[0, 1, 2].map((i) => (
+          <Animated.View key={i} style={[ls.dot, { opacity: flickerAnim }]} />
+        ))}
       </View>
     </Animated.View>
   );
@@ -73,18 +75,21 @@ const ls = StyleSheet.create({
     backgroundColor: C.bg1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
+    paddingHorizontal: 20,
   },
-  lantern: { marginBottom: 4 },
-  lanternEmoji: { fontSize: 36 },
-  lingo: { width: 200, height: 200, resizeMode: "contain" },
+  illustration: {
+    width: IMG_SIZE,
+    height: IMG_SIZE,
+    borderRadius: 16,
+    marginBottom: 8,
+  },
   title: {
     fontSize: 22,
     fontFamily: "Cinzel_900Black",
     color: C.gold,
     letterSpacing: 1,
     textAlign: "center",
-    paddingHorizontal: 20,
   },
   sub: {
     fontSize: 14,
@@ -92,9 +97,9 @@ const ls = StyleSheet.create({
     color: C.goldDim,
     fontStyle: "italic",
     textAlign: "center",
-    paddingHorizontal: 40,
+    paddingHorizontal: 20,
   },
-  dots: { flexDirection: "row", gap: 8, marginTop: 8 },
+  dots: { flexDirection: "row", gap: 8, marginTop: 4 },
   dot:  { width: 7, height: 7, borderRadius: 4, backgroundColor: C.gold },
 });
 
@@ -123,7 +128,7 @@ export default function RootLayout() {
     if (fontsLoaded || fontError) SplashScreen.hideAsync();
   }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded && !fontError) return <LingoLoadingScreen />;
+  if (!fontsLoaded && !fontError) return <LoadingScreen />;
 
   return (
     <ErrorBoundary>
