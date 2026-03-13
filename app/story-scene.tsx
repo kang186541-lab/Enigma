@@ -44,6 +44,7 @@ async function ttsPreload(text: string, lang: string, apiBase: string) {
     if (_ttsCacheWeb.has(key)) return;
     const audio = new (window as any).Audio(urlStr) as HTMLAudioElement;
     audio.preload = "auto";
+    audio.volume = 1.0;
     audio.load();
     _ttsCacheWeb.set(key, audio);
   } else {
@@ -51,7 +52,7 @@ async function ttsPreload(text: string, lang: string, apiBase: string) {
     try {
       const { sound } = await Audio.Sound.createAsync(
         { uri: urlStr },
-        { shouldPlay: false }
+        { shouldPlay: false, volume: 1.0 }
       );
       _ttsCacheNative.set(key, sound);
     } catch {}
@@ -74,12 +75,14 @@ function ttsPlayCached(
     const cached = _ttsCacheWeb.get(key);
     if (cached) {
       cached.currentTime = 0;
+      cached.volume = 1.0;
       setPlaying(true);
       cached.play().catch(() => {});
       cached.onended = () => setPlaying(false);
       cached.onerror = () => setPlaying(false);
     } else {
       const audio = new (window as any).Audio(urlStr);
+      audio.volume = 1.0;
       setPlaying(true);
       audio.play().catch(() => {});
       audio.onended = () => setPlaying(false);
@@ -93,6 +96,7 @@ function ttsPlayCached(
       (async () => {
         try {
           await cached.setPositionAsync(0);
+          await cached.setVolumeAsync(1.0);
           await cached.playAsync();
           cached.setOnPlaybackStatusUpdate((s) => {
             if (s.isLoaded && s.didJustFinish) setPlaying(false);
@@ -103,8 +107,12 @@ function ttsPlayCached(
       setPlaying(true);
       (async () => {
         try {
-          const { sound } = await Audio.Sound.createAsync({ uri: urlStr }, { shouldPlay: false });
+          const { sound } = await Audio.Sound.createAsync(
+            { uri: urlStr },
+            { shouldPlay: false, volume: 1.0 }
+          );
           _ttsCacheNative.set(key, sound);
+          await sound.setVolumeAsync(1.0);
           await sound.playAsync();
           sound.setOnPlaybackStatusUpdate((s) => {
             if (s.isLoaded && s.didJustFinish) setPlaying(false);
