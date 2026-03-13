@@ -58,7 +58,7 @@ function LingoLoadingScreen() {
         source={lingoImg}
         style={[ls.lingo, { transform: [{ translateY: bounceAnim }] }]}
       />
-      <Text style={ls.title}>Enigma</Text>
+      <Text style={ls.title}>Enigma Language Adventure</Text>
       <Text style={ls.sub}>Unravelling languages, one clue at a time...</Text>
       <View style={ls.dots}>
         {[0, 1, 2].map((i) => <Animated.View key={i} style={[ls.dot, { opacity: flickerAnim }]} />)}
@@ -79,10 +79,12 @@ const ls = StyleSheet.create({
   lanternEmoji: { fontSize: 36 },
   lingo: { width: 200, height: 200, resizeMode: "contain" },
   title: {
-    fontSize: 30,
+    fontSize: 22,
     fontFamily: "Cinzel_900Black",
     color: C.gold,
-    letterSpacing: 2,
+    letterSpacing: 1,
+    textAlign: "center",
+    paddingHorizontal: 20,
   },
   sub: {
     fontSize: 14,
