@@ -17,6 +17,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import * as FileSystem from "expo-file-system";
 import { useLanguage, getDefaultLearning, NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
@@ -399,6 +400,7 @@ export default function SpeakScreen() {
   const mediaRecorderRef = useRef<any>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const autoStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nativeRecordingRef = useRef<Audio.Recording | null>(null);
 
   const weakKey = `speak_weak_words_${activeLang}`;
   const lastSeenKey = `speak_last_seen_${activeLang}`;
@@ -406,6 +408,10 @@ export default function SpeakScreen() {
   const resetPracticeState = useCallback(() => {
     if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
     if (mediaRecorderRef.current?.state === "recording") { mediaRecorderRef.current.stop(); }
+    if (nativeRecordingRef.current) {
+      nativeRecordingRef.current.stopAndUnloadAsync().catch(() => {});
+      nativeRecordingRef.current = null;
+    }
     setRecordState("idle");
     recordStateRef.current = "idle";
     setScore(null);
@@ -511,21 +517,124 @@ export default function SpeakScreen() {
     Animated.timing(pulseAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
   };
 
+  const processScoreData = (data: any) => {
+    const scoreVal = data.score ?? 0;
+    setScore(scoreVal);
+    setAccuracyScore(data.accuracyScore ?? null);
+    setFluencyScore(data.fluencyScore ?? null);
+    setCompletenessScore(data.completenessScore ?? null);
+    setGptFeedback(data.feedback ?? "");
+    setRecognizedText(data.recognizedText ?? "");
+    setWordResults(data.words ?? []);
+    Animated.timing(scoreAnim, { toValue: scoreVal / 100, duration: 900, useNativeDriver: false }).start();
+    return scoreVal;
+  };
+
+  const stopNativeRecording = async () => {
+    const rec = nativeRecordingRef.current;
+    if (!rec) return;
+    stopPulse();
+    setRecordState("processing");
+    recordStateRef.current = "processing";
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      await rec.stopAndUnloadAsync();
+      const uri = rec.getURI();
+      nativeRecordingRef.current = null;
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      if (!uri) throw new Error("No audio URI");
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: "base64" as any,
+      });
+      const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+      const apiRes = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          word: phrase?.word ?? "",
+          lang: phrase?.speechLang ?? "en-US",
+          audio: base64,
+          mimeType: "audio/m4a",
+        }),
+      });
+      if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
+      const data = await apiRes.json();
+      const scoreVal = processScoreData(data);
+      if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase?.word ?? ""); }
+      else { await removeWeakWord(phrase?.word ?? ""); }
+      const xpEarned = scoreVal >= 90 ? 30 : 15;
+      setXpGain(xpEarned);
+      updateStats({ xp: statsRef.current.xp + xpEarned });
+      const newCount = pronCountRef.current + 1;
+      pronCountRef.current = newCount;
+      setPronCount(newCount);
+      await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch(() => {});
+      await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase?.word ?? "").catch(() => {});
+      const newLevel = countToPronLevel(newCount);
+      if (newLevel !== pronLevelRef.current) {
+        pronLevelRef.current = newLevel;
+        setPronLevel(newLevel);
+        setLevelUpNewLevel(newLevel);
+        setLevelUpShow(true);
+      }
+    } catch {
+      setSttError("채점 중 오류가 발생했습니다. 다시 시도해 주세요.");
+    } finally {
+      setRecordState("done");
+      recordStateRef.current = "done";
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+  };
+
   const handleRecord = () => {
     if (!phrase || recordState === "processing") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
     // Second tap while recording → stop early
-    if (recordState === "listening" && mediaRecorderRef.current?.state === "recording") {
+    if (recordState === "listening") {
       if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
-      mediaRecorderRef.current.stop();
+      if (Platform.OS !== "web" && nativeRecordingRef.current) {
+        stopNativeRecording();
+      } else if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
       return;
     }
 
+    // Native path (iOS / Android) — use expo-av Audio.Recording
     if (Platform.OS !== "web") {
-      setSttError("발음 평가는 현재 웹 브라우저에서만 지원됩니다.");
-      setRecordState("done");
-      recordStateRef.current = "done";
+      (async () => {
+        try {
+          const { granted } = await Audio.requestPermissionsAsync();
+          if (!granted) {
+            setSttError("마이크 권한을 허용해주세요.\n(설정 → 앱 → LingoFox → 마이크)");
+            setRecordState("done");
+            recordStateRef.current = "done";
+            return;
+          }
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+          const recording = new Audio.Recording();
+          await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+          await recording.startAsync();
+          nativeRecordingRef.current = recording;
+          setRecordState("listening");
+          recordStateRef.current = "listening";
+          setScore(null);
+          setAccuracyScore(null);
+          setFluencyScore(null);
+          setCompletenessScore(null);
+          setGptFeedback("");
+          setRecognizedText("");
+          setWordResults([]);
+          setSttError("");
+          startPulse();
+          autoStopTimerRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
+        } catch {
+          setSttError("마이크를 시작할 수 없습니다. 다시 시도해 주세요.");
+          setRecordState("done");
+          recordStateRef.current = "done";
+        }
+      })();
       return;
     }
 
@@ -586,22 +695,12 @@ export default function SpeakScreen() {
           if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
           const data = await apiRes.json();
 
-          const scoreVal = data.score ?? 0;
-          setScore(scoreVal);
-          setAccuracyScore(data.accuracyScore ?? null);
-          setFluencyScore(data.fluencyScore ?? null);
-          setCompletenessScore(data.completenessScore ?? null);
-          setGptFeedback(data.feedback ?? "");
-          setRecognizedText(data.recognizedText ?? "");
-          setWordResults(data.words ?? []);
-          Animated.timing(scoreAnim, { toValue: scoreVal / 100, duration: 900, useNativeDriver: false }).start();
+          const scoreVal = processScoreData(data);
           if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase.word); }
           else { await removeWeakWord(phrase.word); }
           const xpEarned = scoreVal >= 90 ? 30 : 15;
           setXpGain(xpEarned);
           updateStats({ xp: statsRef.current.xp + xpEarned });
-
-          // Pronunciation level progression
           const newCount = pronCountRef.current + 1;
           pronCountRef.current = newCount;
           setPronCount(newCount);
