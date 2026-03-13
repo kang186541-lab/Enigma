@@ -22,7 +22,7 @@ import { LevelUpModal } from "@/components/LevelUpModal";
 import { C, F } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
-const lingoImg = require("@/assets/lingo.png");
+const rudyBadgeImg = require("@/assets/rudy_badge.png");
 
 function getGreeting(t: (k: string) => string) {
   const h = new Date().getHours();
@@ -237,9 +237,9 @@ export default function HomeScreen() {
             <Text style={styles.headerTitle} numberOfLines={1}>Enigma ✨</Text>
           </View>
           <Image
-            source={lingoImg}
+            source={rudyBadgeImg}
             style={styles.lingoHeader}
-            resizeMode="contain"
+            resizeMode="cover"
           />
         </View>
 
@@ -476,9 +476,10 @@ const styles = StyleSheet.create({
   greeting: { fontSize: 14, fontFamily: F.body, color: C.goldDim, fontStyle: "italic", marginBottom: 4 },
   headerTitle: { fontSize: 30, fontFamily: F.title, color: C.gold, letterSpacing: 3 },
   lingoHeader: {
-    width: 180, height: 200, marginLeft: 4, marginTop: -18, marginRight: -8,
-    backgroundColor: "transparent",
-    ...(Platform.OS === "web" ? { mixBlendMode: "multiply" } as any : {}),
+    width: 72, height: 72, borderRadius: 36,
+    overflow: "hidden",
+    borderWidth: 2, borderColor: C.gold,
+    marginLeft: 8,
   },
   levelRow: { marginBottom: 10 },
   levelBadge: {

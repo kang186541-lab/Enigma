@@ -13,7 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Level } from "@/context/LanguageContext";
 import { C, F } from "@/constants/theme";
 
-const lingoImg = require("@/assets/lingo.png");
+const rudyBadgeImg = require("@/assets/rudy_badge.png");
 const { width: SCREEN_W } = Dimensions.get("window");
 
 const EMOJI_CONFETTI = ["🔍", "📜", "🕯️", "🦊", "✦", "⭐", "👑", "🗝️", "🔮", "📖"];
@@ -197,7 +197,7 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
 
             <View style={styles.lingoWrap}>
               <Animated.Image
-                source={lingoImg}
+                source={rudyBadgeImg}
                 style={[styles.lingo, { transform: [{ translateY: bounceAnim }] }]}
               />
             </View>
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   card: { width: "100%", borderRadius: 28, overflow: "hidden", borderWidth: 2, borderColor: C.gold },
   gradient: { padding: 24, alignItems: "center", gap: 8, overflow: "hidden" },
   lingoWrap: { width: 130, height: 130, alignItems: "center", justifyContent: "center" },
-  lingo: { width: 120, height: 120, resizeMode: "contain" },
+  lingo: { width: 120, height: 120, borderRadius: 60, overflow: "hidden" },
   title: {
     fontSize: 28,
     fontFamily: F.title,

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, Image, Animated, StyleSheet, ViewStyle, Platform } from "react-native";
 import { C } from "@/constants/theme";
 
-const lingoImg = require("@/assets/lingo.png");
+const rudyBadgeImg = require("@/assets/rudy_badge.png");
 
 interface RudyMascotProps {
   size?: number;
@@ -68,10 +68,10 @@ export function RudyMascot({
 
   const imgNode = (
     <Animated.Image
-      source={lingoImg}
+      source={rudyBadgeImg}
       style={[
         styles.img,
-        { width: size, height: size },
+        { width: size, height: size, borderRadius: size / 2 },
         { transform: [{ translateY: bounceAnim }, { rotate }] },
       ]}
     />
@@ -99,9 +99,8 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "flex-end" },
   imgWrap: { position: "relative", alignItems: "center", justifyContent: "center" },
   img: {
-    resizeMode: "contain",
-    backgroundColor: "transparent",
-    ...(Platform.OS === "web" ? { mixBlendMode: "multiply" } as any : {}),
+    resizeMode: "cover",
+    overflow: "hidden",
   },
   circle: {
     backgroundColor: "rgba(201,162,39,0.15)",

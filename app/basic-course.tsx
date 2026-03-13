@@ -953,7 +953,7 @@ export default function BasicCourseScreen() {
     return (
       <View style={[intro.screen, { paddingTop: topPad, paddingBottom: bottomPad + 8 }]}>
         {/* Fox image */}
-        <Image source={require("../assets/lingo.png")} style={intro.fox} resizeMode="contain" />
+        <Image source={require("../assets/rudy_badge.png")} style={intro.fox} resizeMode="cover" />
 
         {/* Title */}
         <Text style={intro.title}>{courseTitle}</Text>
@@ -1424,6 +1424,10 @@ const intro = StyleSheet.create({
   fox: {
     width: 160,
     height: 160,
+    borderRadius: 80,
+    overflow: "hidden",
+    borderWidth: 2.5,
+    borderColor: "#c9a227",
     marginBottom: 4,
   },
   title: {

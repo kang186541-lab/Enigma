@@ -27,7 +27,7 @@ import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
 
-const lingoImg = require("@/assets/lingo.png");
+const rudyBadgeImg = require("@/assets/rudy_badge.png");
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
 // Keyed by "text::lang". Sounds are loaded in advance; on press we just replay.
@@ -2811,7 +2811,7 @@ export default function StoryScene() {
                 <View style={[styles.avatarInner, { backgroundColor: character.avatarBg }]}>
                   {character.isLingo ? (
                     <Image
-                      source={lingoImg}
+                      source={rudyBadgeImg}
                       style={styles.lingoAvatar}
                     />
                   ) : (
@@ -3062,8 +3062,7 @@ const styles = StyleSheet.create({
   lingoAvatar: {
     width: 100,
     height: 100,
-    resizeMode: "contain",
-    ...(Platform.OS === "web" ? ({ mixBlendMode: "multiply" } as any) : {}),
+    resizeMode: "cover",
   },
   avatarEmoji: { fontSize: 56 },
   avatarRing: {
