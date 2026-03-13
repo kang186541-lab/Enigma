@@ -6,6 +6,7 @@ import {
   Pressable,
   Platform,
   Image,
+  ScrollView,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -109,120 +110,128 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: topPad }]}>
+    <View style={styles.container}>
       <LinearGradient colors={[C.bg1, C.bg2, C.bg1]} style={StyleSheet.absoluteFill} />
 
-      {/* Decorative top border */}
-      <View style={styles.topBorder} />
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: topPad, paddingBottom: bottomPad }]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Decorative top border */}
+        <View style={styles.topBorder} />
 
-      {/* Logo */}
-      <View style={styles.logoRow}>
-        <Image source={lingoImg} style={styles.logoImg} resizeMode="contain" />
-        <Text style={styles.logoText}>LingoFox</Text>
-      </View>
+        {/* Logo */}
+        <View style={styles.logoRow}>
+          <Image source={lingoImg} style={styles.logoImg} resizeMode="contain" />
+          <Text style={styles.logoText}>LingoFox</Text>
+        </View>
 
-      {/* Step dots */}
-      <View style={styles.dots}>
-        <View style={[styles.dot, step === 1 && styles.dotActive]} />
-        <View style={[styles.dot, step === 2 && styles.dotActive]} />
-      </View>
+        {/* Step dots */}
+        <View style={styles.dots}>
+          <View style={[styles.dot, step === 1 && styles.dotActive]} />
+          <View style={[styles.dot, step === 2 && styles.dotActive]} />
+        </View>
 
-      {/* ── STEP 1 ── */}
-      {step === 1 && (
-        <>
-          <View style={styles.textBlock}>
-            <Text style={styles.title}>{ui.step1Title}</Text>
-            <Text style={styles.subtitle}>{ui.step1Sub}</Text>
-          </View>
+        {/* ── STEP 1 ── */}
+        {step === 1 && (
+          <>
+            <View style={styles.textBlock}>
+              <Text style={styles.title}>{ui.step1Title}</Text>
+              <Text style={styles.subtitle}>{ui.step1Sub}</Text>
+            </View>
 
-          <View style={styles.cards}>
-            {ALL_LANGS.map((lang) => {
-              const sel = nativeSel === lang.id;
-              return (
-                <Pressable
-                  key={lang.id}
-                  style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
-                  onPress={() => handleNativePick(lang.id)}
-                >
-                  <Text style={styles.flag}>{lang.flag}</Text>
-                  <Text style={[styles.cardName, sel && styles.cardNameSel]}>
-                    {lang.nameMap[uiLang]}
-                  </Text>
-                  {sel && (
-                    <View style={styles.check}>
-                      <Ionicons name="checkmark" size={16} color={C.bg1} />
-                    </View>
-                  )}
-                </Pressable>
-              );
-            })}
-          </View>
+            <View style={styles.cards}>
+              {ALL_LANGS.map((lang) => {
+                const sel = nativeSel === lang.id;
+                return (
+                  <Pressable
+                    key={lang.id}
+                    style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
+                    onPress={() => handleNativePick(lang.id)}
+                  >
+                    <Text style={styles.flag}>{lang.flag}</Text>
+                    <Text style={[styles.cardName, sel && styles.cardNameSel]}>
+                      {lang.nameMap[uiLang]}
+                    </Text>
+                    {sel && (
+                      <View style={styles.check}>
+                        <Ionicons name="checkmark" size={16} color={C.bg1} />
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
 
-          <View style={[styles.bottom, { paddingBottom: bottomPad }]}>
-            <Pressable
-              style={({ pressed }) => [styles.cta, !nativeSel && styles.ctaDim, pressed && nativeSel && styles.ctaPress]}
-              onPress={handleNext}
-              disabled={!nativeSel}
-            >
-              <Text style={styles.ctaText}>{ui.cta1}</Text>
-              <Ionicons name="arrow-forward" size={20} color={C.bg1} />
-            </Pressable>
-          </View>
-        </>
-      )}
+            <View style={styles.bottom}>
+              <Pressable
+                style={({ pressed }) => [styles.cta, !nativeSel && styles.ctaDim, pressed && nativeSel && styles.ctaPress]}
+                onPress={handleNext}
+                disabled={!nativeSel}
+              >
+                <Text style={styles.ctaText}>{ui.cta1}</Text>
+                <Ionicons name="arrow-forward" size={20} color={C.bg1} />
+              </Pressable>
+            </View>
+          </>
+        )}
 
-      {/* ── STEP 2 ── */}
-      {step === 2 && (
-        <>
-          <View style={styles.textBlock}>
-            <Text style={styles.title}>{ui.step2Title}</Text>
-            <Text style={styles.subtitle}>{ui.step2Sub}</Text>
-          </View>
+        {/* ── STEP 2 ── */}
+        {step === 2 && (
+          <>
+            <View style={styles.textBlock}>
+              <Text style={styles.title}>{ui.step2Title}</Text>
+              <Text style={styles.subtitle}>{ui.step2Sub}</Text>
+            </View>
 
-          <View style={styles.cards}>
-            {learningOptions.map((lang) => {
-              const sel = learnSel === lang.id;
-              return (
-                <Pressable
-                  key={lang.id}
-                  style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
-                  onPress={() => handleLearnPick(lang.id)}
-                >
-                  <Text style={styles.flag}>{lang.flag}</Text>
-                  <Text style={[styles.cardName, sel && styles.cardNameSel]}>
-                    {lang.nameMap[uiLang]}
-                  </Text>
-                  {sel && (
-                    <View style={styles.check}>
-                      <Ionicons name="checkmark" size={16} color={C.bg1} />
-                    </View>
-                  )}
-                </Pressable>
-              );
-            })}
-          </View>
+            <View style={styles.cards}>
+              {learningOptions.map((lang) => {
+                const sel = learnSel === lang.id;
+                return (
+                  <Pressable
+                    key={lang.id}
+                    style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
+                    onPress={() => handleLearnPick(lang.id)}
+                  >
+                    <Text style={styles.flag}>{lang.flag}</Text>
+                    <Text style={[styles.cardName, sel && styles.cardNameSel]}>
+                      {lang.nameMap[uiLang]}
+                    </Text>
+                    {sel && (
+                      <View style={styles.check}>
+                        <Ionicons name="checkmark" size={16} color={C.bg1} />
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
 
-          <View style={[styles.bottom, { paddingBottom: bottomPad }]}>
-            <Pressable style={styles.backBtn} onPress={handleBack}>
-              <Ionicons name="chevron-back" size={18} color={C.gold} />
-              <Text style={styles.backText}>{ui.back}</Text>
-            </Pressable>
-            <Pressable
-              style={({ pressed }) => [styles.cta, styles.ctaFlex, !learnSel && styles.ctaDim, pressed && learnSel && styles.ctaPress]}
-              onPress={handleFinish}
-              disabled={!learnSel || loading}
-            >
-              <Text style={styles.ctaText}>{ui.cta2}</Text>
-            </Pressable>
-          </View>
-        </>
-      )}
+            <View style={styles.bottom}>
+              <Pressable style={styles.backBtn} onPress={handleBack}>
+                <Ionicons name="chevron-back" size={18} color={C.gold} />
+                <Text style={styles.backText}>{ui.back}</Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.cta, styles.ctaFlex, !learnSel && styles.ctaDim, pressed && learnSel && styles.ctaPress]}
+                onPress={handleFinish}
+                disabled={!learnSel || loading}
+              >
+                <Text style={styles.ctaText}>{ui.cta2}</Text>
+              </Pressable>
+            </View>
+          </>
+        )}
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  scrollContent: { flexGrow: 1 },
   topBorder: { height: 2, backgroundColor: C.gold, marginHorizontal: 24, marginTop: 8, borderRadius: 1 },
   logoRow: {
     flexDirection: "column", alignItems: "center", justifyContent: "center",
@@ -242,7 +251,7 @@ const styles = StyleSheet.create({
     fontSize: 15, fontFamily: F.body, color: C.goldDim,
     textAlign: "center", lineHeight: 22, fontStyle: "italic",
   },
-  cards: { paddingHorizontal: 24, gap: 14, flex: 1 },
+  cards: { paddingHorizontal: 24, gap: 14 },
   card: {
     flexDirection: "row", alignItems: "center",
     backgroundColor: C.bg2,
