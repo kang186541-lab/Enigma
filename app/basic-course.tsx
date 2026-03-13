@@ -790,6 +790,13 @@ export default function BasicCourseScreen() {
               </Text>
             </Pressable>
           </View>
+
+          {/* Skip writing step */}
+          <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+            <Text style={s.inlineSkip}>
+              {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+            </Text>
+          </Pressable>
         </>
       )}
 
@@ -817,6 +824,15 @@ export default function BasicCourseScreen() {
               <Text style={s.nextBtnTxt}>{nextLabel}</Text>
             </Pressable>
           </View>
+
+          {/* Skip current item */}
+          {step < 3 && (
+            <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+              <Text style={s.inlineSkip}>
+                {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+              </Text>
+            </Pressable>
+          )}
         </>
       )}
 
@@ -993,7 +1009,16 @@ export default function BasicCourseScreen() {
             </Text>
           </Pressable>
         ) : (
-          <Text style={s.stepNum}>{step + 1}/{totalSteps}</Text>
+          <View style={s.topRightRow}>
+            <Text style={s.stepNum}>{step + 1}/{totalSteps}</Text>
+            {step < 3 && (
+              <Pressable onPress={goNext} hitSlop={10}>
+                <Text style={s.topSkipTxt}>
+                  {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                </Text>
+              </Pressable>
+            )}
+          </View>
         )}
       </View>
 
@@ -1017,13 +1042,18 @@ export default function BasicCourseScreen() {
             </View>
           </View>
 
-          {/* Listen button */}
+          {/* Listen button + skip listen */}
           <Pressable
             style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.75 }]}
             onPress={() => playAudio(charItem.char)}
           >
             <Ionicons name="volume-medium-outline" size={18} color={C.bg1} />
             <Text style={s.listenBtnTxt}>{listenLabel}</Text>
+          </Pressable>
+          <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+            <Text style={s.inlineSkip}>
+              {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+            </Text>
           </Pressable>
 
           {/* Divider + label */}
@@ -1087,12 +1117,19 @@ export default function BasicCourseScreen() {
 
                   {/* Phase: listen */}
                   {greetPhase === "listen" && (
-                    <Pressable style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]} onPress={handleGreetListen}>
-                      <Ionicons name="volume-high-outline" size={22} color={C.bg1} />
-                      <Text style={s.listenBtnTxt}>
-                        {native === "korean" ? "🔊  듣기" : native === "spanish" ? "🔊  Escuchar" : "🔊  Listen"}
-                      </Text>
-                    </Pressable>
+                    <>
+                      <Pressable style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]} onPress={handleGreetListen}>
+                        <Ionicons name="volume-high-outline" size={22} color={C.bg1} />
+                        <Text style={s.listenBtnTxt}>
+                          {native === "korean" ? "🔊  듣기" : native === "spanish" ? "🔊  Escuchar" : "🔊  Listen"}
+                        </Text>
+                      </Pressable>
+                      <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+                        <Text style={s.inlineSkip}>
+                          {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                        </Text>
+                      </Pressable>
+                    </>
                   )}
 
                   {/* Phase: speak */}
@@ -1105,6 +1142,11 @@ export default function BasicCourseScreen() {
                         <Ionicons name="mic-outline" size={28} color={C.bg1} />
                         <Text style={s.listenBtnTxt}>
                           {native === "korean" ? "🎤  따라 말하기" : native === "spanish" ? "🎤  Repetir" : "🎤  Speak Now"}
+                        </Text>
+                      </Pressable>
+                      <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+                        <Text style={s.inlineSkip}>
+                          {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
                         </Text>
                       </Pressable>
                     </View>
@@ -1218,6 +1260,10 @@ const s = StyleSheet.create({
   lingoStripFox:  { fontSize: 18 },
   lingoStripText: { fontSize: 11, fontFamily: F.body, color: C.goldDim, flexShrink: 1 },
   stepNum: { fontSize: 11, fontFamily: F.label, color: C.goldDim },
+  topRightRow: { flexDirection: "column", alignItems: "flex-end", gap: 2 },
+  topSkipTxt: { fontSize: 11, fontFamily: F.label, color: C.gold, letterSpacing: 0.3 },
+  inlineSkipWrap: { alignSelf: "center", paddingVertical: 4 },
+  inlineSkip: { fontSize: 12, fontFamily: F.label, color: C.gold, letterSpacing: 0.3 },
 
   progOuter: { height: 4, backgroundColor: "rgba(201,162,39,0.18)", marginHorizontal: 16, borderRadius: 2, marginBottom: 10 },
   progInner: { height: 4, backgroundColor: C.gold, borderRadius: 2 },
