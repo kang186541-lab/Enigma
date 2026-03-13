@@ -14,6 +14,7 @@ import {
   Modal,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import * as FileSystem from "expo-file-system";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -1907,24 +1908,48 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
   lang: string; learningLang: string; onSolved: () => void;
 }) {
   const [idx, setIdx] = useState(0);
-  const [played, setPlayed] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [feedback, setFeedback] = useState<"good" | "retry" | null>(null);
   const [solved, setSolved] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
+  const recordingRef = useRef<Audio.Recording | null>(null);
 
   const q = puzzle.questions[idx];
-  const sentenceText = lang === "korean" ? q.sentence.ko : lang === "spanish" ? q.sentence.es : q.sentence.en;
 
+  // Sentence shown is in the language being LEARNED (not the UI language)
+  const sentenceText =
+    learningLang === "korean" ? q.sentence.ko
+    : learningLang === "spanish" ? q.sentence.es
+    : q.sentence.en;
+
+  // Map learningLang → Azure/Web Speech locale code
+  function getLangCode(): string {
+    if (learningLang === "korean") return "ko-KR";
+    if (learningLang === "spanish") return "es-ES";
+    if (learningLang === "french") return "fr-FR";
+    if (learningLang === "japanese") return "ja-JP";
+    if (learningLang === "chinese") return "zh-CN";
+    return "en-US";
+  }
+
+  // Fuzzy match: what fraction of target words appear in transcript
+  function matchScore(target: string, transcript: string): number {
+    const normalize = (s: string) => s.toLowerCase().replace(/[^\w가-힣]/g, " ").trim();
+    const tWords = normalize(target).split(/\s+/).filter(Boolean);
+    const tr = normalize(transcript);
+    if (!tWords.length || !tr) return 0;
+    const hits = tWords.filter(w => tr.includes(w)).length;
+    return hits / tWords.length;
+  }
+
+  // ── Play TTS ──
   function playAudio() {
     if (playing) return;
     const url = new URL("/api/tts", getApiUrl());
-    url.searchParams.set("text", q.sentence.en);
+    url.searchParams.set("text", sentenceText);
     url.searchParams.set("lang", learningLang);
-
     setPlaying(true);
-    setPlayed(true);
-
     if (Platform.OS === "web") {
       const audio = new (window as any).Audio(url.toString());
       audio.play().catch(() => {});
@@ -1945,47 +1970,177 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
     }
   }
 
-  function handleConfirm() {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setConfirmed(true);
-    setTimeout(() => {
-      if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setPlayed(false); setConfirmed(false); }
-      else setSolved(true);
-    }, 700);
+  // ── Microphone: record + compare ──
+  function handleMic() {
+    if (recording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
   }
+
+  function startRecording() {
+    setFeedback(null);
+    setRecording(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    if (Platform.OS === "web") {
+      // Use Web Speech API — synchronous start inside the tap
+      const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SR) { setRecording(false); setFeedback("retry"); return; }
+      const recognition = new SR();
+      recognition.lang = getLangCode();
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript as string;
+        setRecording(false);
+        const score = matchScore(sentenceText, transcript);
+        setFeedback(score >= 0.5 ? "good" : "retry");
+        if (score >= 0.5) {
+          setTimeout(() => advanceNext(), 1500);
+        }
+      };
+      recognition.onerror = () => { setRecording(false); setFeedback("retry"); };
+      recognition.onend = () => setRecording(false);
+      recognition.start();
+    } else {
+      // Native: record with expo-av
+      (async () => {
+        try {
+          await Audio.requestPermissionsAsync();
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+          const { recording: rec } = await Audio.Recording.createAsync(
+            Audio.RecordingOptionsPresets.HIGH_QUALITY
+          );
+          recordingRef.current = rec;
+        } catch { setRecording(false); }
+      })();
+    }
+  }
+
+  function stopRecording() {
+    if (Platform.OS !== "web") {
+      (async () => {
+        try {
+          if (!recordingRef.current) { setRecording(false); return; }
+          await recordingRef.current.stopAndUnloadAsync();
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+          const uri = recordingRef.current.getURI();
+          recordingRef.current = null;
+          setRecording(false);
+          if (!uri) { setFeedback("retry"); return; }
+
+          // Read as base64 and send to Azure STT
+          const base64 = await FileSystem.readAsStringAsync(uri, {
+            encoding: "base64" as any,
+          });
+          const apiUrl = new URL("/api/stt", getApiUrl());
+          const res = await fetch(apiUrl.toString(), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ audio: base64, mimeType: "audio/m4a", language: getLangCode() }),
+          });
+          const data = await res.json();
+          const transcript: string = data.text ?? "";
+          const score = matchScore(sentenceText, transcript);
+          setFeedback(score >= 0.5 ? "good" : "retry");
+          if (score >= 0.5) setTimeout(() => advanceNext(), 1500);
+        } catch { setRecording(false); setFeedback("retry"); }
+      })();
+    } else {
+      setRecording(false);
+    }
+  }
+
+  function advanceNext() {
+    setFeedback(null);
+    if (idx < puzzle.questions.length - 1) {
+      setIdx((i) => i + 1);
+    } else {
+      setSolved(true);
+    }
+  }
+
+  const ko = lang === "korean";
+  const es = lang === "spanish";
 
   if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
 
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🎤 {lang === "korean" ? "발음 따라하기" : lang === "spanish" ? "Pronuncia esta frase" : "Pronunciation Practice"}</Text>
+        <Text style={styles.puzzleNum}>🎤 {ko ? "발음 따라하기" : es ? "Pronuncia esta frase" : "Pronunciation Practice"}</Text>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
+
+      {/* Sentence card — shown in the TARGET learning language */}
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>
-          {lang === "korean" ? "이 문장을 소리 내어 읽어보세요!" : lang === "spanish" ? "¡Lee esta frase en voz alta!" : "Read this sentence aloud!"}
+          {ko ? "이 문장을 소리 내어 읽어보세요!" : es ? "¡Lee esta frase en voz alta!" : "Read this sentence aloud!"}
         </Text>
         <Text style={styles.puzzleSentence}>{sentenceText}</Text>
       </View>
-      <Pressable style={[styles.listenBtn2, playing && { opacity: 0.7 }]} onPress={playAudio} disabled={playing}>
-        <Ionicons name={playing ? "volume-medium" : "volume-high-outline"} size={20} color={C.bg1} />
-        <Text style={styles.listenBtn2Text}>
-          {playing
-            ? (lang === "korean" ? "재생 중..." : lang === "spanish" ? "Reproduciendo..." : "Playing...")
-            : (lang === "korean" ? "🔊  듣기" : lang === "spanish" ? "🔊  Escuchar" : "🔊  Listen")}
-        </Text>
-      </Pressable>
-      {played && !confirmed && (
-        <Pressable style={styles.puzzleConfirmBtn} onPress={handleConfirm}>
-          <Text style={styles.puzzleConfirmText}>
-            {lang === "korean" ? "✅  따라했어요!" : lang === "spanish" ? "✅  ¡Lo repetí!" : "✅  I said it!"}
+
+      {/* Two action buttons: Listen + Mic */}
+      <View style={styles.pronBtnRow}>
+        {/* Listen / TTS */}
+        <Pressable
+          style={[styles.pronBtn, playing && { opacity: 0.7 }]}
+          onPress={playAudio}
+          disabled={playing}
+        >
+          <Ionicons name={playing ? "volume-medium" : "volume-high-outline"} size={22} color={C.bg1} />
+          <Text style={styles.pronBtnText}>
+            {playing
+              ? (ko ? "재생 중" : es ? "Reproduciendo" : "Playing…")
+              : (ko ? "듣기" : es ? "Escuchar" : "Listen")}
           </Text>
         </Pressable>
+
+        {/* Microphone / Record */}
+        <Pressable
+          style={[styles.pronBtn, styles.pronMicBtn, recording && styles.pronMicRecording]}
+          onPress={handleMic}
+        >
+          <Ionicons name={recording ? "stop-circle" : "mic"} size={22} color={recording ? "#fff" : C.bg1} />
+          <Text style={[styles.pronBtnText, recording && { color: "#fff" }]}>
+            {recording
+              ? (ko ? "중지" : es ? "Detener" : "Stop")
+              : (ko ? "따라하기" : es ? "Repetir" : "Speak")}
+          </Text>
+        </Pressable>
+      </View>
+
+      {/* Feedback */}
+      {feedback === "good" && (
+        <View style={styles.pronFeedbackGood}>
+          <Text style={styles.pronFeedbackText}>
+            ✨ {ko ? "좋아요! 잘 하셨어요." : es ? "¡Muy bien!" : "Great job!"}
+          </Text>
+        </View>
       )}
-      {!played && (
+      {feedback === "retry" && (
+        <View style={styles.pronFeedbackRetry}>
+          <Text style={styles.pronFeedbackText}>
+            🔄 {ko ? "다시 한번 해보세요." : es ? "Inténtalo de nuevo." : "Try once more."}
+          </Text>
+          <Pressable style={styles.pronSkipBtn} onPress={advanceNext}>
+            <Text style={styles.pronSkipText}>
+              {ko ? "그냥 넘어가기 →" : es ? "Continuar →" : "Skip →"}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+
+      {!feedback && !recording && (
         <Text style={styles.pronunciationHint}>
-          {lang === "korean" ? "👆 먼저 듣기 버튼을 눌러보세요" : lang === "spanish" ? "👆 Primero escucha el audio" : "👆 Listen first, then repeat aloud"}
+          {ko ? "👆 듣고 따라 읽어보세요" : es ? "👆 Escucha y repite" : "👆 Listen, then tap Speak to practise"}
+        </Text>
+      )}
+      {recording && (
+        <Text style={styles.pronunciationHint}>
+          🎙️ {ko ? "말하는 중… 다 하면 중지를 누르세요" : es ? "Hablando… pulsa Detener" : "Listening… tap Stop when done"}
         </Text>
       )}
     </View>
@@ -3304,6 +3459,68 @@ const styles = StyleSheet.create({
     fontFamily: F.body,
     color: C.goldDim,
     textAlign: "center",
+    fontStyle: "italic",
+  },
+  pronBtnRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  pronBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: C.gold,
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
+  pronBtnText: {
+    fontFamily: F.header,
+    fontSize: 14,
+    color: C.bg1,
+    letterSpacing: 0.5,
+  },
+  pronMicBtn: {
+    backgroundColor: C.bg2,
+    borderWidth: 1.5,
+    borderColor: C.gold,
+  },
+  pronMicRecording: {
+    backgroundColor: "#c0392b",
+    borderColor: "#e74c3c",
+  },
+  pronFeedbackGood: {
+    backgroundColor: "rgba(46,160,67,0.15)",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(46,160,67,0.4)",
+    padding: 14,
+    alignItems: "center",
+  },
+  pronFeedbackRetry: {
+    backgroundColor: "rgba(200,70,70,0.12)",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(200,70,70,0.3)",
+    padding: 14,
+    alignItems: "center",
+    gap: 10,
+  },
+  pronFeedbackText: {
+    fontFamily: F.bodySemi,
+    fontSize: 16,
+    color: C.parchment,
+    textAlign: "center",
+  },
+  pronSkipBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+  },
+  pronSkipText: {
+    fontFamily: F.body,
+    fontSize: 13,
+    color: C.goldDim,
     fontStyle: "italic",
   },
 

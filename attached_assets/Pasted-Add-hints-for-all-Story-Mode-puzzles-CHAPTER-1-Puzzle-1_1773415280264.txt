@@ -1,0 +1,93 @@
+Add hints for all Story Mode puzzles:
+
+CHAPTER 1 - 런던의 암호 🇬🇧
+
+Puzzle 1 - 🔗 단어 매칭:
+Hint 1 (free): "단어의 첫 글자를 보고 뜻을 연결해보게!"
+Hint 2 (-10 XP): 
+- mysterious = 신비로운
+- cipher = 암호
+- detective = 탐정
+- clue = 단서
+- suspect = 용의자
+
+Puzzle 2 - 🔐 암호 해독 (IFMMP→HELLO):
+Hint 1 (free): "알파벳 순서에서 각 글자의 바로 앞 글자를 찾아보게! 예: B→A"
+Hint 2 (-10 XP): "I→H, F→E, M→L, M→L, P→O"
+
+Puzzle 3 - 👂 듣고 고르기:
+Hint 1 (free): "천천히 다시 들어보게! 🔊 버튼을 눌러보게"
+Hint 2 (-10 XP): "첫 번째 단어에 집중해보게!"
+
+Puzzle 4 - 🔀 문장 순서 맞추기:
+Hint 1 (free): "주어(I/The)로 시작하는 단어를 먼저 찾아보게!"
+Hint 2 (-10 XP): "The mysterious letter was found in the library."
+
+Puzzle 5 - 🎤 발음 미션:
+Hint 1 (free): "천천히 또박또박 말해보게!"
+Hint 2 (-10 XP): "각 단어를 나눠서 말해보게: mys-te-ri-ous"
+
+---
+
+CHAPTER 2 - 마드리드의 실종 🇪🇸
+
+Puzzle 6 - 🔗 단어 매칭:
+Hint 1 (free): "스페인어와 한국어의 비슷한 느낌을 찾아보게!"
+Hint 2 (-10 XP):
+- hola = 안녕하세요
+- gracias = 감사합니다
+- ayuda = 도움
+- desaparecido = 실종된
+- biblioteca = 도서관
+
+Puzzle 7 - 👂 듣고 고르기:
+Hint 1 (free): "스페인어는 적힌 대로 읽어! 발음이 규칙적이야"
+Hint 2 (-10 XP): "¿Dónde está? = 어디 있어요?"
+
+Puzzle 8 - 📝 빈칸 채우기:
+Hint 1 (free): "문장의 앞뒤 내용을 보고 어울리는 단어를 골라보게!"
+Hint 2 (-10 XP): "Necesito ___ ayuda → 'más' (더 많은)"
+
+Puzzle 9 - 🔍 단서 찾기:
+Hint 1 (free): "수상한 단어나 장소 이름을 주목해보게!"
+Hint 2 (-10 XP): "'biblioteca' (도서관) 를 탭해보게!"
+
+Puzzle 10 - 💬 올바른 대답 고르기:
+Hint 1 (free): "정중한 표현을 고르는 게 항상 안전해!"
+Hint 2 (-10 XP): "¿Puede ayudarme? = 도와주실 수 있나요?"
+
+---
+
+CHAPTER 3 - 서울의 비밀 🇰🇷
+
+Puzzle 11 - 🧩 단어 퍼즐:
+Hint 1 (free): "한국어는 자음+모음 조합이야! ㅎ+ㅏ+ㄴ = 한"
+Hint 2 (-10 XP): "글자 순서: ㅂ-ㅣ-ㅁ-ㄹ = 비밀"
+
+Puzzle 12 - 🔀 문장 순서 맞추기:
+Hint 1 (free): "한국어는 동사가 항상 문장 끝에 와!"
+Hint 2 (-10 XP): "나는 + 서울에서 + 단서를 + 찾았다"
+
+Puzzle 13 - 👂 듣고 고르기:
+Hint 1 (free): "받침 소리에 집중해서 들어보게!"
+Hint 2 (-10 XP): "비밀 = 비+밀, 천천히 들어보게"
+
+Puzzle 14 - ✏️ 쓰기 미션:
+Hint 1 (free): "획순대로 써보게! 가로획 먼저, 세로획 나중에"
+Hint 2 (-10 XP): "ㅂ: 왼쪽 세로 → 오른쪽 세로 → 가운데 가로 → 아래 가로"
+
+Puzzle 15 - 🎤 발음 미션:
+Hint 1 (free): "받침을 다음 모음과 연결해서 읽어보게!"
+Hint 2 (-10 XP): "안녕하세요 = 안+녕+하+세+요, 천천히!"
+
+---
+
+HINT DISPLAY RULES:
+- 💡 Hint button always visible during puzzle
+- First hint: FREE
+- Second hint: -10 XP (show warning before deducting)
+- After 2 hints: "더 이상 힌트가 없어요!"
+- Lingo delivers all hints:
+  "견습생, 힌트를 주겠네! 🦊"
+- Hint appears in speech bubble from Lingo
+- Hint text in user's NATIVE language
