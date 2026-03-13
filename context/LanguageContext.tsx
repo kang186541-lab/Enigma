@@ -140,7 +140,7 @@ const translations: Record<NativeLanguage, Record<string, string>> = {
     flashcards: "플래시카드",
     flashcards_desc: "인터랙티브 카드로 어휘 복습",
     conversation: "대화",
-    conversation_desc: "실생활 대화 연습",
+    conversation_desc: "튜터와 자유롭게 대화하기",
     pronunciation: "발음",
     pronunciation_desc: "억양 완벽하게 하기",
     continue_learning: "계속 배우기",
