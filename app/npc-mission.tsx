@@ -81,6 +81,11 @@ export default function NpcMissionScreen() {
   const [scoreDisplay, setScoreDisplay] = useState<{ amount: number; positive: boolean } | null>(null);
   const scoreTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [wordPopup, setWordPopup] = useState<{ word: string; meaning: string; example: string } | null>(null);
+  const [wordLoading, setWordLoading] = useState(false);
+  const [wordExPlaying, setWordExPlaying] = useState(false);
+  const wordCache = useRef<Record<string, { meaning: string; example: string }>>({});
+
   const conversationRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
   const inputRef = useRef<TextInput>(null);
   const statsRef = useRef(stats);
@@ -330,6 +335,100 @@ export default function NpcMissionScreen() {
     setPendingChoice(null);
   }, []);
 
+  const lookupWord = useCallback(async (rawToken: string) => {
+    const clean = rawToken.replace(/[^\p{L}\p{N}'-]/gu, "").trim();
+    if (!clean || clean.length < 1) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const cacheKey = `${clean.toLowerCase()}:${language}:${native}`;
+    if (wordCache.current[cacheKey]) {
+      setWordPopup({ word: clean, ...wordCache.current[cacheKey] });
+      return;
+    }
+    setWordLoading(true);
+    setWordPopup(null);
+    try {
+      const res = await fetch(new URL("/api/word-lookup", getApiUrl()).toString(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: clean, targetLanguage: language, nativeLanguage: native }),
+      });
+      const data = await res.json();
+      const entry = { meaning: data.meaning ?? "", example: data.example ?? "" };
+      wordCache.current[cacheKey] = entry;
+      setWordPopup({ word: clean, ...entry });
+    } catch {
+      setWordPopup({ word: clean, meaning: "—", example: "" });
+    } finally {
+      setWordLoading(false);
+    }
+  }, [language, native]);
+
+  const playWordExample = useCallback((example: string) => {
+    if (!npc || !example) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setWordExPlaying(true);
+    const ttsText = stripEmojis(example).slice(0, 400);
+    if (Platform.OS === "web") {
+      const url = new URL("/api/npc-tts", getApiUrl());
+      url.searchParams.set("text", ttsText);
+      url.searchParams.set("npcId", npc.id);
+      url.searchParams.set("npcLang", language);
+      url.searchParams.set("speed", "0.9");
+      fetch(url.toString())
+        .then(r => r.blob())
+        .then(blob => {
+          const objUrl = URL.createObjectURL(blob);
+          const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+          audio.onended = () => { URL.revokeObjectURL(objUrl); setWordExPlaying(false); };
+          audio.onerror = () => { URL.revokeObjectURL(objUrl); setWordExPlaying(false); };
+          audio.play().catch(() => setWordExPlaying(false));
+        })
+        .catch(() => setWordExPlaying(false));
+    } else {
+      const voiceInfo = npc.voice[language as keyof typeof npc.voice] ?? npc.voice.english;
+      Speech.speak(ttsText, {
+        language: voiceInfo.lang,
+        rate: 0.9,
+        onDone: () => setWordExPlaying(false),
+        onError: () => setWordExPlaying(false),
+      });
+    }
+  }, [npc, language]);
+
+  const renderClickableWords = useCallback((text: string, isNpcMsg: boolean) => {
+    if (!isNpcMsg) {
+      return (
+        <Text style={[styles.bubbleText, styles.bubbleTextUser]}>{text}</Text>
+      );
+    }
+    const tokens = text.split(/(\s+)/);
+    return (
+      <Text style={[styles.bubbleText, styles.bubbleTextNpc]}>
+        {tokens.map((token, i) => {
+          if (/^\s+$/.test(token) || token === "") {
+            return <Text key={i}>{token}</Text>;
+          }
+          const wordPart = token.replace(/^[^\p{L}\p{N}'-]+|[^\p{L}\p{N}'-]+$/gu, "");
+          if (!wordPart) {
+            return <Text key={i} style={styles.bubbleTextNpc}>{token}</Text>;
+          }
+          const prefix = token.slice(0, token.indexOf(wordPart));
+          const suffix = token.slice(token.indexOf(wordPart) + wordPart.length);
+          return (
+            <Text key={i}>
+              {prefix ? <Text>{prefix}</Text> : null}
+              <Text
+                style={styles.clickableWord}
+                onPress={() => lookupWord(wordPart)}
+              >{wordPart}</Text>
+              {suffix ? <Text>{suffix}</Text> : null}
+            </Text>
+          );
+        })}
+      </Text>
+    );
+  }, [lookupWord]);
+
   const handleVoiceInput = async () => {
     if (isRecording || isTyping) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -369,9 +468,7 @@ export default function NpcMissionScreen() {
       )}
       <View style={styles.bubbleCol}>
         <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleNpc]}>
-          <Text style={[styles.bubbleText, item.isUser ? styles.bubbleTextUser : styles.bubbleTextNpc]}>
-            {item.text}
-          </Text>
+          {renderClickableWords(item.text, !item.isUser)}
           {!item.isUser && (
             <Pressable
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); playNpcTts(item.text, item.id); }}
@@ -654,6 +751,76 @@ export default function NpcMissionScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* ── WORD LOOKUP POPUP ── */}
+      <Modal
+        visible={!!wordPopup || wordLoading}
+        transparent
+        animationType="slide"
+        onRequestClose={() => { setWordPopup(null); setWordLoading(false); setWordExPlaying(false); }}
+      >
+        <Pressable
+          style={styles.wordOverlay}
+          onPress={() => { setWordPopup(null); setWordLoading(false); setWordExPlaying(false); }}
+        >
+          <Pressable style={styles.wordCard} onPress={() => {}}>
+            <View style={styles.wordDragHandle} />
+
+            {wordLoading && !wordPopup ? (
+              <View style={styles.wordLoadingRow}>
+                <ActivityIndicator color={C.gold} size="small" />
+                <Text style={styles.wordLoadingText}>
+                  {native === "korean" ? "검색 중…" : native === "spanish" ? "Buscando…" : "Looking up…"}
+                </Text>
+              </View>
+            ) : wordPopup ? (
+              <>
+                <View style={styles.wordHeaderRow}>
+                  <Text style={styles.wordTitle}>{wordPopup.word}</Text>
+                  <Pressable
+                    style={({ pressed }) => [styles.wordCloseBtn, pressed && { opacity: 0.65 }]}
+                    onPress={() => { setWordPopup(null); setWordExPlaying(false); }}
+                    hitSlop={8}
+                  >
+                    <Ionicons name="close" size={18} color={C.goldDark} />
+                  </Pressable>
+                </View>
+
+                <View style={styles.wordDivider} />
+
+                <View style={styles.wordMeaningRow}>
+                  <Text style={styles.wordSectionLabel}>
+                    {native === "korean" ? "의미" : native === "spanish" ? "Significado" : "Meaning"}
+                  </Text>
+                  <Text style={styles.wordMeaning}>{wordPopup.meaning}</Text>
+                </View>
+
+                {!!wordPopup.example && (
+                  <View style={styles.wordExampleRow}>
+                    <Text style={styles.wordSectionLabel}>
+                      {native === "korean" ? "예문" : native === "spanish" ? "Ejemplo" : "Example"}
+                    </Text>
+                    <Text style={styles.wordExample}>{wordPopup.example}</Text>
+                    <Pressable
+                      style={({ pressed }) => [styles.wordPlayBtn, pressed && { opacity: 0.75 }]}
+                      onPress={() => playWordExample(wordPopup.example)}
+                    >
+                      <Ionicons
+                        name={wordExPlaying ? "volume-high" : "volume-medium-outline"}
+                        size={15}
+                        color={wordExPlaying ? C.gold : C.goldDark}
+                      />
+                      <Text style={styles.wordPlayLabel}>
+                        {native === "korean" ? "듣기" : native === "spanish" ? "Escuchar" : "Listen"}
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
+              </>
+            ) : null}
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -871,4 +1038,84 @@ const styles = StyleSheet.create({
     backgroundColor: C.gold, alignItems: "center",
   },
   popupSendLabel: { fontSize: 13, fontFamily: F.bodySemi, color: C.bg1 },
+
+  clickableWord: {
+    color: C.parchment,
+    textDecorationLine: "underline",
+    textDecorationColor: "rgba(201,162,39,0.45)",
+    textDecorationStyle: "dotted",
+  },
+
+  wordOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  wordCard: {
+    backgroundColor: C.bg2,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 22,
+    paddingTop: 10,
+    paddingBottom: 36,
+    borderTopWidth: 1.5,
+    borderLeftWidth: 1.5,
+    borderRightWidth: 1.5,
+    borderColor: C.border,
+    gap: 14,
+    shadowColor: C.gold,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 14,
+  },
+  wordDragHandle: {
+    width: 40, height: 4, borderRadius: 2,
+    backgroundColor: "rgba(201,162,39,0.35)",
+    alignSelf: "center",
+    marginBottom: 6,
+  },
+  wordHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  wordTitle: {
+    fontSize: 24, fontFamily: F.header, color: C.gold, letterSpacing: 0.5,
+  },
+  wordCloseBtn: {
+    width: 30, height: 30, borderRadius: 15,
+    backgroundColor: C.bg1, alignItems: "center", justifyContent: "center",
+    borderWidth: 1, borderColor: C.border,
+  },
+  wordDivider: {
+    height: 1, backgroundColor: C.border,
+  },
+  wordSectionLabel: {
+    fontSize: 10, fontFamily: F.label, color: C.goldDim,
+    letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 4,
+  },
+  wordMeaningRow: { gap: 4 },
+  wordMeaning: {
+    fontSize: 17, fontFamily: F.bodySemi, color: C.parchment, lineHeight: 24,
+  },
+  wordExampleRow: { gap: 4 },
+  wordExample: {
+    fontSize: 15, fontFamily: F.body, color: "rgba(244,232,193,0.75)",
+    lineHeight: 22,
+  },
+  wordPlayBtn: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    alignSelf: "flex-start",
+    paddingHorizontal: 12, paddingVertical: 6,
+    borderRadius: 12, borderWidth: 1, borderColor: C.border,
+    backgroundColor: "rgba(201,162,39,0.08)",
+    marginTop: 4,
+  },
+  wordPlayLabel: { fontSize: 12, fontFamily: F.bodySemi, color: C.goldDark },
+  wordLoadingRow: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    paddingVertical: 20, justifyContent: "center",
+  },
+  wordLoadingText: { fontSize: 14, fontFamily: F.body, color: C.goldDim },
 });

@@ -856,6 +856,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/word-lookup", async (req: Request, res: Response) => {
+    try {
+      const { word, targetLanguage, nativeLanguage } = req.body as {
+        word: string;
+        targetLanguage: string;
+        nativeLanguage: string;
+      };
+      if (!word || !targetLanguage || !nativeLanguage) {
+        return res.status(400).json({ error: "Missing params" });
+      }
+
+      const langLabel: Record<string, string> = {
+        english: "English", korean: "Korean", spanish: "Spanish",
+      };
+      const tl = langLabel[targetLanguage]  ?? targetLanguage;
+      const nl = langLabel[nativeLanguage] ?? nativeLanguage;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        max_completion_tokens: 120,
+        messages: [
+          {
+            role: "system",
+            content: `You are a dictionary assistant. The user is learning ${tl} and speaks ${nl} natively. For the given ${tl} word or phrase, return ONLY valid JSON (no markdown) with two fields: "meaning" (concise translation/definition in ${nl}, 1-3 meanings separated by " / " if multiple) and "example" (one short natural example sentence in ${tl}). Keep it brief.`,
+          },
+          { role: "user", content: word },
+        ],
+      });
+
+      const raw = completion.choices[0]?.message?.content ?? "{}";
+      const jsonStr = extractJsonFromText(raw);
+      let parsed: { meaning?: string; example?: string };
+      try {
+        parsed = JSON.parse(jsonStr);
+      } catch {
+        parsed = { meaning: "", example: "" };
+      }
+
+      res.json({ word, meaning: parsed.meaning ?? "", example: parsed.example ?? "" });
+    } catch (err) {
+      console.error("Word lookup error:", err);
+      res.status(500).json({ error: "Word lookup failed" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
