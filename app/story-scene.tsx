@@ -11,6 +11,7 @@ import {
   ScrollView,
   PanResponder,
   TextInput,
+  Modal,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -328,7 +329,7 @@ const STORIES: Record<string, Story> = {
             encoded: "IFMMP",
             answer: { en: "HELLO", ko: "안녕", es: "HOLA" },
             shift: 1,
-            hint: { en: "Move each letter one step backward (B→A, C→B, D→C)", ko: "각 글자를 한 칸 뒤로 당겨보게 💡 예시: B→A, C→B, D→C", es: "Retrocede cada letra 1 posición 💡 Ejemplo: B→A, C→B, D→C" },
+            hint: { en: "Move each letter one step backward", ko: "각 글자를 한 칸 뒤로 당겨보게", es: "Retrocede cada letra 1 posición" },
             opts: [
               { en: "HELLO", ko: "안녕", es: "HOLA" },
               { en: "WORLD", ko: "세계", es: "MUNDO" },
@@ -1422,6 +1423,8 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [solved, setSolved] = useState(false);
+  const [showHintModal, setShowHintModal] = useState(false);
+  const [unlockedHints, setUnlockedHints] = useState(0);
 
   const q = puzzle.questions[idx];
   const correctAnswer = lang === "korean" ? q.answer.ko : lang === "spanish" ? q.answer.es : q.answer.en;
@@ -1482,10 +1485,34 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
       setSelected(null);
       setShowResult(false);
       setIsCorrect(false);
+      setUnlockedHints(0);
     } else {
       setSolved(true);
     }
   }
+
+  // Progressive hints — generated from puzzle data
+  function getHints() {
+    const firstLetter = q.encoded[0];
+    const decodedFirst = String.fromCharCode(
+      ((firstLetter.charCodeAt(0) - 65 - q.shift + 26) % 26) + 65
+    );
+    const ko = lang === "korean";
+    const es = lang === "spanish";
+    return [
+      ko ? "각 글자를 알파벳에서 한 칸 앞 글자로 바꿔보세요."
+        : es ? "Cambia cada letra por la que está una posición antes en el alfabeto."
+        : "Replace each letter with the one that comes one step before it in the alphabet.",
+      ko ? `예: ${firstLetter} → ${decodedFirst}`
+        : es ? `Ejemplo: ${firstLetter} → ${decodedFirst}`
+        : `Example: ${firstLetter} → ${decodedFirst}`,
+      ko ? `정답은 ${q.answer.en} 입니다.`
+        : es ? `La respuesta es ${q.answer.en}.`
+        : `The answer is ${q.answer.en}.`,
+    ];
+  }
+
+  const hints = getHints();
 
   if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
 
@@ -1572,6 +1599,8 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
         <Text style={styles.puzzleNum}>🔐 {lang === "korean" ? "암호를 해독하라!" : lang === "spanish" ? "¡Descifra el código!" : "Decode the Cipher!"}</Text>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
+
+      {/* Fox bubble */}
       <View style={styles.cipherLingoRow}>
         <Text style={styles.cipherLingoEmoji}>🦊</Text>
         <View style={styles.cipherLingoBubble}>
@@ -1580,10 +1609,34 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
           </Text>
         </View>
       </View>
+
+      {/* Puzzle card — cipher text + clue only */}
       <View style={styles.cipherWordCard}>
+        <Text style={styles.cipherCardLabel}>
+          {lang === "korean" ? "암호" : lang === "spanish" ? "Cifrado" : "Cipher"}
+        </Text>
         <Text style={styles.cipherEncoded}>{q.encoded}</Text>
-        <Text style={styles.cipherHint}>💡 {hintText}</Text>
+        <View style={styles.cipherCardDivider} />
+        <Text style={styles.cipherCardLabel}>
+          {lang === "korean" ? "단서" : lang === "spanish" ? "Pista" : "Clue"}
+        </Text>
+        <Text style={styles.cipherHint}>{hintText}</Text>
       </View>
+
+      {/* Hint button */}
+      <Pressable
+        style={styles.hintBtn}
+        onPress={() => { setShowHintModal(true); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+      >
+        <Text style={styles.hintBtnText}>
+          💡 {lang === "korean" ? "힌트 보기" : lang === "spanish" ? "Ver pistas" : "Show Hints"}
+          {unlockedHints > 0 && (
+            <Text style={styles.hintBtnCount}> ({unlockedHints}/3)</Text>
+          )}
+        </Text>
+      </Pressable>
+
+      {/* Answer options */}
       <View style={styles.puzzleOptions}>
         {shuffledOpts[idx].map((opt, i) => {
           const isSelected = selected === opt;
@@ -1599,6 +1652,71 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
           );
         })}
       </View>
+
+      {/* Detective Hint Modal */}
+      <Modal
+        visible={showHintModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowHintModal(false)}
+      >
+        <Pressable style={styles.hintOverlay} onPress={() => setShowHintModal(false)}>
+          <Pressable style={styles.hintNotebook} onPress={() => {}}>
+            {/* Notebook header */}
+            <View style={styles.hintNotebookHeader}>
+              <Text style={styles.hintNotebookTitle}>
+                🔍 {lang === "korean" ? "수사 노트" : lang === "spanish" ? "Cuaderno de Detective" : "Detective's Notebook"}
+              </Text>
+              <Pressable onPress={() => setShowHintModal(false)} style={styles.hintCloseBtn}>
+                <Text style={styles.hintCloseBtnText}>✕</Text>
+              </Pressable>
+            </View>
+            <View style={styles.hintNotebookRule} />
+
+            {/* Hint rows */}
+            {hints.map((hint, i) => {
+              const isUnlocked = i < unlockedHints;
+              const isNext = i === unlockedHints;
+              return (
+                <View key={i} style={styles.hintRow}>
+                  {isUnlocked ? (
+                    <View style={styles.hintUnlocked}>
+                      <Text style={styles.hintLabel}>
+                        {lang === "korean" ? `힌트 ${i + 1}` : lang === "spanish" ? `Pista ${i + 1}` : `Hint ${i + 1}`}
+                      </Text>
+                      <Text style={styles.hintText}>{hint}</Text>
+                    </View>
+                  ) : isNext ? (
+                    <Pressable
+                      style={styles.hintLocked}
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        setUnlockedHints(i + 1);
+                      }}
+                    >
+                      <Text style={styles.hintLockedIcon}>🔒</Text>
+                      <Text style={styles.hintLockedText}>
+                        {lang === "korean" ? `힌트 ${i + 1} 열기` : lang === "spanish" ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}
+                      </Text>
+                    </Pressable>
+                  ) : (
+                    <View style={[styles.hintLocked, { opacity: 0.4 }]}>
+                      <Text style={styles.hintLockedIcon}>🔒</Text>
+                      <Text style={styles.hintLockedText}>
+                        {lang === "korean" ? `힌트 ${i + 1}` : lang === "spanish" ? `Pista ${i + 1}` : `Hint ${i + 1}`}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+
+            <Text style={styles.hintFooter}>
+              {lang === "korean" ? "이전 힌트를 먼저 열어야 해요" : lang === "spanish" ? "Desbloquea las pistas en orden" : "Unlock hints in order"}
+            </Text>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -2841,6 +2959,133 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 20,
   },
+  cipherCardLabel: {
+    fontSize: 10,
+    fontFamily: F.label,
+    color: C.goldDim,
+    letterSpacing: 2,
+    textTransform: "uppercase" as const,
+  },
+  cipherCardDivider: {
+    width: "80%",
+    height: 1,
+    backgroundColor: C.border,
+    marginVertical: 4,
+  },
+
+  /* ── Hint System ── */
+  hintBtn: {
+    alignSelf: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: C.border,
+    backgroundColor: "rgba(201,162,39,0.08)",
+  },
+  hintBtnText: {
+    fontFamily: F.bodySemi,
+    fontSize: 14,
+    color: C.goldDim,
+  },
+  hintBtnCount: {
+    fontFamily: F.body,
+    fontSize: 12,
+    color: C.goldDim,
+  },
+  hintOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.75)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  hintNotebook: {
+    width: "100%",
+    backgroundColor: "#1e0e06",
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: C.gold,
+    padding: 20,
+    gap: 12,
+    shadowColor: C.gold,
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+  hintNotebookHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  hintNotebookTitle: {
+    fontFamily: F.header,
+    fontSize: 16,
+    color: C.gold,
+    letterSpacing: 1,
+  },
+  hintCloseBtn: {
+    padding: 4,
+  },
+  hintCloseBtnText: {
+    fontFamily: F.label,
+    fontSize: 16,
+    color: C.goldDim,
+  },
+  hintNotebookRule: {
+    height: 1,
+    backgroundColor: C.border,
+  },
+  hintRow: {
+    gap: 0,
+  },
+  hintUnlocked: {
+    backgroundColor: "rgba(201,162,39,0.08)",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.25)",
+    padding: 14,
+    gap: 6,
+  },
+  hintLabel: {
+    fontFamily: F.label,
+    fontSize: 10,
+    color: C.goldDim,
+    letterSpacing: 2,
+    textTransform: "uppercase" as const,
+  },
+  hintText: {
+    fontFamily: F.body,
+    fontSize: 15,
+    color: C.parchment,
+    lineHeight: 22,
+  },
+  hintLocked: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "rgba(255,255,255,0.03)",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.15)",
+    padding: 14,
+  },
+  hintLockedIcon: {
+    fontSize: 18,
+  },
+  hintLockedText: {
+    fontFamily: F.bodySemi,
+    fontSize: 14,
+    color: C.goldDim,
+  },
+  hintFooter: {
+    fontFamily: F.body,
+    fontSize: 11,
+    color: "rgba(201,162,39,0.4)",
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+
   cipherOptLabel: {
     fontSize: 16,
     fontFamily: F.header,
