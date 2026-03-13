@@ -170,7 +170,7 @@ const STORIES: Record<string, Story> = {
         id: "mr_black",
         emoji: "🕴️",
         name: "Mr. Black",
-        nameKo: "블랙 씨",
+        nameKo: "미스터 블랙",
         side: "right",
         avatarBg: "#0A0A0A",
       },
@@ -378,7 +378,7 @@ const STORIES: Record<string, Story> = {
         pType: "investigation",
         questions: [
           {
-            prompt: { en: "Which evidence proves Mr. Black is connected to the Lexicon Society?", ko: "어떤 증거가 블랙 씨가 Lexicon Society와 연결되어 있다는 것을 증명하나요?", es: "¿Qué evidencia prueba que Mr. Black está conectado con la Sociedad Lexicon?" },
+            prompt: { en: "Which evidence proves Mr. Black is connected to the Lexicon Society?", ko: "어떤 증거가 미스터 블랙이 Lexicon Society와 연결되어 있다는 것을 증명하나요?", es: "¿Qué evidencia prueba que Mr. Black está conectado con la Sociedad Lexicon?" },
             clues: [
               { en: "A dusty chair in the corner", ko: "구석의 먼지 쌓인 의자", es: "Una silla polvorienta en el rincón" },
               { en: "The ∆LX seal on a stolen language dictionary", ko: "훔쳐간 언어 사전에 찍힌 ∆LX 인장", es: "El sello ∆LX en un diccionario de idiomas robado" },
@@ -453,7 +453,7 @@ const STORIES: Record<string, Story> = {
         id: "mr_black",
         emoji: "🕴️",
         name: "Mr. Black",
-        nameKo: "블랙 씨",
+        nameKo: "미스터 블랙",
         side: "right",
         avatarBg: "#0A0A0A",
       },
@@ -689,7 +689,7 @@ const STORIES: Record<string, Story> = {
         id: "mr_black",
         emoji: "🕴️",
         name: "Mr. Black",
-        nameKo: "블랙 씨",
+        nameKo: "미스터 블랙",
         side: "right",
         avatarBg: "#0A0A0A",
       },
@@ -796,7 +796,7 @@ const STORIES: Record<string, Story> = {
         titleKo: "단서 — Lexicon Society 파일",
         titleEs: "Pista — Archivos de la Sociedad Lexicon",
         descEn: "Project Erase: The Lexicon Society's plan to delete all world languages. They believe controlling language means controlling thought itself. Mr. Black leads the operation.",
-        descKo: "이레이즈 프로젝트: Lexicon Society의 전 세계 언어 삭제 계획. 그들은 언어를 통제하면 생각 자체를 통제할 수 있다고 믿는다. 블랙 씨가 작전을 이끌고 있다.",
+        descKo: "이레이즈 프로젝트: Lexicon Society의 전 세계 언어 삭제 계획. 그들은 언어를 통제하면 생각 자체를 통제할 수 있다고 믿는다. 미스터 블랙이 작전을 이끌고 있다.",
         descEs: "Proyecto Borrado: El plan de la Sociedad Lexicon para eliminar todos los idiomas del mundo. Creen que controlar el lenguaje significa controlar el pensamiento mismo. Mr. Black lidera la operación.",
       },
       {
@@ -854,7 +854,7 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "junhyuk",
         text: "You're wrong, Mr. Black. Language is not a tool — it's a living thing. Every word carries generations of human thought. You can't own it. *stands up, remembering who he is* And I remember everything now.",
-        textKo: "틀렸어요, 블랙 씨. 언어는 도구가 아니에요 — 살아있는 것이에요. 모든 단어에는 수 세대의 인간 사상이 담겨 있어요. 당신은 그걸 소유할 수 없어요. *일어서며, 자신이 누구인지 기억하며* 그리고 저는 이제 모든 것을 기억해요.",
+        textKo: "틀렸어요, 미스터 블랙. 언어는 도구가 아니에요 — 살아있는 것이에요. 모든 단어에는 수 세대의 인간 사상이 담겨 있어요. 당신은 그걸 소유할 수 없어요. *일어서며, 자신이 누구인지 기억하며* 그리고 저는 이제 모든 것을 기억해요.",
         textEs: "Está equivocado, Mr. Black. El lenguaje no es una herramienta — es un ser vivo. Cada palabra lleva generaciones de pensamiento humano. No puedes poseerlo. *se levanta, recordando quién es* Y yo ahora lo recuerdo todo.",
       },
       {
@@ -865,7 +865,7 @@ const STORIES: Record<string, Story> = {
           {
             prompt: { en: "To stop Project Erase, which evidence do you submit to the authorities?", ko: "이레이즈 프로젝트를 막기 위해 당국에 어떤 증거를 제출하나요?", es: "Para detener el Proyecto Borrado, ¿qué evidencia presentas a las autoridades?" },
             clues: [
-              { en: "A photo of Mr. Black entering the building lobby", ko: "블랙 씨가 빌딩 로비에 들어가는 사진", es: "Una foto de Mr. Black entrando al vestíbulo del edificio" },
+              { en: "A photo of Mr. Black entering the building lobby", ko: "미스터 블랙이 빌딩 로비에 들어가는 사진", es: "Una foto de Mr. Black entrando al vestíbulo del edificio" },
               { en: "Junhyuk's complete research files proving the Project Erase conspiracy", ko: "이레이즈 프로젝트 음모를 증명하는 준혁의 완전한 연구 파일", es: "Los archivos de investigación completos de Junhyuk que prueban la conspiración del Proyecto Borrado" },
               { en: "An empty coffee cup from the lab", ko: "연구실의 빈 커피 컵", es: "Una taza de café vacía del laboratorio" },
               { en: "A business card with the Lexicon Society logo", ko: "Lexicon Society 로고가 있는 명함", es: "Una tarjeta de visita con el logo de la Sociedad Lexicon" },
@@ -878,7 +878,7 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         text: "We've done it, Apprentice! The authorities have the evidence. Project Erase is stopped. Mr. Black is in custody. But this is not over — the Language Conspiracy runs deeper still. The world's languages are safe… for now. Our mission continues!",
-        textKo: "해냈어요, 견습생! 당국이 증거를 확보했어요. 이레이즈 프로젝트가 중단됐어요. 블랙 씨가 구금됐어요. 하지만 아직 끝나지 않았어요 — 언어 음모는 더 깊이 뻗어 있어요. 세계의 언어들이 안전해요… 지금은. 우리의 임무는 계속돼요!",
+        textKo: "해냈어요, 견습생! 당국이 증거를 확보했어요. 이레이즈 프로젝트가 중단됐어요. 미스터 블랙이 구금됐어요. 하지만 아직 끝나지 않았어요 — 언어 음모는 더 깊이 뻗어 있어요. 세계의 언어들이 안전해요… 지금은. 우리의 임무는 계속돼요!",
         textEs: "¡Lo logramos, Aprendiz! Las autoridades tienen la evidencia. El Proyecto Borrado está detenido. Mr. Black está bajo custodia. Pero esto no ha terminado — la Conspiración del Lenguaje es aún más profunda. Los idiomas del mundo están a salvo… por ahora. ¡Nuestra misión continúa!",
       },
     ],

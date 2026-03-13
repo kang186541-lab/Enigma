@@ -37,7 +37,7 @@ const CHAPTERS = [
     titleKo: "런던의 암호",
     titleEs: "El Cifrado de Londres",
     descEn: "Decode the ∆LX symbol before Mr. Black erases London's words",
-    descKo: "블랙 씨가 런던의 단어들을 지우기 전에 ∆LX 기호를 해독하라",
+    descKo: "미스터 블랙이 런던의 단어들을 지우기 전에 ∆LX 기호를 해독하라",
     descEs: "Descifra el símbolo ∆LX antes de que Mr. Black borre las palabras de Londres",
     characters: ["🕵️", "👩‍💼", "🕴️"],
     scenes: 17,
