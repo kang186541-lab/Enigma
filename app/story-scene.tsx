@@ -290,7 +290,7 @@ const STORIES: Record<string, Story> = {
         ],
         hints: {
           h1: { ko: "글자를 단서로 뜻을 추측해보게!", en: "Look at the first letter of each word to match its meaning!", es: "¡Mira la primera letra de cada palabra para emparejar su significado!" },
-          h2: { ko: "mysterious=신비로운, cipher=암호, detective=탐정, clue=단서, suspect=용의자", en: "mysterious=strange, cipher=code, detective=investigator, clue=hint, suspect=suspect", es: "mysterious=misterioso, cipher=cifrado, detective=detective, clue=pista, suspect=sospechoso" },
+          h2: { ko: "evidence=증거, investigation=수사, clue=단서", en: "evidence=proof, investigation=inquiry, clue=hint", es: "evidence=prueba, investigation=investigación, clue=pista" },
         },
       },
       {
