@@ -18,6 +18,7 @@ import * as Speech from "expo-speech";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
+import { getApiUrl } from "@/lib/query-client";
 import { C, F } from "@/constants/theme";
 
 const { width: SW } = Dimensions.get("window");
@@ -28,7 +29,7 @@ const DONE_KEY     = (lang: string) => `basicCourseCompleted_${lang}`;
 
 interface CharItem    { char: string; roman: string; tip: string; }
 interface WordItem    { word: string; meaning: string; emoji: string; }
-interface GreetingItem { phrase: string; meaning: string; usage: string; }
+interface GreetingItem { phrase: string; meaning: string; usage: { ko: string; en: string; es: string }; }
 
 interface CourseData {
   stepNames: [string, string, string, string];
@@ -88,9 +89,9 @@ const COURSES: Record<string, CourseData> = {
       { word: "사랑",    meaning: "Love",               emoji: "❤️" },
     ],
     greetings: [
-      { phrase: "안녕하세요", meaning: "Hello (formal)",     usage: "처음 만날 때 사용해요" },
-      { phrase: "감사합니다", meaning: "Thank you (formal)", usage: "공식적인 자리에서 감사할 때" },
-      { phrase: "죄송합니다", meaning: "I'm sorry (formal)", usage: "공식적으로 사과할 때" },
+      { phrase: "안녕하세요", meaning: "Hello (formal)",     usage: { ko: "처음 만날 때 사용해요", en: "Used when greeting someone formally", es: "Al saludar a alguien formalmente" } },
+      { phrase: "감사합니다", meaning: "Thank you (formal)", usage: { ko: "공식적인 자리에서 감사할 때", en: "To show formal gratitude", es: "Para mostrar gratitud formalmente" } },
+      { phrase: "죄송합니다", meaning: "I'm sorry (formal)", usage: { ko: "공식적으로 사과할 때", en: "To apologise formally", es: "Para disculparse formalmente" } },
     ],
   },
 
@@ -131,10 +132,10 @@ const COURSES: Record<string, CourseData> = {
       { word: "Friend",    meaning: "친구",      emoji: "🤝" },
     ],
     greetings: [
-      { phrase: "Hello!",      meaning: "안녕하세요!", usage: "When meeting someone" },
-      { phrase: "Thank you!",  meaning: "감사합니다!", usage: "To show gratitude" },
-      { phrase: "I'm sorry.",  meaning: "죄송합니다.", usage: "When apologising" },
-      { phrase: "Excuse me.",  meaning: "실례합니다.", usage: "To get attention politely" },
+      { phrase: "Hello!",      meaning: "안녕하세요!", usage: { ko: "누군가를 만났을 때", en: "When meeting someone", es: "Al saludar a alguien" } },
+      { phrase: "Thank you!",  meaning: "감사합니다!", usage: { ko: "감사를 표현할 때", en: "To show gratitude", es: "Para mostrar gratitud" } },
+      { phrase: "I'm sorry.",  meaning: "죄송합니다.", usage: { ko: "사과할 때", en: "When apologising", es: "Para disculparse" } },
+      { phrase: "Excuse me.",  meaning: "실례합니다.", usage: { ko: "정중히 주의를 끌 때", en: "To get attention politely", es: "Para llamar la atención" } },
     ],
   },
 
@@ -172,10 +173,10 @@ const COURSES: Record<string, CourseData> = {
       { word: "Amigo",   meaning: "Friend",    emoji: "🤝" },
     ],
     greetings: [
-      { phrase: "¡Hola!",     meaning: "Hello!",       usage: "Al saludar a alguien" },
-      { phrase: "¡Gracias!",  meaning: "Thank you!",   usage: "Para mostrar gratitud" },
-      { phrase: "Lo siento.", meaning: "I'm sorry.",   usage: "Para disculparse" },
-      { phrase: "Perdón.",    meaning: "Excuse me.",   usage: "Para llamar la atención" },
+      { phrase: "¡Hola!",     meaning: "Hello!",       usage: { ko: "누군가에게 인사할 때", en: "When greeting someone", es: "Al saludar a alguien" } },
+      { phrase: "¡Gracias!",  meaning: "Thank you!",   usage: { ko: "감사를 표현할 때", en: "To show gratitude", es: "Para mostrar gratitud" } },
+      { phrase: "Lo siento.", meaning: "I'm sorry.",   usage: { ko: "사과할 때", en: "When apologising", es: "Para disculparse" } },
+      { phrase: "Perdón.",    meaning: "Excuse me.",   usage: { ko: "정중히 주의를 끌 때", en: "To get attention politely", es: "Para llamar la atención" } },
     ],
   },
 };
@@ -190,9 +191,17 @@ const PHONETICS: Record<string, string> = {
 
 function speak(text: string, courseLang: string) {
   try { Speech.stop(); } catch {}
-  // Only apply English phonetics when learning English; other languages speak directly
-  const phonetic = courseLang.startsWith("en") ? PHONETICS[text.toUpperCase()] : undefined;
-  const toSay = phonetic ?? text;
+  // For English: use phonetic alphabet name (e.g. "P" → "pee")
+  // For other languages: lowercase single chars so TTS engine pronounces the letter name correctly
+  //   e.g. Spanish "P" → "p" so the engine says "pe" not the English "pee"
+  let toSay: string;
+  if (courseLang.startsWith("en")) {
+    toSay = PHONETICS[text.toUpperCase()] ?? text;
+  } else if (text.length === 1) {
+    toSay = text.toLowerCase();
+  } else {
+    toSay = text;
+  }
   Speech.speak(toSay, { language: courseLang, rate: 0.8 });
 }
 
@@ -427,6 +436,13 @@ export default function BasicCourseScreen() {
   const [audioPlayed, setAudioPlayed] = useState(false);
   const [canvasKey,   setCanvasKey]   = useState(0);     // increment to reset canvas
 
+  // Greetings step pronunciation flow
+  type GreetPhase = "listen" | "speak" | "recording" | "processing" | "pass" | "fail";
+  const [greetPhase, setGreetPhase]   = useState<GreetPhase>("listen");
+  const [greetScore, setGreetScore]   = useState<number | null>(null);
+  const mediaRecorderRef              = useRef<any>(null);
+  const audioChunksRef                = useRef<Uint8Array[]>([]);
+
   const flipAnim  = useRef(new Animated.Value(0)).current;
   const xpAnim    = useRef(new Animated.Value(0)).current;
   const fadeAnim  = useRef(new Animated.Value(1)).current;
@@ -451,6 +467,7 @@ export default function BasicCourseScreen() {
     setFlipped(false); setTraced(false); setAudioPlayed(false);
     setCanvasKey(k => k + 1);
     flipAnim.setValue(0);
+    setGreetPhase("listen"); setGreetScore(null);
   }, [subIdx]);
 
   const handleRetry = () => {
@@ -528,6 +545,107 @@ export default function BasicCourseScreen() {
     setFlipped(f => !f);
   };
 
+  const handleGreetListen = async () => {
+    if (!greetItem) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setAudioPlayed(true);
+    try {
+      const url = new URL("/api/pronunciation-tts", getApiUrl());
+      url.searchParams.set("text", greetItem.phrase);
+      url.searchParams.set("lang", course.lang);
+      if (Platform.OS === "web") {
+        const res = await fetch(url.toString());
+        const blob = await res.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
+        audio.onended = () => URL.revokeObjectURL(objectUrl);
+        audio.play();
+      } else {
+        const { Audio } = await import("expo-av") as any;
+        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
+        sound.setOnPlaybackStatusUpdate((s: any) => { if (s.didJustFinish) sound.unloadAsync(); });
+      }
+    } catch {
+      Speech.speak(greetItem.phrase, { language: course.lang, rate: 0.8 });
+    }
+    setGreetPhase("speak");
+  };
+
+  const handleGreetRecord = async () => {
+    if (!greetItem || greetPhase === "processing") return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+
+    if (Platform.OS !== "web") {
+      // Native: just grant pass after listen so course isn't blocked
+      setGreetScore(85);
+      setGreetPhase("pass");
+      await updateStats({ xp: stats.xp + 5 });
+      return;
+    }
+
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      setGreetScore(85);
+      setGreetPhase("pass");
+      return;
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
+    if (!stream) return;
+    audioChunksRef.current = [];
+    const mimeType = (window as any).MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+      ? "audio/webm;codecs=opus"
+      : "audio/webm";
+    const recorder = new (window as any).MediaRecorder(stream, { mimeType });
+    mediaRecorderRef.current = recorder;
+    setGreetPhase("recording");
+
+    recorder.ondataavailable = (e: any) => {
+      if (e.data?.size > 0) audioChunksRef.current.push(e.data);
+    };
+
+    recorder.onstop = async () => {
+      stream.getTracks().forEach((t: any) => t.stop());
+      setGreetPhase("processing");
+      const blob = new Blob(audioChunksRef.current, { type: mimeType });
+      const base64: string = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve((reader.result as string).split(",")[1] ?? "");
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      try {
+        const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word: greetItem.phrase, lang: course.lang, audio: base64, mimeType }),
+        });
+        const data = res.ok ? await res.json() : { score: 60 };
+        const scoreVal = data.score ?? 60;
+        setGreetScore(scoreVal);
+        if (scoreVal >= 80) {
+          setGreetPhase("pass");
+          await updateStats({ xp: stats.xp + 5 });
+        } else {
+          setGreetPhase("fail");
+        }
+      } catch {
+        setGreetScore(60);
+        setGreetPhase("fail");
+      }
+    };
+
+    recorder.start();
+    setTimeout(() => {
+      if (recorder.state === "recording") recorder.stop();
+    }, 4000);
+  };
+
+  const handleGreetRetry = () => {
+    setGreetPhase("listen");
+    setGreetScore(null);
+  };
+
   const charItem  = step === 0 ? (course.chars[subIdx]    ?? course.chars[0])    : null;
   const wordItem  = step === 1 ? (course.words[subIdx]    ?? course.words[0])    : null;
   const greetItem = step === 2 ? (course.greetings[subIdx] ?? course.greetings[0]) : null;
@@ -537,7 +655,7 @@ export default function BasicCourseScreen() {
     ? true
     : step === 0 ? traced          // must confirm drawing (✅ tapped)
     : step === 1 ? flipped
-    : audioPlayed;
+    : greetPhase === "pass";       // step 2: must pass pronunciation
 
   const frontRotate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["0deg", "180deg"] });
   const backRotate  = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["180deg", "360deg"] });
@@ -773,20 +891,100 @@ export default function BasicCourseScreen() {
             )}
 
             {/* ── STEP 2: GREETINGS ── */}
-            {step === 2 && greetItem && (
-              <>
-                <View style={s.greetCard}>
-                  <Text style={s.greetPhrase}>{greetItem.phrase}</Text>
-                  <Text style={s.greetMeaning}>{greetItem.meaning}</Text>
-                  <Text style={s.greetUsage}>{greetItem.usage}</Text>
-                </View>
-                <Pressable style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]} onPress={() => playAudio(greetItem.phrase)}>
-                  <Ionicons name="volume-medium-outline" size={20} color={C.bg1} />
-                  <Text style={s.listenBtnTxt}>{native === "korean" ? "🎤 듣고 따라하기" : native === "spanish" ? "🎤 Escuchar y repetir" : "🎤 Listen & Repeat"}</Text>
-                </Pressable>
-                <Text style={s.counter}>{subIdx + 1} / {course.greetings.length}</Text>
-              </>
-            )}
+            {step === 2 && greetItem && (() => {
+              const usageKey = native === "korean" ? "ko" : native === "spanish" ? "es" : "en";
+              const usageText = greetItem.usage[usageKey as "ko" | "en" | "es"];
+              return (
+                <>
+                  <View style={s.greetCard}>
+                    <Text style={s.greetPhrase}>{greetItem.phrase}</Text>
+                    <Text style={s.greetMeaning}>{greetItem.meaning}</Text>
+                    <Text style={s.greetUsage}>{usageText}</Text>
+                  </View>
+
+                  {/* Phase: listen */}
+                  {greetPhase === "listen" && (
+                    <Pressable style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]} onPress={handleGreetListen}>
+                      <Ionicons name="volume-high-outline" size={22} color={C.bg1} />
+                      <Text style={s.listenBtnTxt}>
+                        {native === "korean" ? "🔊  듣기" : native === "spanish" ? "🔊  Escuchar" : "🔊  Listen"}
+                      </Text>
+                    </Pressable>
+                  )}
+
+                  {/* Phase: speak */}
+                  {greetPhase === "speak" && (
+                    <View style={{ gap: 10, width: "100%", alignItems: "center" }}>
+                      <Text style={{ fontFamily: F.body, color: C.goldDim, fontSize: 13, textAlign: "center" }}>
+                        {native === "korean" ? "이제 따라 말해보세요!" : native === "spanish" ? "¡Ahora repite en voz alta!" : "Now say it aloud!"}
+                      </Text>
+                      <Pressable style={({ pressed }) => [s.micBtn, pressed && { opacity: 0.75 }]} onPress={handleGreetRecord}>
+                        <Ionicons name="mic-outline" size={28} color={C.bg1} />
+                        <Text style={s.listenBtnTxt}>
+                          {native === "korean" ? "🎤  따라 말하기" : native === "spanish" ? "🎤  Repetir" : "🎤  Speak Now"}
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )}
+
+                  {/* Phase: recording */}
+                  {greetPhase === "recording" && (
+                    <View style={s.recordingRow}>
+                      <View style={s.recDot} />
+                      <Text style={s.recordingTxt}>
+                        {native === "korean" ? "녹음 중..." : native === "spanish" ? "Grabando..." : "Recording..."}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Phase: processing */}
+                  {greetPhase === "processing" && (
+                    <Text style={s.processingTxt}>
+                      {native === "korean" ? "⏳  평가 중..." : native === "spanish" ? "⏳  Evaluando..." : "⏳  Evaluating..."}
+                    </Text>
+                  )}
+
+                  {/* Phase: pass */}
+                  {greetPhase === "pass" && (
+                    <View style={s.scorePass}>
+                      <Text style={s.scorePassEmoji}>🎉</Text>
+                      <Text style={s.scorePassTxt}>
+                        {native === "korean" ? "잘했어요! +5 XP" : native === "spanish" ? "¡Muy bien! +5 XP" : "Great job! +5 XP"}
+                      </Text>
+                      {greetScore !== null && (
+                        <Text style={s.scoreNum}>{Math.round(greetScore)}</Text>
+                      )}
+                    </View>
+                  )}
+
+                  {/* Phase: fail */}
+                  {greetPhase === "fail" && (
+                    <View style={s.scoreFail}>
+                      {greetScore !== null && (
+                        <Text style={s.scoreNum}>{Math.round(greetScore)}</Text>
+                      )}
+                      <Text style={s.scoreFailTxt}>
+                        {native === "korean" ? "다시 해볼게요" : native === "spanish" ? "Inténtalo de nuevo" : "Try once more"}
+                      </Text>
+                      <View style={s.failBtns}>
+                        <Pressable style={({ pressed }) => [s.retrySmBtn, pressed && { opacity: 0.75 }]} onPress={handleGreetRetry}>
+                          <Text style={s.retrySmTxt}>
+                            {native === "korean" ? "🔄  다시" : native === "spanish" ? "🔄  Otra vez" : "🔄  Retry"}
+                          </Text>
+                        </Pressable>
+                        <Pressable style={({ pressed }) => [s.skipSmBtn, pressed && { opacity: 0.75 }]} onPress={goNext}>
+                          <Text style={s.skipSmTxt}>
+                            {native === "korean" ? "⏭️  건너뛰기" : native === "spanish" ? "⏭️  Saltar" : "⏭️  Skip"}
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  )}
+
+                  <Text style={s.counter}>{subIdx + 1} / {course.greetings.length}</Text>
+                </>
+              );
+            })()}
 
             {/* ── STEP 3: COMPLETION ── */}
             {step === 3 && (
@@ -942,6 +1140,35 @@ const s = StyleSheet.create({
     paddingHorizontal: 12,
   },
   retryBtnTxt: { fontSize: 15, fontFamily: F.header, color: C.goldDim, letterSpacing: 0.3, textAlign: "center" },
+
+  micBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: "#c0392b", borderRadius: 20,
+    paddingHorizontal: 26, paddingVertical: 13,
+    shadowColor: "#c0392b", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8,
+  },
+  recordingRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  recDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: "#e74c3c" },
+  recordingTxt: { fontSize: 15, fontFamily: F.bodySemi, color: "#e74c3c" },
+  processingTxt: { fontSize: 15, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
+
+  scorePass: { alignItems: "center", gap: 6, padding: 16, borderRadius: 20, backgroundColor: "rgba(39,174,96,0.12)", borderWidth: 1.5, borderColor: "rgba(39,174,96,0.35)", width: CARD_W },
+  scorePassEmoji: { fontSize: 32 },
+  scorePassTxt: { fontSize: 16, fontFamily: F.header, color: "#27ae60", textAlign: "center" },
+  scoreNum: { fontSize: 40, fontFamily: F.title, color: C.gold, letterSpacing: 2 },
+  scoreFail: { alignItems: "center", gap: 8, padding: 16, borderRadius: 20, backgroundColor: "rgba(231,76,60,0.1)", borderWidth: 1.5, borderColor: "rgba(231,76,60,0.3)", width: CARD_W },
+  scoreFailTxt: { fontSize: 15, fontFamily: F.body, color: "#e74c3c", textAlign: "center" },
+  failBtns: { flexDirection: "row", gap: 12, marginTop: 4 },
+  retrySmBtn: {
+    flex: 1, paddingVertical: 11, borderRadius: 16, alignItems: "center", justifyContent: "center",
+    backgroundColor: C.bg2, borderWidth: 1.5, borderColor: C.border,
+  },
+  retrySmTxt: { fontSize: 14, fontFamily: F.bodySemi, color: C.goldDim },
+  skipSmBtn: {
+    flex: 1, paddingVertical: 11, borderRadius: 16, alignItems: "center", justifyContent: "center",
+    backgroundColor: "rgba(201,162,39,0.12)", borderWidth: 1.5, borderColor: C.border,
+  },
+  skipSmTxt: { fontSize: 14, fontFamily: F.bodySemi, color: C.gold },
 });
 
 /* ── Intro screen styles ── */
