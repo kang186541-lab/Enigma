@@ -115,6 +115,7 @@ type PuzzleType =
 interface PuzzleHints {
   h1: Tri;
   h2: Tri;
+  h3?: Tri;
 }
 
 /* Sequence items */
@@ -289,8 +290,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "글자를 단서로 뜻을 추측해보게!", en: "Look at the first letter of each word to match its meaning!", es: "¡Mira la primera letra de cada palabra para emparejar su significado!" },
-          h2: { ko: "evidence=증거, investigation=수사, clue=단서", en: "evidence=proof, investigation=inquiry, clue=hint", es: "evidence=prueba, investigation=investigación, clue=pista" },
+          h1: { ko: "이 단어들이 어떤 이야기와 분위기에서 나왔는지 상상해봐", en: "Think about what story and atmosphere these words come from", es: "Piensa en qué historia y ambiente aparecen estas palabras" },
+          h2: { ko: "모두 탐정 소설에서 나온 단어야 — 사건, 비밀, 수사와 연결돼", en: "All from detective fiction — connected to crimes, secrets, and investigations", es: "Todas vienen de la ficción detectivesca — crímenes, secretos, investigaciones" },
+          h3: { ko: "각 단어가 '사람'인지, '물건/개념'인지, '느낌'인지로 나눠봐", en: "Sort each word: is it a 'person', an 'object/concept', or a 'feeling'?", es: "Clasifica cada palabra: ¿es una 'persona', un 'objeto/concepto' o una 'sensación'?" },
         },
       },
       {
@@ -431,8 +433,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "천천히 다시 들어보게! 🔊 버튼을 눌러보게", en: "Listen again slowly! Try the 🔊 button", es: "¡Escucha de nuevo despacio! Pulsa el botón 🔊" },
-          h2: { ko: "첫 번째 단어에 집중해보게!", en: "Focus on the first word!", es: "¡Concéntrate en la primera palabra!" },
+          h1: { ko: "🔊 버튼을 눌러서 다시 한번 들어봐", en: "Press 🔊 and listen again", es: "Pulsa 🔊 y escucha de nuevo" },
+          h2: { ko: "행동을 나타내는 동사에 집중해봐 — 탐정이 하는 핵심 행동이야", en: "Focus on the action verb — it's the key detective action", es: "Concéntrate en el verbo de acción — es la acción clave del detective" },
+          h3: { ko: "매우 꼼꼼하게 '살펴보는' 행동이야 — 대충이 아닌 정밀한 조사를 뜻해", en: "It's the action of looking very carefully — precise inspection, not casual glancing", es: "Es la acción de examinar muy cuidadosamente — inspección precisa, no casual" },
         },
       },
       {
@@ -482,8 +485,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "주어(I/The)로 시작하는 단어를 먼저 찾아보게!", en: "Find the subject (I/The) word first!", es: "¡Encuentra primero la palabra sujeto (I/The)!" },
-          h2: { ko: "The mysterious letter was found in the library.", en: "The mysterious letter was found in the library.", es: "The mysterious letter was found in the library." },
+          h1: { ko: "주어(The)로 시작할 단어를 먼저 찾아봐", en: "Find the word that starts the subject (The)", es: "Encuentra la palabra que inicia el sujeto (The)" },
+          h2: { ko: "영어 수동태야: 주어 + was + 동사(과거분사) + 장소", en: "It's passive voice: subject + was + past participle + place", es: "Es voz pasiva: sujeto + was + participio pasado + lugar" },
+          h3: { ko: "신비로운 무언가가 어딘가에서 발견됐어 — 누가 한 것이 아닌 수동 형태야", en: "Something mysterious was found somewhere — it happened to it, not by it", es: "Algo misterioso fue encontrado en algún lugar — le ocurrió, no lo hizo" },
         },
       },
       {
@@ -506,8 +510,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "천천히 또박또박 말해보게!", en: "Speak slowly and clearly!", es: "¡Habla despacio y claramente!" },
-          h2: { ko: "각 단어를 나눠서 말해보게: mys-te-ri-ous", en: "Break each word apart: mys-te-ri-ous", es: "Separa cada palabra: mys-te-ri-ous" },
+          h1: { ko: "🎤 버튼을 누르고 자신 있게 말해봐", en: "Press 🎤 and speak confidently", es: "Pulsa 🎤 y habla con confianza" },
+          h2: { ko: "긴 단어는 음절로 나눠봐: lan-guage, great-est, weap-on", en: "Break long words into syllables: lan-guage, great-est, weap-on", es: "Divide palabras largas en sílabas: lan-guage, great-est, weap-on" },
+          h3: { ko: "속도보다 정확성이 중요해 — 천천히 또박또박 말하면 돼", en: "Accuracy matters more than speed — speak slowly and clearly", es: "La precisión importa más que la velocidad — habla despacio y claro" },
         },
       },
       {
@@ -636,8 +641,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "스페인어와 한국어의 비슷한 느낌을 찾아보게!", en: "Look for familiar sounds between languages!", es: "¡Busca sonidos familiares entre los idiomas!" },
-          h2: { ko: "hola=안녕하세요, gracias=감사합니다, ayuda=도움, desaparecido=실종된, biblioteca=도서관", en: "hola=hello, gracias=thank you, ayuda=help, desaparecido=missing, biblioteca=library", es: "hola=hola, gracias=gracias, ayuda=ayuda, desaparecido=desaparecido, biblioteca=biblioteca" },
+          h1: { ko: "단어를 소리 내어 읽어봐 — 발음 자체가 힌트야", en: "Say the word aloud — the sound itself is the clue", es: "Di la palabra en voz alta — el sonido mismo es la pista" },
+          h2: { ko: "배우는 언어 단어와 영어가 발음이나 형태가 비슷할 때가 많아 — 모양과 소리를 비교해봐", en: "Target language words often sound or look like English — compare the shapes and sounds", es: "Las palabras del idioma objetivo a menudo se parecen al inglés — compara formas y sonidos" },
+          h3: { ko: "이 단어들 중에 인사, 감사, 도움 요청, 실종된 사람, 건물 이름이 각각 하나씩 있어", en: "Among these words: one is a greeting, one is gratitude, one is a request for help, one is about a missing person, one is a building", es: "Entre estas palabras hay: un saludo, gratitud, petición de ayuda, una persona desaparecida, un edificio" },
         },
       },
       {
@@ -709,8 +715,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "스페인어는 적힌 대로 읽어! 발음이 규칙적이야", en: "Spanish is pronounced as written — very regular!", es: "¡El español se pronuncia tal como se escribe!" },
-          h2: { ko: "¿Dónde está? = 어디 있어요?", en: "¿Dónde está? = Where is it?", es: "¿Dónde está? = ¿Dónde está?" },
+          h1: { ko: "🔊를 여러 번 눌러봐 — 반복 청취가 최고의 힌트야", en: "Press 🔊 multiple times — repeated listening is the best hint", es: "Pulsa 🔊 varias veces — escuchar repetidamente es la mejor pista" },
+          h2: { ko: "문장의 첫 번째 단어에 집중해봐 — 의문사나 장소 표현이 핵심이야", en: "Focus on the first word — the question word or place expression is key", es: "Concéntrate en la primera palabra — la pregunta o expresión de lugar es clave" },
+          h3: { ko: "어디에 있는지 묻는 장면이야 — 장소를 나타내는 건물 이름이 들릴 거야", en: "It's a scene asking where something is — listen for the name of a building or place", es: "Es una escena preguntando dónde está algo — escucha el nombre de un edificio o lugar" },
         },
       },
       {
@@ -744,8 +751,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "문장의 앞뒤 내용을 보고 어울리는 단어를 골라보게!", en: "Read the context around the blank to find the right word!", es: "¡Lee el contexto alrededor del espacio en blanco!" },
-          h2: { ko: "Necesito ___ ayuda → 'más' (더 많은)", en: "Necesito ___ ayuda → 'más' (more)", es: "Necesito ___ ayuda → 'más' (more)" },
+          h1: { ko: "빈칸 앞뒤 문맥을 보고 자연스러운 단어를 골라봐", en: "Read the context before and after the blank to find a natural fit", es: "Lee el contexto antes y después del espacio para encontrar la palabra natural" },
+          h2: { ko: "배우는 언어의 동사는 주어에 따라 형태가 바뀌어 — 문장의 주어가 누구인지 먼저 파악해봐", en: "Verbs in the target language change form by subject — first figure out who the subject is", es: "Los verbos cambian según el sujeto — primero identifica quién es el sujeto de la oración" },
+          h3: { ko: "첫 번째 빈칸: Carlos가 어떤 행동을 했길래 아무도 막지 못했을까?", en: "First blank: what action did Carlos take that nobody could stop?", es: "Primer espacio: ¿qué acción realizó Carlos que nadie pudo detener?" },
         },
       },
       {
@@ -779,8 +787,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "수상한 단어나 장소 이름을 주목해보게!", en: "Look for suspicious words or place names!", es: "¡Busca palabras o lugares sospechosos!" },
-          h2: { ko: "'biblioteca' (도서관) 를 탭해보게!", en: "Try tapping 'biblioteca' (the library)!", es: "¡Intenta tocar 'biblioteca' (la biblioteca)!" },
+          h1: { ko: "나열된 단서들을 꼼꼼히 하나씩 읽어봐", en: "Read each clue carefully one by one", es: "Lee cada pista con cuidado, una por una" },
+          h2: { ko: "Lexicon Society와 직접 연결된 증거를 찾아봐 — 그들만의 상징이 있어", en: "Look for evidence that directly links to the Lexicon Society — they have a unique symbol", es: "Busca evidencia que conecte directamente con la Sociedad Lexicon — tienen un símbolo único" },
+          h3: { ko: "Carlos가 직접 입거나 사용한 물건 중에 ∆LX 흔적이 있는 게 핵심이야", en: "The key is an item Carlos personally wore or used that bears the ∆LX mark", es: "Lo clave es un objeto que Carlos usaba personalmente y tiene la marca ∆LX" },
         },
       },
       {
@@ -808,8 +817,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "정중한 표현을 고르는 게 항상 안전해!", en: "Choosing the polite expression is always the safest bet!", es: "¡Elegir la expresión más educada siempre es seguro!" },
-          h2: { ko: "¿Puede ayudarme? = 도와주실 수 있나요?", en: "¿Puede ayudarme? = Can you help me?", es: "¿Puede ayudarme? = ¿Puede ayudarme?" },
+          h1: { ko: "탐정의 입장에서 가장 유용한 선택을 골라봐", en: "Choose the option most useful to a detective", es: "Elige la opción más útil para un detective" },
+          h2: { ko: "Isabella가 극장 구석구석을 안다고 했어 — 그 능력을 최대한 활용할 대화를 골라봐", en: "Isabella said she knows every corner of the theatre — pick the response that uses her knowledge best", es: "Isabella dijo que conoce cada rincón del teatro — elige la respuesta que mejor use su conocimiento" },
+          h3: { ko: "구체적인 목표를 제시하는 것이 가장 탐정다운 요청이야 — 무엇을 찾아야 하는지 명확히 알려줘", en: "The most detective-like request states a specific goal — tell her clearly what to look for", es: "La solicitud más detectivesca establece un objetivo específico — dile claramente qué buscar" },
         },
       },
       {
@@ -938,8 +948,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "한국어는 자음+모음 조합이야! ㅎ+ㅏ+ㄴ = 한", en: "Look at the shape of each character to find clues!", es: "¡Mira la forma de cada carácter para encontrar pistas!" },
-          h2: { ko: "비밀 결사의 이름을 기억해보게: Lexicon Society = 언어 조직", en: "Remember the organisation name: Lexicon Society = language organisation", es: "Recuerda el nombre: Sociedad Lexicon = organización lingüística" },
+          h1: { ko: "단어를 소리 내어 읽어봐 — 음절 하나하나가 힌트야", en: "Say the word aloud — each syllable is a clue", es: "Di la palabra en voz alta — cada sílaba es una pista" },
+          h2: { ko: "서울 챕터 단어들은 과학 연구와 음모에 관한 말이야 — 전파, 기억, 주파수, 지우기와 연결돼", en: "Seoul chapter words relate to scientific research and conspiracy — frequency, memory, erase, network", es: "Las palabras del capítulo Seúl se relacionan con investigación científica y conspiración" },
+          h3: { ko: "각 단어가 이야기 속에서 어떤 역할을 하는지 생각해봐 — 사건과 연구, 두 가지 측면이야", en: "Think about what role each word plays in the story — there are two aspects: the incident and the research", es: "Piensa en qué papel juega cada palabra — hay dos aspectos: el incidente y la investigación" },
         },
       },
       {
@@ -999,8 +1010,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "탐정으로서 가장 적극적인 대답을 골라보게!", en: "As a detective, pick the most proactive response!", es: "¡Como detective, elige la respuesta más activa!" },
-          h2: { ko: "언어를 지키는 것이 우리의 임무야!", en: "Protecting language is our mission!", es: "¡Proteger el lenguaje es nuestra misión!" },
+          h1: { ko: "24시간 안에 막아야 해 — 어떻게 반응할지 신중하게 골라봐", en: "You have 24 hours to stop it — choose your response carefully", es: "Tienes 24 horas para detenerlo — elige tu respuesta con cuidado" },
+          h2: { ko: "탐정은 정보를 수집하고 즉시 행동해 — 두 가지를 동시에 해야 해", en: "A detective gathers information AND acts immediately — both are needed", es: "Un detective recoge información Y actúa de inmediato — ambas cosas son necesarias" },
+          h3: { ko: "3,000개의 단어가 사라진다면 어떻게 될까? 그 심각성에 맞는 적극적인 반응을 골라봐", en: "What happens if 3,000 words disappear? Choose the response that matches the seriousness", es: "¿Qué pasa si desaparecen 3,000 palabras? Elige una respuesta acorde a la gravedad" },
         },
       },
       {
@@ -1022,8 +1034,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "주어(language/언어는)로 시작해보게!", en: "Start with the subject (language)!", es: "¡Empieza con el sujeto (language)!" },
-          h2: { ko: "Language is the key to freedom.", en: "Language is the key to freedom.", es: "Language is the key to freedom." },
+          h1: { ko: "주어(Language)로 시작해봐", en: "Start with the subject (Language)", es: "Empieza con el sujeto (Language)" },
+          h2: { ko: "Language + is + ??? + to + freedom — 'to freedom'와 연결되는 핵심 단어를 찾아봐", en: "Language + is + ??? + to + freedom — find the core word that links with 'to freedom'", es: "Language + is + ??? + to + freedom — encuentra la palabra clave que conecta con 'to freedom'" },
+          h3: { ko: "자유에 이르는 '수단'을 나타내는 단어야 — 잠긴 문을 여는 물건을 생각해봐", en: "It's a word meaning a 'means' to reach freedom — think of the object that opens a locked door", es: "Es una palabra que significa un 'medio' para alcanzar la libertad — piensa en el objeto que abre una puerta" },
         },
       },
       {
@@ -1057,8 +1070,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "결정적인 증거를 찾아보게 — 직접 음모를 증명하는 것!", en: "Look for the decisive proof — the one that directly proves the conspiracy!", es: "¡Busca la prueba decisiva — la que prueba directamente la conspiración!" },
-          h2: { ko: "준혁의 연구 파일이 가장 확실한 증거야!", en: "Junhyuk's research files are the strongest evidence!", es: "¡Los archivos de investigación de Junhyuk son la evidencia más sólida!" },
+          h1: { ko: "당국에 제출할 가장 강력한 증거를 골라봐", en: "Choose the strongest evidence to submit to the authorities", es: "Elige la evidencia más sólida para presentar a las autoridades" },
+          h2: { ko: "이레이즈 프로젝트의 존재를 '증명'할 수 있는 자료가 필요해 — 상징이나 사진만으로는 부족해", en: "You need material that can prove the existence of Project Erase — symbols or photos alone aren't enough", es: "Necesitas material que pruebe la existencia del Proyecto Borrado — solo símbolos o fotos no son suficientes" },
+          h3: { ko: "이 사건을 직접 연구한 사람이 남긴 기록이 있어 — 그 기록이 가장 완전한 증거야", en: "There's a record left by the person who directly researched this case — that record is the most complete evidence", es: "Hay un registro dejado por quien investigó directamente este caso — ese registro es la evidencia más completa" },
         },
       },
       {
@@ -2708,8 +2722,12 @@ export default function StoryScene() {
             ? `🧩 Puzzle ${item.puzzleNum} — ¡Demuestra tus habilidades lingüísticas!`
             : `🧩 Puzzle ${item.puzzleNum} — Prove your language skills!`;
           const hasSharedHints = !!item.hints && item.pType !== "cipher";
-          const h1 = item.hints ? (ko ? item.hints.h1.ko : es ? item.hints.h1.es : item.hints.h1.en) : "";
-          const h2 = item.hints ? (ko ? item.hints.h2.ko : es ? item.hints.h2.es : item.hints.h2.en) : "";
+          const tri_ = (t: Tri) => ko ? t.ko : es ? t.es : t.en;
+          const h1 = item.hints ? tri_(item.hints.h1) : "";
+          const h2 = item.hints ? tri_(item.hints.h2) : "";
+          const h3 = item.hints?.h3 ? tri_(item.hints.h3) : null;
+          const allHints = [h1, h2, h3].filter(Boolean) as string[];
+          const totalHints = allHints.length;
 
           return (
             <>
@@ -2754,7 +2772,7 @@ export default function StoryScene() {
                     onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSharedHintVisible(true); }}
                   >
                     <Text style={styles.sharedHintBtnText}>
-                      💡 {ko ? `힌트 보기 (${sharedHintLevel}/2)` : es ? `Ver pistas (${sharedHintLevel}/2)` : `Hints (${sharedHintLevel}/2)`}
+                      💡 {ko ? `힌트 보기 (${sharedHintLevel}/${totalHints})` : es ? `Ver pistas (${sharedHintLevel}/${totalHints})` : `Hints (${sharedHintLevel}/${totalHints})`}
                     </Text>
                   </Pressable>
                 )}
@@ -2771,7 +2789,7 @@ export default function StoryScene() {
                         </Pressable>
                       </View>
                       <View style={styles.hintNotebookRule} />
-                      {[h1, h2].map((hint, i) => (
+                      {allHints.map((hint, i) => (
                         <View key={i} style={styles.hintRow}>
                           {sharedHintLevel > i ? (
                             <View style={styles.hintUnlocked}>
