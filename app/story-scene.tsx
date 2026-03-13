@@ -1518,42 +1518,126 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
 
   // ── Result screen ──
   if (showResult) {
+    const ko = lang === "korean";
+    const es = lang === "spanish";
+
+    if (!isCorrect) {
+      // ── WRONG ANSWER ──
+      return (
+        <View style={styles.puzzleBox}>
+          <View style={styles.puzzleHeaderRow}>
+            <Text style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : "Decode the Cipher!"}</Text>
+            <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
+          </View>
+
+          {/* Error banner — NO answer reveal */}
+          <View style={styles.cipherResultWrong}>
+            <Text style={styles.cipherResultTitle}>
+              ❌ {ko ? "틀렸어요" : es ? "Incorrecto" : "Wrong!"}
+            </Text>
+          </View>
+
+          {/* Fox dialogue */}
+          <View style={styles.cipherLingoRow}>
+            <Text style={styles.cipherLingoEmoji}>🦊</Text>
+            <View style={styles.cipherLingoBubble}>
+              <Text style={[styles.cipherLingoBubbleText, { color: "#2c1810" }]}>
+                {ko ? "흠… 뭔가 조금 다른 것 같군요, 견습생." : es ? "Hmm… algo no está bien, aprendiz." : "Hmm… something's not quite right, apprentice."}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.cipherRetryHint}>
+            {ko ? "조금만 더 생각해보세요." : es ? "Piénsalo un poco más." : "Think it over a bit more."}
+          </Text>
+
+          {/* Buttons: Retry + Hint */}
+          <View style={styles.cipherBtnRow}>
+            <Pressable style={[styles.puzzleConfirmBtn, styles.cipherRetryBtn]} onPress={handleRetry}>
+              <Text style={[styles.puzzleConfirmText, { color: C.gold }]}>
+                {ko ? "다시 시도" : es ? "Reintentar" : "Retry"}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.puzzleConfirmBtn, { flex: 1 }]}
+              onPress={() => { setShowHintModal(true); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+            >
+              <Text style={styles.puzzleConfirmText}>
+                💡 {ko ? "힌트 보기" : es ? "Ver pistas" : "Show Hints"}
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Hint Modal (shared) */}
+          <Modal visible={showHintModal} transparent animationType="fade" onRequestClose={() => setShowHintModal(false)}>
+            <Pressable style={styles.hintOverlay} onPress={() => setShowHintModal(false)}>
+              <Pressable style={styles.hintNotebook} onPress={() => {}}>
+                <View style={styles.hintNotebookHeader}>
+                  <Text style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</Text>
+                  <Pressable onPress={() => setShowHintModal(false)} style={styles.hintCloseBtn}>
+                    <Text style={styles.hintCloseBtnText}>✕</Text>
+                  </Pressable>
+                </View>
+                <View style={styles.hintNotebookRule} />
+                {hints.map((hint, i) => {
+                  const isUnlocked = i < unlockedHints;
+                  const isNext = i === unlockedHints;
+                  return (
+                    <View key={i} style={styles.hintRow}>
+                      {isUnlocked ? (
+                        <View style={styles.hintUnlocked}>
+                          <Text style={styles.hintLabel}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                          <Text style={styles.hintText}>{hint}</Text>
+                        </View>
+                      ) : isNext ? (
+                        <Pressable style={styles.hintLocked} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setUnlockedHints(i + 1); }}>
+                          <Text style={styles.hintLockedIcon}>🔒</Text>
+                          <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
+                        </Pressable>
+                      ) : (
+                        <View style={[styles.hintLocked, { opacity: 0.4 }]}>
+                          <Text style={styles.hintLockedIcon}>🔒</Text>
+                          <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                        </View>
+                      )}
+                    </View>
+                  );
+                })}
+                <Text style={styles.hintFooter}>{ko ? "이전 힌트를 먼저 열어야 해요" : es ? "Desbloquea las pistas en orden" : "Unlock hints in order"}</Text>
+              </Pressable>
+            </Pressable>
+          </Modal>
+        </View>
+      );
+    }
+
+    // ── CORRECT ANSWER ──
     return (
       <View style={styles.puzzleBox}>
         <View style={styles.puzzleHeaderRow}>
-          <Text style={styles.puzzleNum}>🔐 {lang === "korean" ? "암호를 해독하라!" : lang === "spanish" ? "¡Descifra el código!" : "Decode the Cipher!"}</Text>
+          <Text style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : "Decode the Cipher!"}</Text>
           <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
         </View>
 
-        {/* Result banner */}
-        {isCorrect ? (
-          <View style={styles.cipherResultCorrect}>
-            <Text style={styles.cipherResultTitle}>
-              ✅ {lang === "korean" ? `정답! ${correctAnswerEn}` : lang === "spanish" ? `¡Correcto! ${correctAnswerEn}` : `Correct! ${correctAnswerEn}`}
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.cipherResultWrong}>
-            <Text style={styles.cipherResultTitle}>
-              ❌ {lang === "korean" ? "틀렸어요" : lang === "spanish" ? "Incorrecto" : "Wrong!"}
-            </Text>
-            <Text style={styles.cipherResultSub}>
-              {lang === "korean"
-                ? `정답은: ${correctOptNum} ${correctAnswerNative} (${correctAnswerEn})`
-                : lang === "spanish"
-                ? `Respuesta: ${correctOptNum} ${correctAnswerNative} (${correctAnswerEn})`
-                : `Answer: ${correctOptNum} ${correctAnswerEn}`}
-            </Text>
-          </View>
-        )}
+        {/* Success banner */}
+        <View style={styles.cipherResultCorrect}>
+          <Text style={styles.cipherResultTitle}>✨ {ko ? "퍼즐 해결!" : es ? "¡Puzzle resuelto!" : "Puzzle Solved!"}</Text>
+        </View>
 
-        {/* Divider */}
+        {/* Fox celebration */}
+        <View style={styles.cipherLingoRow}>
+          <Text style={styles.cipherLingoEmoji}>🦊</Text>
+          <View style={styles.cipherLingoBubble}>
+            <Text style={[styles.cipherLingoBubbleText, { color: "#2c1810" }]}>
+              {ko ? "훌륭하군요, 견습생! 암호를 완벽히 해독했어요." : es ? "¡Brillante, aprendiz! Has descifrado el código perfectamente." : "Brilliant, apprentice! You've decoded the cipher perfectly."}
+            </Text>
+          </View>
+        </View>
+
+        {/* Explanation (only on success) */}
         <View style={styles.cipherDivider} />
-
-        {/* Explanation */}
         <View style={styles.cipherExplainBox}>
           <Text style={styles.cipherExplainLabel}>
-            💡 {lang === "korean" ? "해설:" : lang === "spanish" ? "Explicación:" : "Explanation:"}
+            💡 {ko ? "해설:" : es ? "Explicación:" : "Explanation:"}
           </Text>
           <Text style={styles.cipherExplainBreakdown}>{breakdown}</Text>
           <Text style={styles.cipherExplainResult}>
@@ -1562,32 +1646,19 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
             {lang !== "english" ? ` (${correctAnswerNative})` : ""}
           </Text>
         </View>
-
-        {/* Divider */}
         <View style={styles.cipherDivider} />
 
-        {/* XP reward if correct */}
-        {isCorrect && (
-          <Text style={styles.cipherXpText}>
-            🏆 {lang === "korean" ? "+20 XP 획득!" : lang === "spanish" ? "¡+20 XP obtenidos!" : "+20 XP earned!"}
-          </Text>
-        )}
+        {/* XP reward */}
+        <Text style={styles.cipherXpText}>
+          🏆 {ko ? "+50 XP 획득!" : es ? "¡+50 XP obtenidos!" : "+50 XP earned!"}
+        </Text>
 
-        {/* Action buttons */}
-        <View style={isCorrect ? undefined : styles.cipherBtnRow}>
-          {!isCorrect && (
-            <Pressable style={[styles.puzzleConfirmBtn, styles.cipherRetryBtn]} onPress={handleRetry}>
-              <Text style={[styles.puzzleConfirmText, { color: C.gold }]}>
-                {lang === "korean" ? "다시 시도 🔄" : lang === "spanish" ? "Reintentar 🔄" : "Retry 🔄"}
-              </Text>
-            </Pressable>
-          )}
-          <Pressable style={[styles.puzzleConfirmBtn, !isCorrect && { flex: 1 }]} onPress={handleContinue}>
-            <Text style={styles.puzzleConfirmText}>
-              {lang === "korean" ? "계속하기 →" : lang === "spanish" ? "Continuar →" : "Continue →"}
-            </Text>
-          </Pressable>
-        </View>
+        {/* Continue button */}
+        <Pressable style={styles.puzzleConfirmBtn} onPress={handleContinue}>
+          <Text style={styles.puzzleConfirmText}>
+            {ko ? "다음 퍼즐 →" : es ? "Siguiente →" : "Next Puzzle →"}
+          </Text>
+        </Pressable>
       </View>
     );
   }
@@ -2974,6 +3045,15 @@ const styles = StyleSheet.create({
   },
 
   /* ── Hint System ── */
+  cipherRetryHint: {
+    fontFamily: F.body,
+    fontSize: 14,
+    color: C.goldDim,
+    textAlign: "center",
+    fontStyle: "italic",
+    marginTop: -4,
+  },
+
   hintBtn: {
     alignSelf: "center",
     paddingHorizontal: 20,
