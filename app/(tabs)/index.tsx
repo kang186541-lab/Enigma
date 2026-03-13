@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, getLevel, getLevelProgress, NativeLanguage } from "@/context/LanguageContext";
 import { LingoMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
@@ -120,7 +121,7 @@ const div = StyleSheet.create({
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { t, stats, nativeLanguage, pendingLevelUp, clearLevelUp } = useLanguage();
+  const { t, stats, nativeLanguage, learningLanguage, pendingLevelUp, clearLevelUp } = useLanguage();
   const topPad = Platform.OS === "web" ? 20 : insets.top;
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
   const lingoGreeting = getLingoGreeting(nativeLang);
@@ -131,14 +132,37 @@ export default function HomeScreen() {
   const xpInLvl  = stats.xp - level.minXP;
   const xpForLvl = level.num < 5 ? level.maxXP - level.minXP : 1;
 
+  const [courseCompleted, setCourseCompleted] = React.useState<boolean | null>(null);
+
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
   const fireScale = useRef(new Animated.Value(1)).current;
   const flickerOp = useRef(new Animated.Value(1)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.spring(xpAnim, { toValue: progress, useNativeDriver: false, tension: 40, friction: 8 }).start();
   }, [stats.xp]);
+
+  useEffect(() => {
+    const key = `basicCourseCompleted_${learningLanguage ?? "english"}`;
+    AsyncStorage.getItem(key).then(v => setCourseCompleted(v === "true"));
+  }, [learningLanguage]);
+
+  useEffect(() => {
+    if (courseCompleted === false) {
+      const loop = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1.06, duration: 800, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1,    duration: 800, useNativeDriver: true }),
+        ])
+      );
+      loop.start();
+      return () => loop.stop();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [courseCompleted]);
 
   useEffect(() => {
     const shimmer = Animated.loop(
@@ -310,6 +334,31 @@ export default function HomeScreen() {
           </View>
         </View>
       </View>
+
+      {/* ── BASIC COURSE PILL ─────────────────────────── */}
+      {courseCompleted !== null && (
+        <View style={styles.basicCourseRow}>
+          <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.basicCoursePill,
+                courseCompleted && styles.basicCoursePillDone,
+                pressed && { opacity: 0.8 },
+              ]}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push("/basic-course" as any);
+              }}
+            >
+              <Text style={styles.basicCoursePillText}>
+                {courseCompleted
+                  ? (nativeLang === "korean" ? "✅  기초 과정 완료" : nativeLang === "spanish" ? "✅  Curso básico" : "✅  Basic Course")
+                  : (nativeLang === "korean" ? "📚  기초 과정 시작" : nativeLang === "spanish" ? "📚  Curso básico" : "📚  Basic Course")}
+              </Text>
+            </Pressable>
+          </Animated.View>
+        </View>
+      )}
 
       {/* ── DAILY MISSION CARD ────────────────────────── */}
       <GoldDivider label={missionLabel} />
@@ -601,4 +650,29 @@ const styles = StyleSheet.create({
   quickText:     { flex: 1 },
   quickLabel:    { fontSize: 15, fontFamily: F.bodySemi, color: C.parchment, marginBottom: 2 },
   quickDesc:     { fontSize: 12, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
+
+  basicCourseRow: {
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  basicCoursePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: C.gold,
+    backgroundColor: "rgba(201,162,39,0.10)",
+  },
+  basicCoursePillDone: {
+    borderColor: "rgba(201,162,39,0.45)",
+    backgroundColor: "rgba(201,162,39,0.07)",
+  },
+  basicCoursePillText: {
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: C.gold,
+    letterSpacing: 0.2,
+  },
 });
