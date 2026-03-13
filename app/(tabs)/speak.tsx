@@ -244,8 +244,41 @@ function getScoreInfo(score: number): { label: string; color: string; emoji: str
 let _pronunciationAudio: HTMLAudioElement | null = null;
 let _nativePronSound: Audio.Sound | null = null;
 
+// ── TTS preload cache ─────────────────────────────────────────
+// Keyed by "text::lang". Audio is fetched in the background so
+// pressing the listen button plays instantly from cache.
+const _pronWebCache    = new Map<string, string>();       // objectURL
+const _pronNativeCache = new Map<string, Audio.Sound>();  // expo-av Sound
+
+async function preloadPronunciationTTS(text: string, lang: string, apiBase: string) {
+  const key = `${text}::${lang}`;
+  const url = new URL("/api/pronunciation-tts", apiBase);
+  url.searchParams.set("text", text);
+  url.searchParams.set("lang", lang);
+  const urlStr = url.toString();
+  if (Platform.OS === "web") {
+    if (_pronWebCache.has(key)) return;
+    try {
+      const res = await fetch(urlStr);
+      if (!res.ok) return;
+      const blob = await res.blob();
+      _pronWebCache.set(key, URL.createObjectURL(blob));
+    } catch {}
+  } else {
+    if (_pronNativeCache.has(key)) return;
+    try {
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: urlStr },
+        { shouldPlay: false }
+      );
+      _pronNativeCache.set(key, sound);
+    } catch {}
+  }
+}
+
 async function playPronunciationTTS(text: string, lang: string, apiBase: string) {
   try {
+    const key = `${text}::${lang}`;
     const url = new URL("/api/pronunciation-tts", apiBase);
     url.searchParams.set("text", text);
     url.searchParams.set("lang", lang);
@@ -257,29 +290,51 @@ async function playPronunciationTTS(text: string, lang: string, apiBase: string)
         _pronunciationAudio.src = "";
         _pronunciationAudio = null;
       }
-      const res = await fetch(urlStr);
-      if (!res.ok) throw new Error(`TTS ${res.status}`);
-      const blob = await res.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
-      _pronunciationAudio = audio;
-      audio.onended = () => { URL.revokeObjectURL(objectUrl); _pronunciationAudio = null; };
-      audio.onerror = () => { URL.revokeObjectURL(objectUrl); _pronunciationAudio = null; };
-      await audio.play();
+      const cachedUrl = _pronWebCache.get(key);
+      if (cachedUrl) {
+        // Play instantly from preloaded blob URL
+        const audio = new (window as any).Audio(cachedUrl) as HTMLAudioElement;
+        _pronunciationAudio = audio;
+        audio.onended = () => { _pronunciationAudio = null; };
+        audio.onerror = () => { _pronunciationAudio = null; };
+        await audio.play();
+      } else {
+        // Fallback: fetch on demand
+        const res = await fetch(urlStr);
+        if (!res.ok) throw new Error(`TTS ${res.status}`);
+        const blob = await res.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        _pronWebCache.set(key, objectUrl);
+        const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
+        _pronunciationAudio = audio;
+        audio.onended = () => { _pronunciationAudio = null; };
+        audio.onerror = () => { _pronunciationAudio = null; };
+        await audio.play();
+      }
     } else {
       if (_nativePronSound) {
         await _nativePronSound.stopAsync().catch(() => {});
         await _nativePronSound.unloadAsync().catch(() => {});
         _nativePronSound = null;
       }
-      const { sound } = await Audio.Sound.createAsync({ uri: urlStr }, { shouldPlay: true });
-      _nativePronSound = sound;
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync();
-          _nativePronSound = null;
-        }
-      });
+      const cached = _pronNativeCache.get(key);
+      if (cached) {
+        // Seek to start and replay the preloaded sound
+        _nativePronSound = cached;
+        await cached.setPositionAsync(0);
+        await cached.playAsync();
+        cached.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) { _nativePronSound = null; }
+        });
+      } else {
+        // Fallback: create on demand
+        const { sound } = await Audio.Sound.createAsync({ uri: urlStr }, { shouldPlay: true });
+        _pronNativeCache.set(key, sound);
+        _nativePronSound = sound;
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) { _nativePronSound = null; }
+        });
+      }
     }
   } catch (err) {
     console.warn("Pronunciation TTS error:", err);
@@ -475,6 +530,15 @@ export default function SpeakScreen() {
 
   const phrase = sessionWords[sessionIdx];
   const tabInfo = LANG_TABS.find((tab) => tab.key === activeLang)!;
+
+  // Preload TTS audio for the current phrase so the listen button plays instantly
+  useEffect(() => {
+    if (!phrase) return;
+    preloadPronunciationTTS(phrase.word, phrase.speechLang, getApiUrl());
+    // Also preload the next phrase so switching is seamless
+    const next = sessionWords[sessionIdx + 1];
+    if (next) preloadPronunciationTTS(next.word, next.speechLang, getApiUrl());
+  }, [sessionIdx, phrase?.word, phrase?.speechLang]);
 
   const switchLang = (lang: LangTab) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

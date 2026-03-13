@@ -28,6 +28,92 @@ import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
 
 const lingoImg = require("@/assets/lingo.png");
+
+// ── TTS Audio Cache ────────────────────────────────────────────────────────
+// Keyed by "text::lang". Sounds are loaded in advance; on press we just replay.
+const _ttsCacheNative = new Map<string, Audio.Sound>();
+const _ttsCacheWeb    = new Map<string, HTMLAudioElement>();
+
+async function ttsPreload(text: string, lang: string, apiBase: string) {
+  const key = `${text}::${lang}`;
+  const url = new URL("/api/tts", apiBase);
+  url.searchParams.set("text", text);
+  url.searchParams.set("lang", lang);
+  const urlStr = url.toString();
+  if (Platform.OS === "web") {
+    if (_ttsCacheWeb.has(key)) return;
+    const audio = new (window as any).Audio(urlStr) as HTMLAudioElement;
+    audio.preload = "auto";
+    audio.load();
+    _ttsCacheWeb.set(key, audio);
+  } else {
+    if (_ttsCacheNative.has(key)) return;
+    try {
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: urlStr },
+        { shouldPlay: false }
+      );
+      _ttsCacheNative.set(key, sound);
+    } catch {}
+  }
+}
+
+function ttsPlayCached(
+  text: string,
+  lang: string,
+  apiBase: string,
+  setPlaying: (v: boolean) => void
+) {
+  const key = `${text}::${lang}`;
+  const url = new URL("/api/tts", apiBase);
+  url.searchParams.set("text", text);
+  url.searchParams.set("lang", lang);
+  const urlStr = url.toString();
+
+  if (Platform.OS === "web") {
+    const cached = _ttsCacheWeb.get(key);
+    if (cached) {
+      cached.currentTime = 0;
+      setPlaying(true);
+      cached.play().catch(() => {});
+      cached.onended = () => setPlaying(false);
+      cached.onerror = () => setPlaying(false);
+    } else {
+      const audio = new (window as any).Audio(urlStr);
+      setPlaying(true);
+      audio.play().catch(() => {});
+      audio.onended = () => setPlaying(false);
+      audio.onerror = () => setPlaying(false);
+      _ttsCacheWeb.set(key, audio);
+    }
+  } else {
+    const cached = _ttsCacheNative.get(key);
+    if (cached) {
+      setPlaying(true);
+      (async () => {
+        try {
+          await cached.setPositionAsync(0);
+          await cached.playAsync();
+          cached.setOnPlaybackStatusUpdate((s) => {
+            if (s.isLoaded && s.didJustFinish) setPlaying(false);
+          });
+        } catch { setPlaying(false); }
+      })();
+    } else {
+      setPlaying(true);
+      (async () => {
+        try {
+          const { sound } = await Audio.Sound.createAsync({ uri: urlStr }, { shouldPlay: false });
+          _ttsCacheNative.set(key, sound);
+          await sound.playAsync();
+          sound.setOnPlaybackStatusUpdate((s) => {
+            if (s.isLoaded && s.didJustFinish) setPlaying(false);
+          });
+        } catch { setPlaying(false); }
+      })();
+    }
+  }
+}
 const { width } = Dimensions.get("window");
 
 /* ─────────────────── TYPES ─────────────────── */
@@ -1880,7 +1966,7 @@ function ListenChoosePuzzle({ puzzle, lang, learningLang, onSolved }: {
   const [selected, setSelected] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [solved, setSolved] = useState(false);
-  const soundRef = useRef<Audio.Sound | null>(null);
+  const apiBase = getApiUrl();
 
   const q = puzzle.questions[idx];
   const wordText = q.word.en;
@@ -1893,34 +1979,14 @@ function ListenChoosePuzzle({ puzzle, lang, learningLang, onSolved }: {
     })
   );
 
+  // Preload audio for every word in this puzzle as soon as it mounts
+  useEffect(() => {
+    puzzle.questions.forEach((qq) => ttsPreload(qq.word.en, learningLang, apiBase));
+  }, []);
+
   function playWord() {
     if (playing) return;
-    const url = new URL("/api/tts", getApiUrl());
-    url.searchParams.set("text", wordText);
-    url.searchParams.set("lang", learningLang);
-
-    if (Platform.OS === "web") {
-      // Web / iOS Safari: call play() synchronously inside the tap gesture
-      const audio = new (window as any).Audio(url.toString());
-      setPlaying(true);
-      audio.play().catch(() => {});
-      audio.onended = () => setPlaying(false);
-      audio.onerror = () => setPlaying(false);
-    } else {
-      // Native (Expo Go iOS/Android): use expo-av
-      setPlaying(true);
-      (async () => {
-        try {
-          if (soundRef.current) { await soundRef.current.unloadAsync(); soundRef.current = null; }
-          const { sound } = await Audio.Sound.createAsync({ uri: url.toString() });
-          soundRef.current = sound;
-          await sound.playAsync();
-          sound.setOnPlaybackStatusUpdate((s) => {
-            if (s.isLoaded && s.didJustFinish) setPlaying(false);
-          });
-        } catch { setPlaying(false); }
-      })();
-    }
+    ttsPlayCached(wordText, learningLang, apiBase, setPlaying);
   }
 
   function handleSelect(opt: string) {
@@ -1989,8 +2055,8 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
   const [recording, setRecording] = useState(false);
   const [feedback, setFeedback] = useState<"good" | "retry" | null>(null);
   const [solved, setSolved] = useState(false);
-  const soundRef = useRef<Audio.Sound | null>(null);
   const recordingRef = useRef<Audio.Recording | null>(null);
+  const apiBase = getApiUrl();
 
   const q = puzzle.questions[idx];
 
@@ -1999,6 +2065,11 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
     learningLang === "korean" ? q.sentence.ko
     : learningLang === "spanish" ? q.sentence.es
     : q.sentence.en;
+
+  // Preload audio for the current sentence whenever it changes
+  useEffect(() => {
+    ttsPreload(sentenceText, learningLang, apiBase);
+  }, [sentenceText]);
 
   // Map learningLang → Azure/Web Speech locale code
   function getLangCode(): string {
@@ -2020,31 +2091,10 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved }: {
     return hits / tWords.length;
   }
 
-  // ── Play TTS ──
+  // ── Play TTS (instant from cache) ──
   function playAudio() {
     if (playing) return;
-    const url = new URL("/api/tts", getApiUrl());
-    url.searchParams.set("text", sentenceText);
-    url.searchParams.set("lang", learningLang);
-    setPlaying(true);
-    if (Platform.OS === "web") {
-      const audio = new (window as any).Audio(url.toString());
-      audio.play().catch(() => {});
-      audio.onended = () => setPlaying(false);
-      audio.onerror = () => setPlaying(false);
-    } else {
-      (async () => {
-        try {
-          if (soundRef.current) { await soundRef.current.unloadAsync(); soundRef.current = null; }
-          const { sound } = await Audio.Sound.createAsync({ uri: url.toString() });
-          soundRef.current = sound;
-          await sound.playAsync();
-          sound.setOnPlaybackStatusUpdate((s) => {
-            if (s.isLoaded && s.didJustFinish) setPlaying(false);
-          });
-        } catch { setPlaying(false); }
-      })();
-    }
+    ttsPlayCached(sentenceText, learningLang, apiBase, setPlaying);
   }
 
   // ── Microphone: record + compare ──
