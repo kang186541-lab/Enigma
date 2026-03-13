@@ -196,6 +196,133 @@ function speak(text: string, lang: string) {
 }
 
 /* ─────────────────────────────────────────────
+   Per-letter tip data (phonetics + example words)
+   ───────────────────────────────────────────── */
+interface LetData { ko: string; es: string; enWord: string; esWord: string; emoji: string; }
+const EN_LET: Record<string, LetData> = {
+  A:{ko:"에이",  es:"a",          enWord:"Apple",   esWord:"Árbol",   emoji:"🍎"},
+  B:{ko:"비",    es:"be",         enWord:"Ball",    esWord:"Bola",    emoji:"⚽"},
+  C:{ko:"씨",    es:"ce",         enWord:"Cat",     esWord:"Casa",    emoji:"🐱"},
+  D:{ko:"디",    es:"de",         enWord:"Dog",     esWord:"Dedo",    emoji:"🐶"},
+  E:{ko:"이",    es:"e",          enWord:"Egg",     esWord:"Elefante",emoji:"🥚"},
+  F:{ko:"에프",  es:"efe",        enWord:"Fish",    esWord:"Flor",    emoji:"🐟"},
+  G:{ko:"지",    es:"ge",         enWord:"Gold",    esWord:"Gato",    emoji:"🥇"},
+  H:{ko:"에이치",es:"hache",      enWord:"Hat",     esWord:"Hola",    emoji:"🎩"},
+  I:{ko:"아이",  es:"i",          enWord:"Ice",     esWord:"Isla",    emoji:"🧊"},
+  J:{ko:"제이",  es:"jota",       enWord:"Jungle",  esWord:"Jugo",    emoji:"🌴"},
+  K:{ko:"케이",  es:"ka",         enWord:"Key",     esWord:"Kilo",    emoji:"🔑"},
+  L:{ko:"엘",    es:"ele",        enWord:"Lion",    esWord:"Luna",    emoji:"🦁"},
+  M:{ko:"엠",    es:"eme",        enWord:"Moon",    esWord:"Mano",    emoji:"🌙"},
+  N:{ko:"엔",    es:"ene",        enWord:"Night",   esWord:"Noche",   emoji:"🌃"},
+  O:{ko:"오",    es:"o",          enWord:"Ocean",   esWord:"Oso",     emoji:"🌊"},
+  P:{ko:"피",    es:"pe",         enWord:"Park",    esWord:"Perro",   emoji:"🌳"},
+  Q:{ko:"큐",    es:"cu",         enWord:"Queen",   esWord:"Queso",   emoji:"👑"},
+  R:{ko:"아르",  es:"erre",       enWord:"Rain",    esWord:"Rosa",    emoji:"🌧️"},
+  S:{ko:"에스",  es:"ese",        enWord:"Sun",     esWord:"Sol",     emoji:"☀️"},
+  T:{ko:"티",    es:"te",         enWord:"Tree",    esWord:"Taza",    emoji:"🌲"},
+  U:{ko:"유",    es:"u",          enWord:"Up",      esWord:"Uva",     emoji:"⬆️"},
+  V:{ko:"브이",  es:"uve",        enWord:"Violin",  esWord:"Vaca",    emoji:"🎻"},
+  W:{ko:"더블유",es:"doble uve",  enWord:"Water",   esWord:"Wifi",    emoji:"💧"},
+  X:{ko:"엑스",  es:"equis",      enWord:"X-ray",   esWord:"Xilofón", emoji:"🩻"},
+  Y:{ko:"와이",  es:"ye",         enWord:"Yellow",  esWord:"Yoyo",    emoji:"💛"},
+  Z:{ko:"지",    es:"zeta",       enWord:"Zero",    esWord:"Zapato",  emoji:"0️⃣"},
+};
+
+interface EsData { ko: string; en: string; word: string; emoji: string; }
+const ES_LET: Record<string, EsData> = {
+  A:{ko:"아",      en:"a",    word:"Árbol",    emoji:"🌳"},
+  B:{ko:"베",      en:"b",    word:"Bola",     emoji:"⚽"},
+  C:{ko:"세",      en:"k/s",  word:"Casa",     emoji:"🏠"},
+  D:{ko:"데",      en:"d",    word:"Dedo",     emoji:"👆"},
+  E:{ko:"에",      en:"e",    word:"Elefante", emoji:"🐘"},
+  F:{ko:"에페",    en:"f",    word:"Flor",     emoji:"🌸"},
+  G:{ko:"헤",      en:"g/h",  word:"Gato",     emoji:"🐱"},
+  H:{ko:"아체",    en:"silent",word:"Hola",    emoji:"👋"},
+  I:{ko:"이",      en:"ee",   word:"Isla",     emoji:"🏝️"},
+  J:{ko:"호타",    en:"h",    word:"Jugo",     emoji:"🧃"},
+  K:{ko:"카",      en:"k",    word:"Kilo",     emoji:"⚖️"},
+  L:{ko:"엘레",    en:"l",    word:"Luna",     emoji:"🌙"},
+  M:{ko:"에메",    en:"m",    word:"Mano",     emoji:"✋"},
+  N:{ko:"에네",    en:"n",    word:"Noche",    emoji:"🌃"},
+  Ñ:{ko:"에녜",    en:"ny",   word:"Niño",     emoji:"👦"},
+  O:{ko:"오",      en:"o",    word:"Oso",      emoji:"🐻"},
+  P:{ko:"뻬",      en:"p",    word:"Perro",    emoji:"🐶"},
+  Q:{ko:"꾸",      en:"k",    word:"Queso",    emoji:"🧀"},
+  R:{ko:"에레",    en:"r",    word:"Rosa",     emoji:"🌹"},
+  S:{ko:"에세",    en:"s",    word:"Sol",      emoji:"☀️"},
+  T:{ko:"떼",      en:"t",    word:"Taza",     emoji:"☕"},
+  U:{ko:"우",      en:"oo",   word:"Uva",      emoji:"🍇"},
+  V:{ko:"베",      en:"b/v",  word:"Vaca",     emoji:"🐄"},
+  W:{ko:"도블레우",en:"w",    word:"Wifi",     emoji:"📶"},
+  X:{ko:"에끼스",  en:"ks/s", word:"Xilofón",  emoji:"🎵"},
+  Y:{ko:"예",      en:"y",    word:"Yoyo",     emoji:"🪀"},
+  Z:{ko:"세타",    en:"s/th", word:"Zapato",   emoji:"👟"},
+  á:{ko:"강세 아", en:"a (stressed)", word:"Árbol",   emoji:"🌳"},
+  é:{ko:"강세 에", en:"e (stressed)", word:"Éxito",   emoji:"🏆"},
+  í:{ko:"강세 이", en:"i (stressed)", word:"Índice",  emoji:"☝️"},
+  ó:{ko:"강세 오", en:"o (stressed)", word:"Ópera",   emoji:"🎭"},
+  ú:{ko:"강세 우", en:"u (stressed)", word:"Último",  emoji:"🔚"},
+};
+
+interface KoData { name: string; enSound: string; esSound: string; enWord: string; esWord: string; emoji: string; }
+const KO_LET: Record<string, KoData> = {
+  ㄱ:{name:"기역", enSound:"g",   esSound:"g",  enWord:"Go",   esWord:"Gato",   emoji:"🏃"},
+  ㄴ:{name:"니은", enSound:"n",   esSound:"n",  enWord:"No",   esWord:"Noche",  emoji:"❌"},
+  ㄷ:{name:"디귿", enSound:"d",   esSound:"d",  enWord:"Dog",  esWord:"Dedo",   emoji:"🐶"},
+  ㄹ:{name:"리을", enSound:"r/l", esSound:"r",  enWord:"Run",  esWord:"Rosa",   emoji:"🏃"},
+  ㅁ:{name:"미음", enSound:"m",   esSound:"m",  enWord:"Moon", esWord:"Mano",   emoji:"🌙"},
+  ㅂ:{name:"비읍", enSound:"b",   esSound:"b",  enWord:"Ball", esWord:"Bola",   emoji:"⚽"},
+  ㅅ:{name:"시옷", enSound:"s",   esSound:"s",  enWord:"Sun",  esWord:"Sol",    emoji:"☀️"},
+  ㅇ:{name:"이응", enSound:"ng",  esSound:"ng", enWord:"Ring", esWord:"Ring",   emoji:"💍"},
+  ㅈ:{name:"지읒", enSound:"j",   esSound:"y",  enWord:"Jam",  esWord:"Yoyo",   emoji:"🍓"},
+  ㅊ:{name:"치읓", enSound:"ch",  esSound:"ch", enWord:"Chip", esWord:"Chico",  emoji:"🍟"},
+  ㅋ:{name:"키읔", enSound:"k",   esSound:"k",  enWord:"Key",  esWord:"Kilo",   emoji:"🔑"},
+  ㅌ:{name:"티읕", enSound:"t",   esSound:"t",  enWord:"Tree", esWord:"Taza",   emoji:"🌲"},
+  ㅍ:{name:"피읖", enSound:"p",   esSound:"p",  enWord:"Park", esWord:"Perro",  emoji:"🌳"},
+  ㅎ:{name:"히읗", enSound:"h",   esSound:"j",  enWord:"Hat",  esWord:"Hola",   emoji:"🎩"},
+  ㅏ:{name:"아",   enSound:"a",   esSound:"a",  enWord:"Ah",   esWord:"Árbol",  emoji:"😮"},
+  ㅑ:{name:"야",   enSound:"ya",  esSound:"ya", enWord:"Yarn", esWord:"Yarda",  emoji:"🧶"},
+  ㅓ:{name:"어",   enSound:"uh",  esSound:"eo", enWord:"Up",   esWord:"Uva",    emoji:"⬆️"},
+  ㅕ:{name:"여",   enSound:"yuh", esSound:"yeo",enWord:"Yes",  esWord:"Yeso",   emoji:"✅"},
+  ㅗ:{name:"오",   enSound:"oh",  esSound:"o",  enWord:"Ocean",esWord:"Oso",    emoji:"🌊"},
+  ㅛ:{name:"요",   enSound:"yo",  esSound:"yo", enWord:"Yo",   esWord:"Yoga",   emoji:"🧘"},
+  ㅜ:{name:"우",   enSound:"oo",  esSound:"u",  enWord:"Zoo",  esWord:"Uva",    emoji:"🦁"},
+  ㅠ:{name:"유",   enSound:"you", esSound:"yu", enWord:"You",  esWord:"Yugo",   emoji:"👤"},
+  ㅡ:{name:"으",   enSound:"eu",  esSound:"eu", enWord:"Ugh",  esWord:"Euro",   emoji:"😑"},
+  ㅣ:{name:"이",   enSound:"ee",  esSound:"i",  enWord:"Eat",  esWord:"Isla",   emoji:"🍽️"},
+};
+
+function getCharTip(char: string, learning: string, native: string): string {
+  const up = char.toUpperCase();
+
+  if (learning === "english") {
+    const d = EN_LET[up];
+    if (!d) return `'${char.toLowerCase()}' — ${char}`;
+    if (native === "korean")  return `'${d.ko}' — ${d.enWord} ${d.emoji} 의 첫 글자`;
+    if (native === "spanish") return `'${d.es}' — como en ${d.enWord} ${d.emoji}`;
+    return `'${d.es}' — as in ${d.enWord} ${d.emoji}`;          // native english
+  }
+
+  if (learning === "spanish") {
+    const d = ES_LET[up] ?? ES_LET[char];
+    if (!d) return `'${char.toLowerCase()}' — ${char}`;
+    if (native === "korean")  return `'${d.ko}' — ${d.word} ${d.emoji} 의 첫 글자`;
+    if (native === "english") return `'${d.en}' — similar to English '${d.en}', as in ${d.word} ${d.emoji}`;
+    return `'${char.toLowerCase()}' — como en ${d.word} ${d.emoji}`; // native spanish
+  }
+
+  if (learning === "korean") {
+    const d = KO_LET[char];
+    if (!d) return char;
+    if (native === "english") return `'${d.name}' — sounds like '${d.enSound}' in ${d.enWord} ${d.emoji}`;
+    if (native === "spanish") return `'${d.name}' — suena como '${d.esSound}' en ${d.esWord} ${d.emoji}`;
+    return `${d.name} · 영어의 '${d.enSound}'처럼 발음해요`; // native korean
+  }
+
+  return char;
+}
+
+/* ─────────────────────────────────────────────
    Tracing Canvas — no auto-pass, self-check UI
    ───────────────────────────────────────────── */
 const DRAW_THRESHOLD = 20;
@@ -584,7 +711,7 @@ export default function BasicCourseScreen() {
             <Text style={s.charBig}>{charItem.char}</Text>
             <View style={s.charMeta}>
               <Text style={s.charRoman}>{charItem.roman}</Text>
-              <Text style={s.charTip}>{charItem.tip}</Text>
+              <Text style={s.charTip}>{getCharTip(charItem.char, lang, native)}</Text>
             </View>
           </View>
 
