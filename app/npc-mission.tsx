@@ -94,10 +94,11 @@ export default function NpcMissionScreen() {
   const [scoreDisplay, setScoreDisplay] = useState<{ amount: number; positive: boolean } | null>(null);
   const scoreTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [wordPopup, setWordPopup] = useState<{ word: string; meaning: string; example: string } | null>(null);
+  const [wordPopup, setWordPopup] = useState<{ word: string; meaning: string; partOfSpeech: string; example: string } | null>(null);
   const [wordLoading, setWordLoading] = useState(false);
   const [wordExPlaying, setWordExPlaying] = useState(false);
-  const wordCache = useRef<Record<string, { meaning: string; example: string }>>({});
+  const [wordPronPlaying, setWordPronPlaying] = useState(false);
+  const wordCache = useRef<Record<string, { meaning: string; partOfSpeech: string; example: string }>>({});
 
   const conversationRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
   const inputRef = useRef<TextInput>(null);
@@ -381,15 +382,51 @@ export default function NpcMissionScreen() {
         body: JSON.stringify({ word: clean, targetLanguage: language, nativeLanguage: native }),
       });
       const data = await res.json();
-      const entry = { meaning: data.meaning ?? "", example: data.example ?? "" };
+      if (!res.ok) throw new Error(data.error ?? "lookup failed");
+      const entry = {
+        meaning:      (data.meaning      ?? "").trim() || clean,
+        partOfSpeech: (data.partOfSpeech ?? "").trim(),
+        example:      (data.example      ?? "").trim(),
+      };
       wordCache.current[cacheKey] = entry;
       setWordPopup({ word: clean, ...entry });
     } catch {
-      setWordPopup({ word: clean, meaning: "—", example: "" });
+      setWordPopup({ word: clean, meaning: clean, partOfSpeech: "", example: "" });
     } finally {
       setWordLoading(false);
     }
   }, [language, native]);
+
+  const playWordPronunciation = useCallback((word: string) => {
+    if (!npc || !word) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setWordPronPlaying(true);
+    if (Platform.OS === "web") {
+      const url = new URL("/api/npc-tts", getApiUrl());
+      url.searchParams.set("text", word);
+      url.searchParams.set("npcId", npc.id);
+      url.searchParams.set("npcLang", language);
+      url.searchParams.set("speed", "0.8");
+      fetch(url.toString())
+        .then(r => r.blob())
+        .then(blob => {
+          const objUrl = URL.createObjectURL(blob);
+          const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+          audio.onended = () => { URL.revokeObjectURL(objUrl); setWordPronPlaying(false); };
+          audio.onerror = () => { URL.revokeObjectURL(objUrl); setWordPronPlaying(false); };
+          audio.play().catch(() => setWordPronPlaying(false));
+        })
+        .catch(() => setWordPronPlaying(false));
+    } else {
+      const voiceInfo = npc.voice[language as keyof typeof npc.voice] ?? npc.voice.english;
+      Speech.speak(word, {
+        language: voiceInfo.lang,
+        rate: 0.8,
+        onDone: () => setWordPronPlaying(false),
+        onError: () => setWordPronPlaying(false),
+      });
+    }
+  }, [npc, language]);
 
   const playWordExample = useCallback((example: string) => {
     if (!npc || !example) return;
@@ -785,11 +822,11 @@ export default function NpcMissionScreen() {
         visible={!!wordPopup || wordLoading}
         transparent
         animationType="slide"
-        onRequestClose={() => { setWordPopup(null); setWordLoading(false); setWordExPlaying(false); }}
+        onRequestClose={() => { setWordPopup(null); setWordLoading(false); setWordExPlaying(false); setWordPronPlaying(false); }}
       >
         <Pressable
           style={styles.wordOverlay}
-          onPress={() => { setWordPopup(null); setWordLoading(false); setWordExPlaying(false); }}
+          onPress={() => { setWordPopup(null); setWordLoading(false); setWordExPlaying(false); setWordPronPlaying(false); }}
         >
           <Pressable style={styles.wordCard} onPress={() => {}}>
             <View style={styles.wordDragHandle} />
@@ -803,19 +840,41 @@ export default function NpcMissionScreen() {
               </View>
             ) : wordPopup ? (
               <>
+                {/* ── Word + pronunciation ── */}
                 <View style={styles.wordHeaderRow}>
-                  <Text style={styles.wordTitle}>{wordPopup.word}</Text>
-                  <Pressable
-                    style={({ pressed }) => [styles.wordCloseBtn, pressed && { opacity: 0.65 }]}
-                    onPress={() => { setWordPopup(null); setWordExPlaying(false); }}
-                    hitSlop={8}
-                  >
-                    <Ionicons name="close" size={18} color={C.goldDark} />
-                  </Pressable>
+                  <View style={styles.wordTitleGroup}>
+                    <Text style={styles.wordTitle}>{wordPopup.word}</Text>
+                    {!!wordPopup.partOfSpeech && (
+                      <View style={styles.wordPosBadge}>
+                        <Text style={styles.wordPosText}>{wordPopup.partOfSpeech}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.wordHeaderActions}>
+                    <Pressable
+                      style={({ pressed }) => [styles.wordPronBtn, pressed && { opacity: 0.7 }]}
+                      onPress={() => playWordPronunciation(wordPopup.word)}
+                      hitSlop={6}
+                    >
+                      <Ionicons
+                        name={wordPronPlaying ? "volume-high" : "volume-medium-outline"}
+                        size={20}
+                        color={wordPronPlaying ? C.gold : C.goldDark}
+                      />
+                    </Pressable>
+                    <Pressable
+                      style={({ pressed }) => [styles.wordCloseBtn, pressed && { opacity: 0.65 }]}
+                      onPress={() => { setWordPopup(null); setWordExPlaying(false); setWordPronPlaying(false); }}
+                      hitSlop={8}
+                    >
+                      <Ionicons name="close" size={18} color={C.goldDark} />
+                    </Pressable>
+                  </View>
                 </View>
 
                 <View style={styles.wordDivider} />
 
+                {/* ── Meaning ── */}
                 <View style={styles.wordMeaningRow}>
                   <Text style={styles.wordSectionLabel}>
                     {native === "korean" ? "의미" : native === "spanish" ? "Significado" : "Meaning"}
@@ -823,6 +882,7 @@ export default function NpcMissionScreen() {
                   <Text style={styles.wordMeaning}>{wordPopup.meaning}</Text>
                 </View>
 
+                {/* ── Example ── */}
                 {!!wordPopup.example && (
                   <View style={styles.wordExampleRow}>
                     <Text style={styles.wordSectionLabel}>
@@ -839,7 +899,7 @@ export default function NpcMissionScreen() {
                         color={wordExPlaying ? C.gold : C.goldDark}
                       />
                       <Text style={styles.wordPlayLabel}>
-                        {native === "korean" ? "듣기" : native === "spanish" ? "Escuchar" : "Listen"}
+                        {native === "korean" ? "예문 듣기" : native === "spanish" ? "Escuchar" : "Listen"}
                       </Text>
                     </Pressable>
                   </View>
@@ -1105,11 +1165,34 @@ const styles = StyleSheet.create({
   },
   wordHeaderRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
+    gap: 8,
   },
+  wordTitleGroup: { flex: 1, gap: 6 },
   wordTitle: {
-    fontSize: 24, fontFamily: F.header, color: C.gold, letterSpacing: 0.5,
+    fontSize: 26, fontFamily: F.header, color: C.gold, letterSpacing: 0.5,
+  },
+  wordPosBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(201,162,39,0.12)",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.3)",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  wordPosText: {
+    fontSize: 11, fontFamily: F.label, color: C.goldDim, letterSpacing: 0.8,
+  },
+  wordHeaderActions: {
+    flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2,
+  },
+  wordPronBtn: {
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: "rgba(201,162,39,0.1)",
+    borderWidth: 1, borderColor: C.border,
+    alignItems: "center", justifyContent: "center",
   },
   wordCloseBtn: {
     width: 30, height: 30, borderRadius: 15,

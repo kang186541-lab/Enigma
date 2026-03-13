@@ -870,16 +870,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const langLabel: Record<string, string> = {
         english: "English", korean: "Korean", spanish: "Spanish",
       };
-      const tl = langLabel[targetLanguage]  ?? targetLanguage;
+      const tl = langLabel[targetLanguage] ?? targetLanguage;
       const nl = langLabel[nativeLanguage] ?? nativeLanguage;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
-        max_completion_tokens: 120,
+        max_completion_tokens: 180,
         messages: [
           {
             role: "system",
-            content: `You are a dictionary assistant. The user is learning ${tl} and speaks ${nl} natively. For the given ${tl} word or phrase, return ONLY valid JSON (no markdown) with two fields: "meaning" (concise translation/definition in ${nl}, 1-3 meanings separated by " / " if multiple) and "example" (one short natural example sentence in ${tl}). Keep it brief.`,
+            content: [
+              `You are a bilingual dictionary. The user speaks ${nl} natively and is learning ${tl}.`,
+              `Given a ${tl} word, return ONLY valid JSON (no markdown fences) with these fields:`,
+              `"meaning": translation/definition in ${nl} — MUST be non-empty, 1-3 meanings separated by " / "`,
+              `"partOfSpeech": one of noun/verb/adjective/adverb/pronoun/conjunction/particle/interjection`,
+              `"example": one short natural ${tl} example sentence`,
+              `Rules: meaning MUST be in ${nl}. Never return empty strings. Always translate, even for particles or grammar words.`,
+            ].join(" "),
           },
           { role: "user", content: word },
         ],
@@ -887,14 +894,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const raw = completion.choices[0]?.message?.content ?? "{}";
       const jsonStr = extractJsonFromText(raw);
-      let parsed: { meaning?: string; example?: string };
+      let parsed: { meaning?: string; partOfSpeech?: string; example?: string };
       try {
         parsed = JSON.parse(jsonStr);
       } catch {
-        parsed = { meaning: "", example: "" };
+        parsed = {};
       }
 
-      res.json({ word, meaning: parsed.meaning ?? "", example: parsed.example ?? "" });
+      const meaning      = (parsed.meaning      ?? "").trim();
+      const partOfSpeech = (parsed.partOfSpeech ?? "").trim();
+      const example      = (parsed.example      ?? "").trim();
+
+      if (!meaning) {
+        const retry = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          max_completion_tokens: 80,
+          messages: [
+            { role: "system", content: `Translate this ${tl} word/phrase to ${nl}. Return ONLY the translation, nothing else.` },
+            { role: "user", content: word },
+          ],
+        });
+        const fallbackMeaning = (retry.choices[0]?.message?.content ?? "").trim();
+        return res.json({ word, meaning: fallbackMeaning || word, partOfSpeech, example });
+      }
+
+      res.json({ word, meaning, partOfSpeech, example });
     } catch (err) {
       console.error("Word lookup error:", err);
       res.status(500).json({ error: "Word lookup failed" });
