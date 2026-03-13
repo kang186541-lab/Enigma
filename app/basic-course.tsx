@@ -199,17 +199,14 @@ function speak(text: string, lang: string) {
    ───────────────────────────────────────────── */
 const DRAW_THRESHOLD = 20;
 
-interface TracingCanvasProps { char: string; onConfirmed: () => void; }
+interface TracingCanvasProps { char: string; onDrawn: () => void; }
 
-function TracingCanvas({ char, onConfirmed }: TracingCanvasProps) {
-  const [dots,      setDots]      = useState<{ x: number; y: number }[]>([]);
-  const [hasDrawn,  setHasDrawn]  = useState(false);   // enough strokes detected
-  const [confirmed, setConfirmed] = useState(false);   // user tapped ✅
-
-  const moveCount     = useRef(0);
-  const hasDrawnRef   = useRef(false);
-  const onConfRef     = useRef(onConfirmed);
-  onConfRef.current   = onConfirmed;
+function TracingCanvas({ char, onDrawn }: TracingCanvasProps) {
+  const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
+  const moveCount  = useRef(0);
+  const drawnRef   = useRef(false);
+  const onDrawnRef = useRef(onDrawn);
+  onDrawnRef.current = onDrawn;
 
   const panResponder = useRef(
     PanResponder.create({
@@ -217,9 +214,7 @@ function TracingCanvas({ char, onConfirmed }: TracingCanvasProps) {
       onStartShouldSetPanResponderCapture: () => true,
       onMoveShouldSetPanResponder:         () => true,
       onMoveShouldSetPanResponderCapture:  () => true,
-
       onPanResponderGrant: (e) => {
-        // Add the initial touch point but do NOT count it toward the draw threshold
         const { locationX, locationY } = e.nativeEvent;
         setDots(prev => [...prev.slice(-150), { x: locationX, y: locationY }]);
       },
@@ -227,79 +222,37 @@ function TracingCanvas({ char, onConfirmed }: TracingCanvasProps) {
         const { locationX, locationY } = e.nativeEvent;
         setDots(prev => [...prev.slice(-150), { x: locationX, y: locationY }]);
         moveCount.current += 1;
-        // Only set hasDrawn after real sustained movement
-        if (moveCount.current >= DRAW_THRESHOLD && !hasDrawnRef.current) {
-          hasDrawnRef.current = true;
-          setHasDrawn(true);
+        if (moveCount.current >= DRAW_THRESHOLD && !drawnRef.current) {
+          drawnRef.current = true;
+          onDrawnRef.current();
         }
       },
     })
   ).current;
 
-  const reset = () => {
+  useEffect(() => {
     setDots([]);
-    setHasDrawn(false);
-    setConfirmed(false);
-    moveCount.current   = 0;
-    hasDrawnRef.current = false;
-  };
-
-  useEffect(() => { reset(); }, [char]);
-
-  const handleConfirm = () => {
-    setConfirmed(true);
-    onConfRef.current();
-  };
+    moveCount.current = 0;
+    drawnRef.current  = false;
+  }, [char]);
 
   const webExtra = Platform.OS === "web" ? ({ touchAction: "none" } as object) : {};
 
   return (
-    <View style={tc.wrapper}>
-      {/* Drawing area */}
-      <View style={[tc.grid, webExtra, confirmed && tc.gridDone]} {...panResponder.panHandlers}>
-        <Text style={tc.guideChar}>{char}</Text>
-
-        {dots.map((d, i) => (
-          <View key={i} style={[tc.dot, { left: d.x - 7, top: d.y - 7 }]} />
-        ))}
-
-        {confirmed && (
-          <View style={tc.confirmOverlay}>
-            <Ionicons name="checkmark-circle" size={72} color={C.gold} />
-          </View>
-        )}
-      </View>
-
-      {/* State messages + self-check buttons */}
-      {!hasDrawn && !confirmed && (
-        <Text style={tc.hint}>✍️  {char >= "A" && char <= "Z" ? "Draw the letter in the box" : "화면에 글자를 써보세요"}</Text>
-      )}
-
-      {hasDrawn && !confirmed && (
-        <View style={tc.checkRow}>
-          <Pressable style={({ pressed }) => [tc.checkBtn, tc.checkBtnOk, pressed && { opacity: 0.8 }]} onPress={handleConfirm}>
-            <Text style={tc.checkBtnTxt}>✅  {char >= "A" && char <= "Z" ? "Looks good!" : "잘 썼어요!"}</Text>
-          </Pressable>
-          <Pressable style={({ pressed }) => [tc.checkBtn, tc.checkBtnRetry, pressed && { opacity: 0.8 }]} onPress={reset}>
-            <Text style={[tc.checkBtnTxt, { color: C.goldDim }]}>🔄  {char >= "A" && char <= "Z" ? "Try again" : "다시 쓸게요"}</Text>
-          </Pressable>
-        </View>
-      )}
-
-      {confirmed && (
-        <Text style={tc.confirmedHint}>✓  {char >= "A" && char <= "Z" ? "Well done! Tap Next →" : "잘 하셨어요! 다음 →"}</Text>
-      )}
+    <View style={[tc.grid, webExtra]} {...panResponder.panHandlers}>
+      <Text style={tc.guideChar}>{char}</Text>
+      {dots.map((d, i) => (
+        <View key={i} style={[tc.dot, { left: d.x - 7, top: d.y - 7 }]} />
+      ))}
     </View>
   );
 }
 
 const tc = StyleSheet.create({
-  wrapper: { flex: 1, gap: 10 },
   grid: {
     flex: 1,
     width: "100%",
-    minHeight: 280,
-    maxHeight: 360,
+    minHeight: 260,
     borderRadius: 20,
     borderWidth: 1.5,
     borderColor: C.border,
@@ -309,7 +262,6 @@ const tc = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  gridDone: { borderColor: C.gold, borderStyle: "solid", backgroundColor: "rgba(201,162,39,0.07)" },
   guideChar: {
     position: "absolute",
     fontSize: 130,
@@ -323,19 +275,6 @@ const tc = StyleSheet.create({
     backgroundColor: C.gold,
     opacity: 0.8,
   },
-  confirmOverlay: {
-    position: "absolute",
-    width: "100%", height: "100%",
-    justifyContent: "center", alignItems: "center",
-    backgroundColor: "rgba(26,10,5,0.50)",
-  },
-  hint:          { fontSize: 13, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
-  confirmedHint: { fontSize: 14, fontFamily: F.bodySemi, color: C.gold, textAlign: "center" },
-  checkRow:  { flexDirection: "row", gap: 10 },
-  checkBtn:  { flex: 1, borderRadius: 16, paddingVertical: 12, alignItems: "center", borderWidth: 1.5 },
-  checkBtnOk:    { backgroundColor: C.gold, borderColor: C.gold },
-  checkBtnRetry: { backgroundColor: "transparent", borderColor: C.border },
-  checkBtnTxt:   { fontSize: 14, fontFamily: F.bodySemi, color: C.bg1 },
 });
 
 /* ─────────────────────────────────────────────
@@ -350,11 +289,12 @@ export default function BasicCourseScreen() {
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  const [step,       setStep]       = useState(0);
-  const [subIdx,     setSubIdx]     = useState(0);
-  const [flipped,    setFlipped]    = useState(false);
-  const [traced,     setTraced]     = useState(false);
+  const [step,        setStep]        = useState(0);
+  const [subIdx,      setSubIdx]      = useState(0);
+  const [flipped,     setFlipped]     = useState(false);
+  const [traced,      setTraced]      = useState(false);  // step 0: user has drawn enough
   const [audioPlayed, setAudioPlayed] = useState(false);
+  const [canvasKey,   setCanvasKey]   = useState(0);     // increment to reset canvas
 
   const flipAnim  = useRef(new Animated.Value(0)).current;
   const xpAnim    = useRef(new Animated.Value(0)).current;
@@ -378,8 +318,14 @@ export default function BasicCourseScreen() {
 
   useEffect(() => {
     setFlipped(false); setTraced(false); setAudioPlayed(false);
+    setCanvasKey(k => k + 1);
     flipAnim.setValue(0);
   }, [subIdx]);
+
+  const handleRetry = () => {
+    setTraced(false);
+    setCanvasKey(k => k + 1);
+  };
 
   const loadProgress = async () => {
     try {
@@ -468,32 +414,71 @@ export default function BasicCourseScreen() {
       ? (lang === "korean" ? "다음 단계 →" : lang === "spanish" ? "Siguiente paso →" : "Next Step →")
       : (lang === "korean" ? "다음 →"      : lang === "spanish" ? "Siguiente →"      : "Next →");
 
-  /* ── shared nav bar ── */
+  /* ── bottom nav bar ── */
   const NavBar = () => (
     <View style={[s.navArea, { paddingBottom: bottomPad + 8 }]}>
-      {!canNext && step < 3 && (
-        <Text style={s.nudge}>
-          {step === 0
-            ? (lang === "korean" ? "글자를 쓰고 ✅ 버튼을 눌러주세요" : "Draw in the canvas above, then tap ✅")
-            : step === 1
-              ? (lang === "korean" ? "카드를 탭해서 의미를 확인하세요 👆" : "Tap the card to see the meaning 👆")
-              : (lang === "korean" ? "발음 듣기를 먼저 눌러보세요 👆" : "Tap the listen button above 👆")}
-        </Text>
+
+      {/* ── Step 0: canvas self-check buttons replace Next ── */}
+      {step === 0 && (
+        <>
+          {!traced && (
+            <Text style={s.nudge}>
+              {lang === "korean" ? "✏️ 위 캔버스에 글자를 써보세요" : "✏️ Draw the character in the canvas above"}
+            </Text>
+          )}
+          <View style={s.navRow}>
+            {subIdx > 0 && (
+              <Pressable style={({ pressed }) => [s.prevBtn, pressed && { opacity: 0.7 }]} onPress={goPrev}>
+                <Ionicons name="arrow-back" size={18} color={C.goldDark} />
+              </Pressable>
+            )}
+            {/* ✅ Looks good! — only active after drawing, advances to next letter */}
+            <Pressable
+              style={({ pressed }) => [s.nextBtn, !traced && s.nextBtnOff, pressed && traced && { opacity: 0.85 }]}
+              onPress={traced ? goNext : undefined}
+              disabled={!traced}
+            >
+              <Text style={s.nextBtnTxt}>
+                {lang === "korean" ? "✅  잘 썼어요!" : lang === "spanish" ? "✅  ¡Bien hecho!" : "✅  Looks good!"}
+              </Text>
+            </Pressable>
+            {/* 🔄 Try again — only shown after drawing */}
+            {traced && (
+              <Pressable style={({ pressed }) => [s.retryBtn, pressed && { opacity: 0.7 }]} onPress={handleRetry}>
+                <Text style={s.retryBtnTxt}>🔄</Text>
+              </Pressable>
+            )}
+          </View>
+        </>
       )}
-      <View style={s.navRow}>
-        {step < 3 && subIdx > 0 && (
-          <Pressable style={({ pressed }) => [s.prevBtn, pressed && { opacity: 0.7 }]} onPress={goPrev}>
-            <Ionicons name="arrow-back" size={18} color={C.goldDark} />
-          </Pressable>
-        )}
-        <Pressable
-          style={({ pressed }) => [s.nextBtn, !canNext && s.nextBtnOff, pressed && canNext && { opacity: 0.85 }]}
-          onPress={canNext ? goNext : undefined}
-          disabled={!canNext}
-        >
-          <Text style={s.nextBtnTxt}>{nextLabel}</Text>
-        </Pressable>
-      </View>
+
+      {/* ── Steps 1–3: normal Next button ── */}
+      {step > 0 && (
+        <>
+          {!canNext && step < 3 && (
+            <Text style={s.nudge}>
+              {step === 1
+                ? (lang === "korean" ? "카드를 탭해서 의미를 확인하세요 👆" : "Tap the card to see the meaning 👆")
+                : (lang === "korean" ? "발음 듣기를 먼저 눌러보세요 👆" : "Tap the listen button above 👆")}
+            </Text>
+          )}
+          <View style={s.navRow}>
+            {step < 3 && subIdx > 0 && (
+              <Pressable style={({ pressed }) => [s.prevBtn, pressed && { opacity: 0.7 }]} onPress={goPrev}>
+                <Ionicons name="arrow-back" size={18} color={C.goldDark} />
+              </Pressable>
+            )}
+            <Pressable
+              style={({ pressed }) => [s.nextBtn, !canNext && s.nextBtnOff, pressed && canNext && { opacity: 0.85 }]}
+              onPress={canNext ? goNext : undefined}
+              disabled={!canNext}
+            >
+              <Text style={s.nextBtnTxt}>{nextLabel}</Text>
+            </Pressable>
+          </View>
+        </>
+      )}
+
     </View>
   );
 
@@ -547,7 +532,7 @@ export default function BasicCourseScreen() {
           </View>
 
           {/* ── CANVAS fills remaining space ── */}
-          <TracingCanvas char={charItem.char} onConfirmed={() => setTraced(true)} />
+          <TracingCanvas key={canvasKey} char={charItem.char} onDrawn={() => setTraced(true)} />
 
           {/* Counter */}
           <Text style={s.counter}>{subIdx + 1} / {course.chars.length}</Text>
@@ -752,4 +737,10 @@ const s = StyleSheet.create({
   },
   nextBtnOff: { backgroundColor: "rgba(201,162,39,0.28)" },
   nextBtnTxt: { fontSize: 15, fontFamily: F.header, color: C.bg1, letterSpacing: 0.3 },
+  retryBtn: {
+    width: 52, height: 48, borderRadius: 14,
+    borderWidth: 1.5, borderColor: C.border,
+    backgroundColor: C.bg2, alignItems: "center", justifyContent: "center",
+  },
+  retryBtnTxt: { fontSize: 20 },
 });
