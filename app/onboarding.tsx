@@ -11,9 +11,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
+
+const DONE_KEY = (lang: string) => `basicCourseCompleted_${lang}`;
 
 const lingoImg = require("@/assets/lingo.png");
 
@@ -97,7 +100,12 @@ export default function OnboardingScreen() {
     setLoading(true);
     await setNativeLanguage(nativeSel);
     await setLearningLanguage(learnSel);
-    router.replace("/(tabs)");
+    const done = await AsyncStorage.getItem(DONE_KEY(learnSel));
+    if (done === "true") {
+      router.replace("/(tabs)");
+    } else {
+      router.replace("/basic-course");
+    }
   };
 
   return (
