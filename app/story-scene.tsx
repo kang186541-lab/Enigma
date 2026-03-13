@@ -539,7 +539,7 @@ const STORIES: Record<string, Story> = {
         hints: {
           h1: { ko: "각 단어의 첫 글자: 1번 'm', 2번 'e', 3번 'i' — 소문자로 입력해도 돼", en: "First letter of each word: 1st 'm', 2nd 'e', 3rd 'i' — lowercase is fine", es: "Primera letra de cada palabra: 1ª 'm', 2ª 'e', 3ª 'i' — puedes escribir en minúsculas" },
           h2: { ko: "1번: m으로 시작하는 10글자 단어 / 2번: e로 시작하는 8글자 단어 / 3번: i로 시작하는 11글자 단어", en: "Word 1: 10 letters starting with 'm' / Word 2: 8 letters starting with 'e' / Word 3: 11 letters starting with 'i'", es: "Palabra 1: 10 letras, empieza con 'm' / Palabra 2: 8 letras, empieza con 'e' / Palabra 3: 11 letras, empieza con 'i'" },
-          h3: { ko: "정답: mysterious / evidence / investigate", en: "Answers: mysterious / evidence / investigate", es: "Respuestas: mysterious / evidence / investigate" },
+          h3: { ko: "1번: 설명하기 어려운, 이해하기 힘든 것 / 2번: 무언가를 증명하는 사실이나 정보 / 3번: 무언가를 꼼꼼하게 살펴보는 행동", en: "Word 1: something hard to explain or understand / Word 2: facts or information that prove something / Word 3: the action of examining something carefully", es: "Palabra 1: algo difícil de explicar o entender / Palabra 2: hechos que prueban algo / Palabra 3: la acción de examinar algo con cuidado" },
         },
       },
       {
@@ -861,7 +861,7 @@ const STORIES: Record<string, Story> = {
         hints: {
           h1: { ko: "각 단어의 첫 글자: 1번 'd', 2번 'w', 3번 't' — 소문자로 입력해도 돼", en: "First letter of each word: 1st 'd', 2nd 'w', 3rd 't' — lowercase is fine", es: "Primera letra de cada palabra: 1ª 'd', 2ª 'w', 3ª 't' — puedes escribir en minúsculas" },
           h2: { ko: "1번: d로 시작하는 9글자 단어 / 2번: w로 시작하는 7글자 단어 / 3번: t로 시작하는 7글자 단어", en: "Word 1: 9 letters starting with 'd' / Word 2: 7 letters starting with 'w' / Word 3: 7 letters starting with 't'", es: "Palabra 1: 9 letras, empieza con 'd' / Palabra 2: 7 letras, empieza con 'w' / Palabra 3: 7 letras, empieza con 't'" },
-          h3: { ko: "정답: disappear / whisper / theatre", en: "Answers: disappear / whisper / theatre", es: "Respuestas: disappear / whisper / theatre" },
+          h3: { ko: "1번: 갑자기 눈에 보이지 않게 되는 것 / 2번: 다른 사람이 듣지 못할 만큼 아주 조용히 말하는 것 / 3번: 배우들이 관객 앞에서 공연을 펼치는 건물", en: "Word 1: to suddenly become impossible to see / Word 2: to speak so quietly that others can barely hear / Word 3: a building where actors perform in front of an audience", es: "Palabra 1: volverse de repente imposible de ver / Palabra 2: hablar tan bajo que otros apenas oyen / Palabra 3: edificio donde los actores actúan ante el público" },
         },
       },
       {
@@ -1746,6 +1746,10 @@ function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
     );
     const ko = lang === "korean";
     const es = lang === "spanish";
+    const halfLen = Math.ceil(q.encoded.length / 2);
+    const decodedHalf = q.encoded.slice(0, halfLen).split("").map((ch: string) =>
+      String.fromCharCode(((ch.charCodeAt(0) - 65 - q.shift + 26) % 26) + 65)
+    ).join("") + "_".repeat(q.encoded.length - halfLen);
     return [
       ko ? "각 글자를 알파벳에서 한 칸 앞 글자로 바꿔보세요."
         : es ? "Cambia cada letra por la que está una posición antes en el alfabeto."
@@ -1753,9 +1757,9 @@ function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
       ko ? `예: ${firstLetter} → ${decodedFirst}`
         : es ? `Ejemplo: ${firstLetter} → ${decodedFirst}`
         : `Example: ${firstLetter} → ${decodedFirst}`,
-      ko ? `정답은 ${q.answer.en} 입니다.`
-        : es ? `La respuesta es ${q.answer.en}.`
-        : `The answer is ${q.answer.en}.`,
+      ko ? `단어의 앞부분: ${decodedHalf} — 나머지 글자도 같은 방법으로 풀어봐`
+        : es ? `Primeras letras descifradas: ${decodedHalf} — descifra el resto con el mismo método`
+        : `First letters decoded: ${decodedHalf} — apply the same shift to the rest`,
     ];
   }
 
