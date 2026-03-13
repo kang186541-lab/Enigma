@@ -103,6 +103,8 @@ function RootLayoutNav() {
       <Stack.Screen name="onboarding"   options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)"       options={{ headerShown: false }} />
       <Stack.Screen name="chat-room"    options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="npc-list"     options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="npc-mission"  options={{ headerShown: false, presentation: "card" }} />
     </Stack>
   );
 }

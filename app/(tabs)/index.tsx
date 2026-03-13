@@ -191,7 +191,9 @@ export default function HomeScreen() {
     { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
   ];
 
-  const missionLabel = nativeLang === "korean" ? "오늘의 임무" : nativeLang === "spanish" ? "Misión de Hoy" : "Today's Mission";
+  const missionLabel  = nativeLang === "korean" ? "오늘의 임무" : nativeLang === "spanish" ? "Misión de Hoy" : "Today's Mission";
+  const npcMissionLabel = nativeLang === "korean" ? "실전 미션" : nativeLang === "spanish" ? "Misión Real" : "Real Mission";
+  const npcMissionDesc  = nativeLang === "korean" ? "NPC와 실전 대화로 레벨업!" : nativeLang === "spanish" ? "¡Habla con NPC en escenarios reales!" : "Practice real-world conversations with NPCs!";
 
   return (
     <>
@@ -338,6 +340,40 @@ export default function HomeScreen() {
             </View>
           </View>
           <Text style={styles.dailyBookEmoji}>📜</Text>
+        </Pressable>
+      </View>
+
+      {/* ── NPC REAL MISSION ──────────────────────────── */}
+      <GoldDivider label={npcMissionLabel} />
+      <View style={[styles.pad, { marginTop: 0 }]}>
+        <Pressable
+          style={({ pressed }) => [styles.npcMissionCard, pressed && { transform: [{ scale: 0.985 }] }]}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            router.push("/npc-list" as any);
+          }}
+        >
+          <View style={styles.npcMissionContent}>
+            <View style={styles.npcMissionTop}>
+              <View style={styles.npcMissionEmojis}>
+                <Text style={styles.npcEmoji}>☕</Text>
+                <Text style={styles.npcEmoji}>✈️</Text>
+                <Text style={styles.npcEmoji}>🏨</Text>
+                <Text style={styles.npcEmoji}>🚕</Text>
+              </View>
+              <View style={styles.xpPill}>
+                <Text style={styles.xpPillText}>10 NPCs</Text>
+              </View>
+            </View>
+            <Text style={styles.npcMissionTitle}>{npcMissionDesc}</Text>
+            <View style={styles.npcMissionBtn}>
+              <Text style={styles.npcMissionBtnText}>
+                {nativeLang === "korean" ? "NPC 선택" : nativeLang === "spanish" ? "Elegir NPC" : "Choose NPC"}
+              </Text>
+              <Ionicons name="arrow-forward" size={13} color={C.bg1} />
+            </View>
+          </View>
+          <Text style={styles.npcMissionBg}>🕵️</Text>
         </Pressable>
       </View>
 
@@ -522,6 +558,35 @@ const styles = StyleSheet.create({
   },
   dailyBtnText: { fontSize: 13, fontFamily: F.header, color: C.bg1, letterSpacing: 0.5 },
   dailyBookEmoji: { fontSize: 52, marginLeft: 8 },
+
+  /* ─ NPC MISSION CARD ─ */
+  npcMissionCard: {
+    backgroundColor: C.bg2,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: "rgba(201,162,39,0.5)",
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    shadowColor: "#c9a227",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  npcMissionContent: { flex: 1, gap: 10 },
+  npcMissionTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  npcMissionEmojis: { flexDirection: "row", gap: 4 },
+  npcEmoji: { fontSize: 20 },
+  npcMissionTitle: { fontSize: 15, fontFamily: F.bodyBold, color: C.parchment, lineHeight: 22, maxWidth: 200 },
+  npcMissionBtn: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: "rgba(201,162,39,0.85)", paddingHorizontal: 12, paddingVertical: 8,
+    borderRadius: 12, alignSelf: "flex-start",
+  },
+  npcMissionBtnText: { fontSize: 12, fontFamily: F.header, color: C.bg1, letterSpacing: 0.5 },
+  npcMissionBg: { fontSize: 48, marginLeft: 8, opacity: 0.7 },
 
   /* ─ QUICK PRACTICE ─ */
   quickList: { gap: 10 },

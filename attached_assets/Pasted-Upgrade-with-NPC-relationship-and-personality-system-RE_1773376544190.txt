@@ -1,0 +1,136 @@
+Upgrade 실전 미션 with NPC relationship and personality system.
+
+RELATIONSHIP SYSTEM (0-100):
+Save each NPC's relationship score to localStorage separately.
+
+Levels:
+0-30 = Stranger → show 3 choice buttons (beginner mode)
+30-60 = Familiar → show 2 choices + free input option
+60-80 = Friendly → full free conversation
+80-100 = Close → free conversation + special dialogue unlocked
+
+Score changes:
++5 correct natural sentence
++3 polite conversation
++3 pronunciation success
+-2 grammar mistake
+-5 rude response
+
+RELATIONSHIP DISPLAY:
+Show relationship bar under NPC name during conversation:
+"Emma ☕ | 💝 Familiar 45/100"
+
+NPC GREETING changes based on relationship:
+Stranger: "What would you like?" (cold)
+Familiar: "Hello! What can I get you today?" (neutral)
+Friendly: "Hey! Good to see you again! 😊" (warm)
+Close: "Your usual? I saved your favorite spot! 🧡" (personal)
+
+GRAMMAR CORRECTION:
+Remove detailed grammar feedback from NPC missions.
+NPC only naturally uses correct form in response.
+Direct users to tutor chat for detailed feedback.
+After mission show simple note:
+"더 자세한 문법 피드백은 튜터와 대화해보세요! 💬"
+
+NPC PERSONALITIES AND VOICES:
+
+☕ Emma - Cafe Barista
+Personality: Energetic and sassy
+Voice EN: en-US-JennyNeural (bright, fast)
+Voice KO: ko-KR-SunHiNeural
+Voice ES: es-ES-ElviraNeural
+SSML: fast pace, high energy
+
+✈️ James - Airport Staff
+Personality: Strict and impatient
+Voice EN: en-GB-RyanNeural (formal, clipped)
+Voice KO: ko-KR-InJoonNeural
+Voice ES: es-MX-JorgeNeural
+SSML: slow, authoritative tone
+
+🚔 Officer Park - Detective
+Personality: Serious and intimidating
+Voice EN: en-US-DavisNeural (deep, slow)
+Voice KO: ko-KR-InJoonNeural
+Voice ES: es-MX-JorgeNeural
+SSML: very slow, low pitch
+
+🍺 Alex - Friend at Bar
+Personality: Funny and casual
+Voice EN: en-US-GuyNeural (relaxed, laughing)
+Voice KO: ko-KR-InJoonNeural
+Voice ES: es-MX-JorgeNeural
+SSML: casual, fast, playful
+
+🏨 Sofia - Hotel Receptionist
+Personality: Elegant and polite
+Voice EN: en-US-AriaNeural (smooth, professional)
+Voice KO: ko-KR-SunHiNeural
+Voice ES: es-ES-ElviraNeural
+SSML: measured, clear, refined
+
+🛍️ Mia - Shop Assistant
+Personality: Bubbly and curious
+Voice EN: en-US-MichelleNeural (bright, friendly)
+Voice KO: ko-KR-SunHiNeural
+Voice ES: es-ES-ElviraNeural
+SSML: enthusiastic, varied pitch
+
+🏥 Dr. Kim - Doctor
+Personality: Calm and serious
+Voice EN: en-US-BrandonNeural (deep, calm)
+Voice KO: ko-KR-HyunsuNeural
+Voice ES: es-ES-AlvaroNeural
+SSML: slow, reassuring
+
+📞 Lisa - Customer Service
+Personality: Passive aggressive and overly polite
+Voice EN: en-US-SaraNeural (sweet but tense)
+Voice KO: ko-KR-SunHiNeural
+Voice ES: es-ES-ElviraNeural
+SSML: forced cheerfulness
+
+🍽️ Marco - Restaurant Host
+Personality: Warm and friendly
+Voice EN: en-US-ChristopherNeural (warm, welcoming)
+Voice KO: ko-KR-InJoonNeural
+Voice ES: es-ES-AlvaroNeural
+SSML: warm, inviting
+
+🚕 Tom - Taxi Driver
+Personality: Chatty and impatient
+Voice EN: en-US-TonyNeural (fast, direct)
+Voice KO: ko-KR-InJoonNeural
+Voice ES: es-MX-JorgeNeural
+SSML: fast pace, direct
+
+EMOTIONAL STATES:
+NPCs show emotion icon during conversation:
+😊 Happy - when user speaks correctly
+😐 Neutral - normal conversation
+🤔 Confused - when response doesn't make sense
+😠 Annoyed - repeated mistakes or rude response
+😲 Impressed - perfect sentence or pronunciation
+
+Show emotion icon next to NPC name during chat.
+Emotion affects NPC response tone via SSML.
+
+CONVERSATION FLOW:
+1. NPC introduces situation
+2. User responds (choices if Stranger, free if Friendly+)
+3. NPC reacts with emotion
+4. Relationship score updates (+/-)
+5. Show relationship change: "+3 💝" or "-2 💔"
+6. NPC continues conversation
+
+BEGINNER MODE (Stranger 0-30):
+When user taps choice:
+1. Azure TTS plays sentence immediately
+2. Popup: sentence text + 🔊 replay + ✅ 보내기 + ❌ 다시선택
+3. 보내기 → NPC responds → new choices
+
+SAVE TO LOCALSTORAGE:
+npcRelationships: {emma: 45, james: 20, alex: 78...}
+npcEmotions: current emotion per NPC
+missionsCompleted

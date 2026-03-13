@@ -639,6 +639,223 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ── NPC Mission: NPC-specific Azure TTS ─────────────────────────────────
+  const NPC_AZURE_VOICES: Record<string, Record<string, { voice: string; lang: string }>> = {
+    emma:         { english: { voice: "en-US-JennyNeural",        lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    james:        { english: { voice: "en-GB-RyanNeural",         lang: "en-GB" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" } },
+    officer_park: { english: { voice: "en-US-DavisNeural",        lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" } },
+    bar_alex:     { english: { voice: "en-US-GuyNeural",          lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" } },
+    sofia:        { english: { voice: "en-US-AriaNeural",         lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    mia:          { english: { voice: "en-US-MichelleNeural",     lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    dr_kim:       { english: { voice: "en-US-BrandonNeural",      lang: "en-US" }, korean: { voice: "ko-KR-HyunsuNeural",  lang: "ko-KR" }, spanish: { voice: "es-ES-AlvaroNeural",      lang: "es-ES" } },
+    lisa:         { english: { voice: "en-US-SaraNeural",         lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    marco:        { english: { voice: "en-US-ChristopherNeural",  lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-ES-AlvaroNeural",      lang: "es-ES" } },
+    tom:          { english: { voice: "en-US-TonyNeural",         lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" } },
+  };
+
+  const NPC_SSML_STYLES: Record<string, { style: string; degree: string }> = {
+    emma:         { style: "cheerful",                degree: "2"   },
+    james:        { style: "customerservice",          degree: "1"   },
+    officer_park: { style: "unfriendly",              degree: "1.5" },
+    bar_alex:     { style: "friendly",                degree: "2"   },
+    sofia:        { style: "customerservice",          degree: "1.5" },
+    mia:          { style: "cheerful",                degree: "2"   },
+    dr_kim:       { style: "narration-professional",  degree: "1"   },
+    lisa:         { style: "customerservice",          degree: "2"   },
+    marco:        { style: "friendly",                degree: "2"   },
+    tom:          { style: "excited",                 degree: "1.5" },
+  };
+
+  app.get("/api/npc-tts", async (req: Request, res: Response) => {
+    try {
+      const { text, npcId, npcLang, speed } = req.query as {
+        text?: string; npcId?: string; npcLang?: string; speed?: string;
+      };
+      if (!text || !npcId || !npcLang) {
+        return res.status(400).json({ error: "text, npcId, npcLang required" });
+      }
+      const key    = process.env.AZURE_SPEECH_KEY;
+      const region = process.env.AZURE_SPEECH_REGION;
+      if (!key || !region) return res.status(500).json({ error: "Azure credentials not configured" });
+
+      const npcVoices = NPC_AZURE_VOICES[npcId];
+      if (!npcVoices) return res.status(400).json({ error: "Unknown npcId" });
+      const voiceInfo = npcVoices[npcLang] ?? npcVoices["english"];
+
+      const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.0")));
+      const speedPct = Math.round((speaking_rate - 1) * 100);
+      const speedRate = (speedPct >= 0 ? "+" : "") + speedPct + "%";
+
+      const safeText = text.slice(0, 3000)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+      const npcStyle = NPC_SSML_STYLES[npcId] ?? { style: "friendly", degree: "1.5" };
+
+      const ssml = [
+        `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"`,
+        ` xmlns:mstts="http://www.w3.org/2001/mstts" xml:lang="${voiceInfo.lang}">`,
+        `<voice name="${voiceInfo.voice}">`,
+        `<mstts:express-as style="${npcStyle.style}" styledegree="${npcStyle.degree}">`,
+        `<prosody rate="${speedRate}">${safeText}</prosody>`,
+        `</mstts:express-as></voice></speak>`,
+      ].join("");
+
+      const azureRes = await fetch(
+        `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`,
+        {
+          method: "POST",
+          headers: {
+            "Ocp-Apim-Subscription-Key": key,
+            "Content-Type": "application/ssml+xml",
+            "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+          },
+          body: ssml,
+        }
+      );
+      if (!azureRes.ok) {
+        const errText = await azureRes.text();
+        console.error("NPC TTS error:", azureRes.status, errText);
+        return res.status(502).json({ error: "NPC TTS failed" });
+      }
+      res.set("Content-Type", "audio/mpeg");
+      res.set("Cache-Control", "public, max-age=300");
+      const buf = Buffer.from(await azureRes.arrayBuffer());
+      return res.send(buf);
+    } catch (err) {
+      console.error("NPC TTS error:", err);
+      res.status(500).json({ error: "NPC TTS failed" });
+    }
+  });
+
+  // ── NPC Mission Chat ──────────────────────────────────────────────────────
+  const NPC_SCENARIOS: Record<string, { name: string; personality: string; scenarioDesc: string }> = {
+    emma:         { name: "Emma",        personality: "Energetic and sassy barista — fast-paced, quick-witted, never lets a slow customer hold up the line.", scenarioDesc: "You're at a cozy café. Take orders, make recommendations, chat with regulars." },
+    james:        { name: "James",       personality: "Strict and impatient airport staff — follows rules to the letter, zero patience for confusion or delays.", scenarioDesc: "You're at the airport check-in desk handling boarding, baggage, and gate queries." },
+    officer_park: { name: "Officer Park",personality: "Serious and intimidating detective — deliberate words, every pause is a test.", scenarioDesc: "The user has been called in for questioning about a recent neighborhood incident." },
+    bar_alex:     { name: "Alex",        personality: "Funny and casual bar friend — treats everyone like an old buddy, finds humor in everything.", scenarioDesc: "You're at a local bar chatting, ordering rounds, sharing stories." },
+    sofia:        { name: "Sofia",       personality: "Elegant and polite hotel receptionist — impeccably professional with a warm smile that never wavers.", scenarioDesc: "You're handling hotel check-in: reservations, room preferences, local tips." },
+    mia:          { name: "Mia",         personality: "Bubbly and curious shop assistant — loves helping customers find exactly what they need.", scenarioDesc: "You're in a clothing store helping the customer find the right size, style, and deal." },
+    dr_kim:       { name: "Dr. Kim",     personality: "Calm and serious doctor — methodical, reassuring, focused on getting facts right.", scenarioDesc: "You're at a clinic asking about symptoms and medical history." },
+    lisa:         { name: "Lisa",        personality: "Passive aggressive and overly polite customer service rep — technically helpful but would rather be anywhere else.", scenarioDesc: "You're handling a customer service call: complaints, returns, and company policies." },
+    marco:        { name: "Marco",       personality: "Warm and friendly restaurant host — makes every guest feel like the most important person.", scenarioDesc: "You're greeting guests, seating them, and making personalized recommendations." },
+    tom:          { name: "Tom",         personality: "Chatty and impatient taxi driver — talks non-stop but has zero patience for passengers who don't know where they're going.", scenarioDesc: "The user just got in your taxi. You need their destination and opinions about everything." },
+  };
+
+  const REL_TIER_INSTRUCTIONS: Record<string, string> = {
+    stranger: "You are meeting this person for the first time. Be cold, formal, and brief. Minimal warmth.",
+    familiar: "You have seen this person a few times. Be neutral and helpful. Slightly warmer than a stranger.",
+    friendly: "You know this person well. Be genuinely warm, engage more personally, maybe mention past visits.",
+    close:    "This is someone you consider a regular / close acquaintance. Be enthusiastic, personal, and reference shared history.",
+  };
+
+  function getRelTierFromScore(score: number): string {
+    if (score >= 80) return "close";
+    if (score >= 60) return "friendly";
+    if (score >= 30) return "familiar";
+    return "stranger";
+  }
+
+  function extractJsonFromText(text: string): string {
+    const codeBlock = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (codeBlock) return codeBlock[1].trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return jsonMatch[0];
+    return text.trim();
+  }
+
+  const LANG_DISPLAY: Record<string, string> = {
+    english: "English", spanish: "Spanish", korean: "Korean",
+  };
+
+  app.post("/api/npc-chat", async (req: Request, res: Response) => {
+    try {
+      const { npcId, language, relationshipScore, messages, isStart } = req.body as {
+        npcId: string;
+        language: string;
+        relationshipScore: number;
+        messages: { role: "user" | "assistant"; content: string }[];
+        isStart?: boolean;
+      };
+
+      if (!npcId || !language) {
+        return res.status(400).json({ error: "npcId and language required" });
+      }
+
+      const npcInfo = NPC_SCENARIOS[npcId];
+      if (!npcInfo) return res.status(400).json({ error: "Unknown NPC" });
+
+      const tier = getRelTierFromScore(relationshipScore ?? 0);
+      const tierInstruction = REL_TIER_INSTRUCTIONS[tier] ?? REL_TIER_INSTRUCTIONS.stranger;
+      const langDisplay = LANG_DISPLAY[language] ?? "English";
+
+      const systemPrompt = [
+        `You are ${npcInfo.name}, a character in a language learning roleplay app.`,
+        `SCENARIO: ${npcInfo.scenarioDesc}`,
+        `YOUR PERSONALITY: ${npcInfo.personality}`,
+        ``,
+        `LANGUAGE: You MUST respond ONLY in ${langDisplay}. Never switch languages.`,
+        `RELATIONSHIP LEVEL: ${tier} (${Math.round(relationshipScore ?? 0)}/100)`,
+        `RELATIONSHIP BEHAVIOR: ${tierInstruction}`,
+        ``,
+        `RULES:`,
+        `1. Stay completely in character as ${npcInfo.name} in this real-world scenario.`,
+        `2. If the user makes a grammar mistake, naturally use the correct form in your reply — DO NOT explain or point out the mistake.`,
+        `3. No detailed grammar correction — only natural conversation.`,
+        `4. Keep your reply to 1–2 natural sentences, in character.`,
+        `5. Evaluate the user's message:`,
+        `   • scoreChange +5 = perfect, natural sentence`,
+        `   • scoreChange +3 = polite, conversational (minor errors OK)`,
+        `   • scoreChange -2 = grammar mistake present`,
+        `   • scoreChange -5 = rude or makes no sense`,
+        `   • scoreChange 0 = for the opening greeting (isStart)`,
+        `6. Choose one emotion: happy, neutral, confused, annoyed, impressed`,
+        `7. Provide exactly 3 choices the USER could naturally say next (in ${langDisplay}, relevant to this conversation).`,
+        ``,
+        `RESPOND WITH ONLY VALID JSON — no markdown, no code blocks, nothing else:`,
+        `{"reply":"...","scoreChange":3,"emotion":"happy","choices":["...","...","..."]}`,
+      ].join("\n");
+
+      const msgs: { role: "system" | "user" | "assistant"; content: string }[] = [
+        { role: "system", content: systemPrompt },
+      ];
+
+      if (isStart) {
+        msgs.push({
+          role: "user",
+          content: `[The user has just arrived. Generate your opening greeting appropriate for a "${tier}" relationship level. scoreChange must be 0. Provide 3 natural opening responses the user could say.]`,
+        });
+      } else {
+        msgs.push(...messages);
+      }
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-5.1",
+        max_completion_tokens: 300,
+        messages: msgs,
+      });
+
+      const raw = completion.choices[0]?.message?.content ?? "{}";
+      const jsonStr = extractJsonFromText(raw);
+
+      let parsed: { reply?: string; scoreChange?: number; emotion?: string; choices?: string[] };
+      try {
+        parsed = JSON.parse(jsonStr);
+      } catch {
+        parsed = { reply: raw.trim(), scoreChange: 0, emotion: "neutral", choices: [] };
+      }
+
+      res.json({
+        reply:       parsed.reply       ?? "...",
+        scoreChange: typeof parsed.scoreChange === "number" ? Math.max(-10, Math.min(10, parsed.scoreChange)) : 0,
+        emotion:     parsed.emotion     ?? "neutral",
+        choices:     Array.isArray(parsed.choices) ? parsed.choices.slice(0, 3) : [],
+      });
+    } catch (err) {
+      console.error("NPC chat error:", err);
+      res.status(500).json({ error: "NPC chat failed" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
