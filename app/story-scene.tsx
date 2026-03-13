@@ -197,11 +197,21 @@ type PuzzleType =
   | { pType: "cipher"; questions: CipherQ[] }
   | { pType: "word-puzzle"; questions: WordPuzzleQ[] };
 
-/* Puzzle hints */
+/* Puzzle hints
+ * Each tier is a Tri (ui-language display) with an optional `byLearning` map
+ * that overrides the content for a specific learningLang value.
+ * Resolution priority: byLearning[learningLang] > default Tri
+ */
+type HintTri = Tri & { byLearning?: Partial<Record<string, Tri>> };
 interface PuzzleHints {
-  h1: Tri;
-  h2: Tri;
-  h3?: Tri;
+  h1: HintTri;
+  h2: HintTri;
+  h3?: HintTri;
+}
+
+function resolveHint(h: HintTri, uiLang: string, learningLang: string): string {
+  const src: Tri = h.byLearning?.[learningLang] ?? h;
+  return uiLang === "korean" ? src.ko : uiLang === "spanish" ? src.es : src.en;
 }
 
 /* Sequence items */
@@ -571,9 +581,33 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "주어(The)로 시작할 단어를 먼저 찾아봐", en: "Find the word that starts the subject (The)", es: "Encuentra la palabra que inicia el sujeto (The)" },
-          h2: { ko: "영어 수동태야: 주어 + was + 동사(과거분사) + 장소", en: "It's passive voice: subject + was + past participle + place", es: "Es voz pasiva: sujeto + was + participio pasado + lugar" },
-          h3: { ko: "신비로운 무언가가 어딘가에서 발견됐어 — 누가 한 것이 아닌 수동 형태야", en: "Something mysterious was found somewhere — it happened to it, not by it", es: "Algo misterioso fue encontrado en algún lugar — le ocurrió, no lo hizo" },
+          h1: {
+            ko: "주어(The)로 시작하는 단어를 먼저 찾아봐",
+            en: "Find the subject word (The) first",
+            es: "Encuentra la palabra sujeto (The) primero",
+            byLearning: {
+              spanish: { ko: "스페인어 주어(El)로 시작하는 단어를 먼저 찾아봐", en: "Find the Spanish subject word (El) first", es: "Primero encuentra la palabra sujeto en español (El)" },
+              korean:  { ko: "한국어 주어(그/언어는)로 시작하는 단어를 먼저 찾아봐", en: "Find the Korean subject word first", es: "Encuentra primero la palabra sujeto en coreano" },
+            },
+          },
+          h2: {
+            ko: "동사에 주목해봐: appeared(나타났다)는 주어의 행동, is being used(사용되고 있다)는 주어가 당하는 행동이야",
+            en: "Focus on the verb: 'appeared' is what the subject does; 'is being used' is what happens to it",
+            es: "Fíjate en el verbo: 'appeared' es lo que hace el sujeto; 'is being used' es lo que le ocurre",
+            byLearning: {
+              spanish: { ko: "스페인어 동사에 주목해봐: apareció(나타났다)는 주어의 행동, está siendo usado(사용되고 있다)는 주어가 당하는 행동이야", en: "Focus on the Spanish verbs: 'apareció' is what the subject did; 'está siendo usado' is what happens to it", es: "Fíjate en los verbos españoles: 'apareció' es la acción del sujeto; 'está siendo usado' es lo que le ocurre" },
+              korean:  { ko: "한국어 동사에 주목해봐: 나타났다는 기호의 행동이고, 사용되고 있다는 언어에게 일어나는 일이야", en: "Focus on the Korean verbs: 나타났다 is the symbol's action; 사용되고 있다 is what happens to language", es: "Fíjate en los verbos coreanos: 나타났다 es la acción del símbolo; 사용되고 있다 es lo que le pasa al lenguaje" },
+            },
+          },
+          h3: {
+            ko: "첫 문장: 기호가 범죄 현장마다 '나타나는' 패턴 / 두 번째 문장: 언어가 무기로 '쓰이고 있는' 상황을 표현해봐",
+            en: "First sentence: the symbol keeps 'appearing' at crime scenes / Second: language is 'being used' as a weapon — find those key verbs",
+            es: "Primera frase: el símbolo 'apareció' en cada escena / Segunda: el lenguaje 'está siendo usado' como arma — encuentra esos verbos clave",
+            byLearning: {
+              spanish: { ko: "첫 문장: 스페인어로 기호가 '나타난(apareció)' 패턴 / 두 번째 문장: 언어가 무기로 '사용되고 있는(está siendo usado)' 상황", en: "First: the symbol 'apareció' at each scene / Second: the language 'está siendo usado' as a weapon", es: "Primera: el símbolo 'apareció' en cada escena / Segunda: el lenguaje 'está siendo usado' como arma" },
+              korean:  { ko: "첫 문장: 기호가 '나타났다'는 패턴 / 두 번째 문장: 언어가 무기로 '사용되고 있다'는 상황", en: "First: the symbol '나타났다' at each scene / Second: language '사용되고 있다' as a weapon", es: "Primera: el símbolo '나타났다' en cada escena / Segunda: el lenguaje '사용되고 있다' como arma" },
+            },
+          },
         },
       },
       {
@@ -597,7 +631,15 @@ const STORIES: Record<string, Story> = {
         ],
         hints: {
           h1: { ko: "🎤 버튼을 누르고 자신 있게 말해봐", en: "Press 🎤 and speak confidently", es: "Pulsa 🎤 y habla con confianza" },
-          h2: { ko: "긴 단어는 음절로 나눠봐: lan-guage, great-est, weap-on", en: "Break long words into syllables: lan-guage, great-est, weap-on", es: "Divide palabras largas en sílabas: lan-guage, great-est, weap-on" },
+          h2: {
+            ko: "긴 단어는 음절로 나눠봐: lan-guage, great-est, weap-on",
+            en: "Break long words into syllables: lan-guage, great-est, weap-on",
+            es: "Divide palabras largas en sílabas: lan-guage, great-est, weap-on",
+            byLearning: {
+              spanish: { ko: "스페인어 단어를 음절로 나눠봐: mis-te-rio, re-suel-to, len-gua-je, ar-ma", en: "Break the Spanish words into syllables: mis-te-rio, re-suel-to, len-gua-je, ar-ma", es: "Divide estas palabras en sílabas: mis-te-rio, re-suel-to, len-gua-je, ar-ma" },
+              korean:  { ko: "한국어 단어를 소리 단위로 나눠봐: 런-던, 미-스-터-리, 해-결-되-었-다", en: "Break Korean words into sound units: 런-던, 미-스-터-리, 해-결-되-었-다", es: "Divide las palabras coreanas en unidades de sonido: 런-던, 미-스-터-리" },
+            },
+          },
           h3: { ko: "속도보다 정확성이 중요해 — 천천히 또박또박 말하면 돼", en: "Accuracy matters more than speed — speak slowly and clearly", es: "La precisión importa más que la velocidad — habla despacio y claro" },
         },
       },
@@ -728,7 +770,15 @@ const STORIES: Record<string, Story> = {
         ],
         hints: {
           h1: { ko: "단어를 소리 내어 읽어봐 — 발음 자체가 힌트야", en: "Say the word aloud — the sound itself is the clue", es: "Di la palabra en voz alta — el sonido mismo es la pista" },
-          h2: { ko: "배우는 언어 단어와 영어가 발음이나 형태가 비슷할 때가 많아 — 모양과 소리를 비교해봐", en: "Target language words often sound or look like English — compare the shapes and sounds", es: "Las palabras del idioma objetivo a menudo se parecen al inglés — compara formas y sonidos" },
+          h2: {
+            ko: "스페인어 단어가 영어와 발음이나 형태가 비슷할 때가 많아 — 모양과 소리를 비교해봐",
+            en: "Spanish words often sound or look like English — compare the shapes and sounds for cognates",
+            es: "Las palabras españolas a menudo se parecen al inglés — compara formas y sonidos para encontrar cognados",
+            byLearning: {
+              english: { ko: "이 스페인어 단어들은 영어와 형태나 소리가 비슷해 — 탐정 이야기 맥락을 이용해서 뜻을 추측해봐", en: "These Spanish words share roots with English — use the detective story context to guess their meanings", es: "Estas palabras españolas comparten raíces con el inglés — usa el contexto de la historia para adivinar su significado" },
+              korean:  { ko: "스페인어 단어를 소리 내어 읽어봐 — 소리 패턴과 탐정 이야기 맥락으로 뜻을 추측할 수 있어", en: "Read the Spanish words aloud — use sound patterns and the detective story context to guess meanings", es: "Lee las palabras en voz alta — usa los patrones de sonido y el contexto detectivesco para adivinar el significado" },
+            },
+          },
           h3: { ko: "이 단어들 중에 인사, 감사, 도움 요청, 실종된 사람, 건물 이름이 각각 하나씩 있어", en: "Among these words: one is a greeting, one is gratitude, one is a request for help, one is about a missing person, one is a building", es: "Entre estas palabras hay: un saludo, gratitud, petición de ayuda, una persona desaparecida, un edificio" },
         },
       },
@@ -1120,8 +1170,24 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "주어(Language)로 시작해봐", en: "Start with the subject (Language)", es: "Empieza con el sujeto (Language)" },
-          h2: { ko: "Language + is + ??? + to + freedom — 'to freedom'와 연결되는 핵심 단어를 찾아봐", en: "Language + is + ??? + to + freedom — find the core word that links with 'to freedom'", es: "Language + is + ??? + to + freedom — encuentra la palabra clave que conecta con 'to freedom'" },
+          h1: {
+            ko: "주어(Language)로 시작해봐",
+            en: "Start with the subject (Language)",
+            es: "Empieza con el sujeto (Language)",
+            byLearning: {
+              spanish: { ko: "스페인어 주어(el)로 시작해봐", en: "Start with the Spanish subject (el)", es: "Empieza con el sujeto español (el)" },
+              korean:  { ko: "한국어 주어(언어는)로 시작해봐", en: "Start with the Korean subject (언어는)", es: "Empieza con el sujeto coreano (언어는)" },
+            },
+          },
+          h2: {
+            ko: "Language + is + ??? + to + freedom — 'to freedom'와 연결되는 핵심 단어를 찾아봐",
+            en: "Language + is + ??? + to + freedom — find the core word that links with 'to freedom'",
+            es: "Language + is + ??? + to + freedom — encuentra la palabra clave que conecta con 'to freedom'",
+            byLearning: {
+              spanish: { ko: "el + lenguaje + es + la + ??? + de la libertad — 자유와 연결되는 핵심 단어를 찾아봐", en: "el + lenguaje + es + la + ??? + de la libertad — find the word linking to 'de la libertad'", es: "el + lenguaje + es + la + ??? + de la libertad — encuentra la palabra clave que conecta con 'de la libertad'" },
+              korean:  { ko: "언어는 + 자유 + 에 + ??? + 이다 — 자유로 이어지는 핵심 단어를 찾아봐", en: "언어는 + 자유 + 에 + ??? + 이다 — find the core word that leads to '자유'", es: "언어는 + 자유 + 에 + ??? + 이다 — encuentra la palabra clave que conduce a '자유'" },
+            },
+          },
           h3: { ko: "자유에 이르는 '수단'을 나타내는 단어야 — 잠긴 문을 여는 물건을 생각해봐", en: "It's a word meaning a 'means' to reach freedom — think of the object that opens a locked door", es: "Es una palabra que significa un 'medio' para alcanzar la libertad — piensa en el objeto que abre una puerta" },
         },
       },
@@ -2772,10 +2838,9 @@ export default function StoryScene() {
             ? `🧩 Puzzle ${item.puzzleNum} — ¡Demuestra tus habilidades lingüísticas!`
             : `🧩 Puzzle ${item.puzzleNum} — Prove your language skills!`;
           const hasSharedHints = !!item.hints && item.pType !== "cipher";
-          const tri_ = (t: Tri) => ko ? t.ko : es ? t.es : t.en;
-          const h1 = item.hints ? tri_(item.hints.h1) : "";
-          const h2 = item.hints ? tri_(item.hints.h2) : "";
-          const h3 = item.hints?.h3 ? tri_(item.hints.h3) : null;
+          const h1 = item.hints ? resolveHint(item.hints.h1, lang, learningLang) : "";
+          const h2 = item.hints ? resolveHint(item.hints.h2, lang, learningLang) : "";
+          const h3 = item.hints?.h3 ? resolveHint(item.hints.h3, lang, learningLang) : null;
           const allHints = [h1, h2, h3].filter(Boolean) as string[];
           const totalHints = allHints.length;
 
