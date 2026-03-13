@@ -352,7 +352,7 @@ export default function HomeScreen() {
             >
               <Text style={styles.basicCoursePillText}>
                 {courseCompleted
-                  ? (nativeLang === "korean" ? "✅  기초 과정 완료" : nativeLang === "spanish" ? "✅  Curso básico" : "✅  Basic Course")
+                  ? (nativeLang === "korean" ? "📚  기초 과정 복습" : nativeLang === "spanish" ? "📚  Repasar curso" : "📚  Review Course")
                   : (nativeLang === "korean" ? "📚  기초 과정 시작" : nativeLang === "spanish" ? "📚  Curso básico" : "📚  Basic Course")}
               </Text>
             </Pressable>
