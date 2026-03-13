@@ -1419,10 +1419,14 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
 }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
   const [solved, setSolved] = useState(false);
 
   const q = puzzle.questions[idx];
   const correctAnswer = lang === "korean" ? q.answer.ko : lang === "spanish" ? q.answer.es : q.answer.en;
+  const correctAnswerEn = q.answer.en;
+  const correctAnswerNative = lang === "korean" ? q.answer.ko : lang === "spanish" ? q.answer.es : q.answer.en;
   const hintText = lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : q.hint.en;
 
   const [shuffledOpts] = useState(() =>
@@ -1432,23 +1436,136 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
     })
   );
 
+  // Build letter-by-letter decode breakdown: "I→H, F→E, M→L, M→L, P→O"
+  function buildBreakdown(encoded: string, shift: number): string {
+    return encoded
+      .split("")
+      .map((ch) => {
+        const code = ch.charCodeAt(0);
+        if (code >= 65 && code <= 90) {
+          const decoded = String.fromCharCode(((code - 65 - shift + 26) % 26) + 65);
+          return `${ch}→${decoded}`;
+        }
+        return ch;
+      })
+      .join(", ");
+  }
+
+  const breakdown = buildBreakdown(q.encoded, q.shift);
+
+  // Find the circled number label of the correct answer in the shuffled list
+  const correctOptNum = (() => {
+    const labels = ["①", "②", "③", "④"];
+    const ci = shuffledOpts[idx]?.indexOf(correctAnswer);
+    return ci >= 0 ? labels[ci] : "";
+  })();
+
   function handleSelect(opt: string) {
-    if (selected) return;
+    if (showResult) return;
+    const correct = opt === correctAnswer;
     setSelected(opt);
-    if (opt === correctAnswer) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setTimeout(() => {
-        if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); }
-        else setSolved(true);
-      }, 900);
+    setIsCorrect(correct);
+    setShowResult(true);
+    if (correct) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+  }
+
+  function handleRetry() {
+    setSelected(null);
+    setShowResult(false);
+    setIsCorrect(false);
+  }
+
+  function handleContinue() {
+    if (idx < puzzle.questions.length - 1) {
+      setIdx((i) => i + 1);
+      setSelected(null);
+      setShowResult(false);
+      setIsCorrect(false);
     } else {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      setTimeout(() => setSelected(null), 900);
+      setSolved(true);
     }
   }
 
   if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
 
+  // ── Result screen ──
+  if (showResult) {
+    return (
+      <View style={styles.puzzleBox}>
+        <View style={styles.puzzleHeaderRow}>
+          <Text style={styles.puzzleNum}>🔐 {lang === "korean" ? "암호를 해독하라!" : lang === "spanish" ? "¡Descifra el código!" : "Decode the Cipher!"}</Text>
+          <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
+        </View>
+
+        {/* Result banner */}
+        {isCorrect ? (
+          <View style={styles.cipherResultCorrect}>
+            <Text style={styles.cipherResultTitle}>
+              ✅ {lang === "korean" ? `정답! ${correctAnswerEn}` : lang === "spanish" ? `¡Correcto! ${correctAnswerEn}` : `Correct! ${correctAnswerEn}`}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.cipherResultWrong}>
+            <Text style={styles.cipherResultTitle}>
+              ❌ {lang === "korean" ? "틀렸어요" : lang === "spanish" ? "Incorrecto" : "Wrong!"}
+            </Text>
+            <Text style={styles.cipherResultSub}>
+              {lang === "korean"
+                ? `정답은: ${correctOptNum} ${correctAnswerNative} (${correctAnswerEn})`
+                : lang === "spanish"
+                ? `Respuesta: ${correctOptNum} ${correctAnswerNative} (${correctAnswerEn})`
+                : `Answer: ${correctOptNum} ${correctAnswerEn}`}
+            </Text>
+          </View>
+        )}
+
+        {/* Divider */}
+        <View style={styles.cipherDivider} />
+
+        {/* Explanation */}
+        <View style={styles.cipherExplainBox}>
+          <Text style={styles.cipherExplainLabel}>
+            💡 {lang === "korean" ? "해설:" : lang === "spanish" ? "Explicación:" : "Explanation:"}
+          </Text>
+          <Text style={styles.cipherExplainBreakdown}>{breakdown}</Text>
+          <Text style={styles.cipherExplainResult}>
+            {"= "}
+            <Text style={{ color: C.gold }}>{correctAnswerEn}</Text>
+            {lang !== "english" ? ` (${correctAnswerNative})` : ""}
+          </Text>
+        </View>
+
+        {/* Divider */}
+        <View style={styles.cipherDivider} />
+
+        {/* XP reward if correct */}
+        {isCorrect && (
+          <Text style={styles.cipherXpText}>
+            🏆 {lang === "korean" ? "+20 XP 획득!" : lang === "spanish" ? "¡+20 XP obtenidos!" : "+20 XP earned!"}
+          </Text>
+        )}
+
+        {/* Action buttons */}
+        <View style={isCorrect ? undefined : styles.cipherBtnRow}>
+          {!isCorrect && (
+            <Pressable style={[styles.puzzleConfirmBtn, styles.cipherRetryBtn]} onPress={handleRetry}>
+              <Text style={[styles.puzzleConfirmText, { color: C.gold }]}>
+                {lang === "korean" ? "다시 시도 🔄" : lang === "spanish" ? "Reintentar 🔄" : "Retry 🔄"}
+              </Text>
+            </Pressable>
+          )}
+          <Pressable style={[styles.puzzleConfirmBtn, !isCorrect && { flex: 1 }]} onPress={handleContinue}>
+            <Text style={styles.puzzleConfirmText}>
+              {lang === "korean" ? "계속하기 →" : lang === "spanish" ? "Continuar →" : "Continue →"}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
+
+  // ── Question screen ──
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
@@ -1470,16 +1587,14 @@ function CipherPuzzle({ puzzle, lang, onSolved }: {
       <View style={styles.puzzleOptions}>
         {shuffledOpts[idx].map((opt, i) => {
           const isSelected = selected === opt;
-          const isCorrect = opt === correctAnswer;
+          const isOpt = opt === correctAnswer;
           let bg = C.bg2; let borderColor = C.border;
-          if (isSelected && isCorrect) { bg = "rgba(90,170,90,0.25)"; borderColor = "#5a9"; }
-          else if (isSelected && !isCorrect) { bg = "rgba(200,70,70,0.25)"; borderColor = "#e55"; }
+          if (isSelected && isOpt) { bg = "rgba(90,170,90,0.25)"; borderColor = "#5a9"; }
+          else if (isSelected && !isOpt) { bg = "rgba(200,70,70,0.25)"; borderColor = "#e55"; }
           return (
             <Pressable key={i} style={[styles.puzzleOption, { backgroundColor: bg, borderColor }]} onPress={() => handleSelect(opt)}>
               <Text style={styles.cipherOptLabel}>{["①", "②", "③", "④"][i]}</Text>
               <Text style={[styles.puzzleOptionText, { marginLeft: 8 }]}>{opt}</Text>
-              {isSelected && isCorrect && <Ionicons name="checkmark-circle" size={18} color="#5a9" />}
-              {isSelected && !isCorrect && <Ionicons name="close-circle" size={18} color="#e55" />}
             </Pressable>
           );
         })}
@@ -2731,6 +2846,79 @@ const styles = StyleSheet.create({
     fontFamily: F.header,
     color: C.gold,
     width: 24,
+  },
+  cipherResultCorrect: {
+    backgroundColor: "rgba(90,170,90,0.15)",
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: "#5a9",
+    padding: 14,
+    alignItems: "center",
+  },
+  cipherResultWrong: {
+    backgroundColor: "rgba(200,70,70,0.12)",
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: "#e55",
+    padding: 14,
+    alignItems: "center",
+    gap: 4,
+  },
+  cipherResultTitle: {
+    fontSize: 17,
+    fontFamily: F.header,
+    color: C.parchment,
+    letterSpacing: 0.5,
+  },
+  cipherResultSub: {
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: C.goldDim,
+  },
+  cipherDivider: {
+    height: 1,
+    backgroundColor: "rgba(201,162,39,0.2)",
+    marginVertical: 2,
+  },
+  cipherExplainBox: {
+    gap: 6,
+    paddingVertical: 4,
+  },
+  cipherExplainLabel: {
+    fontSize: 13,
+    fontFamily: F.header,
+    color: C.gold,
+    letterSpacing: 0.5,
+  },
+  cipherExplainBreakdown: {
+    fontSize: 15,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+    letterSpacing: 0.5,
+    lineHeight: 24,
+  },
+  cipherExplainResult: {
+    fontSize: 15,
+    fontFamily: F.header,
+    color: C.parchmentDark,
+    letterSpacing: 0.5,
+  },
+  cipherXpText: {
+    fontSize: 15,
+    fontFamily: F.header,
+    color: C.gold,
+    textAlign: "center",
+    letterSpacing: 0.5,
+  },
+  cipherBtnRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  cipherRetryBtn: {
+    flex: 1,
+    backgroundColor: "rgba(201,162,39,0.12)",
+    borderWidth: 1,
+    borderColor: C.gold,
   },
 
   /* ── Listen-Choose Puzzle ── */
