@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
   Platform,
-  Image,
+  Animated,
   ScrollView,
   Dimensions,
 } from "react-native";
@@ -23,6 +23,25 @@ const DONE_KEY = (lang: string) => `basicCourseCompleted_${lang}`;
 const rudySplashImg = require("@/assets/rudy_splash.png");
 const { width: SCREEN_W } = Dimensions.get("window");
 const SPLASH_SIZE = Math.min(SCREEN_W - 48, 300);
+
+function RudySplashPlaceholder() {
+  const [loaded, setLoaded] = useState(false);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const onLoad = () => {
+    setLoaded(true);
+    Animated.timing(opacity, { toValue: 1, duration: 250, useNativeDriver: true }).start();
+  };
+  return (
+    <View style={{ width: SPLASH_SIZE, height: SPLASH_SIZE, borderRadius: 14, overflow: "hidden" }}>
+      {!loaded && (
+        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: "rgba(201,162,39,0.12)", justifyContent: "center", alignItems: "center", borderRadius: 14 }]}>
+          <Text style={{ fontSize: 60 }}>🦊</Text>
+        </View>
+      )}
+      <Animated.Image source={rudySplashImg} style={{ width: SPLASH_SIZE, height: SPLASH_SIZE, borderRadius: 14, opacity }} resizeMode="contain" onLoad={onLoad} />
+    </View>
+  );
+}
 
 type Step = 1 | 2;
 
@@ -127,7 +146,7 @@ export default function OnboardingScreen() {
 
         {/* Rudy splash illustration */}
         <View style={styles.splashWrap}>
-          <Image source={rudySplashImg} style={styles.splashImg} resizeMode="contain" />
+          <RudySplashPlaceholder />
         </View>
 
         {/* Step dots */}

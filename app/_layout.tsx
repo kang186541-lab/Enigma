@@ -11,6 +11,7 @@ import {
   useFonts as useCrimson,
 } from "@expo-google-fonts/crimson-text";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { Asset } from "expo-asset";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef } from "react";
@@ -119,12 +120,22 @@ function RootLayoutNav() {
   );
 }
 
+const PRELOAD_IMAGES = [
+  require("@/assets/rudy_badge.png"),
+  require("@/assets/rudy_splash.png"),
+  require("@/assets/rudy_story.png"),
+];
+
 export default function RootLayout() {
   const [cinzelLoaded,  cinzelError]  = useCinzel({ Cinzel_400Regular, Cinzel_700Bold, Cinzel_900Black });
   const [crimsonLoaded, crimsonError] = useCrimson({ CrimsonText_400Regular, CrimsonText_600SemiBold, CrimsonText_700Bold });
 
   const fontsLoaded = cinzelLoaded  && crimsonLoaded;
   const fontError   = cinzelError   || crimsonError;
+
+  useEffect(() => {
+    Asset.loadAsync(PRELOAD_IMAGES).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded || fontError) SplashScreen.hideAsync();

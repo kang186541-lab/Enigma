@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   Platform,
   Dimensions,
   Animated,
-  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -30,6 +29,25 @@ import {
 
 const { width } = Dimensions.get("window");
 const rudyBadgeImg = require("@/assets/rudy_badge.png");
+
+function RudyImageWithPlaceholder({ source, style, resizeMode }: { source: any; style: any; resizeMode?: any }) {
+  const [loaded, setLoaded] = useState(false);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const onLoad = () => {
+    setLoaded(true);
+    Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+  };
+  return (
+    <View style={[style, { overflow: "hidden" }]}>
+      {!loaded && (
+        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: "rgba(201,162,39,0.15)", justifyContent: "center", alignItems: "center" }]}>
+          <Text style={{ fontSize: 22 }}>🦊</Text>
+        </View>
+      )}
+      <Animated.Image source={source} style={[style, { opacity }]} resizeMode={resizeMode} onLoad={onLoad} />
+    </View>
+  );
+}
 
 function getGreeting(t: (k: string) => string) {
   const h = new Date().getHours();
@@ -248,7 +266,7 @@ export default function HomeScreen() {
             <Text style={styles.greeting} numberOfLines={1}>{lingoGreeting}</Text>
             <Text style={styles.headerTitle} numberOfLines={1}>Enigma ✨</Text>
           </View>
-          <Image
+          <RudyImageWithPlaceholder
             source={rudyBadgeImg}
             style={styles.lingoHeader}
             resizeMode="cover"
