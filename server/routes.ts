@@ -769,9 +769,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/npc-chat", async (req: Request, res: Response) => {
     try {
-      const { npcId, language, relationshipScore, messages, isStart } = req.body as {
+      const { npcId, language, nativeLanguage, relationshipScore, messages, isStart } = req.body as {
         npcId: string;
         language: string;
+        nativeLanguage?: string;
         relationshipScore: number;
         messages: { role: "user" | "assistant"; content: string }[];
         isStart?: boolean;
@@ -787,6 +788,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tier = getRelTierFromScore(relationshipScore ?? 0);
       const tierInstruction = REL_TIER_INSTRUCTIONS[tier] ?? REL_TIER_INSTRUCTIONS.stranger;
       const langDisplay = LANG_DISPLAY[language] ?? "English";
+      const nativeLangDisplay = LANG_DISPLAY[nativeLanguage ?? "english"] ?? "English";
+      const includeTranslation = nativeLangDisplay !== langDisplay;
 
       const systemPrompt = [
         `You are ${npcInfo.name}, a character in a language learning roleplay app.`,
@@ -810,9 +813,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         `   • scoreChange 0 = for the opening greeting (isStart)`,
         `6. Choose one emotion: happy, neutral, confused, annoyed, impressed`,
         `7. Provide exactly 3 choices the USER could naturally say next (in ${langDisplay}, relevant to this conversation).`,
+        includeTranslation
+          ? `   Each choice must include: "text" (${langDisplay}) and "translation" (${nativeLangDisplay}).`
+          : `   Each choice is a plain string in ${langDisplay}.`,
         ``,
         `RESPOND WITH ONLY VALID JSON — no markdown, no code blocks, nothing else:`,
-        `{"reply":"...","scoreChange":3,"emotion":"happy","choices":["...","...","..."]}`,
+        includeTranslation
+          ? `{"reply":"...","scoreChange":3,"emotion":"happy","choices":[{"text":"...","translation":"..."},{"text":"...","translation":"..."},{"text":"...","translation":"..."}]}`
+          : `{"reply":"...","scoreChange":3,"emotion":"happy","choices":["...","...","..."]}`,
       ].join("\n");
 
       const msgs: { role: "system" | "user" | "assistant"; content: string }[] = [
@@ -837,18 +845,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const raw = completion.choices[0]?.message?.content ?? "{}";
       const jsonStr = extractJsonFromText(raw);
 
-      let parsed: { reply?: string; scoreChange?: number; emotion?: string; choices?: string[] };
+      type RawChoice = string | { text?: string; translation?: string };
+      let parsed: { reply?: string; scoreChange?: number; emotion?: string; choices?: RawChoice[] };
       try {
         parsed = JSON.parse(jsonStr);
       } catch {
         parsed = { reply: raw.trim(), scoreChange: 0, emotion: "neutral", choices: [] };
       }
 
+      const rawChoices: RawChoice[] = Array.isArray(parsed.choices) ? parsed.choices.slice(0, 3) : [];
+      const choices = rawChoices.map((c): { text: string; translation: string } => {
+        if (typeof c === "string") return { text: c, translation: "" };
+        return { text: c.text ?? "", translation: c.translation ?? "" };
+      });
+
       res.json({
         reply:       parsed.reply       ?? "...",
         scoreChange: typeof parsed.scoreChange === "number" ? Math.max(-10, Math.min(10, parsed.scoreChange)) : 0,
         emotion:     parsed.emotion     ?? "neutral",
-        choices:     Array.isArray(parsed.choices) ? parsed.choices.slice(0, 3) : [],
+        choices,
       });
     } catch (err) {
       console.error("NPC chat error:", err);

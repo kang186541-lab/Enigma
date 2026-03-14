@@ -79,7 +79,8 @@ export default function NpcMissionScreen() {
   const [messages, setMessages]     = useState<NpcMessage[]>([]);
   const [relationship, setRelationship] = useState(0);
   const [emotion, setEmotion]       = useState("neutral");
-  const [choices, setChoices]       = useState<string[]>([]);
+  const [choices, setChoices]       = useState<{ text: string; translation: string }[]>([]);
+  const [choiceTranslVisible, setChoiceTranslVisible] = useState<boolean[]>([]);
   const [isTyping, setIsTyping]     = useState(false);
   const [inputText, setInputText]   = useState("");
   const [muted, setMuted]           = useState(false);
@@ -212,6 +213,7 @@ export default function NpcMissionScreen() {
         body: JSON.stringify({
           npcId: npc.id,
           language,
+          nativeLanguage: native,
           relationshipScore: relScore,
           messages: history,
           isStart,
@@ -225,11 +227,14 @@ export default function NpcMissionScreen() {
         reply: string;
         scoreChange: number;
         emotion: string;
-        choices: string[];
+        choices: { text: string; translation: string }[];
       };
 
+      const safeChoices = Array.isArray(newChoices) ? newChoices.slice(0, 3) : [];
+
       if (isStart) {
-        setChoices(Array.isArray(newChoices) ? newChoices.slice(0, 3) : []);
+        setChoices(safeChoices);
+        setChoiceTranslVisible(Array(safeChoices.length).fill(false));
         setEmotion(newEmotion ?? "neutral");
         return;
       }
@@ -239,7 +244,8 @@ export default function NpcMissionScreen() {
 
       setMessages(prev => [npcMsg, ...prev]);
       conversationRef.current = [...history, { role: "assistant", content: reply }];
-      setChoices(Array.isArray(newChoices) ? newChoices.slice(0, 3) : []);
+      setChoices(safeChoices);
+      setChoiceTranslVisible(Array(safeChoices.length).fill(false));
 
       if (scoreChange !== 0) {
         const newScore = Math.min(100, Math.max(0, relScore + scoreChange));
@@ -276,6 +282,7 @@ export default function NpcMissionScreen() {
     setMessages(prev => [userMsg, ...prev]);
     setInputText("");
     setChoices([]);
+    setChoiceTranslVisible([]);
 
     await fetchNpcReply(newHistory, false, relationship);
   }, [npc, isTyping, relationship, fetchNpcReply]);
@@ -644,15 +651,31 @@ export default function NpcMissionScreen() {
           {showStranger && choices.length > 0 && (
             <View style={styles.choicesWrap}>
               {choices.map((choice, i) => (
-                <Pressable
-                  key={i}
-                  style={({ pressed }) => [styles.choiceBtn, pressed && { opacity: 0.8, transform: [{ scale: 0.97 }] }]}
-                  onPress={() => handleChoiceTap(choice)}
-                  disabled={isTyping}
-                >
-                  <Text style={styles.choiceBtnText}>{choice}</Text>
-                  <Ionicons name="volume-medium-outline" size={12} color={C.goldDark} style={{ marginLeft: 6 }} />
-                </Pressable>
+                <View key={i} style={styles.choiceBtnWrap}>
+                  <Pressable
+                    style={({ pressed }) => [styles.choiceBtn, pressed && { opacity: 0.8, transform: [{ scale: 0.97 }] }]}
+                    onPress={() => handleChoiceTap(choice.text)}
+                    disabled={isTyping}
+                  >
+                    <Text style={styles.choiceBtnText}>{choice.text}</Text>
+                    <Ionicons name="volume-medium-outline" size={12} color={C.goldDark} style={{ marginLeft: 6 }} />
+                  </Pressable>
+                  {choice.translation ? (
+                    <Pressable
+                      style={styles.translToggleBtn}
+                      onPress={() => setChoiceTranslVisible(prev => { const n = [...prev]; n[i] = !n[i]; return n; })}
+                    >
+                      <Text style={styles.translToggleText}>
+                        {choiceTranslVisible[i]
+                          ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : "Hide translation")
+                          : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : "Show translation")}
+                      </Text>
+                    </Pressable>
+                  ) : null}
+                  {choiceTranslVisible[i] && choice.translation ? (
+                    <Text style={styles.translText}>{choice.translation}</Text>
+                  ) : null}
+                </View>
               ))}
             </View>
           )}
@@ -663,14 +686,30 @@ export default function NpcMissionScreen() {
               {choices.length > 0 && (
                 <View style={styles.familiarChoicesRow}>
                   {familiarChoices.map((choice, i) => (
-                    <Pressable
-                      key={i}
-                      style={({ pressed }) => [styles.familiarChoiceBtn, pressed && { opacity: 0.8 }]}
-                      onPress={() => handleChoiceTap(choice)}
-                      disabled={isTyping}
-                    >
-                      <Text style={styles.familiarChoiceBtnText} numberOfLines={2}>{choice}</Text>
-                    </Pressable>
+                    <View key={i} style={styles.familiarChoiceBtnWrap}>
+                      <Pressable
+                        style={({ pressed }) => [styles.familiarChoiceBtn, pressed && { opacity: 0.8 }]}
+                        onPress={() => handleChoiceTap(choice.text)}
+                        disabled={isTyping}
+                      >
+                        <Text style={styles.familiarChoiceBtnText} numberOfLines={3}>{choice.text}</Text>
+                      </Pressable>
+                      {choice.translation ? (
+                        <Pressable
+                          style={styles.translToggleBtn}
+                          onPress={() => setChoiceTranslVisible(prev => { const n = [...prev]; n[i] = !n[i]; return n; })}
+                        >
+                          <Text style={styles.translToggleText}>
+                            {choiceTranslVisible[i]
+                              ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : "Hide translation")
+                              : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : "Show translation")}
+                          </Text>
+                        </Pressable>
+                      ) : null}
+                      {choiceTranslVisible[i] && choice.translation ? (
+                        <Text style={styles.translText}>{choice.translation}</Text>
+                      ) : null}
+                    </View>
                   ))}
                 </View>
               )}
@@ -999,6 +1038,7 @@ const styles = StyleSheet.create({
   },
 
   choicesWrap: { gap: 7 },
+  choiceBtnWrap: { gap: 0 },
   choiceBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -1013,8 +1053,9 @@ const styles = StyleSheet.create({
   choiceBtnText: { flex: 1, fontSize: 14, fontFamily: F.body, color: C.parchment, lineHeight: 19 },
 
   familiarChoicesRow: { flexDirection: "row", gap: 8 },
+  familiarChoiceBtnWrap: { flex: 1, gap: 0 },
   familiarChoiceBtn: {
-    flex: 1,
+    width: "100%",
     backgroundColor: C.bg2,
     borderRadius: 12,
     borderWidth: 1,
@@ -1024,6 +1065,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   familiarChoiceBtnText: { fontSize: 12, fontFamily: F.body, color: C.parchment, textAlign: "center", lineHeight: 17 },
+
+  translToggleBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignSelf: "flex-start",
+  },
+  translToggleText: {
+    fontSize: 11,
+    fontFamily: F.body,
+    color: C.gold,
+    textDecorationLine: "underline",
+    opacity: 0.85,
+  },
+  translText: {
+    paddingHorizontal: 14,
+    paddingBottom: 8,
+    fontSize: 12,
+    fontFamily: F.body,
+    color: C.parchment,
+    opacity: 0.6,
+    lineHeight: 17,
+  },
 
   inputRow: {
     flexDirection: "row",
