@@ -182,7 +182,7 @@ interface WritingMissionQ {
   hint?: Tri;
 }
 interface CipherQ {
-  encoded: string;
+  encoded: { en: string; es: string };
   answer: Tri;
   shift: number;
   hint: Tri;
@@ -444,7 +444,7 @@ const STORIES: Record<string, Story> = {
         pType: "cipher",
         questions: [
           {
-            encoded: "IFMMP",
+            encoded: { en: "IFMMP", es: "IPMB" },
             answer: { en: "HELLO", ko: "안녕", es: "HOLA" },
             shift: 1,
             hint: { en: "Move each letter one step backward", ko: "각 글자를 한 칸 뒤로 당겨보게", es: "Retrocede cada letra 1 posición" },
@@ -456,7 +456,7 @@ const STORIES: Record<string, Story> = {
             ],
           },
           {
-            encoded: "SVEZ",
+            encoded: { en: "SVEZ", es: "SVEZ" },
             answer: { en: "RUDY", ko: "루디", es: "RUDY" },
             shift: 1,
             hint: { en: "The detective's name — move each letter one step backward", ko: "탐정의 이름 — 각 글자를 한 칸 뒤로 당겨보게", es: "El nombre del detective — retrocede cada letra 1 posición" },
@@ -468,7 +468,7 @@ const STORIES: Record<string, Story> = {
             ],
           },
           {
-            encoded: "MFYJDPO",
+            encoded: { en: "MFYJDPO", es: "MFYJDP" },
             answer: { en: "LEXICON", ko: "렉시콘", es: "LÉXICO" },
             shift: 1,
             hint: { en: "The secret society's name — move each letter one step backward", ko: "비밀 결사의 이름 — 각 글자를 한 칸 뒤로 당겨보게", es: "El nombre de la sociedad secreta — retrocede cada letra 1 posición" },
@@ -482,7 +482,7 @@ const STORIES: Record<string, Story> = {
         ],
         hints: {
           h1: { ko: "알파벳 순서에서 각 글자의 바로 앞 글자를 찾아보게! 예: B→A", en: "Find the letter right before each one in the alphabet! e.g. B→A", es: "¡Encuentra la letra anterior en el alfabeto! ej: B→A" },
-          h2: { ko: "I→H, F→E, M→L, M→L, P→O", en: "I→H, F→E, M→L, M→L, P→O", es: "I→H, F→E, M→L, M→L, P→O" },
+          h2: { ko: "I→H, F→E, M→L, M→L, P→O", en: "I→H, F→E, M→L, M→L, P→O", es: "I→H, P→O, M→L, B→A", byLearning: { spanish: "I→H, P→O, M→L, B→A" } },
         },
       },
       {
@@ -1681,9 +1681,9 @@ function InvestigationPuzzle({ puzzle, lang, onSolved, onResetHints }: {
 
 /* ─────────────────── CIPHER PUZZLE ─────────────────── */
 
-function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
+function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   puzzle: { pType: "cipher"; questions: CipherQ[] };
-  lang: string; onSolved: () => void; onResetHints?: () => void;
+  lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -1694,19 +1694,30 @@ function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
   const [unlockedHints, setUnlockedHints] = useState(0);
 
   const q = puzzle.questions[idx];
-  const correctAnswer = lang === "korean" ? q.answer.ko : lang === "spanish" ? q.answer.es : q.answer.en;
-  const correctAnswerEn = q.answer.en;
-  const correctAnswerNative = lang === "korean" ? q.answer.ko : lang === "spanish" ? q.answer.es : q.answer.en;
+  // encodedWord is the cipher text for the learning language
+  const encodedWord = learningLang === "spanish" ? q.encoded.es : q.encoded.en;
+  // correctAnswer is the decoded answer in the learning language
+  const correctAnswer = learningLang === "spanish" ? q.answer.es
+    : learningLang === "korean" ? q.answer.ko
+    : q.answer.en;
+  // nativeTranslation shows the same answer in the UI language (for understanding)
+  const nativeTranslation = lang === "korean" ? q.answer.ko
+    : lang === "spanish" ? q.answer.es
+    : q.answer.en;
   const hintText = lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : q.hint.en;
 
   const [shuffledOpts] = useState(() =>
     puzzle.questions.map((qq) => {
-      const opts = qq.opts.map((o) => lang === "korean" ? o.ko : lang === "spanish" ? o.es : o.en);
+      const opts = qq.opts.map((o) =>
+        learningLang === "spanish" ? o.es
+        : learningLang === "korean" ? o.ko
+        : o.en
+      );
       return shuffle(opts);
     })
   );
 
-  // Build letter-by-letter decode breakdown: "I→H, F→E, M→L, M→L, P→O"
+  // Build letter-by-letter decode breakdown: "I→H, P→O, M→L, B→A"
   function buildBreakdown(encoded: string, shift: number): string {
     return encoded
       .split("")
@@ -1721,7 +1732,7 @@ function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
       .join(", ");
   }
 
-  const breakdown = buildBreakdown(q.encoded, q.shift);
+  const breakdown = buildBreakdown(encodedWord, q.shift);
 
   // Find the circled number label of the correct answer in the shuffled list
   const correctOptNum = (() => {
@@ -1761,16 +1772,16 @@ function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
 
   // Progressive hints — generated from puzzle data
   function getHints() {
-    const firstLetter = q.encoded[0];
+    const firstLetter = encodedWord[0];
     const decodedFirst = String.fromCharCode(
       ((firstLetter.charCodeAt(0) - 65 - q.shift + 26) % 26) + 65
     );
     const ko = lang === "korean";
     const es = lang === "spanish";
-    const halfLen = Math.ceil(q.encoded.length / 2);
-    const decodedHalf = q.encoded.slice(0, halfLen).split("").map((ch: string) =>
+    const halfLen = Math.ceil(encodedWord.length / 2);
+    const decodedHalf = encodedWord.slice(0, halfLen).split("").map((ch: string) =>
       String.fromCharCode(((ch.charCodeAt(0) - 65 - q.shift + 26) % 26) + 65)
-    ).join("") + "_".repeat(q.encoded.length - halfLen);
+    ).join("") + "_".repeat(encodedWord.length - halfLen);
     return [
       ko ? "각 글자를 알파벳에서 한 칸 앞 글자로 바꿔보세요."
         : es ? "Cambia cada letra por la que está una posición antes en el alfabeto."
@@ -1914,8 +1925,8 @@ function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
           <Text style={styles.cipherExplainBreakdown}>{breakdown}</Text>
           <Text style={styles.cipherExplainResult}>
             {"= "}
-            <Text style={{ color: C.gold }}>{correctAnswerEn}</Text>
-            {lang !== "english" ? ` (${correctAnswerNative})` : ""}
+            <Text style={{ color: C.gold }}>{correctAnswer}</Text>
+            {lang !== learningLang ? ` (${nativeTranslation})` : ""}
           </Text>
         </View>
         <View style={styles.cipherDivider} />
@@ -1958,7 +1969,7 @@ function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
         <Text style={styles.cipherCardLabel}>
           {lang === "korean" ? "암호" : lang === "spanish" ? "Cifrado" : "Cipher"}
         </Text>
-        <Text style={styles.cipherEncoded}>{q.encoded}</Text>
+        <Text style={styles.cipherEncoded}>{encodedWord}</Text>
         <View style={styles.cipherCardDivider} />
         <Text style={styles.cipherCardLabel}>
           {lang === "korean" ? "단서" : lang === "spanish" ? "Pista" : "Clue"}
@@ -2948,7 +2959,7 @@ export default function StoryScene() {
                   <InvestigationPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "cipher" && (
-                  <CipherPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <CipherPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "listen-choose" && (
                   <WordTypingPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
