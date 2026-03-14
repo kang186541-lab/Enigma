@@ -357,6 +357,7 @@ function TracingCanvas({ char, onDrawn }: TracingCanvasProps) {
       onStartShouldSetPanResponderCapture: () => true,
       onMoveShouldSetPanResponder:         () => true,
       onMoveShouldSetPanResponderCapture:  () => true,
+      onPanResponderTerminationRequest:    () => false,
       onPanResponderGrant: (e) => {
         const x = e.nativeEvent.pageX - canvasOffset.current.x;
         const y = e.nativeEvent.pageY - canvasOffset.current.y;
@@ -471,6 +472,20 @@ export default function BasicCourseScreen() {
   const [traced,      setTraced]      = useState(false);  // step 0: user has drawn enough
   const [audioPlayed, setAudioPlayed] = useState(false);
   const [canvasKey,   setCanvasKey]   = useState(0);     // increment to reset canvas
+
+  // Blocks parent scroll when drawing on canvas
+  const canvasBlocker = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder:        () => true,
+      onMoveShouldSetPanResponder:         () => true,
+      onStartShouldSetPanResponderCapture: () => true,
+      onMoveShouldSetPanResponderCapture:  () => true,
+      onPanResponderTerminationRequest:    () => false,
+      onPanResponderGrant:                 () => {},
+      onPanResponderMove:                  () => {},
+      onPanResponderRelease:               () => {},
+    })
+  ).current;
 
   // Greetings step pronunciation flow
   type GreetPhase = "listen" | "speak" | "recording" | "processing" | "pass" | "fail";
@@ -1074,8 +1089,13 @@ export default function BasicCourseScreen() {
             <View style={s.traceLine} />
           </View>
 
-          {/* ── CANVAS fills remaining space ── */}
-          <TracingCanvas key={canvasKey} char={charItem.char} onDrawn={() => setTraced(true)} />
+          {/* ── CANVAS fills remaining space — wrapper blocks parent scroll ── */}
+          <View
+            style={[{ flex: 1 }, Platform.OS === "web" ? ({ touchAction: "none" } as object) : {}]}
+            {...canvasBlocker.panHandlers}
+          >
+            <TracingCanvas key={canvasKey} char={charItem.char} onDrawn={() => setTraced(true)} />
+          </View>
         </Animated.View>
       )}
 

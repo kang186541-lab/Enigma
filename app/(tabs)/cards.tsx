@@ -1450,6 +1450,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+    bottom: 0,
     overflow: "hidden",
     borderRadius: 28,
   },
@@ -1465,11 +1466,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   cardInnerBack: {
+    flex: 1,
     alignItems: "center",
     paddingHorizontal: 24,
-    paddingVertical: 24,
-    gap: 10,
-    minHeight: 300,
+    paddingVertical: 20,
+    gap: 8,
     justifyContent: "center",
   },
   cardEmoji: {

@@ -1,0 +1,108 @@
+앱 첫 접속 시 이미지들이 늦게 로딩돼서 빈 원/빈 공간이 먼저 보이고 나중에 이미지가 나타나는 문제가 있어.
+
+## 문제 상황
+
+- 홈화면의 루디 프로필 이미지 (오른쪽 상단 원형) — 빈 원이 먼저 보이고 나중에 이미지 로드
+- 온보딩 화면의 루디 일러스트 — 빈 공간이 먼저 보이고 나중에 이미지 로드
+- 연속 학습 카드의 엠블럼 이미지 — 같은 문제
+
+## 수정 방법
+
+### 1. 이미지 프리로딩 (앱 시작 시 미리 로드)
+
+앱이 시작될 때 (App.js 또는 최상위 컴포넌트에서) 주요 이미지들을 미리 캐시해줘:
+
+```javascript
+import { Image } from 'react-native';
+import { Asset } from 'expo-asset';
+
+// 앱 시작 시 프리로드할 이미지 목록
+const preloadImages = [
+  require('./assets/rudy-profile.png'),    // 루디 프로필
+  require('./assets/rudy-emblem.png'),      // 루디 엠블럼
+  require('./assets/onboarding-hero.png'),  // 온보딩 일러스트
+  // 기타 자주 쓰이는 이미지들 추가
+];
+
+async function preloadAssets() {
+  const imagePromises = preloadImages.map(image => {
+    return Asset.fromModule(image).downloadAsync();
+  });
+  await Promise.all(imagePromises);
+}
+
+// App.js에서 스플래시 화면 동안 실행
+export default function App() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      await preloadAssets();
+      // 기존 폰트 로딩 등도 여기서 함께
+      setIsReady(true);
+    }
+    prepare();
+  }, []);
+
+  if (!isReady) {
+    return null; // 또는 스플래시 화면 유지
+  }
+
+  return <MainApp />;
+}
+```
+
+이미 expo-font 로딩이 있을 텐데, 거기에 이미지 프리로딩도 같이 넣어줘.
+
+### 2. 로딩 중 플레이스홀더 표시
+
+프리로딩이 안 되는 이미지(네트워크 이미지 등)에는 로딩 중 플레이스홀더를 보여줘:
+
+```javascript
+function ImageWithPlaceholder({ source, style, ...props }) {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <View style={style}>
+      {/* 로딩 중 플레이스홀더 */}
+      {!loaded && (
+        <View style={{
+          ...StyleSheet.absoluteFillObject,
+          backgroundColor: 'rgba(201, 162, 39, 0.1)',  // 연한 골드 배경
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: style?.borderRadius || 0,
+        }}>
+          <Text style={{ fontSize: 24 }}>🦊</Text>
+        </View>
+      )}
+      
+      {/* 실제 이미지 */}
+      <Image
+        source={source}
+        style={[style, { opacity: loaded ? 1 : 0 }]}
+        onLoad={() => setLoaded(true)}
+        {...props}
+      />
+    </View>
+  );
+}
+```
+
+- 이미지 로딩 중: 연한 골드 배경 + 🦊 이모지 표시
+- 이미지 로드 완료: 부드럽게 이미지 나타남
+
+### 3. 적용 위치
+
+다음 곳에 적용해줘:
+
+- 홈화면 루디 프로필 이미지 (오른쪽 상단 원형)
+- 온보딩/언어 선택 화면의 루디 일러스트
+- 연속 학습 카드의 엠블럼 이미지
+- 그 외 앱에서 이미지가 늦게 뜨는 곳 전부
+
+### 주의
+
+- 로컬 이미지(require로 불러오는 것)는 프리로딩으로 해결
+- 네트워크 이미지(URL)는 플레이스홀더 + 캐시로 해결
+- expo-image 라이브러리가 있으면 그걸 쓰는 게 캐싱이 더 좋아. 없으면 기본 Image 컴포넌트 + Asset 프리로딩으로 충분해
