@@ -96,6 +96,7 @@ function getMeaning(t: Tri, lc: "ko" | "en" | "es"): string {
 export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplete }: Props) {
   const [messages, setMessages]       = useState<ChatMsg[]>([]);
   const [phase, setPhase]             = useState<Phase>("loading");
+  const [ttsPlaying, setTtsPlaying]   = useState(false);
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [inputText, setInputText]     = useState("");
   const [totalSentences, setTotalSentences] = useState(0);
@@ -124,7 +125,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       content: m.text,
     }));
 
-  // On mount — get Rudy's opening line
+  // On mount — get Rudy's opening line; cleanup audio/recording on unmount
   useEffect(() => {
     (async () => {
       const rudyText = await fetchRudyLine([]);
@@ -136,7 +137,15 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       setPhase("idle");
     })();
     return () => {
-      soundRef.current?.unloadAsync().catch(() => {});
+      if (soundRef.current) {
+        soundRef.current.stopAsync().catch(() => {});
+        soundRef.current.unloadAsync().catch(() => {});
+        soundRef.current = null;
+      }
+      if (nativeRecRef.current) {
+        nativeRecRef.current.stopAndUnloadAsync().catch(() => {});
+        nativeRecRef.current = null;
+      }
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
     };
   }, []);
@@ -198,21 +207,27 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       url.searchParams.set("lang", ttsLang);
       url.searchParams.set("voice", rudyVoice);
 
+      setTtsPlaying(true);
       if (Platform.OS === "web") {
         const res = await fetch(url.toString());
-        if (!res.ok) return;
+        if (!res.ok) { setTtsPlaying(false); return; }
         const blob = await res.blob();
         const objUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
-        audio.play().catch(() => {});
+        audio.onended = () => setTtsPlaying(false);
+        audio.onerror = () => setTtsPlaying(false);
+        audio.play().catch(() => setTtsPlaying(false));
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
         sound.setOnPlaybackStatusUpdate((st) => {
-          if (st.isLoaded && st.didJustFinish) soundRef.current = null;
+          if (st.isLoaded && st.didJustFinish) {
+            soundRef.current = null;
+            setTtsPlaying(false);
+          }
         });
       }
-    } catch {}
+    } catch { setTtsPlaying(false); }
   }
 
   // ── Pulse anim ───────────────────────────────────────────────────────────────
@@ -234,7 +249,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   // ── Recording (native) ────────────────────────────────────────────────────────
 
   async function startRecording() {
-    if (phase !== "idle") return;
+    if (phase !== "idle" || ttsPlaying) return;
     setShowKeyboard(false);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setPhase("recording");
@@ -249,8 +264,15 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
           await soundRef.current.stopAsync().catch(() => {});
           await soundRef.current.unloadAsync().catch(() => {});
           soundRef.current = null;
+          setTtsPlaying(false);
         }
-        await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          interruptionModeIOS: 1,
+          interruptionModeAndroid: 1,
+        });
         const rec = new Audio.Recording();
         await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
         await rec.startAsync();
@@ -536,17 +558,23 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 style={({ pressed }) => [
                   s.micBtn,
                   phase === "recording" && s.micBtnActive,
-                  (phase === "processing" || phase === "loading") && { opacity: 0.5 },
+                  (phase === "processing" || phase === "loading" || ttsPlaying) && { opacity: 0.5 },
                   pressed && { opacity: 0.85 },
                 ]}
                 onPress={handleMicPress}
-                disabled={phase === "processing" || phase === "loading"}
+                disabled={phase === "processing" || phase === "loading" || ttsPlaying}
               >
                 {(phase === "processing" || phase === "loading")
                   ? <ActivityIndicator color={C.bg1} size="small" />
-                  : <Ionicons name={phase === "recording" ? "stop" : "mic"} size={20} color={C.bg1} />
+                  : ttsPlaying
+                    ? <Ionicons name="volume-medium" size={20} color={C.bg1} />
+                    : <Ionicons name={phase === "recording" ? "stop" : "mic"} size={20} color={C.bg1} />
                 }
-                <Text style={s.micBtnText}>{micLabel}</Text>
+                <Text style={s.micBtnText}>
+                  {ttsPlaying
+                    ? (nativeLang === "korean" ? "루디 말하는 중..." : nativeLang === "spanish" ? "Rudy habla..." : "Rudy speaking...")
+                    : micLabel}
+                </Text>
               </Pressable>
             </Animated.View>
 

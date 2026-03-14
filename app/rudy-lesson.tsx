@@ -264,6 +264,60 @@ function LessonScreen({
   onReviewComplete: (scores: number[]) => void;
   insets: ReturnType<typeof useSafeAreaInsets>;
 }) {
+  const [stepDone, setStepDone] = useState(false);
+  const completeAnim = useRef(new Animated.Value(0)).current;
+
+  // Reset stepDone when step actually changes
+  useEffect(() => { setStepDone(false); }, [currentStep]);
+
+  // Animate completion card in
+  useEffect(() => {
+    if (stepDone) {
+      completeAnim.setValue(0);
+      Animated.spring(completeAnim, { toValue: 1, useNativeDriver: true, tension: 80, friction: 10 }).start();
+    }
+  }, [stepDone]);
+
+  // Called by step content when it finishes — shows completion card instead of auto-advancing
+  function handleStepDone() {
+    // STEP 4 (index 3) goes straight to mission complete — no intermediate card
+    if (currentStep === 3) { onStepComplete(); return; }
+    setStepDone(true);
+  }
+
+  // Called by the "Next Step →" button
+  function handleNextStep() {
+    setStepDone(false);
+    onStepComplete();
+  }
+
+  const STEP_COMPLETE_MSGS: Record<string, string[]> = {
+    korean: [
+      "훌륭해! 귀를 잘 트이고 있어 👂",
+      "완벽해! 핵심을 잘 이해했어 🧠",
+      "대단해! 직접 말해봤잖아! 🎤",
+    ],
+    spanish: [
+      "¡Excelente! Tu oído mejora 👂",
+      "¡Perfecto! Bien entendido 🧠",
+      "¡Asombroso! ¡Hablaste de verdad! 🎤",
+    ],
+    english: [
+      "Great job! Your ears are opening up 👂",
+      "Perfect! You got the key points 🧠",
+      "Amazing! You actually spoke! 🎤",
+    ],
+  };
+
+  const NEXT_STEP_LABELS: Record<string, string[]> = {
+    korean: ["STEP 2로 →", "STEP 3으로 →", "STEP 4로 →"],
+    spanish: ["Al STEP 2 →", "Al STEP 3 →", "Al STEP 4 →"],
+    english: ["To STEP 2 →", "To STEP 3 →", "To STEP 4 →"],
+  };
+
+  const completeMsgs = STEP_COMPLETE_MSGS[nativeLang] ?? STEP_COMPLETE_MSGS.english;
+  const nextStepLabels = NEXT_STEP_LABELS[nativeLang] ?? NEXT_STEP_LABELS.english;
+
   const sentenceLabel = nativeLang === "korean" ? "문장 완료"
     : nativeLang === "spanish" ? "oraciones"
     : "sentences done";
@@ -327,22 +381,50 @@ function LessonScreen({
 
       {/* ── Step content area ───────────────────── */}
       <ScrollView style={styles.lessonScroll} contentContainerStyle={styles.lessonScrollContent}>
-        <StepContent
-          stepIndex={currentStep}
-          day={day}
-          nativeLang={nativeLang}
-          lc={lc}
-          learningLang={learningLang}
-          stepLabels={stepLabels}
-          onStepComplete={onStepComplete}
-          onSentenceSpoken={(n) => setSentenceCount(sentenceCount + n)}
-          onMissionComplete={onMissionComplete}
-          onReviewComplete={onReviewComplete}
-        />
+        {stepDone ? (
+          <Animated.View style={[
+            styles.stepCompleteCard,
+            { opacity: completeAnim, transform: [{ scale: completeAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] }) }] },
+          ]}>
+            <Text style={styles.stepCompleteEmoji}>✅</Text>
+            <Text style={styles.stepCompleteTitle}>
+              {nativeLang === "korean" ? `STEP ${currentStep + 1} 완료! 🎉`
+                : nativeLang === "spanish" ? `¡STEP ${currentStep + 1} Completado! 🎉`
+                : `STEP ${currentStep + 1} Complete! 🎉`}
+            </Text>
+            <View style={styles.stepCompleteRudy}>
+              <Text style={styles.stepCompleteRudyTag}>🦊 루디</Text>
+              <Text style={styles.stepCompleteRudyMsg}>{completeMsgs[currentStep] ?? completeMsgs[0]}</Text>
+            </View>
+            <Pressable
+              style={({ pressed }) => [styles.stepCompleteBtn, pressed && { opacity: 0.85 }]}
+              onPress={() => {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                handleNextStep();
+              }}
+            >
+              <Text style={styles.stepCompleteBtnText}>{nextStepLabels[currentStep] ?? nextLabel}</Text>
+              <Ionicons name="arrow-forward" size={16} color={C.bg1} />
+            </Pressable>
+          </Animated.View>
+        ) : (
+          <StepContent
+            stepIndex={currentStep}
+            day={day}
+            nativeLang={nativeLang}
+            lc={lc}
+            learningLang={learningLang}
+            stepLabels={stepLabels}
+            onStepComplete={handleStepDone}
+            onSentenceSpoken={(n) => setSentenceCount(sentenceCount + n)}
+            onMissionComplete={onMissionComplete}
+            onReviewComplete={onReviewComplete}
+          />
+        )}
       </ScrollView>
 
       {/* ── Bottom bar (hidden for self-completing steps) ──────────────── */}
-      {!selfCompletes && (
+      {!selfCompletes && !stepDone && (
         <View style={[styles.lessonFooter, { paddingBottom: insets.bottom + 16 }]}>
           <View style={styles.footerLeft}>
             <Ionicons name="chatbubble-outline" size={15} color={C.goldDim} />
@@ -352,7 +434,7 @@ function LessonScreen({
             style={({ pressed }) => [styles.nextStepBtn, pressed && { opacity: 0.85 }]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              onStepComplete();
+              handleStepDone();
             }}
           >
             <Text style={styles.nextStepBtnText}>
@@ -754,6 +836,43 @@ const styles = StyleSheet.create({
     borderRadius: 13,
   },
   nextStepBtnText: { fontSize: 13, fontFamily: F.header, color: C.bg1, letterSpacing: 0.3 },
+
+  stepCompleteCard: {
+    marginTop: 32,
+    marginHorizontal: 4,
+    backgroundColor: C.bg2,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: C.gold,
+    padding: 28,
+    alignItems: "center",
+    gap: 16,
+    shadowColor: C.gold,
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  stepCompleteEmoji: { fontSize: 48 },
+  stepCompleteTitle: { fontSize: 22, fontFamily: F.header, color: C.gold, letterSpacing: 0.4, textAlign: "center" },
+  stepCompleteRudy: {
+    backgroundColor: C.bg3,
+    borderRadius: 14,
+    padding: 16,
+    gap: 8,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  stepCompleteRudyTag: { fontSize: 12, fontFamily: F.label, color: C.goldDim, letterSpacing: 0.5 },
+  stepCompleteRudyMsg: { fontSize: 15, fontFamily: F.body, color: C.parchment, lineHeight: 22 },
+  stepCompleteBtn: {
+    marginTop: 8,
+    flexDirection: "row", alignItems: "center", gap: 8,
+    backgroundColor: C.gold,
+    paddingHorizontal: 28, paddingVertical: 14,
+    borderRadius: 16,
+  },
+  stepCompleteBtnText: { fontSize: 16, fontFamily: F.header, color: C.bg1, letterSpacing: 0.3 },
 });
 
 const stepContentStyles = StyleSheet.create({

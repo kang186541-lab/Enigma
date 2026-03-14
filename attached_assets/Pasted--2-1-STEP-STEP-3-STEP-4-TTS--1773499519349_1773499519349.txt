@@ -1,0 +1,151 @@
+데일리 코스에 2가지 문제가 있어.
+
+## 문제 1: STEP 전환 시 이전 음성이 계속 재생됨 + 자동으로 넘어감
+
+STEP 3에서 STEP 4로 갈 때 루디의 TTS가 아직 재생 중인데 자동으로 다음 화면이 나타남. 유저가 준비도 안 됐는데 갑자기 넘어가버림.
+
+### 수정 방법
+
+**자동 전환을 제거하고, “다음 단계로” 버튼을 추가해줘:**
+
+각 STEP이 완료되면 자동으로 다음 STEP으로 넘기지 말고, 완료 메시지 + “다음 단계로 →” 버튼을 보여줘:
+
+```
+┌─────────────────────────────┐
+│                              │
+│  ✅ STEP 3 완료!             │
+│                              │
+│  🦊 "잘했어! 다음은 복습      │
+│     챌린지야. 준비되면        │
+│     넘어가자!"               │
+│                              │
+│   [다음 단계로 →]             │
+│                              │
+└─────────────────────────────┘
+```
+
+- STEP 1 완료 → “STEP 1 완료! 🎉” + [STEP 2로 →] 버튼
+- STEP 2 완료 → “STEP 2 완료! 🎉” + [STEP 3으로 →] 버튼
+- STEP 3 완료 → “STEP 3 완료! 🎉” + [STEP 4로 →] 버튼
+- STEP 4 완료 → 미션 완료 화면으로 이동 (이건 자동으로 OK)
+
+**버튼을 누르기 전에 반드시 이전 STEP의 오디오를 정리:**
+
+```javascript
+// STEP 전환 함수
+async function goToNextStep() {
+  // 1. 현재 재생 중인 모든 TTS 오디오 중지
+  if (currentSound) {
+    await currentSound.stopAsync();
+    await currentSound.unloadAsync();
+    setCurrentSound(null);
+  }
+  
+  // 2. 현재 녹음 중이면 녹음도 중지
+  if (currentRecording) {
+    await currentRecording.stopAndUnloadAsync();
+    setCurrentRecording(null);
+  }
+  
+  // 3. 그 다음 STEP으로 전환
+  setCurrentStep(prev => prev + 1);
+}
+```
+
+이걸 모든 STEP 전환(1→2, 2→3, 3→4, 4→완료)에 적용해줘. 핵심은 **다음 STEP으로 넘어가기 전에 현재 오디오/녹음을 완전히 정리하는 것**.
+
+또한 STEP 컴포넌트가 언마운트될 때도 정리해줘:
+
+```javascript
+useEffect(() => {
+  return () => {
+    // 컴포넌트 언마운트 시 오디오 정리
+    if (soundRef.current) {
+      soundRef.current.stopAsync();
+      soundRef.current.unloadAsync();
+    }
+    if (recordingRef.current) {
+      recordingRef.current.stopAndUnloadAsync();
+    }
+  };
+}, []);
+```
+
+## 문제 2: STEP 3, STEP 4에서 녹음 인식률이 매우 낮음 (10% 정도만 성공)
+
+완전히 안 되는 건 아니고 가끔 인식이 됨. 10번 중 1번 정도만 성공. 반면 발음 연습 화면에서는 거의 100% 인식됨.
+
+### 가능한 원인들 (전부 확인해줘)
+
+**원인 1: 녹음 시간이 너무 짧음**
+버튼을 누르면 바로 녹음이 시작되고 너무 빨리 종료되는 것 같아. 유저가 말할 시간이 부족함.
+
+- 녹음 최소 시간을 2초 이상으로 설정
+- 버튼을 누르면 녹음 시작, 다시 누르면 녹음 종료 (토글 방식) 확인
+- 또는 말이 끝나면 자동 종료되는 silence detection이 너무 민감하게 설정된 건 아닌지 확인
+- silence timeout을 최소 1.5~2초로 넉넉하게 설정
+
+**원인 2: 오디오 세션 충돌**
+STEP 3에서는 루디의 TTS 음성도 재생되잖아. TTS 재생과 녹음이 충돌할 수 있어.
+
+- 루디의 TTS 재생이 완전히 끝난 후에 녹음 버튼을 활성화해줘
+- TTS 재생 중에는 마이크 버튼을 비활성화 (회색 처리)
+- TTS 재생 완료 후 0.5초 대기 → 마이크 버튼 활성화
+
+```javascript
+// TTS 재생 완료 콜백
+sound.setOnPlaybackStatusUpdate((status) => {
+  if (status.didJustFinish) {
+    // TTS 끝남 → 0.5초 후 마이크 활성화
+    setTimeout(() => setMicEnabled(true), 500);
+  }
+});
+```
+
+**원인 3: 오디오 모드 설정 누락**
+TTS 재생 모드에서 녹음 모드로 전환이 안 되고 있을 수 있어.
+
+- 녹음 시작 전에 반드시 오디오 모드를 녹음용으로 설정:
+
+```javascript
+// 녹음 시작 전에 항상 이걸 호출
+await Audio.setAudioModeAsync({
+  allowsRecordingIOS: true,
+  playsInSilentModeIOS: true,
+  staysActiveInBackground: false,
+  interruptionModeIOS: 1,   // Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX
+  interruptionModeAndroid: 1,
+});
+```
+
+발음 연습 화면에서는 이 설정이 되어있는데 STEP 3/4에서는 빠져있을 수 있어.
+
+**원인 4: 녹음 품질 설정**
+녹음 옵션이 Azure Speech가 인식하기 어려운 포맷일 수 있어.
+
+- 발음 연습 화면에서 사용하는 녹음 옵션(sampleRate, bitRate 등)을 그대로 사용하고 있는지 확인
+- 다르다면 발음 연습 화면의 설정을 그대로 복사해와
+
+### 중요: 공통 녹음 모듈 만들기
+
+STEP 3, STEP 4, 발음 연습 화면이 전부 같은 녹음 로직을 써야 해. 세 군데에서 각각 다르게 구현하면 계속 버그가 생겨.
+
+```javascript
+// hooks/useVoiceRecording.js 같은 공통 파일을 만들어서
+// 발음 연습에서 쓰는 녹음 로직을 여기에 넣고
+// STEP 3, STEP 4, 발음 연습 화면 세 곳에서 이 훅을 import해서 쓰게 해줘
+
+export function useVoiceRecording() {
+  // 발음 연습 화면에서 작동하는 녹음 코드를 여기에 넣어
+  
+  return {
+    startRecording,
+    stopRecording,
+    isRecording,
+    recognizedText,
+    error,
+  };
+}
+```
+
+기존 발음 연습 화면에서 녹음 관련 코드를 이 훅으로 추출하고, 발음 연습/STEP 3/STEP 4 세 곳에서 동일하게 사용하도록 리팩토링해줘.

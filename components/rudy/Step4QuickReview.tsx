@@ -95,6 +95,22 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   };
   const sttLang = STT_LANG[learningLang] ?? "en-US";
 
+  // Cleanup audio and recording on unmount
+  useEffect(() => {
+    return () => {
+      if (autoStopRef.current) clearTimeout(autoStopRef.current);
+      if (nativeRecRef.current) {
+        nativeRecRef.current.stopAndUnloadAsync().catch(() => {});
+        nativeRecRef.current = null;
+      }
+      if (soundRef.current) {
+        soundRef.current.stopAsync().catch(() => {});
+        soundRef.current.unloadAsync().catch(() => {});
+        soundRef.current = null;
+      }
+    };
+  }, []);
+
   // ── Timer ──────────────────────────────────────────────────────────────────
 
   const handleTimerEnd = useCallback(() => {
@@ -188,19 +204,35 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       const { granted } = await Audio.requestPermissionsAsync().catch(() => ({ granted: false }));
       if (!granted) { stopPulse(); setQPhase("ready"); return; }
       try {
-        await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+        // Stop any playing TTS before switching to record mode
+        if (soundRef.current) {
+          await soundRef.current.stopAsync().catch(() => {});
+          await soundRef.current.unloadAsync().catch(() => {});
+          soundRef.current = null;
+        }
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          interruptionModeIOS: 1,
+          interruptionModeAndroid: 1,
+        });
         const rec = new Audio.Recording();
         await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
         await rec.startAsync();
         nativeRecRef.current = rec;
-        autoStopRef.current = setTimeout(() => stopRecordAndAssess(q), 5000);
+        autoStopRef.current = setTimeout(() => stopRecordAndAssess(q), 7000);
       } catch { stopPulse(); setQPhase("ready"); }
     } else {
       if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); setQPhase("ready"); return; }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
       if (!stream) { stopPulse(); setQPhase("ready"); return; }
       audioChunksRef.current = [];
-      const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
+      const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/mp4")
+          ? "audio/mp4"
+          : "audio/webm";
       const rec = new (window as any).MediaRecorder(stream, { mimeType: mime });
       mediaRecRef.current = rec;
       rec.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunksRef.current.push(e.data); };
