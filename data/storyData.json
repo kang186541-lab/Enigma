@@ -1,0 +1,418 @@
+{
+  "meta": {
+    "version": "2.0",
+    "title": "The Language Conspiracy",
+    "description": "Language-adaptive story mode for Enigma Language Adventure",
+    "supportedNativeLangs": ["ko", "en", "es"],
+    "supportedTargetLangs": ["ko", "en", "es"]
+  },
+
+  "languages": {
+    "ko": { "name": "한국어", "nameEn": "Korean", "nameEs": "Coreano", "flag": "🇰🇷" },
+    "en": { "name": "English", "nameKo": "영어", "nameEs": "Inglés", "flag": "🇬🇧" },
+    "es": { "name": "Español", "nameKo": "스페인어", "nameEn": "Spanish", "flag": "🇪🇸" }
+  },
+
+  "uiText": {
+    "ko": {
+      "storyMode": "스토리 모드",
+      "quizStart": "퀴즈 시작",
+      "showHint": "힌트 보기",
+      "submit": "제출",
+      "correct": "정답입니다! 🎉",
+      "tryAgain": "다시 시도해보세요",
+      "showTranslation": "번역 보기",
+      "hideTranslation": "번역 숨기기",
+      "xpGained": "XP 획득",
+      "badgeEarned": "뱃지 획득!",
+      "chapterComplete": "챕터 완료!",
+      "nextChapter": "다음 챕터",
+      "bossQuiz": "보스 퀴즈",
+      "locked": "잠김",
+      "unlockAt": "레벨 {level}에 해금",
+      "timeRemaining": "남은 시간",
+      "score": "점수"
+    },
+    "en": {
+      "storyMode": "Story Mode",
+      "quizStart": "Start Quiz",
+      "showHint": "Show Hint",
+      "submit": "Submit",
+      "correct": "Correct! 🎉",
+      "tryAgain": "Try again",
+      "showTranslation": "Show Translation",
+      "hideTranslation": "Hide Translation",
+      "xpGained": "XP Earned",
+      "badgeEarned": "Badge Earned!",
+      "chapterComplete": "Chapter Complete!",
+      "nextChapter": "Next Chapter",
+      "bossQuiz": "Boss Quiz",
+      "locked": "Locked",
+      "unlockAt": "Unlocks at Level {level}",
+      "timeRemaining": "Time Remaining",
+      "score": "Score"
+    },
+    "es": {
+      "storyMode": "Modo Historia",
+      "quizStart": "Iniciar Quiz",
+      "showHint": "Ver Pista",
+      "submit": "Enviar",
+      "correct": "¡Correcto! 🎉",
+      "tryAgain": "Inténtalo de nuevo",
+      "showTranslation": "Ver Traducción",
+      "hideTranslation": "Ocultar Traducción",
+      "xpGained": "XP Ganado",
+      "badgeEarned": "¡Insignia Obtenida!",
+      "chapterComplete": "¡Capítulo Completado!",
+      "nextChapter": "Siguiente Capítulo",
+      "bossQuiz": "Quiz del Jefe",
+      "locked": "Bloqueado",
+      "unlockAt": "Se desbloquea en el Nivel {level}",
+      "timeRemaining": "Tiempo Restante",
+      "score": "Puntuación"
+    }
+  },
+
+  "npcs": {
+    "eleanor": {
+      "id": "eleanor",
+      "name": "Lady Eleanor",
+      "role": { "ko": "박물관 큐레이터", "en": "Museum Curator", "es": "Curadora del Museo" },
+      "personality": { "ko": "지적이고 냉철, 루디의 멘토", "en": "Intellectual and sharp, Rudy's mentor", "es": "Intelectual y perspicaz, mentora de Rudy" },
+      "chapter": "ch1",
+      "avatar": "eleanor.png"
+    },
+    "tom": {
+      "id": "tom",
+      "name": "Tom",
+      "role": { "ko": "박물관 경비원", "en": "Museum Guard", "es": "Guardia del Museo" },
+      "personality": { "ko": "유쾌하고 수다쟁이, 구어체 달인", "en": "Cheerful chatterbox, slang master", "es": "Alegre y parlanchín, maestro del argot" },
+      "chapter": "ch1",
+      "avatar": "tom.png"
+    },
+    "penny": {
+      "id": "penny",
+      "name": "Miss Penny",
+      "role": { "ko": "고서점 주인", "en": "Antique Bookshop Owner", "es": "Dueña de Librería Antigua" },
+      "personality": { "ko": "친절하지만 비밀이 많음, 이중 스파이?", "en": "Kind but secretive, double agent?", "es": "Amable pero misteriosa, ¿agente doble?" },
+      "chapter": "ch1",
+      "avatar": "penny.png"
+    },
+    "carlos": {
+      "id": "carlos",
+      "name": "Carlos",
+      "role": { "ko": "미술관 복원사", "en": "Museum Restorer", "es": "Restaurador del Museo" },
+      "personality": { "ko": "과묵하지만 정의로움, 수호석 보호자의 후손", "en": "Quiet but righteous, descendant of stone guardians", "es": "Callado pero justo, descendiente de guardianes" },
+      "chapter": "ch2",
+      "avatar": "carlos.png"
+    },
+    "isabel": {
+      "id": "isabel",
+      "name": "Isabel",
+      "role": { "ko": "플라멩코 댄서", "en": "Flamenco Dancer", "es": "Bailaora de Flamenco" },
+      "personality": { "ko": "활발하고 대담, 거리 정보통", "en": "Bold and daring, street informant", "es": "Atrevida y audaz, informante callejera" },
+      "chapter": "ch2",
+      "avatar": "isabel.png"
+    },
+    "miguel": {
+      "id": "miguel",
+      "name": "Don Miguel",
+      "role": { "ko": "시장 상인", "en": "Market Merchant", "es": "Comerciante del Mercado" },
+      "personality": { "ko": "다정한 할아버지, 속담의 달인", "en": "Warm grandfather figure, proverb master", "es": "Abuelo cariñoso, maestro de refranes" },
+      "chapter": "ch2",
+      "avatar": "miguel.png"
+    },
+    "sujin": {
+      "id": "sujin",
+      "name": "Sujin",
+      "role": { "ko": "대학원생 언어학자", "en": "Graduate Linguist", "es": "Lingüista Universitaria" },
+      "personality": { "ko": "똑똑하고 호기심 많음", "en": "Smart and curious", "es": "Inteligente y curiosa" },
+      "chapter": "ch3",
+      "avatar": "sujin.png"
+    },
+    "youngsook": {
+      "id": "youngsook",
+      "name": { "ko": "영숙 할머니", "en": "Grandma Youngsook", "es": "Abuela Youngsook" },
+      "role": { "ko": "광장시장 분식집 사장", "en": "Market Food Stall Owner", "es": "Dueña de Puesto en el Mercado" },
+      "personality": { "ko": "따뜻하고 지혜로움", "en": "Warm and wise", "es": "Cálida y sabia" },
+      "chapter": "ch3",
+      "avatar": "youngsook.png"
+    },
+    "minho": {
+      "id": "minho",
+      "name": "Minho",
+      "role": { "ko": "래퍼 겸 정보상", "en": "Rapper & Informant", "es": "Rapero e Informante" },
+      "personality": { "ko": "쿨하고 영리, 지하 세계 연결책", "en": "Cool and clever, underground contact", "es": "Genial y listo, contacto del bajo mundo" },
+      "chapter": "ch3",
+      "avatar": "minho.png"
+    }
+  },
+
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": { "ko": "런던의 암호", "en": "The London Cipher", "es": "El Cifrado de Londres" },
+      "city": "London",
+      "flag": "🇬🇧",
+      "icon": "🔍",
+      "isLocked": false,
+      "unlockLevel": 1,
+      "theme": { "ko": "미스터리 & 고전 탐정", "en": "Mystery & Classic Detective", "es": "Misterio y Detective Clásico" },
+      "npcs": ["eleanor", "tom", "penny"],
+      "totalXP": 730,
+      "badge": { "id": "the_fog_lifts", "name": { "ko": "안개가 걷히다", "en": "The Fog Lifts", "es": "La Niebla Se Disipa" }, "icon": "🌫️" },
+      "scenes": [
+        {
+          "id": "ch1_scene1",
+          "title": { "ko": "박물관의 발견", "en": "The Museum Discovery", "es": "El Descubrimiento del Museo" },
+          "narration": {
+            "ko": "안개 낀 런던의 아침. 루디가 박물관에 출근하자 엘리너 경이 급하게 부른다. 로제타 석판 복제본에 누군가 암호화된 메시지를 남겨놓았다.",
+            "en": "A foggy London morning. As Rudy arrives at the museum, Lady Eleanor calls urgently. Someone left an encrypted message on the Rosetta replica.",
+            "es": "Una mañana neblinosa en Londres. Cuando Rudy llega al museo, Lady Eleanor lo llama con urgencia. Alguien dejó un mensaje cifrado en la réplica de Rosetta."
+          },
+          "dialogues": [
+            {
+              "npc": "eleanor",
+              "text": {
+                "en": "Rudy, come quickly. Someone left a cipher on the Rosetta replica. I can't make sense of it.",
+                "es": "Rudy, ven rápido. Alguien dejó un cifrado en la réplica de Rosetta. No logro descifrarlo.",
+                "ko": "루디, 빨리 와. 누군가 로제타 복제본에 암호를 남겼어. 도무지 해석이 안 돼."
+              }
+            },
+            {
+              "npc": "rudy",
+              "text": {
+                "en": "A cipher? On the replica? That's... peculiar.",
+                "es": "¿Un cifrado? ¿En la réplica? Eso es... peculiar.",
+                "ko": "암호? 복제본에? 그건... 이상한데."
+              }
+            }
+          ],
+          "quizzes": ["ch1_quiz_a", "ch1_quiz_b"]
+        },
+        {
+          "id": "ch1_scene2",
+          "title": { "ko": "고서점의 비밀", "en": "The Bookshop Secret", "es": "El Secreto de la Librería" },
+          "narration": {
+            "ko": "톰의 증언을 따라 루디는 베이커가 골목의 고서점으로 향한다. 미스 페니는 도움을 주겠다지만 대가를 요구한다 — 오래된 문서의 번역.",
+            "en": "Following Tom's testimony, Rudy heads to the antique bookshop on Baker Lane. Miss Penny offers help, but demands a price — translating an old manuscript.",
+            "es": "Siguiendo el testimonio de Tom, Rudy se dirige a la librería antigua en Baker Lane. Miss Penny ofrece ayuda, pero exige un precio — traducir un manuscrito antiguo."
+          },
+          "dialogues": [
+            {
+              "npc": "penny",
+              "text": {
+                "en": "Welcome, dear fox. Looking for something specific? We have first editions, rare manuscripts, and perhaps... answers you didn't know you needed.",
+                "es": "Bienvenido, querido zorro. ¿Buscas algo específico? Tenemos primeras ediciones, manuscritos raros, y quizás... respuestas que no sabías que necesitabas.",
+                "ko": "어서 와, 여우 씨. 뭔가 특별한 걸 찾나? 초판본, 희귀 원고, 그리고 어쩌면... 네가 필요한 줄도 몰랐던 답을 가지고 있지."
+              }
+            }
+          ],
+          "quizzes": ["ch1_quiz_c"]
+        },
+        {
+          "id": "ch1_scene2_twist",
+          "title": { "ko": "도청", "en": "Eavesdropping", "es": "Escucha Secreta" },
+          "narration": {
+            "ko": "미스 페니의 서점 뒷방에서 수상한 전화 통화가 들린다. 루디가 문 너머로 도청한다.",
+            "en": "A suspicious phone call can be heard from Miss Penny's back room. Rudy eavesdrops through the door.",
+            "es": "Se escucha una llamada sospechosa desde la trastienda de Miss Penny. Rudy escucha a escondidas."
+          },
+          "isTwist": true,
+          "twistReveal": {
+            "ko": "미스 페니가 렉시콘 소사이어티의 연락책이었다! 하지만 양심의 가책을 느끼고 루디에게 마드리드행 열차표와 학습 핸드북을 건넨다.",
+            "en": "Miss Penny was the Lexicon Society's contact! But feeling guilty, she gives Rudy a train ticket to Madrid and a language handbook.",
+            "es": "¡Miss Penny era el contacto de la Sociedad Lexicón! Pero sintiendo culpa, le da a Rudy un boleto de tren a Madrid y un manual de idiomas."
+          },
+          "quizzes": ["ch1_quiz_d"]
+        },
+        {
+          "id": "ch1_scene3_boss",
+          "title": { "ko": "수호석의 수수께끼", "en": "The Guardian's Riddle", "es": "El Acertijo del Guardián" },
+          "narration": {
+            "ko": "박물관 지하에서 수호석 방을 발견하지만 수호석은 이미 사라진 후. 대신 수호석 자리에 수수께끼가 남겨져 있다.",
+            "en": "Rudy finds the Guardian Stone chamber beneath the museum, but the stone is already gone. In its place, riddles have been left behind.",
+            "es": "Rudy encuentra la cámara de la Piedra Guardiana bajo el museo, pero la piedra ya no está. En su lugar, quedan acertijos."
+          },
+          "isBoss": true,
+          "quizzes": ["ch1_quiz_e"]
+        }
+      ],
+      "cliffhanger": {
+        "ko": "수수께끼를 풀자 벽면에 지도가 나타난다. 마드리드의 프라도 미술관이 표시되어 있고, 그 아래 메시지가 있다: '진실은 예술 속에 숨어 있다.'",
+        "en": "As the riddles are solved, a map appears on the wall. Madrid's Prado Museum is marked, with a message below: 'The truth is hidden in art.'",
+        "es": "Al resolver los acertijos, un mapa aparece en la pared. El Museo del Prado de Madrid está marcado, con un mensaje: 'La verdad está escondida en el arte.'"
+      }
+    },
+    {
+      "id": "ch2",
+      "title": { "ko": "마드리드의 실종", "en": "The Madrid Disappearance", "es": "La Desaparición de Madrid" },
+      "city": "Madrid",
+      "flag": "🇪🇸",
+      "icon": "🎭",
+      "isLocked": false,
+      "unlockLevel": 5,
+      "theme": { "ko": "열정 & 예술", "en": "Passion & Art", "es": "Pasión y Arte" },
+      "npcs": ["carlos", "isabel", "miguel"],
+      "totalXP": 1070,
+      "badge": { "id": "madrid_rescuer", "name": { "ko": "마드리드의 구원자", "en": "Madrid Rescuer", "es": "Rescatador de Madrid" }, "icon": "🎭" },
+      "scenes": [
+        {
+          "id": "ch2_scene1",
+          "title": { "ko": "프라도의 비밀", "en": "The Prado Secret", "es": "El Secreto del Prado" },
+          "narration": {
+            "ko": "마드리드에 도착한 루디. 프라도 미술관 앞은 소란스럽다 — 유명 복원사 카를로스가 갑자기 실종되었다.",
+            "en": "Rudy arrives in Madrid. The Prado Museum is in chaos — the famous restorer Carlos has suddenly disappeared.",
+            "es": "Rudy llega a Madrid. El Museo del Prado está en caos — el famoso restaurador Carlos ha desaparecido repentinamente."
+          },
+          "dialogues": [
+            {
+              "npc": "isabel",
+              "text": {
+                "en": "Are you the fox detective? Carlos disappeared last night. Nobody knows where he is. But I saw something...",
+                "es": "¿Eres el detective zorro? Carlos desapareció anoche. Nadie sabe dónde está. Pero yo vi algo...",
+                "ko": "너 여우 탐정이야? 카를로스가 어젯밤 사라졌어. 아무도 어디 있는지 몰라. 하지만 나는 뭔가 봤어..."
+              }
+            }
+          ],
+          "quizzes": ["ch2_quiz_a", "ch2_quiz_b"]
+        },
+        {
+          "id": "ch2_scene2",
+          "title": { "ko": "레티로 공원의 추적", "en": "The Retiro Park Chase", "es": "La Persecución en el Retiro" },
+          "narration": {
+            "ko": "돈 미겔의 지도를 따라 레티로 공원 깊숙이 들어간 루디. 나무 사이로 검은 코트의 남자가 보인다.",
+            "en": "Following Don Miguel's map deep into Retiro Park, Rudy spots a man in a black coat among the trees.",
+            "es": "Siguiendo el mapa de Don Miguel hacia las profundidades del Retiro, Rudy ve a un hombre de abrigo negro entre los árboles."
+          },
+          "quizzes": ["ch2_quiz_c", "ch2_quiz_d"]
+        },
+        {
+          "id": "ch2_scene3_boss",
+          "title": { "ko": "카를로스 구출", "en": "Rescuing Carlos", "es": "Rescatando a Carlos" },
+          "narration": {
+            "ko": "숨겨진 방 끝에서 카를로스를 발견한다. 그를 구하려면 렉시콘이 설치한 언어 함정을 해제해야 한다.",
+            "en": "At the end of a hidden room, Rudy finds Carlos. To save him, the Lexicon's language trap must be disabled.",
+            "es": "Al final de una sala oculta, Rudy encuentra a Carlos. Para salvarlo, hay que desactivar la trampa lingüística de Lexicón."
+          },
+          "isBoss": true,
+          "quizzes": ["ch2_quiz_e"]
+        }
+      ],
+      "cliffhanger": {
+        "ko": "카를로스를 구한 순간 루디의 전화가 울린다. 미스터 블랙: '서울에서 만나자, 루디. 거기선 네가 아는 모든 것이 소용없을 거다.'",
+        "en": "The moment Carlos is saved, Rudy's phone rings. Mr. Black: 'See you in Seoul, Rudy. Nothing you know will help you there.'",
+        "es": "En el momento en que Carlos es salvado, suena el teléfono de Rudy. Sr. Black: 'Nos vemos en Seúl, Rudy. Nada de lo que sabes te servirá allí.'"
+      }
+    },
+    {
+      "id": "ch3",
+      "title": { "ko": "서울의 비밀", "en": "The Seoul Secret", "es": "El Secreto de Seúl" },
+      "city": "Seoul",
+      "flag": "🇰🇷",
+      "icon": "🏯",
+      "isLocked": false,
+      "unlockLevel": 10,
+      "theme": { "ko": "전통과 현대의 융합", "en": "Tradition Meets Modernity", "es": "Tradición y Modernidad" },
+      "npcs": ["sujin", "youngsook", "minho"],
+      "totalXP": 1240,
+      "badge": { "id": "seoul_guardian", "name": { "ko": "서울의 수호자", "en": "Seoul Guardian", "es": "Guardián de Seúl" }, "icon": "🏯" },
+      "scenes": [
+        {
+          "id": "ch3_scene1",
+          "title": { "ko": "한글의 도시", "en": "The City of Hangul", "es": "La Ciudad del Hangul" },
+          "narration": {
+            "ko": "서울 인천공항에 도착한 루디. 전통과 현대가 공존하는 이 도시에서 새로운 도전이 기다린다.",
+            "en": "Rudy arrives at Seoul's Incheon Airport. New challenges await in this city where tradition meets modernity.",
+            "es": "Rudy llega al Aeropuerto de Incheon en Seúl. Nuevos desafíos esperan en esta ciudad donde tradición y modernidad se encuentran."
+          },
+          "dialogues": [
+            {
+              "npc": "sujin",
+              "text": {
+                "en": "Rudy? I got a message from Carlos. I'll help you. But... how much of the local language do you know?",
+                "es": "¿Rudy? Recibí un mensaje de Carlos. Te ayudaré. Pero... ¿cuánto sabes del idioma local?",
+                "ko": "루디 씨? 카를로스한테서 연락 받았어요. 도와드릴게요. 그런데... 현지 언어 얼마나 알아요?"
+              }
+            }
+          ],
+          "quizzes": ["ch3_quiz_a", "ch3_quiz_b"]
+        },
+        {
+          "id": "ch3_scene2",
+          "title": { "ko": "민호의 지하 네트워크", "en": "Minho's Underground Network", "es": "La Red Subterránea de Minho" },
+          "narration": {
+            "ko": "비밀 한옥 안에서 민호를 만난다. 그는 서울 지하 세계의 정보를 알고 있다.",
+            "en": "Inside a secret hanok, Rudy meets Minho. He knows the information from Seoul's underground world.",
+            "es": "Dentro de un hanok secreto, Rudy conoce a Minho. Él tiene información del mundo subterráneo de Seúl."
+          },
+          "quizzes": ["ch3_quiz_c", "ch3_quiz_d"]
+        },
+        {
+          "id": "ch3_scene3_boss",
+          "title": { "ko": "남산타워 결전", "en": "The Namsan Tower Showdown", "es": "La Batalla en la Torre Namsan" },
+          "narration": {
+            "ko": "남산타워 지하. 루디는 드디어 한국 수호석을 발견한다. 하지만 렉시콘의 부하가 지키고 있다.",
+            "en": "Beneath Namsan Tower. Rudy finally finds the Korean Guardian Stone. But Lexicon's agent guards it.",
+            "es": "Bajo la Torre Namsan. Rudy finalmente encuentra la Piedra Guardiana coreana. Pero un agente de Lexicón la vigila."
+          },
+          "isBoss": true,
+          "quizzes": ["ch3_quiz_e"]
+        }
+      ],
+      "cliffhanger": {
+        "ko": "3개의 수호석이 진동하며 세계 지도를 투영한다. 수호석은 총 7개. 다음 목적지: 카이로.",
+        "en": "The three Guardian Stones vibrate and project a world map. There are 7 stones total. Next destination: Cairo.",
+        "es": "Las tres Piedras Guardianas vibran y proyectan un mapa mundial. Hay 7 piedras en total. Próximo destino: El Cairo."
+      }
+    },
+    {
+      "id": "ch4",
+      "title": { "ko": "카이로의 유산", "en": "The Cairo Legacy", "es": "El Legado de El Cairo" },
+      "city": "Cairo",
+      "flag": "🇪🇬",
+      "icon": "🏛️",
+      "isLocked": true,
+      "unlockLevel": 15,
+      "theme": { "ko": "고대 문명 & 수수께끼", "en": "Ancient Civilization & Enigmas", "es": "Civilización Antigua y Enigmas" },
+      "npcs": [],
+      "totalXP": 1550,
+      "badge": { "id": "pyramid_scholar", "name": { "ko": "피라미드 학자", "en": "Pyramid Scholar", "es": "Erudito de las Pirámides" }, "icon": "🏛️" },
+      "scenes": [],
+      "cliffhanger": { "ko": "잠김", "en": "Locked", "es": "Bloqueado" },
+      "comingSoon": true
+    },
+    {
+      "id": "ch5",
+      "title": { "ko": "최후의 대결", "en": "The Final Showdown", "es": "La Batalla Final" },
+      "city": "Babel Tower",
+      "flag": "🌍",
+      "icon": "👑",
+      "isLocked": true,
+      "unlockLevel": 20,
+      "theme": { "ko": "최종 결전 & 연대", "en": "Final Battle & Unity", "es": "Batalla Final y Unidad" },
+      "npcs": [],
+      "totalXP": 2300,
+      "badge": { "id": "language_defender", "name": { "ko": "언어의 수호자", "en": "Language Defender", "es": "Defensor del Idioma" }, "icon": "👑" },
+      "scenes": [],
+      "cliffhanger": { "ko": "잠김", "en": "Locked", "es": "Bloqueado" },
+      "comingSoon": true
+    }
+  ],
+
+  "badges": [
+    { "id": "london_codebreaker", "name": { "ko": "런던 암호해독가", "en": "London Codebreaker", "es": "Descifrador de Londres" }, "icon": "🔓", "condition": "ch1_all_quiz_clear" },
+    { "id": "the_fog_lifts", "name": { "ko": "안개가 걷히다", "en": "The Fog Lifts", "es": "La Niebla Se Disipa" }, "icon": "🌫️", "condition": "ch1_boss_clear" },
+    { "id": "madrid_rescuer", "name": { "ko": "마드리드의 구원자", "en": "Madrid Rescuer", "es": "Rescatador de Madrid" }, "icon": "🎭", "condition": "ch2_boss_clear" },
+    { "id": "flamenco_linguist", "name": { "ko": "플라멩코 언어학자", "en": "Flamenco Linguist", "es": "Lingüista Flamenco" }, "icon": "💃", "condition": "isabel_max_relation" },
+    { "id": "seoul_guardian", "name": { "ko": "서울의 수호자", "en": "Seoul Guardian", "es": "Guardián de Seúl" }, "icon": "🏯", "condition": "ch3_boss_clear" },
+    { "id": "pyramid_scholar", "name": { "ko": "피라미드 학자", "en": "Pyramid Scholar", "es": "Erudito de las Pirámides" }, "icon": "🏛️", "condition": "ch4_boss_clear" },
+    { "id": "polyglot_fox", "name": { "ko": "다국어 여우", "en": "Polyglot Fox", "es": "Zorro Políglota" }, "icon": "🌍", "condition": "3_boss_perfect" },
+    { "id": "language_defender", "name": { "ko": "언어의 수호자", "en": "Language Defender", "es": "Defensor del Idioma" }, "icon": "👑", "condition": "all_story_clear" },
+    { "id": "mr_blacks_rival", "name": { "ko": "미스터 블랙의 라이벌", "en": "Mr. Black's Rival", "es": "El Rival del Sr. Black" }, "icon": "🎩", "condition": "final_boss_perfect" },
+    { "id": "rudys_best_friend", "name": { "ko": "루디의 절친", "en": "Rudy's Best Friend", "es": "Mejor Amigo de Rudy" }, "icon": "🦊", "condition": "all_npc_max" },
+    { "id": "speed_demon", "name": { "ko": "스피드 데몬", "en": "Speed Demon", "es": "Demonio Veloz" }, "icon": "⚡", "condition": "all_timed_clear" },
+    { "id": "perfect_ear", "name": { "ko": "완벽한 귀", "en": "Perfect Ear", "es": "Oído Perfecto" }, "icon": "👂", "condition": "all_listening_perfect" },
+    { "id": "silver_tongue", "name": { "ko": "은의 혀", "en": "Silver Tongue", "es": "Lengua de Plata" }, "icon": "🗣️", "condition": "all_roleplay_90plus" }
+  ]
+}

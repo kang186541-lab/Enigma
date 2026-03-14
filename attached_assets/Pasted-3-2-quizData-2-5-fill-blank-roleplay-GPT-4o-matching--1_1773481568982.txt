@@ -1,0 +1,886 @@
+3번째 메시지야. 챕터2(마드리드)의 퀴즈 데이터야. 이걸 quizData에 추가해줘.
+
+챕터2 퀴즈 5개: fill_blank, roleplay(GPT-4o), matching, writing(GPT-4o), timed(보스)
+
+```json
+{
+  "quizzes": [
+    {
+      "id": "ch2_quiz_a",
+      "chapter": "ch2",
+      "scene": "ch2_scene1",
+      "type": "fill_blank",
+      "title": {
+        "ko": "목격자 증언",
+        "en": "Witness Testimony",
+        "es": "Testimonio del Testigo"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "이사벨이 카를로스 실종 당시를 증언한다. 학습 언어로 된 텍스트를 읽고 정보를 추출하라.",
+        "en": "Isabel testifies about Carlos's disappearance. Read the text in your target language and extract information.",
+        "es": "Isabel testifica sobre la desaparición de Carlos. Lee el texto y extrae la información."
+      },
+      "content": {
+        "en": {
+          "passage": "Last night, at ___(1)___, I saw Carlos leave the museum with a ___(2)___ man. The man wore a black ___(3)___ and a hat. They went toward ___(4)___ Park. Carlos looked ___(5)___.",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "eleven",
+              "options": [
+                "nine",
+                "ten",
+                "eleven",
+                "midnight"
+              ],
+              "hint": {
+                "ko": "밤 11시입니다",
+                "en": "It was 11 PM",
+                "es": "Eran las 11 PM"
+              }
+            },
+            {
+              "id": 2,
+              "answer": "tall",
+              "options": [
+                "short",
+                "tall",
+                "young",
+                "old"
+              ],
+              "hint": {
+                "ko": "키가 큰",
+                "en": "Vertically big",
+                "es": "De gran estatura"
+              }
+            },
+            {
+              "id": 3,
+              "answer": "coat",
+              "options": [
+                "coat",
+                "shirt",
+                "suit",
+                "scarf"
+              ],
+              "hint": {
+                "ko": "외투",
+                "en": "An outer garment",
+                "es": "Prenda de abrigo"
+              }
+            },
+            {
+              "id": 4,
+              "answer": "Retiro",
+              "options": [
+                "Hyde",
+                "Central",
+                "Retiro",
+                "Ueno"
+              ],
+              "hint": {
+                "ko": "마드리드의 유명한 공원",
+                "en": "Famous park in Madrid",
+                "es": "Parque famoso de Madrid"
+              }
+            },
+            {
+              "id": 5,
+              "answer": "scared",
+              "options": [
+                "happy",
+                "scared",
+                "angry",
+                "tired"
+              ],
+              "hint": {
+                "ko": "무서워하는",
+                "en": "Feeling fear",
+                "es": "Sintiendo miedo"
+              }
+            }
+          ]
+        },
+        "es": {
+          "passage": "Anoche, a las ___(1)___, vi a Carlos salir del museo con un hombre ___(2)___. El hombre llevaba un ___(3)___ negro y un sombrero. Fueron hacia el Parque del ___(4)___. Carlos parecía ___(5)___.",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "once",
+              "options": [
+                "nueve",
+                "diez",
+                "once",
+                "medianoche"
+              ],
+              "hint": {
+                "ko": "11시",
+                "en": "11 o'clock",
+                "es": "Las 11"
+              }
+            },
+            {
+              "id": 2,
+              "answer": "alto",
+              "options": [
+                "bajo",
+                "alto",
+                "joven",
+                "viejo"
+              ],
+              "hint": {
+                "ko": "키가 큰",
+                "en": "Tall",
+                "es": "De gran estatura"
+              }
+            },
+            {
+              "id": 3,
+              "answer": "abrigo",
+              "options": [
+                "abrigo",
+                "camisa",
+                "traje",
+                "bufanda"
+              ],
+              "hint": {
+                "ko": "외투/코트",
+                "en": "A coat",
+                "es": "Prenda de abrigo"
+              }
+            },
+            {
+              "id": 4,
+              "answer": "Retiro",
+              "options": [
+                "Retiro",
+                "Sol",
+                "Prado",
+                "Real"
+              ],
+              "hint": {
+                "ko": "마드리드의 유명한 공원",
+                "en": "Famous park in Madrid",
+                "es": "Parque famoso de Madrid"
+              }
+            },
+            {
+              "id": 5,
+              "answer": "asustado",
+              "options": [
+                "feliz",
+                "asustado",
+                "enfadado",
+                "cansado"
+              ],
+              "hint": {
+                "ko": "무서워하는",
+                "en": "Feeling fear",
+                "es": "Sintiendo miedo"
+              }
+            }
+          ]
+        },
+        "ko": {
+          "passage": "어젯밤 ___(1)___시에, 카를로스가 ___(2)___ 남자와 박물관에서 나오는 걸 봤어. 남자는 검은 ___(3)___에 모자를 쓰고 있었어. ___(4)___ 공원 쪽으로 갔는데, 카를로스가 ___(5)___ 것 같았어.",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "열한",
+              "options": [
+                "아홉",
+                "열",
+                "열한",
+                "열두"
+              ],
+              "hint": {
+                "en": "11 o'clock",
+                "es": "Las 11",
+                "ko": "11시"
+              }
+            },
+            {
+              "id": 2,
+              "answer": "키 큰",
+              "options": [
+                "키 작은",
+                "키 큰",
+                "젊은",
+                "나이 든"
+              ],
+              "hint": {
+                "en": "Tall",
+                "es": "Alto",
+                "ko": "키가 크다"
+              }
+            },
+            {
+              "id": 3,
+              "answer": "코트",
+              "options": [
+                "코트",
+                "셔츠",
+                "정장",
+                "목도리"
+              ],
+              "hint": {
+                "en": "A coat/overcoat",
+                "es": "Un abrigo",
+                "ko": "외투"
+              }
+            },
+            {
+              "id": 4,
+              "answer": "레티로",
+              "options": [
+                "하이드",
+                "센트럴",
+                "레티로",
+                "우에노"
+              ],
+              "hint": {
+                "en": "Famous Madrid park",
+                "es": "Parque famoso de Madrid",
+                "ko": "마드리드의 유명한 공원"
+              }
+            },
+            {
+              "id": 5,
+              "answer": "무서워하는",
+              "options": [
+                "행복해하는",
+                "무서워하는",
+                "화난",
+                "피곤한"
+              ],
+              "hint": {
+                "en": "Feeling fear",
+                "es": "Sintiendo miedo",
+                "ko": "두려움을 느끼는"
+              }
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 100,
+        "items": [],
+        "npcRelation": {
+          "npc": "isabel",
+          "points": 1
+        }
+      }
+    },
+    {
+      "id": "ch2_quiz_b",
+      "chapter": "ch2",
+      "scene": "ch2_scene1",
+      "type": "roleplay",
+      "title": {
+        "ko": "시장에서 주문하기",
+        "en": "Ordering at the Market",
+        "es": "Pidiendo en el Mercado"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "useGPT": true,
+      "storyContext": {
+        "ko": "돈 미겔의 가게에서 학습 언어로 음식 3가지를 주문해야 정보를 얻을 수 있다.",
+        "en": "You must order 3 food items in your target language at Don Miguel's stall to get information.",
+        "es": "Debes pedir 3 comidas en tu idioma objetivo en el puesto de Don Miguel para obtener información."
+      },
+      "gptPrompt": "You are Don Miguel, a warm and friendly market merchant in Madrid. The player must order 3 food items from your stall in {targetLang}. Available items: jamón (ham), tortilla española (Spanish omelette), churros, paella, gazpacho (cold soup). Respond warmly in {targetLang}. After 3 successful orders, reveal the secret: you saw suspicious people near Retiro Park. Evaluate: grammar (0-30), vocabulary (0-30), politeness (0-20), cultural awareness (0-20). Return JSON after each exchange: {\"npcResponse\": \"...\", \"ordersCompleted\": 0-3, \"score\": 0-100, \"feedback\": \"...\", \"secretRevealed\": false}",
+      "content": {
+        "en": {
+          "foodVocab": [
+            "ham (jamón)",
+            "Spanish omelette (tortilla)",
+            "churros",
+            "paella",
+            "cold tomato soup (gazpacho)"
+          ],
+          "keyPhrases": [
+            "Could I have...",
+            "I'd like...",
+            "please",
+            "How much is...",
+            "thank you"
+          ]
+        },
+        "es": {
+          "foodVocab": [
+            "jamón",
+            "tortilla española",
+            "churros",
+            "paella",
+            "gazpacho"
+          ],
+          "keyPhrases": [
+            "Quiero...",
+            "Me da...",
+            "por favor",
+            "¿Cuánto cuesta...?",
+            "gracias"
+          ]
+        },
+        "ko": {
+          "foodVocab": [
+            "하몬 (ham)",
+            "또르띠야 (Spanish omelette)",
+            "츄러스",
+            "빠에야",
+            "가스파초 (cold soup)"
+          ],
+          "keyPhrases": [
+            "~주세요",
+            "~하나요",
+            "얼마예요?",
+            "감사합니다",
+            "맛있어요"
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 120,
+        "items": [
+          "miguels_map"
+        ],
+        "npcRelation": {
+          "npc": "miguel",
+          "points": 1
+        }
+      }
+    },
+    {
+      "id": "ch2_quiz_c",
+      "chapter": "ch2",
+      "scene": "ch2_scene2",
+      "type": "matching",
+      "title": {
+        "ko": "속담 퍼즐",
+        "en": "Proverb Puzzle",
+        "es": "Puzzle de Refranes"
+      },
+      "difficulty": 3,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "레티로 공원의 분수대에 속담이 새겨져 있다. 속담을 완성하면 비밀 통로가 열린다.",
+        "en": "Proverbs are carved on the fountain in Retiro Park. Complete them to open the secret passage.",
+        "es": "Hay refranes tallados en la fuente del Retiro. Complétalos para abrir el pasaje secreto."
+      },
+      "content": {
+        "en": {
+          "pairs": [
+            {
+              "left": "Every cloud has a...",
+              "right": "silver lining",
+              "wrongOptions": [
+                "golden edge",
+                "dark side",
+                "rainy day"
+              ],
+              "meaning": {
+                "ko": "전화위복",
+                "en": "Bad situations can have good outcomes",
+                "es": "Las malas situaciones pueden tener buenos resultados"
+              }
+            },
+            {
+              "left": "Silence is...",
+              "right": "golden",
+              "wrongOptions": [
+                "silver",
+                "boring",
+                "dangerous"
+              ],
+              "meaning": {
+                "ko": "침묵이 금",
+                "en": "Sometimes it's better to say nothing",
+                "es": "A veces es mejor no decir nada"
+              }
+            },
+            {
+              "left": "Better late than...",
+              "right": "never",
+              "wrongOptions": [
+                "early",
+                "always",
+                "soon"
+              ],
+              "meaning": {
+                "ko": "안 하는 것보다 늦게라도 하는 게 낫다",
+                "en": "Doing something late is better than not doing it",
+                "es": "Hacer algo tarde es mejor que no hacerlo"
+              }
+            },
+            {
+              "left": "Don't bite off more than you can...",
+              "right": "chew",
+              "wrongOptions": [
+                "eat",
+                "swallow",
+                "taste"
+              ],
+              "meaning": {
+                "ko": "과욕은 금물",
+                "en": "Don't try to do more than you can handle",
+                "es": "No intentes hacer más de lo que puedes"
+              }
+            }
+          ]
+        },
+        "es": {
+          "pairs": [
+            {
+              "left": "No hay mal que por ___ no venga",
+              "right": "bien",
+              "wrongOptions": [
+                "mal",
+                "aquí",
+                "siempre"
+              ],
+              "meaning": {
+                "ko": "전화위복",
+                "en": "Every cloud has a silver lining",
+                "es": "Las malas situaciones traen cosas buenas"
+              }
+            },
+            {
+              "left": "En boca cerrada no entran...",
+              "right": "moscas",
+              "wrongOptions": [
+                "palabras",
+                "pájaros",
+                "problemas"
+              ],
+              "meaning": {
+                "ko": "침묵이 금",
+                "en": "Silence is golden",
+                "es": "Es mejor callarse para evitar problemas"
+              }
+            },
+            {
+              "left": "Más vale tarde que...",
+              "right": "nunca",
+              "wrongOptions": [
+                "siempre",
+                "pronto",
+                "antes"
+              ],
+              "meaning": {
+                "ko": "안 하는 것보다 낫다",
+                "en": "Better late than never",
+                "es": "Es mejor hacer algo tarde que no hacerlo"
+              }
+            },
+            {
+              "left": "El que mucho abarca, poco...",
+              "right": "aprieta",
+              "wrongOptions": [
+                "come",
+                "duerme",
+                "gana"
+              ],
+              "meaning": {
+                "ko": "과욕은 금물",
+                "en": "Don't bite off more than you can chew",
+                "es": "Quien intenta mucho, logra poco"
+              }
+            }
+          ]
+        },
+        "ko": {
+          "pairs": [
+            {
+              "left": "비 온 뒤에 땅이...",
+              "right": "굳어진다",
+              "wrongOptions": [
+                "무너진다",
+                "사라진다",
+                "젖는다"
+              ],
+              "meaning": {
+                "en": "After rain, the ground hardens (hardship makes you stronger)",
+                "es": "Después de la lluvia, el suelo se endurece (las dificultades te fortalecen)",
+                "ko": "고난 뒤에 더 강해진다"
+              }
+            },
+            {
+              "left": "침묵이...",
+              "right": "금이다",
+              "wrongOptions": [
+                "은이다",
+                "돌이다",
+                "물이다"
+              ],
+              "meaning": {
+                "en": "Silence is golden",
+                "es": "El silencio es oro",
+                "ko": "가만히 있는 것이 더 나을 때가 있다"
+              }
+            },
+            {
+              "left": "늦더라도 안 하는 것보다...",
+              "right": "낫다",
+              "wrongOptions": [
+                "나쁘다",
+                "같다",
+                "힘들다"
+              ],
+              "meaning": {
+                "en": "Better late than never",
+                "es": "Mejor tarde que nunca",
+                "ko": "늦게라도 하는 게 더 좋다"
+              }
+            },
+            {
+              "left": "욕심이 과하면 화를...",
+              "right": "부른다",
+              "wrongOptions": [
+                "피한다",
+                "잊는다",
+                "덮는다"
+              ],
+              "meaning": {
+                "en": "Greed invites disaster",
+                "es": "La codicia trae desgracia",
+                "ko": "너무 욕심부리면 안 좋은 결과가 온다"
+              }
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 150,
+        "items": [
+          "secret_passage_key"
+        ],
+        "npcRelation": null
+      }
+    },
+    {
+      "id": "ch2_quiz_d",
+      "chapter": "ch2",
+      "scene": "ch2_scene2",
+      "type": "writing",
+      "title": {
+        "ko": "예술이 말하다",
+        "en": "Art Speaks",
+        "es": "El Arte Habla"
+      },
+      "difficulty": 3,
+      "timeLimit": null,
+      "isBoss": false,
+      "useGPT": true,
+      "storyContext": {
+        "ko": "숨겨진 방의 3개 그림을 학습 언어 2~3문장으로 묘사해야 문이 열린다.",
+        "en": "Describe 3 paintings in 2-3 sentences in your target language to open the door.",
+        "es": "Describe 3 pinturas en 2-3 oraciones en tu idioma objetivo para abrir la puerta."
+      },
+      "content": {
+        "en": {
+          "prompts": [
+            {
+              "image": "beach_scene",
+              "description": "A beach with blue ocean and people",
+              "requiredVocab": [
+                "ocean/sea",
+                "sky",
+                "people/person"
+              ],
+              "minSentences": 2
+            },
+            {
+              "image": "market_scene",
+              "description": "A colorful market with fruits",
+              "requiredVocab": [
+                "fruit",
+                "color",
+                "seller/vendor"
+              ],
+              "minSentences": 2
+            },
+            {
+              "image": "night_scene",
+              "description": "A city at night with moon and stars",
+              "requiredVocab": [
+                "moon",
+                "stars",
+                "city"
+              ],
+              "minSentences": 2
+            }
+          ]
+        },
+        "es": {
+          "prompts": [
+            {
+              "image": "beach_scene",
+              "description": "Una playa con océano azul y personas",
+              "requiredVocab": [
+                "mar/océano",
+                "cielo",
+                "personas"
+              ],
+              "minSentences": 2
+            },
+            {
+              "image": "market_scene",
+              "description": "Un mercado colorido con frutas",
+              "requiredVocab": [
+                "frutas",
+                "colores",
+                "vendedor"
+              ],
+              "minSentences": 2
+            },
+            {
+              "image": "night_scene",
+              "description": "Una ciudad de noche con luna y estrellas",
+              "requiredVocab": [
+                "luna",
+                "estrellas",
+                "ciudad"
+              ],
+              "minSentences": 2
+            }
+          ]
+        },
+        "ko": {
+          "prompts": [
+            {
+              "image": "beach_scene",
+              "description": "파란 바다와 사람들이 있는 해변",
+              "requiredVocab": [
+                "바다",
+                "하늘",
+                "사람"
+              ],
+              "minSentences": 2
+            },
+            {
+              "image": "market_scene",
+              "description": "과일이 있는 다채로운 시장",
+              "requiredVocab": [
+                "과일",
+                "색깔",
+                "상인"
+              ],
+              "minSentences": 2
+            },
+            {
+              "image": "night_scene",
+              "description": "달과 별이 있는 밤의 도시",
+              "requiredVocab": [
+                "달",
+                "별",
+                "도시"
+              ],
+              "minSentences": 2
+            }
+          ]
+        }
+      },
+      "gptPrompt": "You are an art description evaluator. The player must describe a painting in {targetLang}. Required vocabulary: {requiredVocab}. Minimum {minSentences} sentences. Evaluate: grammar (0-30), vocabulary richness (0-30), descriptive quality (0-20), cultural expression (0-20). Return JSON: {\"score\": 0-100, \"feedback\": \"...\", \"missingVocab\": [], \"grammarErrors\": []}",
+      "rewards": {
+        "xp": 200,
+        "items": [
+          "restorers_key"
+        ],
+        "npcRelation": null
+      }
+    },
+    {
+      "id": "ch2_quiz_e",
+      "chapter": "ch2",
+      "scene": "ch2_scene3_boss",
+      "type": "timed",
+      "title": {
+        "ko": "렉시콘의 함정",
+        "en": "The Lexicon Trap",
+        "es": "La Trampa de Lexicón"
+      },
+      "difficulty": 4,
+      "timeLimit": 60,
+      "isBoss": true,
+      "useGPT": true,
+      "useAzureTTS": true,
+      "storyContext": {
+        "ko": "카를로스를 구하려면 60초 안에 5개의 언어 함정을 해제해야 한다!",
+        "en": "Save Carlos by disabling 5 language traps within 60 seconds each!",
+        "es": "¡Salva a Carlos desactivando 5 trampas lingüísticas en 60 segundos cada una!"
+      },
+      "content": {
+        "en": {
+          "rounds": [
+            {
+              "type": "fill_blank",
+              "question": "She ___ (go) to the museum yesterday.",
+              "answer": "went",
+              "options": [
+                "go",
+                "goes",
+                "went",
+                "gone"
+              ]
+            },
+            {
+              "type": "listening",
+              "ttsScript": "The stone is hidden beneath the fountain in the eastern garden.",
+              "ttsVoice": "en-GB-SoniaNeural",
+              "question": "Where is the stone hidden?",
+              "answer": "beneath the fountain",
+              "acceptableAnswers": [
+                "beneath the fountain",
+                "under the fountain",
+                "fountain in eastern garden"
+              ]
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "진실은 예술 속에 숨어 있다",
+                "es": "La verdad está escondida en el arte",
+                "en": "The truth is hidden in art"
+              },
+              "answer": "The truth is hidden in art"
+            },
+            {
+              "type": "fill_blank",
+              "question": "Carlos is ___ in the museum.",
+              "answer": "trapped",
+              "options": [
+                "trapping",
+                "trapped",
+                "trap",
+                "traps"
+              ]
+            },
+            {
+              "type": "roleplay",
+              "prompt": "Explain your escape plan to Carlos in English. Use at least 3 sentences."
+            }
+          ]
+        },
+        "es": {
+          "rounds": [
+            {
+              "type": "fill_blank",
+              "question": "Yo ___ (tener) que encontrar la piedra.",
+              "answer": "tengo",
+              "options": [
+                "tiene",
+                "tengo",
+                "tener",
+                "tenemos"
+              ]
+            },
+            {
+              "type": "listening",
+              "ttsScript": "La piedra está escondida debajo de la fuente en el jardín oriental.",
+              "ttsVoice": "es-ES-ElviraNeural",
+              "question": "¿Dónde está escondida la piedra?",
+              "answer": "debajo de la fuente",
+              "acceptableAnswers": [
+                "debajo de la fuente",
+                "bajo la fuente",
+                "fuente del jardín"
+              ]
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "진실은 예술 속에 숨어 있다",
+                "en": "The truth is hidden in art",
+                "es": "La verdad está escondida en el arte"
+              },
+              "answer": "La verdad está escondida en el arte"
+            },
+            {
+              "type": "fill_blank",
+              "question": "Carlos está ___ en el museo.",
+              "answer": "atrapado",
+              "options": [
+                "atrapando",
+                "atrapado",
+                "atrapar",
+                "atrapamos"
+              ]
+            },
+            {
+              "type": "roleplay",
+              "prompt": "Explica tu plan de escape a Carlos en español. Usa al menos 3 oraciones."
+            }
+          ]
+        },
+        "ko": {
+          "rounds": [
+            {
+              "type": "fill_blank",
+              "question": "나는 어제 박물관에 ___ (가다).",
+              "answer": "갔다",
+              "options": [
+                "간다",
+                "갔다",
+                "가다",
+                "갈 것이다"
+              ]
+            },
+            {
+              "type": "listening",
+              "ttsScript": "수호석은 동쪽 정원의 분수 아래에 숨겨져 있습니다.",
+              "ttsVoice": "ko-KR-SunHiNeural",
+              "question": "수호석은 어디에 숨겨져 있나요?",
+              "answer": "분수 아래",
+              "acceptableAnswers": [
+                "분수 아래",
+                "동쪽 정원 분수 아래",
+                "분수대 아래"
+              ]
+            },
+            {
+              "type": "translation",
+              "source": {
+                "en": "The truth is hidden in art",
+                "es": "La verdad está escondida en el arte",
+                "ko": "진실은 예술 속에 숨어 있다"
+              },
+              "answer": "진실은 예술 속에 숨어 있다"
+            },
+            {
+              "type": "fill_blank",
+              "question": "카를로스는 박물관에 ___ 있다.",
+              "answer": "갇혀",
+              "options": [
+                "갇혀",
+                "갇히고",
+                "갇히다",
+                "갇힌"
+              ]
+            },
+            {
+              "type": "roleplay",
+              "prompt": "카를로스에게 탈출 계획을 한국어로 설명하세요. 최소 3문장 이상 사용하세요."
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 350,
+        "items": [
+          "spain_guardian_stone"
+        ],
+        "npcRelation": null,
+        "badge": "madrid_rescuer"
+      }
+    }
+  ]
+}```
+
+이 퀴즈들을 챕터1 데이터와 같은 quizData 파일에 추가해줘. 다음 메시지에서 마지막 챕터3 데이터를 보낼게.
+```

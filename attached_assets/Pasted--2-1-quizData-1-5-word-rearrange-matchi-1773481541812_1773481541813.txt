@@ -1,0 +1,939 @@
+이전 메시지의 이어서 보내는 2번째 메시지야. 챕터1(런던)의 퀴즈 데이터야. 이걸 quizData 파일에 추가해줘.
+
+챕터1 퀴즈 5개: word_rearrange, matching, fill_blank, listening, riddle(보스)
+
+```json
+{
+  "quizzes": [
+    {
+      "id": "ch1_quiz_a",
+      "chapter": "ch1",
+      "scene": "ch1_scene1",
+      "type": "word_rearrange",
+      "title": {
+        "ko": "숨겨진 메시지",
+        "en": "The Hidden Message",
+        "es": "El Mensaje Oculto"
+      },
+      "difficulty": 1,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "석판의 암호를 해독하기 위해 문장을 올바르게 배열해야 한다.",
+        "en": "You must arrange the words correctly to decode the cipher on the tablet.",
+        "es": "Debes ordenar las palabras correctamente para descifrar el código de la tablilla."
+      },
+      "content": {
+        "en": {
+          "questions": [
+            {
+              "scrambled": [
+                "the",
+                "stones",
+                "protect",
+                "language",
+                "guardian"
+              ],
+              "answer": "The guardian stones protect language",
+              "hint": {
+                "ko": "주어를 먼저 찾으세요. 'guardian stones'가 주어입니다.",
+                "en": "Find the subject first. 'Guardian stones' is the subject.",
+                "es": "Encuentra el sujeto primero. 'Guardian stones' es el sujeto."
+              },
+              "grammarNote": {
+                "ko": "영어 어순: 주어(S) + 동사(V) + 목적어(O). 관사 'the'는 문장 맨 앞에 옵니다.",
+                "en": "English word order: Subject + Verb + Object. Article 'the' goes first.",
+                "es": "Orden en inglés: Sujeto + Verbo + Objeto. El artículo 'the' va primero."
+              }
+            },
+            {
+              "scrambled": [
+                "seeks",
+                "society",
+                "to",
+                "destroy",
+                "words"
+              ],
+              "answer": "Society seeks to destroy words",
+              "hint": {
+                "ko": "'seeks to + 동사원형' 패턴입니다.",
+                "en": "Look for the 'seeks to + verb' pattern.",
+                "es": "Busca el patrón 'seeks to + verbo'."
+              },
+              "grammarNote": {
+                "ko": "'seek to + 동사원형'은 '~하려고 하다'라는 뜻입니다.",
+                "en": "'Seek to + base verb' means 'to try to do something'.",
+                "es": "'Seek to + verbo base' significa 'intentar hacer algo'."
+              }
+            },
+            {
+              "scrambled": [
+                "find",
+                "them",
+                "before",
+                "it's",
+                "too",
+                "late"
+              ],
+              "answer": "Find them before it's too late",
+              "hint": {
+                "ko": "명령문은 동사로 시작합니다. 시간 표현이 마지막에 옵니다.",
+                "en": "Commands start with the verb. Time expression goes at the end.",
+                "es": "Los imperativos empiezan con verbo. La expresión de tiempo va al final."
+              },
+              "grammarNote": {
+                "ko": "명령문(imperative)은 주어 없이 동사로 시작합니다. 'before'는 '~전에'라는 접속사입니다.",
+                "en": "Imperatives start with the verb without a subject. 'Before' is a conjunction meaning 'prior to'.",
+                "es": "Los imperativos comienzan con el verbo sin sujeto. 'Before' es una conjunción que significa 'antes de'."
+              }
+            }
+          ]
+        },
+        "es": {
+          "questions": [
+            {
+              "scrambled": [
+                "las",
+                "piedras",
+                "protegen",
+                "el",
+                "guardianas",
+                "idioma"
+              ],
+              "answer": "Las piedras guardianas protegen el idioma",
+              "hint": {
+                "ko": "스페인어에서 형용사는 보통 명사 뒤에 옵니다.",
+                "en": "In Spanish, adjectives usually come after nouns.",
+                "es": "En español, los adjetivos suelen ir después del sustantivo."
+              },
+              "grammarNote": {
+                "ko": "스페인어 어순: 관사 + 명사 + 형용사 + 동사 + 목적어. 'Las'는 여성 복수 정관사입니다.",
+                "en": "Spanish order: Article + Noun + Adjective + Verb + Object. 'Las' is the feminine plural article.",
+                "es": "Orden: Artículo + Sustantivo + Adjetivo + Verbo + Objeto. 'Las' es el artículo femenino plural."
+              }
+            },
+            {
+              "scrambled": [
+                "la",
+                "sociedad",
+                "busca",
+                "destruir",
+                "palabras"
+              ],
+              "answer": "La sociedad busca destruir palabras",
+              "hint": {
+                "ko": "'busca + 동사원형' 패턴입니다.",
+                "en": "Look for the 'busca + infinitive' pattern.",
+                "es": "Busca el patrón 'busca + infinitivo'."
+              },
+              "grammarNote": {
+                "ko": "'buscar + 동사원형'은 '~하려고 하다'입니다. 동사원형(-ar, -er, -ir)은 변환된 동사 뒤에 옵니다.",
+                "en": "'Buscar + infinitive' means 'to seek to'. Infinitives (-ar, -er, -ir) follow conjugated verbs.",
+                "es": "'Buscar + infinitivo' significa intentar hacer algo."
+              }
+            },
+            {
+              "scrambled": [
+                "encuéntralas",
+                "antes",
+                "de",
+                "que",
+                "sea",
+                "tarde"
+              ],
+              "answer": "Encuéntralas antes de que sea tarde",
+              "hint": {
+                "ko": "명령형이 먼저, 'antes de que + 접속법' 구조입니다.",
+                "en": "Imperative first, then 'antes de que + subjunctive'.",
+                "es": "Imperativo primero, luego 'antes de que + subjuntivo'."
+              },
+              "grammarNote": {
+                "ko": "'antes de que' 뒤에는 접속법(subjuntivo)이 옵니다. 'sea'는 'ser'의 접속법 형태입니다.",
+                "en": "'Antes de que' requires subjunctive. 'Sea' is subjunctive of 'ser'.",
+                "es": "'Antes de que' requiere subjuntivo. 'Sea' es el subjuntivo de 'ser'."
+              }
+            }
+          ]
+        },
+        "ko": {
+          "questions": [
+            {
+              "scrambled": [
+                "수호석은",
+                "언어를",
+                "보호한다"
+              ],
+              "answer": "수호석은 언어를 보호한다",
+              "hint": {
+                "en": "Korean order: Subject + Object + Verb. Look for the particles.",
+                "es": "Orden coreano: Sujeto + Objeto + Verbo. Busca las partículas.",
+                "ko": "한국어 어순: 주어 + 목적어 + 동사입니다."
+              },
+              "grammarNote": {
+                "en": "Korean uses SOV order. 은/는 marks the topic/subject, 을/를 marks the object.",
+                "es": "El coreano usa orden SOV. 은/는 marca el tema, 을/를 marca el objeto.",
+                "ko": "한국어는 SOV 어순입니다. '은/는'은 주제, '을/를'은 목적어를 나타냅니다."
+              }
+            },
+            {
+              "scrambled": [
+                "그들은",
+                "단어를",
+                "파괴하려",
+                "한다"
+              ],
+              "answer": "그들은 단어를 파괴하려 한다",
+              "hint": {
+                "en": "'-려 한다' means 'trying to' — it goes at the end.",
+                "es": "'-려 한다' significa 'intentar' — va al final.",
+                "ko": "'-려 한다'는 의도를 나타내며 문장 끝에 옵니다."
+              },
+              "grammarNote": {
+                "en": "'-려 하다' expresses intention, like 'to try to'. The verb stem + 려 + 하다.",
+                "es": "'-려 하다' expresa intención. Raíz del verbo + 려 + 하다.",
+                "ko": "'-려 하다'는 '~하고자 하다'의 의미입니다. 동사 어간 + 려 + 하다."
+              }
+            },
+            {
+              "scrambled": [
+                "너무",
+                "늦기",
+                "전에",
+                "찾아라"
+              ],
+              "answer": "너무 늦기 전에 찾아라",
+              "hint": {
+                "en": "'전에' means 'before'. Commands end the sentence in Korean.",
+                "es": "'전에' significa 'antes de'. Los imperativos van al final en coreano.",
+                "ko": "'전에'는 '~하기 전에'입니다. 명령형은 문장 끝에 옵니다."
+              },
+              "grammarNote": {
+                "en": "'~기 전에' means 'before doing ~'. '찾아라' is an imperative form of '찾다' (to find).",
+                "es": "'~기 전에' significa 'antes de hacer ~'. '찾아라' es imperativo de '찾다' (encontrar).",
+                "ko": "'~기 전에'는 시간 순서를 나타냅니다. '찾아라'는 '찾다'의 명령형입니다."
+              }
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 50,
+        "items": [
+          "broken_seal"
+        ],
+        "npcRelation": null
+      }
+    },
+    {
+      "id": "ch1_quiz_b",
+      "chapter": "ch1",
+      "scene": "ch1_scene1",
+      "type": "matching",
+      "title": {
+        "ko": "톰의 목격담",
+        "en": "Tom's Testimony",
+        "es": "El Testimonio de Tom"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "톰이 수상한 인물을 목격했지만 구어체로만 설명한다. 이해해야 단서를 얻을 수 있다.",
+        "en": "Tom witnessed a suspicious figure but describes it only in slang. You must understand to get the clue.",
+        "es": "Tom vio a una persona sospechosa pero lo describe solo en jerga. Debes entender para obtener la pista."
+      },
+      "npcDialogueBefore": {
+        "npc": "tom",
+        "text": {
+          "en": "Oi Rudy! Last night, some dodgy bloke was having a butcher's at the replica. Proper sus, mate. He legged it when he saw me.",
+          "es": "¡Eh, Rudy! Anoche, un tío sospechoso estaba mirando la réplica. ¡Qué fuerte, tío! Se piró cuando me vio.",
+          "ko": "야 루디! 어젯밤에 수상한 놈이 복제본을 뚫어지게 보고 있었는데, 완전 수상했어. 나 보더니 바로 튀었다니까."
+        }
+      },
+      "content": {
+        "en": {
+          "pairs": [
+            {
+              "left": "dodgy",
+              "right": "suspicious",
+              "wrongOptions": [
+                "friendly",
+                "clever",
+                "tired"
+              ]
+            },
+            {
+              "left": "having a butcher's",
+              "right": "having a look",
+              "wrongOptions": [
+                "eating meat",
+                "cooking food",
+                "buying things"
+              ]
+            },
+            {
+              "left": "legged it",
+              "right": "ran away",
+              "wrongOptions": [
+                "kicked it",
+                "walked slowly",
+                "sat down"
+              ]
+            },
+            {
+              "left": "bloke",
+              "right": "man",
+              "wrongOptions": [
+                "building",
+                "animal",
+                "car"
+              ]
+            },
+            {
+              "left": "proper sus",
+              "right": "really suspicious",
+              "wrongOptions": [
+                "very sweet",
+                "quite normal",
+                "very tired"
+              ]
+            }
+          ],
+          "grammarNote": {
+            "ko": "영국 영어 슬랭은 일상 대화에서 자주 쓰입니다. 'Butcher's hook'은 'look'의 코크니 라이밍 슬랭입니다.",
+            "en": "British slang is common in casual conversation. 'Butcher's hook' is Cockney rhyming slang for 'look'.",
+            "es": "El argot británico es común en conversaciones informales. 'Butcher's hook' es jerga cockney que rima con 'look'."
+          }
+        },
+        "es": {
+          "pairs": [
+            {
+              "left": "tío",
+              "right": "hombre/persona",
+              "wrongOptions": [
+                "tío familiar",
+                "edificio",
+                "animal"
+              ]
+            },
+            {
+              "left": "qué fuerte",
+              "right": "increíble/impactante",
+              "wrongOptions": [
+                "muy fuerte físicamente",
+                "muy ruidoso",
+                "muy amable"
+              ]
+            },
+            {
+              "left": "se piró",
+              "right": "se fue rápido",
+              "wrongOptions": [
+                "se sentó",
+                "se durmió",
+                "se rió"
+              ]
+            },
+            {
+              "left": "mola",
+              "right": "es genial/cool",
+              "wrongOptions": [
+                "molesta",
+                "muele",
+                "moja"
+              ]
+            },
+            {
+              "left": "currar",
+              "right": "trabajar",
+              "wrongOptions": [
+                "correr",
+                "curar",
+                "cocinar"
+              ]
+            }
+          ],
+          "grammarNote": {
+            "ko": "스페인 구어체는 중남미 스페인어와 다를 수 있습니다. 'Tío/tía'는 가족이 아닌 친구 사이에서도 씁니다.",
+            "en": "Spanish slang differs from Latin American Spanish. 'Tío/tía' is used between friends, not just for relatives.",
+            "es": "El argot español peninsular difiere del latinoamericano. 'Tío/tía' se usa entre amigos."
+          }
+        },
+        "ko": {
+          "pairs": [
+            {
+              "left": "대박",
+              "right": "놀라운/대단한",
+              "wrongOptions": [
+                "큰 상자",
+                "폭발",
+                "실패"
+              ]
+            },
+            {
+              "left": "튀다",
+              "right": "도망가다",
+              "wrongOptions": [
+                "튀기다",
+                "춤추다",
+                "뛰어오르다"
+              ]
+            },
+            {
+              "left": "꿀잼",
+              "right": "매우 재미있는",
+              "wrongOptions": [
+                "꿀맛 잼",
+                "달콤한",
+                "지루한"
+              ]
+            },
+            {
+              "left": "뚫어지게 보다",
+              "right": "집중해서 바라보다",
+              "wrongOptions": [
+                "구멍을 뚫다",
+                "눈이 아프다",
+                "무시하다"
+              ]
+            },
+            {
+              "left": "완전",
+              "right": "매우/정말",
+              "wrongOptions": [
+                "완전한/완벽한",
+                "절반",
+                "조금"
+              ]
+            }
+          ],
+          "grammarNote": {
+            "en": "Korean slang and expressions often combine words creatively. '꿀잼' = 꿀(honey) + 재미(fun), meaning 'super fun'.",
+            "es": "El argot coreano combina palabras creativamente. '꿀잼' = 꿀(miel) + 재미(diversión), 'super divertido'.",
+            "ko": "한국어 신조어는 단어를 창의적으로 결합합니다. '꿀잼' = 꿀 + 재미."
+          }
+        }
+      },
+      "rewards": {
+        "xp": 80,
+        "items": [],
+        "npcRelation": {
+          "npc": "tom",
+          "points": 1
+        }
+      }
+    },
+    {
+      "id": "ch1_quiz_c",
+      "chapter": "ch1",
+      "scene": "ch1_scene2",
+      "type": "fill_blank",
+      "title": {
+        "ko": "고문서 번역",
+        "en": "The Old Manuscript",
+        "es": "El Manuscrito Antiguo"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "미스 페니가 건넨 오래된 문서의 훼손된 부분을 채워야 한다.",
+        "en": "You must fill in the damaged parts of the old document Miss Penny gave you.",
+        "es": "Debes completar las partes dañadas del documento antiguo que te dio Miss Penny."
+      },
+      "content": {
+        "en": {
+          "passage": "The ___(1)___ of London once gathered in secret to ___(2)___ the ancient tongues. They believed that every ___(3)___ holds power, and to lose a language is to lose a piece of the ___(4)___.",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "scholars",
+              "options": [
+                "scholars",
+                "soldiers",
+                "merchants",
+                "thieves"
+              ],
+              "hint": {
+                "ko": "비밀리에 모여 고대 언어를 다루는 사람들은?",
+                "en": "Who would secretly gather to work with ancient languages?",
+                "es": "¿Quiénes se reunirían en secreto para trabajar con lenguas antiguas?"
+              }
+            },
+            {
+              "id": 2,
+              "answer": "preserve",
+              "options": [
+                "destroy",
+                "preserve",
+                "translate",
+                "forget"
+              ],
+              "hint": {
+                "ko": "그들은 언어를 지키려는 쪽입니다.",
+                "en": "They are on the side of protecting languages.",
+                "es": "Están del lado de proteger los idiomas."
+              }
+            },
+            {
+              "id": 3,
+              "answer": "word",
+              "options": [
+                "word",
+                "sword",
+                "world",
+                "stone"
+              ],
+              "hint": {
+                "ko": "언어의 가장 기본 단위는?",
+                "en": "What is the most basic unit of language?",
+                "es": "¿Cuál es la unidad más básica del idioma?"
+              }
+            },
+            {
+              "id": 4,
+              "answer": "soul",
+              "options": [
+                "soul",
+                "gold",
+                "code",
+                "wall"
+              ],
+              "hint": {
+                "ko": "언어를 잃는 것은 무엇의 일부를 잃는 것일까요?",
+                "en": "Losing a language is like losing a part of what?",
+                "es": "Perder un idioma es como perder una parte de ¿qué?"
+              }
+            }
+          ]
+        },
+        "es": {
+          "passage": "Los ___(1)___ de Londres se reunían en secreto para ___(2)___ las lenguas antiguas. Creían que cada ___(3)___ tiene poder, y que perder un idioma es perder una parte del ___(4)___.",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "eruditos",
+              "options": [
+                "eruditos",
+                "soldados",
+                "comerciantes",
+                "ladrones"
+              ],
+              "hint": {
+                "ko": "고대 언어를 연구하는 사람들은?",
+                "en": "Who would study ancient languages?",
+                "es": "¿Quiénes estudiarían lenguas antiguas?"
+              }
+            },
+            {
+              "id": 2,
+              "answer": "preservar",
+              "options": [
+                "destruir",
+                "preservar",
+                "traducir",
+                "olvidar"
+              ],
+              "hint": {
+                "ko": "이 사람들은 언어를 지키려고 합니다.",
+                "en": "These people want to protect languages.",
+                "es": "Estas personas quieren proteger los idiomas."
+              }
+            },
+            {
+              "id": 3,
+              "answer": "palabra",
+              "options": [
+                "palabra",
+                "espada",
+                "mundo",
+                "piedra"
+              ],
+              "hint": {
+                "ko": "언어의 기본 단위는?",
+                "en": "Basic unit of language?",
+                "es": "¿La unidad básica del idioma?"
+              }
+            },
+            {
+              "id": 4,
+              "answer": "alma",
+              "options": [
+                "alma",
+                "oro",
+                "código",
+                "muro"
+              ],
+              "hint": {
+                "ko": "언어를 잃으면 무엇의 일부를 잃는 걸까요?",
+                "en": "Losing a language means losing part of the...?",
+                "es": "Perder un idioma es perder parte del...?"
+              }
+            }
+          ]
+        },
+        "ko": {
+          "passage": "런던의 ___(1)___들은 비밀리에 모여 고대 언어를 ___(2)___하였다. 그들은 모든 ___(3)___에 힘이 깃들어 있으며, 하나의 언어를 잃는 것은 ___(4)___의 일부를 잃는 것이라 믿었다.",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "학자",
+              "options": [
+                "학자",
+                "군인",
+                "상인",
+                "도둑"
+              ],
+              "hint": {
+                "en": "Who studies ancient languages?",
+                "es": "¿Quién estudia lenguas antiguas?",
+                "ko": "고대 언어를 연구하는 사람은?"
+              }
+            },
+            {
+              "id": 2,
+              "answer": "보존",
+              "options": [
+                "파괴",
+                "보존",
+                "번역",
+                "망각"
+              ],
+              "hint": {
+                "en": "They want to protect languages.",
+                "es": "Quieren proteger los idiomas.",
+                "ko": "이 사람들은 언어를 지키려고 합니다."
+              }
+            },
+            {
+              "id": 3,
+              "answer": "말",
+              "options": [
+                "말",
+                "칼",
+                "세상",
+                "돌"
+              ],
+              "hint": {
+                "en": "The basic unit of language.",
+                "es": "La unidad básica del idioma.",
+                "ko": "언어의 가장 기본 단위."
+              }
+            },
+            {
+              "id": 4,
+              "answer": "영혼",
+              "options": [
+                "영혼",
+                "금",
+                "암호",
+                "벽"
+              ],
+              "hint": {
+                "en": "Losing a language means losing part of the...?",
+                "es": "Perder un idioma es perder parte del...?",
+                "ko": "언어를 잃으면 무엇의 일부를 잃을까요?"
+              }
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 100,
+        "items": [
+          "pennys_note"
+        ],
+        "npcRelation": null
+      }
+    },
+    {
+      "id": "ch1_quiz_d",
+      "chapter": "ch1",
+      "scene": "ch1_scene2_twist",
+      "type": "listening",
+      "title": {
+        "ko": "도청",
+        "en": "Eavesdropping",
+        "es": "Escucha Secreta"
+      },
+      "difficulty": 3,
+      "timeLimit": null,
+      "isBoss": false,
+      "useAzureTTS": true,
+      "storyContext": {
+        "ko": "미스 페니의 뒷방에서 수상한 전화 통화가 들린다. 핵심 정보를 추출하라.",
+        "en": "A suspicious phone call from Miss Penny's back room. Extract the key information.",
+        "es": "Una llamada sospechosa desde la trastienda de Miss Penny. Extrae la información clave."
+      },
+      "content": {
+        "en": {
+          "ttsScript": "The first stone is secured. London's guardian is nearly ours. Move the operation to Madrid. The Spanish stone won't be as easy. We need someone on the inside.",
+          "ttsVoice": "en-GB-SoniaNeural",
+          "ttsSpeed": "0.9",
+          "questions": [
+            {
+              "question": {
+                "ko": "무엇이 확보되었나요?",
+                "en": "What has been secured?",
+                "es": "¿Qué ha sido asegurado?"
+              },
+              "answer": "The first stone",
+              "acceptableAnswers": [
+                "first stone",
+                "the stone",
+                "stone"
+              ]
+            },
+            {
+              "question": {
+                "ko": "다음 도시는 어디인가요?",
+                "en": "What city is mentioned next?",
+                "es": "¿Qué ciudad se menciona?"
+              },
+              "answer": "Madrid",
+              "acceptableAnswers": [
+                "madrid"
+              ]
+            },
+            {
+              "question": {
+                "ko": "마드리드에서 무엇이 필요한가요?",
+                "en": "What do they need in Madrid?",
+                "es": "¿Qué necesitan en Madrid?"
+              },
+              "answer": "Someone on the inside",
+              "acceptableAnswers": [
+                "someone inside",
+                "insider",
+                "person inside",
+                "someone on the inside"
+              ]
+            }
+          ]
+        },
+        "es": {
+          "ttsScript": "La primera piedra está asegurada. El guardián de Londres es casi nuestro. Mueve la operación a Madrid. La piedra española no será tan fácil. Necesitamos a alguien dentro.",
+          "ttsVoice": "es-ES-ElviraNeural",
+          "ttsSpeed": "0.9",
+          "questions": [
+            {
+              "question": {
+                "ko": "무엇이 확보되었나요?",
+                "en": "What has been secured?",
+                "es": "¿Qué ha sido asegurado?"
+              },
+              "answer": "La primera piedra",
+              "acceptableAnswers": [
+                "primera piedra",
+                "la piedra",
+                "piedra"
+              ]
+            },
+            {
+              "question": {
+                "ko": "다음 도시는 어디인가요?",
+                "en": "What city is mentioned next?",
+                "es": "¿Qué ciudad se menciona?"
+              },
+              "answer": "Madrid",
+              "acceptableAnswers": [
+                "madrid"
+              ]
+            },
+            {
+              "question": {
+                "ko": "마드리드에서 무엇이 필요한가요?",
+                "en": "What do they need in Madrid?",
+                "es": "¿Qué necesitan en Madrid?"
+              },
+              "answer": "Alguien dentro",
+              "acceptableAnswers": [
+                "alguien dentro",
+                "una persona dentro",
+                "alguien adentro"
+              ]
+            }
+          ]
+        },
+        "ko": {
+          "ttsScript": "첫 번째 돌은 확보했다. 런던의 수호석은 거의 우리 것이다. 작전을 마드리드로 옮겨라. 스페인 수호석은 쉽지 않을 거다. 내부에 사람이 필요하다.",
+          "ttsVoice": "ko-KR-SunHiNeural",
+          "ttsSpeed": "0.9",
+          "questions": [
+            {
+              "question": {
+                "en": "What has been secured?",
+                "es": "¿Qué ha sido asegurado?",
+                "ko": "무엇이 확보되었나요?"
+              },
+              "answer": "첫 번째 돌",
+              "acceptableAnswers": [
+                "첫번째 돌",
+                "첫 번째 수호석",
+                "돌"
+              ]
+            },
+            {
+              "question": {
+                "en": "What city is mentioned next?",
+                "es": "¿Qué ciudad se menciona?",
+                "ko": "다음 도시는?"
+              },
+              "answer": "마드리드",
+              "acceptableAnswers": [
+                "마드리드"
+              ]
+            },
+            {
+              "question": {
+                "en": "What do they need?",
+                "es": "¿Qué necesitan?",
+                "ko": "무엇이 필요한가요?"
+              },
+              "answer": "내부에 사람",
+              "acceptableAnswers": [
+                "내부에 사람",
+                "내부자",
+                "사람이 필요",
+                "내부 사람"
+              ]
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 150,
+        "items": [
+          "madrid_ticket"
+        ],
+        "npcRelation": null,
+        "badge": "london_codebreaker"
+      }
+    },
+    {
+      "id": "ch1_quiz_e",
+      "chapter": "ch1",
+      "scene": "ch1_scene3_boss",
+      "type": "riddle",
+      "title": {
+        "ko": "수호석의 수수께끼",
+        "en": "The Guardian's Riddle",
+        "es": "El Acertijo del Guardián"
+      },
+      "difficulty": 4,
+      "timeLimit": null,
+      "isBoss": true,
+      "useGPT": true,
+      "storyContext": {
+        "ko": "수호석이 있던 자리에 남겨진 3개의 수수께끼. 학습 언어로 답해야 한다.",
+        "en": "Three riddles left where the Guardian Stone once was. Answer in your target language.",
+        "es": "Tres acertijos donde estaba la Piedra Guardiana. Responde en tu idioma objetivo."
+      },
+      "content": {
+        "en": {
+          "riddles": [
+            {
+              "text": "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?",
+              "answer": "a map",
+              "acceptableAnswers": [
+                "map",
+                "a map",
+                "world map"
+              ]
+            },
+            {
+              "text": "The more you take, the more you leave behind. What am I?",
+              "answer": "footsteps",
+              "acceptableAnswers": [
+                "footsteps",
+                "steps",
+                "footprints"
+              ]
+            },
+            {
+              "text": "I speak every language but have no mouth. I tell every story but have no voice. I've lived for centuries but was never alive. What am I?",
+              "answer": "a book",
+              "acceptableAnswers": [
+                "book",
+                "a book",
+                "books"
+              ]
+            }
+          ]
+        },
+        "es": {
+          "riddles": [
+            {
+              "text": "Tengo ciudades, pero no casas. Tengo montañas, pero no árboles. Tengo agua, pero no peces. ¿Qué soy?",
+              "answer": "un mapa",
+              "acceptableAnswers": [
+                "mapa",
+                "un mapa",
+                "el mapa"
+              ]
+            },
+            {
+              "text": "Cuanto más quitas, más dejas atrás. ¿Qué soy?",
+              "answer": "huellas",
+              "acceptableAnswers": [
+                "huellas",
+                "pisadas",
+                "pasos"
+              ]
+            },
+            {
+              "text": "Hablo todos los idiomas pero no tengo boca. Cuento todas las historias pero no tengo voz. He vivido siglos pero nunca estuve vivo. ¿Qué soy?",
+              "answer": "un libro",
+              "acceptableAnswers": [
+                "libro",
+                "un libro",
+                "el libro"
+              ]
+            }
+          ]
+        },
+        "ko": {
+          "riddles": [
+            {
+              "text": "나에게는 도시가 있지만 집은 없다. 산이 있지만 나무는 없다. 물이 있지만 물고기는 없다. 나는 무엇일까?",
+              "answer": "지도",
+              "acceptableAnswers": [
+                "지도",
+                "세계지도",
+                "약도"
+              ]
+            },
+            {
+              "text": "가져갈수록 더 많이 남기는 것은 무엇일까?",
+              "answer": "발자국",
+              "acceptableAnswers": [
+                "발자국",
+                "발자취",
+                "족적"
+              ]
+            },
+            {
+              "text": "모든 언어를 말하지만 입이 없다. 모든 이야기를 전하지만 목소리가 없다. 수백 년을 살았지만 살아있던 적이 없다. 나는 무엇일까?",
+              "answer": "책",
+              "acceptableAnswers": [
+                "책",
+                "서적",
+                "도서"
+              ]
+            }
+          ]
+        }
+      },
+      "gptPrompt": "You are a quiz evaluator for a language learning game. The player must answer riddles in {targetLang}. Evaluate if the answer is correct considering meaning, not exact wording. If correct, respond with encouragement in {targetLang}. If wrong, give a small hint in {nativeLang}. Return JSON: {\"correct\": true/false, \"feedback\": \"...\", \"score\": 0-100}",
+      "rewards": {
+        "xp": 300,
+        "items": [],
+        "npcRelation": null,
+        "badge": "the_fog_lifts"
+      }
+    }
+  ]
+}```
+
+이 데이터를 quizData.json (또는 기존 퀴즈 데이터 파일)에 저장해줘. 다음 메시지에서 챕터2 데이터를 보낼게.
+```
