@@ -1,6 +1,7 @@
 import type { NativeLanguage } from "@/context/LanguageContext";
 import type { LangCode, LocalizedText, LoadedQuiz, StoryChapter, StoryScene, StoryDialogue, UiTextSet } from "@/constants/storyTypes";
 import storyData from "@/data/storyData.json";
+import quizData from "@/data/quizData.json";
 
 /** Map the app's long language name to the 2-letter code used in storyData */
 export function toLangCode(lang: NativeLanguage | null | undefined): LangCode {
@@ -48,27 +49,39 @@ export function getScene(chapterId: string, sceneId: string): StoryScene | undef
 
 /**
  * Load a quiz with language-resolved fields.
- * quizData is passed in from the caller (loaded from quizData.json once available).
+ * Resolves title and storyContext into nativeLang strings,
+ * and questions into the targetLang content block.
  */
 export function loadQuiz(
   quizId: string,
   nativeLang: LangCode,
-  targetLang: LangCode,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  quizData: any
+  targetLang: LangCode
 ): LoadedQuiz | null {
-  if (!quizData?.quizzes) return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const quiz = quizData.quizzes.find((q: any) => q.id === quizId);
+  const quiz = (quizData.quizzes as any[]).find(q => q.id === quizId);
   if (!quiz) return null;
   return {
     ...quiz,
-    storyContext: pick(quiz.storyContext, nativeLang),
-    title: pick(quiz.title, nativeLang),
+    storyContext: pick(quiz.storyContext as LocalizedText, nativeLang),
+    title: pick(quiz.title as LocalizedText, nativeLang),
     questions: quiz.content?.[targetLang] ?? [],
     nativeLang,
     targetLang,
   };
+}
+
+/**
+ * Get all quizzes for a specific scene, language-resolved.
+ */
+export function loadSceneQuizzes(
+  quizIds: string[],
+  nativeLang: LangCode,
+  targetLang: LangCode
+): LoadedQuiz[] {
+  return quizIds.flatMap(id => {
+    const q = loadQuiz(id, nativeLang, targetLang);
+    return q ? [q] : [];
+  });
 }
 
 /**
