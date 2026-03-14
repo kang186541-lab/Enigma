@@ -86,7 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`;
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-5.1",
+        model: "gpt-4o",
         max_completion_tokens: 200,
         messages: [
           { role: "system", content: systemPrompt },
@@ -114,7 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-5.1",
+        model: "gpt-4o",
         max_completion_tokens: 300,
         messages: [
           {
@@ -876,7 +876,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-5.1",
+        model: "gpt-4o",
         max_completion_tokens: 300,
         messages: msgs,
       });
@@ -948,7 +948,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fullSystemPrompt = systemPrompt.replace("{targetLang}", langName) + commonRules;
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-5.1",
+        model: "gpt-4o",
         max_completion_tokens: 400,
         messages: [
           { role: "system", content: fullSystemPrompt },
