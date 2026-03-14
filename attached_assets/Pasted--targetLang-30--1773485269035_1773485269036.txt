@@ -1,0 +1,406 @@
+발음 연습의 단어 수가 부족해서 각 레벨별로 단어를 대폭 추가해줘. 유저의 targetLang에 맞는 단어가 나와야 해. 각 레벨당 최소 30개 이상이 되도록 해줘.
+
+기존 단어는 유지하고, 아래 단어들을 추가해줘.
+
+-----
+
+## 영어(EN) 학습자용 단어
+
+### A1 (기초 — 일상 기본 단어)
+
+|단어     |IPA       |한국어 뜻|스페인어 뜻  |
+|-------|----------|-----|--------|
+|apple  |/ˈæp.əl/  |사과   |manzana |
+|water  |/ˈwɔː.tər/|물    |agua    |
+|house  |/haʊs/    |집    |casa    |
+|table  |/ˈteɪ.bəl/|탁자   |mesa    |
+|chair  |/tʃɛər/   |의자   |silla   |
+|book   |/bʊk/     |책    |libro   |
+|school |/skuːl/   |학교   |escuela |
+|friend |/frɛnd/   |친구   |amigo   |
+|mother |/ˈmʌð.ər/ |어머니  |madre   |
+|father |/ˈfɑː.ðər/|아버지  |padre   |
+|brother|/ˈbrʌð.ər/|형제   |hermano |
+|sister |/ˈsɪs.tər/|자매   |hermana |
+|cat    |/kæt/     |고양이  |gato    |
+|dog    |/dɒɡ/     |개    |perro   |
+|fish   |/fɪʃ/     |물고기  |pez     |
+|bird   |/bɜːrd/   |새    |pájaro  |
+|food   |/fuːd/    |음식   |comida  |
+|milk   |/mɪlk/    |우유   |leche   |
+|bread  |/brɛd/    |빵    |pan     |
+|rice   |/raɪs/    |쌀    |arroz   |
+|hand   |/hænd/    |손    |mano    |
+|head   |/hɛd/     |머리   |cabeza  |
+|eye    |/aɪ/      |눈    |ojo     |
+|mouth  |/maʊθ/    |입    |boca    |
+|door   |/dɔːr/    |문    |puerta  |
+|window |/ˈwɪn.doʊ/|창문   |ventana |
+|sun    |/sʌn/     |태양   |sol     |
+|moon   |/muːn/    |달    |luna    |
+|star   |/stɑːr/   |별    |estrella|
+|tree   |/triː/    |나무   |árbol   |
+|flower |/ˈflaʊ.ər/|꽃    |flor    |
+|red    |/rɛd/     |빨간   |rojo    |
+|blue   |/bluː/    |파란   |azul    |
+|green  |/ɡriːn/   |초록   |verde   |
+|happy  |/ˈhæp.i/  |행복한  |feliz   |
+
+### A2 (초급 — 일상 확장)
+
+|단어        |IPA            |한국어 뜻  |스페인어 뜻     |
+|----------|---------------|-------|-----------|
+|kitchen   |/ˈkɪtʃ.ən/     |부엌     |cocina     |
+|bathroom  |/ˈbæθ.ruːm/    |화장실    |baño       |
+|restaurant|/ˈrɛs.tər.ɑːnt/|식당     |restaurante|
+|hospital  |/ˈhɒs.pɪ.təl/  |병원     |hospital   |
+|airport   |/ˈɛər.pɔːrt/   |공항     |aeropuerto |
+|weather   |/ˈwɛð.ər/      |날씨     |clima      |
+|yesterday |/ˈjɛs.tər.deɪ/ |어제     |ayer       |
+|tomorrow  |/təˈmɒr.oʊ/    |내일     |mañana     |
+|beautiful |/ˈbjuː.tɪ.fəl/ |아름다운   |hermoso    |
+|dangerous |/ˈdeɪn.dʒər.əs/|위험한    |peligroso  |
+|important |/ɪmˈpɔːr.tənt/ |중요한    |importante |
+|different |/ˈdɪf.ər.ənt/  |다른     |diferente  |
+|favorite  |/ˈfeɪ.vər.ɪt/  |가장 좋아하는|favorito   |
+|together  |/təˈɡɛð.ər/    |함께     |juntos     |
+|language  |/ˈlæŋ.ɡwɪdʒ/   |언어     |idioma     |
+|mystery   |/ˈmɪs.tər.i/   |미스터리   |misterio   |
+|adventure |/ədˈvɛn.tʃər/  |모험     |aventura   |
+|treasure  |/ˈtrɛʒ.ər/     |보물     |tesoro     |
+|journey   |/ˈdʒɜːr.ni/    |여행     |viaje      |
+|discover  |/dɪˈskʌv.ər/   |발견하다   |descubrir  |
+|remember  |/rɪˈmɛm.bər/   |기억하다   |recordar   |
+|understand|/ˌʌn.dərˈstænd/|이해하다   |entender   |
+|practice  |/ˈpræk.tɪs/    |연습     |práctica   |
+|trouble   |/ˈtrʌb.əl/     |문제     |problema   |
+|between   |/bɪˈtwiːn/     |사이에    |entre      |
+|already   |/ɔːlˈrɛd.i/    |이미     |ya         |
+|enough    |/ɪˈnʌf/        |충분한    |suficiente |
+|foreign   |/ˈfɒr.ən/      |외국의    |extranjero |
+|surprise  |/sərˈpraɪz/    |놀라움    |sorpresa   |
+|imagine   |/ɪˈmædʒ.ɪn/    |상상하다   |imaginar   |
+|library   |/ˈlaɪ.brər.i/  |도서관    |biblioteca |
+|museum    |/mjuːˈziː.əm/  |박물관    |museo      |
+|mountain  |/ˈmaʊn.tɪn/    |산      |montaña    |
+|ocean     |/ˈoʊ.ʃən/      |바다     |océano     |
+|village   |/ˈvɪl.ɪdʒ/     |마을     |pueblo     |
+
+### B1 (중급)
+
+|단어            |IPA                  |한국어 뜻|스페인어 뜻         |
+|--------------|---------------------|-----|---------------|
+|environment   |/ɪnˈvaɪ.rən.mənt/    |환경   |medio ambiente |
+|opportunity   |/ˌɒp.ərˈtjuː.nɪ.ti/  |기회   |oportunidad    |
+|experience    |/ɪkˈspɪr.i.əns/      |경험   |experiencia    |
+|approximately |/əˈprɒk.sɪ.mət.li/   |대략   |aproximadamente|
+|investigate   |/ɪnˈvɛs.tɪ.ɡeɪt/     |조사하다 |investigar     |
+|communication |/kəˌmjuː.nɪˈkeɪ.ʃən/ |의사소통 |comunicación   |
+|professional  |/prəˈfɛʃ.ən.əl/      |전문적인 |profesional    |
+|responsibility|/rɪˌspɒn.sɪˈbɪl.ɪ.ti/|책임   |responsabilidad|
+|technology    |/tɛkˈnɒl.ə.dʒi/      |기술   |tecnología     |
+|government    |/ˈɡʌv.ərn.mənt/      |정부   |gobierno       |
+|education     |/ˌɛdʒ.uˈkeɪ.ʃən/     |교육   |educación      |
+|situation     |/ˌsɪtʃ.uˈeɪ.ʃən/     |상황   |situación      |
+|organization  |/ˌɔːr.ɡən.aɪˈzeɪ.ʃən/|조직   |organización   |
+|development   |/dɪˈvɛl.əp.mənt/     |발전   |desarrollo     |
+|relationship  |/rɪˈleɪ.ʃən.ʃɪp/     |관계   |relación       |
+|absolutely    |/ˌæb.səˈluːt.li/     |절대적으로|absolutamente  |
+|particularly  |/pərˈtɪk.jə.lər.li/  |특히   |particularmente|
+|comfortable   |/ˈkʌm.fər.tə.bəl/    |편안한  |cómodo         |
+|temperature   |/ˈtɛm.pər.ə.tʃər/    |온도   |temperatura    |
+|independent   |/ˌɪn.dɪˈpɛn.dənt/    |독립적인 |independiente  |
+|photography   |/fəˈtɒɡ.rə.fi/       |사진술  |fotografía     |
+|architecture  |/ˈɑːr.kɪ.tɛk.tʃər/   |건축   |arquitectura   |
+|vocabulary    |/voʊˈkæb.jə.lɛr.i/   |어휘   |vocabulario    |
+|pronunciation |/prəˌnʌn.siˈeɪ.ʃən/  |발음   |pronunciación  |
+|literature    |/ˈlɪt.ər.ə.tʃər/     |문학   |literatura     |
+|ingredient    |/ɪnˈɡriː.di.ənt/     |재료   |ingrediente    |
+|appreciate    |/əˈpriː.ʃi.eɪt/      |감사하다 |apreciar       |
+|consequence   |/ˈkɒn.sɪ.kwəns/      |결과   |consecuencia   |
+|significance  |/sɪɡˈnɪf.ɪ.kəns/     |중요성  |significancia  |
+|enthusiasm    |/ɪnˈθjuː.zi.æz.əm/   |열정   |entusiasmo     |
+
+### B2 (중상급)
+
+|단어              |IPA                      |한국어 뜻  |스페인어 뜻          |
+|----------------|-------------------------|-------|----------------|
+|sophisticated   |/səˈfɪs.tɪ.keɪ.tɪd/      |세련된    |sofisticado     |
+|comprehensive   |/ˌkɒm.prɪˈhɛn.sɪv/       |포괄적인   |comprensivo     |
+|circumstances   |/ˈsɜːr.kəm.stæn.sɪz/     |상황     |circunstancias  |
+|entrepreneurship|/ˌɒn.trə.prəˈnɜːr.ʃɪp/   |기업가 정신 |emprendimiento  |
+|extraordinary   |/ɪkˈstrɔːr.dɪn.ɛr.i/     |비범한    |extraordinario  |
+|philosophical   |/ˌfɪl.əˈsɒf.ɪ.kəl/       |철학적인   |filosófico      |
+|archaeological  |/ˌɑːr.ki.əˈlɒdʒ.ɪ.kəl/   |고고학적인  |arqueológico    |
+|unprecedented   |/ʌnˈprɛs.ɪ.dɛn.tɪd/      |전례 없는  |sin precedentes |
+|simultaneously  |/ˌsaɪ.məlˈteɪ.ni.əs.li/  |동시에    |simultáneamente |
+|characteristics |/ˌkær.ək.təˈrɪs.tɪks/    |특성     |características |
+|vulnerability   |/ˌvʌl.nər.əˈbɪl.ɪ.ti/    |취약성    |vulnerabilidad  |
+|consciousness   |/ˈkɒn.ʃəs.nəs/           |의식     |conciencia      |
+|distinguishable |/dɪˈstɪŋ.ɡwɪ.ʃə.bəl/     |구별 가능한 |distinguible    |
+|enthusiastically|/ɪnˌθjuː.ziˈæs.tɪ.kəl.i/ |열정적으로  |entusiastamente |
+|inconvenience   |/ˌɪn.kənˈviː.ni.əns/     |불편     |inconveniencia  |
+|autobiography   |/ˌɔː.toʊ.baɪˈɒɡ.rə.fi/   |자서전    |autobiografía   |
+|collaboration   |/kəˌlæb.əˈreɪ.ʃən/       |협업     |colaboración    |
+|determination   |/dɪˌtɜːr.mɪˈneɪ.ʃən/     |결단력    |determinación   |
+|interpretation  |/ɪnˌtɜːr.prɪˈteɪ.ʃən/    |해석     |interpretación  |
+|misunderstanding|/ˌmɪs.ʌn.dərˈstæn.dɪŋ/   |오해     |malentendido    |
+|accomplishment  |/əˈkɒm.plɪʃ.mənt/        |성취     |logro           |
+|rehabilitation  |/ˌriː.hə.bɪl.ɪˈteɪ.ʃən/  |재활     |rehabilitación  |
+|counterintuitive|/ˌkaʊn.tər.ɪnˈtjuː.ɪ.tɪv/|직관에 반하는|contraintuitivo |
+|electromagnetic |/ɪˌlɛk.troʊ.mæɡˈnɛt.ɪk/  |전자기의   |electromagnético|
+|overwhelmingly  |/ˌoʊ.vərˈwɛl.mɪŋ.li/     |압도적으로  |abrumadoramente |
+|bureaucracy     |/bjʊˈrɒk.rə.si/          |관료제    |burocracia      |
+|Mediterranean   |/ˌmɛd.ɪ.təˈreɪ.ni.ən/    |지중해의   |mediterráneo    |
+|civilization    |/ˌsɪv.ɪ.laɪˈzeɪ.ʃən/     |문명     |civilización    |
+|psychological   |/ˌsaɪ.kəˈlɒdʒ.ɪ.kəl/     |심리적인   |psicológico     |
+|revolutionary   |/ˌrɛv.əˈluː.ʃən.ɛr.i/    |혁명적인   |revolucionario  |
+
+-----
+
+## 스페인어(ES) 학습자용 단어
+
+### A1 (기초)
+
+|단어      |IPA         |영어 뜻        |한국어 뜻|
+|--------|------------|------------|-----|
+|casa    |/ˈka.sa/    |house       |집    |
+|perro   |/ˈpe.ro/    |dog         |개    |
+|gato    |/ˈɡa.to/    |cat         |고양이  |
+|agua    |/ˈa.ɡwa/    |water       |물    |
+|libro   |/ˈli.βɾo/   |book        |책    |
+|mesa    |/ˈme.sa/    |table       |탁자   |
+|silla   |/ˈsi.ʎa/    |chair       |의자   |
+|comida  |/koˈmi.ða/  |food        |음식   |
+|amigo   |/aˈmi.ɣo/   |friend      |친구   |
+|familia |/faˈmi.lja/ |family      |가족   |
+|madre   |/ˈma.ðɾe/   |mother      |어머니  |
+|padre   |/ˈpa.ðɾe/   |father      |아버지  |
+|niño    |/ˈni.ɲo/    |boy/child   |아이   |
+|mujer   |/muˈxeɾ/    |woman       |여자   |
+|hombre  |/ˈom.bɾe/   |man         |남자   |
+|calle   |/ˈka.ʎe/    |street      |거리   |
+|ciudad  |/θjuˈðað/   |city        |도시   |
+|día     |/ˈdi.a/     |day         |날    |
+|noche   |/ˈno.tʃe/   |night       |밤    |
+|tiempo  |/ˈtjem.po/  |time/weather|시간/날씨|
+|grande  |/ˈɡɾan.de/  |big         |큰    |
+|pequeño |/peˈke.ɲo/  |small       |작은   |
+|bueno   |/ˈbwe.no/   |good        |좋은   |
+|malo    |/ˈma.lo/    |bad         |나쁜   |
+|nuevo   |/ˈnwe.βo/   |new         |새로운  |
+|comer   |/koˈmeɾ/    |to eat      |먹다   |
+|beber   |/beˈβeɾ/    |to drink    |마시다  |
+|dormir  |/doɾˈmiɾ/   |to sleep    |자다   |
+|hablar  |/aˈβlaɾ/    |to speak    |말하다  |
+|escuchar|/es.kuˈtʃaɾ/|to listen   |듣다   |
+|blanco  |/ˈblaŋ.ko/  |white       |흰    |
+|negro   |/ˈne.ɣɾo/   |black       |검은   |
+|rojo    |/ˈro.xo/    |red         |빨간   |
+|verde   |/ˈbeɾ.ðe/   |green       |초록   |
+|azul    |/aˈθul/     |blue        |파란   |
+
+### A2 (초급)
+
+|단어        |IPA             |영어 뜻         |한국어 뜻 |
+|----------|----------------|-------------|------|
+|cocina    |/koˈθi.na/      |kitchen      |부엌    |
+|ventana   |/benˈta.na/     |window       |창문    |
+|edificio  |/e.ðiˈfi.θjo/   |building     |건물    |
+|aeropuerto|/a.e.ɾoˈpweɾ.to/|airport      |공항    |
+|mercado   |/meɾˈka.ðo/     |market       |시장    |
+|iglesia   |/iˈɣle.sja/     |church       |교회    |
+|hermoso   |/eɾˈmo.so/      |beautiful    |아름다운  |
+|peligroso |/pe.liˈɣɾo.so/  |dangerous    |위험한   |
+|diferente |/di.feˈɾen.te/  |different    |다른    |
+|necesario |/ne.θeˈsa.ɾjo/  |necessary    |필요한   |
+|misterio  |/misˈte.ɾjo/    |mystery      |미스터리  |
+|aventura  |/a.βenˈtu.ɾa/   |adventure    |모험    |
+|tesoro    |/teˈso.ɾo/      |treasure     |보물    |
+|descubrir |/des.kuˈβɾiɾ/   |to discover  |발견하다  |
+|recordar  |/re.koɾˈðaɾ/    |to remember  |기억하다  |
+|entender  |/en.tenˈdeɾ/    |to understand|이해하다  |
+|viajar    |/bjaˈxaɾ/       |to travel    |여행하다  |
+|trabajar  |/tɾa.βaˈxaɾ/    |to work      |일하다   |
+|aprender  |/a.pɾenˈdeɾ/    |to learn     |배우다   |
+|conocer   |/ko.noˈθeɾ/     |to know/meet |알다/만나다|
+|biblioteca|/bi.bljo.ˈte.ka/|library      |도서관   |
+|museo     |/muˈse.o/       |museum       |박물관   |
+|montaña   |/monˈta.ɲa/     |mountain     |산     |
+|playa     |/ˈpla.ʝa/       |beach        |해변    |
+|idioma    |/iˈðjo.ma/      |language     |언어    |
+|izquierda |/iθˈkjeɾ.ða/    |left         |왼쪽    |
+|derecha   |/deˈɾe.tʃa/     |right        |오른쪽   |
+|todavía   |/to.ða.ˈβi.a/   |still/yet    |아직    |
+|bastante  |/basˈtan.te/    |enough/quite |충분히   |
+|siguiente |/siˈɣjen.te/    |next         |다음의   |
+|problema  |/pɾoˈble.ma/    |problem      |문제    |
+|costumbre |/kosˈtum.bɾe/   |custom/habit |습관    |
+|equipaje  |/e.kiˈpa.xe/    |luggage      |짐     |
+|periódico |/pe.ɾiˈo.ði.ko/ |newspaper    |신문    |
+|sorpresa  |/soɾˈpɾe.sa/    |surprise     |놀라움   |
+
+### B1 (중급)
+
+|단어                |IPA                         |영어 뜻          |한국어 뜻|
+|------------------|----------------------------|--------------|-----|
+|desarrollo        |/de.sa.ˈro.ʎo/              |development   |발전   |
+|gobierno          |/ɡo.ˈβjeɾ.no/               |government    |정부   |
+|investigación     |/im.bes.ti.ɣa.ˈθjon/        |research      |연구   |
+|oportunidad       |/o.poɾ.tu.ni.ˈðað/          |opportunity   |기회   |
+|experiencia       |/eks.pe.ˈɾjen.θja/          |experience    |경험   |
+|responsabilidad   |/res.pon.sa.βi.li.ˈðað/     |responsibility|책임   |
+|comunicación      |/ko.mu.ni.ka.ˈθjon/         |communication |소통   |
+|independiente     |/in.de.pen.ˈðjen.te/        |independent   |독립적인 |
+|particularmente   |/paɾ.ti.ku.laɾ.ˈmen.te/     |particularly  |특히   |
+|aproximadamente   |/a.pɾok.si.ma.ða.ˈmen.te/   |approximately |대략   |
+|conocimiento      |/ko.no.θi.ˈmjen.to/         |knowledge     |지식   |
+|acontecimiento    |/a.kon.te.θi.ˈmjen.to/      |event         |사건   |
+|funcionamiento    |/fun.θjo.na.ˈmjen.to/       |functioning   |작동   |
+|absolutamente     |/ab.so.lu.ta.ˈmen.te/       |absolutely    |절대적으로|
+|establecimiento   |/es.ta.βle.θi.ˈmjen.to/     |establishment |설립   |
+|organización      |/oɾ.ɣa.ni.θa.ˈθjon/         |organization  |조직   |
+|extraordinario    |/eks.tɾa.oɾ.ði.ˈna.ɾjo/     |extraordinary |비범한  |
+|circunstancia     |/θiɾ.kuns.ˈtan.θja/         |circumstance  |상황   |
+|significativo     |/siɡ.ni.fi.ka.ˈti.βo/       |significant   |중요한  |
+|imprescindible    |/im.pɾes.θin.ˈdi.βle/       |essential     |필수적인 |
+|desafortunadamente|/de.sa.foɾ.tu.na.ða.ˈmen.te/|unfortunately |불행히도 |
+|agradecimiento    |/a.ɣɾa.ðe.θi.ˈmjen.to/      |gratitude     |감사   |
+|entretenimiento   |/en.tɾe.te.ni.ˈmjen.to/     |entertainment |오락   |
+|descubrimiento    |/des.ku.βɾi.ˈmjen.to/       |discovery     |발견   |
+|pronunciación     |/pɾo.nun.θja.ˈθjon/         |pronunciation |발음   |
+|arquitectura      |/aɾ.ki.tek.ˈtu.ɾa/          |architecture  |건축   |
+|colaboración      |/ko.la.βo.ɾa.ˈθjon/         |collaboration |협업   |
+|consecuencia      |/kon.se.ˈkwen.θja/          |consequence   |결과   |
+|reconocimiento    |/re.ko.no.θi.ˈmjen.to/      |recognition   |인정   |
+|sostenibilidad    |/sos.te.ni.βi.li.ˈðað/      |sustainability|지속가능성|
+
+-----
+
+## 한국어(KO) 학습자용 단어
+
+### A1 (기초)
+
+|단어   |발음 힌트             |영어 뜻          |스페인어 뜻       |
+|-----|------------------|--------------|-------------|
+|안녕하세요|an-nyeong-ha-se-yo|hello (formal)|hola (formal)|
+|감사합니다|gam-sa-ham-ni-da  |thank you     |gracias      |
+|네    |ne                |yes           |sí           |
+|아니요  |a-ni-yo           |no            |no           |
+|물    |mul               |water         |agua         |
+|밥    |bap               |rice/meal     |arroz/comida |
+|사람   |sa-ram            |person        |persona      |
+|집    |jip               |house         |casa         |
+|학교   |hak-gyo           |school        |escuela      |
+|친구   |chin-gu           |friend        |amigo        |
+|엄마   |eom-ma            |mom           |mamá         |
+|아빠   |a-ppa             |dad           |papá         |
+|고양이  |go-yang-i         |cat           |gato         |
+|강아지  |gang-a-ji         |puppy         |cachorro     |
+|나무   |na-mu             |tree          |árbol        |
+|하늘   |ha-neul           |sky           |cielo        |
+|바다   |ba-da             |sea           |mar          |
+|꽃    |kkot              |flower        |flor         |
+|눈    |nun               |eye/snow      |ojo/nieve    |
+|귀    |gwi               |ear           |oreja        |
+|손    |son               |hand          |mano         |
+|입    |ip                |mouth         |boca         |
+|크다   |keu-da            |big           |grande       |
+|작다   |jak-da            |small         |pequeño      |
+|좋다   |jo-ta             |good          |bueno        |
+|먹다   |meok-da           |to eat        |comer        |
+|마시다  |ma-si-da          |to drink      |beber        |
+|자다   |ja-da             |to sleep      |dormir       |
+|가다   |ga-da             |to go         |ir           |
+|오다   |o-da              |to come       |venir        |
+|하나   |ha-na             |one           |uno          |
+|둘    |dul               |two           |dos          |
+|셋    |set               |three         |tres         |
+|빨간색  |ppal-gan-saek     |red           |rojo         |
+|파란색  |pa-ran-saek       |blue          |azul         |
+
+### A2 (초급)
+
+|단어   |발음 힌트            |영어 뜻           |스페인어 뜻                 |
+|-----|-----------------|---------------|-----------------------|
+|식당   |sik-dang         |restaurant     |restaurante            |
+|병원   |byeong-won       |hospital       |hospital               |
+|공항   |gong-hang        |airport        |aeropuerto             |
+|시장   |si-jang          |market         |mercado                |
+|도서관  |do-seo-gwan      |library        |biblioteca             |
+|박물관  |bak-mul-gwan     |museum         |museo                  |
+|아름답다 |a-reum-dap-da    |beautiful      |hermoso                |
+|위험하다 |wi-heom-ha-da    |dangerous      |peligroso              |
+|중요하다 |jung-yo-ha-da    |important      |importante             |
+|다르다  |da-reu-da        |different      |diferente              |
+|필요하다 |pil-yo-ha-da     |necessary      |necesario              |
+|모험   |mo-heom          |adventure      |aventura               |
+|비밀   |bi-mil           |secret         |secreto                |
+|수수께끼 |su-su-kke-kki    |riddle         |acertijo               |
+|발견하다 |bal-gyeon-ha-da  |to discover    |descubrir              |
+|기억하다 |gi-eok-ha-da     |to remember    |recordar               |
+|이해하다 |i-hae-ha-da      |to understand  |entender               |
+|연습하다 |yeon-seup-ha-da  |to practice    |practicar              |
+|여행하다 |yeo-haeng-ha-da  |to travel      |viajar                 |
+|공부하다 |gong-bu-ha-da    |to study       |estudiar               |
+|떡볶이  |tteok-bok-ki     |spicy rice cake|pastel de arroz picante|
+|김치   |gim-chi          |kimchi         |kimchi                 |
+|비빔밥  |bi-bim-bap       |mixed rice     |arroz mixto            |
+|경복궁  |gyeong-bok-gung  |Gyeongbokgung  |Gyeongbokgung          |
+|한옥   |han-ok           |Korean house   |casa coreana           |
+|고맙습니다|go-map-seum-ni-da|thank you      |gracias                |
+|미안합니다|mi-an-ham-ni-da  |sorry          |lo siento              |
+|어디에요 |eo-di-e-yo       |where is it    |dónde está             |
+|얼마예요 |eol-ma-ye-yo     |how much       |cuánto cuesta          |
+|주세요  |ju-se-yo         |please give    |por favor dé           |
+|맛있다  |ma-sit-da        |delicious      |delicioso              |
+|재미있다 |jae-mi-it-da     |fun/interesting|divertido              |
+|날씨   |nal-ssi          |weather        |clima                  |
+|지하철  |ji-ha-cheol      |subway         |metro                  |
+|버스   |beo-seu          |bus            |autobús                |
+
+### B1 (중급)
+
+|단어       |발음 힌트                        |영어 뜻                    |스페인어 뜻                    |
+|---------|-----------------------------|------------------------|--------------------------|
+|환경       |hwan-gyeong                  |environment             |medio ambiente            |
+|경험       |gyeong-heom                  |experience              |experiencia               |
+|의사소통     |ui-sa-so-tong                |communication           |comunicación              |
+|책임감      |chaek-im-gam                 |responsibility          |responsabilidad           |
+|기회       |gi-hoe                       |opportunity             |oportunidad               |
+|교육       |gyo-yuk                      |education               |educación                 |
+|정부       |jeong-bu                     |government              |gobierno                  |
+|기술       |gi-sul                       |technology              |tecnología                |
+|문화유산     |mun-hwa-yu-san               |cultural heritage       |patrimonio cultural       |
+|전통문화     |jeon-tong-mun-hwa            |traditional culture     |cultura tradicional       |
+|독립적이다    |dok-rip-jeok-i-da            |independent             |independiente             |
+|건축물      |geon-chuk-mul                |architecture            |arquitectura              |
+|약속을 지키다  |yak-sok-eul ji-ki-da         |keep a promise          |cumplir promesa           |
+|사자성어     |sa-ja-seong-eo               |four-character idiom    |modismo de 4 caracteres   |
+|전화위복     |jeon-hwa-wi-bok              |blessing in disguise    |bendición disfrazada      |
+|유비무환     |yu-bi-mu-hwan                |preparedness            |prevención                |
+|동고동락     |dong-go-dong-rak             |sharing joys and sorrows|compartir penas y alegrías|
+|대한민국     |dae-han-min-guk              |Republic of Korea       |República de Corea        |
+|세종대왕     |se-jong-dae-wang             |King Sejong             |Rey Sejong                |
+|한글       |han-geul                     |Korean alphabet         |alfabeto coreano          |
+|존댓말      |jon-daen-mal                 |formal speech           |habla formal              |
+|반말       |ban-mal                      |informal speech         |habla informal            |
+|감사드립니다   |gam-sa-deu-rim-ni-da         |thank you (very formal) |muchas gracias (formal)   |
+|실례합니다    |sil-lye-ham-ni-da            |excuse me               |disculpe                  |
+|어떻게 생각하세요|eo-tteo-ke saeng-gak-ha-se-yo|what do you think       |qué piensa usted          |
+|가능성      |ga-neung-seong               |possibility             |posibilidad               |
+|불가능하다    |bul-ga-neung-ha-da           |impossible              |imposible                 |
+|추천해 주세요  |chu-cheon-hae ju-se-yo       |please recommend        |recomiende por favor      |
+|예약하고 싶어요 |ye-yak-ha-go si-peo-yo       |I want to reserve       |quiero reservar           |
+|도와주세요    |do-wa-ju-se-yo               |please help me          |ayúdeme por favor         |
+
+-----
+
+## 적용 방법
+
+- 기존 발음 연습 단어 데이터에 위 단어들을 추가해줘
+- 각 단어에 level 필드 (A1, A2, B1, B2)가 있어야 해
+- targetLang에 따라 해당 언어의 단어를 표시
+- nativeLang에 따라 뜻(번역)을 표시
+- IPA 또는 발음 힌트도 함께 표시
+- 유저의 현재 레벨에 맞는 단어만 필터링해서 보여주기
