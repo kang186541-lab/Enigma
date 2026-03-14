@@ -326,6 +326,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       const timeoutId = setTimeout(() => abortCtrl.abort(), 10000);
       let data: Record<string, any> = {};
       try {
+        console.log('[STEP4] Sending to API...', { word, lang, base64Len: base64.length });
+        const startTime = Date.now();
         const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -333,11 +335,20 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
           signal: abortCtrl.signal,
         });
         clearTimeout(timeoutId);
-        data = res.ok ? await res.json() : {};
-      } catch {
+        console.log('[STEP4] API responded in', Date.now() - startTime, 'ms, status:', res.status);
+        if (res.ok) {
+          data = await res.json();
+          console.log('[STEP4] Azure FULL response:', JSON.stringify(data));
+        } else {
+          const errorText = await res.text();
+          console.log('[STEP4] Azure ERROR response:', res.status, errorText);
+        }
+      } catch (e) {
         clearTimeout(timeoutId);
+        console.error('[STEP4] Azure call EXCEPTION:', e);
       }
-      const score: number = data.pronunciationScore ?? data.score ?? 70;
+      const score: number = data.pronunciationScore ?? data.score ?? -1;
+      console.log('[STEP4] Final score:', score, '(if -1, Azure returned nothing)');
       setPronScore(score);
       setAllScores((prev) => [...prev, score]);
       setStars(score >= 90 ? 3 : score >= 75 ? 2 : 1);
