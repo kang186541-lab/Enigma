@@ -95,7 +95,7 @@ export default function NpcMissionScreen() {
   const [scoreDisplay, setScoreDisplay] = useState<{ amount: number; positive: boolean } | null>(null);
   const scoreTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [wordPopup, setWordPopup] = useState<{ word: string; meaning: string; partOfSpeech: string; example: string } | null>(null);
+  const [wordPopup, setWordPopup] = useState<{ word: string; meaning: string; partOfSpeech: string; example: string; sentenceTranslation?: string } | null>(null);
   const [wordLoading, setWordLoading] = useState(false);
   const [wordExPlaying, setWordExPlaying] = useState(false);
   const [wordPronPlaying, setWordPronPlaying] = useState(false);
@@ -371,11 +371,12 @@ export default function NpcMissionScreen() {
     setPendingChoice(null);
   }, []);
 
-  const lookupWord = useCallback(async (rawToken: string) => {
+  const lookupWord = useCallback(async (rawToken: string, sentence?: string) => {
     const clean = rawToken.replace(/[^\p{L}\p{N}'-]/gu, "").trim();
     if (!clean || clean.length < 1) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const cacheKey = `${clean.toLowerCase()}:${language}:${native}`;
+    const sentenceKey = sentence ? sentence.slice(0, 60) : "";
+    const cacheKey = `${clean.toLowerCase()}:${language}:${native}:${sentenceKey}`;
     if (wordCache.current[cacheKey]) {
       setWordPopup({ word: clean, ...wordCache.current[cacheKey] });
       return;
@@ -386,14 +387,15 @@ export default function NpcMissionScreen() {
       const res = await fetch(new URL("/api/word-lookup", getApiUrl()).toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: clean, targetLanguage: language, nativeLanguage: native }),
+        body: JSON.stringify({ word: clean, targetLanguage: language, nativeLanguage: native, sentence }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "lookup failed");
       const entry = {
-        meaning:      (data.meaning      ?? "").trim() || clean,
-        partOfSpeech: (data.partOfSpeech ?? "").trim(),
-        example:      (data.example      ?? "").trim(),
+        meaning:             (data.meaning             ?? "").trim() || clean,
+        partOfSpeech:        (data.partOfSpeech        ?? "").trim(),
+        example:             (data.example             ?? "").trim(),
+        sentenceTranslation: (data.sentenceTranslation ?? "").trim(),
       };
       wordCache.current[cacheKey] = entry;
       setWordPopup({ word: clean, ...entry });
@@ -491,7 +493,7 @@ export default function NpcMissionScreen() {
               {prefix ? <Text>{prefix}</Text> : null}
               <Text
                 style={styles.clickableWord}
-                onPress={() => lookupWord(wordPart)}
+                onPress={() => lookupWord(wordPart, text)}
               >{wordPart}</Text>
               {suffix ? <Text>{suffix}</Text> : null}
             </Text>
@@ -921,6 +923,19 @@ export default function NpcMissionScreen() {
                   <Text style={styles.wordMeaning}>{wordPopup.meaning}</Text>
                 </View>
 
+                {/* ── Sentence translation ── */}
+                {!!wordPopup.sentenceTranslation && (
+                  <>
+                    <View style={styles.wordDivider} />
+                    <View style={styles.wordMeaningRow}>
+                      <Text style={styles.wordSectionLabel}>
+                        {native === "korean" ? "문장 번역" : native === "spanish" ? "Traducción de la frase" : "Sentence translation"}
+                      </Text>
+                      <Text style={styles.wordSentenceTransl}>{wordPopup.sentenceTranslation}</Text>
+                    </View>
+                  </>
+                )}
+
                 {/* ── Example ── */}
                 {!!wordPopup.example && (
                   <View style={styles.wordExampleRow}>
@@ -1272,6 +1287,14 @@ const styles = StyleSheet.create({
   wordMeaningRow: { gap: 4 },
   wordMeaning: {
     fontSize: 17, fontFamily: F.bodySemi, color: C.parchment, lineHeight: 24,
+  },
+  wordSentenceTransl: {
+    fontSize: 14,
+    fontFamily: F.body,
+    color: C.parchment,
+    opacity: 0.7,
+    lineHeight: 21,
+    fontStyle: "italic",
   },
   wordExampleRow: { gap: 4 },
   wordExample: {
