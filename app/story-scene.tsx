@@ -2201,6 +2201,8 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
   const [recognizedText, setRecognizedText] = useState("");
   const [solved, setSolved] = useState(false);
   const canvasSizeRef = useRef({ width: 320, height: 180 });
+  const canvasRef     = useRef<View>(null);
+  const canvasOffset  = useRef({ x: 0, y: 0 });
   const apiBase = getApiUrl();
 
   const q = puzzle.questions[idx];
@@ -2219,13 +2221,15 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: (e) => {
-      const { locationX, locationY } = e.nativeEvent;
-      setCurrentPath([{ x: locationX, y: locationY }]);
+      const x = e.nativeEvent.pageX - canvasOffset.current.x;
+      const y = e.nativeEvent.pageY - canvasOffset.current.y;
+      setCurrentPath([{ x, y }]);
       setFeedback(null);
     },
     onPanResponderMove: (e) => {
-      const { locationX, locationY } = e.nativeEvent;
-      setCurrentPath((prev) => [...prev, { x: locationX, y: locationY }]);
+      const x = e.nativeEvent.pageX - canvasOffset.current.x;
+      const y = e.nativeEvent.pageY - canvasOffset.current.y;
+      setCurrentPath((prev) => [...prev, { x, y }]);
     },
     onPanResponderRelease: () => {
       if (currentPath.length > 0) setPaths((prev) => [...prev, currentPath]);
@@ -2357,12 +2361,16 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
 
       {/* Drawing canvas */}
       <View
+        ref={canvasRef}
         style={styles.hwCanvas}
         onLayout={(e) => {
           canvasSizeRef.current = {
             width: e.nativeEvent.layout.width,
             height: e.nativeEvent.layout.height,
           };
+          canvasRef.current?.measure((_fx, _fy, _w, _h, px, py) => {
+            canvasOffset.current = { x: px, y: py };
+          });
         }}
         {...panResponder.panHandlers}
       >

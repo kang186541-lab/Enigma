@@ -346,6 +346,11 @@ function TracingCanvas({ char, onDrawn }: TracingCanvasProps) {
   const onDrawnRef = useRef(onDrawn);
   onDrawnRef.current = onDrawn;
 
+  // Track the canvas's absolute screen position so we can convert
+  // pageX/pageY touch coordinates into canvas-local coordinates.
+  const canvasRef    = useRef<View>(null);
+  const canvasOffset = useRef({ x: 0, y: 0 });
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder:        () => true,
@@ -353,12 +358,14 @@ function TracingCanvas({ char, onDrawn }: TracingCanvasProps) {
       onMoveShouldSetPanResponder:         () => true,
       onMoveShouldSetPanResponderCapture:  () => true,
       onPanResponderGrant: (e) => {
-        const { locationX, locationY } = e.nativeEvent;
-        setDots(prev => [...prev.slice(-150), { x: locationX, y: locationY }]);
+        const x = e.nativeEvent.pageX - canvasOffset.current.x;
+        const y = e.nativeEvent.pageY - canvasOffset.current.y;
+        setDots(prev => [...prev.slice(-150), { x, y }]);
       },
       onPanResponderMove: (e) => {
-        const { locationX, locationY } = e.nativeEvent;
-        setDots(prev => [...prev.slice(-150), { x: locationX, y: locationY }]);
+        const x = e.nativeEvent.pageX - canvasOffset.current.x;
+        const y = e.nativeEvent.pageY - canvasOffset.current.y;
+        setDots(prev => [...prev.slice(-150), { x, y }]);
         moveCount.current += 1;
         if (moveCount.current >= DRAW_THRESHOLD && !drawnRef.current) {
           drawnRef.current = true;
@@ -377,7 +384,16 @@ function TracingCanvas({ char, onDrawn }: TracingCanvasProps) {
   const webExtra = Platform.OS === "web" ? ({ touchAction: "none" } as object) : {};
 
   return (
-    <View style={[tc.grid, webExtra]} {...panResponder.panHandlers}>
+    <View
+      ref={canvasRef}
+      style={[tc.grid, webExtra]}
+      onLayout={() => {
+        canvasRef.current?.measure((_fx, _fy, _w, _h, px, py) => {
+          canvasOffset.current = { x: px, y: py };
+        });
+      }}
+      {...panResponder.panHandlers}
+    >
       <Text style={tc.guideChar}>{char}</Text>
       {dots.map((d, i) => (
         <View key={i} style={[tc.dot, { left: d.x - 7, top: d.y - 7 }]} />
