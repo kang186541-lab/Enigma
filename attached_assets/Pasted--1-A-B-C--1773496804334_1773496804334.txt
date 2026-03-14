@@ -1,0 +1,116 @@
+이전에 버튼 겹침 수정을 요청했는데 아직 고쳐지지 않았어. 더 구체적으로 설명할게.
+
+## 문제 1: 알파벳 따라 쓰기 — 캔버스에서 스크롤이 됨
+
+알파벳(A, B, C…) 따라 쓰기 화면에서 점선 캔버스 영역에 손가락으로 글자를 그리려고 하면 화면 전체가 스크롤돼서 글씨를 쓸 수 없어.
+
+### 반드시 이렇게 수정해줘
+
+캔버스 컴포넌트를 감싸는 View에 다음을 적용해:
+
+```javascript
+// 캔버스를 감싸는 부모 View에 panResponder를 설정
+const panResponder = PanResponder.create({
+  onStartShouldSetPanResponder: () => true,
+  onMoveShouldSetPanResponder: () => true,
+  onStartShouldSetPanResponderCapture: () => true,
+  onMoveShouldSetPanResponderCapture: () => true,
+  onPanResponderTerminationRequest: () => false,
+});
+
+// 캔버스 영역
+<View {...panResponder.panHandlers}>
+  {/* 캔버스 컴포넌트 */}
+</View>
+```
+
+그리고 이 화면의 최상위 ScrollView에서 캔버스 터치 시 스크롤을 멈추게 해:
+
+```javascript
+const [scrollEnabled, setScrollEnabled] = useState(true);
+
+<ScrollView scrollEnabled={scrollEnabled}>
+  {/* 기타 콘텐츠 */}
+  
+  <View 
+    onTouchStart={() => setScrollEnabled(false)}
+    onTouchEnd={() => setScrollEnabled(true)}
+    onTouchCancel={() => setScrollEnabled(true)}
+  >
+    {/* 캔버스 */}
+  </View>
+  
+  {/* 버튼 등 */}
+</ScrollView>
+```
+
+**두 가지를 모두 적용해야 해.** PanResponder만으로 안 되면 ScrollView의 scrollEnabled도 같이 써야 확실하게 동작해.
+
+## 문제 2: 오늘의 카드 덱 — Listen 버튼과 Again/Got it 겹침
+
+카드 덱 화면에서 “Listen” 버튼이 “AGAIN” / “GOT IT!” 버튼과 겹쳐 있어. 이건 레이아웃 문제야.
+
+### 반드시 이렇게 수정해줘
+
+전체 화면을 flex 레이아웃으로 재구성해:
+
+```jsx
+<View style={{ flex: 1, backgroundColor: '#1a0a05' }}>
+  {/* 상단: 제목 + Beginner/Advanced 탭 + 프로그레스 */}
+  <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+    <Text>오늘의 카드 덱</Text>
+    {/* 탭, 프로그레스 바 */}
+  </View>
+
+  {/* 중간: 카드 내용 (스크롤 가능) */}
+  <ScrollView 
+    style={{ flex: 1 }} 
+    contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
+  >
+    {/* 이모지 */}
+    {/* 단어 */}
+    {/* 설명 */}
+    {/* 예문 */}
+  </ScrollView>
+
+  {/* 하단: 버튼들 (고정) */}
+  <View style={{ 
+    paddingHorizontal: 16, 
+    paddingBottom: 16,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(201, 162, 39, 0.2)'
+  }}>
+    {/* Listen 버튼 */}
+    <TouchableOpacity style={{ alignSelf: 'center', marginBottom: 12 }}>
+      <Text>🔊 Listen</Text>
+    </TouchableOpacity>
+    
+    {/* Again / Got it 버튼 */}
+    <View style={{ flexDirection: 'row', gap: 12 }}>
+      <TouchableOpacity style={{ flex: 1, padding: 16, backgroundColor: 'rgba(201,162,39,0.2)', borderRadius: 12 }}>
+        <Text>😅 AGAIN</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={{ flex: 1, padding: 16, backgroundColor: 'rgba(0,128,0,0.3)', borderRadius: 12 }}>
+        <Text>✅ GOT IT!</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</View>
+```
+
+핵심은:
+
+- 카드 내용은 `flex: 1 + ScrollView`로 스크롤 가능하게
+- Listen 버튼과 Again/Got it 버튼은 **ScrollView 바깥**, 화면 하단에 고정
+- 카드 내용이 아무리 길어도 버튼은 항상 하단에 보임
+- Listen은 Again/Got it 위에 별도 줄로 배치 (겹치지 않게)
+
+## 확인 사항
+
+수정 후 다음을 확인해줘:
+
+1. 알파벳 캔버스에서 손가락으로 A를 그릴 수 있는지 (스크롤 안 되고 그리기만 되는지)
+1. 카드 덱에서 Listen 버튼이 Again/Got it 버튼과 겹치지 않는지
+1. 카드 내용이 길 때 스크롤해도 하단 버튼은 고정되어 있는지
+1. 하단 네비게이션 바(홈/카드/스토리/튜터/말하기)와 겹치지 않는지
