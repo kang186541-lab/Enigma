@@ -506,7 +506,7 @@ const STORIES: Record<string, Story> = {
         pType: "listen-choose",
         questions: [
           {
-            word: { en: "mysterious", ko: "mysterious", es: "mysterious" },
+            word: { en: "mysterious", ko: "불가사의한", es: "misterioso" },
             opts: [
               { en: "strange and unknown", ko: "이상하고 알 수 없는", es: "extraño y desconocido" },
               { en: "bright and cheerful", ko: "밝고 명랑한", es: "brillante y alegre" },
@@ -516,7 +516,7 @@ const STORIES: Record<string, Story> = {
             answerIdx: 0,
           },
           {
-            word: { en: "evidence", ko: "evidence", es: "evidence" },
+            word: { en: "evidence", ko: "증거", es: "evidencia" },
             opts: [
               { en: "a type of hat", ko: "모자의 종류", es: "un tipo de sombrero" },
               { en: "proof something happened", ko: "무언가가 일어났다는 증거", es: "prueba de que algo ocurrió" },
@@ -526,7 +526,7 @@ const STORIES: Record<string, Story> = {
             answerIdx: 1,
           },
           {
-            word: { en: "investigate", ko: "investigate", es: "investigate" },
+            word: { en: "investigate", ko: "조사하다", es: "investigar" },
             opts: [
               { en: "to eat dinner slowly", ko: "천천히 저녁을 먹다", es: "cenar despacio" },
               { en: "to play an instrument", ko: "악기를 연주하다", es: "tocar un instrumento" },
@@ -538,7 +538,14 @@ const STORIES: Record<string, Story> = {
         ],
         hints: {
           h1: { ko: "각 단어의 첫 글자: 1번 'm', 2번 'e', 3번 'i' — 소문자로 입력해도 돼", en: "First letter of each word: 1st 'm', 2nd 'e', 3rd 'i' — lowercase is fine", es: "Primera letra de cada palabra: 1ª 'm', 2ª 'e', 3ª 'i' — puedes escribir en minúsculas" },
-          h2: { ko: "1번: m으로 시작하는 10글자 단어 / 2번: e로 시작하는 8글자 단어 / 3번: i로 시작하는 11글자 단어", en: "Word 1: 10 letters starting with 'm' / Word 2: 8 letters starting with 'e' / Word 3: 11 letters starting with 'i'", es: "Palabra 1: 10 letras, empieza con 'm' / Palabra 2: 8 letras, empieza con 'e' / Palabra 3: 11 letras, empieza con 'i'" },
+          h2: {
+            ko: "1번: m으로 시작하는 10글자 단어 / 2번: e로 시작하는 8글자 단어 / 3번: i로 시작하는 11글자 단어",
+            en: "Word 1: 10 letters starting with 'm' / Word 2: 8 letters starting with 'e' / Word 3: 11 letters starting with 'i'",
+            es: "Palabra 1: 10 letras, empieza con 'm' / Palabra 2: 8 letras, empieza con 'e' / Palabra 3: 11 letras, empieza con 'i'",
+            byLearning: {
+              spanish: { ko: "1번: m으로 시작하는 10글자 단어 / 2번: e로 시작하는 9글자 단어 / 3번: i로 시작하는 10글자 단어", en: "Word 1: 10 letters starting with 'm' / Word 2: 9 letters starting with 'e' / Word 3: 10 letters starting with 'i'", es: "Palabra 1: 10 letras, empieza con 'm' / Palabra 2: 9 letras, empieza con 'e' / Palabra 3: 10 letras, empieza con 'i'" },
+            },
+          },
           h3: { ko: "1번: 설명하기 어려운, 이해하기 힘든 것 / 2번: 무언가를 증명하는 사실이나 정보 / 3번: 무언가를 꼼꼼하게 살펴보는 행동", en: "Word 1: something hard to explain or understand / Word 2: facts or information that prove something / Word 3: the action of examining something carefully", es: "Palabra 1: algo difícil de explicar o entender / Palabra 2: hechos que prueban algo / Palabra 3: la acción de examinar algo con cuidado" },
         },
       },
@@ -859,8 +866,22 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "각 단어의 첫 글자: 1번 'd', 2번 'w', 3번 't' — 소문자로 입력해도 돼", en: "First letter of each word: 1st 'd', 2nd 'w', 3rd 't' — lowercase is fine", es: "Primera letra de cada palabra: 1ª 'd', 2ª 'w', 3ª 't' — puedes escribir en minúsculas" },
-          h2: { ko: "1번: d로 시작하는 9글자 단어 / 2번: w로 시작하는 7글자 단어 / 3번: t로 시작하는 7글자 단어", en: "Word 1: 9 letters starting with 'd' / Word 2: 7 letters starting with 'w' / Word 3: 7 letters starting with 't'", es: "Palabra 1: 9 letras, empieza con 'd' / Palabra 2: 7 letras, empieza con 'w' / Palabra 3: 7 letras, empieza con 't'" },
+          h1: {
+            ko: "각 단어의 첫 글자: 1번 'd', 2번 'w', 3번 't' — 소문자로 입력해도 돼",
+            en: "First letter of each word: 1st 'd', 2nd 'w', 3rd 't' — lowercase is fine",
+            es: "Primera letra de cada palabra: 1ª 'd', 2ª 'w', 3ª 't' — puedes escribir en minúsculas",
+            byLearning: {
+              spanish: { ko: "각 단어의 첫 글자: 1번 'd', 2번 's', 3번 't' — 소문자로 입력해도 돼", en: "First letter of each word: 1st 'd', 2nd 's', 3rd 't' — lowercase is fine", es: "Primera letra de cada palabra: 1ª 'd', 2ª 's', 3ª 't' — puedes escribir en minúsculas" },
+            },
+          },
+          h2: {
+            ko: "1번: d로 시작하는 9글자 단어 / 2번: w로 시작하는 7글자 단어 / 3번: t로 시작하는 7글자 단어",
+            en: "Word 1: 9 letters starting with 'd' / Word 2: 7 letters starting with 'w' / Word 3: 7 letters starting with 't'",
+            es: "Palabra 1: 9 letras, empieza con 'd' / Palabra 2: 7 letras, empieza con 'w' / Palabra 3: 7 letras, empieza con 't'",
+            byLearning: {
+              spanish: { ko: "1번: d로 시작하는 12글자 단어 / 2번: s로 시작하는 8글자 단어 / 3번: t로 시작하는 6글자 단어", en: "Word 1: 12 letters starting with 'd' / Word 2: 8 letters starting with 's' / Word 3: 6 letters starting with 't'", es: "Palabra 1: 12 letras, empieza con 'd' / Palabra 2: 8 letras, empieza con 's' / Palabra 3: 6 letras, empieza con 't'" },
+            },
+          },
           h3: { ko: "1번: 갑자기 눈에 보이지 않게 되는 것 / 2번: 다른 사람이 듣지 못할 만큼 아주 조용히 말하는 것 / 3번: 배우들이 관객 앞에서 공연을 펼치는 건물", en: "Word 1: to suddenly become impossible to see / Word 2: to speak so quietly that others can barely hear / Word 3: a building where actors perform in front of an audience", es: "Palabra 1: volverse de repente imposible de ver / Palabra 2: hablar tan bajo que otros apenas oyen / Palabra 3: edificio donde los actores actúan ante el público" },
         },
       },
@@ -2045,9 +2066,9 @@ function CipherPuzzle({ puzzle, lang, onSolved, onResetHints }: {
 
 /* ─────────────────── WORD TYPING PUZZLE (replaces listen-choose) ─────────── */
 
-function WordTypingPuzzle({ puzzle, lang, onSolved, onResetHints }: {
+function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   puzzle: { pType: "listen-choose"; questions: ListenChooseQ[] };
-  lang: string; onSolved: () => void; onResetHints?: () => void;
+  lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -2057,7 +2078,14 @@ function WordTypingPuzzle({ puzzle, lang, onSolved, onResetHints }: {
   const inputRef = useRef<TextInput>(null);
 
   const q = puzzle.questions[idx];
-  const targetWord = q.word.en;
+  const targetWord = learningLang === "spanish" ? q.word.es
+                   : learningLang === "korean"  ? q.word.ko
+                   : q.word.en;
+  const targetLangLabel = learningLang === "spanish"
+    ? (lang === "korean" ? "스페인어" : lang === "spanish" ? "español" : "Spanish")
+    : learningLang === "korean"
+    ? (lang === "korean" ? "한국어" : lang === "spanish" ? "coreano" : "Korean")
+    : (lang === "korean" ? "영어" : lang === "spanish" ? "inglés" : "English");
   const meaning = lang === "korean" ? q.opts[q.answerIdx].ko
                 : lang === "spanish" ? q.opts[q.answerIdx].es
                 : q.opts[q.answerIdx].en;
@@ -2095,7 +2123,7 @@ function WordTypingPuzzle({ puzzle, lang, onSolved, onResetHints }: {
 
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>
-          {lang === "korean" ? "이 뜻에 맞는 영어 단어를 입력하세요" : lang === "spanish" ? "Escribe la palabra en inglés que significa:" : "Type the English word that means:"}
+          {lang === "korean" ? `이 뜻에 맞는 ${targetLangLabel} 단어를 입력하세요` : lang === "spanish" ? `Escribe la palabra en ${targetLangLabel} que significa:` : `Type the ${targetLangLabel} word that means:`}
         </Text>
         <Text style={[styles.puzzleWordMain, { fontSize: 17, textTransform: "none", lineHeight: 26 }]}>{meaning}</Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginTop: 10, gap: 5 }}>
@@ -2113,7 +2141,7 @@ function WordTypingPuzzle({ puzzle, lang, onSolved, onResetHints }: {
         style={[styles.writingInput, confirmed && (isCorrect ? styles.writingInputCorrect : styles.writingInputWrong)]}
         value={answer}
         onChangeText={setAnswer}
-        placeholder={lang === "korean" ? "영어 단어를 입력하세요..." : lang === "spanish" ? "Escribe en inglés..." : "Type the English word..."}
+        placeholder={lang === "korean" ? `${targetLangLabel} 단어를 입력하세요...` : lang === "spanish" ? `Escribe en ${targetLangLabel}...` : `Type the ${targetLangLabel} word...`}
         placeholderTextColor={C.goldDim}
         editable={!confirmed}
         autoCapitalize="none"
@@ -2923,7 +2951,7 @@ export default function StoryScene() {
                   <CipherPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "listen-choose" && (
-                  <WordTypingPuzzle key={seqIdx} puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <WordTypingPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "pronunciation" && (
                   <PronunciationPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
