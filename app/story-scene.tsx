@@ -177,7 +177,7 @@ interface ListenChooseQ {
   answerIdx: number;
 }
 interface PronunciationQ {
-  sentence: Tri;
+  word: Tri;
 }
 interface WritingMissionQ {
   word: Tri;
@@ -640,24 +640,24 @@ const STORIES: Record<string, Story> = {
         pType: "pronunciation",
         questions: [
           {
-            sentence: { en: "The mystery of London has been solved.", ko: "런던의 미스터리가 해결되었다.", es: "El misterio de Londres ha sido resuelto." },
+            word: { en: "mystery", ko: "미스터리", es: "misterio" },
           },
           {
-            sentence: { en: "Language is our greatest weapon.", ko: "언어는 우리의 가장 큰 무기이다.", es: "El lenguaje es nuestra mayor arma." },
+            word: { en: "language", ko: "언어", es: "lenguaje" },
           },
         ],
         hints: {
-          h1: { ko: "🎤 버튼을 누르고 자신 있게 말해봐", en: "Press 🎤 and speak confidently", es: "Pulsa 🎤 y habla con confianza" },
+          h1: { ko: "단어를 보고 한 글자씩 천천히 써봐", en: "Look at the word and write it letter by letter", es: "Mira la palabra y escríbela letra por letra" },
           h2: {
-            ko: "긴 단어는 음절로 나눠봐: lan-guage, great-est, weap-on",
-            en: "Break long words into syllables: lan-guage, great-est, weap-on",
-            es: "Divide palabras largas en sílabas: lan-guage, great-est, weap-on",
+            ko: "글자 모양에 집중해서 또박또박 써봐",
+            en: "Focus on the shape of each letter and write carefully",
+            es: "Concéntrate en la forma de cada letra y escribe con cuidado",
             byLearning: {
-              spanish: { ko: "스페인어 단어를 음절로 나눠봐: mis-te-rio, re-suel-to, len-gua-je, ar-ma", en: "Break the Spanish words into syllables: mis-te-rio, re-suel-to, len-gua-je, ar-ma", es: "Divide estas palabras en sílabas: mis-te-rio, re-suel-to, len-gua-je, ar-ma" },
-              korean:  { ko: "한국어 단어를 소리 단위로 나눠봐: 런-던, 미-스-터-리, 해-결-되-었-다", en: "Break Korean words into sound units: 런-던, 미-스-터-리, 해-결-되-었-다", es: "Divide las palabras coreanas en unidades de sonido: 런-던, 미-스-터-리" },
+              spanish: { ko: "스페인어 단어: mis-te-rio / len-gua-je — 음절별로 나눠서 써봐", en: "Spanish word: mis-te-rio / len-gua-je — write it syllable by syllable", es: "Palabra española: mis-te-rio / len-gua-je — escríbela sílaba por sílaba" },
+              korean:  { ko: "한국어 단어: 미-스-터-리 / 언-어 — 자음과 모음을 조합해서 써봐", en: "Korean word: 미-스-터-리 / 언-어 — combine consonants and vowels", es: "Palabra coreana: 미-스-터-리 / 언-어 — combina consonantes y vocales" },
             },
           },
-          h3: { ko: "속도보다 정확성이 중요해 — 천천히 또박또박 말하면 돼", en: "Accuracy matters more than speed — speak slowly and clearly", es: "La precisión importa más que la velocidad — habla despacio y claro" },
+          h3: { ko: "쓰고 나서 단어와 비교해봐 — 맞으면 제출!", en: "After writing, compare with the word above — if it matches, submit!", es: "Después de escribir, compara con la palabra de arriba — si coincide, ¡envía!" },
         },
       },
       {
@@ -2193,7 +2193,6 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
   lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
   const [idx, setIdx] = useState(0);
-  const [playing, setPlaying] = useState(false);
   const [paths, setPaths] = useState<{ x: number; y: number }[][]>([]);
   const [currentPath, setCurrentPath] = useState<{ x: number; y: number }[]>([]);
   const [recognizing, setRecognizing] = useState(false);
@@ -2203,17 +2202,12 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
   const canvasSizeRef = useRef({ width: 320, height: 180 });
   const canvasRef     = useRef<View>(null);
   const canvasOffset  = useRef({ x: 0, y: 0 });
-  const apiBase = getApiUrl();
 
   const q = puzzle.questions[idx];
-  const sentenceText =
-    learningLang === "korean" ? q.sentence.ko
-    : learningLang === "spanish" ? q.sentence.es
-    : q.sentence.en;
-
-  useEffect(() => {
-    ttsPreload(sentenceText, learningLang, apiBase);
-  }, [sentenceText]);
+  const targetWord =
+    learningLang === "korean" ? q.word.ko
+    : learningLang === "spanish" ? q.word.es
+    : q.word.en;
 
   const allPaths = [...paths, ...(currentPath.length > 0 ? [currentPath] : [])];
 
@@ -2253,19 +2247,18 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
     setRecognizedText("");
   }
 
-  function playAudio() {
-    if (playing) return;
-    ttsPlayCached(sentenceText, learningLang, apiBase, setPlaying);
-  }
-
-  function matchScore(target: string, recognized: string): number {
-    const normalize = (s: string) =>
-      s.toLowerCase().replace(/[^\w가-힣]/g, " ").trim();
-    const tWords = normalize(target).split(/\s+/).filter(Boolean);
-    const tr = normalize(recognized);
-    if (!tWords.length || !tr) return 0;
-    const hits = tWords.filter((w) => tr.includes(w)).length;
-    return hits / tWords.length;
+  function wordMatchScore(target: string, recognized: string): number {
+    const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9가-힣]/g, "").trim();
+    const t = norm(target);
+    const r = norm(recognized);
+    if (!t || !r) return 0;
+    if (r.includes(t)) return 1;
+    // partial: count matching characters from the start
+    let common = 0;
+    for (let i = 0; i < Math.min(t.length, r.length); i++) {
+      if (t[i] === r[i]) common++;
+    }
+    return common / t.length;
   }
 
   function advanceNext() {
@@ -2315,8 +2308,8 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
       }) as { recognized?: string };
       const recognized = resp.recognized ?? "";
       setRecognizedText(recognized);
-      const score = matchScore(sentenceText, recognized);
-      if (score >= 0.35) {
+      const score = wordMatchScore(targetWord, recognized);
+      if (score >= 0.6) {
         setFeedback("good");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setTimeout(() => advanceNext(), 2000);
@@ -2340,23 +2333,19 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
         <Text style={styles.puzzleNum}>
-          ✍️ {ko ? "받아쓰기" : es ? "Escritura a mano" : "Handwriting"}
+          ✏️ {ko ? "손으로 쓰기" : es ? "Escritura a mano" : "Write the Word"}
         </Text>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
 
-      {/* Sentence card */}
-      <View style={styles.puzzleWordCard}>
-        <Text style={styles.puzzleWordLabel}>
-          {ko ? "이 문장을 손으로 써보세요!" : es ? "¡Escribe esta frase con el dedo!" : "Write this sentence with your finger!"}
-        </Text>
-        <Text style={styles.puzzleSentence}>{sentenceText}</Text>
-        <Pressable style={styles.hwListenBtn} onPress={playAudio} disabled={playing}>
-          <Ionicons name={playing ? "volume-medium" : "volume-high-outline"} size={16} color={C.gold} />
-          <Text style={styles.hwListenText}>
-            {playing ? (ko ? "재생 중…" : es ? "Reproduciendo…" : "Playing…") : (ko ? "듣기" : es ? "Escuchar" : "Listen")}
-          </Text>
-        </Pressable>
+      {/* Instruction */}
+      <Text style={styles.hwInstruction}>
+        {ko ? "이 단어를 손가락으로 써보세요:" : es ? "Escribe esta palabra con el dedo:" : "Write this word with your finger:"}
+      </Text>
+
+      {/* Word display */}
+      <View style={styles.hwWordDisplay}>
+        <Text style={styles.hwWordText}>{targetWord}</Text>
       </View>
 
       {/* Drawing canvas */}
@@ -2391,7 +2380,7 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
         </Svg>
         {allPaths.length === 0 && currentPath.length === 0 && (
           <Text style={styles.hwPlaceholder}>
-            {ko ? "여기에 손으로 쓰세요…" : es ? "Escribe aquí con el dedo…" : "Draw letters here with your finger…"}
+            {ko ? "여기에 쓰세요…" : es ? "Escribe aquí…" : "Write here…"}
           </Text>
         )}
       </View>
@@ -2410,14 +2399,14 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
       {feedback === "good" && (
         <View style={styles.pronFeedbackGood}>
           <Text style={styles.pronFeedbackText}>
-            ✨ {ko ? "훌륭해요! 잘 썼어요." : es ? "¡Excelente escritura!" : "Excellent handwriting!"}
+            ✨ {ko ? "잘 썼어요!" : es ? "¡Excelente escritura!" : "Great handwriting!"}
           </Text>
         </View>
       )}
       {feedback === "retry" && (
         <View style={styles.pronFeedbackRetry}>
           <Text style={styles.pronFeedbackText}>
-            🔄 {ko ? "다시 써보세요." : es ? "Inténtalo de nuevo." : "Try writing again."}
+            🔄 {ko ? "다시 써보세요." : es ? "Inténtalo de nuevo." : "Try again."}
           </Text>
           <Pressable style={styles.pronSkipBtn} onPress={advanceNext}>
             <Text style={styles.pronSkipText}>
@@ -3977,6 +3966,29 @@ const styles = StyleSheet.create({
   },
 
   /* ── Handwriting Puzzle ── */
+  hwInstruction: {
+    fontFamily: F.body,
+    fontSize: 13,
+    color: C.parchment + "99",
+    marginBottom: 8,
+  },
+  hwWordDisplay: {
+    alignSelf: "center",
+    backgroundColor: C.bg2,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: C.gold,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    marginBottom: 12,
+  },
+  hwWordText: {
+    fontFamily: F.header,
+    fontSize: 36,
+    color: C.gold,
+    letterSpacing: 3,
+    textAlign: "center",
+  },
   hwCanvas: {
     width: "100%",
     height: 180,
@@ -3994,17 +4006,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: F.body,
     textAlign: "center",
-  },
-  hwListenBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 8,
-  },
-  hwListenText: {
-    color: C.gold,
-    fontSize: 13,
-    fontFamily: F.body,
   },
   hwRecognized: {
     backgroundColor: C.bg2,
