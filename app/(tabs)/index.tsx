@@ -18,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, getLevel, getLevelProgress, NativeLanguage } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
+import { LanguageChangeModal } from "@/components/LanguageChangeModal";
 import { C, F } from "@/constants/theme";
 import {
   loadProgress,
@@ -29,6 +30,10 @@ import {
 
 const { width } = Dimensions.get("window");
 const rudyBadgeImg = require("@/assets/rudy_badge.png");
+
+const LANG_FLAGS: Record<NativeLanguage, string> = {
+  korean: "🇰🇷", english: "🇬🇧", spanish: "🇪🇸",
+};
 
 function RudyImageWithPlaceholder({ source, style, resizeMode }: { source: any; style: any; resizeMode?: any }) {
   const [loaded, setLoaded] = useState(false);
@@ -160,6 +165,7 @@ export default function HomeScreen() {
 
   const [courseCompleted, setCourseCompleted] = React.useState<boolean | null>(null);
   const [dailyProgress, setDailyProgress] = React.useState<DailyCourseProgress | null>(null);
+  const [showLangModal, setShowLangModal] = React.useState(false);
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
@@ -274,7 +280,7 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* Level badge */}
+        {/* Level badge + Language change row */}
         <View style={styles.levelRow}>
           <View style={styles.levelBadge}>
             <Text style={styles.levelEmoji}>{level.emoji}</Text>
@@ -282,6 +288,17 @@ export default function HomeScreen() {
             <View style={styles.levelDot} />
             <Text style={styles.levelNum}>{t("level")} {level.num}</Text>
           </View>
+          <Pressable
+            style={({ pressed }) => [styles.langChip, pressed && { opacity: 0.75 }]}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowLangModal(true); }}
+          >
+            <Text style={styles.langChipText}>
+              {LANG_FLAGS[nativeLang]} → {LANG_FLAGS[(learningLanguage ?? "english") as NativeLanguage]}
+            </Text>
+            <Text style={styles.langChipEdit}>
+              {nativeLang === "korean" ? "변경" : nativeLang === "spanish" ? "Cambiar" : "Change"}
+            </Text>
+          </Pressable>
         </View>
 
         {/* XP bar with shimmer */}
@@ -473,6 +490,7 @@ export default function HomeScreen() {
       lang={nativeLang}
       onClose={clearLevelUp}
     />
+    <LanguageChangeModal visible={showLangModal} onClose={() => setShowLangModal(false)} />
     </>
   );
 }
@@ -592,7 +610,7 @@ const styles = StyleSheet.create({
     borderWidth: 2, borderColor: C.gold,
     marginLeft: 8,
   },
-  levelRow: { marginBottom: 10 },
+  levelRow: { marginBottom: 10, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   levelBadge: {
     flexDirection: "row", alignItems: "center", gap: 5,
     backgroundColor: "rgba(201,162,39,0.12)",
@@ -603,6 +621,14 @@ const styles = StyleSheet.create({
   levelName:  { fontSize: 13, fontFamily: F.bodySemi, color: C.gold },
   levelDot:   { width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.goldDark },
   levelNum:   { fontSize: 12, fontFamily: F.body, color: C.goldDim },
+  langChip: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: "rgba(201,162,39,0.08)",
+    borderWidth: 1, borderColor: C.border,
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
+  },
+  langChipText: { fontSize: 14, color: C.parchment },
+  langChipEdit: { fontSize: 11, fontFamily: F.label, color: C.gold, letterSpacing: 0.3 },
 
   /* XP bar */
   xpSection: { gap: 5 },
