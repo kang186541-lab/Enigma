@@ -116,8 +116,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const sttFailCount   = useRef(0);
 
   const apiBase   = getApiUrl();
-  // Use data.speechLang for STT so recognition locale matches TTS locale (e.g. en-GB, not en-US)
-  const sttLang   = data.speechLang ?? STT_LANG[learningLang] ?? "en-US";
+  // sttLang: use learningLang locale for Azure STT recognition (NOT speechLang which is TTS-only)
+  const sttLang   = STT_LANG[learningLang] ?? "en-US";
   const ttsLang   = data.speechLang;
   const rudyVoice = RUDY_VOICE[learningLang] ?? "en-GB-RyanNeural";
 

@@ -313,16 +313,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
 
   async function assessPronunciation(base64: string, mimeType: string, currentQ: ReviewQuestion) {
     const word = (currentQ.type === "speak" ? currentQ.sentence : currentQ.fullSentence) ?? "";
-    const lang = (currentQ.type === "speak" ? currentQ.speechLang : (currentQ.speechLang ?? sttLang)) ?? sttLang;
-    console.log('[STEP4 DEBUG]', {
-      type: currentQ.type,
-      sentence: currentQ.sentence,
-      fullSentence: currentQ.fullSentence,
-      speechLang: currentQ.speechLang,
-      word,
-      lang,
-      sttLang,
-    });
+    const lang = sttLang;
 
     // Show skip button after 5 seconds
     setCanSkipScoring(false);
@@ -338,7 +329,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word, lang, audio: base64, mimeType }),
+          body: JSON.stringify({ word, lang, audio: base64, mimeType: "audio/m4a" }),
           signal: abortCtrl.signal,
         });
         clearTimeout(timeoutId);
