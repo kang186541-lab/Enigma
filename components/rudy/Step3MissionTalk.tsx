@@ -114,6 +114,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const pulseAnim      = useRef(new Animated.Value(1)).current;
   const pulseLoop      = useRef<Animated.CompositeAnimation | null>(null);
   const sttFailCount   = useRef(0);
+  const isProcessingRef = useRef(false);
 
   const apiBase   = getApiUrl();
   // sttLang: use learningLang locale for Azure STT recognition (NOT speechLang which is TTS-only)
@@ -314,6 +315,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     console.log("[MissionTalk] 녹음 중지 시도 (native)");
     try {
       await rec.stopAndUnloadAsync();
+      // 300ms delay — ensure file is fully flushed to disk before reading
+      await new Promise(resolve => setTimeout(resolve, 300));
       const uri = rec.getURI();
       nativeRecRef.current = null;
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
@@ -419,13 +422,19 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     setPhase((cur) => cur === "done" ? "done" : "idle");
   }
 
-  function handleMicPress() {
-    if (phase === "recording") {
-      if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
-      if (Platform.OS !== "web") stopNativeRecording();
-      else if (mediaRecRef.current?.state === "recording") mediaRecRef.current.stop();
-    } else if (phase === "idle") {
-      startRecording();
+  async function handleMicPress() {
+    if (isProcessingRef.current) return;
+    isProcessingRef.current = true;
+    try {
+      if (phase === "recording") {
+        if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
+        if (Platform.OS !== "web") await stopNativeRecording();
+        else if (mediaRecRef.current?.state === "recording") mediaRecRef.current.stop();
+      } else if (phase === "idle") {
+        await startRecording();
+      }
+    } finally {
+      isProcessingRef.current = false;
     }
   }
 

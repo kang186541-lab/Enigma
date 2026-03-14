@@ -86,6 +86,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   const autoStopRef       = useRef<ReturnType<typeof setTimeout> | null>(null);
   const soundRef          = useRef<Audio.Sound | null>(null);
   const safetyTimeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isProcessingRef   = useRef(false);
   const pulseAnim         = useRef(new Animated.Value(1)).current;
   const pulseLoop         = useRef<Animated.CompositeAnimation | null>(null);
   const progressAnim      = useRef(new Animated.Value(1)).current;
@@ -282,6 +283,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       if (!rec) { fallbackReveal(); return; }
       try {
         await rec.stopAndUnloadAsync();
+        // 300ms delay — ensure file is fully flushed to disk before reading
+        await new Promise(resolve => setTimeout(resolve, 300));
         const uri = rec.getURI();
         nativeRecRef.current = null;
         await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
@@ -416,12 +419,18 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     setTimerRunning(false);
   }
 
-  function handleMicPress() {
-    if (qPhase === "recording") {
-      if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
-      stopRecordAndAssess(q);
-    } else if (qPhase === "ready") {
-      startRecording();
+  async function handleMicPress() {
+    if (isProcessingRef.current) return;
+    isProcessingRef.current = true;
+    try {
+      if (qPhase === "recording") {
+        if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
+        await stopRecordAndAssess(q);
+      } else if (qPhase === "ready") {
+        await startRecording();
+      }
+    } finally {
+      isProcessingRef.current = false;
     }
   }
 

@@ -1,0 +1,88 @@
+Found the bug: When the user manually stops recording early (by pressing the button again), the scoring fails and gives default 70. When the user lets the recording auto-stop (silence detection), it works and gives a real score.
+
+This means the manual stop function is either:
+
+- Not properly saving the audio file before sending to Azure
+- Sending the request before the recording is fully flushed to disk
+- Not waiting for stopAndUnloadAsync() to complete
+
+## Find and fix the manual stop function
+
+Show me the function that runs when the user taps the recording button to STOP recording in STEP 4. There is likely a race condition — the code sends audio to Azure before the recording file is fully written.
+
+## The fix pattern
+
+```javascript
+async function stopRecordingManually() {
+  if (!recording) return;
+  
+  try {
+    // 1. Stop recording and WAIT for it to fully complete
+    await recording.stopAndUnloadAsync();
+    
+    // 2. Small delay to ensure file is fully written to disk
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // 3. Get the URI AFTER stop is complete
+    const uri = recording.getURI();
+    if (!uri) {
+      console.error('[STEP4] No audio URI after stop');
+      return;
+    }
+    
+    // 4. Reset audio mode
+    await Audio.setAudioModeAsync({ 
+      allowsRecordingIOS: false, 
+      playsInSilentModeIOS: true 
+    });
+    
+    // 5. Read the file AFTER everything above is done
+    const base64 = await FileSystem.readAsStringAsync(uri, { 
+      encoding: FileSystem.EncodingType.Base64 
+    });
+    
+    // 6. NOW send to Azure
+    await assessPronunciation(base64, "audio/m4a", currentQuestion);
+    
+  } catch (error) {
+    console.error('[STEP4] Manual stop error:', error);
+  }
+}
+```
+
+Key points:
+
+1. `await recording.stopAndUnloadAsync()` must be awaited — if it’s not awaited, the file isn’t ready
+1. Add a 300ms delay after stop to ensure the file is flushed to disk
+1. `recording.getURI()` must be called AFTER stop completes
+1. `FileSystem.readAsStringAsync` must be called AFTER the URI is confirmed
+1. Azure call must be AFTER the base64 is fully read
+
+## Compare with the auto-stop (silence detection) path
+
+The auto-stop probably already does these steps in the correct order, which is why it works. The manual stop button likely skips the delay or doesn’t properly await the stop.
+
+## Also check: is the recording button handler debounced?
+
+If the user taps the stop button quickly, it might fire twice — once to stop, once trying to start a new recording. Add a guard:
+
+```javascript
+const [isProcessing, setIsProcessing] = useState(false);
+
+async function handleMicButton() {
+  if (isProcessing) return;  // Prevent double-tap
+  setIsProcessing(true);
+  
+  try {
+    if (isRecording) {
+      await stopRecordingManually();
+    } else {
+      await startRecording();
+    }
+  } finally {
+    setIsProcessing(false);
+  }
+}
+```
+
+Apply the same fix to STEP 3 (Mission Talk) recording as well.
