@@ -1,0 +1,140 @@
+URGENT: STEP 4 (Review Challenge) freezes on “채점 중…” (Scoring…) after recording. It never finishes — infinite loading. Fix this NOW.
+
+## Problem
+
+After the user records their voice in STEP 4, the screen shows “채점 중…” and stays there forever. It never shows a score or moves to the next question.
+
+## Root cause investigation
+
+Check what happens after the recording is sent for scoring. Add console.log at every step:
+
+```javascript
+console.log('[STEP4] Recording stopped, sending to Azure...');
+// Azure call
+console.log('[STEP4] Azure response received:', response);
+// Score parsing
+console.log('[STEP4] Parsed score:', score);
+// Display score
+console.log('[STEP4] Displaying score...');
+// Move to next question
+console.log('[STEP4] Moving to next question...');
+```
+
+## Most likely causes and fixes
+
+### Cause 1: Azure pronunciation assessment is failing silently
+
+The API call might be failing but the error isn’t caught, so “채점 중…” stays forever.
+
+**Fix — wrap everything in try/catch with a timeout:**
+
+```javascript
+async function handleScoring(audioUri, referenceText) {
+  setIsScoring(true);
+  
+  try {
+    // 10 second timeout
+    const scoreResult = await Promise.race([
+      assessPronunciation(audioUri, referenceText),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Scoring timeout')), 10000)
+      )
+    ]);
+    
+    // Show score
+    setScore(scoreResult);
+    setIsScoring(false);
+    
+    // After 2 seconds, move to next question
+    setTimeout(() => moveToNextQuestion(), 2000);
+    
+  } catch (error) {
+    console.error('[STEP4] Scoring failed:', error);
+    setIsScoring(false);
+    
+    // Don't freeze — skip scoring and move on
+    showTemporaryMessage('채점을 건너뛰고 다음으로 넘어갈게요!');
+    setTimeout(() => moveToNextQuestion(), 1500);
+  }
+}
+```
+
+### Cause 2: Score is returned but the UI doesn’t update
+
+Maybe the score comes back but setIsScoring(false) is never called, or the state update doesn’t trigger a re-render.
+
+**Fix — make sure isScoring is set to false in ALL cases:**
+
+```javascript
+// Use finally block to guarantee isScoring is reset
+try {
+  const score = await assessPronunciation(audioUri, referenceText);
+  showScore(score);
+} catch (error) {
+  showSkipMessage();
+} finally {
+  setIsScoring(false);  // ALWAYS reset, no matter what
+}
+```
+
+### Cause 3: The moveToNextQuestion function isn’t being called
+
+After showing the score, the app should automatically move to the next question after a short delay.
+
+**Fix — add explicit auto-advance:**
+
+```javascript
+function showScoreAndAdvance(score) {
+  setCurrentScore(score);
+  setIsScoring(false);
+  setShowScoreCard(true);
+  
+  // Auto-advance to next question after 2.5 seconds
+  setTimeout(() => {
+    setShowScoreCard(false);
+    setCurrentQuestionIndex(prev => {
+      if (prev + 1 >= totalQuestions) {
+        // All questions done — go to completion screen
+        completeStep4();
+      }
+      return prev + 1;
+    });
+  }, 2500);
+}
+```
+
+### IMPORTANT: Add a skip button as safety net
+
+While scoring is in progress, show a skip button after 5 seconds:
+
+```jsx
+// In the scoring UI
+<View style={{ alignItems: 'center' }}>
+  <ActivityIndicator />
+  <Text>채점 중...</Text>
+  
+  {scoringTime > 5000 && (
+    <TouchableOpacity onPress={() => {
+      setIsScoring(false);
+      moveToNextQuestion();
+    }}>
+      <Text style={{ color: '#c9a227', marginTop: 16 }}>건너뛰기 →</Text>
+    </TouchableOpacity>
+  )}
+</View>
+```
+
+Use a timer that starts when scoring begins:
+
+```javascript
+useEffect(() => {
+  if (isScoring) {
+    const timer = setTimeout(() => setScoringTime(5001), 5000);
+    return () => clearTimeout(timer);
+  } else {
+    setScoringTime(0);
+  }
+}, [isScoring]);
+```
+
+This way, even if scoring completely breaks, the user can always skip and continue.

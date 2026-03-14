@@ -244,6 +244,15 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     }
   }
 
+  function fallbackReveal() {
+    if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
+    setCanSkipScoring(false);
+    setPronScore(70);
+    setAllScores((prev) => [...prev, 70]);
+    setStars(2);
+    setQPhase("revealed");
+  }
+
   async function stopRecordAndAssess(currentQ: ReviewQuestion) {
     if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
     stopPulse();
@@ -251,7 +260,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
 
     if (Platform.OS !== "web") {
       const rec = nativeRecRef.current;
-      if (!rec) { setQPhase("ready"); return; }
+      if (!rec) { fallbackReveal(); return; }
       try {
         await rec.stopAndUnloadAsync();
         const uri = rec.getURI();
@@ -260,7 +269,9 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         if (!uri) throw new Error("no uri");
         const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
         await assessPronunciation(base64, "audio/m4a", currentQ);
-      } catch { setQPhase("ready"); }
+      } catch {
+        fallbackReveal();
+      }
     }
     // web handled by onstop
   }
@@ -278,7 +289,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         r.readAsDataURL(blob);
       });
       await assessPronunciation(base64, mime, currentQ);
-    } catch { setQPhase("ready"); }
+    } catch { fallbackReveal(); }
   }
 
   async function assessPronunciation(base64: string, mimeType: string, currentQ: ReviewQuestion) {
