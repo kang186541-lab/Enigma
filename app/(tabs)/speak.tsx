@@ -424,6 +424,13 @@ export default function SpeakScreen() {
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
+
+  const rudyListeningMsg = nativeLang === "korean"
+    ? "루디가 듣고 있어요… 🦊"
+    : nativeLang === "spanish"
+    ? "Rudy está escuchando… 🦊"
+    : "Rudy is listening… 🦊";
+
   const visibleTabs = learningLanguage && learningLanguage !== nativeLang
     ? LANG_TABS.filter((tab) => tab.key === learningLanguage)
     : LANG_TABS.filter((tab) => tab.key !== nativeLang);
@@ -917,7 +924,7 @@ export default function SpeakScreen() {
         {levelUpShow && (
           <Pressable
             style={styles.levelUpOverlay}
-            onPress={() => setLevelUpShow(false)}
+            onPress={() => { setLevelUpShow(false); loadSession(activeLang); }}
           >
             <View style={styles.levelUpCard}>
               <Text style={styles.levelUpEmoji}>🎉</Text>
@@ -1166,7 +1173,7 @@ export default function SpeakScreen() {
               </Animated.View>
 
               <Text style={styles.micHint}>
-                {isRecording ? "녹음 중… 탭하여 정지" : isProcessing ? "Azure 분석 중…" : hasListened ? "탭하여 발음 녹음" : "먼저 듣기를 눌러보세요"}
+                {isRecording ? "녹음 중… 탭하여 정지" : isProcessing ? rudyListeningMsg : hasListened ? "탭하여 발음 녹음" : "먼저 듣기를 눌러보세요"}
               </Text>
             </View>
           )}
