@@ -396,8 +396,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: "Azure credentials not configured" });
       }
 
-      const audioBuffer = Buffer.from(audio, "base64");
-      const contentType = normalizeAudioMime(mimeType ?? "audio/wav");
+      const rawBuffer = Buffer.from(audio, "base64");
+      console.log(`[stt] raw=${rawBuffer.length}B  mime=${mimeType}  lang=${language}`);
+
+      // Convert any audio format → 16kHz mono WAV PCM (same as pronunciation-assess)
+      const { spawn } = await import("child_process");
+      const { writeFile, unlink, readFile } = await import("fs/promises");
+      const { randomUUID } = await import("crypto");
+      const { tmpdir } = await import("os");
+      const { join } = await import("path");
+
+      const inputPath  = join(tmpdir(), `stt-in-${randomUUID()}`);
+      const outputPath = join(tmpdir(), `stt-out-${randomUUID()}.wav`);
+      let wavBuffer: Buffer;
+      try {
+        await writeFile(inputPath, rawBuffer);
+        await new Promise<void>((resolve, reject) => {
+          const ff = spawn("ffmpeg", [
+            "-i", inputPath,
+            "-vn", "-ar", "16000", "-ac", "1", "-acodec", "pcm_s16le", "-y",
+            outputPath,
+          ]);
+          const errs: string[] = [];
+          ff.stderr.on("data", (d: Buffer) => errs.push(d.toString()));
+          ff.on("close", (code: number) => code === 0 ? resolve() : reject(new Error(`ffmpeg exit ${code}: ${errs.slice(-2).join(" ")}`)));
+          ff.on("error", reject);
+        });
+        wavBuffer = await readFile(outputPath);
+        console.log(`[stt] ffmpeg ok → ${wavBuffer.length}B WAV`);
+      } catch (convErr) {
+        console.error("[stt] ffmpeg failed, using raw buffer:", convErr);
+        wavBuffer = rawBuffer;
+      } finally {
+        await unlink(inputPath).catch(() => {});
+        await unlink(outputPath).catch(() => {});
+      }
 
       const azureUrl =
         `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation` +
@@ -407,21 +440,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         method: "POST",
         headers: {
           "Ocp-Apim-Subscription-Key": key,
-          "Content-Type": contentType,
+          "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000",
         },
-        body: audioBuffer,
+        body: wavBuffer,
       });
 
       if (!azureRes.ok) {
         const errText = await azureRes.text();
-        console.error("Azure STT error:", azureRes.status, errText);
+        console.error("[stt] Azure error:", azureRes.status, errText);
         return res.status(502).json({ error: "STT failed" });
       }
 
       const data = (await azureRes.json()) as { RecognitionStatus: string; DisplayText?: string };
+      console.log(`[stt] Azure status=${data.RecognitionStatus}  text="${data.DisplayText ?? ""}"`);
       res.json({ text: data.DisplayText ?? "", status: data.RecognitionStatus });
     } catch (err) {
-      console.error("STT error:", err);
+      console.error("[stt] error:", err);
       res.status(500).json({ error: "STT failed" });
     }
   });

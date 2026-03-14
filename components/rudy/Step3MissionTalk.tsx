@@ -255,14 +255,21 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
         await rec.startAsync();
         nativeRecRef.current = rec;
+        console.log("[MissionTalk] 녹음 시작 성공 (native)");
         autoStopRef.current = setTimeout(() => stopNativeRecording(), 7000);
-      } catch { stopPulse(); setPhase("idle"); }
+      } catch (e) { console.error("[MissionTalk] 녹음 시작 실패:", e); stopPulse(); setPhase("idle"); }
     } else {
       if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); setPhase("idle"); return; }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
       if (!stream) { stopPulse(); setPhase("idle"); return; }
       audioChunksRef.current = [];
-      const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
+      // Pick best supported MIME — must check audio/mp4 for iOS Safari
+      const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/mp4")
+        ? "audio/mp4"
+        : "audio/webm";
+      console.log("[MissionTalk] 녹음 시작 성공 (web), mime:", mime);
       const rec = new (window as any).MediaRecorder(stream, { mimeType: mime });
       mediaRecRef.current = rec;
       rec.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunksRef.current.push(e.data); };
@@ -278,23 +285,28 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
     stopPulse();
     setPhase("processing");
+    console.log("[MissionTalk] 녹음 중지 시도 (native)");
     try {
       await rec.stopAndUnloadAsync();
       const uri = rec.getURI();
       nativeRecRef.current = null;
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
       if (!uri) throw new Error("no uri");
+      console.log("[MissionTalk] 녹음 중지 성공, 파일:", uri);
       const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
       await submitSTT(base64, "audio/m4a", true);
-    } catch { showSttError(); }
+    } catch (e) { console.error("[MissionTalk] native 중지 실패:", e); showSttError(); }
   }
 
   async function handleWebStop(mime: string, stream: MediaStream) {
     stopPulse();
     stream.getTracks().forEach((t: any) => t.stop());
     setPhase("processing");
+    console.log("[MissionTalk] 녹음 중지 성공 (web), mime:", mime, "chunks:", audioChunksRef.current.length);
     try {
       const blob = new Blob(audioChunksRef.current, { type: mime });
+      console.log("[MissionTalk] blob size:", blob.size);
+      if (blob.size < 100) { console.warn("[MissionTalk] blob too small — silent recording"); showSttError(); return; }
       const base64: string = await new Promise((res, rej) => {
         const r = new FileReader();
         r.onloadend = () => res((r.result as string).split(",")[1] ?? "");
@@ -302,13 +314,14 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         r.readAsDataURL(blob);
       });
       await submitSTT(base64, mime, true);
-    } catch { showSttError(); }
+    } catch (e) { console.error("[MissionTalk] handleWebStop 실패:", e); showSttError(); }
   }
 
   // ── STT ───────────────────────────────────────────────────────────────────────
 
   async function submitSTT(base64: string, mimeType: string, isVoice: boolean) {
     try {
+      console.log("[MissionTalk] Azure 전송 시도, mimeType:", mimeType, "lang:", sttLang, "base64 len:", base64.length);
       const url = new URL("/api/stt", apiBase).toString();
       const res = await fetch(url, {
         method: "POST",
@@ -316,13 +329,16 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         body: JSON.stringify({ audio: base64, mimeType, language: sttLang }),
       });
       const json = res.ok ? await res.json() : {};
+      console.log("[MissionTalk] Azure 응답:", json);
       const text: string = (json.text ?? "").trim();
       if (!text) {
+        console.warn("[MissionTalk] STT 결과 없음 (빈 텍스트), status:", json.status);
         showSttError();
         return;
       }
+      console.log("[MissionTalk] GPT 전송 시도, 텍스트:", text);
       await sendUserMessage(text, isVoice);
-    } catch { showSttError(); }
+    } catch (e) { console.error("[MissionTalk] submitSTT 실패:", e); showSttError(); }
   }
 
   function showSttError() {
