@@ -314,6 +314,15 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   async function assessPronunciation(base64: string, mimeType: string, currentQ: ReviewQuestion) {
     const word = (currentQ.type === "speak" ? currentQ.sentence : currentQ.fullSentence) ?? "";
     const lang = (currentQ.type === "speak" ? currentQ.speechLang : (currentQ.speechLang ?? sttLang)) ?? sttLang;
+    console.log('[STEP4 DEBUG]', {
+      type: currentQ.type,
+      sentence: currentQ.sentence,
+      fullSentence: currentQ.fullSentence,
+      speechLang: currentQ.speechLang,
+      word,
+      lang,
+      sttLang,
+    });
 
     // Show skip button after 5 seconds
     setCanSkipScoring(false);
