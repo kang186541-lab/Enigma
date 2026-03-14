@@ -37,14 +37,15 @@ function RudyImageWithPlaceholder({ source, style, resizeMode }: { source: any; 
     setLoaded(true);
     Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }).start();
   };
+  const { width, height } = StyleSheet.flatten(style) as { width: number; height: number };
   return (
-    <View style={[style, { overflow: "hidden" }]}>
+    <View style={[style, { overflow: "hidden", justifyContent: "center", alignItems: "center" }]}>
       {!loaded && (
         <View style={[StyleSheet.absoluteFillObject, { backgroundColor: "rgba(201,162,39,0.15)", justifyContent: "center", alignItems: "center" }]}>
           <Text style={{ fontSize: 22 }}>🦊</Text>
         </View>
       )}
-      <Animated.Image source={source} style={[style, { opacity }]} resizeMode={resizeMode} onLoad={onLoad} />
+      <Animated.Image source={source} style={{ width, height, opacity }} resizeMode={resizeMode ?? "cover"} onLoad={onLoad} />
     </View>
   );
 }
