@@ -10,6 +10,7 @@ import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
 import { type LessonSentence, getRandomFeedback } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
+import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
   useEffect(() => {
     return () => {
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
-      soundRef.current?.unloadAsync().catch(() => {});
+      stopAllTTSSync();
     };
   }, []);
 
@@ -113,12 +114,14 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
         const blob = await res.blob();
         const objUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+        registerGlobalWebAudio(audio);
         audio.onended = () => { setPhase("idle"); setPlayingMode(null); };
         audio.onerror = () => { setPhase("idle"); setPlayingMode(null); };
         await audio.play();
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
+        registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded && status.didJustFinish) {
             soundRef.current = null;

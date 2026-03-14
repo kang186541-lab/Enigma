@@ -9,6 +9,7 @@ import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
+import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { type MissionTalkLangData } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 
@@ -138,11 +139,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       setPhase("idle");
     })();
     return () => {
-      if (soundRef.current) {
-        soundRef.current.stopAsync().catch(() => {});
-        soundRef.current.unloadAsync().catch(() => {});
-        soundRef.current = null;
-      }
+      stopAllTTSSync();
       if (nativeRecRef.current) {
         nativeRecRef.current.stopAndUnloadAsync().catch(() => {});
         nativeRecRef.current = null;
@@ -222,12 +219,14 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         const blob = await res.blob();
         const objUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+        registerGlobalWebAudio(audio);
         audio.onended = () => setTtsPlaying(false);
         audio.onerror = () => setTtsPlaying(false);
         audio.play().catch(() => setTtsPlaying(false));
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
+        registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
           if (st.isLoaded && st.didJustFinish) {
             soundRef.current = null;

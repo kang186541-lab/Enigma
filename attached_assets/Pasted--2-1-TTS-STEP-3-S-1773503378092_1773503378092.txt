@@ -1,0 +1,150 @@
+데일리 코스에서 2가지 문제가 있어.
+
+## 문제 1: 다음 단계/챕터로 넘어가도 루디 TTS가 계속 재생됨
+
+STEP 3에서 루디가 말하는 중에 “다음 단계로” 버튼을 누르면 STEP 4 화면으로 넘어가는데, 루디 음성이 계속 들려. 뒤로가기를 눌러 홈화면으로 가도 음성이 멈추지 않아.
+
+### 수정 방법
+
+앱에서 TTS 오디오를 재생하는 Sound 객체를 전역으로 관리해서, 화면 전환 시 반드시 중지해줘:
+
+```javascript
+// 전역 또는 Context로 관리하는 현재 재생 중인 Sound
+let currentPlayingSound = null;
+
+// TTS 재생 함수 — 앱 전체에서 이것만 사용
+async function playTTS(text, voice) {
+  // 이전에 재생 중인 게 있으면 먼저 중지
+  if (currentPlayingSound) {
+    try {
+      await currentPlayingSound.stopAsync();
+      await currentPlayingSound.unloadAsync();
+    } catch (e) {}
+    currentPlayingSound = null;
+  }
+  
+  // 새 TTS 재생
+  const sound = new Audio.Sound();
+  currentPlayingSound = sound;
+  // ... TTS 로드 및 재생
+}
+
+// TTS 강제 중지 함수
+async function stopAllTTS() {
+  if (currentPlayingSound) {
+    try {
+      await currentPlayingSound.stopAsync();
+      await currentPlayingSound.unloadAsync();
+    } catch (e) {}
+    currentPlayingSound = null;
+  }
+}
+```
+
+그리고 다음 모든 상황에서 stopAllTTS()를 호출해줘:
+
+1. **“다음 단계로” 버튼을 누를 때**
+
+```javascript
+async function goToNextStep() {
+  await stopAllTTS();  // 먼저 TTS 중지
+  setCurrentStep(prev => prev + 1);
+}
+```
+
+1. **뒤로가기(←) 버튼을 누를 때**
+
+```javascript
+async function handleBack() {
+  await stopAllTTS();  // TTS 중지
+  navigation.goBack();
+}
+```
+
+1. **각 STEP 컴포넌트가 언마운트될 때**
+
+```javascript
+useEffect(() => {
+  return () => {
+    stopAllTTS();  // 컴포넌트 사라질 때 TTS 중지
+  };
+}, []);
+```
+
+1. **앱이 백그라운드로 갈 때도 중지**
+
+```javascript
+import { AppState } from 'react-native';
+
+useEffect(() => {
+  const subscription = AppState.addEventListener('change', (state) => {
+    if (state !== 'active') {
+      stopAllTTS();
+    }
+  });
+  return () => subscription.remove();
+}, []);
+```
+
+## 문제 2: STEP 4에서 녹음 후 “채점 중…“에서 멈춤
+
+Day 2의 STEP 4(복습 챌린지)에서 “Hello, my name is Rudy” 문장을 녹음한 후 “채점 중…“이 무한 로딩되고 다음으로 넘어가지 않아.
+
+### 수정 방법
+
+**1. 채점 타임아웃 추가**
+
+Azure 응답이 안 오면 영원히 대기하는 것 같아. 타임아웃을 넣어줘:
+
+```javascript
+async function scoreRecording(audioUri, referenceText) {
+  try {
+    // 10초 타임아웃
+    const result = await Promise.race([
+      sendToAzureForScoring(audioUri, referenceText),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('timeout')), 10000)
+      )
+    ]);
+    return result;
+  } catch (error) {
+    console.log('[Review] 채점 실패:', error);
+    // 타임아웃이나 에러 시 기본 점수 부여하고 넘어가기
+    return { score: 70, feedback: '채점에 문제가 있었어요. 다음으로 넘어갈게요!' };
+  }
+}
+```
+
+**2. 채점 실패 시 멈추지 않고 넘어가기**
+
+채점이 실패해도 “채점 중…“에서 영원히 멈추지 않게:
+
+```javascript
+try {
+  const score = await scoreRecording(audioUri, referenceText);
+  showScore(score);
+} catch (error) {
+  // 에러여도 넘어감
+  showMessage('채점에 문제가 있었어요. 다음 문제로 넘어갈게요!');
+  setTimeout(() => goToNextQuestion(), 2000);
+}
+```
+
+**3. “채점 중…” 화면에 취소 버튼 추가**
+
+5초 이상 채점 중이면 “건너뛰기” 버튼을 보여줘:
+
+```jsx
+{isScoring && (
+  <View>
+    <Text>채점 중...</Text>
+    {scoringDuration > 5000 && (
+      <TouchableOpacity onPress={skipScoring}>
+        <Text>건너뛰기 →</Text>
+      </TouchableOpacity>
+    )}
+  </View>
+)}
+```
+
+이렇게 하면 채점이 실패해도 유저가 영원히 멈추지 않고 진행할 수 있어.

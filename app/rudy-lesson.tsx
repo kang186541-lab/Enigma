@@ -13,6 +13,7 @@ import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { C, F } from "@/constants/theme";
+import { stopAllTTSSync } from "@/lib/ttsManager";
 import {
   loadProgress,
   saveProgress,
@@ -208,7 +209,7 @@ function BriefingScreen({
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <Pressable style={styles.briefingBackBtn} onPress={() => router.back()}>
+      <Pressable style={styles.briefingBackBtn} onPress={() => { stopAllTTSSync(); router.back(); }}>
         <Ionicons name="close" size={22} color={C.goldDim} />
       </Pressable>
 
@@ -283,6 +284,7 @@ function LessonScreen({
 
   // Called by step content when it finishes — shows completion card instead of auto-advancing
   function handleStepDone() {
+    stopAllTTSSync();
     // STEP 4 (index 3) goes straight to mission complete — no intermediate card
     if (currentStep === 3) { onStepComplete(); return; }
     // STEP 3 (index 2) has its own inline completion card with the Next Step button
@@ -292,6 +294,7 @@ function LessonScreen({
 
   // Called by the "Next Step →" button
   function handleNextStep() {
+    stopAllTTSSync();
     setStepDone(false);
     onStepComplete();
   }
@@ -346,7 +349,7 @@ function LessonScreen({
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* ── Top bar ─────────────────────────────── */}
       <View style={styles.lessonHeader}>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
+        <Pressable style={styles.backBtn} onPress={() => { stopAllTTSSync(); router.back(); }}>
           <Ionicons name="arrow-back" size={20} color={C.goldDim} />
         </Pressable>
         <View style={styles.lessonHeaderCenter}>

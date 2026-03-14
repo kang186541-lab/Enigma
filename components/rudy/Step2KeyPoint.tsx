@@ -10,6 +10,7 @@ import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
 import { type Step2Data, type FillBlankQuiz } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
+import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -67,6 +68,14 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   const apiBase    = getApiUrl();
   const quiz: FillBlankQuiz = data.quizzes[quizIdx];
   const speechLang = SPEECH_LANG_MAP[learningLang] ?? "en-US";
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      if (autoStopRef.current) clearTimeout(autoStopRef.current);
+      stopAllTTSSync();
+    };
+  }, []);
 
   function startPulse() {
     pulseLoop.current = Animated.loop(
@@ -137,11 +146,13 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
           const blob = await res.blob();
           const objUrl = URL.createObjectURL(blob);
           const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+          registerGlobalWebAudio(audio);
           audio.play().catch(() => {});
         }
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
+        registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
           if (st.isLoaded && st.didJustFinish) soundRef.current = null;
         });

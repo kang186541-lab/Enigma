@@ -10,6 +10,7 @@ import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
 import type { ReviewQuestion } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
+import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -76,6 +77,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   const [stars, setStars]             = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
+  const [canSkipScoring, setCanSkipScoring] = useState(false);
+  const skipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const nativeRecRef   = useRef<Audio.Recording | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -99,15 +102,12 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   useEffect(() => {
     return () => {
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
+      if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
       if (nativeRecRef.current) {
         nativeRecRef.current.stopAndUnloadAsync().catch(() => {});
         nativeRecRef.current = null;
       }
-      if (soundRef.current) {
-        soundRef.current.stopAsync().catch(() => {});
-        soundRef.current.unloadAsync().catch(() => {});
-        soundRef.current = null;
-      }
+      stopAllTTSSync();
     };
   }, []);
 
@@ -180,10 +180,12 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         const blob = await res.blob();
         const objUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+        registerGlobalWebAudio(audio);
         audio.play().catch(() => {});
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
+        registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
           if (st.isLoaded && st.didJustFinish) soundRef.current = null;
         });
@@ -282,26 +284,50 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   async function assessPronunciation(base64: string, mimeType: string, currentQ: ReviewQuestion) {
     const word = (currentQ.type === "speak" ? currentQ.sentence : currentQ.fullSentence) ?? "";
     const lang = (currentQ.type === "speak" ? currentQ.speechLang : (currentQ.speechLang ?? sttLang)) ?? sttLang;
+
+    // Show skip button after 5 seconds
+    setCanSkipScoring(false);
+    if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
+    skipTimerRef.current = setTimeout(() => setCanSkipScoring(true), 5000);
+
     try {
       const url = new URL("/api/pronunciation-assess", apiBase).toString();
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word, lang, audio: base64, mimeType }),
-      });
-      const data = res.ok ? await res.json() : {};
+      const abortCtrl = new AbortController();
+      const timeoutId = setTimeout(() => abortCtrl.abort(), 10000);
+      let data: Record<string, any> = {};
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word, lang, audio: base64, mimeType }),
+          signal: abortCtrl.signal,
+        });
+        clearTimeout(timeoutId);
+        data = res.ok ? await res.json() : {};
+      } catch {
+        clearTimeout(timeoutId);
+      }
       const score: number = data.pronunciationScore ?? data.score ?? 70;
       setPronScore(score);
       setAllScores((prev) => [...prev, score]);
       setStars(score >= 90 ? 3 : score >= 75 ? 2 : 1);
-
-      // Play TTS of correct sentence
       await playTTS(word, lang);
     } catch {
       setPronScore(70);
       setAllScores((prev) => [...prev, 70]);
       setStars(2);
     }
+    if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
+    setCanSkipScoring(false);
+    setQPhase("revealed");
+  }
+
+  function skipScoring() {
+    if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
+    setCanSkipScoring(false);
+    setPronScore(70);
+    setAllScores((prev) => [...prev, 70]);
+    setStars(2);
     setQPhase("revealed");
   }
 
@@ -485,7 +511,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
 
       {/* Actions */}
       {isSpeakQ && qPhase !== "revealed" ? (
-        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+        <Animated.View style={{ transform: [{ scale: pulseAnim }], alignItems: "center" }}>
           <Pressable
             style={({ pressed }) => [
               s.micBtn,
@@ -504,6 +530,13 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
               {qPhase === "assessing" ? L.assessing : qPhase === "recording" ? L.stop : L.speak}
             </Text>
           </Pressable>
+          {qPhase === "assessing" && canSkipScoring && (
+            <Pressable style={s.skipScoringBtn} onPress={skipScoring}>
+              <Text style={s.skipScoringText}>
+                {nativeLang === "korean" ? "건너뛰기 →" : nativeLang === "spanish" ? "Saltar →" : "Skip →"}
+              </Text>
+            </Pressable>
+          )}
         </Animated.View>
       ) : null}
 
@@ -580,6 +613,12 @@ const s = StyleSheet.create({
   },
   micBtnActive: { backgroundColor: "#e55", shadowColor: "#e55" },
   micBtnText:   { fontSize: 16, fontFamily: F.header, color: C.bg1 },
+
+  skipScoringBtn: {
+    marginTop: 12, paddingVertical: 8, paddingHorizontal: 20,
+    borderRadius: 20, borderWidth: 1, borderColor: C.border,
+  },
+  skipScoringText: { fontSize: 13, fontFamily: F.label, color: C.goldDim },
 
   nextBtn: {
     backgroundColor: C.gold, borderRadius: 14, paddingVertical: 14, alignItems: "center",
