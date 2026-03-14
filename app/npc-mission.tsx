@@ -10,7 +10,13 @@ import {
   ActivityIndicator,
   Modal,
   Animated,
+  LayoutAnimation,
+  UIManager,
 } from "react-native";
+
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -83,6 +89,8 @@ export default function NpcMissionScreen() {
   const [choices, setChoices]       = useState<{ text: string; translation: string }[]>([]);
   const [choiceTranslVisible, setChoiceTranslVisible] = useState<boolean[]>([]);
   const [msgTranslVisible, setMsgTranslVisible] = useState<Set<string>>(new Set());
+  const [onDemandTranslMap, setOnDemandTranslMap] = useState<Record<string, string>>({});
+  const [fetchingTranslSet, setFetchingTranslSet] = useState<Set<string>>(new Set());
   const [isTyping, setIsTyping]     = useState(false);
   const [inputText, setInputText]   = useState("");
   const [muted, setMuted]           = useState(false);
@@ -536,17 +544,55 @@ export default function NpcMissionScreen() {
 
   const emojiIcon = NPC_EMOTIONS[emotion] ?? "😐";
 
-  const toggleMsgTransl = useCallback((id: string) => {
+  const toggleMsgTransl = useCallback(async (item: NpcMessage) => {
+    const { id, text, translation } = item;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setMsgTranslVisible(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  }, []);
+
+    const alreadyVisible = msgTranslVisible.has(id);
+
+    if (alreadyVisible) {
+      LayoutAnimation.configureNext(LayoutAnimation.create(220, "easeInEaseOut", "opacity"));
+      setMsgTranslVisible(prev => { const n = new Set(prev); n.delete(id); return n; });
+      return;
+    }
+
+    const hasTransl = !!translation || !!onDemandTranslMap[id];
+    if (hasTransl) {
+      LayoutAnimation.configureNext(LayoutAnimation.create(250, "easeInEaseOut", "opacity"));
+      setMsgTranslVisible(prev => new Set(prev).add(id));
+      return;
+    }
+
+    if (fetchingTranslSet.has(id)) return;
+
+    setFetchingTranslSet(prev => new Set(prev).add(id));
+    setMsgTranslVisible(prev => new Set(prev).add(id));
+    try {
+      const langLabel: Record<string, string> = { english: "English", korean: "Korean", spanish: "Spanish" };
+      const res = await fetch(new URL("/api/translate", getApiUrl()).toString(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, targetLanguage: langLabel[native] ?? native }),
+      });
+      const data = await res.json();
+      const tr = (data.translation ?? "").trim();
+      LayoutAnimation.configureNext(LayoutAnimation.create(250, "easeInEaseOut", "opacity"));
+      setOnDemandTranslMap(prev => ({ ...prev, [id]: tr || text }));
+    } catch {
+      setOnDemandTranslMap(prev => ({ ...prev, [id]: "" }));
+    } finally {
+      setFetchingTranslSet(prev => { const n = new Set(prev); n.delete(id); return n; });
+    }
+  }, [msgTranslVisible, onDemandTranslMap, fetchingTranslSet, native]);
 
   const renderItem = ({ item }: { item: NpcMessage }) => {
-    const translShown = msgTranslVisible.has(item.id);
+    const translShown   = msgTranslVisible.has(item.id);
+    const isFetching    = fetchingTranslSet.has(item.id);
+    const resolvedTransl = item.translation || onDemandTranslMap[item.id] || "";
+    const btnLabel = translShown
+      ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : "Hide")
+      : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : "Translate");
+
     return (
       <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowNpc]}>
         {!item.isUser && npc && (
@@ -571,19 +617,29 @@ export default function NpcMissionScreen() {
               </Pressable>
             )}
           </View>
+
           {/* Translation toggle — NPC only */}
-          {!item.isUser && !!item.translation && (
+          {!item.isUser && (
             <View style={styles.msgTranslWrap}>
-              <Pressable onPress={() => toggleMsgTransl(item.id)} style={styles.msgTranslBtn}>
-                <Text style={styles.msgTranslBtnText}>
-                  {translShown
-                    ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : "Hide translation")
-                    : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : "Show translation")}
-                </Text>
+              <Pressable
+                onPress={() => toggleMsgTransl(item)}
+                style={({ pressed }) => [styles.msgTranslBtn, pressed && { opacity: 0.7 }]}
+                disabled={isFetching}
+              >
+                {isFetching ? (
+                  <ActivityIndicator size="small" color={C.gold} style={{ marginRight: 4 }} />
+                ) : null}
+                <Text style={styles.msgTranslBtnText}>{btnLabel}</Text>
               </Pressable>
-              {translShown && (
-                <Text style={styles.msgTranslText}>{item.translation}</Text>
-              )}
+              {translShown && (resolvedTransl || isFetching) ? (
+                <View style={styles.msgTranslBox}>
+                  {isFetching && !resolvedTransl ? (
+                    <ActivityIndicator size="small" color={C.gold} />
+                  ) : (
+                    <Text style={styles.msgTranslText}>{resolvedTransl}</Text>
+                  )}
+                </View>
+              ) : null}
             </View>
           )}
         </View>
@@ -1060,17 +1116,26 @@ const styles = StyleSheet.create({
   bubbleTextNpc: { fontFamily: F.body, color: "#2c1810" },
   replayBtn: { marginTop: 4, alignSelf: "flex-end", padding: 2 },
 
-  msgTranslWrap: { marginTop: 4, paddingLeft: 2, gap: 4 },
-  msgTranslBtn: { alignSelf: "flex-start", paddingVertical: 3, paddingHorizontal: 2 },
+  msgTranslWrap: { marginTop: 3, paddingLeft: 2, gap: 3 },
+  msgTranslBtn: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    alignSelf: "flex-start", paddingVertical: 4, paddingHorizontal: 2,
+  },
   msgTranslBtnText: {
-    fontSize: 11, fontFamily: F.body, color: C.gold,
-    textDecorationLine: "underline", opacity: 0.85,
+    fontSize: 12, fontFamily: F.body, color: C.gold,
+  },
+  msgTranslBox: {
+    backgroundColor: "rgba(0,0,0,0.32)",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    minHeight: 32,
+    justifyContent: "center",
   },
   msgTranslText: {
-    fontSize: 13, fontFamily: F.body,
-    color: C.parchment, opacity: 0.6,
-    lineHeight: 18, fontStyle: "italic",
-    maxWidth: "90%",
+    fontSize: 12, fontFamily: F.body,
+    color: "rgba(244,232,193,0.88)",
+    lineHeight: 18,
   },
 
   typingBubble: { paddingVertical: 14 },
