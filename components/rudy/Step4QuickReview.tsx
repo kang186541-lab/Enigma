@@ -80,14 +80,15 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   const [canSkipScoring, setCanSkipScoring] = useState(false);
   const skipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const nativeRecRef   = useRef<Audio.Recording | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const mediaRecRef    = useRef<any>(null);
-  const autoStopRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const soundRef       = useRef<Audio.Sound | null>(null);
-  const pulseAnim      = useRef(new Animated.Value(1)).current;
-  const pulseLoop      = useRef<Animated.CompositeAnimation | null>(null);
-  const progressAnim   = useRef(new Animated.Value(1)).current;
+  const nativeRecRef      = useRef<Audio.Recording | null>(null);
+  const audioChunksRef    = useRef<Blob[]>([]);
+  const mediaRecRef       = useRef<any>(null);
+  const autoStopRef       = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const soundRef          = useRef<Audio.Sound | null>(null);
+  const safetyTimeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pulseAnim         = useRef(new Animated.Value(1)).current;
+  const pulseLoop         = useRef<Animated.CompositeAnimation | null>(null);
+  const progressAnim      = useRef(new Animated.Value(1)).current;
 
   const apiBase = getApiUrl();
   const q       = questions[qIndex];
@@ -103,6 +104,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     return () => {
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
       if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
+      if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
       if (nativeRecRef.current) {
         nativeRecRef.current.stopAndUnloadAsync().catch(() => {});
         nativeRecRef.current = null;
@@ -110,6 +112,26 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       stopAllTTSSync();
     };
   }, []);
+
+  // Safety timeout: if "assessing" lasts > 8s, force reveal with default score
+  useEffect(() => {
+    if (qPhase === "assessing") {
+      if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
+      safetyTimeoutRef.current = setTimeout(() => {
+        if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
+        setCanSkipScoring(false);
+        setPronScore(70);
+        setAllScores((prev) => [...prev, 70]);
+        setStars(2);
+        setQPhase("revealed");
+      }, 8000);
+    } else {
+      if (safetyTimeoutRef.current) { clearTimeout(safetyTimeoutRef.current); safetyTimeoutRef.current = null; }
+    }
+    return () => {
+      if (safetyTimeoutRef.current) { clearTimeout(safetyTimeoutRef.current); safetyTimeoutRef.current = null; }
+    };
+  }, [qPhase]);
 
   // ── Timer ──────────────────────────────────────────────────────────────────
 

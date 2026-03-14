@@ -1,0 +1,74 @@
+STEP 4 scoring is STILL freezing on “채점 중…” forever. Previous fixes did NOT work. I need you to actually debug this properly.
+
+## DO THIS STEP BY STEP. Do not skip any step.
+
+### Step 1: Find the code
+
+Find the STEP 4 Review component file. Show me the EXACT function that runs after the user finishes recording. Copy the entire function here so I can see it.
+
+### Step 2: Find where it gets stuck
+
+In that function, find where “채점 중…” (isScoring = true) is set. Then find EVERY place where isScoring should be set back to false. Show me those lines.
+
+### Step 3: The problem
+
+I suspect one of these:
+
+- isScoring is set to true but NEVER set back to false when Azure fails
+- The Azure pronunciation assessment call throws an error that isn’t caught
+- The function awaits something that never resolves
+- After scoring, there’s no code to move to the next question
+
+### Step 4: Fix it with this EXACT pattern
+
+Replace the entire scoring function with this pattern:
+
+```javascript
+async function handleRecordingComplete(audioUri, referenceText) {
+  setIsScoring(true);
+  
+  // Safety timeout — force move on after 8 seconds no matter what
+  const safetyTimeout = setTimeout(() => {
+    console.log('[STEP4] Safety timeout triggered — forcing next question');
+    setIsScoring(false);
+    goToNextQuestion();
+  }, 8000);
+  
+  try {
+    // Use the SAME scoring function that works in pronunciation practice
+    const result = await assessPronunciation(audioUri, referenceText);
+    
+    clearTimeout(safetyTimeout);
+    setIsScoring(false);
+    
+    if (result && result.score !== undefined) {
+      setCurrentScore(result.score);
+      // Show score for 2 seconds then move on
+      setTimeout(() => goToNextQuestion(), 2000);
+    } else {
+      // No score returned — just move on
+      goToNextQuestion();
+    }
+    
+  } catch (error) {
+    console.error('[STEP4] Scoring error:', error);
+    clearTimeout(safetyTimeout);
+    setIsScoring(false);
+    // Error — skip scoring and move on
+    goToNextQuestion();
+  }
+}
+```
+
+The KEY difference: there is a **safety timeout of 8 seconds** that will FORCE the app to move on no matter what happens. Even if Azure crashes, even if the code has a bug, the user will never be stuck for more than 8 seconds.
+
+### Step 5: Verify
+
+After making the change, confirm:
+
+1. isScoring is set to false in the try block ✓
+1. isScoring is set to false in the catch block ✓
+1. isScoring is set to false by the safety timeout ✓
+1. goToNextQuestion is called in ALL three paths ✓
+
+There must be NO path where the user gets stuck on “채점 중…” forever.
