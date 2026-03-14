@@ -6,6 +6,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
+import * as FileSystem from "expo-file-system";
 import { C, F } from "@/constants/theme";
 import type { LoadedQuiz, LangCode } from "@/constants/storyTypes";
 import { fillGptPrompt } from "@/lib/storyUtils";
@@ -1112,6 +1113,257 @@ function TimedBossView({
   );
 }
 
+// ─── Pronunciation Quiz ───────────────────────────────────────────────────────
+
+function PronunciationQuizView({
+  quiz,
+  onDone,
+}: {
+  quiz: LoadedQuiz;
+  onDone: (correct: number, total: number) => void;
+}) {
+  const tl = quiz.targetLang as "en" | "es" | "ko";
+  const nl = quiz.nativeLang;
+  const contentMap = quiz.content as Record<string, { sentences: { text: string; minScore: number }[] }>;
+  const sentences = contentMap[tl]?.sentences ?? contentMap["en"]?.sentences ?? [];
+
+  const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : "en-US";
+  const rudyMsg = nl === "ko" ? "루디가 듣고 있어요… 🦊" : nl === "es" ? "Rudy está escuchando… 🦊" : "Rudy is listening… 🦊";
+
+  const [sIdx, setSIdx] = useState(0);
+  const [recordState, setRecordState] = useState<"idle" | "recording" | "processing" | "done">("idle");
+  const [score, setScore] = useState<number | null>(null);
+  const [error, setError] = useState("");
+  const [correctCount, setCorrectCount] = useState(0);
+
+  const nativeRecordingRef = useRef<Audio.Recording | null>(null);
+  const autoStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mediaRecorderRef = useRef<any>(null);
+  const audioChunksRef = useRef<any[]>([]);
+
+  const sentence = sentences[sIdx];
+  const isLast = sIdx >= sentences.length - 1;
+  const passed = score !== null && score >= (sentence?.minScore ?? 60);
+
+  function advance() {
+    const wasCorrect = score !== null && score >= (sentence?.minScore ?? 60);
+    const newCorrect = correctCount + (wasCorrect ? 1 : 0);
+    if (isLast) {
+      onDone(newCorrect, sentences.length);
+    } else {
+      setCorrectCount(newCorrect);
+      setSIdx((i) => i + 1);
+      setScore(null);
+      setError("");
+      setRecordState("idle");
+    }
+  }
+
+  async function stopNativeRecording() {
+    const rec = nativeRecordingRef.current;
+    if (!rec) return;
+    if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
+    setRecordState("processing");
+    try {
+      await rec.stopAndUnloadAsync();
+      const uri = rec.getURI();
+      nativeRecordingRef.current = null;
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      if (!uri) throw new Error("No URI");
+      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
+      const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: sentence?.text ?? "", lang: speechLang, audio: base64, mimeType: "audio/m4a" }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const s = typeof data.accuracyScore === "number" ? data.accuracyScore : typeof data.score === "number" ? data.score : 0;
+      setScore(Math.round(s));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : nl === "es" ? "Error al evaluar." : "Evaluation error.");
+    } finally {
+      setRecordState("done");
+    }
+  }
+
+  function handleRecord() {
+    if (recordState === "processing") return;
+
+    if (recordState === "recording") {
+      if (Platform.OS !== "web" && nativeRecordingRef.current) {
+        stopNativeRecording();
+      } else if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+      return;
+    }
+
+    setScore(null);
+    setError("");
+
+    if (Platform.OS !== "web") {
+      (async () => {
+        try {
+          const { granted } = await Audio.requestPermissionsAsync();
+          if (!granted) {
+            setError(nl === "ko" ? "마이크 권한을 허용해주세요." : nl === "es" ? "Permite el micrófono." : "Microphone permission required.");
+            return;
+          }
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+          const recording = new Audio.Recording();
+          await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+          await recording.startAsync();
+          nativeRecordingRef.current = recording;
+          setRecordState("recording");
+          autoStopRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
+        } catch {
+          setError(nl === "ko" ? "마이크를 시작할 수 없습니다." : nl === "es" ? "No se puede iniciar el micrófono." : "Cannot start microphone.");
+        }
+      })();
+      return;
+    }
+
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      setError(nl === "ko" ? "이 브라우저는 마이크를 지원하지 않습니다." : "Microphone not supported.");
+      return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      audioChunksRef.current = [];
+      const mimeType = (window as any).MediaRecorder?.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : "audio/webm";
+      const recorder = new (window as any).MediaRecorder(stream, { mimeType });
+      mediaRecorderRef.current = recorder;
+      recorder.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunksRef.current.push(e.data); };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t: any) => t.stop());
+        setRecordState("processing");
+        const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        const base64: string = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve((reader.result as string).split(",")[1] ?? "");
+          reader.readAsDataURL(blob);
+        });
+        try {
+          const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+          const res = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ word: sentence?.text ?? "", lang: speechLang, audio: base64, mimeType: recorder.mimeType || "audio/webm" }),
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          const s = typeof data.accuracyScore === "number" ? data.accuracyScore : typeof data.score === "number" ? data.score : 0;
+          setScore(Math.round(s));
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch {
+          setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : "Evaluation error.");
+        } finally {
+          setRecordState("done");
+        }
+      };
+      recorder.start();
+      setRecordState("recording");
+      autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 8000);
+    }).catch(() => {
+      setError(nl === "ko" ? "마이크 권한을 허용해주세요." : "Microphone permission required.");
+    });
+  }
+
+  if (!sentence) return <Text style={styles.instructionText}>No sentences found.</Text>;
+
+  const scoreColor = score === null ? C.gold : score >= 80 ? "#4caf50" : score >= 60 ? "#ff9800" : "#f44336";
+
+  return (
+    <View style={styles.pronContainer}>
+      {/* Progress */}
+      <Text style={styles.pronProgress}>{sIdx + 1} / {sentences.length}</Text>
+
+      {/* Sentence card */}
+      <View style={styles.pronCard}>
+        <Text style={styles.pronSentenceLabel}>
+          {nl === "ko" ? "다음 문장을 소리 내어 읽으세요:" : nl === "es" ? "Lee la siguiente frase en voz alta:" : "Read the following sentence aloud:"}
+        </Text>
+        <Text style={styles.pronSentenceText}>{sentence.text}</Text>
+      </View>
+
+      {/* Mic button */}
+      <Pressable
+        style={[
+          styles.pronMicBtn,
+          recordState === "recording" && styles.pronMicBtnActive,
+          recordState === "processing" && { opacity: 0.6 },
+        ]}
+        onPress={handleRecord}
+        disabled={recordState === "processing" || recordState === "done"}
+      >
+        {recordState === "processing" ? (
+          <ActivityIndicator size="large" color={C.bg1} />
+        ) : (
+          <Ionicons
+            name={recordState === "recording" ? "stop-circle" : "mic"}
+            size={40}
+            color={C.bg1}
+          />
+        )}
+      </Pressable>
+
+      {/* Status text */}
+      <Text style={styles.pronStatusText}>
+        {recordState === "recording"
+          ? rudyMsg
+          : recordState === "processing"
+          ? (nl === "ko" ? "채점 중…" : nl === "es" ? "Evaluando…" : "Evaluating…")
+          : recordState === "idle"
+          ? (nl === "ko" ? "마이크 버튼을 눌러 말하세요" : nl === "es" ? "Presiona el micrófono" : "Tap mic to speak")
+          : ""}
+      </Text>
+
+      {/* Score result */}
+      {score !== null && (
+        <View style={[styles.pronScoreBox, { borderColor: scoreColor }]}>
+          <Text style={[styles.pronScoreNum, { color: scoreColor }]}>{score}</Text>
+          <Text style={styles.pronScoreLabel}>/ 100</Text>
+          {passed ? (
+            <Text style={[styles.pronFeedbackLabel, { color: "#4caf50" }]}>
+              {nl === "ko" ? "🎉 훌륭해요!" : nl === "es" ? "🎉 ¡Excelente!" : "🎉 Excellent!"}
+            </Text>
+          ) : (
+            <Text style={[styles.pronFeedbackLabel, { color: "#f44336" }]}>
+              {nl === "ko" ? "다시 도전해볼게요 🦊" : nl === "es" ? "¡Inténtalo de nuevo! 🦊" : "Keep trying! 🦊"}
+            </Text>
+          )}
+        </View>
+      )}
+
+      {/* Error */}
+      {!!error && <Text style={styles.pronErrorText}>{error}</Text>}
+
+      {/* Actions */}
+      {recordState === "done" && (
+        <View style={styles.pronActionRow}>
+          {!passed && (
+            <Pressable style={styles.pronRetryBtn} onPress={() => { setScore(null); setError(""); setRecordState("idle"); }}>
+              <Text style={styles.pronRetryText}>{nl === "ko" ? "다시 녹음" : nl === "es" ? "Reintentar" : "Retry"}</Text>
+            </Pressable>
+          )}
+          <Pressable style={[styles.pronNextBtn, !passed && { backgroundColor: C.bg3 }]} onPress={advance}>
+            <Text style={[styles.pronNextText, !passed && { color: C.textMuted }]}>
+              {isLast
+                ? (nl === "ko" ? "완료" : nl === "es" ? "Completar" : "Complete")
+                : (nl === "ko" ? "다음 →" : nl === "es" ? "Siguiente →" : "Next →")}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+    </View>
+  );
+}
+
 // ─── Main Modal ────────────────────────────────────────────────────────────────
 
 export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }: Props) {
@@ -1140,6 +1392,7 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
     timed: "⏱ Boss Quiz",
     mixed: "🏆 Final Trial",
     translation: "🌐 Translate",
+    pronunciation: "🎤 Pronunciation",
   };
 
   function renderQuiz() {
@@ -1163,6 +1416,8 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
       case "timed":
       case "mixed":
         return <TimedBossView quiz={quiz!} onDone={handleDone} />;
+      case "pronunciation":
+        return <PronunciationQuizView quiz={quiz!} onDone={handleDone} />;
       default:
         return <Text style={styles.instructionText}>Quiz type not yet supported: {quiz!.type}</Text>;
     }
@@ -1449,4 +1704,43 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   continueBtnText: { fontSize: 16, fontFamily: F.label, color: C.parchment },
+
+  // Pronunciation quiz
+  pronContainer: { flex: 1, alignItems: "center", gap: 16, paddingVertical: 8 },
+  pronProgress: { fontSize: 13, fontFamily: F.body, color: C.textMuted },
+  pronCard: {
+    width: "100%", backgroundColor: C.bg2, borderRadius: 16, padding: 18,
+    borderWidth: 1, borderColor: C.border, gap: 8,
+  },
+  pronSentenceLabel: { fontSize: 13, fontFamily: F.body, color: C.textMuted },
+  pronSentenceText: { fontSize: 18, fontFamily: F.bodySemi, color: C.parchment, textAlign: "center" },
+  pronMicBtn: {
+    width: 80, height: 80, borderRadius: 40, backgroundColor: C.gold,
+    alignItems: "center", justifyContent: "center",
+    shadowColor: C.gold, shadowOpacity: 0.4, shadowRadius: 12, elevation: 6,
+  },
+  pronMicBtnActive: {
+    backgroundColor: "#c62828",
+    shadowColor: "#c62828", shadowOpacity: 0.5, shadowRadius: 16,
+  },
+  pronStatusText: { fontSize: 14, fontFamily: F.body, color: C.textMuted },
+  pronScoreBox: {
+    alignItems: "center", borderWidth: 2, borderRadius: 16,
+    paddingHorizontal: 24, paddingVertical: 12, gap: 2,
+  },
+  pronScoreNum: { fontSize: 48, fontFamily: F.label },
+  pronScoreLabel: { fontSize: 13, fontFamily: F.body, color: C.textMuted },
+  pronFeedbackLabel: { fontSize: 15, fontFamily: F.bodySemi, marginTop: 4 },
+  pronErrorText: { fontSize: 13, fontFamily: F.body, color: "#f44336", textAlign: "center" },
+  pronActionRow: { flexDirection: "row", gap: 12, marginTop: 4 },
+  pronRetryBtn: {
+    flex: 1, backgroundColor: C.bg3, borderRadius: 14, paddingVertical: 12,
+    alignItems: "center", borderWidth: 1, borderColor: C.border,
+  },
+  pronRetryText: { fontSize: 14, fontFamily: F.bodySemi, color: C.parchment },
+  pronNextBtn: {
+    flex: 1, backgroundColor: C.gold, borderRadius: 14, paddingVertical: 12,
+    alignItems: "center",
+  },
+  pronNextText: { fontSize: 14, fontFamily: F.label, color: C.bg1 },
 });

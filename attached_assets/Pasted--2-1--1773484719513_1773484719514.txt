@@ -1,0 +1,107 @@
+스토리 모드에서 2가지 문제를 수정해줘.
+
+## 문제 1: 손으로 쓰기(필기) 영역에서 스크롤이 되어 그릴 수 없음
+
+“손으로 쓰기” 퀴즈에서 캔버스(그리기 영역)를 손가락으로 터치하면 글씨를 쓰는 대신 화면이 스크롤돼서 글씨를 쓸 수가 없어.
+
+### 수정 방법
+
+캔버스(그리기) 영역을 터치할 때는 스크롤을 비활성화해야 해.
+
+- 캔버스 영역에 터치가 시작되면(onTouchStart / onPanResponder) 부모 ScrollView의 스크롤을 잠금
+- 캔버스에서 손을 떼면(onTouchEnd) 스크롤을 다시 활성화
+- React Native에서는 ScrollView의 `scrollEnabled` 속성을 state로 제어하거나, 캔버스의 PanResponder에서 `onStartShouldSetResponder`와 `onMoveShouldSetResponder`를 true로 설정해서 터치 이벤트를 캔버스가 가져가도록 해줘
+
+```javascript
+// 방법 1: ScrollView scrollEnabled 제어
+const [scrollEnabled, setScrollEnabled] = useState(true);
+
+<ScrollView scrollEnabled={scrollEnabled}>
+  {/* ... */}
+  <Canvas
+    onTouchStart={() => setScrollEnabled(false)}
+    onTouchEnd={() => setScrollEnabled(true)}
+    onTouchCancel={() => setScrollEnabled(true)}
+  />
+</ScrollView>
+
+// 방법 2: PanResponder에서 이벤트 가로채기
+// 캔버스 컴포넌트의 PanResponder에서
+onStartShouldSetResponder: () => true,
+onMoveShouldSetResponder: () => true,
+onResponderTerminationRequest: () => false,  // 다른 컴포넌트가 터치를 뺏지 못하게
+```
+
+두 방법 중 현재 코드에 맞는 걸 적용해줘. 핵심은 **캔버스 위에서 손가락을 움직일 때 스크롤이 안 되고 그리기만 되어야 한다는 것**.
+
+## 문제 2: 발음 테스트 퀴즈가 스토리 모드에 없음
+
+현재 스토리 모드 퀴즈에 발음 테스트(pronunciation) 타입이 포함되어 있지 않아. 기존에 발음 연습 기능은 이미 앱에 구현되어 있으니까, 스토리 모드 퀴즈에서도 발음 테스트를 사용할 수 있게 해줘.
+
+### 추가할 퀴즈 타입
+
+quizData에 “pronunciation” 타입을 지원하도록 추가해줘. 기존 발음 연습(말하기 탭)의 녹음 + Azure Speech 분석 로직을 재사용하면 돼.
+
+### 각 챕터에 발음 퀴즈 1개씩 추가
+
+기존 퀴즈 사이사이에 보너스 발음 퀴즈를 넣어줘:
+
+챕터1 런던 (ch1_scene2 뒤에 추가):
+
+- 유저의 targetLang에 맞는 단어/문장 발음 테스트
+- EN: “The guardian stones protect language” 발음
+- ES: “Las piedras guardianas protegen el idioma” 발음
+- KO: “수호석은 언어를 보호한다” 발음
+
+챕터2 마드리드 (ch2_scene2 뒤에 추가):
+
+- EN: “The truth is hidden in art” 발음
+- ES: “La verdad está escondida en el arte” 발음
+- KO: “진실은 예술 속에 숨어 있다” 발음
+
+챕터3 서울 (ch3_scene2 뒤에 추가):
+
+- EN: “Languages connect people across the world” 발음
+- ES: “Los idiomas conectan a personas en todo el mundo” 발음
+- KO: “언어는 전 세계 사람들을 연결한다” 발음
+
+### 발음 퀴즈 데이터 구조
+
+```json
+{
+  "id": "ch1_quiz_pronunciation",
+  "chapter": "ch1",
+  "type": "pronunciation",
+  "title": { "ko": "발음 도전", "en": "Pronunciation Challenge", "es": "Desafío de Pronunciación" },
+  "difficulty": 2,
+  "isBoss": false,
+  "storyContext": {
+    "ko": "수호석의 메시지를 정확하게 소리 내어 읽어야 한다.",
+    "en": "You must read the Guardian Stone's message aloud accurately.",
+    "es": "Debes leer el mensaje de la Piedra Guardiana en voz alta con precisión."
+  },
+  "content": {
+    "en": {
+      "sentences": [
+        { "text": "The guardian stones protect language", "minScore": 60 },
+        { "text": "Find them before it's too late", "minScore": 60 }
+      ]
+    },
+    "es": {
+      "sentences": [
+        { "text": "Las piedras guardianas protegen el idioma", "minScore": 60 },
+        { "text": "Encuéntralas antes de que sea tarde", "minScore": 60 }
+      ]
+    },
+    "ko": {
+      "sentences": [
+        { "text": "수호석은 언어를 보호한다", "minScore": 60 },
+        { "text": "너무 늦기 전에 찾아라", "minScore": 60 }
+      ]
+    }
+  },
+  "rewards": { "xp": 80, "items": [], "npcRelation": null }
+}
+```
+
+발음 퀴즈 UI는 기존 발음 연습 화면(마이크 버튼 + Azure 분석)을 그대로 재사용하면 돼. 다만 스토리 맥락(storyContext)을 상단에 표시해서 스토리 흐름에 맞게 보여줘.

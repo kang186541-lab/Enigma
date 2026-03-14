@@ -22,7 +22,13 @@
         "en": {
           "questions": [
             {
-              "scrambled": ["the", "stones", "protect", "language", "guardian"],
+              "scrambled": [
+                "the",
+                "stones",
+                "protect",
+                "language",
+                "guardian"
+              ],
               "answer": "The guardian stones protect language",
               "hint": {
                 "ko": "주어를 먼저 찾으세요. 'guardian stones'가 주어입니다.",
@@ -36,7 +42,13 @@
               }
             },
             {
-              "scrambled": ["seeks", "society", "to", "destroy", "words"],
+              "scrambled": [
+                "seeks",
+                "society",
+                "to",
+                "destroy",
+                "words"
+              ],
               "answer": "Society seeks to destroy words",
               "hint": {
                 "ko": "'seeks to + 동사원형' 패턴입니다.",
@@ -50,7 +62,14 @@
               }
             },
             {
-              "scrambled": ["find", "them", "before", "it's", "too", "late"],
+              "scrambled": [
+                "find",
+                "them",
+                "before",
+                "it's",
+                "too",
+                "late"
+              ],
               "answer": "Find them before it's too late",
               "hint": {
                 "ko": "명령문은 동사로 시작합니다. 시간 표현이 마지막에 옵니다.",
@@ -68,7 +87,14 @@
         "es": {
           "questions": [
             {
-              "scrambled": ["las", "piedras", "protegen", "el", "guardianas", "idioma"],
+              "scrambled": [
+                "las",
+                "piedras",
+                "protegen",
+                "el",
+                "guardianas",
+                "idioma"
+              ],
               "answer": "Las piedras guardianas protegen el idioma",
               "hint": {
                 "ko": "스페인어에서 형용사는 보통 명사 뒤에 옵니다.",
@@ -82,7 +108,13 @@
               }
             },
             {
-              "scrambled": ["la", "sociedad", "busca", "destruir", "palabras"],
+              "scrambled": [
+                "la",
+                "sociedad",
+                "busca",
+                "destruir",
+                "palabras"
+              ],
               "answer": "La sociedad busca destruir palabras",
               "hint": {
                 "ko": "'busca + 동사원형' 패턴입니다.",
@@ -96,7 +128,14 @@
               }
             },
             {
-              "scrambled": ["encuéntralas", "antes", "de", "que", "sea", "tarde"],
+              "scrambled": [
+                "encuéntralas",
+                "antes",
+                "de",
+                "que",
+                "sea",
+                "tarde"
+              ],
               "answer": "Encuéntralas antes de que sea tarde",
               "hint": {
                 "ko": "명령형이 먼저, 'antes de que + 접속법' 구조입니다.",
@@ -114,7 +153,11 @@
         "ko": {
           "questions": [
             {
-              "scrambled": ["수호석은", "언어를", "보호한다"],
+              "scrambled": [
+                "수호석은",
+                "언어를",
+                "보호한다"
+              ],
               "answer": "수호석은 언어를 보호한다",
               "hint": {
                 "en": "Korean order: Subject + Object + Verb. Look for the particles.",
@@ -128,7 +171,12 @@
               }
             },
             {
-              "scrambled": ["그들은", "단어를", "파괴하려", "한다"],
+              "scrambled": [
+                "그들은",
+                "단어를",
+                "파괴하려",
+                "한다"
+              ],
               "answer": "그들은 단어를 파괴하려 한다",
               "hint": {
                 "en": "'-려 한다' means 'trying to' — it goes at the end.",
@@ -142,7 +190,12 @@
               }
             },
             {
-              "scrambled": ["너무", "늦기", "전에", "찾아라"],
+              "scrambled": [
+                "너무",
+                "늦기",
+                "전에",
+                "찾아라"
+              ],
               "answer": "너무 늦기 전에 찾아라",
               "hint": {
                 "en": "'전에' means 'before'. Commands end the sentence in Korean.",
@@ -160,7 +213,9 @@
       },
       "rewards": {
         "xp": 50,
-        "items": ["broken_seal"],
+        "items": [
+          "broken_seal"
+        ],
         "npcRelation": null
       }
     },
@@ -196,27 +251,47 @@
             {
               "left": "dodgy",
               "right": "suspicious",
-              "wrongOptions": ["friendly", "clever", "tired"]
+              "wrongOptions": [
+                "friendly",
+                "clever",
+                "tired"
+              ]
             },
             {
               "left": "having a butcher's",
               "right": "having a look",
-              "wrongOptions": ["eating meat", "cooking food", "buying things"]
+              "wrongOptions": [
+                "eating meat",
+                "cooking food",
+                "buying things"
+              ]
             },
             {
               "left": "legged it",
               "right": "ran away",
-              "wrongOptions": ["kicked it", "walked slowly", "sat down"]
+              "wrongOptions": [
+                "kicked it",
+                "walked slowly",
+                "sat down"
+              ]
             },
             {
               "left": "bloke",
               "right": "man",
-              "wrongOptions": ["building", "animal", "car"]
+              "wrongOptions": [
+                "building",
+                "animal",
+                "car"
+              ]
             },
             {
               "left": "proper sus",
               "right": "really suspicious",
-              "wrongOptions": ["very sweet", "quite normal", "very tired"]
+              "wrongOptions": [
+                "very sweet",
+                "quite normal",
+                "very tired"
+              ]
             }
           ],
           "grammarNote": {
@@ -230,27 +305,47 @@
             {
               "left": "tío",
               "right": "hombre/persona",
-              "wrongOptions": ["tío familiar", "edificio", "animal"]
+              "wrongOptions": [
+                "tío familiar",
+                "edificio",
+                "animal"
+              ]
             },
             {
               "left": "qué fuerte",
               "right": "increíble/impactante",
-              "wrongOptions": ["muy fuerte físicamente", "muy ruidoso", "muy amable"]
+              "wrongOptions": [
+                "muy fuerte físicamente",
+                "muy ruidoso",
+                "muy amable"
+              ]
             },
             {
               "left": "se piró",
               "right": "se fue rápido",
-              "wrongOptions": ["se sentó", "se durmió", "se rió"]
+              "wrongOptions": [
+                "se sentó",
+                "se durmió",
+                "se rió"
+              ]
             },
             {
               "left": "mola",
               "right": "es genial/cool",
-              "wrongOptions": ["molesta", "muele", "moja"]
+              "wrongOptions": [
+                "molesta",
+                "muele",
+                "moja"
+              ]
             },
             {
               "left": "currar",
               "right": "trabajar",
-              "wrongOptions": ["correr", "curar", "cocinar"]
+              "wrongOptions": [
+                "correr",
+                "curar",
+                "cocinar"
+              ]
             }
           ],
           "grammarNote": {
@@ -264,27 +359,47 @@
             {
               "left": "대박",
               "right": "놀라운/대단한",
-              "wrongOptions": ["큰 상자", "폭발", "실패"]
+              "wrongOptions": [
+                "큰 상자",
+                "폭발",
+                "실패"
+              ]
             },
             {
               "left": "튀다",
               "right": "도망가다",
-              "wrongOptions": ["튀기다", "춤추다", "뛰어오르다"]
+              "wrongOptions": [
+                "튀기다",
+                "춤추다",
+                "뛰어오르다"
+              ]
             },
             {
               "left": "꿀잼",
               "right": "매우 재미있는",
-              "wrongOptions": ["꿀맛 잼", "달콤한", "지루한"]
+              "wrongOptions": [
+                "꿀맛 잼",
+                "달콤한",
+                "지루한"
+              ]
             },
             {
               "left": "뚫어지게 보다",
               "right": "집중해서 바라보다",
-              "wrongOptions": ["구멍을 뚫다", "눈이 아프다", "무시하다"]
+              "wrongOptions": [
+                "구멍을 뚫다",
+                "눈이 아프다",
+                "무시하다"
+              ]
             },
             {
               "left": "완전",
               "right": "매우/정말",
-              "wrongOptions": ["완전한/완벽한", "절반", "조금"]
+              "wrongOptions": [
+                "완전한/완벽한",
+                "절반",
+                "조금"
+              ]
             }
           ],
           "grammarNote": {
@@ -297,7 +412,10 @@
       "rewards": {
         "xp": 80,
         "items": [],
-        "npcRelation": { "npc": "tom", "points": 1 }
+        "npcRelation": {
+          "npc": "tom",
+          "points": 1
+        }
       }
     },
     {
@@ -325,7 +443,12 @@
             {
               "id": 1,
               "answer": "scholars",
-              "options": ["scholars", "soldiers", "merchants", "thieves"],
+              "options": [
+                "scholars",
+                "soldiers",
+                "merchants",
+                "thieves"
+              ],
               "hint": {
                 "ko": "비밀리에 모여 고대 언어를 다루는 사람들은?",
                 "en": "Who would secretly gather to work with ancient languages?",
@@ -335,7 +458,12 @@
             {
               "id": 2,
               "answer": "preserve",
-              "options": ["destroy", "preserve", "translate", "forget"],
+              "options": [
+                "destroy",
+                "preserve",
+                "translate",
+                "forget"
+              ],
               "hint": {
                 "ko": "그들은 언어를 지키려는 쪽입니다.",
                 "en": "They are on the side of protecting languages.",
@@ -345,7 +473,12 @@
             {
               "id": 3,
               "answer": "word",
-              "options": ["word", "sword", "world", "stone"],
+              "options": [
+                "word",
+                "sword",
+                "world",
+                "stone"
+              ],
               "hint": {
                 "ko": "언어의 가장 기본 단위는?",
                 "en": "What is the most basic unit of language?",
@@ -355,7 +488,12 @@
             {
               "id": 4,
               "answer": "soul",
-              "options": ["soul", "gold", "code", "wall"],
+              "options": [
+                "soul",
+                "gold",
+                "code",
+                "wall"
+              ],
               "hint": {
                 "ko": "언어를 잃는 것은 무엇의 일부를 잃는 것일까요?",
                 "en": "Losing a language is like losing a part of what?",
@@ -370,7 +508,12 @@
             {
               "id": 1,
               "answer": "eruditos",
-              "options": ["eruditos", "soldados", "comerciantes", "ladrones"],
+              "options": [
+                "eruditos",
+                "soldados",
+                "comerciantes",
+                "ladrones"
+              ],
               "hint": {
                 "ko": "고대 언어를 연구하는 사람들은?",
                 "en": "Who would study ancient languages?",
@@ -380,7 +523,12 @@
             {
               "id": 2,
               "answer": "preservar",
-              "options": ["destruir", "preservar", "traducir", "olvidar"],
+              "options": [
+                "destruir",
+                "preservar",
+                "traducir",
+                "olvidar"
+              ],
               "hint": {
                 "ko": "이 사람들은 언어를 지키려고 합니다.",
                 "en": "These people want to protect languages.",
@@ -390,7 +538,12 @@
             {
               "id": 3,
               "answer": "palabra",
-              "options": ["palabra", "espada", "mundo", "piedra"],
+              "options": [
+                "palabra",
+                "espada",
+                "mundo",
+                "piedra"
+              ],
               "hint": {
                 "ko": "언어의 기본 단위는?",
                 "en": "Basic unit of language?",
@@ -400,7 +553,12 @@
             {
               "id": 4,
               "answer": "alma",
-              "options": ["alma", "oro", "código", "muro"],
+              "options": [
+                "alma",
+                "oro",
+                "código",
+                "muro"
+              ],
               "hint": {
                 "ko": "언어를 잃으면 무엇의 일부를 잃는 걸까요?",
                 "en": "Losing a language means losing part of the...?",
@@ -415,7 +573,12 @@
             {
               "id": 1,
               "answer": "학자",
-              "options": ["학자", "군인", "상인", "도둑"],
+              "options": [
+                "학자",
+                "군인",
+                "상인",
+                "도둑"
+              ],
               "hint": {
                 "en": "Who studies ancient languages?",
                 "es": "¿Quién estudia lenguas antiguas?",
@@ -425,7 +588,12 @@
             {
               "id": 2,
               "answer": "보존",
-              "options": ["파괴", "보존", "번역", "망각"],
+              "options": [
+                "파괴",
+                "보존",
+                "번역",
+                "망각"
+              ],
               "hint": {
                 "en": "They want to protect languages.",
                 "es": "Quieren proteger los idiomas.",
@@ -435,7 +603,12 @@
             {
               "id": 3,
               "answer": "말",
-              "options": ["말", "칼", "세상", "돌"],
+              "options": [
+                "말",
+                "칼",
+                "세상",
+                "돌"
+              ],
               "hint": {
                 "en": "The basic unit of language.",
                 "es": "La unidad básica del idioma.",
@@ -445,7 +618,12 @@
             {
               "id": 4,
               "answer": "영혼",
-              "options": ["영혼", "금", "암호", "벽"],
+              "options": [
+                "영혼",
+                "금",
+                "암호",
+                "벽"
+              ],
               "hint": {
                 "en": "Losing a language means losing part of the...?",
                 "es": "Perder un idioma es perder parte del...?",
@@ -457,7 +635,9 @@
       },
       "rewards": {
         "xp": 100,
-        "items": ["pennys_note"],
+        "items": [
+          "pennys_note"
+        ],
         "npcRelation": null
       }
     },
@@ -493,7 +673,11 @@
                 "es": "¿Qué ha sido asegurado?"
               },
               "answer": "The first stone",
-              "acceptableAnswers": ["first stone", "the stone", "stone"]
+              "acceptableAnswers": [
+                "first stone",
+                "the stone",
+                "stone"
+              ]
             },
             {
               "question": {
@@ -502,7 +686,9 @@
                 "es": "¿Qué ciudad se menciona?"
               },
               "answer": "Madrid",
-              "acceptableAnswers": ["madrid"]
+              "acceptableAnswers": [
+                "madrid"
+              ]
             },
             {
               "question": {
@@ -511,7 +697,12 @@
                 "es": "¿Qué necesitan en Madrid?"
               },
               "answer": "Someone on the inside",
-              "acceptableAnswers": ["someone inside", "insider", "person inside", "someone on the inside"]
+              "acceptableAnswers": [
+                "someone inside",
+                "insider",
+                "person inside",
+                "someone on the inside"
+              ]
             }
           ]
         },
@@ -527,7 +718,11 @@
                 "es": "¿Qué ha sido asegurado?"
               },
               "answer": "La primera piedra",
-              "acceptableAnswers": ["primera piedra", "la piedra", "piedra"]
+              "acceptableAnswers": [
+                "primera piedra",
+                "la piedra",
+                "piedra"
+              ]
             },
             {
               "question": {
@@ -536,7 +731,9 @@
                 "es": "¿Qué ciudad se menciona?"
               },
               "answer": "Madrid",
-              "acceptableAnswers": ["madrid"]
+              "acceptableAnswers": [
+                "madrid"
+              ]
             },
             {
               "question": {
@@ -545,7 +742,11 @@
                 "es": "¿Qué necesitan en Madrid?"
               },
               "answer": "Alguien dentro",
-              "acceptableAnswers": ["alguien dentro", "una persona dentro", "alguien adentro"]
+              "acceptableAnswers": [
+                "alguien dentro",
+                "una persona dentro",
+                "alguien adentro"
+              ]
             }
           ]
         },
@@ -561,7 +762,11 @@
                 "ko": "무엇이 확보되었나요?"
               },
               "answer": "첫 번째 돌",
-              "acceptableAnswers": ["첫번째 돌", "첫 번째 수호석", "돌"]
+              "acceptableAnswers": [
+                "첫번째 돌",
+                "첫 번째 수호석",
+                "돌"
+              ]
             },
             {
               "question": {
@@ -570,7 +775,9 @@
                 "ko": "다음 도시는?"
               },
               "answer": "마드리드",
-              "acceptableAnswers": ["마드리드"]
+              "acceptableAnswers": [
+                "마드리드"
+              ]
             },
             {
               "question": {
@@ -579,16 +786,84 @@
                 "ko": "무엇이 필요한가요?"
               },
               "answer": "내부에 사람",
-              "acceptableAnswers": ["내부에 사람", "내부자", "사람이 필요", "내부 사람"]
+              "acceptableAnswers": [
+                "내부에 사람",
+                "내부자",
+                "사람이 필요",
+                "내부 사람"
+              ]
             }
           ]
         }
       },
       "rewards": {
         "xp": 150,
-        "items": ["madrid_ticket"],
+        "items": [
+          "madrid_ticket"
+        ],
         "npcRelation": null,
         "badge": "london_codebreaker"
+      }
+    },
+    {
+      "id": "ch1_quiz_pronunciation",
+      "chapter": "ch1",
+      "scene": "ch1_scene2",
+      "type": "pronunciation",
+      "title": {
+        "ko": "발음 도전",
+        "en": "Pronunciation Challenge",
+        "es": "Desafío de Pronunciación"
+      },
+      "difficulty": 2,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "수호석의 메시지를 정확하게 소리 내어 읽어야 한다.",
+        "en": "You must read the Guardian Stone's message aloud accurately.",
+        "es": "Debes leer el mensaje de la Piedra Guardiana en voz alta con precisión."
+      },
+      "content": {
+        "en": {
+          "sentences": [
+            {
+              "text": "The guardian stones protect language",
+              "minScore": 60
+            },
+            {
+              "text": "Find them before it is too late",
+              "minScore": 60
+            }
+          ]
+        },
+        "es": {
+          "sentences": [
+            {
+              "text": "Las piedras guardianas protegen el idioma",
+              "minScore": 60
+            },
+            {
+              "text": "Encuéntralas antes de que sea tarde",
+              "minScore": 60
+            }
+          ]
+        },
+        "ko": {
+          "sentences": [
+            {
+              "text": "수호석은 언어를 보호한다",
+              "minScore": 60
+            },
+            {
+              "text": "너무 늦기 전에 찾아라",
+              "minScore": 60
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 80,
+        "items": [],
+        "npcRelation": null
       }
     },
     {
@@ -616,17 +891,29 @@
             {
               "text": "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?",
               "answer": "a map",
-              "acceptableAnswers": ["map", "a map", "world map"]
+              "acceptableAnswers": [
+                "map",
+                "a map",
+                "world map"
+              ]
             },
             {
               "text": "The more you take, the more you leave behind. What am I?",
               "answer": "footsteps",
-              "acceptableAnswers": ["footsteps", "steps", "footprints"]
+              "acceptableAnswers": [
+                "footsteps",
+                "steps",
+                "footprints"
+              ]
             },
             {
               "text": "I speak every language but have no mouth. I tell every story but have no voice. I've lived for centuries but was never alive. What am I?",
               "answer": "a book",
-              "acceptableAnswers": ["book", "a book", "books"]
+              "acceptableAnswers": [
+                "book",
+                "a book",
+                "books"
+              ]
             }
           ]
         },
@@ -635,17 +922,29 @@
             {
               "text": "Tengo ciudades, pero no casas. Tengo montañas, pero no árboles. Tengo agua, pero no peces. ¿Qué soy?",
               "answer": "un mapa",
-              "acceptableAnswers": ["mapa", "un mapa", "el mapa"]
+              "acceptableAnswers": [
+                "mapa",
+                "un mapa",
+                "el mapa"
+              ]
             },
             {
               "text": "Cuanto más quitas, más dejas atrás. ¿Qué soy?",
               "answer": "huellas",
-              "acceptableAnswers": ["huellas", "pisadas", "pasos"]
+              "acceptableAnswers": [
+                "huellas",
+                "pisadas",
+                "pasos"
+              ]
             },
             {
               "text": "Hablo todos los idiomas pero no tengo boca. Cuento todas las historias pero no tengo voz. He vivido siglos pero nunca estuve vivo. ¿Qué soy?",
               "answer": "un libro",
-              "acceptableAnswers": ["libro", "un libro", "el libro"]
+              "acceptableAnswers": [
+                "libro",
+                "un libro",
+                "el libro"
+              ]
             }
           ]
         },
@@ -654,17 +953,29 @@
             {
               "text": "나에게는 도시가 있지만 집은 없다. 산이 있지만 나무는 없다. 물이 있지만 물고기는 없다. 나는 무엇일까?",
               "answer": "지도",
-              "acceptableAnswers": ["지도", "세계지도", "약도"]
+              "acceptableAnswers": [
+                "지도",
+                "세계지도",
+                "약도"
+              ]
             },
             {
               "text": "가져갈수록 더 많이 남기는 것은 무엇일까?",
               "answer": "발자국",
-              "acceptableAnswers": ["발자국", "발자취", "족적"]
+              "acceptableAnswers": [
+                "발자국",
+                "발자취",
+                "족적"
+              ]
             },
             {
               "text": "모든 언어를 말하지만 입이 없다. 모든 이야기를 전하지만 목소리가 없다. 수백 년을 살았지만 살아있던 적이 없다. 나는 무엇일까?",
               "answer": "책",
-              "acceptableAnswers": ["책", "서적", "도서"]
+              "acceptableAnswers": [
+                "책",
+                "서적",
+                "도서"
+              ]
             }
           ]
         }
@@ -702,32 +1013,77 @@
             {
               "id": 1,
               "answer": "eleven",
-              "options": ["nine", "ten", "eleven", "midnight"],
-              "hint": { "ko": "밤 11시입니다", "en": "It was 11 PM", "es": "Eran las 11 PM" }
+              "options": [
+                "nine",
+                "ten",
+                "eleven",
+                "midnight"
+              ],
+              "hint": {
+                "ko": "밤 11시입니다",
+                "en": "It was 11 PM",
+                "es": "Eran las 11 PM"
+              }
             },
             {
               "id": 2,
               "answer": "tall",
-              "options": ["short", "tall", "young", "old"],
-              "hint": { "ko": "키가 큰", "en": "Vertically big", "es": "De gran estatura" }
+              "options": [
+                "short",
+                "tall",
+                "young",
+                "old"
+              ],
+              "hint": {
+                "ko": "키가 큰",
+                "en": "Vertically big",
+                "es": "De gran estatura"
+              }
             },
             {
               "id": 3,
               "answer": "coat",
-              "options": ["coat", "shirt", "suit", "scarf"],
-              "hint": { "ko": "외투", "en": "An outer garment", "es": "Prenda de abrigo" }
+              "options": [
+                "coat",
+                "shirt",
+                "suit",
+                "scarf"
+              ],
+              "hint": {
+                "ko": "외투",
+                "en": "An outer garment",
+                "es": "Prenda de abrigo"
+              }
             },
             {
               "id": 4,
               "answer": "Retiro",
-              "options": ["Hyde", "Central", "Retiro", "Ueno"],
-              "hint": { "ko": "마드리드의 유명한 공원", "en": "Famous park in Madrid", "es": "Parque famoso de Madrid" }
+              "options": [
+                "Hyde",
+                "Central",
+                "Retiro",
+                "Ueno"
+              ],
+              "hint": {
+                "ko": "마드리드의 유명한 공원",
+                "en": "Famous park in Madrid",
+                "es": "Parque famoso de Madrid"
+              }
             },
             {
               "id": 5,
               "answer": "scared",
-              "options": ["happy", "scared", "angry", "tired"],
-              "hint": { "ko": "무서워하는", "en": "Feeling fear", "es": "Sintiendo miedo" }
+              "options": [
+                "happy",
+                "scared",
+                "angry",
+                "tired"
+              ],
+              "hint": {
+                "ko": "무서워하는",
+                "en": "Feeling fear",
+                "es": "Sintiendo miedo"
+              }
             }
           ]
         },
@@ -737,32 +1093,77 @@
             {
               "id": 1,
               "answer": "once",
-              "options": ["nueve", "diez", "once", "medianoche"],
-              "hint": { "ko": "11시", "en": "11 o'clock", "es": "Las 11" }
+              "options": [
+                "nueve",
+                "diez",
+                "once",
+                "medianoche"
+              ],
+              "hint": {
+                "ko": "11시",
+                "en": "11 o'clock",
+                "es": "Las 11"
+              }
             },
             {
               "id": 2,
               "answer": "alto",
-              "options": ["bajo", "alto", "joven", "viejo"],
-              "hint": { "ko": "키가 큰", "en": "Tall", "es": "De gran estatura" }
+              "options": [
+                "bajo",
+                "alto",
+                "joven",
+                "viejo"
+              ],
+              "hint": {
+                "ko": "키가 큰",
+                "en": "Tall",
+                "es": "De gran estatura"
+              }
             },
             {
               "id": 3,
               "answer": "abrigo",
-              "options": ["abrigo", "camisa", "traje", "bufanda"],
-              "hint": { "ko": "외투/코트", "en": "A coat", "es": "Prenda de abrigo" }
+              "options": [
+                "abrigo",
+                "camisa",
+                "traje",
+                "bufanda"
+              ],
+              "hint": {
+                "ko": "외투/코트",
+                "en": "A coat",
+                "es": "Prenda de abrigo"
+              }
             },
             {
               "id": 4,
               "answer": "Retiro",
-              "options": ["Retiro", "Sol", "Prado", "Real"],
-              "hint": { "ko": "마드리드의 유명한 공원", "en": "Famous park in Madrid", "es": "Parque famoso de Madrid" }
+              "options": [
+                "Retiro",
+                "Sol",
+                "Prado",
+                "Real"
+              ],
+              "hint": {
+                "ko": "마드리드의 유명한 공원",
+                "en": "Famous park in Madrid",
+                "es": "Parque famoso de Madrid"
+              }
             },
             {
               "id": 5,
               "answer": "asustado",
-              "options": ["feliz", "asustado", "enfadado", "cansado"],
-              "hint": { "ko": "무서워하는", "en": "Feeling fear", "es": "Sintiendo miedo" }
+              "options": [
+                "feliz",
+                "asustado",
+                "enfadado",
+                "cansado"
+              ],
+              "hint": {
+                "ko": "무서워하는",
+                "en": "Feeling fear",
+                "es": "Sintiendo miedo"
+              }
             }
           ]
         },
@@ -772,32 +1173,77 @@
             {
               "id": 1,
               "answer": "열한",
-              "options": ["아홉", "열", "열한", "열두"],
-              "hint": { "en": "11 o'clock", "es": "Las 11", "ko": "11시" }
+              "options": [
+                "아홉",
+                "열",
+                "열한",
+                "열두"
+              ],
+              "hint": {
+                "en": "11 o'clock",
+                "es": "Las 11",
+                "ko": "11시"
+              }
             },
             {
               "id": 2,
               "answer": "키 큰",
-              "options": ["키 작은", "키 큰", "젊은", "나이 든"],
-              "hint": { "en": "Tall", "es": "Alto", "ko": "키가 크다" }
+              "options": [
+                "키 작은",
+                "키 큰",
+                "젊은",
+                "나이 든"
+              ],
+              "hint": {
+                "en": "Tall",
+                "es": "Alto",
+                "ko": "키가 크다"
+              }
             },
             {
               "id": 3,
               "answer": "코트",
-              "options": ["코트", "셔츠", "정장", "목도리"],
-              "hint": { "en": "A coat/overcoat", "es": "Un abrigo", "ko": "외투" }
+              "options": [
+                "코트",
+                "셔츠",
+                "정장",
+                "목도리"
+              ],
+              "hint": {
+                "en": "A coat/overcoat",
+                "es": "Un abrigo",
+                "ko": "외투"
+              }
             },
             {
               "id": 4,
               "answer": "레티로",
-              "options": ["하이드", "센트럴", "레티로", "우에노"],
-              "hint": { "en": "Famous Madrid park", "es": "Parque famoso de Madrid", "ko": "마드리드의 유명한 공원" }
+              "options": [
+                "하이드",
+                "센트럴",
+                "레티로",
+                "우에노"
+              ],
+              "hint": {
+                "en": "Famous Madrid park",
+                "es": "Parque famoso de Madrid",
+                "ko": "마드리드의 유명한 공원"
+              }
             },
             {
               "id": 5,
               "answer": "무서워하는",
-              "options": ["행복해하는", "무서워하는", "화난", "피곤한"],
-              "hint": { "en": "Feeling fear", "es": "Sintiendo miedo", "ko": "두려움을 느끼는" }
+              "options": [
+                "행복해하는",
+                "무서워하는",
+                "화난",
+                "피곤한"
+              ],
+              "hint": {
+                "en": "Feeling fear",
+                "es": "Sintiendo miedo",
+                "ko": "두려움을 느끼는"
+              }
             }
           ]
         }
@@ -805,7 +1251,10 @@
       "rewards": {
         "xp": 100,
         "items": [],
-        "npcRelation": { "npc": "isabel", "points": 1 }
+        "npcRelation": {
+          "npc": "isabel",
+          "points": 1
+        }
       }
     },
     {
@@ -830,22 +1279,63 @@
       "gptPrompt": "You are Don Miguel, a warm and friendly market merchant in Madrid. The player must order 3 food items from your stall in {targetLang}. Available items: jamón (ham), tortilla española (Spanish omelette), churros, paella, gazpacho (cold soup). Respond warmly in {targetLang}. After 3 successful orders, reveal the secret: you saw suspicious people near Retiro Park. Evaluate: grammar (0-30), vocabulary (0-30), politeness (0-20), cultural awareness (0-20). Return JSON after each exchange: {\"npcResponse\": \"...\", \"ordersCompleted\": 0-3, \"score\": 0-100, \"feedback\": \"...\", \"secretRevealed\": false}",
       "content": {
         "en": {
-          "foodVocab": ["ham (jamón)", "Spanish omelette (tortilla)", "churros", "paella", "cold tomato soup (gazpacho)"],
-          "keyPhrases": ["Could I have...", "I'd like...", "please", "How much is...", "thank you"]
+          "foodVocab": [
+            "ham (jamón)",
+            "Spanish omelette (tortilla)",
+            "churros",
+            "paella",
+            "cold tomato soup (gazpacho)"
+          ],
+          "keyPhrases": [
+            "Could I have...",
+            "I'd like...",
+            "please",
+            "How much is...",
+            "thank you"
+          ]
         },
         "es": {
-          "foodVocab": ["jamón", "tortilla española", "churros", "paella", "gazpacho"],
-          "keyPhrases": ["Quiero...", "Me da...", "por favor", "¿Cuánto cuesta...?", "gracias"]
+          "foodVocab": [
+            "jamón",
+            "tortilla española",
+            "churros",
+            "paella",
+            "gazpacho"
+          ],
+          "keyPhrases": [
+            "Quiero...",
+            "Me da...",
+            "por favor",
+            "¿Cuánto cuesta...?",
+            "gracias"
+          ]
         },
         "ko": {
-          "foodVocab": ["하몬 (ham)", "또르띠야 (Spanish omelette)", "츄러스", "빠에야", "가스파초 (cold soup)"],
-          "keyPhrases": ["~주세요", "~하나요", "얼마예요?", "감사합니다", "맛있어요"]
+          "foodVocab": [
+            "하몬 (ham)",
+            "또르띠야 (Spanish omelette)",
+            "츄러스",
+            "빠에야",
+            "가스파초 (cold soup)"
+          ],
+          "keyPhrases": [
+            "~주세요",
+            "~하나요",
+            "얼마예요?",
+            "감사합니다",
+            "맛있어요"
+          ]
         }
       },
       "rewards": {
         "xp": 120,
-        "items": ["miguels_map"],
-        "npcRelation": { "npc": "miguel", "points": 1 }
+        "items": [
+          "miguels_map"
+        ],
+        "npcRelation": {
+          "npc": "miguel",
+          "points": 1
+        }
       }
     },
     {
@@ -872,26 +1362,58 @@
             {
               "left": "Every cloud has a...",
               "right": "silver lining",
-              "wrongOptions": ["golden edge", "dark side", "rainy day"],
-              "meaning": { "ko": "전화위복", "en": "Bad situations can have good outcomes", "es": "Las malas situaciones pueden tener buenos resultados" }
+              "wrongOptions": [
+                "golden edge",
+                "dark side",
+                "rainy day"
+              ],
+              "meaning": {
+                "ko": "전화위복",
+                "en": "Bad situations can have good outcomes",
+                "es": "Las malas situaciones pueden tener buenos resultados"
+              }
             },
             {
               "left": "Silence is...",
               "right": "golden",
-              "wrongOptions": ["silver", "boring", "dangerous"],
-              "meaning": { "ko": "침묵이 금", "en": "Sometimes it's better to say nothing", "es": "A veces es mejor no decir nada" }
+              "wrongOptions": [
+                "silver",
+                "boring",
+                "dangerous"
+              ],
+              "meaning": {
+                "ko": "침묵이 금",
+                "en": "Sometimes it's better to say nothing",
+                "es": "A veces es mejor no decir nada"
+              }
             },
             {
               "left": "Better late than...",
               "right": "never",
-              "wrongOptions": ["early", "always", "soon"],
-              "meaning": { "ko": "안 하는 것보다 늦게라도 하는 게 낫다", "en": "Doing something late is better than not doing it", "es": "Hacer algo tarde es mejor que no hacerlo" }
+              "wrongOptions": [
+                "early",
+                "always",
+                "soon"
+              ],
+              "meaning": {
+                "ko": "안 하는 것보다 늦게라도 하는 게 낫다",
+                "en": "Doing something late is better than not doing it",
+                "es": "Hacer algo tarde es mejor que no hacerlo"
+              }
             },
             {
               "left": "Don't bite off more than you can...",
               "right": "chew",
-              "wrongOptions": ["eat", "swallow", "taste"],
-              "meaning": { "ko": "과욕은 금물", "en": "Don't try to do more than you can handle", "es": "No intentes hacer más de lo que puedes" }
+              "wrongOptions": [
+                "eat",
+                "swallow",
+                "taste"
+              ],
+              "meaning": {
+                "ko": "과욕은 금물",
+                "en": "Don't try to do more than you can handle",
+                "es": "No intentes hacer más de lo que puedes"
+              }
             }
           ]
         },
@@ -900,26 +1422,58 @@
             {
               "left": "No hay mal que por ___ no venga",
               "right": "bien",
-              "wrongOptions": ["mal", "aquí", "siempre"],
-              "meaning": { "ko": "전화위복", "en": "Every cloud has a silver lining", "es": "Las malas situaciones traen cosas buenas" }
+              "wrongOptions": [
+                "mal",
+                "aquí",
+                "siempre"
+              ],
+              "meaning": {
+                "ko": "전화위복",
+                "en": "Every cloud has a silver lining",
+                "es": "Las malas situaciones traen cosas buenas"
+              }
             },
             {
               "left": "En boca cerrada no entran...",
               "right": "moscas",
-              "wrongOptions": ["palabras", "pájaros", "problemas"],
-              "meaning": { "ko": "침묵이 금", "en": "Silence is golden", "es": "Es mejor callarse para evitar problemas" }
+              "wrongOptions": [
+                "palabras",
+                "pájaros",
+                "problemas"
+              ],
+              "meaning": {
+                "ko": "침묵이 금",
+                "en": "Silence is golden",
+                "es": "Es mejor callarse para evitar problemas"
+              }
             },
             {
               "left": "Más vale tarde que...",
               "right": "nunca",
-              "wrongOptions": ["siempre", "pronto", "antes"],
-              "meaning": { "ko": "안 하는 것보다 낫다", "en": "Better late than never", "es": "Es mejor hacer algo tarde que no hacerlo" }
+              "wrongOptions": [
+                "siempre",
+                "pronto",
+                "antes"
+              ],
+              "meaning": {
+                "ko": "안 하는 것보다 낫다",
+                "en": "Better late than never",
+                "es": "Es mejor hacer algo tarde que no hacerlo"
+              }
             },
             {
               "left": "El que mucho abarca, poco...",
               "right": "aprieta",
-              "wrongOptions": ["come", "duerme", "gana"],
-              "meaning": { "ko": "과욕은 금물", "en": "Don't bite off more than you can chew", "es": "Quien intenta mucho, logra poco" }
+              "wrongOptions": [
+                "come",
+                "duerme",
+                "gana"
+              ],
+              "meaning": {
+                "ko": "과욕은 금물",
+                "en": "Don't bite off more than you can chew",
+                "es": "Quien intenta mucho, logra poco"
+              }
             }
           ]
         },
@@ -928,33 +1482,67 @@
             {
               "left": "비 온 뒤에 땅이...",
               "right": "굳어진다",
-              "wrongOptions": ["무너진다", "사라진다", "젖는다"],
-              "meaning": { "en": "After rain, the ground hardens (hardship makes you stronger)", "es": "Después de la lluvia, el suelo se endurece", "ko": "고난 뒤에 더 강해진다" }
+              "wrongOptions": [
+                "무너진다",
+                "사라진다",
+                "젖는다"
+              ],
+              "meaning": {
+                "en": "After rain, the ground hardens (hardship makes you stronger)",
+                "es": "Después de la lluvia, el suelo se endurece",
+                "ko": "고난 뒤에 더 강해진다"
+              }
             },
             {
               "left": "침묵이...",
               "right": "금이다",
-              "wrongOptions": ["은이다", "돌이다", "물이다"],
-              "meaning": { "en": "Silence is golden", "es": "El silencio es oro", "ko": "가만히 있는 것이 더 나을 때가 있다" }
+              "wrongOptions": [
+                "은이다",
+                "돌이다",
+                "물이다"
+              ],
+              "meaning": {
+                "en": "Silence is golden",
+                "es": "El silencio es oro",
+                "ko": "가만히 있는 것이 더 나을 때가 있다"
+              }
             },
             {
               "left": "늦더라도 안 하는 것보다...",
               "right": "낫다",
-              "wrongOptions": ["나쁘다", "같다", "힘들다"],
-              "meaning": { "en": "Better late than never", "es": "Mejor tarde que nunca", "ko": "늦게라도 하는 게 더 좋다" }
+              "wrongOptions": [
+                "나쁘다",
+                "같다",
+                "힘들다"
+              ],
+              "meaning": {
+                "en": "Better late than never",
+                "es": "Mejor tarde que nunca",
+                "ko": "늦게라도 하는 게 더 좋다"
+              }
             },
             {
               "left": "욕심이 과하면 화를...",
               "right": "부른다",
-              "wrongOptions": ["피한다", "잊는다", "덮는다"],
-              "meaning": { "en": "Greed invites disaster", "es": "La codicia trae desgracia", "ko": "너무 욕심부리면 안 좋은 결과가 온다" }
+              "wrongOptions": [
+                "피한다",
+                "잊는다",
+                "덮는다"
+              ],
+              "meaning": {
+                "en": "Greed invites disaster",
+                "es": "La codicia trae desgracia",
+                "ko": "너무 욕심부리면 안 좋은 결과가 온다"
+              }
             }
           ]
         }
       },
       "rewards": {
         "xp": 150,
-        "items": ["secret_passage_key"],
+        "items": [
+          "secret_passage_key"
+        ],
         "npcRelation": null
       }
     },
@@ -984,19 +1572,31 @@
             {
               "image": "beach_scene",
               "description": "A beach with blue ocean and people",
-              "requiredVocab": ["ocean/sea", "sky", "people/person"],
+              "requiredVocab": [
+                "ocean/sea",
+                "sky",
+                "people/person"
+              ],
               "minSentences": 2
             },
             {
               "image": "market_scene",
               "description": "A colorful market with fruits",
-              "requiredVocab": ["fruit", "color", "seller/vendor"],
+              "requiredVocab": [
+                "fruit",
+                "color",
+                "seller/vendor"
+              ],
               "minSentences": 2
             },
             {
               "image": "night_scene",
               "description": "A city at night with moon and stars",
-              "requiredVocab": ["moon", "stars", "city"],
+              "requiredVocab": [
+                "moon",
+                "stars",
+                "city"
+              ],
               "minSentences": 2
             }
           ]
@@ -1006,19 +1606,31 @@
             {
               "image": "beach_scene",
               "description": "Una playa con océano azul y personas",
-              "requiredVocab": ["mar/océano", "cielo", "personas"],
+              "requiredVocab": [
+                "mar/océano",
+                "cielo",
+                "personas"
+              ],
               "minSentences": 2
             },
             {
               "image": "market_scene",
               "description": "Un mercado colorido con frutas",
-              "requiredVocab": ["frutas", "colores", "vendedor"],
+              "requiredVocab": [
+                "frutas",
+                "colores",
+                "vendedor"
+              ],
               "minSentences": 2
             },
             {
               "image": "night_scene",
               "description": "Una ciudad de noche con luna y estrellas",
-              "requiredVocab": ["luna", "estrellas", "ciudad"],
+              "requiredVocab": [
+                "luna",
+                "estrellas",
+                "ciudad"
+              ],
               "minSentences": 2
             }
           ]
@@ -1028,19 +1640,31 @@
             {
               "image": "beach_scene",
               "description": "파란 바다와 사람들이 있는 해변",
-              "requiredVocab": ["바다", "하늘", "사람"],
+              "requiredVocab": [
+                "바다",
+                "하늘",
+                "사람"
+              ],
               "minSentences": 2
             },
             {
               "image": "market_scene",
               "description": "과일이 있는 다채로운 시장",
-              "requiredVocab": ["과일", "색깔", "상인"],
+              "requiredVocab": [
+                "과일",
+                "색깔",
+                "상인"
+              ],
               "minSentences": 2
             },
             {
               "image": "night_scene",
               "description": "달과 별이 있는 밤의 도시",
-              "requiredVocab": ["달", "별", "도시"],
+              "requiredVocab": [
+                "달",
+                "별",
+                "도시"
+              ],
               "minSentences": 2
             }
           ]
@@ -1048,7 +1672,70 @@
       },
       "rewards": {
         "xp": 200,
-        "items": ["restorers_key"],
+        "items": [
+          "restorers_key"
+        ],
+        "npcRelation": null
+      }
+    },
+    {
+      "id": "ch2_quiz_pronunciation",
+      "chapter": "ch2",
+      "scene": "ch2_scene2",
+      "type": "pronunciation",
+      "title": {
+        "ko": "발음 도전",
+        "en": "Pronunciation Challenge",
+        "es": "Desafío de Pronunciación"
+      },
+      "difficulty": 2,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "화랑의 숨겨진 메시지를 소리 내어 읽어야 한다.",
+        "en": "You must read the gallery's hidden message aloud.",
+        "es": "Debes leer en voz alta el mensaje oculto de la galería."
+      },
+      "content": {
+        "en": {
+          "sentences": [
+            {
+              "text": "The truth is hidden in art",
+              "minScore": 60
+            },
+            {
+              "text": "Look closer and you will see",
+              "minScore": 60
+            }
+          ]
+        },
+        "es": {
+          "sentences": [
+            {
+              "text": "La verdad está escondida en el arte",
+              "minScore": 60
+            },
+            {
+              "text": "Mira más de cerca y verás",
+              "minScore": 60
+            }
+          ]
+        },
+        "ko": {
+          "sentences": [
+            {
+              "text": "진실은 예술 속에 숨어 있다",
+              "minScore": 60
+            },
+            {
+              "text": "더 가까이 보면 알 수 있다",
+              "minScore": 60
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 80,
+        "items": [],
         "npcRelation": null
       }
     },
@@ -1079,7 +1766,12 @@
               "type": "fill_blank",
               "question": "She ___ (go) to the museum yesterday.",
               "answer": "went",
-              "options": ["go", "goes", "went", "gone"]
+              "options": [
+                "go",
+                "goes",
+                "went",
+                "gone"
+              ]
             },
             {
               "type": "listening",
@@ -1087,7 +1779,11 @@
               "ttsVoice": "en-GB-SoniaNeural",
               "question": "Where is the stone hidden?",
               "answer": "beneath the fountain",
-              "acceptableAnswers": ["beneath the fountain", "under the fountain", "fountain in eastern garden"]
+              "acceptableAnswers": [
+                "beneath the fountain",
+                "under the fountain",
+                "fountain in eastern garden"
+              ]
             },
             {
               "type": "translation",
@@ -1102,7 +1798,12 @@
               "type": "fill_blank",
               "question": "Carlos is ___ in the museum.",
               "answer": "trapped",
-              "options": ["trapping", "trapped", "trap", "traps"]
+              "options": [
+                "trapping",
+                "trapped",
+                "trap",
+                "traps"
+              ]
             },
             {
               "type": "roleplay",
@@ -1116,7 +1817,12 @@
               "type": "fill_blank",
               "question": "Yo ___ (tener) que encontrar la piedra.",
               "answer": "tengo",
-              "options": ["tiene", "tengo", "tener", "tenemos"]
+              "options": [
+                "tiene",
+                "tengo",
+                "tener",
+                "tenemos"
+              ]
             },
             {
               "type": "listening",
@@ -1124,7 +1830,11 @@
               "ttsVoice": "es-ES-ElviraNeural",
               "question": "¿Dónde está escondida la piedra?",
               "answer": "debajo de la fuente",
-              "acceptableAnswers": ["debajo de la fuente", "bajo la fuente", "fuente del jardín"]
+              "acceptableAnswers": [
+                "debajo de la fuente",
+                "bajo la fuente",
+                "fuente del jardín"
+              ]
             },
             {
               "type": "translation",
@@ -1139,7 +1849,12 @@
               "type": "fill_blank",
               "question": "Carlos está ___ en el museo.",
               "answer": "atrapado",
-              "options": ["atrapando", "atrapado", "atrapar", "atrapamos"]
+              "options": [
+                "atrapando",
+                "atrapado",
+                "atrapar",
+                "atrapamos"
+              ]
             },
             {
               "type": "roleplay",
@@ -1153,7 +1868,12 @@
               "type": "fill_blank",
               "question": "나는 어제 박물관에 ___ (가다).",
               "answer": "갔다",
-              "options": ["간다", "갔다", "가다", "갈 것이다"]
+              "options": [
+                "간다",
+                "갔다",
+                "가다",
+                "갈 것이다"
+              ]
             },
             {
               "type": "listening",
@@ -1161,7 +1881,11 @@
               "ttsVoice": "ko-KR-SunHiNeural",
               "question": "수호석은 어디에 숨겨져 있나요?",
               "answer": "분수 아래",
-              "acceptableAnswers": ["분수 아래", "동쪽 정원 분수 아래", "분수대 아래"]
+              "acceptableAnswers": [
+                "분수 아래",
+                "동쪽 정원 분수 아래",
+                "분수대 아래"
+              ]
             },
             {
               "type": "translation",
@@ -1176,7 +1900,12 @@
               "type": "fill_blank",
               "question": "카를로스는 박물관에 ___ 있다.",
               "answer": "갇혀",
-              "options": ["갇혀", "갇히고", "갇히다", "갇힌"]
+              "options": [
+                "갇혀",
+                "갇히고",
+                "갇히다",
+                "갇힌"
+              ]
             },
             {
               "type": "roleplay",
@@ -1187,7 +1916,9 @@
       },
       "rewards": {
         "xp": 350,
-        "items": ["spain_guardian_stone"],
+        "items": [
+          "spain_guardian_stone"
+        ],
         "npcRelation": null,
         "badge": "madrid_rescuer"
       }
@@ -1215,28 +1946,128 @@
           "pairs": [
             {
               "left": "Exit",
-              "right": { "ko": "출구", "es": "Salida", "en": "Way out" },
-              "wrongOptions": { "ko": ["입구","화장실","계단"], "es": ["Entrada","Baño","Escalera"], "en": ["Entrance","Restroom","Stairs"] }
+              "right": {
+                "ko": "출구",
+                "es": "Salida",
+                "en": "Way out"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "입구",
+                  "화장실",
+                  "계단"
+                ],
+                "es": [
+                  "Entrada",
+                  "Baño",
+                  "Escalera"
+                ],
+                "en": [
+                  "Entrance",
+                  "Restroom",
+                  "Stairs"
+                ]
+              }
             },
             {
               "left": "No Smoking",
-              "right": { "ko": "금연", "es": "Prohibido Fumar", "en": "Smoke-free zone" },
-              "wrongOptions": { "ko": ["금지","주의","위험"], "es": ["Prohibido","Cuidado","Peligro"], "en": ["No entry","Caution","Danger"] }
+              "right": {
+                "ko": "금연",
+                "es": "Prohibido Fumar",
+                "en": "Smoke-free zone"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "금지",
+                  "주의",
+                  "위험"
+                ],
+                "es": [
+                  "Prohibido",
+                  "Cuidado",
+                  "Peligro"
+                ],
+                "en": [
+                  "No entry",
+                  "Caution",
+                  "Danger"
+                ]
+              }
             },
             {
               "left": "Underground",
-              "right": { "ko": "지하철", "es": "Metro", "en": "Subway/Metro" },
-              "wrongOptions": { "ko": ["지하실","지하도","지하수"], "es": ["Sótano","Túnel","Subsuelo"], "en": ["Basement","Tunnel","Cellar"] }
+              "right": {
+                "ko": "지하철",
+                "es": "Metro",
+                "en": "Subway/Metro"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "지하실",
+                  "지하도",
+                  "지하수"
+                ],
+                "es": [
+                  "Sótano",
+                  "Túnel",
+                  "Subsuelo"
+                ],
+                "en": [
+                  "Basement",
+                  "Tunnel",
+                  "Cellar"
+                ]
+              }
             },
             {
               "left": "Caution",
-              "right": { "ko": "주의", "es": "Cuidado", "en": "Be careful" },
-              "wrongOptions": { "ko": ["위험","정지","출발"], "es": ["Peligro","Alto","Salida"], "en": ["Danger","Stop","Go"] }
+              "right": {
+                "ko": "주의",
+                "es": "Cuidado",
+                "en": "Be careful"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "위험",
+                  "정지",
+                  "출발"
+                ],
+                "es": [
+                  "Peligro",
+                  "Alto",
+                  "Salida"
+                ],
+                "en": [
+                  "Danger",
+                  "Stop",
+                  "Go"
+                ]
+              }
             },
             {
               "left": "Entrance",
-              "right": { "ko": "입구", "es": "Entrada", "en": "Way in" },
-              "wrongOptions": { "ko": ["출구","비상구","통로"], "es": ["Salida","Emergencia","Pasillo"], "en": ["Exit","Emergency","Passage"] }
+              "right": {
+                "ko": "입구",
+                "es": "Entrada",
+                "en": "Way in"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "출구",
+                  "비상구",
+                  "통로"
+                ],
+                "es": [
+                  "Salida",
+                  "Emergencia",
+                  "Pasillo"
+                ],
+                "en": [
+                  "Exit",
+                  "Emergency",
+                  "Passage"
+                ]
+              }
             }
           ]
         },
@@ -1244,28 +2075,128 @@
           "pairs": [
             {
               "left": "Salida",
-              "right": { "ko": "출구", "en": "Exit", "es": "Donde se sale" },
-              "wrongOptions": { "ko": ["입구","화장실","계단"], "en": ["Entrance","Restroom","Stairs"], "es": ["Entrada","Baño","Escalera"] }
+              "right": {
+                "ko": "출구",
+                "en": "Exit",
+                "es": "Donde se sale"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "입구",
+                  "화장실",
+                  "계단"
+                ],
+                "en": [
+                  "Entrance",
+                  "Restroom",
+                  "Stairs"
+                ],
+                "es": [
+                  "Entrada",
+                  "Baño",
+                  "Escalera"
+                ]
+              }
             },
             {
               "left": "Prohibido Fumar",
-              "right": { "ko": "금연", "en": "No Smoking", "es": "No se puede fumar" },
-              "wrongOptions": { "ko": ["금지","주의","위험"], "en": ["No entry","Caution","Danger"], "es": ["Prohibido paso","Cuidado","Peligro"] }
+              "right": {
+                "ko": "금연",
+                "en": "No Smoking",
+                "es": "No se puede fumar"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "금지",
+                  "주의",
+                  "위험"
+                ],
+                "en": [
+                  "No entry",
+                  "Caution",
+                  "Danger"
+                ],
+                "es": [
+                  "Prohibido paso",
+                  "Cuidado",
+                  "Peligro"
+                ]
+              }
             },
             {
               "left": "Metro",
-              "right": { "ko": "지하철", "en": "Underground/Subway", "es": "Transporte subterráneo" },
-              "wrongOptions": { "ko": ["버스","택시","기차"], "en": ["Bus","Taxi","Train"], "es": ["Autobús","Taxi","Tren"] }
+              "right": {
+                "ko": "지하철",
+                "en": "Underground/Subway",
+                "es": "Transporte subterráneo"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "버스",
+                  "택시",
+                  "기차"
+                ],
+                "en": [
+                  "Bus",
+                  "Taxi",
+                  "Train"
+                ],
+                "es": [
+                  "Autobús",
+                  "Taxi",
+                  "Tren"
+                ]
+              }
             },
             {
               "left": "Cuidado",
-              "right": { "ko": "주의", "en": "Caution", "es": "Ten cuidado" },
-              "wrongOptions": { "ko": ["위험","정지","출발"], "en": ["Danger","Stop","Go"], "es": ["Peligro","Alto","Adelante"] }
+              "right": {
+                "ko": "주의",
+                "en": "Caution",
+                "es": "Ten cuidado"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "위험",
+                  "정지",
+                  "출발"
+                ],
+                "en": [
+                  "Danger",
+                  "Stop",
+                  "Go"
+                ],
+                "es": [
+                  "Peligro",
+                  "Alto",
+                  "Adelante"
+                ]
+              }
             },
             {
               "left": "Entrada",
-              "right": { "ko": "입구", "en": "Entrance", "es": "Donde se entra" },
-              "wrongOptions": { "ko": ["출구","비상구","통로"], "en": ["Exit","Emergency","Passage"], "es": ["Salida","Emergencia","Pasillo"] }
+              "right": {
+                "ko": "입구",
+                "en": "Entrance",
+                "es": "Donde se entra"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "출구",
+                  "비상구",
+                  "통로"
+                ],
+                "en": [
+                  "Exit",
+                  "Emergency",
+                  "Passage"
+                ],
+                "es": [
+                  "Salida",
+                  "Emergencia",
+                  "Pasillo"
+                ]
+              }
             }
           ]
         },
@@ -1273,33 +2204,137 @@
           "pairs": [
             {
               "left": "출구",
-              "right": { "en": "Exit", "es": "Salida", "ko": "나가는 곳" },
-              "wrongOptions": { "en": ["Entrance","Restroom","Stairs"], "es": ["Entrada","Baño","Escalera"], "ko": ["입구","화장실","계단"] }
+              "right": {
+                "en": "Exit",
+                "es": "Salida",
+                "ko": "나가는 곳"
+              },
+              "wrongOptions": {
+                "en": [
+                  "Entrance",
+                  "Restroom",
+                  "Stairs"
+                ],
+                "es": [
+                  "Entrada",
+                  "Baño",
+                  "Escalera"
+                ],
+                "ko": [
+                  "입구",
+                  "화장실",
+                  "계단"
+                ]
+              }
             },
             {
               "left": "금연",
-              "right": { "en": "No Smoking", "es": "Prohibido Fumar", "ko": "담배를 피우면 안 되는 곳" },
-              "wrongOptions": { "en": ["No entry","Caution","Danger"], "es": ["Prohibido paso","Cuidado","Peligro"], "ko": ["금지","주의","위험"] }
+              "right": {
+                "en": "No Smoking",
+                "es": "Prohibido Fumar",
+                "ko": "담배를 피우면 안 되는 곳"
+              },
+              "wrongOptions": {
+                "en": [
+                  "No entry",
+                  "Caution",
+                  "Danger"
+                ],
+                "es": [
+                  "Prohibido paso",
+                  "Cuidado",
+                  "Peligro"
+                ],
+                "ko": [
+                  "금지",
+                  "주의",
+                  "위험"
+                ]
+              }
             },
             {
               "left": "지하철",
-              "right": { "en": "Subway/Underground", "es": "Metro", "ko": "땅 아래로 다니는 열차" },
-              "wrongOptions": { "en": ["Bus","Taxi","Train"], "es": ["Autobús","Taxi","Tren"], "ko": ["버스","택시","기차"] }
+              "right": {
+                "en": "Subway/Underground",
+                "es": "Metro",
+                "ko": "땅 아래로 다니는 열차"
+              },
+              "wrongOptions": {
+                "en": [
+                  "Bus",
+                  "Taxi",
+                  "Train"
+                ],
+                "es": [
+                  "Autobús",
+                  "Taxi",
+                  "Tren"
+                ],
+                "ko": [
+                  "버스",
+                  "택시",
+                  "기차"
+                ]
+              }
             },
             {
               "left": "주의",
-              "right": { "en": "Caution", "es": "Cuidado", "ko": "조심해야 하는 곳" },
-              "wrongOptions": { "en": ["Danger","Stop","Go"], "es": ["Peligro","Alto","Adelante"], "ko": ["위험","정지","출발"] }
+              "right": {
+                "en": "Caution",
+                "es": "Cuidado",
+                "ko": "조심해야 하는 곳"
+              },
+              "wrongOptions": {
+                "en": [
+                  "Danger",
+                  "Stop",
+                  "Go"
+                ],
+                "es": [
+                  "Peligro",
+                  "Alto",
+                  "Adelante"
+                ],
+                "ko": [
+                  "위험",
+                  "정지",
+                  "출발"
+                ]
+              }
             },
             {
               "left": "입구",
-              "right": { "en": "Entrance", "es": "Entrada", "ko": "들어가는 곳" },
-              "wrongOptions": { "en": ["Exit","Emergency","Passage"], "es": ["Salida","Emergencia","Pasillo"], "ko": ["출구","비상구","통로"] }
+              "right": {
+                "en": "Entrance",
+                "es": "Entrada",
+                "ko": "들어가는 곳"
+              },
+              "wrongOptions": {
+                "en": [
+                  "Exit",
+                  "Emergency",
+                  "Passage"
+                ],
+                "es": [
+                  "Salida",
+                  "Emergencia",
+                  "Pasillo"
+                ],
+                "ko": [
+                  "출구",
+                  "비상구",
+                  "통로"
+                ]
+              }
             }
           ]
         }
       },
-      "rewards": { "xp": 80, "items": [], "npcRelation": null }
+      "rewards": {
+        "xp": 80,
+        "items": [],
+        "npcRelation": null
+      }
     },
     {
       "id": "ch3_quiz_b",
@@ -1323,22 +2358,61 @@
       "gptPrompt": "You are Grandma Youngsook, a warm Korean market food stall owner. The player must order Korean food and have a conversation in {targetLang}. Available: tteokbokki (spicy rice cakes), kimbap (seaweed rice roll), sundae (Korean blood sausage), hotteok (sweet pancake), bibimbap (mixed rice). Be warm and encouraging. After successful ordering, share the clue: suspicious people have been seen near Bukchon. Evaluate: grammar (0-30), vocabulary (0-30), politeness (0-20), cultural awareness (0-20). Return JSON: {\"npcResponse\": \"...\", \"score\": 0-100, \"feedback\": \"...\", \"clueRevealed\": false}",
       "content": {
         "en": {
-          "foodVocab": ["tteokbokki (spicy rice cakes)","kimbap (seaweed rice roll)","sundae (blood sausage)","hotteok (sweet pancake)","bibimbap (mixed rice)"],
-          "keyPhrases": ["Could I try the...","What do you recommend?","How spicy is it?","It looks delicious","thank you"]
+          "foodVocab": [
+            "tteokbokki (spicy rice cakes)",
+            "kimbap (seaweed rice roll)",
+            "sundae (blood sausage)",
+            "hotteok (sweet pancake)",
+            "bibimbap (mixed rice)"
+          ],
+          "keyPhrases": [
+            "Could I try the...",
+            "What do you recommend?",
+            "How spicy is it?",
+            "It looks delicious",
+            "thank you"
+          ]
         },
         "es": {
-          "foodVocab": ["tteokbokki (pasteles de arroz picantes)","kimbap (rollo de arroz con alga)","sundae (morcilla coreana)","hotteok (panqueque dulce)","bibimbap (arroz mixto)"],
-          "keyPhrases": ["¿Podría probar el...?","¿Qué recomienda?","¿Qué tan picante es?","Se ve delicioso","gracias"]
+          "foodVocab": [
+            "tteokbokki (pasteles de arroz picantes)",
+            "kimbap (rollo de arroz con alga)",
+            "sundae (morcilla coreana)",
+            "hotteok (panqueque dulce)",
+            "bibimbap (arroz mixto)"
+          ],
+          "keyPhrases": [
+            "¿Podría probar el...?",
+            "¿Qué recomienda?",
+            "¿Qué tan picante es?",
+            "Se ve delicioso",
+            "gracias"
+          ]
         },
         "ko": {
-          "foodVocab": ["떡볶이","김밥","순대","호떡","비빔밥"],
-          "keyPhrases": ["~주세요","뭐가 맛있어요?","매워요?","맛있겠다","감사합니다"]
+          "foodVocab": [
+            "떡볶이",
+            "김밥",
+            "순대",
+            "호떡",
+            "비빔밥"
+          ],
+          "keyPhrases": [
+            "~주세요",
+            "뭐가 맛있어요?",
+            "매워요?",
+            "맛있겠다",
+            "감사합니다"
+          ]
         }
       },
       "rewards": {
         "xp": 120,
         "items": [],
-        "npcRelation": { "npc": "youngsook", "points": 1 }
+        "npcRelation": {
+          "npc": "youngsook",
+          "points": 1
+        }
       }
     },
     {
@@ -1365,22 +2439,38 @@
             {
               "left": "Forewarned is forearmed",
               "right": "Rudy always carries his detective tools — which proverb?",
-              "meaning": { "ko": "유비무환 — 준비가 있으면 걱정 없다", "es": "Hombre prevenido vale por dos", "en": "Being prepared prevents problems" }
+              "meaning": {
+                "ko": "유비무환 — 준비가 있으면 걱정 없다",
+                "es": "Hombre prevenido vale por dos",
+                "en": "Being prepared prevents problems"
+              }
             },
             {
               "left": "Seeing is believing",
               "right": "Better to see the Guardian Stone yourself than hear Carlos describe it — which proverb?",
-              "meaning": { "ko": "백문이 불여일견", "es": "Ver para creer", "en": "Direct experience is worth more than hearsay" }
+              "meaning": {
+                "ko": "백문이 불여일견",
+                "es": "Ver para creer",
+                "en": "Direct experience is worth more than hearsay"
+              }
             },
             {
               "left": "A friend in need is a friend indeed",
               "right": "Rudy and his friends share hardship and joy together — which proverb?",
-              "meaning": { "ko": "동고동락", "es": "En la necesidad se conoce la amistad", "en": "True friends are proven in difficult times" }
+              "meaning": {
+                "ko": "동고동락",
+                "es": "En la necesidad se conoce la amistad",
+                "en": "True friends are proven in difficult times"
+              }
             },
             {
               "left": "Knowledge is power",
               "right": "Learning languages gives Rudy the ability to solve cases — which proverb?",
-              "meaning": { "ko": "아는 것이 힘이다", "es": "El saber es poder", "en": "What you know gives you strength" }
+              "meaning": {
+                "ko": "아는 것이 힘이다",
+                "es": "El saber es poder",
+                "en": "What you know gives you strength"
+              }
             }
           ]
         },
@@ -1389,22 +2479,38 @@
             {
               "left": "Hombre prevenido vale por dos",
               "right": "Rudy siempre lleva sus herramientas de detective — ¿qué refrán?",
-              "meaning": { "ko": "유비무환", "en": "Forewarned is forearmed", "es": "Estar preparado previene problemas" }
+              "meaning": {
+                "ko": "유비무환",
+                "en": "Forewarned is forearmed",
+                "es": "Estar preparado previene problemas"
+              }
             },
             {
               "left": "Ver para creer",
               "right": "Mejor ver la Piedra Guardiana que escuchar a Carlos — ¿qué refrán?",
-              "meaning": { "ko": "백문이 불여일견", "en": "Seeing is believing", "es": "La experiencia directa vale más" }
+              "meaning": {
+                "ko": "백문이 불여일견",
+                "en": "Seeing is believing",
+                "es": "La experiencia directa vale más"
+              }
             },
             {
               "left": "En la necesidad se conoce la amistad",
               "right": "Rudy y sus amigos comparten penas y alegrías — ¿qué refrán?",
-              "meaning": { "ko": "동고동락", "en": "A friend in need is a friend indeed", "es": "Los verdaderos amigos se prueban en momentos difíciles" }
+              "meaning": {
+                "ko": "동고동락",
+                "en": "A friend in need is a friend indeed",
+                "es": "Los verdaderos amigos se prueban en momentos difíciles"
+              }
             },
             {
               "left": "El saber es poder",
               "right": "Aprender idiomas le da a Rudy la habilidad de resolver casos — ¿qué refrán?",
-              "meaning": { "ko": "아는 것이 힘이다", "en": "Knowledge is power", "es": "Lo que sabes te da fuerza" }
+              "meaning": {
+                "ko": "아는 것이 힘이다",
+                "en": "Knowledge is power",
+                "es": "Lo que sabes te da fuerza"
+              }
             }
           ]
         },
@@ -1413,29 +2519,47 @@
             {
               "left": "유비무환",
               "right": "루디는 항상 탐정 도구를 가지고 다닌다 — 어떤 사자성어?",
-              "meaning": { "en": "Forewarned is forearmed", "es": "Hombre prevenido vale por dos", "ko": "준비가 있으면 걱정이 없다" }
+              "meaning": {
+                "en": "Forewarned is forearmed",
+                "es": "Hombre prevenido vale por dos",
+                "ko": "준비가 있으면 걱정이 없다"
+              }
             },
             {
               "left": "백문이 불여일견",
               "right": "카를로스의 설명보다 직접 수호석을 보는 게 낫다 — 어떤 사자성어?",
-              "meaning": { "en": "Seeing is believing", "es": "Ver para creer", "ko": "백 번 듣는 것보다 한 번 보는 게 낫다" }
+              "meaning": {
+                "en": "Seeing is believing",
+                "es": "Ver para creer",
+                "ko": "백 번 듣는 것보다 한 번 보는 게 낫다"
+              }
             },
             {
               "left": "동고동락",
               "right": "루디와 친구들은 고생과 즐거움을 함께 한다 — 어떤 사자성어?",
-              "meaning": { "en": "A friend in need is a friend indeed", "es": "En la necesidad se conoce la amistad", "ko": "고생과 즐거움을 함께 나누다" }
+              "meaning": {
+                "en": "A friend in need is a friend indeed",
+                "es": "En la necesidad se conoce la amistad",
+                "ko": "고생과 즐거움을 함께 나누다"
+              }
             },
             {
               "left": "아는 것이 힘이다",
               "right": "언어를 배우면 루디가 사건을 해결할 수 있다 — 어떤 격언?",
-              "meaning": { "en": "Knowledge is power", "es": "El saber es poder", "ko": "지식이 곧 능력이다" }
+              "meaning": {
+                "en": "Knowledge is power",
+                "es": "El saber es poder",
+                "ko": "지식이 곧 능력이다"
+              }
             }
           ]
         }
       },
       "rewards": {
         "xp": 180,
-        "items": ["secret_hanok_key"],
+        "items": [
+          "secret_hanok_key"
+        ],
         "npcRelation": null
       }
     },
@@ -1464,45 +2588,249 @@
           "ttsVoice": "en-GB-RyanNeural",
           "ttsSpeed": "0.9",
           "questions": [
-            { "question": { "ko": "비밀번호의 첫 글자는?", "en": "First letter of the password?", "es": "¿Primera letra de la contraseña?" }, "answer": "L", "acceptableAnswers": ["l","L"] },
-            { "question": { "ko": "비밀번호의 두 번째 글자는?", "en": "Second letter?", "es": "¿Segunda letra?" }, "answer": "I", "acceptableAnswers": ["i","I"] },
-            { "question": { "ko": "비밀번호의 세 번째 글자는?", "en": "Third letter?", "es": "¿Tercera letra?" }, "answer": "L", "acceptableAnswers": ["l","L"] },
-            { "question": { "ko": "완성된 비밀번호는?", "en": "Complete password?", "es": "¿Contraseña completa?" }, "answer": "LILH", "acceptableAnswers": ["LILH","lilh"] }
+            {
+              "question": {
+                "ko": "비밀번호의 첫 글자는?",
+                "en": "First letter of the password?",
+                "es": "¿Primera letra de la contraseña?"
+              },
+              "answer": "L",
+              "acceptableAnswers": [
+                "l",
+                "L"
+              ]
+            },
+            {
+              "question": {
+                "ko": "비밀번호의 두 번째 글자는?",
+                "en": "Second letter?",
+                "es": "¿Segunda letra?"
+              },
+              "answer": "I",
+              "acceptableAnswers": [
+                "i",
+                "I"
+              ]
+            },
+            {
+              "question": {
+                "ko": "비밀번호의 세 번째 글자는?",
+                "en": "Third letter?",
+                "es": "¿Tercera letra?"
+              },
+              "answer": "L",
+              "acceptableAnswers": [
+                "l",
+                "L"
+              ]
+            },
+            {
+              "question": {
+                "ko": "완성된 비밀번호는?",
+                "en": "Complete password?",
+                "es": "¿Contraseña completa?"
+              },
+              "answer": "LILH",
+              "acceptableAnswers": [
+                "LILH",
+                "lilh"
+              ]
+            }
           ],
           "finalAnswer": "LIFE",
-          "explanation": { "ko": "L(light) + I(time) + F(life) + E(hope의 끝)", "en": "L(light) + I(time) + F(of) + E(hope ending) = LIFE", "es": "L(light) + I(time) + F(of) + E(hope final) = LIFE" }
+          "explanation": {
+            "ko": "L(light) + I(time) + F(life) + E(hope의 끝)",
+            "en": "L(light) + I(time) + F(of) + E(hope ending) = LIFE",
+            "es": "L(light) + I(time) + F(of) + E(hope final) = LIFE"
+          }
         },
         "es": {
           "ttsScript": "Escucha bien, amigo. En la montaña del sur, brilla una torre. Debajo se esconde una puerta secreta. La contraseña tiene cuatro letras. Primera: el inicio de 'luz'. Segunda: el centro de 'vida'. Tercera: el final de 'sol'. Cuarta: el inicio de 'alma'.",
           "ttsVoice": "es-ES-AlvaroNeural",
           "ttsSpeed": "0.9",
           "questions": [
-            { "question": { "ko": "비밀번호의 첫 글자는?", "en": "First letter?", "es": "¿Primera letra?" }, "answer": "L", "acceptableAnswers": ["l","L"] },
-            { "question": { "ko": "두 번째 글자는?", "en": "Second letter?", "es": "¿Segunda letra?" }, "answer": "D", "acceptableAnswers": ["d","D"] },
-            { "question": { "ko": "세 번째 글자는?", "en": "Third letter?", "es": "¿Tercera letra?" }, "answer": "L", "acceptableAnswers": ["l","L"] },
-            { "question": { "ko": "완성된 비밀번호는?", "en": "Complete password?", "es": "¿Contraseña completa?" }, "answer": "LUNA", "acceptableAnswers": ["luna","LUNA"] }
+            {
+              "question": {
+                "ko": "비밀번호의 첫 글자는?",
+                "en": "First letter?",
+                "es": "¿Primera letra?"
+              },
+              "answer": "L",
+              "acceptableAnswers": [
+                "l",
+                "L"
+              ]
+            },
+            {
+              "question": {
+                "ko": "두 번째 글자는?",
+                "en": "Second letter?",
+                "es": "¿Segunda letra?"
+              },
+              "answer": "D",
+              "acceptableAnswers": [
+                "d",
+                "D"
+              ]
+            },
+            {
+              "question": {
+                "ko": "세 번째 글자는?",
+                "en": "Third letter?",
+                "es": "¿Tercera letra?"
+              },
+              "answer": "L",
+              "acceptableAnswers": [
+                "l",
+                "L"
+              ]
+            },
+            {
+              "question": {
+                "ko": "완성된 비밀번호는?",
+                "en": "Complete password?",
+                "es": "¿Contraseña completa?"
+              },
+              "answer": "LUNA",
+              "acceptableAnswers": [
+                "luna",
+                "LUNA"
+              ]
+            }
           ],
           "finalAnswer": "LUNA",
-          "explanation": { "ko": "L(luz) + U(중심) + N(조정) + A(alma) = LUNA (달)", "en": "L(luz) + U(vida center) + N(sol end) + A(alma) = LUNA (moon)", "es": "L(luz) + U(vida centro) + N(sol final) + A(alma) = LUNA" }
+          "explanation": {
+            "ko": "L(luz) + U(중심) + N(조정) + A(alma) = LUNA (달)",
+            "en": "L(luz) + U(vida center) + N(sol end) + A(alma) = LUNA (moon)",
+            "es": "L(luz) + U(vida centro) + N(sol final) + A(alma) = LUNA"
+          }
         },
         "ko": {
           "ttsScript": "잘 들어, 형. 남산 위에 빛나는 탑이 있어. 그 아래 비밀 문이 숨겨져 있지. 비밀번호는 네 글자야. 첫 글자는 '빛'의 시작. 둘째는 '나라'의 가운데. 셋째는 '달'의 끝. 넷째는 '별'의 처음.",
           "ttsVoice": "ko-KR-InJoonNeural",
           "ttsSpeed": "0.9",
           "questions": [
-            { "question": { "en": "First character hint?", "es": "¿Pista del primer carácter?", "ko": "첫 글자는?" }, "answer": "ㅂ", "acceptableAnswers": ["ㅂ"] },
-            { "question": { "en": "Second character hint?", "es": "¿Segundo carácter?", "ko": "둘째 글자는?" }, "answer": "ㄹ", "acceptableAnswers": ["ㄹ"] },
-            { "question": { "en": "Third character?", "es": "¿Tercer carácter?", "ko": "셋째 글자는?" }, "answer": "ㄹ", "acceptableAnswers": ["ㄹ"] },
-            { "question": { "en": "Complete password?", "es": "¿Contraseña completa?", "ko": "완성된 비밀번호는?" }, "answer": "빛나라", "acceptableAnswers": ["빛나라"] }
+            {
+              "question": {
+                "en": "First character hint?",
+                "es": "¿Pista del primer carácter?",
+                "ko": "첫 글자는?"
+              },
+              "answer": "ㅂ",
+              "acceptableAnswers": [
+                "ㅂ"
+              ]
+            },
+            {
+              "question": {
+                "en": "Second character hint?",
+                "es": "¿Segundo carácter?",
+                "ko": "둘째 글자는?"
+              },
+              "answer": "ㄹ",
+              "acceptableAnswers": [
+                "ㄹ"
+              ]
+            },
+            {
+              "question": {
+                "en": "Third character?",
+                "es": "¿Tercer carácter?",
+                "ko": "셋째 글자는?"
+              },
+              "answer": "ㄹ",
+              "acceptableAnswers": [
+                "ㄹ"
+              ]
+            },
+            {
+              "question": {
+                "en": "Complete password?",
+                "es": "¿Contraseña completa?",
+                "ko": "완성된 비밀번호는?"
+              },
+              "answer": "빛나라",
+              "acceptableAnswers": [
+                "빛나라"
+              ]
+            }
           ],
           "finalAnswer": "빛나라",
-          "explanation": { "en": "ㅂ(빛) + ㄴ(나라 center) + ㄹ(달 end) + ㅂ(별) → 빛나라", "es": "ㅂ(빛) + ㄴ(나라 centro) + ㄹ(달 final) + ㅂ(별) → 빛나라", "ko": "ㅂ(빛) + 나(나라 가운데) + 라(달의 끝 소리) → 빛나라!" }
+          "explanation": {
+            "en": "ㅂ(빛) + ㄴ(나라 center) + ㄹ(달 end) + ㅂ(별) → 빛나라",
+            "es": "ㅂ(빛) + ㄴ(나라 centro) + ㄹ(달 final) + ㅂ(별) → 빛나라",
+            "ko": "ㅂ(빛) + 나(나라 가운데) + 라(달의 끝 소리) → 빛나라!"
+          }
         }
       },
       "rewards": {
         "xp": 160,
         "items": [],
-        "npcRelation": { "npc": "minho", "points": 1 }
+        "npcRelation": {
+          "npc": "minho",
+          "points": 1
+        }
+      }
+    },
+    {
+      "id": "ch3_quiz_pronunciation",
+      "chapter": "ch3",
+      "scene": "ch3_scene2",
+      "type": "pronunciation",
+      "title": {
+        "ko": "발음 도전",
+        "en": "Pronunciation Challenge",
+        "es": "Desafío de Pronunciación"
+      },
+      "difficulty": 2,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "고대 도서관의 비문을 큰 소리로 읽어야 한다.",
+        "en": "You must read the ancient library inscription aloud.",
+        "es": "Debes leer en voz alta la inscripción de la biblioteca antigua."
+      },
+      "content": {
+        "en": {
+          "sentences": [
+            {
+              "text": "Languages connect people across the world",
+              "minScore": 60
+            },
+            {
+              "text": "Words carry the power of civilization",
+              "minScore": 60
+            }
+          ]
+        },
+        "es": {
+          "sentences": [
+            {
+              "text": "Los idiomas conectan a personas en todo el mundo",
+              "minScore": 60
+            },
+            {
+              "text": "Las palabras llevan el poder de la civilización",
+              "minScore": 60
+            }
+          ]
+        },
+        "ko": {
+          "sentences": [
+            {
+              "text": "언어는 전 세계 사람들을 연결한다",
+              "minScore": 60
+            },
+            {
+              "text": "말은 문명의 힘을 담고 있다",
+              "minScore": 60
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 80,
+        "items": [],
+        "npcRelation": null
       }
     },
     {
@@ -1528,49 +2856,237 @@
       "content": {
         "en": {
           "rounds": [
-            { "type": "riddle", "text": "What has keys but no locks, space but no room, and you can enter but can't go inside?", "answer": "a keyboard", "acceptableAnswers": ["keyboard","a keyboard","computer keyboard"] },
-            { "type": "translation", "source": { "ko": "별이 빛나는 밤", "es": "La noche estrellada", "en": "A starry night" }, "answer": "A starry night" },
-            { "type": "fill_blank", "question": "If she ___ (know) the truth, she would help us.", "answer": "knew", "options": ["know","knows","knew","known"] },
-            { "type": "listening", "ttsScript": "The guardian stone glows when true words are spoken nearby. It recognizes sincerity in any language.", "ttsVoice": "en-GB-SoniaNeural", "question": "What makes the stone glow?", "answer": "true words spoken nearby", "acceptableAnswers": ["true words","sincere words","speaking true words","sincerity"] },
-            { "type": "roleplay", "prompt": "Explain to the Guardian Stone why languages are important. Speak in English with at least 3 sentences. Be sincere and persuasive." }
+            {
+              "type": "riddle",
+              "text": "What has keys but no locks, space but no room, and you can enter but can't go inside?",
+              "answer": "a keyboard",
+              "acceptableAnswers": [
+                "keyboard",
+                "a keyboard",
+                "computer keyboard"
+              ]
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "별이 빛나는 밤",
+                "es": "La noche estrellada",
+                "en": "A starry night"
+              },
+              "answer": "A starry night"
+            },
+            {
+              "type": "fill_blank",
+              "question": "If she ___ (know) the truth, she would help us.",
+              "answer": "knew",
+              "options": [
+                "know",
+                "knows",
+                "knew",
+                "known"
+              ]
+            },
+            {
+              "type": "listening",
+              "ttsScript": "The guardian stone glows when true words are spoken nearby. It recognizes sincerity in any language.",
+              "ttsVoice": "en-GB-SoniaNeural",
+              "question": "What makes the stone glow?",
+              "answer": "true words spoken nearby",
+              "acceptableAnswers": [
+                "true words",
+                "sincere words",
+                "speaking true words",
+                "sincerity"
+              ]
+            },
+            {
+              "type": "roleplay",
+              "prompt": "Explain to the Guardian Stone why languages are important. Speak in English with at least 3 sentences. Be sincere and persuasive."
+            }
           ]
         },
         "es": {
           "rounds": [
-            { "type": "riddle", "text": "Tiene teclas pero no cerraduras, espacio pero no habitación, puedes entrar pero no puedes ir adentro. ¿Qué es?", "answer": "un teclado", "acceptableAnswers": ["teclado","un teclado","el teclado"] },
-            { "type": "translation", "source": { "ko": "별이 빛나는 밤", "en": "A starry night", "es": "La noche estrellada" }, "answer": "La noche estrellada" },
-            { "type": "fill_blank", "question": "Si ella ___ (saber) la verdad, nos ayudaría.", "answer": "supiera", "options": ["sabe","sabía","supiera","sabrá"] },
-            { "type": "listening", "ttsScript": "La piedra guardiana brilla cuando se pronuncian palabras verdaderas cerca. Reconoce la sinceridad en cualquier idioma.", "ttsVoice": "es-ES-ElviraNeural", "question": "¿Qué hace brillar la piedra?", "answer": "palabras verdaderas", "acceptableAnswers": ["palabras verdaderas","sinceridad","palabras sinceras"] },
-            { "type": "roleplay", "prompt": "Explica a la Piedra Guardiana por qué los idiomas son importantes. Habla en español con al menos 3 oraciones. Sé sincero y persuasivo." }
+            {
+              "type": "riddle",
+              "text": "Tiene teclas pero no cerraduras, espacio pero no habitación, puedes entrar pero no puedes ir adentro. ¿Qué es?",
+              "answer": "un teclado",
+              "acceptableAnswers": [
+                "teclado",
+                "un teclado",
+                "el teclado"
+              ]
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "별이 빛나는 밤",
+                "en": "A starry night",
+                "es": "La noche estrellada"
+              },
+              "answer": "La noche estrellada"
+            },
+            {
+              "type": "fill_blank",
+              "question": "Si ella ___ (saber) la verdad, nos ayudaría.",
+              "answer": "supiera",
+              "options": [
+                "sabe",
+                "sabía",
+                "supiera",
+                "sabrá"
+              ]
+            },
+            {
+              "type": "listening",
+              "ttsScript": "La piedra guardiana brilla cuando se pronuncian palabras verdaderas cerca. Reconoce la sinceridad en cualquier idioma.",
+              "ttsVoice": "es-ES-ElviraNeural",
+              "question": "¿Qué hace brillar la piedra?",
+              "answer": "palabras verdaderas",
+              "acceptableAnswers": [
+                "palabras verdaderas",
+                "sinceridad",
+                "palabras sinceras"
+              ]
+            },
+            {
+              "type": "roleplay",
+              "prompt": "Explica a la Piedra Guardiana por qué los idiomas son importantes. Habla en español con al menos 3 oraciones. Sé sincero y persuasivo."
+            }
           ]
         },
         "ko": {
           "rounds": [
-            { "type": "riddle", "text": "열쇠가 있지만 자물쇠는 없다. 공간이 있지만 방은 없다. 들어갈 수 있지만 안에 갈 수는 없다. 이것은 무엇일까?", "answer": "키보드", "acceptableAnswers": ["키보드","컴퓨터 키보드","자판"] },
-            { "type": "translation", "source": { "en": "A starry night", "es": "La noche estrellada", "ko": "별이 빛나는 밤" }, "answer": "별이 빛나는 밤" },
-            { "type": "fill_blank", "question": "그녀가 진실을 ___ (알다), 우리를 도와줬을 텐데.", "answer": "알았다면", "options": ["안다면","알았다면","알 것이다","알고 있다"] },
-            { "type": "listening", "ttsScript": "수호석은 진실된 말이 가까이에서 들릴 때 빛이 납니다. 어떤 언어든 진심을 알아봅니다.", "ttsVoice": "ko-KR-SunHiNeural", "question": "수호석이 빛나는 조건은?", "answer": "진실된 말", "acceptableAnswers": ["진실된 말","진심","진실한 말","진심을 담은 말"] },
-            { "type": "roleplay", "prompt": "수호석에게 왜 언어가 중요한지 설명하세요. 한국어로 최소 3문장 이상 말하세요. 진심을 담아 설득력 있게 말해주세요." }
+            {
+              "type": "riddle",
+              "text": "열쇠가 있지만 자물쇠는 없다. 공간이 있지만 방은 없다. 들어갈 수 있지만 안에 갈 수는 없다. 이것은 무엇일까?",
+              "answer": "키보드",
+              "acceptableAnswers": [
+                "키보드",
+                "컴퓨터 키보드",
+                "자판"
+              ]
+            },
+            {
+              "type": "translation",
+              "source": {
+                "en": "A starry night",
+                "es": "La noche estrellada",
+                "ko": "별이 빛나는 밤"
+              },
+              "answer": "별이 빛나는 밤"
+            },
+            {
+              "type": "fill_blank",
+              "question": "그녀가 진실을 ___ (알다), 우리를 도와줬을 텐데.",
+              "answer": "알았다면",
+              "options": [
+                "안다면",
+                "알았다면",
+                "알 것이다",
+                "알고 있다"
+              ]
+            },
+            {
+              "type": "listening",
+              "ttsScript": "수호석은 진실된 말이 가까이에서 들릴 때 빛이 납니다. 어떤 언어든 진심을 알아봅니다.",
+              "ttsVoice": "ko-KR-SunHiNeural",
+              "question": "수호석이 빛나는 조건은?",
+              "answer": "진실된 말",
+              "acceptableAnswers": [
+                "진실된 말",
+                "진심",
+                "진실한 말",
+                "진심을 담은 말"
+              ]
+            },
+            {
+              "type": "roleplay",
+              "prompt": "수호석에게 왜 언어가 중요한지 설명하세요. 한국어로 최소 3문장 이상 말하세요. 진심을 담아 설득력 있게 말해주세요."
+            }
           ]
         }
       },
       "rewards": {
         "xp": 500,
-        "items": ["korea_guardian_stone"],
+        "items": [
+          "korea_guardian_stone"
+        ],
         "npcRelation": null,
         "badge": "seoul_guardian"
       }
     }
   ],
   "npcRelationLevels": [
-    { "level": 1, "name": { "ko": "낯선 사이", "en": "Stranger", "es": "Desconocido" }, "points": 0, "benefit": { "ko": "기본 대화", "en": "Basic dialogue", "es": "Diálogo básico" } },
-    { "level": 2, "name": { "ko": "아는 사이", "en": "Acquaintance", "es": "Conocido" }, "points": 3, "benefit": { "ko": "퀴즈 힌트 +1", "en": "Quiz hint +1", "es": "Pista extra +1" } },
-    { "level": 3, "name": { "ko": "친구", "en": "Friend", "es": "Amigo" }, "points": 7, "benefit": { "ko": "보너스 퀴즈 해금", "en": "Bonus quiz unlocked", "es": "Quiz bonus desbloqueado" } },
-    { "level": 4, "name": { "ko": "절친", "en": "Best Friend", "es": "Mejor Amigo" }, "points": 12, "benefit": { "ko": "비밀 스토리 + NPC 스킨", "en": "Secret story + NPC skin", "es": "Historia secreta + skin de NPC" } }
+    {
+      "level": 1,
+      "name": {
+        "ko": "낯선 사이",
+        "en": "Stranger",
+        "es": "Desconocido"
+      },
+      "points": 0,
+      "benefit": {
+        "ko": "기본 대화",
+        "en": "Basic dialogue",
+        "es": "Diálogo básico"
+      }
+    },
+    {
+      "level": 2,
+      "name": {
+        "ko": "아는 사이",
+        "en": "Acquaintance",
+        "es": "Conocido"
+      },
+      "points": 3,
+      "benefit": {
+        "ko": "퀴즈 힌트 +1",
+        "en": "Quiz hint +1",
+        "es": "Pista extra +1"
+      }
+    },
+    {
+      "level": 3,
+      "name": {
+        "ko": "친구",
+        "en": "Friend",
+        "es": "Amigo"
+      },
+      "points": 7,
+      "benefit": {
+        "ko": "보너스 퀴즈 해금",
+        "en": "Bonus quiz unlocked",
+        "es": "Quiz bonus desbloqueado"
+      }
+    },
+    {
+      "level": 4,
+      "name": {
+        "ko": "절친",
+        "en": "Best Friend",
+        "es": "Mejor Amigo"
+      },
+      "points": 12,
+      "benefit": {
+        "ko": "비밀 스토리 + NPC 스킨",
+        "en": "Secret story + NPC skin",
+        "es": "Historia secreta + skin de NPC"
+      }
+    }
   ],
   "ttsVoiceMap": {
-    "en": { "default": "en-GB-SoniaNeural", "male": "en-GB-RyanNeural" },
-    "es": { "default": "es-ES-ElviraNeural", "male": "es-ES-AlvaroNeural" },
-    "ko": { "default": "ko-KR-SunHiNeural", "male": "ko-KR-InJoonNeural" }
+    "en": {
+      "default": "en-GB-SoniaNeural",
+      "male": "en-GB-RyanNeural"
+    },
+    "es": {
+      "default": "es-ES-ElviraNeural",
+      "male": "es-ES-AlvaroNeural"
+    },
+    "ko": {
+      "default": "ko-KR-SunHiNeural",
+      "male": "ko-KR-InJoonNeural"
+    }
   }
 }

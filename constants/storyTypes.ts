@@ -96,7 +96,8 @@ export type QuizType =
   | "translation"
   | "writing"
   | "timed"
-  | "mixed";
+  | "mixed"
+  | "pronunciation";
 
 export interface QuizRewards {
   xp: number;

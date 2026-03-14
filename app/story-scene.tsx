@@ -2214,6 +2214,9 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
+    onStartShouldSetPanResponderCapture: () => true,
+    onMoveShouldSetPanResponderCapture: () => true,
+    onPanResponderTerminationRequest: () => false,
     onPanResponderGrant: (e) => {
       const x = e.nativeEvent.pageX - canvasOffset.current.x;
       const y = e.nativeEvent.pageY - canvasOffset.current.y;
