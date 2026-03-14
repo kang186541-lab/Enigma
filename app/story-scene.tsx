@@ -27,6 +27,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
 import { C, F } from "@/constants/theme";
 import { getApiUrl, apiRequest } from "@/lib/query-client";
+import { checkAnswer, AnswerResult } from "@/lib/answerUtils";
 import { Svg, Path } from "react-native-svg";
 
 const rudyStoryImg = require("@/assets/rudy_story.png");
@@ -2171,7 +2172,7 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
   const [idx, setIdx] = useState(0);
   const [answer, setAnswer] = useState("");
   const [confirmed, setConfirmed] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const [answerResult, setAnswerResult] = useState<AnswerResult | null>(null);
   const [solved, setSolved] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
@@ -2188,12 +2189,14 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
                 : lang === "spanish" ? q.opts[q.answerIdx].es
                 : q.opts[q.answerIdx].en;
 
+  const isCorrect = answerResult?.correct ?? false;
+
   function handleConfirm() {
     if (!answer.trim()) return;
-    const correct = answer.trim().toLowerCase() === targetWord.toLowerCase();
-    setIsCorrect(correct);
+    const result = checkAnswer(answer, targetWord, { learningLang });
+    setAnswerResult(result);
     setConfirmed(true);
-    if (correct) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    if (result.correct) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
   }
 
@@ -2202,12 +2205,34 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
       setIdx((i) => i + 1);
       setAnswer("");
       setConfirmed(false);
-      setIsCorrect(false);
+      setAnswerResult(null);
       onResetHints?.();
       setTimeout(() => inputRef.current?.focus(), 150);
     } else {
       setSolved(true);
     }
+  }
+
+  function getFeedbackText(): string {
+    if (!answerResult) return "";
+    if (!answerResult.correct) {
+      return lang === "korean" ? `오답. 정답: ${targetWord}`
+           : lang === "spanish" ? `Incorrecto. Respuesta: ${targetWord}`
+           : `Incorrect. Answer: ${targetWord}`;
+    }
+    if (answerResult.accentDiff) {
+      return lang === "korean" ? `🎉 정답! 참고: 올바른 표기는 ${targetWord}입니다`
+           : lang === "spanish" ? `🎉 ¡Correcto! Nota: la ortografía correcta es ${targetWord}`
+           : `🎉 Correct! Note: the proper spelling is ${targetWord}`;
+    }
+    if (answerResult.isVariant) {
+      return lang === "korean" ? `🎉 정답! 참고: 표준 표기는 ${targetWord}입니다`
+           : lang === "spanish" ? `🎉 ¡Correcto! Nota: la ortografía estándar es ${targetWord}`
+           : `🎉 Correct! Note: the standard spelling is ${targetWord}`;
+    }
+    return lang === "korean" ? "🎉 정답이에요!"
+         : lang === "spanish" ? "🎉 ¡Correcto!"
+         : "🎉 Correct!";
   }
 
   if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
@@ -2251,9 +2276,7 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
       {confirmed && (
         <View style={[styles.writingResult, { backgroundColor: isCorrect ? "rgba(90,170,90,0.15)" : "rgba(200,70,70,0.15)" }]}>
           <Text style={{ fontFamily: F.bodySemi, fontSize: 14, color: isCorrect ? "#5a9" : "#e55" }}>
-            {isCorrect
-              ? (lang === "korean" ? "🎉 정답이에요!" : lang === "spanish" ? "🎉 ¡Correcto!" : "🎉 Correct!")
-              : (lang === "korean" ? `오답. 정답: ${targetWord}` : lang === "spanish" ? `Incorrecto. Respuesta: ${targetWord}` : `Incorrect. Answer: ${targetWord}`)}
+            {getFeedbackText()}
           </Text>
         </View>
       )}
@@ -2542,7 +2565,7 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
   const [idx, setIdx] = useState(0);
   const [answer, setAnswer] = useState("");
   const [confirmed, setConfirmed] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const [answerResult, setAnswerResult] = useState<AnswerResult | null>(null);
   const [solved, setSolved] = useState(false);
 
   useEffect(() => { onResetHints?.(); }, [idx]);
@@ -2552,18 +2575,37 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
   const displayWord = lang === "korean" ? q.word.ko : lang === "spanish" ? q.word.es : q.word.en;
   const hintText = q.hint ? (lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : q.hint.en) : null;
 
+  const isCorrect = answerResult?.correct ?? false;
+
   function handleConfirm() {
     if (!answer.trim()) return;
-    const correct = answer.trim().toLowerCase() === targetWord.toLowerCase();
-    setIsCorrect(correct);
+    const result = checkAnswer(answer, targetWord, { learningLang: "english" });
+    setAnswerResult(result);
     setConfirmed(true);
-    if (correct) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    if (result.correct) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
   }
 
   function handleNext() {
-    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setAnswer(""); setConfirmed(false); setIsCorrect(false); onResetHints?.(); }
+    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setAnswer(""); setConfirmed(false); setAnswerResult(null); onResetHints?.(); }
     else setSolved(true);
+  }
+
+  function getFeedbackText(): string {
+    if (!answerResult) return "";
+    if (!answerResult.correct) {
+      return lang === "korean" ? `정답: ${targetWord}`
+           : lang === "spanish" ? `Respuesta: ${targetWord}`
+           : `Answer: ${targetWord}`;
+    }
+    if (answerResult.isVariant) {
+      return lang === "korean" ? `🎉 정답! 참고: 표준 표기는 ${targetWord}입니다`
+           : lang === "spanish" ? `🎉 ¡Correcto! Nota: la ortografía estándar es ${targetWord}`
+           : `🎉 Correct! Note: the standard spelling is ${targetWord}`;
+    }
+    return lang === "korean" ? "🎉 정답이에요!"
+         : lang === "spanish" ? "🎉 ¡Correcto!"
+         : "🎉 Correct!";
   }
 
   if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
@@ -2594,9 +2636,7 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
       {confirmed && (
         <View style={[styles.writingResult, { backgroundColor: isCorrect ? "rgba(90,170,90,0.15)" : "rgba(200,70,70,0.15)" }]}>
           <Text style={{ fontFamily: F.bodySemi, fontSize: 14, color: isCorrect ? "#5a9" : "#e55" }}>
-            {isCorrect
-              ? (lang === "korean" ? "🎉 정답이에요!" : lang === "spanish" ? "🎉 ¡Correcto!" : "🎉 Correct!")
-              : (lang === "korean" ? `정답: ${targetWord}` : lang === "spanish" ? `Respuesta: ${targetWord}` : `Answer: ${targetWord}`)}
+            {getFeedbackText()}
           </Text>
         </View>
       )}

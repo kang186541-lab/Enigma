@@ -11,6 +11,7 @@ import { C, F } from "@/constants/theme";
 import type { LoadedQuiz, LangCode } from "@/constants/storyTypes";
 import { fillGptPrompt } from "@/lib/storyUtils";
 import { getApiUrl, apiRequest } from "@/lib/query-client";
+import { checkAnswer as checkSpelling } from "@/lib/answerUtils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -495,8 +496,11 @@ function ListeningQuizView({
 
   function checkAnswer() {
     const q = questions[qIdx];
-    const acceptable = q.acceptableAnswers ?? [q.answer];
-    const isCorrect = acceptable.some(a => normalise(a) === normalise(input));
+    const acceptable = q.acceptableAnswers ?? [];
+    const langMap: Record<string, string> = { en: "english", es: "spanish", ko: "korean" };
+    const learningLang = langMap[targetLang] ?? "english";
+    const result = checkSpelling(input, q.answer, { acceptableAnswers: acceptable, learningLang });
+    const isCorrect = result.correct;
     setFeedback(isCorrect ? "correct" : "wrong");
     Haptics.impactAsync(isCorrect ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light);
     const newCorrect = isCorrect ? correct + 1 : correct;

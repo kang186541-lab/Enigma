@@ -1,0 +1,115 @@
+단어 입력 퀴즈에서 “theater”를 입력했는데 오답 처리되고 정답이 “theatre”라고 나왔어. theater는 미국식, theatre는 영국식인데 둘 다 정답이야. 이런 케이스를 전부 수정해줘.
+
+## 수정 방법
+
+### 1. 영어 단어 입력 퀴즈의 정답 판정 로직 수정
+
+정답 체크 시 다음 규칙을 적용해줘:
+
+- 대소문자 무시 (이미 되어있을 수 있음)
+- 영국식/미국식 스펠링 모두 허용
+- 앞뒤 공백 무시
+
+### 2. 허용해야 할 영국식/미국식 스펠링 목록
+
+정답 데이터에 acceptableAnswers 배열을 추가해서 아래 변형들을 모두 정답으로 인정해줘:
+
+|미국식      |영국식      |패턴                  |
+|---------|---------|--------------------|
+|theater  |theatre  |-er / -re           |
+|center   |centre   |-er / -re           |
+|color    |colour   |-or / -our          |
+|favor    |favour   |-or / -our          |
+|neighbor |neighbour|-or / -our          |
+|honor    |honour   |-or / -our          |
+|humor    |humour   |-or / -our          |
+|organize |organise |-ize / -ise         |
+|realize  |realise  |-ize / -ise         |
+|recognize|recognise|-ize / -ise         |
+|apologize|apologise|-ize / -ise         |
+|analyze  |analyse  |-yze / -yse         |
+|traveled |travelled|-ed / -led          |
+|canceled |cancelled|-ed / -led          |
+|defense  |defence  |-se / -ce           |
+|offense  |offence  |-se / -ce           |
+|license  |licence  |-se / -ce           |
+|gray     |grey     |gray / grey         |
+|airplane |aeroplane|airplane / aeroplane|
+|catalog  |catalogue|-og / -ogue         |
+|dialog   |dialogue |-og / -ogue         |
+|program  |programme|(일반 의미)             |
+|check    |cheque   |(금융)                |
+|jewelry  |jewellery|                    |
+|pajamas  |pyjamas  |                    |
+|mom      |mum      |                    |
+
+### 3. 자동 변형 체크 함수
+
+매번 수동으로 넣기 어려우니까, 정답 체크 시 자동으로 변형을 허용하는 함수를 만들어줘:
+
+```javascript
+function isAcceptableAnswer(userAnswer, correctAnswer, acceptableAnswers = []) {
+  const normalize = (str) => str.trim().toLowerCase();
+  const userNorm = normalize(userAnswer);
+  const correctNorm = normalize(correctAnswer);
+  
+  // 정확히 일치
+  if (userNorm === correctNorm) return true;
+  
+  // acceptableAnswers에 포함
+  if (acceptableAnswers.some(a => normalize(a) === userNorm)) return true;
+  
+  // 영국식/미국식 자동 변환 체크
+  const variants = getSpellingVariants(correctNorm);
+  if (variants.includes(userNorm)) return true;
+  
+  return false;
+}
+
+function getSpellingVariants(word) {
+  const variants = [word];
+  
+  // -re / -er
+  if (word.endsWith('re')) variants.push(word.slice(0, -2) + 'er');
+  if (word.endsWith('er')) variants.push(word.slice(0, -2) + 're');
+  
+  // -our / -or
+  if (word.endsWith('our')) variants.push(word.replace(/our$/, 'or'));
+  if (word.endsWith('or') && !word.endsWith('oor')) variants.push(word.replace(/or$/, 'our'));
+  
+  // -ise / -ize
+  if (word.endsWith('ise')) variants.push(word.replace(/ise$/, 'ize'));
+  if (word.endsWith('ize')) variants.push(word.replace(/ize$/, 'ise'));
+  
+  // -yse / -yze
+  if (word.endsWith('yse')) variants.push(word.replace(/yse$/, 'yze'));
+  if (word.endsWith('yze')) variants.push(word.replace(/yze$/, 'yse'));
+  
+  // -ence / -ense
+  if (word.endsWith('ence')) variants.push(word.replace(/ence$/, 'ense'));
+  if (word.endsWith('ense')) variants.push(word.replace(/ense$/, 'ence'));
+  
+  // -ogue / -og
+  if (word.endsWith('ogue')) variants.push(word.replace(/ogue$/, 'og'));
+  if (word.endsWith('og')) variants.push(word + 'ue');
+  
+  // gray / grey
+  variants.push(word.replace('gray', 'grey'));
+  variants.push(word.replace('grey', 'gray'));
+  
+  return variants;
+}
+```
+
+### 4. 스페인어/한국어 단어에도 적용
+
+스페인어 입력 퀴즈에서도 악센트 유무를 유연하게 허용해줘:
+
+- “cafe” = “café” (악센트 없어도 정답)
+- “si” = “sí” (악센트 없어도 정답)
+- 악센트가 빠져도 정답으로 인정하되, 피드백으로 “정답! 참고: 올바른 스펠링은 café입니다” 이렇게 알려주기
+
+한국어 입력에서도:
+
+- 띄어쓰기 차이 무시 (“감사합니다” = “감사 합니다”)
+- 맞춤법 유사 변형 허용 (“됬다” → “됐다” 등은 정답 처리하되 올바른 표기 알려주기)
