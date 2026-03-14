@@ -1,0 +1,72 @@
+Bug: User switched target language to Spanish, but the daily course STEP 2 (Key Point) still shows English content (“My name is ___” / “I’m ___”). It should show Spanish content (“Me llamo ___” / “Soy ___”).
+
+## The Problem
+
+The daily course is not reading the user’s current targetLang when loading lesson content. It’s probably hardcoded to English or cached from the first time.
+
+## Fix
+
+### 1. Check where daily course loads its content
+
+Find where the daily course reads the Day data (listenRepeat, keyPoint, missionTalk, review). It should be selecting content based on targetLang:
+
+```javascript
+// WRONG — hardcoded to English
+const keyPointContent = dayData.keyPoint.explanation.en;
+const quizzes = dayData.keyPoint.quizzes; // only English version
+
+// CORRECT — use targetLang
+const keyPointContent = dayData.keyPoint.explanation[nativeLang];
+const sentences = dayData.listenRepeat[targetLang];
+```
+
+### 2. Check all 4 STEPs
+
+Every STEP must use targetLang for content:
+
+|STEP                  |What uses targetLang              |What uses nativeLang   |
+|----------------------|----------------------------------|-----------------------|
+|STEP 1 Listen & Repeat|Sentences to practice             |-                      |
+|STEP 2 Key Point      |Quiz sentences, fill_blank options|Explanation text       |
+|STEP 3 Mission Talk   |GPT conversation language         |Situation description  |
+|STEP 4 Review         |Sentences to speak, fill_blank    |Translation shown below|
+
+### 3. Make sure targetLang is read fresh, not cached
+
+When the user changes language in settings, the daily course must pick up the new value:
+
+```javascript
+// In the daily course screen, read targetLang from AsyncStorage or context
+const { targetLang, nativeLang } = useLanguageSettings(); // or however it's stored
+
+// Use these when selecting content
+const listenRepeatSentences = dayData.listenRepeat[targetLang];
+const keyPointExplanation = dayData.keyPoint.explanation[nativeLang];
+const keyPointQuizzes = dayData.keyPoint.quizzes; // quizzes have multi-lang sentences inside
+```
+
+### 4. For quizzes that have per-language sentences
+
+The quiz data has sentences like:
+
+```json
+{ "sentence": { "en": "My name ___ Rudy.", "es": "Me llamo ___.", "ko": "제 이름은 ___ 루디예요." } }
+```
+
+Make sure the quiz renderer picks the right language:
+
+```javascript
+const displaySentence = quiz.sentence[targetLang] ?? quiz.sentence['en'];
+```
+
+### 5. Reload content when language changes
+
+If the user changes targetLang mid-session, the daily course screen should reload its content. Add targetLang as a dependency:
+
+```javascript
+useEffect(() => {
+  loadDayContent(currentDay, targetLang, nativeLang);
+}, [currentDay, targetLang, nativeLang]);
+```
+
+Check and fix all 4 STEPs to properly use targetLang. Test with Spanish selected — all content should be in Spanish.
