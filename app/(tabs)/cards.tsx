@@ -1276,23 +1276,26 @@ export default function CardsScreen() {
                         </Text>
                       )}
                     </View>
-                    <Pressable
-                      style={({ pressed }) => [styles.speakerBtnBack, pressed && { opacity: 0.75 }]}
-                      onPress={handleSpeak}
-                      hitSlop={12}
-                    >
-                      <Ionicons
-                        name={isSpeaking ? "volume-high" : "volume-medium"}
-                        size={16}
-                        color={C.parchment}
-                      />
-                      <Text style={styles.speakerBtnBackText}>Listen</Text>
-                    </Pressable>
                   </View>
                 </Animated.View>
               </Pressable>
             </Animated.View>
           </View>
+
+          {isFlipped && (
+            <Pressable
+              style={({ pressed }) => [styles.listenRowBtn, pressed && { opacity: 0.75 }]}
+              onPress={handleSpeak}
+              hitSlop={12}
+            >
+              <Ionicons
+                name={isSpeaking ? "volume-high" : "volume-medium"}
+                size={16}
+                color={C.parchment}
+              />
+              <Text style={styles.speakerBtnBackText}>Listen</Text>
+            </Pressable>
+          )}
 
           {isFlipped ? (
             <View style={styles.actionRow}>
@@ -1523,6 +1526,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: F.bodySemi,
     color: C.parchment,
+  },
+  listenRowBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    alignSelf: "center",
+    backgroundColor: "rgba(201,162,39,0.15)",
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.35)",
+    marginVertical: 6,
   },
   flipHint: {
     flexDirection: "row",

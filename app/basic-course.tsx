@@ -406,7 +406,7 @@ const tc = StyleSheet.create({
   grid: {
     flex: 1,
     width: "100%",
-    minHeight: 260,
+    minHeight: 200,
     borderRadius: 20,
     borderWidth: 1.5,
     borderColor: C.border,
@@ -1058,18 +1058,13 @@ export default function BasicCourseScreen() {
             </View>
           </View>
 
-          {/* Listen button + skip listen */}
+          {/* Listen button */}
           <Pressable
             style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.75 }]}
             onPress={() => playAudio(charItem.char)}
           >
             <Ionicons name="volume-medium-outline" size={18} color={C.bg1} />
             <Text style={s.listenBtnTxt}>{listenLabel}</Text>
-          </Pressable>
-          <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
-            <Text style={s.inlineSkip}>
-              {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
-            </Text>
           </Pressable>
 
           {/* Divider + label */}
