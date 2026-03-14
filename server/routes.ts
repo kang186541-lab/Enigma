@@ -816,10 +816,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         includeTranslation
           ? `   Each choice must include: "text" (${langDisplay}) and "translation" (${nativeLangDisplay}).`
           : `   Each choice is a plain string in ${langDisplay}.`,
+        includeTranslation
+          ? `8. Include "replyTranslation": a natural ${nativeLangDisplay} translation of your own reply (the "reply" field).`
+          : "",
         ``,
         `RESPOND WITH ONLY VALID JSON — no markdown, no code blocks, nothing else:`,
         includeTranslation
-          ? `{"reply":"...","scoreChange":3,"emotion":"happy","choices":[{"text":"...","translation":"..."},{"text":"...","translation":"..."},{"text":"...","translation":"..."}]}`
+          ? `{"reply":"...","replyTranslation":"...","scoreChange":3,"emotion":"happy","choices":[{"text":"...","translation":"..."},{"text":"...","translation":"..."},{"text":"...","translation":"..."}]}`
           : `{"reply":"...","scoreChange":3,"emotion":"happy","choices":["...","...","..."]}`,
       ].join("\n");
 
@@ -846,7 +849,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const jsonStr = extractJsonFromText(raw);
 
       type RawChoice = string | { text?: string; translation?: string };
-      let parsed: { reply?: string; scoreChange?: number; emotion?: string; choices?: RawChoice[] };
+      let parsed: { reply?: string; replyTranslation?: string; scoreChange?: number; emotion?: string; choices?: RawChoice[] };
       try {
         parsed = JSON.parse(jsonStr);
       } catch {
@@ -860,9 +863,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       res.json({
-        reply:       parsed.reply       ?? "...",
-        scoreChange: typeof parsed.scoreChange === "number" ? Math.max(-10, Math.min(10, parsed.scoreChange)) : 0,
-        emotion:     parsed.emotion     ?? "neutral",
+        reply:            parsed.reply            ?? "...",
+        replyTranslation: (parsed.replyTranslation ?? "").trim() || undefined,
+        scoreChange:      typeof parsed.scoreChange === "number" ? Math.max(-10, Math.min(10, parsed.scoreChange)) : 0,
+        emotion:          parsed.emotion          ?? "neutral",
         choices,
       });
     } catch (err) {

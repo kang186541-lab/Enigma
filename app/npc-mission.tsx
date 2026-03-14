@@ -44,6 +44,7 @@ interface NpcMessage {
   id: string;
   text: string;
   isUser: boolean;
+  translation?: string;
 }
 
 let _webAudioEl: HTMLAudioElement | null = null;
@@ -81,6 +82,7 @@ export default function NpcMissionScreen() {
   const [emotion, setEmotion]       = useState("neutral");
   const [choices, setChoices]       = useState<{ text: string; translation: string }[]>([]);
   const [choiceTranslVisible, setChoiceTranslVisible] = useState<boolean[]>([]);
+  const [msgTranslVisible, setMsgTranslVisible] = useState<Set<string>>(new Set());
   const [isTyping, setIsTyping]     = useState(false);
   const [inputText, setInputText]   = useState("");
   const [muted, setMuted]           = useState(false);
@@ -223,8 +225,9 @@ export default function NpcMissionScreen() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "NPC chat failed");
 
-      const { reply, scoreChange, emotion: newEmotion, choices: newChoices } = data as {
+      const { reply, replyTranslation, scoreChange, emotion: newEmotion, choices: newChoices } = data as {
         reply: string;
+        replyTranslation?: string;
         scoreChange: number;
         emotion: string;
         choices: { text: string; translation: string }[];
@@ -240,7 +243,7 @@ export default function NpcMissionScreen() {
       }
 
       const msgId = Date.now().toString() + "npc";
-      const npcMsg: NpcMessage = { id: msgId, text: reply, isUser: false };
+      const npcMsg: NpcMessage = { id: msgId, text: reply, isUser: false, translation: replyTranslation };
 
       setMessages(prev => [npcMsg, ...prev]);
       conversationRef.current = [...history, { role: "assistant", content: reply }];
@@ -533,33 +536,60 @@ export default function NpcMissionScreen() {
 
   const emojiIcon = NPC_EMOTIONS[emotion] ?? "😐";
 
-  const renderItem = ({ item }: { item: NpcMessage }) => (
-    <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowNpc]}>
-      {!item.isUser && npc && (
-        <View style={[styles.npcAvatar, { backgroundColor: npc.color + "33", borderColor: npc.color + "88" }]}>
-          <Text style={styles.npcAvatarEmoji}>{npc.emoji}</Text>
-        </View>
-      )}
-      <View style={styles.bubbleCol}>
-        <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleNpc]}>
-          {renderClickableWords(item.text, !item.isUser)}
-          {!item.isUser && (
-            <Pressable
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); playNpcTts(item.text, item.id); }}
-              style={({ pressed }) => [styles.replayBtn, pressed && { opacity: 0.65 }]}
-              hitSlop={6}
-            >
-              <Ionicons
-                name={speakingId === item.id ? "volume-high" : "volume-medium-outline"}
-                size={14}
-                color={speakingId === item.id ? C.gold : C.goldDark}
-              />
-            </Pressable>
+  const toggleMsgTransl = useCallback((id: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setMsgTranslVisible(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }, []);
+
+  const renderItem = ({ item }: { item: NpcMessage }) => {
+    const translShown = msgTranslVisible.has(item.id);
+    return (
+      <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowNpc]}>
+        {!item.isUser && npc && (
+          <View style={[styles.npcAvatar, { backgroundColor: npc.color + "33", borderColor: npc.color + "88" }]}>
+            <Text style={styles.npcAvatarEmoji}>{npc.emoji}</Text>
+          </View>
+        )}
+        <View style={styles.bubbleCol}>
+          <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleNpc]}>
+            {renderClickableWords(item.text, !item.isUser)}
+            {!item.isUser && (
+              <Pressable
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); playNpcTts(item.text, item.id); }}
+                style={({ pressed }) => [styles.replayBtn, pressed && { opacity: 0.65 }]}
+                hitSlop={6}
+              >
+                <Ionicons
+                  name={speakingId === item.id ? "volume-high" : "volume-medium-outline"}
+                  size={14}
+                  color={speakingId === item.id ? C.gold : C.goldDark}
+                />
+              </Pressable>
+            )}
+          </View>
+          {/* Translation toggle — NPC only */}
+          {!item.isUser && !!item.translation && (
+            <View style={styles.msgTranslWrap}>
+              <Pressable onPress={() => toggleMsgTransl(item.id)} style={styles.msgTranslBtn}>
+                <Text style={styles.msgTranslBtnText}>
+                  {translShown
+                    ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : "Hide translation")
+                    : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : "Show translation")}
+                </Text>
+              </Pressable>
+              {translShown && (
+                <Text style={styles.msgTranslText}>{item.translation}</Text>
+              )}
+            </View>
           )}
         </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const showFreeInput = tier === "friendly" || tier === "close";
   const showFamiliar  = tier === "familiar";
@@ -1029,6 +1059,19 @@ const styles = StyleSheet.create({
   bubbleTextUser: { fontFamily: F.body, color: C.bg1 },
   bubbleTextNpc: { fontFamily: F.body, color: "#2c1810" },
   replayBtn: { marginTop: 4, alignSelf: "flex-end", padding: 2 },
+
+  msgTranslWrap: { marginTop: 4, paddingLeft: 2, gap: 4 },
+  msgTranslBtn: { alignSelf: "flex-start", paddingVertical: 3, paddingHorizontal: 2 },
+  msgTranslBtnText: {
+    fontSize: 11, fontFamily: F.body, color: C.gold,
+    textDecorationLine: "underline", opacity: 0.85,
+  },
+  msgTranslText: {
+    fontSize: 13, fontFamily: F.body,
+    color: C.parchment, opacity: 0.6,
+    lineHeight: 18, fontStyle: "italic",
+    maxWidth: "90%",
+  },
 
   typingBubble: { paddingVertical: 14 },
   typingDots: { flexDirection: "row", gap: 5, alignItems: "center" },
