@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
 
   /* ─ HEADER ─ */
   header: { paddingHorizontal: 20, paddingBottom: 22 },
-  headerTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 },
+  headerTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 14 },
   greeting: { fontSize: 14, fontFamily: F.body, color: C.goldDim, fontStyle: "italic", marginBottom: 4 },
   headerTitle: { fontSize: 30, fontFamily: F.title, color: C.gold, letterSpacing: 3 },
   lingoHeader: {
