@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -24,6 +24,9 @@ import {
   type DailyCourseProgress,
   type DayData,
 } from "@/lib/dailyCourseData";
+import { LESSON_CONTENT, type LearningLangKey } from "@/lib/lessonContent";
+import { Step1ListenRepeat } from "@/components/rudy/Step1ListenRepeat";
+import { Step2KeyPoint } from "@/components/rudy/Step2KeyPoint";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -43,8 +46,9 @@ type Phase = "briefing" | "lesson" | "complete";
 export default function RudyLessonScreen() {
   const insets = useSafeAreaInsets();
   const { dayId } = useLocalSearchParams<{ dayId: string }>();
-  const { nativeLanguage } = useLanguage();
+  const { nativeLanguage, learningLanguage } = useLanguage();
   const nativeLang = (nativeLanguage ?? "english") as string;
+  const learnLang = (learningLanguage ?? "english") as string;
   const lc = langToCode(nativeLang);
 
   const [phase, setPhase] = useState<Phase>("briefing");
@@ -144,6 +148,7 @@ export default function RudyLessonScreen() {
   return (
     <LessonScreen
       day={day} nativeLang={nativeLang} lc={lc}
+      learningLang={learnLang}
       currentStep={currentStep} totalSteps={TOTAL_STEPS}
       stepLabels={stepLabels} stepAnim={stepAnim}
       sentenceCount={sentenceCount}
@@ -222,11 +227,14 @@ function BriefingScreen({
 
 // ── Lesson Screen ────────────────────────────────────────────────────────────
 
+// Steps 0 (Listen&Repeat) and 1 (KeyPoint) drive their own completion
+const SELF_COMPLETING_STEPS = [0, 1];
+
 function LessonScreen({
-  day, nativeLang, lc, currentStep, totalSteps, stepLabels, stepAnim,
+  day, nativeLang, lc, learningLang, currentStep, totalSteps, stepLabels, stepAnim,
   sentenceCount, setSentenceCount, onStepComplete, insets,
 }: {
-  day: DayData; nativeLang: string; lc: "ko" | "en" | "es";
+  day: DayData; nativeLang: string; lc: "ko" | "en" | "es"; learningLang: string;
   currentStep: number; totalSteps: number;
   stepLabels: string[]; stepAnim: Animated.Value;
   sentenceCount: number;
@@ -245,6 +253,8 @@ function LessonScreen({
   const completeStepLabel = nativeLang === "korean" ? "STEP 완료 →"
     : nativeLang === "spanish" ? "Completar STEP →"
     : "Complete STEP →";
+
+  const selfCompletes = SELF_COMPLETING_STEPS.includes(currentStep);
 
   const stepWidth = stepAnim.interpolate({
     inputRange: [0, 1],
@@ -300,96 +310,157 @@ function LessonScreen({
           day={day}
           nativeLang={nativeLang}
           lc={lc}
+          learningLang={learningLang}
           stepLabels={stepLabels}
-          onSentenceSpoken={() => setSentenceCount(sentenceCount + 1)}
+          onStepComplete={onStepComplete}
+          onSentenceSpoken={(n) => setSentenceCount(sentenceCount + n)}
         />
       </ScrollView>
 
-      {/* ── Bottom bar ──────────────────────────── */}
-      <View style={[styles.lessonFooter, { paddingBottom: insets.bottom + 16 }]}>
-        <View style={styles.footerLeft}>
-          <Ionicons name="chatbubble-outline" size={15} color={C.goldDim} />
-          <Text style={styles.sentenceCountText}>{sentenceCount} {sentenceLabel}</Text>
+      {/* ── Bottom bar (hidden for self-completing steps) ──────────────── */}
+      {!selfCompletes && (
+        <View style={[styles.lessonFooter, { paddingBottom: insets.bottom + 16 }]}>
+          <View style={styles.footerLeft}>
+            <Ionicons name="chatbubble-outline" size={15} color={C.goldDim} />
+            <Text style={styles.sentenceCountText}>{sentenceCount} {sentenceLabel}</Text>
+          </View>
+          <Pressable
+            style={({ pressed }) => [styles.nextStepBtn, pressed && { opacity: 0.85 }]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              onStepComplete();
+            }}
+          >
+            <Text style={styles.nextStepBtnText}>
+              {currentStep + 1 >= totalSteps ? completeStepLabel : nextLabel}
+            </Text>
+            <Ionicons name="arrow-forward" size={14} color={C.bg1} />
+          </Pressable>
         </View>
-        <Pressable
-          style={({ pressed }) => [styles.nextStepBtn, pressed && { opacity: 0.85 }]}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      )}
+    </View>
+  );
+}
+
+// ── Step Content ──────────────────────────────────────────────────────────────
+
+function StepContent({
+  stepIndex, day, nativeLang, lc, learningLang, stepLabels, onStepComplete, onSentenceSpoken,
+}: {
+  stepIndex: number; day: DayData; nativeLang: string; lc: "ko" | "en" | "es";
+  learningLang: string;
+  stepLabels: string[]; onStepComplete: () => void;
+  onSentenceSpoken: (n: number) => void;
+}) {
+  const dayContent = LESSON_CONTENT[day.id];
+  const langContent = dayContent?.[learningLang as LearningLangKey];
+
+  // ── STEP 1: 듣고 따라하기 ─────────────────────────────────────────────────
+  if (stepIndex === 0) {
+    if (!langContent?.step1Sentences?.length) {
+      return <NoContentCard nativeLang={nativeLang} step={1} onSkip={onStepComplete} />;
+    }
+    return (
+      <View style={stepContentStyles.container}>
+        <View style={stepContentStyles.header}>
+          <View style={stepContentStyles.iconWrap}>
+            <Ionicons name="headset" size={26} color={C.gold} />
+          </View>
+          <Text style={stepContentStyles.stepTitle}>STEP 1: {stepLabels[0]}</Text>
+          <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
+        </View>
+        <Step1ListenRepeat
+          sentences={langContent.step1Sentences}
+          nativeLang={nativeLang}
+          lc={lc}
+          onComplete={(spoken) => {
+            onSentenceSpoken(spoken);
             onStepComplete();
           }}
-        >
-          <Text style={styles.nextStepBtnText}>
-            {currentStep + 1 >= totalSteps ? completeStepLabel : nextLabel}
-          </Text>
-          <Ionicons name="arrow-forward" size={14} color={C.bg1} />
-        </Pressable>
+        />
+      </View>
+    );
+  }
+
+  // ── STEP 2: 핵심 포인트 ───────────────────────────────────────────────────
+  if (stepIndex === 1) {
+    if (!langContent?.step2) {
+      return <NoContentCard nativeLang={nativeLang} step={2} onSkip={onStepComplete} />;
+    }
+    return (
+      <View style={stepContentStyles.container}>
+        <View style={stepContentStyles.header}>
+          <View style={stepContentStyles.iconWrap}>
+            <Ionicons name="bulb" size={26} color={C.gold} />
+          </View>
+          <Text style={stepContentStyles.stepTitle}>STEP 2: {stepLabels[1]}</Text>
+          <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
+        </View>
+        <Step2KeyPoint
+          data={langContent.step2}
+          nativeLang={nativeLang}
+          lc={lc}
+          learningLang={learningLang}
+          onComplete={(correct) => {
+            onSentenceSpoken(correct);
+            onStepComplete();
+          }}
+        />
+      </View>
+    );
+  }
+
+  // ── STEP 3 & 4: Placeholder (Mission Talk & Review) ───────────────────────
+  const stepIcons = ["mic", "refresh-circle"] as const;
+  const stepDescriptions: Record<string, string[]> = {
+    korean: ["배운 표현으로 루디와 자유롭게 대화해보세요.", "오늘 배운 내용을 최종 복습해보세요."],
+    english: ["Have a free conversation with Rudy using what you've learned.", "Do a final review of everything learned today."],
+    spanish: ["Conversa libremente con Rudy usando lo que has aprendido.", "Haz un repaso final de todo lo aprendido hoy."],
+  };
+  const descs = stepDescriptions[nativeLang] ?? stepDescriptions.english;
+  const relIdx = stepIndex - 2;
+  const comingLabel = nativeLang === "korean" ? "곧 업데이트될 예정이에요 🛠️"
+    : nativeLang === "spanish" ? "Próximamente 🛠️"
+    : "Coming soon 🛠️";
+
+  return (
+    <View style={stepContentStyles.container}>
+      <View style={stepContentStyles.header}>
+        <View style={stepContentStyles.iconWrap}>
+          <Ionicons name={stepIcons[relIdx]} size={26} color={C.gold} />
+        </View>
+        <Text style={stepContentStyles.stepTitle}>STEP {stepIndex + 1}: {stepLabels[stepIndex]}</Text>
+        <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
+        <Text style={stepContentStyles.stepDesc}>{descs[relIdx]}</Text>
+      </View>
+      <View style={stepContentStyles.placeholder}>
+        <Text style={stepContentStyles.placeholderEmoji}>🦊</Text>
+        <Text style={stepContentStyles.placeholderText}>{comingLabel}</Text>
       </View>
     </View>
   );
 }
 
-// ── Step Content (placeholder for next message) ──────────────────────────────
+// ── No Content Card ───────────────────────────────────────────────────────────
 
-function StepContent({
-  stepIndex, day, nativeLang, lc, stepLabels, onSentenceSpoken,
-}: {
-  stepIndex: number; day: DayData; nativeLang: string; lc: "ko" | "en" | "es";
-  stepLabels: string[]; onSentenceSpoken: () => void;
-}) {
-  const stepIcons = ["headset", "bulb", "mic", "refresh-circle"] as const;
-  const stepDescriptions: Record<string, string[]> = {
-    korean: [
-      "원어민의 발음을 듣고 따라 말해보세요.",
-      "오늘의 핵심 문법과 표현을 배워보세요.",
-      "배운 표현으로 자유롭게 말해보세요.",
-      "오늘 배운 내용을 복습해보세요.",
-    ],
-    english: [
-      "Listen to the native speaker and repeat each phrase.",
-      "Learn the key grammar point and expressions for today.",
-      "Speak freely using the expressions you've learned.",
-      "Review everything you've learned today.",
-    ],
-    spanish: [
-      "Escucha al hablante nativo y repite cada frase.",
-      "Aprende el punto gramatical clave y las expresiones de hoy.",
-      "Habla libremente usando las expresiones que has aprendido.",
-      "Repasa todo lo que has aprendido hoy.",
-    ],
-  };
-
-  const descs = stepDescriptions[nativeLang] ?? stepDescriptions.english;
-  const comingLabel = nativeLang === "korean" ? "다음 메시지에서 구현될 예정이에요"
-    : nativeLang === "spanish" ? "Se implementará en el próximo mensaje"
-    : "Full content coming in the next message";
-
+function NoContentCard({
+  nativeLang, step, onSkip,
+}: { nativeLang: string; step: number; onSkip: () => void }) {
+  const msg = nativeLang === "korean" ? `STEP ${step} 콘텐츠가 아직 없어요.`
+    : nativeLang === "spanish" ? `Contenido del STEP ${step} aún no disponible.`
+    : `STEP ${step} content not yet available.`;
+  const skipLabel = nativeLang === "korean" ? "건너뛰기 →" : nativeLang === "spanish" ? "Omitir →" : "Skip →";
   return (
     <View style={stepContentStyles.container}>
-      {/* Step header */}
-      <View style={stepContentStyles.header}>
-        <View style={stepContentStyles.iconWrap}>
-          <Ionicons name={stepIcons[stepIndex]} size={28} color={C.gold} />
-        </View>
-        <Text style={stepContentStyles.stepTitle}>STEP {stepIndex + 1}: {stepLabels[stepIndex]}</Text>
-        <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
-        <Text style={stepContentStyles.stepDesc}>{descs[stepIndex]}</Text>
-      </View>
-
-      {/* Placeholder content */}
       <View style={stepContentStyles.placeholder}>
         <Text style={stepContentStyles.placeholderEmoji}>🦊</Text>
-        <Text style={stepContentStyles.placeholderText}>{comingLabel}</Text>
+        <Text style={stepContentStyles.placeholderText}>{msg}</Text>
       </View>
-
-      {/* Demo sentence button */}
       <Pressable
         style={({ pressed }) => [stepContentStyles.demoBtn, pressed && { opacity: 0.8 }]}
-        onPress={onSentenceSpoken}
+        onPress={onSkip}
       >
-        <Ionicons name="mic-outline" size={18} color={C.gold} />
-        <Text style={stepContentStyles.demoBtnText}>
-          {nativeLang === "korean" ? "문장 연습 (+1)" : nativeLang === "spanish" ? "Practicar frase (+1)" : "Practice sentence (+1)"}
-        </Text>
+        <Text style={stepContentStyles.demoBtnText}>{skipLabel}</Text>
       </Pressable>
     </View>
   );

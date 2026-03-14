@@ -295,6 +295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const MODE_SSML_STYLES: Record<string, { style: string; degree: string; rate: string; pitch: string }> = {
     "독설": { style: "excited",  degree: "2",   rate: "+15%", pitch: "+15%" },
     "친절": { style: "friendly", degree: "1.5", rate: "+5%",  pitch: "0%"   },
+    "slow": { style: "friendly", degree: "1.5", rate: "-30%", pitch: "0%"   },
   };
 
   // speedRate: explicit prosody rate string (e.g. "+20%") derived from the client's
