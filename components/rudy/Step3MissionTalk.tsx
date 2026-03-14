@@ -102,7 +102,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const [totalSentences, setTotalSentences] = useState(0);
   const [grammarNotes, setGrammarNotes]    = useState<string[]>([]);
   const [usedKeyboard, setUsedKeyboard]    = useState(false);
-  const [showDoneBanner, setShowDoneBanner] = useState(false);
+  const [step3Done, setStep3Done] = useState(false);
 
   const nativeRecRef   = useRef<Audio.Recording | null>(null);
   const autoStopRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -154,6 +154,13 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   useEffect(() => {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
   }, [messages]);
+
+  // Auto-scroll when inline done card appears
+  useEffect(() => {
+    if (step3Done) {
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 200);
+    }
+  }, [step3Done]);
 
   // ── GPT call ─────────────────────────────────────────────────────────────────
 
@@ -427,11 +434,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   }
 
   function triggerDone() {
-    setShowDoneBanner(true);
+    setStep3Done(true);
     setPhase("done");
-    setTimeout(() => {
-      onComplete(totalSentences, !usedKeyboard, grammarNotes);
-    }, 2200);
   }
 
   // ── Labels ────────────────────────────────────────────────────────────────────
@@ -499,14 +503,33 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
             <Text style={[s.bubbleText, { color: C.goldDim }]}>{processingLabel}</Text>
           </View>
         )}
-      </ScrollView>
 
-      {/* Done banner */}
-      {showDoneBanner && (
-        <View style={s.doneBanner}>
-          <Text style={s.doneBannerText}>{doneMsg}</Text>
-        </View>
-      )}
+        {/* Inline mission-complete card (inside chat scroll, bottom) */}
+        {step3Done && (
+          <View style={s.inlineDoneCard}>
+            <Text style={s.inlineDoneEmoji}>✅</Text>
+            <Text style={s.inlineDoneTitle}>{doneMsg}</Text>
+            <Text style={s.inlineDoneStat}>
+              {nativeLang === "korean"
+                ? `🗣️ 말한 문장: ${totalSentences}문장`
+                : nativeLang === "spanish"
+                ? `🗣️ Frases habladas: ${totalSentences}`
+                : `🗣️ Sentences spoken: ${totalSentences}`}
+            </Text>
+            <Pressable
+              style={({ pressed }) => [s.inlineDoneBtn, pressed && { opacity: 0.82 }]}
+              onPress={() => {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                onComplete(totalSentences, !usedKeyboard, grammarNotes);
+              }}
+            >
+              <Text style={s.inlineDoneBtnText}>
+                {nativeLang === "korean" ? "STEP 4로 →" : nativeLang === "spanish" ? "PASO 4 →" : "To STEP 4 →"}
+              </Text>
+            </Pressable>
+          </View>
+        )}
+      </ScrollView>
 
       {/* Suggested answers */}
       {phase === "idle" && messages.length > 0 && (
@@ -630,11 +653,19 @@ const s = StyleSheet.create({
   userBubbleText: { color: C.gold },
   voiceBadge:   { fontSize: 10, fontFamily: F.label, color: C.goldDim, textAlign: "right", marginTop: 2 },
 
-  doneBanner: {
-    backgroundColor: C.gold, borderRadius: 14, padding: 14, alignItems: "center",
-    shadowColor: C.gold, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 10, elevation: 6,
+  inlineDoneCard: {
+    marginTop: 16, marginBottom: 8, borderRadius: 18, padding: 20, alignItems: "center",
+    backgroundColor: C.bg2, borderWidth: 2, borderColor: C.gold,
+    shadowColor: C.gold, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 12, elevation: 8,
   },
-  doneBannerText: { fontSize: 16, fontFamily: F.header, color: C.bg1, letterSpacing: 0.5 },
+  inlineDoneEmoji: { fontSize: 36, marginBottom: 6 },
+  inlineDoneTitle: { fontSize: 17, fontFamily: F.header, color: C.gold, letterSpacing: 0.5, textAlign: "center", marginBottom: 8 },
+  inlineDoneStat:  { fontSize: 14, fontFamily: F.label,  color: C.textMuted, marginBottom: 14 },
+  inlineDoneBtn: {
+    flexDirection: "row", alignItems: "center",
+    backgroundColor: C.gold, borderRadius: 50, paddingVertical: 12, paddingHorizontal: 28,
+  },
+  inlineDoneBtnText: { fontSize: 15, fontFamily: F.header, color: C.bg1, letterSpacing: 0.3 },
 
   suggestionsWrap: { gap: 6 },
   suggestLabel:    { fontSize: 11, fontFamily: F.label, color: C.goldDim, paddingLeft: 2 },

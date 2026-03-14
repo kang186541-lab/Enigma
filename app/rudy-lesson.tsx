@@ -285,6 +285,8 @@ function LessonScreen({
   function handleStepDone() {
     // STEP 4 (index 3) goes straight to mission complete — no intermediate card
     if (currentStep === 3) { onStepComplete(); return; }
+    // STEP 3 (index 2) has its own inline completion card with the Next Step button
+    if (currentStep === 2) { onStepComplete(); return; }
     setStepDone(true);
   }
 
