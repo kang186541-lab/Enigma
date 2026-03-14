@@ -237,9 +237,6 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: true,
           playsInSilentModeIOS: true,
-          staysActiveInBackground: false,
-          interruptionModeIOS: 1,
-          interruptionModeAndroid: 1,
         });
         const rec = new Audio.Recording();
         await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);

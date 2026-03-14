@@ -276,9 +276,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: true,
           playsInSilentModeIOS: true,
-          staysActiveInBackground: false,
-          interruptionModeIOS: 1,
-          interruptionModeAndroid: 1,
         });
         const rec = new Audio.Recording();
         await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);

@@ -1,0 +1,72 @@
+STEP 4 recording/scoring does not recognize speech properly. The pronunciation practice screen works fine but STEP 3 and STEP 4 have very low recognition rates.
+
+## DO THIS NOW — Compare the working code vs broken code
+
+### Step 1: Show me the pronunciation practice recording code
+
+Find the pronunciation practice screen (the one that works well). Copy the ENTIRE recording + Azure Speech API call code. Show me:
+
+- How recording starts
+- Recording options (sampleRate, format, channels etc)
+- How the audio is sent to Azure
+- The Azure endpoint URL
+- The Azure API headers
+- The request body format
+- The speech recognition language setting
+
+### Step 2: Show me the STEP 3/4 recording code
+
+Find the Mission Talk (STEP 3) and Review (STEP 4) recording code. Show me the same things as above.
+
+### Step 3: Find EVERY difference
+
+Compare the two. There MUST be differences causing STEP 3/4 to fail. Common differences:
+
+- **speechRecognitionLanguage** — Is it set correctly in STEP 3/4? (en-US for English, ko-KR for Korean, es-ES for Spanish)
+- **Audio recording format** — Is it the same sampleRate, bitRate, channels?
+- **Azure endpoint** — Is it the same URL?
+- **API key** — Is the same key being used?
+- **Audio mode** — Is `allowsRecordingIOS: true` set before recording?
+- **How audio file is read and sent** — Same format? Same encoding?
+
+### Step 4: Make STEP 3/4 use the EXACT same code
+
+Do NOT keep two different recording implementations. Create one shared module:
+
+```javascript
+// Create: shared/speechService.js (or similar)
+
+// Copy ALL recording + Azure code from pronunciation practice into here
+export async function startRecording() { /* from pronunciation practice */ }
+export async function stopAndRecognize(targetLang) { /* from pronunciation practice */ }
+export async function assessPronunciation(audioUri, referenceText, targetLang) { /* from pronunciation practice */ }
+```
+
+Then in pronunciation practice, STEP 3, and STEP 4:
+
+```javascript
+import { startRecording, stopAndRecognize, assessPronunciation } from '../shared/speechService';
+```
+
+Delete ALL recording/speech code from STEP 3 and STEP 4 components. Use ONLY the shared module.
+
+### Step 5: Verify the language setting
+
+Make sure the shared module uses the correct language based on targetLang:
+
+```javascript
+const azureLocaleMap = {
+  'en': 'en-US',
+  'es': 'es-ES', 
+  'ko': 'ko-KR',
+};
+
+// When calling Azure, use:
+const locale = azureLocaleMap[targetLang];
+```
+
+This MUST be set correctly or Azure will try to recognize the wrong language and fail.
+
+## Summary
+
+The pronunciation practice screen works. STEP 3/4 don’t. The ONLY fix is to make all three use the EXACT same code. Create a shared module, delete duplicate code.
