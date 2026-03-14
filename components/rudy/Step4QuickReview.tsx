@@ -238,7 +238,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       rec.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunksRef.current.push(e.data); };
       rec.onstop = () => handleWebStop(mime, stream, q);
       rec.start();
-      autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, 5000);
+      autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, 7000);
     }
   }
 

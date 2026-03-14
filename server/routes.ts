@@ -433,8 +433,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const azureUrl =
-        `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation` +
-        `/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=simple`;
+        `https://${region}.stt.speech.microsoft.com/speech/recognition/interactive` +
+        `/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed`;
 
       const azureRes = await fetch(azureUrl, {
         method: "POST",
@@ -451,9 +451,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(502).json({ error: "STT failed" });
       }
 
-      const data = (await azureRes.json()) as { RecognitionStatus: string; DisplayText?: string };
-      console.log(`[stt] Azure status=${data.RecognitionStatus}  text="${data.DisplayText ?? ""}"`);
-      res.json({ text: data.DisplayText ?? "", status: data.RecognitionStatus });
+      const data = (await azureRes.json()) as { RecognitionStatus: string; DisplayText?: string; NBest?: { Display?: string; Lexical?: string }[] };
+      const text = data.DisplayText ?? data.NBest?.[0]?.Display ?? "";
+      console.log(`[stt] Azure status=${data.RecognitionStatus}  text="${text}"`);
+      res.json({ text, status: data.RecognitionStatus });
     } catch (err) {
       console.error("[stt] error:", err);
       res.status(500).json({ error: "STT failed" });

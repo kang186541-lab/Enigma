@@ -265,16 +265,19 @@ function LessonScreen({
   insets: ReturnType<typeof useSafeAreaInsets>;
 }) {
   const [stepDone, setStepDone] = useState(false);
-  const completeAnim = useRef(new Animated.Value(0)).current;
+  const completeAnim  = useRef(new Animated.Value(0)).current;
+  const lessonScrollRef = useRef<ScrollView>(null);
 
   // Reset stepDone when step actually changes
   useEffect(() => { setStepDone(false); }, [currentStep]);
 
-  // Animate completion card in
+  // Animate completion card in and auto-scroll to show it
   useEffect(() => {
     if (stepDone) {
       completeAnim.setValue(0);
       Animated.spring(completeAnim, { toValue: 1, useNativeDriver: true, tension: 80, friction: 10 }).start();
+      // Scroll to bottom so the completion card is visible
+      setTimeout(() => lessonScrollRef.current?.scrollToEnd({ animated: true }), 350);
     }
   }, [stepDone]);
 
@@ -380,8 +383,26 @@ function LessonScreen({
       </View>
 
       {/* ── Step content area ───────────────────── */}
-      <ScrollView style={styles.lessonScroll} contentContainerStyle={styles.lessonScrollContent}>
-        {stepDone ? (
+      <ScrollView
+        ref={lessonScrollRef}
+        style={styles.lessonScroll}
+        contentContainerStyle={styles.lessonScrollContent}
+      >
+        <StepContent
+          stepIndex={currentStep}
+          day={day}
+          nativeLang={nativeLang}
+          lc={lc}
+          learningLang={learningLang}
+          stepLabels={stepLabels}
+          onStepComplete={handleStepDone}
+          onSentenceSpoken={(n) => setSentenceCount(sentenceCount + n)}
+          onMissionComplete={onMissionComplete}
+          onReviewComplete={onReviewComplete}
+        />
+
+        {/* ── Step completion card (shown BELOW content, not replacing it) ── */}
+        {stepDone && (
           <Animated.View style={[
             styles.stepCompleteCard,
             { opacity: completeAnim, transform: [{ scale: completeAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] }) }] },
@@ -407,19 +428,6 @@ function LessonScreen({
               <Ionicons name="arrow-forward" size={16} color={C.bg1} />
             </Pressable>
           </Animated.View>
-        ) : (
-          <StepContent
-            stepIndex={currentStep}
-            day={day}
-            nativeLang={nativeLang}
-            lc={lc}
-            learningLang={learningLang}
-            stepLabels={stepLabels}
-            onStepComplete={handleStepDone}
-            onSentenceSpoken={(n) => setSentenceCount(sentenceCount + n)}
-            onMissionComplete={onMissionComplete}
-            onReviewComplete={onReviewComplete}
-          />
         )}
       </ScrollView>
 
