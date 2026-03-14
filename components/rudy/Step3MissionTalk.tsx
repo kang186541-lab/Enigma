@@ -20,6 +20,7 @@ interface ChatMsg {
   role: "rudy" | "user";
   text: string;
   isVoice?: boolean;
+  sttError?: boolean;
 }
 
 interface Props {
@@ -35,6 +36,54 @@ interface Props {
 const STT_LANG: Record<string, string> = {
   english: "en-US", spanish: "es-ES", korean: "ko-KR",
 };
+
+// ── Rudy male voice mapping ───────────────────────────────────────────────────
+
+const RUDY_VOICE: Record<string, string> = {
+  english: "en-GB-RyanNeural",
+  spanish: "es-ES-AlvaroNeural",
+  korean:  "ko-KR-InJoonNeural",
+};
+
+// ── Sanitize text for TTS (remove emojis + markdown) ─────────────────────────
+
+function sanitizeForTTS(text: string): string {
+  return text
+    .replace(/[\u{1F600}-\u{1F64F}]/gu, "")
+    .replace(/[\u{1F300}-\u{1F5FF}]/gu, "")
+    .replace(/[\u{1F680}-\u{1F6FF}]/gu, "")
+    .replace(/[\u{1F900}-\u{1F9FF}]/gu, "")
+    .replace(/[\u{2600}-\u{26FF}]/gu, "")
+    .replace(/[\u{2700}-\u{27BF}]/gu, "")
+    .replace(/[\u{FE00}-\u{FE0F}]/gu, "")
+    .replace(/[\u{200D}]/gu, "")
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
+    .replace(/__/g, "")
+    .replace(/_/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// ── Render Rudy's bubble text with **bold** → gold colour ────────────────────
+
+function RudyText({ text, style }: { text: string; style: object }) {
+  const segments = text.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <Text style={style}>
+      {segments.map((seg, i) => {
+        if (seg.startsWith("**") && seg.endsWith("**")) {
+          return (
+            <Text key={i} style={{ color: C.gold, fontFamily: F.bodySemi }}>
+              {seg.slice(2, -2)}
+            </Text>
+          );
+        }
+        return <Text key={i}>{seg}</Text>;
+      })}
+    </Text>
+  );
+}
 
 // ── Helper ────────────────────────────────────────────────────────────────────
 
@@ -53,7 +102,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const [grammarNotes, setGrammarNotes]    = useState<string[]>([]);
   const [usedKeyboard, setUsedKeyboard]    = useState(false);
   const [showDoneBanner, setShowDoneBanner] = useState(false);
-  const [activeSuggestion, setActiveSuggestion] = useState<string | null>(null);
 
   const nativeRecRef   = useRef<Audio.Recording | null>(null);
   const autoStopRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -64,13 +112,13 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const pulseAnim      = useRef(new Animated.Value(1)).current;
   const pulseLoop      = useRef<Animated.CompositeAnimation | null>(null);
 
-  const apiBase  = getApiUrl();
-  const sttLang  = STT_LANG[learningLang] ?? "en-US";
-  const ttsLang  = data.speechLang;
+  const apiBase   = getApiUrl();
+  const sttLang   = STT_LANG[learningLang] ?? "en-US";
+  const ttsLang   = data.speechLang;
+  const rudyVoice = RUDY_VOICE[learningLang] ?? "en-GB-RyanNeural";
 
-  // Build GPT history from chatMsg array
   const buildHistory = (msgs: ChatMsg[]) =>
-    msgs.map((m) => ({
+    msgs.filter((m) => !m.sttError).map((m) => ({
       role: m.role === "rudy" ? "assistant" as const : "user" as const,
       content: m.text,
     }));
@@ -92,7 +140,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     };
   }, []);
 
-  // Auto-scroll on new message
   useEffect(() => {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
   }, [messages]);
@@ -117,11 +164,9 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         grammarNote: string; shouldEnd: boolean;
       };
 
-      // Update tracking
       if (json.sentenceCount > 0) setTotalSentences(json.sentenceCount);
       if (json.grammarNote) setGrammarNotes((prev) => [...prev, json.grammarNote]);
       if (json.shouldEnd) {
-        // Trigger completion after displaying message
         setTimeout(() => triggerDone(), 2500);
       }
 
@@ -133,7 +178,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     }
   }
 
-  // ── TTS ───────────────────────────────────────────────────────────────────────
+  // ── TTS (sanitized + male Rudy voice) ────────────────────────────────────────
 
   async function playTTS(text: string) {
     try {
@@ -144,9 +189,13 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       }
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
 
+      const clean = sanitizeForTTS(text);
+      if (!clean) return;
+
       const url = new URL("/api/pronunciation-tts", apiBase);
-      url.searchParams.set("text", text);
+      url.searchParams.set("text", clean);
       url.searchParams.set("lang", ttsLang);
+      url.searchParams.set("voice", rudyVoice);
 
       if (Platform.OS === "web") {
         const res = await fetch(url.toString());
@@ -186,7 +235,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   async function startRecording() {
     if (phase !== "idle") return;
     setShowKeyboard(false);
-    setActiveSuggestion(null);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setPhase("recording");
     startPulse();
@@ -200,7 +248,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
         await rec.startAsync();
         nativeRecRef.current = rec;
-        autoStopRef.current = setTimeout(() => stopNativeRecording(), 6000);
+        autoStopRef.current = setTimeout(() => stopNativeRecording(), 7000);
       } catch { stopPulse(); setPhase("idle"); }
     } else {
       if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); setPhase("idle"); return; }
@@ -213,7 +261,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       rec.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunksRef.current.push(e.data); };
       rec.onstop = () => handleWebStop(mime, stream);
       rec.start();
-      autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, 6000);
+      autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, 7000);
     }
   }
 
@@ -231,7 +279,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       if (!uri) throw new Error("no uri");
       const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
       await submitSTT(base64, "audio/m4a", true);
-    } catch { setPhase("idle"); }
+    } catch { showSttError(); }
   }
 
   async function handleWebStop(mime: string, stream: MediaStream) {
@@ -247,7 +295,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         r.readAsDataURL(blob);
       });
       await submitSTT(base64, mime, true);
-    } catch { setPhase("idle"); }
+    } catch { showSttError(); }
   }
 
   // ── STT ───────────────────────────────────────────────────────────────────────
@@ -260,14 +308,31 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ audio: base64, mimeType, language: sttLang }),
       });
-      const data = res.ok ? await res.json() : {};
-      const text: string = (data.text ?? "").trim();
-      if (!text) { setPhase("idle"); return; }
+      const json = res.ok ? await res.json() : {};
+      const text: string = (json.text ?? "").trim();
+      if (!text) {
+        showSttError();
+        return;
+      }
       await sendUserMessage(text, isVoice);
-    } catch { setPhase("idle"); }
+    } catch { showSttError(); }
   }
 
-  // ── Send message (voice or keyboard) ─────────────────────────────────────────
+  function showSttError() {
+    const errMsg: ChatMsg = {
+      role: "rudy",
+      text: nativeLang === "korean"
+        ? "루디가 잘 못 들었어요. 다시 말해주세요 🦊"
+        : nativeLang === "spanish"
+        ? "No te escuché bien. ¡Inténtalo de nuevo! 🦊"
+        : "Rudy didn't catch that. Please try again! 🦊",
+      sttError: true,
+    };
+    setMessages((prev) => [...prev, errMsg]);
+    setPhase("idle");
+  }
+
+  // ── Send message ──────────────────────────────────────────────────────────────
 
   async function sendUserMessage(text: string, isVoice: boolean) {
     if (!isVoice) setUsedKeyboard(true);
@@ -276,7 +341,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     setMessages(newMsgs);
     setInputText("");
 
-    // Get Rudy's reply
     const history = buildHistory(newMsgs);
     const rudyText = await fetchRudyLine(history);
     const rudyMsg: ChatMsg = { role: "rudy", text: rudyText };
@@ -292,12 +356,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     setPhase("processing");
     await sendUserMessage(text, false);
     setPhase((cur) => cur === "done" ? "done" : "idle");
-  }
-
-  async function sendSuggestion(suggestion: string) {
-    if (phase !== "idle") return;
-    setActiveSuggestion(suggestion);
-    await startRecording();
   }
 
   function handleMicPress() {
@@ -335,6 +393,12 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     : "🎉 Conversation mission complete!";
   const situation = getMeaning(data.situation, lc);
 
+  const processingLabel = nativeLang === "korean"
+    ? "루디가 듣고 있어요… 🦊"
+    : nativeLang === "spanish"
+    ? "Rudy está escuchando… 🦊"
+    : "Rudy is listening… 🦊";
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -354,11 +418,17 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         showsVerticalScrollIndicator={false}
       >
         {messages.map((msg, i) => (
-          <View key={i} style={[s.bubble, msg.role === "rudy" ? s.rudyBubble : s.userBubble]}>
-            {msg.role === "rudy" && <Text style={s.rudyLabel}>🦊 Rudy</Text>}
-            <Text style={[s.bubbleText, msg.role === "user" && s.userBubbleText]}>
-              {msg.text}
-            </Text>
+          <View key={i} style={[s.bubble, msg.role === "rudy" ? s.rudyBubble : s.userBubble, msg.sttError && s.errorBubble]}>
+            {msg.role === "rudy" && (
+              <Text style={[s.rudyLabel, msg.sttError && s.errorLabel]}>
+                {msg.sttError ? "🦊 루디" : "🦊 RUDY"}
+              </Text>
+            )}
+            {msg.role === "rudy" ? (
+              <RudyText text={msg.text} style={s.bubbleText} />
+            ) : (
+              <Text style={[s.bubbleText, s.userBubbleText]}>{msg.text}</Text>
+            )}
             {msg.role === "user" && msg.isVoice && (
               <Text style={s.voiceBadge}>{voiceBonus}</Text>
             )}
@@ -367,8 +437,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
 
         {(phase === "processing" || phase === "loading") && (
           <View style={[s.bubble, s.rudyBubble]}>
-            <Text style={s.rudyLabel}>🦊 Rudy</Text>
-            <ActivityIndicator size="small" color={C.gold} style={{ marginTop: 4 }} />
+            <Text style={s.rudyLabel}>🦊 RUDY</Text>
+            <Text style={[s.bubbleText, { color: C.goldDim }]}>{processingLabel}</Text>
           </View>
         )}
       </ScrollView>
@@ -426,7 +496,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
           ) : null}
 
           <View style={s.controlRow}>
-            {/* Mic button */}
             <Animated.View style={{ transform: [{ scale: pulseAnim }], flex: 1 }}>
               <Pressable
                 style={({ pressed }) => [
@@ -438,7 +507,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 onPress={handleMicPress}
                 disabled={phase === "processing" || phase === "loading"}
               >
-                {phase === "processing"
+                {(phase === "processing" || phase === "loading")
                   ? <ActivityIndicator color={C.bg1} size="small" />
                   : <Ionicons name={phase === "recording" ? "stop" : "mic"} size={20} color={C.bg1} />
                 }
@@ -446,7 +515,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
               </Pressable>
             </Animated.View>
 
-            {/* Keyboard toggle */}
             <Pressable
               style={({ pressed }) => [s.keyboardToggle, showKeyboard && s.keyboardToggleActive, pressed && { opacity: 0.8 }]}
               onPress={() => setShowKeyboard(!showKeyboard)}
@@ -455,7 +523,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
             </Pressable>
           </View>
 
-          {/* Voice bonus hint */}
           {!showKeyboard && (
             <Text style={s.voiceHint}>
               {nativeLang === "korean" ? "음성으로 답하면 XP 1.5배!" : nativeLang === "spanish" ? "¡Voz = XP ×1.5!" : "Voice answers earn XP ×1.5!"}
@@ -492,7 +559,9 @@ const s = StyleSheet.create({
   bubble:       { maxWidth: "85%", borderRadius: 16, padding: 12, gap: 4 },
   rudyBubble:   { backgroundColor: C.bg2, borderWidth: 1, borderColor: C.border, alignSelf: "flex-start" },
   userBubble:   { backgroundColor: "rgba(201,162,39,0.15)", borderWidth: 1, borderColor: "rgba(201,162,39,0.3)", alignSelf: "flex-end" },
+  errorBubble:  { backgroundColor: "rgba(139,90,43,0.2)", borderColor: "rgba(201,162,39,0.2)" },
   rudyLabel:    { fontSize: 10, fontFamily: F.label, color: C.goldDim, marginBottom: 2 },
+  errorLabel:   { color: "rgba(201,162,39,0.5)" },
   bubbleText:   { fontSize: 15, fontFamily: F.body, color: C.parchment, lineHeight: 22 },
   userBubbleText: { color: C.gold },
   voiceBadge:   { fontSize: 10, fontFamily: F.label, color: C.goldDim, textAlign: "right", marginTop: 2 },

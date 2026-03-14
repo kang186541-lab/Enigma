@@ -9,7 +9,7 @@ import { openai } from "./openai";
  *   anything else          → pass through  (webm/opus, ogg/opus, etc.)
  */
 function normalizeAudioMime(mime: string): string {
-  if (mime === "audio/mp4" || mime === "video/mp4") return "audio/x-m4a";
+  if (mime === "audio/mp4" || mime === "video/mp4" || mime === "audio/m4a") return "audio/x-m4a";
   if (mime.startsWith("audio/wav")) return "audio/wav";
   return mime;
 }
