@@ -4,7 +4,8 @@ import type { Tri } from "./dailyCourseData";
 
 export interface LessonSentence {
   text: string;        // sentence in the target language being learned
-  speechLang: string;  // Azure TTS lang code e.g. "en-US"
+  speechLang: string;  // Azure TTS lang code e.g. "en-GB"
+  ttsVoice?: string;   // specific Azure neural voice name e.g. "en-GB-RyanNeural"
   meaning: Tri;        // translation to show (nativeLang selects which field)
 }
 

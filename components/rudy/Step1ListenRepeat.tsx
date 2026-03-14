@@ -104,6 +104,7 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
       const url = new URL("/api/pronunciation-tts", apiBase);
       url.searchParams.set("text", sentence.text);
       url.searchParams.set("lang", sentence.speechLang);
+      if (sentence.ttsVoice) url.searchParams.set("voice", sentence.ttsVoice);
       if (mode === "slow") url.searchParams.set("mode", "slow");
 
       if (Platform.OS === "web") {

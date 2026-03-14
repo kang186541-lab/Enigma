@@ -330,7 +330,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/pronunciation-tts", async (req: Request, res: Response) => {
     try {
-      const { text, lang, tutorId, mode } = req.query as { text?: string; lang?: string; tutorId?: string; mode?: string };
+      const { text, lang, tutorId, mode, voice } = req.query as { text?: string; lang?: string; tutorId?: string; mode?: string; voice?: string };
       if (!text || !lang) {
         return res.status(400).json({ error: "text and lang required" });
       }
@@ -341,7 +341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: "Azure credentials not configured" });
       }
 
-      const voiceName = AZURE_TTS_VOICES[lang] ?? "en-US-JennyNeural";
+      const voiceName = voice ?? AZURE_TTS_VOICES[lang] ?? "en-US-JennyNeural";
       const safeText = text.slice(0, 500)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")

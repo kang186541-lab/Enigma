@@ -1,0 +1,349 @@
+데일리 코스 4번째 메시지야. Day 1~6 실제 학습 데이터야. 이전 메시지에서 만든 더미 데이터를 이걸로 교체해줘.
+
+## A1 Unit 1: 인사 & 자기소개 (Day 1~6)
+
+아래 JSON을 데일리 코스 데이터 파일에 저장해줘.
+
+```json
+{
+  "courseData": {
+    "levels": [
+      {
+        "id": "A1",
+        "name": { "ko": "A1 기초", "en": "A1 Beginner", "es": "A1 Principiante" },
+        "units": [
+          {
+            "id": "unit_1",
+            "title": { "ko": "인사 & 자기소개", "en": "Greetings & Self-Introduction", "es": "Saludos y Autopresentación" },
+            "days": [
+              {
+                "id": "day_1",
+                "dayNumber": 1,
+                "topic": { "ko": "만남 인사", "en": "Meeting & Greeting", "es": "Encuentros y Saludos" },
+                "listenRepeat": {
+                  "en": [
+                    { "text": "Hello, my name is Rudy.", "ttsVoice": "en-GB-RyanNeural" },
+                    { "text": "Nice to meet you.", "ttsVoice": "en-GB-RyanNeural" },
+                    { "text": "Where are you from?", "ttsVoice": "en-GB-RyanNeural" }
+                  ],
+                  "es": [
+                    { "text": "Hola, me llamo Rudy.", "ttsVoice": "es-ES-AlvaroNeural" },
+                    { "text": "Mucho gusto.", "ttsVoice": "es-ES-AlvaroNeural" },
+                    { "text": "¿De dónde eres?", "ttsVoice": "es-ES-AlvaroNeural" }
+                  ],
+                  "ko": [
+                    { "text": "안녕하세요, 제 이름은 루디예요.", "ttsVoice": "ko-KR-InJoonNeural" },
+                    { "text": "만나서 반갑습니다.", "ttsVoice": "ko-KR-InJoonNeural" },
+                    { "text": "어디에서 오셨어요?", "ttsVoice": "ko-KR-InJoonNeural" }
+                  ]
+                },
+                "keyPoint": {
+                  "explanation": {
+                    "ko": "자기소개할 때 'My name is ___' 또는 'I'm ___'을 사용해요. 'I'm'은 'I am'의 줄임말이에요.",
+                    "en": "When introducing yourself, use 'My name is ___' or 'I'm ___'. 'I'm' is short for 'I am'.",
+                    "es": "Para presentarte, usa 'My name is ___' o 'I'm ___'. 'I'm' es la abreviación de 'I am'."
+                  },
+                  "quizzes": [
+                    { "type": "fill_blank", "sentence": { "en": "My name ___ Rudy.", "es": "My name ___ Rudy.", "ko": "My name ___ Rudy." }, "answer": "is", "options": ["is", "am", "are"], "speakAfter": true },
+                    { "type": "speak", "prompt": { "ko": "'I'm [이름]'으로 자기소개 해보세요", "en": "Introduce yourself with 'I'm [name]'", "es": "Preséntate con 'I'm [nombre]'" }, "template": { "en": "I'm ___.", "es": "I'm ___.", "ko": "I'm ___." } },
+                    { "type": "fill_blank", "sentence": { "en": "Nice to ___ you.", "es": "Nice to ___ you.", "ko": "Nice to ___ you." }, "answer": "meet", "options": ["meet", "see", "have"], "speakAfter": true }
+                  ]
+                },
+                "missionTalk": {
+                  "situation": { "ko": "루디가 런던 박물관에서 새 동료를 만났습니다.", "en": "Rudy meets a new colleague at the London museum.", "es": "Rudy conoce a un nuevo colega en el museo de Londres." },
+                  "gptPrompt": "You are Rudy the fox detective meeting a new partner at the London museum. Have a simple A1-level introduction conversation in {targetLang}. Guide through: 1) greeting 2) asking name 3) asking where they're from 4) asking what they do 5) saying nice to meet you. Keep sentences very short. After 5-6 exchanges, say goodbye warmly.",
+                  "suggestedResponses": {
+                    "en": ["Hello!", "My name is ___.", "I'm from ___.", "I'm a student.", "Nice to meet you too!"],
+                    "es": ["¡Hola!", "Me llamo ___.", "Soy de ___.", "Soy estudiante.", "¡Mucho gusto también!"],
+                    "ko": ["안녕하세요!", "제 이름은 ___이에요.", "저는 ___에서 왔어요.", "저는 학생이에요.", "만나서 반가워요!"]
+                  }
+                },
+                "review": {
+                  "questions": [
+                    { "type": "speak", "text": { "en": "Hello, nice to meet you.", "es": "Hola, mucho gusto.", "ko": "안녕하세요, 만나서 반갑습니다." } },
+                    { "type": "fill_blank", "sentence": { "en": "My name ___ ___.", "es": "My name ___ ___.", "ko": "My name ___ ___." }, "answer": "is", "options": ["is", "am", "are"] },
+                    { "type": "speak", "text": { "en": "I'm from Korea.", "es": "Soy de Corea.", "ko": "저는 한국에서 왔어요." } },
+                    { "type": "fill_blank", "sentence": { "en": "Where are you ___?", "es": "Where are you ___?", "ko": "Where are you ___?" }, "answer": "from", "options": ["from", "to", "at"] },
+                    { "type": "speak", "text": { "en": "My name is ___. Nice to meet you.", "es": "Me llamo ___. Mucho gusto.", "ko": "제 이름은 ___이에요. 반갑습니다." } }
+                  ]
+                },
+                "rewards": { "xp": 100, "bonusPronunciation": 30, "bonusAllVoice": 50 }
+              },
+
+              {
+                "id": "day_2",
+                "dayNumber": 2,
+                "topic": { "ko": "출신 말하기", "en": "Where Are You From?", "es": "¿De Dónde Eres?" },
+                "listenRepeat": {
+                  "en": [
+                    { "text": "I'm from Korea.", "ttsVoice": "en-GB-SoniaNeural" },
+                    { "text": "I live in Seoul.", "ttsVoice": "en-GB-SoniaNeural" },
+                    { "text": "It's a beautiful city.", "ttsVoice": "en-GB-SoniaNeural" }
+                  ],
+                  "es": [
+                    { "text": "Soy de Corea.", "ttsVoice": "es-ES-ElviraNeural" },
+                    { "text": "Vivo en Seúl.", "ttsVoice": "es-ES-ElviraNeural" },
+                    { "text": "Es una ciudad hermosa.", "ttsVoice": "es-ES-ElviraNeural" }
+                  ],
+                  "ko": [
+                    { "text": "저는 한국에서 왔어요.", "ttsVoice": "ko-KR-SunHiNeural" },
+                    { "text": "서울에 살고 있어요.", "ttsVoice": "ko-KR-SunHiNeural" },
+                    { "text": "아름다운 도시예요.", "ttsVoice": "ko-KR-SunHiNeural" }
+                  ]
+                },
+                "keyPoint": {
+                  "explanation": {
+                    "ko": "출신을 말할 때 'I'm from ___'을 써요. 사는 곳을 말할 때는 'I live in ___'을 써요.",
+                    "en": "Use 'I'm from ___' for origin. Use 'I live in ___' for where you live now.",
+                    "es": "Usa 'I'm from ___' para el origen. Usa 'I live in ___' para donde vives ahora."
+                  },
+                  "quizzes": [
+                    { "type": "fill_blank", "sentence": { "en": "I'm ___ Korea.", "es": "I'm ___ Korea.", "ko": "I'm ___ Korea." }, "answer": "from", "options": ["from", "in", "at"], "speakAfter": true },
+                    { "type": "speak", "prompt": { "ko": "출신 나라를 말해보세요", "en": "Say where you're from", "es": "Di de dónde eres" }, "template": { "en": "I'm from ___.", "es": "I'm from ___.", "ko": "I'm from ___." } },
+                    { "type": "fill_blank", "sentence": { "en": "I ___ in Seoul.", "es": "I ___ in Seoul.", "ko": "I ___ in Seoul." }, "answer": "live", "options": ["live", "from", "go"], "speakAfter": true }
+                  ]
+                },
+                "missionTalk": {
+                  "situation": { "ko": "루디가 다른 나라에서 온 동료들과 이야기하고 있습니다.", "en": "Rudy is chatting with colleagues from different countries.", "es": "Rudy está hablando con colegas de diferentes países." },
+                  "gptPrompt": "You are Rudy chatting with your new partner about where you're both from. Simple A1 conversation in {targetLang}. Ask about: 1) their country 2) their city 3) what it's like there 4) if they like it. Share that you're from London. Keep it simple and encouraging.",
+                  "suggestedResponses": {
+                    "en": ["I'm from Korea.", "I live in Seoul.", "It's a big city.", "Yes, I like it!", "Seoul is beautiful."],
+                    "es": ["Soy de Corea.", "Vivo en Seúl.", "Es una ciudad grande.", "¡Sí, me gusta!", "Seúl es hermoso."],
+                    "ko": ["저는 한국에서 왔어요.", "서울에 살아요.", "큰 도시예요.", "네, 좋아해요!", "서울은 아름다워요."]
+                  }
+                },
+                "review": {
+                  "questions": [
+                    { "type": "speak", "text": { "en": "Hello, my name is ___.", "es": "Hola, me llamo ___.", "ko": "안녕하세요, 제 이름은 ___이에요." }, "isYesterdayReview": true },
+                    { "type": "fill_blank", "sentence": { "en": "Nice to ___ you.", "es": "Nice to ___ you.", "ko": "Nice to ___ you." }, "answer": "meet", "options": ["meet", "see", "do"], "isYesterdayReview": true },
+                    { "type": "speak", "text": { "en": "I'm from Korea.", "es": "Soy de Corea.", "ko": "저는 한국에서 왔어요." } },
+                    { "type": "fill_blank", "sentence": { "en": "I ___ in Seoul.", "es": "I ___ in Seoul.", "ko": "I ___ in Seoul." }, "answer": "live", "options": ["live", "from", "go"] },
+                    { "type": "speak", "text": { "en": "I'm from Korea. I live in Seoul.", "es": "Soy de Corea. Vivo en Seúl.", "ko": "저는 한국에서 왔어요. 서울에 살아요." } }
+                  ]
+                },
+                "rewards": { "xp": 100, "bonusPronunciation": 30, "bonusAllVoice": 50 }
+              },
+
+              {
+                "id": "day_3",
+                "dayNumber": 3,
+                "topic": { "ko": "직업 말하기", "en": "Talking About Jobs", "es": "Hablar de Trabajos" },
+                "listenRepeat": {
+                  "en": [
+                    { "text": "What do you do?", "ttsVoice": "en-GB-RyanNeural" },
+                    { "text": "I'm a student.", "ttsVoice": "en-GB-RyanNeural" },
+                    { "text": "I work at a museum.", "ttsVoice": "en-GB-RyanNeural" }
+                  ],
+                  "es": [
+                    { "text": "¿A qué te dedicas?", "ttsVoice": "es-ES-AlvaroNeural" },
+                    { "text": "Soy estudiante.", "ttsVoice": "es-ES-AlvaroNeural" },
+                    { "text": "Trabajo en un museo.", "ttsVoice": "es-ES-AlvaroNeural" }
+                  ],
+                  "ko": [
+                    { "text": "무슨 일 하세요?", "ttsVoice": "ko-KR-InJoonNeural" },
+                    { "text": "저는 학생이에요.", "ttsVoice": "ko-KR-InJoonNeural" },
+                    { "text": "박물관에서 일해요.", "ttsVoice": "ko-KR-InJoonNeural" }
+                  ]
+                },
+                "keyPoint": {
+                  "explanation": {
+                    "ko": "직업을 말할 때 'I'm a ___'을 써요. 일하는 곳을 말할 때 'I work at ___'을 써요. 참고: 모음(a,e,i,o,u)으로 시작하면 'an' (예: an artist).",
+                    "en": "Use 'I'm a ___' for jobs. 'I work at ___' for workplace. Note: use 'an' before vowels (an artist).",
+                    "es": "Usa 'I'm a ___' para trabajos. 'I work at ___' para lugar de trabajo. Nota: usa 'an' antes de vocales (an artist)."
+                  },
+                  "quizzes": [
+                    { "type": "fill_blank", "sentence": { "en": "I'm ___ teacher.", "es": "I'm ___ teacher.", "ko": "I'm ___ teacher." }, "answer": "a", "options": ["a", "an", "the"], "speakAfter": true },
+                    { "type": "speak", "prompt": { "ko": "자기 직업을 말해보세요", "en": "Say your job", "es": "Di tu trabajo" }, "template": { "en": "I'm a ___.", "es": "I'm a ___.", "ko": "I'm a ___." } },
+                    { "type": "fill_blank", "sentence": { "en": "I work ___ a museum.", "es": "I work ___ a museum.", "ko": "I work ___ a museum." }, "answer": "at", "options": ["at", "in", "on"], "speakAfter": true }
+                  ]
+                },
+                "missionTalk": {
+                  "situation": { "ko": "박물관에서 여러 직업의 사람들을 만나고 있습니다.", "en": "Meeting people with different jobs at the museum.", "es": "Conociendo personas con diferentes trabajos en el museo." },
+                  "gptPrompt": "You are Rudy at a museum event meeting your new partner. Talk about jobs in simple A1 {targetLang}. Ask about: 1) what they do 2) where they work 3) if they like their job 4) share your job as detective. Keep very simple.",
+                  "suggestedResponses": {
+                    "en": ["I'm a student.", "I work at a school.", "Yes, I like it.", "That's interesting!", "I want to be a detective too!"],
+                    "es": ["Soy estudiante.", "Trabajo en una escuela.", "Sí, me gusta.", "¡Qué interesante!", "¡Yo también quiero ser detective!"],
+                    "ko": ["저는 학생이에요.", "학교에서 일해요.", "네, 좋아해요.", "재미있네요!", "저도 탐정이 되고 싶어요!"]
+                  }
+                },
+                "review": {
+                  "questions": [
+                    { "type": "speak", "text": { "en": "I'm from Korea. I live in Seoul.", "es": "Soy de Corea. Vivo en Seúl.", "ko": "저는 한국에서 왔어요. 서울에 살아요." }, "isYesterdayReview": true },
+                    { "type": "fill_blank", "sentence": { "en": "I'm ___ Korea.", "es": "I'm ___ Korea.", "ko": "I'm ___ Korea." }, "answer": "from", "options": ["from", "in", "at"], "isYesterdayReview": true },
+                    { "type": "speak", "text": { "en": "I'm a student.", "es": "Soy estudiante.", "ko": "저는 학생이에요." } },
+                    { "type": "fill_blank", "sentence": { "en": "I work ___ a museum.", "es": "I work ___ a museum.", "ko": "I work ___ a museum." }, "answer": "at", "options": ["at", "in", "on"] },
+                    { "type": "speak", "text": { "en": "I'm a student. I work at a school.", "es": "Soy estudiante. Trabajo en una escuela.", "ko": "저는 학생이에요. 학교에서 일해요." } }
+                  ]
+                },
+                "rewards": { "xp": 100, "bonusPronunciation": 30, "bonusAllVoice": 50 }
+              },
+
+              {
+                "id": "day_4",
+                "dayNumber": 4,
+                "topic": { "ko": "작별 인사", "en": "Saying Goodbye", "es": "Despedidas" },
+                "listenRepeat": {
+                  "en": [
+                    { "text": "Goodbye! See you later.", "ttsVoice": "en-GB-SoniaNeural" },
+                    { "text": "Take care!", "ttsVoice": "en-GB-SoniaNeural" },
+                    { "text": "It was nice meeting you.", "ttsVoice": "en-GB-SoniaNeural" }
+                  ],
+                  "es": [
+                    { "text": "¡Adiós! Hasta luego.", "ttsVoice": "es-ES-ElviraNeural" },
+                    { "text": "¡Cuídate!", "ttsVoice": "es-ES-ElviraNeural" },
+                    { "text": "Fue un placer conocerte.", "ttsVoice": "es-ES-ElviraNeural" }
+                  ],
+                  "ko": [
+                    { "text": "안녕히 가세요! 다음에 봐요.", "ttsVoice": "ko-KR-SunHiNeural" },
+                    { "text": "잘 가요!", "ttsVoice": "ko-KR-SunHiNeural" },
+                    { "text": "만나서 반가웠어요.", "ttsVoice": "ko-KR-SunHiNeural" }
+                  ]
+                },
+                "keyPoint": {
+                  "explanation": {
+                    "ko": "'Goodbye'는 정식, 'Bye'는 캐주얼, 'See you later'는 다시 볼 때. 'Take care'는 상대를 걱정하는 따뜻한 표현이에요.",
+                    "en": "'Goodbye' is formal, 'Bye' is casual, 'See you later' when meeting again. 'Take care' is a warm expression.",
+                    "es": "'Goodbye' es formal, 'Bye' es casual, 'See you later' cuando te verás de nuevo. 'Take care' es una expresión cálida."
+                  },
+                  "quizzes": [
+                    { "type": "fill_blank", "sentence": { "en": "See you ___!", "es": "See you ___!", "ko": "See you ___!" }, "answer": "later", "options": ["later", "after", "next"], "speakAfter": true },
+                    { "type": "speak", "prompt": { "ko": "따뜻하게 작별 인사를 해보세요", "en": "Say a warm goodbye", "es": "Di una despedida cálida" }, "template": { "en": "Goodbye! Take care!", "es": "¡Adiós! ¡Cuídate!", "ko": "안녕히 가세요! 잘 가요!" } }
+                  ]
+                },
+                "missionTalk": {
+                  "situation": { "ko": "박물관에서 동료와 하루를 마치고 헤어지는 상황입니다.", "en": "Wrapping up a day at the museum and saying goodbye.", "es": "Terminando un día en el museo y despidiéndose." },
+                  "gptPrompt": "You are Rudy saying goodbye to your partner after a day at the museum. Simple A1 {targetLang}. Practice: 1) saying it was a good day 2) saying goodbye 3) making plans to meet again 4) wishing well. Keep very simple and warm.",
+                  "suggestedResponses": {
+                    "en": ["It was a good day!", "Goodbye, Rudy!", "See you tomorrow!", "Take care!", "It was nice meeting you."],
+                    "es": ["¡Fue un buen día!", "¡Adiós, Rudy!", "¡Hasta mañana!", "¡Cuídate!", "Fue un placer conocerte."],
+                    "ko": ["좋은 하루였어요!", "안녕히 가세요, 루디!", "내일 봐요!", "잘 가요!", "만나서 반가웠어요."]
+                  }
+                },
+                "review": {
+                  "questions": [
+                    { "type": "speak", "text": { "en": "I'm a student. I work at a school.", "es": "Soy estudiante. Trabajo en una escuela.", "ko": "저는 학생이에요. 학교에서 일해요." }, "isYesterdayReview": true },
+                    { "type": "fill_blank", "sentence": { "en": "What do you ___?", "es": "What do you ___?", "ko": "What do you ___?" }, "answer": "do", "options": ["do", "go", "have"], "isYesterdayReview": true },
+                    { "type": "speak", "text": { "en": "Goodbye! See you later.", "es": "¡Adiós! Hasta luego.", "ko": "안녕히 가세요! 다음에 봐요." } },
+                    { "type": "fill_blank", "sentence": { "en": "It was nice ___ you.", "es": "It was nice ___ you.", "ko": "It was nice ___ you." }, "answer": "meeting", "options": ["meeting", "meet", "met"] },
+                    { "type": "speak", "text": { "en": "Take care! See you tomorrow!", "es": "¡Cuídate! ¡Hasta mañana!", "ko": "잘 가요! 내일 봐요!" } }
+                  ]
+                },
+                "rewards": { "xp": 100, "bonusPronunciation": 30, "bonusAllVoice": 50 }
+              },
+
+              {
+                "id": "day_5",
+                "dayNumber": 5,
+                "topic": { "ko": "안부 묻기", "en": "How Are You?", "es": "¿Cómo Estás?" },
+                "listenRepeat": {
+                  "en": [
+                    { "text": "How are you today?", "ttsVoice": "en-GB-RyanNeural" },
+                    { "text": "I'm fine, thank you.", "ttsVoice": "en-GB-RyanNeural" },
+                    { "text": "Not bad, how about you?", "ttsVoice": "en-GB-RyanNeural" }
+                  ],
+                  "es": [
+                    { "text": "¿Cómo estás hoy?", "ttsVoice": "es-ES-AlvaroNeural" },
+                    { "text": "Estoy bien, gracias.", "ttsVoice": "es-ES-AlvaroNeural" },
+                    { "text": "No está mal, ¿y tú?", "ttsVoice": "es-ES-AlvaroNeural" }
+                  ],
+                  "ko": [
+                    { "text": "오늘 어떻게 지내요?", "ttsVoice": "ko-KR-SunHiNeural" },
+                    { "text": "잘 지내요, 감사합니다.", "ttsVoice": "ko-KR-SunHiNeural" },
+                    { "text": "괜찮아요, 당신은요?", "ttsVoice": "ko-KR-SunHiNeural" }
+                  ]
+                },
+                "keyPoint": {
+                  "explanation": {
+                    "ko": "'How are you?'에 'I'm fine' 말고도 다양한 대답이 있어요: 'I'm great!', 'Not bad', 'I'm okay', 'A little tired'. 상대에게 되묻을 때 'And you?'를 붙여요.",
+                    "en": "Besides 'I'm fine', you can say: 'I'm great!', 'Not bad', 'I'm okay', 'A little tired'. Add 'And you?' to ask back.",
+                    "es": "Además de 'I'm fine', puedes decir: 'I'm great!', 'Not bad', 'I'm okay', 'A little tired'. Agrega 'And you?' para preguntar de vuelta."
+                  },
+                  "quizzes": [
+                    { "type": "fill_blank", "sentence": { "en": "How ___ you?", "es": "How ___ you?", "ko": "How ___ you?" }, "answer": "are", "options": ["are", "is", "am"], "speakAfter": true },
+                    { "type": "speak", "prompt": { "ko": "기분이 좋다고 대답해보세요", "en": "Answer that you're feeling great", "es": "Responde que te sientes genial" }, "template": { "en": "I'm great, thank you! And you?", "es": "¡Estoy genial, gracias! ¿Y tú?", "ko": "잘 지내요, 감사합니다! 당신은요?" } },
+                    { "type": "fill_blank", "sentence": { "en": "I'm fine, ___ you.", "es": "I'm fine, ___ you.", "ko": "I'm fine, ___ you." }, "answer": "thank", "options": ["thank", "thanks", "and"], "speakAfter": true }
+                  ]
+                },
+                "missionTalk": {
+                  "situation": { "ko": "아침에 박물관에 도착해서 동료들과 안부를 나누고 있습니다.", "en": "Arriving at the museum in the morning and greeting colleagues.", "es": "Llegando al museo por la mañana y saludando a los colegas." },
+                  "gptPrompt": "You are Rudy greeting your partner in the morning at the museum. Simple A1 {targetLang}. Practice: 1) asking how they are 2) responding to their answer 3) sharing how you feel 4) talking about the day ahead. Vary your responses - don't just say 'fine'.",
+                  "suggestedResponses": {
+                    "en": ["I'm great, thanks!", "Not bad, and you?", "I'm a little tired.", "I'm happy today!", "How are you, Rudy?"],
+                    "es": ["¡Estoy genial, gracias!", "No está mal, ¿y tú?", "Estoy un poco cansado.", "¡Estoy feliz hoy!", "¿Cómo estás, Rudy?"],
+                    "ko": ["잘 지내요, 감사해요!", "괜찮아요, 당신은요?", "좀 피곤해요.", "오늘 기분 좋아요!", "루디, 어떻게 지내요?"]
+                  }
+                },
+                "review": {
+                  "questions": [
+                    { "type": "speak", "text": { "en": "Goodbye! Take care!", "es": "¡Adiós! ¡Cuídate!", "ko": "안녕히 가세요! 잘 가요!" }, "isYesterdayReview": true },
+                    { "type": "fill_blank", "sentence": { "en": "See you ___!", "es": "See you ___!", "ko": "See you ___!" }, "answer": "later", "options": ["later", "after", "next"], "isYesterdayReview": true },
+                    { "type": "speak", "text": { "en": "I'm fine, thank you. And you?", "es": "Estoy bien, gracias. ¿Y tú?", "ko": "잘 지내요, 감사합니다. 당신은요?" } },
+                    { "type": "fill_blank", "sentence": { "en": "How ___ you today?", "es": "How ___ you today?", "ko": "How ___ you today?" }, "answer": "are", "options": ["are", "is", "do"] },
+                    { "type": "speak", "text": { "en": "I'm great! How about you?", "es": "¡Estoy genial! ¿Y tú?", "ko": "잘 지내요! 당신은요?" } }
+                  ]
+                },
+                "rewards": { "xp": 100, "bonusPronunciation": 30, "bonusAllVoice": 50 }
+              },
+
+              {
+                "id": "day_6",
+                "dayNumber": 6,
+                "topic": { "ko": "종합 복습", "en": "Unit 1 Review", "es": "Repaso Unidad 1" },
+                "listenRepeat": {
+                  "en": [
+                    { "text": "Hello, my name is Rudy. Nice to meet you.", "ttsVoice": "en-GB-RyanNeural" },
+                    { "text": "I'm from London. I work as a detective.", "ttsVoice": "en-GB-RyanNeural" },
+                    { "text": "How are you? I'm great, thanks! See you later!", "ttsVoice": "en-GB-RyanNeural" }
+                  ],
+                  "es": [
+                    { "text": "Hola, me llamo Rudy. Mucho gusto.", "ttsVoice": "es-ES-AlvaroNeural" },
+                    { "text": "Soy de Londres. Trabajo como detective.", "ttsVoice": "es-ES-AlvaroNeural" },
+                    { "text": "¿Cómo estás? ¡Estoy genial, gracias! ¡Hasta luego!", "ttsVoice": "es-ES-AlvaroNeural" }
+                  ],
+                  "ko": [
+                    { "text": "안녕하세요, 제 이름은 루디예요. 만나서 반갑습니다.", "ttsVoice": "ko-KR-InJoonNeural" },
+                    { "text": "저는 런던에서 왔어요. 탐정으로 일해요.", "ttsVoice": "ko-KR-InJoonNeural" },
+                    { "text": "어떻게 지내세요? 잘 지내요, 감사합니다! 다음에 봐요!", "ttsVoice": "ko-KR-InJoonNeural" }
+                  ]
+                },
+                "keyPoint": {
+                  "explanation": {
+                    "ko": "이번 주에 배운 모든 표현을 복습해요! 자기소개(이름, 출신, 직업)와 인사(만남, 안부, 작별)를 자연스럽게 연결해서 말해보세요.",
+                    "en": "Let's review everything! Connect introductions (name, origin, job) with greetings (meeting, asking how, goodbye) naturally.",
+                    "es": "¡Repasemos todo! Conecta presentaciones (nombre, origen, trabajo) con saludos (encuentro, preguntar cómo, despedida) naturalmente."
+                  },
+                  "quizzes": [
+                    { "type": "speak", "prompt": { "ko": "자기소개 전체를 해보세요 (이름+출신+직업)", "en": "Full self-introduction (name+origin+job)", "es": "Presentación completa (nombre+origen+trabajo)" }, "template": { "en": "Hello, my name is ___. I'm from ___. I'm a ___.", "es": "Hola, me llamo ___. Soy de ___. Soy ___.", "ko": "안녕하세요, 제 이름은 ___이에요. ___에서 왔어요. ___이에요." } },
+                    { "type": "speak", "prompt": { "ko": "안부를 묻고 대답해보세요", "en": "Ask and answer how are you", "es": "Pregunta y responde cómo estás" }, "template": { "en": "How are you? I'm great, thank you!", "es": "¿Cómo estás? ¡Estoy genial, gracias!", "ko": "어떻게 지내세요? 잘 지내요, 감사합니다!" } }
+                  ]
+                },
+                "missionTalk": {
+                  "situation": { "ko": "박물관 환영 파티에서 새로운 사람들을 여러 명 만나는 상황입니다. 배운 모든 표현을 활용하세요!", "en": "At a welcome party, meeting several new people. Use everything you've learned!", "es": "En una fiesta de bienvenida, conociendo a varias personas. ¡Usa todo lo aprendido!" },
+                  "gptPrompt": "You are Rudy hosting a welcome party at the museum. Test ALL of Unit 1 in a natural A1 {targetLang} conversation. Cover: greeting, self-introduction, asking about them (name, origin, job), asking how they are, saying goodbye. Introduce 2-3 different 'guests' to keep it interesting. This is a review day so be encouraging but thorough.",
+                  "suggestedResponses": {
+                    "en": ["Hello! My name is ___.", "I'm from ___.", "I'm a ___.", "Nice to meet you!", "I'm great, thank you!", "Goodbye! See you later!"],
+                    "es": ["¡Hola! Me llamo ___.", "Soy de ___.", "Soy ___.", "¡Mucho gusto!", "¡Estoy genial, gracias!", "¡Adiós! ¡Hasta luego!"],
+                    "ko": ["안녕하세요! 제 이름은 ___이에요.", "___에서 왔어요.", "___이에요.", "만나서 반가워요!", "잘 지내요, 감사합니다!", "안녕히 가세요! 다음에 봐요!"]
+                  }
+                },
+                "review": {
+                  "questions": [
+                    { "type": "speak", "text": { "en": "Hello, my name is ___. Nice to meet you.", "es": "Hola, me llamo ___. Mucho gusto.", "ko": "안녕하세요, 제 이름은 ___이에요. 반갑습니다." } },
+                    { "type": "speak", "text": { "en": "I'm from Korea. I live in Seoul.", "es": "Soy de Corea. Vivo en Seúl.", "ko": "한국에서 왔어요. 서울에 살아요." } },
+                    { "type": "speak", "text": { "en": "I'm a student. I work at a school.", "es": "Soy estudiante. Trabajo en una escuela.", "ko": "학생이에요. 학교에서 일해요." } },
+                    { "type": "speak", "text": { "en": "How are you? I'm great, thanks!", "es": "¿Cómo estás? ¡Genial, gracias!", "ko": "어떻게 지내세요? 잘 지내요!" } },
+                    { "type": "speak", "text": { "en": "Goodbye! Take care! See you tomorrow!", "es": "¡Adiós! ¡Cuídate! ¡Hasta mañana!", "ko": "안녕히 가세요! 잘 가요! 내일 봐요!" } }
+                  ]
+                },
+                "rewards": { "xp": 150, "bonusPronunciation": 50, "bonusAllVoice": 50 }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+이 데이터를 프로젝트에 저장하고, 이전 메시지에서 만든 더미 데이터를 교체해줘. 이걸로 데일리 코스 Phase 1에 필요한 내용은 전부 보냈어! STEP 1→2→3→4→완료 순서로 자연스럽게 흘러가게 연결해줘.
