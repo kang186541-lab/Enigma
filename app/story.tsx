@@ -6,85 +6,27 @@ import {
   ScrollView,
   Pressable,
   Platform,
-  Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, getLevel } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
-
-const { width } = Dimensions.get("window");
-
-const STORIES = [
-  {
-    id: "london",
-    flag: "🇬🇧",
-    title: "London Mystery",
-    subtitle: "A foggy detective story",
-    lang: "English",
-    langIcon: "language",
-    gradient: ["#1A1A2E", "#16213E", "#0F3460"] as const,
-    accentColor: "#E94560",
-    scenes: 8,
-    characters: ["🕵️", "👩", "🦹"],
-    labelKo: "런던 미스터리",
-    descKo: "안개 속 런던, 탐정 이야기",
-    labelEs: "Misterio en Londres",
-    descEs: "Una historia de detective en la niebla",
-  },
-  {
-    id: "madrid",
-    flag: "🇪🇸",
-    title: "Madrid Romance",
-    subtitle: "Passion under the Spanish sun",
-    lang: "Spanish",
-    langIcon: "heart",
-    gradient: ["#FF6B35", "#F7931E", "#FFCD3C"] as const,
-    accentColor: "#C41E3A",
-    scenes: 8,
-    characters: ["💃", "👨", "👵"],
-    labelKo: "마드리드 로맨스",
-    descKo: "스페인 태양 아래 열정적인 사랑",
-    labelEs: "Romance en Madrid",
-    descEs: "Pasión bajo el sol español",
-  },
-  {
-    id: "seoul",
-    flag: "🇰🇷",
-    title: "K-Drama Seoul",
-    subtitle: "Lost memories, secret love",
-    lang: "Korean",
-    langIcon: "star",
-    gradient: ["#0A0A1A", "#12122A", "#1E1E4A"] as const,
-    accentColor: "#FF6B9D",
-    scenes: 8,
-    characters: ["👨‍💼", "👩", "👩‍⚕️"],
-    labelKo: "K-드라마 서울",
-    descKo: "잃어버린 기억, 비밀스러운 사랑",
-    labelEs: "K-Drama Seúl",
-    descEs: "Recuerdos perdidos, amor secreto",
-  },
-];
+import {
+  getChapters, pick, toLangCode, getChapterGradient, getChapterAccent,
+  isChapterUnlocked, getChapterTotalXP, getUiText,
+} from "@/lib/storyUtils";
 
 export default function StoryScreen() {
   const insets = useSafeAreaInsets();
-  const { nativeLanguage } = useLanguage();
+  const { nativeLanguage, stats } = useLanguage();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
-  const lang = nativeLanguage ?? "english";
-
-  function getLabel(s: typeof STORIES[0]) {
-    if (lang === "korean") return s.labelKo;
-    if (lang === "spanish") return s.labelEs;
-    return s.title;
-  }
-  function getDesc(s: typeof STORIES[0]) {
-    if (lang === "korean") return s.descKo;
-    if (lang === "spanish") return s.descEs;
-    return s.subtitle;
-  }
+  const nativeLang = toLangCode(nativeLanguage);
+  const ui = getUiText(nativeLang);
+  const chapters = getChapters();
+  const userLevel = getLevel(stats.xp).num;
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
@@ -97,23 +39,25 @@ export default function StoryScreen() {
           <Ionicons name="arrow-back" size={22} color="#1A1A2E" />
         </Pressable>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>
-            {lang === "korean" ? "스토리 모드 📖" : lang === "spanish" ? "Modo Historia 📖" : "Story Mode 📖"}
-          </Text>
+          <Text style={styles.headerTitle}>{ui.storyMode} 📖</Text>
           <Text style={styles.headerSub}>
-            {lang === "korean" ? "이야기로 언어를 배워요" : lang === "spanish" ? "Aprende con historias" : "Learn through stories"}
+            {nativeLang === "ko"
+              ? "이야기로 언어를 배워요"
+              : nativeLang === "es"
+              ? "Aprende con historias"
+              : "Learn through stories"}
           </Text>
         </View>
       </View>
 
-      {/* Lingo guide banner */}
-      <View style={styles.lingoBanner}>
+      {/* Rudy banner */}
+      <View style={styles.rudyBanner}>
         <RudyMascot size={100} mood="excited" />
-        <View style={styles.lingoSpeech}>
-          <Text style={styles.lingoSpeechText}>
-            {lang === "korean"
+        <View style={styles.rudySpeech}>
+          <Text style={styles.rudySpeechText}>
+            {nativeLang === "ko"
               ? "안녕! 저는 루디예요 🦊\n이야기로 함께 언어를 배워봐요!"
-              : lang === "spanish"
+              : nativeLang === "es"
               ? "¡Hola! Soy Rudy 🦊\n¡Aprendamos idiomas con historias!"
               : "Hi! I'm Rudy 🦊\nLet's learn languages through stories!"}
           </Text>
@@ -121,60 +65,101 @@ export default function StoryScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {STORIES.map((story) => (
-          <Pressable
-            key={story.id}
-            style={({ pressed }) => [styles.card, pressed && { transform: [{ scale: 0.975 }], opacity: 0.92 }]}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.push(`/story-scene?id=${story.id}` as any);
-            }}
-          >
-            <LinearGradient colors={story.gradient} style={styles.cardGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-              {/* Top row */}
-              <View style={styles.cardTop}>
-                <Text style={styles.cardFlag}>{story.flag}</Text>
-                <View style={styles.langBadge}>
-                  <Text style={styles.langBadgeText}>{story.lang}</Text>
-                </View>
-              </View>
+        {chapters.map((chapter) => {
+          const unlocked = isChapterUnlocked(chapter, userLevel);
+          const totalXP = getChapterTotalXP(chapter.id);
+          const gradient = getChapterGradient(chapter.id);
+          const accent = getChapterAccent(chapter.id);
+          const title = pick(chapter.title, nativeLang);
+          const theme = pick(chapter.theme, nativeLang);
 
-              {/* Characters row */}
-              <View style={styles.charsRow}>
-                {story.characters.map((emoji, i) => (
-                  <View
-                    key={i}
-                    style={[
-                      styles.charBubble,
-                      { backgroundColor: "rgba(255,255,255,0.15)", marginLeft: i > 0 ? -10 : 0 },
-                    ]}
-                  >
-                    <Text style={styles.charEmoji}>{emoji}</Text>
+          return (
+            <Pressable
+              key={chapter.id}
+              style={({ pressed }) => [
+                styles.card,
+                !unlocked && styles.cardLocked,
+                pressed && unlocked && { transform: [{ scale: 0.975 }], opacity: 0.92 },
+              ]}
+              onPress={() => {
+                if (!unlocked) return;
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push(`/story-scene?id=${chapter.id}` as never);
+              }}
+            >
+              <LinearGradient
+                colors={gradient}
+                style={styles.cardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                {/* Lock overlay */}
+                {!unlocked && (
+                  <View style={styles.lockOverlay}>
+                    <Ionicons name="lock-closed" size={32} color="rgba(255,255,255,0.7)" />
+                    <Text style={styles.lockText}>
+                      {ui.unlockAt.replace("{level}", String(chapter.unlockLevel))}
+                    </Text>
                   </View>
-                ))}
-              </View>
+                )}
 
-              {/* Title block */}
-              <Text style={styles.cardTitle}>{getLabel(story)}</Text>
-              <Text style={styles.cardDesc}>{getDesc(story)}</Text>
+                {/* Top row */}
+                <View style={styles.cardTop}>
+                  <Text style={styles.cardFlag}>{chapter.flag}</Text>
+                  <View style={[styles.langBadge, { backgroundColor: "rgba(255,255,255,0.2)" }]}>
+                    <Text style={styles.langBadgeText}>{chapter.city}</Text>
+                  </View>
+                </View>
 
-              {/* Bottom row */}
-              <View style={styles.cardBottom}>
-                <View style={styles.sceneBadge}>
-                  <Ionicons name="film" size={12} color="rgba(255,255,255,0.8)" />
-                  <Text style={styles.scenesText}>
-                    {story.scenes} {lang === "korean" ? "장면" : lang === "spanish" ? "escenas" : "scenes"}
-                  </Text>
+                {/* NPC emoji row */}
+                <View style={styles.charsRow}>
+                  {chapter.npcs.slice(0, 3).map((npcId, i) => (
+                    <View
+                      key={npcId}
+                      style={[
+                        styles.charBubble,
+                        { backgroundColor: "rgba(255,255,255,0.15)", marginLeft: i > 0 ? -10 : 0 },
+                      ]}
+                    >
+                      <Text style={styles.charEmoji}>{chapter.icon}</Text>
+                    </View>
+                  ))}
                 </View>
-                <View style={[styles.playBtn, { backgroundColor: story.accentColor }]}>
-                  <Text style={styles.playBtnText}>
-                    {lang === "korean" ? "시작 ▶" : lang === "spanish" ? "Iniciar ▶" : "Play ▶"}
-                  </Text>
+
+                {/* Title + theme */}
+                <Text style={styles.cardTitle}>{title}</Text>
+                <Text style={styles.cardDesc}>{theme}</Text>
+
+                {/* Bottom row */}
+                <View style={styles.cardBottom}>
+                  <View style={styles.metaRow}>
+                    <View style={styles.metaBadge}>
+                      <Ionicons name="film" size={12} color="rgba(255,255,255,0.8)" />
+                      <Text style={styles.metaText}>
+                        {chapter.scenes.length}
+                        {nativeLang === "ko" ? "개 장면" : nativeLang === "es" ? " escenas" : " scenes"}
+                      </Text>
+                    </View>
+                    <View style={styles.metaBadge}>
+                      <Ionicons name="star" size={12} color="rgba(255,255,255,0.8)" />
+                      <Text style={styles.metaText}>{totalXP} XP</Text>
+                    </View>
+                    <View style={styles.metaBadge}>
+                      <Text style={styles.metaText}>{chapter.badge.icon}</Text>
+                    </View>
+                  </View>
+                  {unlocked && (
+                    <View style={[styles.playBtn, { backgroundColor: accent }]}>
+                      <Text style={styles.playBtnText}>
+                        {nativeLang === "ko" ? "시작 ▶" : nativeLang === "es" ? "Iniciar ▶" : "Play ▶"}
+                      </Text>
+                    </View>
+                  )}
                 </View>
-              </View>
-            </LinearGradient>
-          </Pressable>
-        ))}
+              </LinearGradient>
+            </Pressable>
+          );
+        })}
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -202,7 +187,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 20, fontFamily: "Inter_700Bold", color: "#1A1A2E" },
   headerSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: "#A08090", marginTop: 2 },
-  lingoBanner: {
+  rudyBanner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
@@ -212,7 +197,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#FFD6E8",
   },
-  lingoSpeech: {
+  rudySpeech: {
     flex: 1,
     backgroundColor: "#FFFFFF",
     borderRadius: 14,
@@ -223,7 +208,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  lingoSpeechText: { fontSize: 13, color: "#5A2040", lineHeight: 19 },
+  rudySpeechText: { fontSize: 13, color: "#5A2040", lineHeight: 19 },
   scroll: { paddingHorizontal: 16, paddingTop: 16, gap: 16 },
   card: {
     borderRadius: 24,
@@ -234,13 +219,27 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 8,
   },
+  cardLocked: { opacity: 0.65 },
   cardGradient: { padding: 24 },
+  lockOverlay: {
+    position: "absolute",
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    zIndex: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 24,
+  },
+  lockText: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    color: "rgba(255,255,255,0.85)",
+    textAlign: "center",
+  },
   cardTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
   cardFlag: { fontSize: 36 },
-  langBadge: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-    paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20,
-  },
+  langBadge: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20 },
   langBadgeText: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: "#FFFFFF" },
   charsRow: { flexDirection: "row", marginBottom: 16 },
   charBubble: {
@@ -252,8 +251,13 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 22, fontFamily: "Inter_700Bold", color: "#FFFFFF", marginBottom: 4 },
   cardDesc: { fontSize: 14, fontFamily: "Inter_400Regular", color: "rgba(255,255,255,0.75)", marginBottom: 20 },
   cardBottom: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  sceneBadge: { flexDirection: "row", alignItems: "center", gap: 5 },
-  scenesText: { fontSize: 12, fontFamily: "Inter_500Medium", color: "rgba(255,255,255,0.8)" },
+  metaRow: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
+  metaBadge: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10,
+  },
+  metaText: { fontSize: 11, fontFamily: "Inter_500Medium", color: "rgba(255,255,255,0.85)" },
   playBtn: { paddingHorizontal: 18, paddingVertical: 9, borderRadius: 14 },
   playBtnText: { fontSize: 14, fontFamily: "Inter_700Bold", color: "#FFFFFF" },
 });

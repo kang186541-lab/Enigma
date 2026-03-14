@@ -102,23 +102,66 @@ export interface QuizRewards {
   xp: number;
   items?: string[];
   badge?: string;
-  npcRelation?: { npcId: string; points: number };
+  npcRelation?: { npc: string; points: number } | null;
 }
 
 export interface BaseQuiz {
   id: string;
+  chapter: string;
+  scene: string;
   type: QuizType;
+  difficulty: number;
   title: LocalizedText;
   storyContext: LocalizedText;
   isBoss?: boolean;
-  timeLimit?: number;
+  timeLimit?: number | null;
+  useGPT?: boolean;
+  useAzureTTS?: boolean;
+  gptPrompt?: string;
   rewards: QuizRewards;
+  content: Record<LangCode, unknown>;
 }
 
-export interface LoadedQuiz extends Omit<BaseQuiz, "title" | "storyContext"> {
+export interface LoadedQuiz extends Omit<BaseQuiz, "title" | "storyContext" | "content"> {
   title: string;
   storyContext: string;
-  questions: unknown[];
+  content: unknown;
   nativeLang: LangCode;
   targetLang: LangCode;
+}
+
+export interface NpcRelationLevel {
+  level: number;
+  name: LocalizedText;
+  points: number;
+  benefit: LocalizedText;
+}
+
+export interface TtsVoiceMap {
+  en: { default: string; male: string };
+  es: { default: string; male: string };
+  ko: { default: string; male: string };
+}
+
+export interface QuizData {
+  quizzes: BaseQuiz[];
+  npcRelationLevels: NpcRelationLevel[];
+  ttsVoiceMap: TtsVoiceMap;
+}
+
+export interface NpcRelationState {
+  [npcId: string]: number;
+}
+
+export interface ChapterProgress {
+  chapterId: string;
+  completedQuizzes: string[];
+  earnedBadges: string[];
+  npcRelations: NpcRelationState;
+  totalXpEarned: number;
+  isComplete: boolean;
+}
+
+export interface StoryProgress {
+  chapters: Record<string, ChapterProgress>;
 }
