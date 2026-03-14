@@ -111,6 +111,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const scrollRef      = useRef<ScrollView>(null);
   const pulseAnim      = useRef(new Animated.Value(1)).current;
   const pulseLoop      = useRef<Animated.CompositeAnimation | null>(null);
+  const sttFailCount   = useRef(0);
 
   const apiBase   = getApiUrl();
   const sttLang   = STT_LANG[learningLang] ?? "en-US";
@@ -243,6 +244,12 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       const { granted } = await Audio.requestPermissionsAsync().catch(() => ({ granted: false }));
       if (!granted) { stopPulse(); setPhase("idle"); return; }
       try {
+        // Stop any TTS that's still playing — audio session must be clean before switching to record mode
+        if (soundRef.current) {
+          await soundRef.current.stopAsync().catch(() => {});
+          await soundRef.current.unloadAsync().catch(() => {});
+          soundRef.current = null;
+        }
         await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
         const rec = new Audio.Recording();
         await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
@@ -319,22 +326,34 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   }
 
   function showSttError() {
-    const errMsg: ChatMsg = {
-      role: "rudy",
-      text: nativeLang === "korean"
-        ? "루디가 잘 못 들었어요. 다시 말해주세요 🦊"
-        : nativeLang === "spanish"
-        ? "No te escuché bien. ¡Inténtalo de nuevo! 🦊"
-        : "Rudy didn't catch that. Please try again! 🦊",
-      sttError: true,
-    };
+    sttFailCount.current += 1;
+    const autoKb = sttFailCount.current >= 3;
+
+    const text = autoKb
+      ? (nativeLang === "korean"
+          ? "음성 인식에 문제가 있어요. 키보드로 입력해볼까요? 🦊"
+          : nativeLang === "spanish"
+          ? "Hay un problema con el reconocimiento de voz. ¿Intentamos con el teclado? 🦊"
+          : "Voice recognition seems to be having trouble. Let's type instead! 🦊")
+      : (nativeLang === "korean"
+          ? "루디가 잘 못 들었어요. 다시 말해주세요 🦊"
+          : nativeLang === "spanish"
+          ? "No te escuché bien. ¡Inténtalo de nuevo! 🦊"
+          : "Rudy didn't catch that. Please try again! 🦊");
+
+    const errMsg: ChatMsg = { role: "rudy", text, sttError: true };
     setMessages((prev) => [...prev, errMsg]);
     setPhase("idle");
+    if (autoKb) {
+      sttFailCount.current = 0;
+      setShowKeyboard(true);
+    }
   }
 
   // ── Send message ──────────────────────────────────────────────────────────────
 
   async function sendUserMessage(text: string, isVoice: boolean) {
+    sttFailCount.current = 0;   // reset on successful send
     if (!isVoice) setUsedKeyboard(true);
     const userMsg: ChatMsg = { role: "user", text, isVoice };
     const newMsgs = [...messages, userMsg];
