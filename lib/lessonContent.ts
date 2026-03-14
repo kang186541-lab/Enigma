@@ -402,21 +402,21 @@ export const REVIEW_CONTENT: Record<string, Partial<Record<LearningLangKey, Revi
   day_1: {
     english: [
       { type: "speak", sentence: "Hello, nice to meet you.", speechLang: "en-GB", meaning: { ko: "안녕하세요, 만나서 반갑습니다.", en: "Hello, nice to meet you.", es: "Hola, mucho gusto." } },
-      { type: "fill_blank", promptWithBlank: "My name ___ ___.", answer: "is", options: ["is", "am", "are"], fullSentence: "My name is Rudy.", fullSentenceMeaning: { ko: "제 이름은 루디예요.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
+      { type: "fill_blank", promptWithBlank: "My name ___ Rudy.", answer: "is", options: ["is", "am", "are"], fullSentence: "My name is Rudy.", fullSentenceMeaning: { ko: "제 이름은 루디예요.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
       { type: "speak", sentence: "I'm from Korea.", speechLang: "en-GB", meaning: { ko: "저는 한국에서 왔어요.", en: "I'm from Korea.", es: "Soy de Corea." } },
       { type: "fill_blank", promptWithBlank: "Where are you ___?", answer: "from", options: ["from", "to", "at"], fullSentence: "Where are you from?", fullSentenceMeaning: { ko: "어디에서 오셨어요?", en: "Where are you from?", es: "¿De dónde eres?" } },
       { type: "speak", sentence: "My name is Rudy. Nice to meet you.", speechLang: "en-GB", meaning: { ko: "제 이름은 루디예요. 만나서 반갑습니다.", en: "My name is Rudy. Nice to meet you.", es: "Me llamo Rudy. Mucho gusto." } },
     ],
     spanish: [
       { type: "speak", sentence: "Hola, mucho gusto.", speechLang: "es-ES", meaning: { ko: "안녕하세요, 만나서 반갑습니다.", en: "Hello, nice to meet you.", es: "Hola, mucho gusto." } },
-      { type: "fill_blank", promptWithBlank: "My name ___ ___.", answer: "is", options: ["is", "am", "are"], fullSentence: "My name is Rudy.", fullSentenceMeaning: { ko: "제 이름은 루디예요.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
+      { type: "fill_blank", promptWithBlank: "My name ___ Rudy.", answer: "is", options: ["is", "am", "are"], fullSentence: "My name is Rudy.", fullSentenceMeaning: { ko: "제 이름은 루디예요.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
       { type: "speak", sentence: "Soy de Corea.", speechLang: "es-ES", meaning: { ko: "저는 한국에서 왔어요.", en: "I'm from Korea.", es: "Soy de Corea." } },
       { type: "fill_blank", promptWithBlank: "Where are you ___?", answer: "from", options: ["from", "to", "at"], fullSentence: "Where are you from?", fullSentenceMeaning: { ko: "어디에서 오셨어요?", en: "Where are you from?", es: "¿De dónde eres?" } },
       { type: "speak", sentence: "Me llamo Rudy. Mucho gusto.", speechLang: "es-ES", meaning: { ko: "제 이름은 루디예요. 만나서 반갑습니다.", en: "My name is Rudy. Nice to meet you.", es: "Me llamo Rudy. Mucho gusto." } },
     ],
     korean: [
       { type: "speak", sentence: "안녕하세요, 만나서 반갑습니다.", speechLang: "ko-KR", meaning: { ko: "안녕하세요, 만나서 반갑습니다.", en: "Hello, nice to meet you.", es: "Hola, mucho gusto." } },
-      { type: "fill_blank", promptWithBlank: "My name ___ ___.", answer: "is", options: ["is", "am", "are"], fullSentence: "My name is Rudy.", fullSentenceMeaning: { ko: "제 이름은 루디예요.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
+      { type: "fill_blank", promptWithBlank: "My name ___ Rudy.", answer: "is", options: ["is", "am", "are"], fullSentence: "My name is Rudy.", fullSentenceMeaning: { ko: "제 이름은 루디예요.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
       { type: "speak", sentence: "저는 한국에서 왔어요.", speechLang: "ko-KR", meaning: { ko: "저는 한국에서 왔어요.", en: "I'm from Korea.", es: "Soy de Corea." } },
       { type: "fill_blank", promptWithBlank: "Where are you ___?", answer: "from", options: ["from", "to", "at"], fullSentence: "Where are you from?", fullSentenceMeaning: { ko: "어디에서 오셨어요?", en: "Where are you from?", es: "¿De dónde eres?" } },
       { type: "speak", sentence: "제 이름은 루디예요. 만나서 반갑습니다.", speechLang: "ko-KR", meaning: { ko: "제 이름은 루디예요. 만나서 반갑습니다.", en: "My name is Rudy. Nice to meet you.", es: "Me llamo Rudy. Mucho gusto." } },
