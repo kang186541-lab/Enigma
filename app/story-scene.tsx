@@ -154,6 +154,7 @@ interface FillBlankQ {
   sentence: Tri;
   answer: Tri;
   opts: [Tri, Tri];
+  hints?: { h1: Tri; h2?: Tri; h3?: Tri };
 }
 interface DialogueChoiceQ {
   prompt: Tri;
@@ -899,6 +900,11 @@ const STORIES: Record<string, Story> = {
               { en: "sang", ko: "노래했다", es: "cantó" },
               { en: "slept", ko: "잠들었다", es: "durmió" },
             ],
+            hints: {
+              h1: { ko: "빈칸 앞뒤 문맥을 살펴봐", en: "Look at the context around the blank", es: "Observa el contexto alrededor del espacio" },
+              h2: { ko: "Carlos는 빠르게 어딘가로 갔어 — 아무도 그를 막지 못했어", en: "Carlos moved away quickly — nobody could stop him", es: "Carlos se fue rápido — nadie pudo detenerlo" },
+              h3: { ko: "아무도 막지 못한 동작 → 사라졌다 (disappeared)", en: "An action no one could stop → disappeared", es: "Una acción que nadie pudo detener → desapareció" },
+            },
           },
           {
             sentence: { en: "The secret ___ was hidden under the stage.", ko: "비밀 ___가 무대 아래에 숨겨져 있었다.", es: "El ___ secreto estaba escondido debajo del escenario." },
@@ -907,6 +913,11 @@ const STORIES: Record<string, Story> = {
               { en: "painting", ko: "그림", es: "pintura" },
               { en: "mirror", ko: "거울", es: "espejo" },
             ],
+            hints: {
+              h1: { ko: "무대 아래에 숨겨진 것 — 어떤 종류의 구조물일까?", en: "Something hidden under a stage — what kind of structure?", es: "Algo oculto bajo el escenario — ¿qué tipo de estructura?" },
+              h2: { ko: "무대에서 사람이 사라지는 마술 쇼를 생각해봐", en: "Think of magic shows where performers vanish on stage", es: "Piensa en espectáculos de magia donde los artistas desaparecen" },
+              h3: { ko: "바닥에 있는 비밀 문 → 덫문 (trapdoor)", en: "A hidden door in the floor → trapdoor", es: "Una puerta secreta en el suelo → trampilla" },
+            },
           },
           {
             sentence: { en: "The Lexicon Society wants to ___ all languages.", ko: "Lexicon Society는 모든 언어를 ___하려 한다.", es: "La Sociedad Lexicon quiere ___ todos los idiomas." },
@@ -915,13 +926,13 @@ const STORIES: Record<string, Story> = {
               { en: "celebrate", ko: "축하", es: "celebrar" },
               { en: "translate", ko: "번역", es: "traducir" },
             ],
+            hints: {
+              h1: { ko: "Lexicon Society는 악당이야 — 언어에 대해 무엇을 원할까?", en: "The Lexicon Society are villains — what would they want with languages?", es: "La Sociedad Lexicon son villanos — ¿qué querrían hacer con los idiomas?" },
+              h2: { ko: "권력을 가진 사람들은 다른 사람들을 어떻게 하려 할까?", en: "People who seek power want to do what to others?", es: "Las personas que buscan poder ¿qué quieren hacer con los demás?" },
+              h3: { ko: "지배, 통치, 장악 → 통제 (control)", en: "Dominate, rule, take over → control", es: "Dominar, gobernar, apoderarse → controlar" },
+            },
           },
         ],
-        hints: {
-          h1: { ko: "빈칸 앞뒤 문맥을 보고 자연스러운 단어를 골라봐", en: "Read the context before and after the blank to find a natural fit", es: "Lee el contexto antes y después del espacio para encontrar la palabra natural" },
-          h2: { ko: "배우는 언어의 동사는 주어에 따라 형태가 바뀌어 — 문장의 주어가 누구인지 먼저 파악해봐", en: "Verbs in the target language change form by subject — first figure out who the subject is", es: "Los verbos cambian según el sujeto — primero identifica quién es el sujeto de la oración" },
-          h3: { ko: "첫 번째 빈칸: Carlos가 어떤 행동을 했길래 아무도 막지 못했을까?", en: "First blank: what action did Carlos take that nobody could stop?", es: "Primer espacio: ¿qué acción realizó Carlos que nadie pudo detener?" },
-        },
       },
       {
         kind: "scene",
@@ -1319,6 +1330,8 @@ function WordMatchPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
   const [selected, setSelected] = useState<string | null>(null);
   const [solved, setSolved] = useState(false);
 
+  useEffect(() => { onResetHints?.(); }, [idx]);
+
   const q = puzzle.questions[idx];
   const correctAnswer = tri(q.meaning, lang);
   const [options] = useState(() =>
@@ -1377,16 +1390,25 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
   puzzle: { pType: "fill-blank"; questions: FillBlankQ[] };
   lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
+  const ko = lang === "korean"; const es = lang === "spanish";
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [solved, setSolved] = useState(false);
+  const [hintLevel, setHintLevel] = useState(0);
+  const [hintVisible, setHintVisible] = useState(false);
 
   const q = puzzle.questions[idx];
   const answer = tri(q.answer, learningLang);
   const [options] = useState(() =>
     puzzle.questions.map((qq) => shuffle([tri(qq.answer, learningLang), ...qq.opts.map((o) => tri(o, learningLang))]))
   );
+
+  useEffect(() => {
+    setHintLevel(0);
+    setHintVisible(false);
+    onResetHints?.();
+  }, [idx]);
 
   function handleConfirm() {
     if (!selected) return;
@@ -1396,7 +1418,7 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
   }
 
   function handleNext() {
-    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); onResetHints?.(); }
+    if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); }
     else setSolved(true);
   }
 
@@ -1405,14 +1427,21 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
   const sentence = tri(q.sentence, learningLang);
   const display = confirmed ? sentence.replace("___", `[${selected}]`) : sentence;
 
+  const qHints = q.hints;
+  const h1 = qHints ? tri(qHints.h1, lang) : null;
+  const h2 = qHints?.h2 ? tri(qHints.h2, lang) : null;
+  const h3 = qHints?.h3 ? tri(qHints.h3, lang) : null;
+  const allQHints = [h1, h2, h3].filter(Boolean) as string[];
+  const hasQHints = allQHints.length > 0;
+
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
         <Text style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</Text>
-        <Text style={styles.puzzleType}>{lang === "korean" ? "빈칸 채우기" : lang === "spanish" ? "Completar espacios" : "Fill in the Blank"}</Text>
+        <Text style={styles.puzzleType}>{ko ? "빈칸 채우기" : es ? "Completar espacios" : "Fill in the Blank"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
-        <Text style={styles.puzzleWordLabel}>{lang === "korean" ? "빈칸에 알맞은 단어는?" : lang === "spanish" ? "¿Qué palabra completa la frase?" : "Which word fills the blank?"}</Text>
+        <Text style={styles.puzzleWordLabel}>{ko ? "빈칸에 알맞은 단어는?" : es ? "¿Qué palabra completa la frase?" : "Which word fills the blank?"}</Text>
         <Text style={styles.puzzleSentence}>{display}</Text>
       </View>
       <View style={styles.puzzleOptions}>
@@ -1432,14 +1461,64 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
           );
         })}
       </View>
+      {hasQHints && (
+        <Pressable
+          style={[styles.sharedHintBtn, { marginTop: 8 }]}
+          onPress={() => { setHintVisible(true); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+        >
+          <Text style={styles.sharedHintBtnText}>
+            💡 {ko ? `힌트 보기 (${hintLevel}/${allQHints.length})` : es ? `Ver pistas (${hintLevel}/${allQHints.length})` : `Hints (${hintLevel}/${allQHints.length})`}
+          </Text>
+        </Pressable>
+      )}
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: selected ? 1 : 0.5 }]} onPress={handleConfirm} disabled={!selected}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Confirmar ✓" : "Confirm ✓"}</Text>
+          <Text style={styles.puzzleConfirmText}>{ko ? "확인 ✓" : es ? "Confirmar ✓" : "Confirm ✓"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
-          <Text style={styles.puzzleConfirmText}>{idx < puzzle.questions.length - 1 ? (lang === "korean" ? "다음 ▶" : "Next ▶") : (lang === "korean" ? "완료 ✓" : "Done ✓")}</Text>
+          <Text style={styles.puzzleConfirmText}>{idx < puzzle.questions.length - 1 ? (ko ? "다음 ▶" : "Next ▶") : (ko ? "완료 ✓" : es ? "Listo ✓" : "Done ✓")}</Text>
         </Pressable>
+      )}
+      {hasQHints && (
+        <Modal visible={hintVisible} transparent animationType="fade" onRequestClose={() => setHintVisible(false)}>
+          <Pressable style={styles.hintOverlay} onPress={() => setHintVisible(false)}>
+            <Pressable style={styles.hintNotebook} onPress={() => {}}>
+              <View style={styles.hintNotebookHeader}>
+                <Text style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</Text>
+                <Pressable onPress={() => setHintVisible(false)} style={styles.hintCloseBtn}>
+                  <Text style={styles.hintCloseBtnText}>✕</Text>
+                </Pressable>
+              </View>
+              <View style={styles.hintNotebookRule} />
+              {allQHints.map((hint, i) => {
+                const isUnlocked = i < hintLevel;
+                const isNext = i === hintLevel;
+                return (
+                  <View key={i} style={styles.hintRow}>
+                    {isUnlocked ? (
+                      <View style={styles.hintUnlocked}>
+                        <Text style={styles.hintLabel}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                        <Text style={styles.hintText}>{hint}</Text>
+                      </View>
+                    ) : isNext ? (
+                      <Pressable style={styles.hintLocked} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setHintLevel(i + 1); }}>
+                        <Text style={styles.hintLockedIcon}>🔒</Text>
+                        <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
+                      </Pressable>
+                    ) : (
+                      <View style={[styles.hintLocked, { opacity: 0.4 }]}>
+                        <Text style={styles.hintLockedIcon}>🔒</Text>
+                        <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
+              <Text style={styles.hintFooter}>{ko ? "이전 힌트를 먼저 열어야 해요" : es ? "Desbloquea las pistas en orden" : "Unlock hints in order"}</Text>
+            </Pressable>
+          </Pressable>
+        </Modal>
       )}
     </View>
   );
@@ -1453,6 +1532,8 @@ function DialogueChoicePuzzle({ puzzle, lang, onSolved, onResetHints }: {
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [solved, setSolved] = useState(false);
+
+  useEffect(() => { onResetHints?.(); }, [idx]);
 
   const q = puzzle.questions[idx];
   const answer = tri(q.answer, lang);
@@ -1524,6 +1605,8 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
   const [confirmed, setConfirmed] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [solved, setSolved] = useState(false);
+
+  useEffect(() => { onResetHints?.(); }, [idx]);
 
   const q = puzzle.questions[idx];
   const [shuffledIndices] = useState(() =>
@@ -1618,6 +1701,8 @@ function InvestigationPuzzle({ puzzle, lang, onSolved, onResetHints }: {
   const [selected, setSelected] = useState<number | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [solved, setSolved] = useState(false);
+
+  useEffect(() => { onResetHints?.(); }, [idx]);
 
   const q = puzzle.questions[idx];
 
@@ -2460,6 +2545,8 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
   const [isCorrect, setIsCorrect] = useState(false);
   const [solved, setSolved] = useState(false);
 
+  useEffect(() => { onResetHints?.(); }, [idx]);
+
   const q = puzzle.questions[idx];
   const targetWord = q.word.en;
   const displayWord = lang === "korean" ? q.word.ko : lang === "spanish" ? q.word.es : q.word.en;
@@ -2535,6 +2622,8 @@ function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
   const [idx, setIdx] = useState(0);
   const [tapped, setTapped] = useState<number[]>([]);
   const [solved, setSolved] = useState(false);
+
+  useEffect(() => { onResetHints?.(); }, [idx]);
 
   const q = puzzle.questions[idx];
   const scrambledText = lang === "korean" ? q.scrambled.ko : lang === "spanish" ? q.scrambled.es : q.scrambled.en;
@@ -2959,7 +3048,7 @@ export default function StoryScene() {
             : es
             ? `🧩 Puzzle ${item.puzzleNum} — ¡Demuestra tus habilidades lingüísticas!`
             : `🧩 Puzzle ${item.puzzleNum} — Prove your language skills!`;
-          const hasSharedHints = !!item.hints && item.pType !== "cipher";
+          const hasSharedHints = !!item.hints && item.pType !== "cipher" && item.pType !== "fill-blank";
           const h1 = item.hints ? resolveHint(item.hints.h1, lang, learningLang) : "";
           const h2 = item.hints ? resolveHint(item.hints.h2, lang, learningLang) : "";
           const h3 = item.hints?.h3 ? resolveHint(item.hints.h3, lang, learningLang) : null;
@@ -2971,34 +3060,34 @@ export default function StoryScene() {
               <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: bottomPad + 20 }}>
                 <Text style={styles.puzzleHeader}>{headerText}</Text>
                 {item.pType === "word-match" && (
-                  <WordMatchPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <WordMatchPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "fill-blank" && (
-                  <FillBlankPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <FillBlankPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "dialogue-choice" && (
-                  <DialogueChoicePuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <DialogueChoicePuzzle key={seqIdx} puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "sentence-builder" && (
-                  <SentenceBuilderPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <SentenceBuilderPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "investigation" && (
-                  <InvestigationPuzzle puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <InvestigationPuzzle key={seqIdx} puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "cipher" && (
-                  <CipherPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <CipherPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "listen-choose" && (
                   <WordTypingPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "pronunciation" && (
-                  <PronunciationPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <PronunciationPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "writing-mission" && (
-                  <WritingMissionPuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <WritingMissionPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "word-puzzle" && (
-                  <WordPuzzlePuzzle puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <WordPuzzlePuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {!["word-match","fill-blank","dialogue-choice","sentence-builder","investigation","cipher","listen-choose","pronunciation","writing-mission","word-puzzle"].includes(item.pType) && (
                   <FallbackPuzzle lang={lang} onSolved={handlePuzzleSolved} />
