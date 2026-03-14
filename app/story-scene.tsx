@@ -13,6 +13,7 @@ import {
   TextInput,
   Modal,
   AppState,
+  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as FileSystem from "expo-file-system";
@@ -25,7 +26,8 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
 import { C, F } from "@/constants/theme";
-import { getApiUrl } from "@/lib/query-client";
+import { getApiUrl, apiRequest } from "@/lib/query-client";
+import { Svg, Path } from "react-native-svg";
 
 const rudyStoryImg = require("@/assets/rudy_story.png");
 
@@ -2192,206 +2194,222 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
 }) {
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [recording, setRecording] = useState(false);
+  const [paths, setPaths] = useState<{ x: number; y: number }[][]>([]);
+  const [currentPath, setCurrentPath] = useState<{ x: number; y: number }[]>([]);
+  const [recognizing, setRecognizing] = useState(false);
   const [feedback, setFeedback] = useState<"good" | "retry" | null>(null);
+  const [recognizedText, setRecognizedText] = useState("");
   const [solved, setSolved] = useState(false);
-  const recordingRef = useRef<Audio.Recording | null>(null);
+  const canvasSizeRef = useRef({ width: 320, height: 180 });
   const apiBase = getApiUrl();
 
   const q = puzzle.questions[idx];
-
-  // Sentence shown is in the language being LEARNED (not the UI language)
   const sentenceText =
     learningLang === "korean" ? q.sentence.ko
     : learningLang === "spanish" ? q.sentence.es
     : q.sentence.en;
 
-  // Preload audio for the current sentence whenever it changes
   useEffect(() => {
     ttsPreload(sentenceText, learningLang, apiBase);
   }, [sentenceText]);
 
-  // Map learningLang → Azure/Web Speech locale code
-  function getLangCode(): string {
-    if (learningLang === "korean") return "ko-KR";
-    if (learningLang === "spanish") return "es-ES";
-    if (learningLang === "french") return "fr-FR";
-    if (learningLang === "japanese") return "ja-JP";
-    if (learningLang === "chinese") return "zh-CN";
-    return "en-US";
+  const allPaths = [...paths, ...(currentPath.length > 0 ? [currentPath] : [])];
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderGrant: (e) => {
+      const { locationX, locationY } = e.nativeEvent;
+      setCurrentPath([{ x: locationX, y: locationY }]);
+      setFeedback(null);
+    },
+    onPanResponderMove: (e) => {
+      const { locationX, locationY } = e.nativeEvent;
+      setCurrentPath((prev) => [...prev, { x: locationX, y: locationY }]);
+    },
+    onPanResponderRelease: () => {
+      if (currentPath.length > 0) setPaths((prev) => [...prev, currentPath]);
+      setCurrentPath([]);
+    },
+  });
+
+  function pathToSvgD(points: { x: number; y: number }[]): string {
+    if (points.length === 0) return "";
+    if (points.length === 1) return `M ${points[0].x} ${points[0].y} L ${points[0].x + 0.5} ${points[0].y}`;
+    return points.reduce(
+      (d, { x, y }, i) => (i === 0 ? `M ${x} ${y}` : `${d} L ${x} ${y}`),
+      ""
+    );
   }
 
-  // Fuzzy match: what fraction of target words appear in transcript
-  function matchScore(target: string, transcript: string): number {
-    const normalize = (s: string) => s.toLowerCase().replace(/[^\w가-힣]/g, " ").trim();
-    const tWords = normalize(target).split(/\s+/).filter(Boolean);
-    const tr = normalize(transcript);
-    if (!tWords.length || !tr) return 0;
-    const hits = tWords.filter(w => tr.includes(w)).length;
-    return hits / tWords.length;
+  function clearCanvas() {
+    setPaths([]);
+    setCurrentPath([]);
+    setFeedback(null);
+    setRecognizedText("");
   }
 
-  // ── Play TTS (instant from cache) ──
   function playAudio() {
     if (playing) return;
     ttsPlayCached(sentenceText, learningLang, apiBase, setPlaying);
   }
 
-  // ── Microphone: record + compare ──
-  function handleMic() {
-    if (recording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  }
-
-  function startRecording() {
-    setFeedback(null);
-    setRecording(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
-    if (Platform.OS === "web") {
-      // Use Web Speech API — synchronous start inside the tap
-      const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (!SR) { setRecording(false); setFeedback("retry"); return; }
-      const recognition = new SR();
-      recognition.lang = getLangCode();
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript as string;
-        setRecording(false);
-        const score = matchScore(sentenceText, transcript);
-        setFeedback(score >= 0.5 ? "good" : "retry");
-        if (score >= 0.5) {
-          setTimeout(() => advanceNext(), 1500);
-        }
-      };
-      recognition.onerror = () => { setRecording(false); setFeedback("retry"); };
-      recognition.onend = () => setRecording(false);
-      recognition.start();
-    } else {
-      // Native: record with expo-av
-      (async () => {
-        try {
-          await Audio.requestPermissionsAsync();
-          await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
-          const { recording: rec } = await Audio.Recording.createAsync(
-            Audio.RecordingOptionsPresets.HIGH_QUALITY
-          );
-          recordingRef.current = rec;
-        } catch { setRecording(false); }
-      })();
-    }
-  }
-
-  function stopRecording() {
-    if (Platform.OS !== "web") {
-      (async () => {
-        try {
-          if (!recordingRef.current) { setRecording(false); return; }
-          await recordingRef.current.stopAndUnloadAsync();
-          await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
-          const uri = recordingRef.current.getURI();
-          recordingRef.current = null;
-          setRecording(false);
-          if (!uri) { setFeedback("retry"); return; }
-
-          // Read as base64 and send to Azure STT
-          const base64 = await FileSystem.readAsStringAsync(uri, {
-            encoding: "base64" as any,
-          });
-          const apiUrl = new URL("/api/stt", getApiUrl());
-          const res = await fetch(apiUrl.toString(), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ audio: base64, mimeType: "audio/m4a", language: getLangCode() }),
-          });
-          const data = await res.json();
-          const transcript: string = data.text ?? "";
-          const score = matchScore(sentenceText, transcript);
-          setFeedback(score >= 0.5 ? "good" : "retry");
-          if (score >= 0.5) setTimeout(() => advanceNext(), 1500);
-        } catch { setRecording(false); setFeedback("retry"); }
-      })();
-    } else {
-      setRecording(false);
-    }
+  function matchScore(target: string, recognized: string): number {
+    const normalize = (s: string) =>
+      s.toLowerCase().replace(/[^\w가-힣]/g, " ").trim();
+    const tWords = normalize(target).split(/\s+/).filter(Boolean);
+    const tr = normalize(recognized);
+    if (!tWords.length || !tr) return 0;
+    const hits = tWords.filter((w) => tr.includes(w)).length;
+    return hits / tWords.length;
   }
 
   function advanceNext() {
-    setFeedback(null);
     if (idx < puzzle.questions.length - 1) {
       setIdx((i) => i + 1);
+      clearCanvas();
       onResetHints?.();
     } else {
       setSolved(true);
     }
   }
 
-  const ko = lang === "korean";
-  const es = lang === "spanish";
+  async function handleSubmit() {
+    if (allPaths.length === 0) return;
+    setRecognizing(true);
+    try {
+      let imageBase64 = "";
+      if (Platform.OS === "web") {
+        const canvas = document.createElement("canvas");
+        const { width, height } = canvasSizeRef.current;
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.fillStyle = "#0d0503";
+        ctx.fillRect(0, 0, width, height);
+        ctx.strokeStyle = "#c9a227";
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        allPaths.forEach((path) => {
+          if (path.length === 0) return;
+          ctx.beginPath();
+          ctx.moveTo(path[0].x, path[0].y);
+          path.forEach(({ x, y }, i) => { if (i > 0) ctx.lineTo(x, y); });
+          ctx.stroke();
+        });
+        imageBase64 = canvas.toDataURL("image/png");
+      } else {
+        setRecognizing(false);
+        advanceNext();
+        return;
+      }
+
+      const resp = await apiRequest("POST", "/api/handwriting-recognize", {
+        imageBase64,
+        lang: learningLang,
+      }) as { recognized?: string };
+      const recognized = resp.recognized ?? "";
+      setRecognizedText(recognized);
+      const score = matchScore(sentenceText, recognized);
+      if (score >= 0.35) {
+        setFeedback("good");
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setTimeout(() => advanceNext(), 2000);
+      } else {
+        setFeedback("retry");
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
+    } catch {
+      setFeedback("retry");
+    } finally {
+      setRecognizing(false);
+    }
+  }
 
   if (solved) return <PuzzleSolvedBadge onNext={onSolved} lang={lang} />;
+
+  const ko = lang === "korean";
+  const es = lang === "spanish";
 
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🎤 {ko ? "발음 따라하기" : es ? "Pronuncia esta frase" : "Pronunciation Practice"}</Text>
+        <Text style={styles.puzzleNum}>
+          ✍️ {ko ? "받아쓰기" : es ? "Escritura a mano" : "Handwriting"}
+        </Text>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
 
-      {/* Sentence card — shown in the TARGET learning language */}
+      {/* Sentence card */}
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>
-          {ko ? "이 문장을 소리 내어 읽어보세요!" : es ? "¡Lee esta frase en voz alta!" : "Read this sentence aloud!"}
+          {ko ? "이 문장을 손으로 써보세요!" : es ? "¡Escribe esta frase con el dedo!" : "Write this sentence with your finger!"}
         </Text>
         <Text style={styles.puzzleSentence}>{sentenceText}</Text>
-      </View>
-
-      {/* Two action buttons: Listen + Mic */}
-      <View style={styles.pronBtnRow}>
-        {/* Listen / TTS */}
-        <Pressable
-          style={[styles.pronBtn, playing && { opacity: 0.7 }]}
-          onPress={playAudio}
-          disabled={playing}
-        >
-          <Ionicons name={playing ? "volume-medium" : "volume-high-outline"} size={22} color={C.bg1} />
-          <Text style={styles.pronBtnText}>
-            {playing
-              ? (ko ? "재생 중" : es ? "Reproduciendo" : "Playing…")
-              : (ko ? "듣기" : es ? "Escuchar" : "Listen")}
-          </Text>
-        </Pressable>
-
-        {/* Microphone / Record */}
-        <Pressable
-          style={[styles.pronBtn, styles.pronMicBtn, recording && styles.pronMicRecording]}
-          onPress={handleMic}
-        >
-          <Ionicons name={recording ? "stop-circle" : "mic"} size={22} color={recording ? "#fff" : C.bg1} />
-          <Text style={[styles.pronBtnText, recording && { color: "#fff" }]}>
-            {recording
-              ? (ko ? "중지" : es ? "Detener" : "Stop")
-              : (ko ? "따라하기" : es ? "Repetir" : "Speak")}
+        <Pressable style={styles.hwListenBtn} onPress={playAudio} disabled={playing}>
+          <Ionicons name={playing ? "volume-medium" : "volume-high-outline"} size={16} color={C.gold} />
+          <Text style={styles.hwListenText}>
+            {playing ? (ko ? "재생 중…" : es ? "Reproduciendo…" : "Playing…") : (ko ? "듣기" : es ? "Escuchar" : "Listen")}
           </Text>
         </Pressable>
       </View>
+
+      {/* Drawing canvas */}
+      <View
+        style={styles.hwCanvas}
+        onLayout={(e) => {
+          canvasSizeRef.current = {
+            width: e.nativeEvent.layout.width,
+            height: e.nativeEvent.layout.height,
+          };
+        }}
+        {...panResponder.panHandlers}
+      >
+        <Svg style={StyleSheet.absoluteFill}>
+          {allPaths.map((path, pi) =>
+            path.length > 0 ? (
+              <Path
+                key={pi}
+                d={pathToSvgD(path)}
+                stroke={C.gold}
+                strokeWidth={4}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            ) : null
+          )}
+        </Svg>
+        {allPaths.length === 0 && currentPath.length === 0 && (
+          <Text style={styles.hwPlaceholder}>
+            {ko ? "여기에 손으로 쓰세요…" : es ? "Escribe aquí con el dedo…" : "Draw letters here with your finger…"}
+          </Text>
+        )}
+      </View>
+
+      {/* Recognized text */}
+      {recognizedText ? (
+        <View style={styles.hwRecognized}>
+          <Text style={styles.hwRecognizedLabel}>
+            {ko ? "인식된 텍스트:" : es ? "Texto reconocido:" : "Recognized:"}
+          </Text>
+          <Text style={styles.hwRecognizedText}>{recognizedText}</Text>
+        </View>
+      ) : null}
 
       {/* Feedback */}
       {feedback === "good" && (
         <View style={styles.pronFeedbackGood}>
           <Text style={styles.pronFeedbackText}>
-            ✨ {ko ? "좋아요! 잘 하셨어요." : es ? "¡Muy bien!" : "Great job!"}
+            ✨ {ko ? "훌륭해요! 잘 썼어요." : es ? "¡Excelente escritura!" : "Excellent handwriting!"}
           </Text>
         </View>
       )}
       {feedback === "retry" && (
         <View style={styles.pronFeedbackRetry}>
           <Text style={styles.pronFeedbackText}>
-            🔄 {ko ? "다시 한번 해보세요." : es ? "Inténtalo de nuevo." : "Try once more."}
+            🔄 {ko ? "다시 써보세요." : es ? "Inténtalo de nuevo." : "Try writing again."}
           </Text>
           <Pressable style={styles.pronSkipBtn} onPress={advanceNext}>
             <Text style={styles.pronSkipText}>
@@ -2401,16 +2419,31 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
         </View>
       )}
 
-      {!feedback && !recording && (
-        <Text style={styles.pronunciationHint}>
-          {ko ? "👆 듣고 따라 읽어보세요" : es ? "👆 Escucha y repite" : "👆 Listen, then tap Speak to practise"}
-        </Text>
-      )}
-      {recording && (
-        <Text style={styles.pronunciationHint}>
-          🎙️ {ko ? "말하는 중… 다 하면 중지를 누르세요" : es ? "Hablando… pulsa Detener" : "Listening… tap Stop when done"}
-        </Text>
-      )}
+      {/* Clear + Submit */}
+      <View style={styles.hwBtnRow}>
+        <Pressable style={[styles.hwBtn, styles.hwClearBtn]} onPress={clearCanvas}>
+          <Ionicons name="trash-outline" size={18} color={C.gold} />
+          <Text style={[styles.hwBtnText, { color: C.gold }]}>
+            {ko ? "지우기" : es ? "Borrar" : "Clear"}
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[styles.hwBtn, styles.hwSubmitBtn, (recognizing || allPaths.length === 0) && { opacity: 0.5 }]}
+          onPress={handleSubmit}
+          disabled={recognizing || allPaths.length === 0}
+        >
+          {recognizing ? (
+            <ActivityIndicator size="small" color={C.bg1} />
+          ) : (
+            <>
+              <Ionicons name="checkmark-circle" size={18} color={C.bg1} />
+              <Text style={[styles.hwBtnText, { color: C.bg1 }]}>
+                {ko ? "제출" : es ? "Enviar" : "Submit"}
+              </Text>
+            </>
+          )}
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -3933,6 +3966,80 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: C.goldDim,
     fontStyle: "italic",
+  },
+
+  /* ── Handwriting Puzzle ── */
+  hwCanvas: {
+    width: "100%",
+    height: 180,
+    backgroundColor: "#0d0503",
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: C.gold,
+    marginBottom: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  hwPlaceholder: {
+    color: C.parchment + "44",
+    fontSize: 13,
+    fontFamily: F.body,
+    textAlign: "center",
+  },
+  hwListenBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+  },
+  hwListenText: {
+    color: C.gold,
+    fontSize: 13,
+    fontFamily: F.body,
+  },
+  hwRecognized: {
+    backgroundColor: C.bg2,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 8,
+  },
+  hwRecognizedLabel: {
+    color: C.parchment + "77",
+    fontSize: 11,
+    fontFamily: F.body,
+    marginBottom: 3,
+  },
+  hwRecognizedText: {
+    color: C.parchment,
+    fontSize: 14,
+    fontFamily: F.body,
+  },
+  hwBtnRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 6,
+  },
+  hwBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 13,
+    borderRadius: 12,
+  },
+  hwClearBtn: {
+    borderWidth: 1.5,
+    borderColor: C.gold,
+    backgroundColor: "transparent",
+  },
+  hwSubmitBtn: {
+    backgroundColor: C.gold,
+  },
+  hwBtnText: {
+    fontSize: 15,
+    fontFamily: F.semibold,
   },
 
   /* ── Writing Mission Puzzle ── */

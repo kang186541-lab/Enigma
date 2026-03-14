@@ -925,6 +925,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/handwriting-recognize", async (req: Request, res: Response) => {
+    try {
+      const { imageBase64, lang } = req.body as { imageBase64: string; lang: string };
+      if (!imageBase64) return res.status(400).json({ error: "Missing imageBase64" });
+
+      const langLabel: Record<string, string> = {
+        english: "English", korean: "Korean", spanish: "Spanish",
+      };
+      const langName = langLabel[lang] ?? "English";
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        max_completion_tokens: 200,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "image_url",
+                image_url: { url: imageBase64, detail: "high" },
+              },
+              {
+                type: "text",
+                text: `This image contains handwritten text in ${langName}. Please read and transcribe the handwritten text exactly as written. Return ONLY the transcribed text with no extra explanation. If the handwriting is unclear or partial, do your best to interpret it.`,
+              },
+            ],
+          },
+        ],
+      });
+
+      const recognized = (completion.choices[0]?.message?.content ?? "").trim();
+      res.json({ recognized });
+    } catch (err) {
+      console.error("Handwriting recognize error:", err);
+      res.status(500).json({ error: "Recognition failed" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
