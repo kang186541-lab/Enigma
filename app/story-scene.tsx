@@ -647,17 +647,17 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "단어를 보고 한 글자씩 천천히 써봐", en: "Look at the word and write it letter by letter", es: "Mira la palabra y escríbela letra por letra" },
+          h1: { ko: "단어의 철자를 떠올려 보세요", en: "Try to recall the spelling of the word", es: "Intenta recordar la ortografía de la palabra" },
           h2: {
-            ko: "글자 모양에 집중해서 또박또박 써봐",
-            en: "Focus on the shape of each letter and write carefully",
-            es: "Concéntrate en la forma de cada letra y escribe con cuidado",
+            ko: "첫 글자부터 천천히 써보세요",
+            en: "Write slowly, starting from the first letter",
+            es: "Escribe despacio, comenzando desde la primera letra",
             byLearning: {
-              spanish: { ko: "스페인어 단어: mis-te-rio / len-gua-je — 음절별로 나눠서 써봐", en: "Spanish word: mis-te-rio / len-gua-je — write it syllable by syllable", es: "Palabra española: mis-te-rio / len-gua-je — escríbela sílaba por sílaba" },
-              korean:  { ko: "한국어 단어: 미-스-터-리 / 언-어 — 자음과 모음을 조합해서 써봐", en: "Korean word: 미-스-터-리 / 언-어 — combine consonants and vowels", es: "Palabra coreana: 미-스-터-리 / 언-어 — combina consonantes y vocales" },
+              spanish: { ko: "첫 글자부터: m-i-s-t-e-r-i-o / l-e-n-g-u-a-j-e — 한 글자씩 천천히 써보세요", en: "Start from the first letter: m-i-s-t-e-r-i-o / l-e-n-g-u-a-j-e — write one letter at a time", es: "Empieza por la primera letra: m-i-s-t-e-r-i-o / l-e-n-g-u-a-j-e — escribe de a una letra" },
+              korean:  { ko: "첫 글자부터: 미-스-터-리 / 언-어 — 자음과 모음을 조합해서 한 글자씩 써보세요", en: "Start from the first letter: 미-스-터-리 / 언-어 — combine consonants and vowels one at a time", es: "Empieza por la primera letra: 미-스-터-리 / 언-어 — combina consonantes y vocales de a una" },
             },
           },
-          h3: { ko: "쓰고 나서 단어와 비교해봐 — 맞으면 제출!", en: "After writing, compare with the word above — if it matches, submit!", es: "Después de escribir, compara con la palabra de arriba — si coincide, ¡envía!" },
+          h3: { ko: "단어 전체를 정확하게 완성하세요", en: "Complete the entire word accurately", es: "Completa toda la palabra con precisión" },
         },
       },
       {
@@ -786,14 +786,14 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "단어를 소리 내어 읽어봐 — 발음 자체가 힌트야", en: "Say the word aloud — the sound itself is the clue", es: "Di la palabra en voz alta — el sonido mismo es la pista" },
+          h1: { ko: "단어의 생김새를 잘 봐 — 철자 구조가 힌트야", en: "Look at the word's shape carefully — the letter structure is the clue", es: "Fíjate bien en la forma de la palabra — la estructura de las letras es la pista" },
           h2: {
             ko: "스페인어 단어가 영어와 발음이나 형태가 비슷할 때가 많아 — 모양과 소리를 비교해봐",
             en: "Spanish words often sound or look like English — compare the shapes and sounds for cognates",
             es: "Las palabras españolas a menudo se parecen al inglés — compara formas y sonidos para encontrar cognados",
             byLearning: {
               english: { ko: "이 스페인어 단어들은 영어와 형태나 소리가 비슷해 — 탐정 이야기 맥락을 이용해서 뜻을 추측해봐", en: "These Spanish words share roots with English — use the detective story context to guess their meanings", es: "Estas palabras españolas comparten raíces con el inglés — usa el contexto de la historia para adivinar su significado" },
-              korean:  { ko: "스페인어 단어를 소리 내어 읽어봐 — 소리 패턴과 탐정 이야기 맥락으로 뜻을 추측할 수 있어", en: "Read the Spanish words aloud — use sound patterns and the detective story context to guess meanings", es: "Lee las palabras en voz alta — usa los patrones de sonido y el contexto detectivesco para adivinar el significado" },
+              korean:  { ko: "스페인어 단어의 철자를 봐 — 이야기 맥락과 단어 구조로 뜻을 추측해봐", en: "Look at the Spanish word's spelling — use the story context and letter patterns to guess the meaning", es: "Mira la ortografía de las palabras — usa el contexto de la historia y los patrones de letras para adivinar el significado" },
             },
           },
           h3: { ko: "이 단어들 중에 인사, 감사, 도움 요청, 실종된 사람, 건물 이름이 각각 하나씩 있어", en: "Among these words: one is a greeting, one is gratitude, one is a request for help, one is about a missing person, one is a building", es: "Entre estas palabras hay: un saludo, gratitud, petición de ayuda, una persona desaparecida, un edificio" },
@@ -1115,7 +1115,7 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "단어를 소리 내어 읽어봐 — 음절 하나하나가 힌트야", en: "Say the word aloud — each syllable is a clue", es: "Di la palabra en voz alta — cada sílaba es una pista" },
+          h1: { ko: "각 단어의 철자를 자세히 살펴봐 — 단어 구조 자체가 힌트야", en: "Study each word's spelling carefully — the structure itself is the clue", es: "Estudia la ortografía de cada palabra — la estructura misma es la pista" },
           h2: { ko: "서울 챕터 단어들은 과학 연구와 음모에 관한 말이야 — 전파, 기억, 주파수, 지우기와 연결돼", en: "Seoul chapter words relate to scientific research and conspiracy — frequency, memory, erase, network", es: "Las palabras del capítulo Seúl se relacionan con investigación científica y conspiración" },
           h3: { ko: "각 단어가 이야기 속에서 어떤 역할을 하는지 생각해봐 — 사건과 연구, 두 가지 측면이야", en: "Think about what role each word plays in the story — there are two aspects: the incident and the research", es: "Piensa en qué papel juega cada palabra — hay dos aspectos: el incidente y la investigación" },
         },
@@ -2786,16 +2786,10 @@ export default function StoryScene() {
   const seq = story.sequence;
   const totalScenes = seq.filter((s) => s.kind === "scene").length;
 
-  /* Duck BGM volume when a listening or pronunciation puzzle is active */
   const BGM_FULL   = 0.4;
-  const BGM_DUCKED = 0.08; // 20 % of 0.4
 
   useEffect(() => {
-    const item = seq[seqIdx];
-    const needsDuck =
-      item?.kind === "puzzle" &&
-      item.pType === "pronunciation";
-    bgmRef.current?.setVolumeAsync(needsDuck ? BGM_DUCKED : BGM_FULL).catch(() => {});
+    bgmRef.current?.setVolumeAsync(BGM_FULL).catch(() => {});
   }, [seqIdx]);
   const sceneCount = seq.slice(0, seqIdx).filter((s) => s.kind === "scene").length;
 
