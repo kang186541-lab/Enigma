@@ -24,9 +24,14 @@ import {
   type DailyCourseProgress,
   type DayData,
 } from "@/lib/dailyCourseData";
-import { LESSON_CONTENT, type LearningLangKey } from "@/lib/lessonContent";
+import {
+  LESSON_CONTENT, MISSION_CONTENT, REVIEW_CONTENT, DAY_REWARDS,
+  getCompletionMessage, type LearningLangKey,
+} from "@/lib/lessonContent";
 import { Step1ListenRepeat } from "@/components/rudy/Step1ListenRepeat";
 import { Step2KeyPoint } from "@/components/rudy/Step2KeyPoint";
+import { Step3MissionTalk } from "@/components/rudy/Step3MissionTalk";
+import { Step4QuickReview } from "@/components/rudy/Step4QuickReview";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -54,6 +59,10 @@ export default function RudyLessonScreen() {
   const [phase, setPhase] = useState<Phase>("briefing");
   const [currentStep, setCurrentStep] = useState(0);
   const [sentenceCount, setSentenceCount] = useState(0);
+  const [missionSentCount, setMissionSentCount] = useState(0);
+  const [pronScores, setPronScores] = useState<number[]>([]);
+  const [usedVoiceOnly, setUsedVoiceOnly] = useState(true);
+  const [grammarNotes, setGrammarNotes] = useState<string[]>([]);
   const [progress, setProgress] = useState<DailyCourseProgress | null>(null);
   const [briefingMsg] = useState(() => getRandomBriefing(nativeLang));
 
@@ -95,9 +104,10 @@ export default function RudyLessonScreen() {
     }
     now.todayCompleted = true;
     now.todayStepsCompleted = { listenRepeat: true, keyPoint: true, missionTalk: true, review: true };
+    const totalSpoken = sentenceCount + missionSentCount;
     now.stats = {
       ...now.stats,
-      totalSentencesSpoken: now.stats.totalSentencesSpoken + sentenceCount,
+      totalSentencesSpoken: now.stats.totalSentencesSpoken + totalSpoken,
       totalDaysCompleted: now.stats.totalDaysCompleted + 1,
     };
 
@@ -141,7 +151,11 @@ export default function RudyLessonScreen() {
   if (phase === "complete") {
     return <CompleteScreen
       day={day} nativeLang={nativeLang} lc={lc}
-      sentenceCount={sentenceCount} insets={insets}
+      sentenceCount={sentenceCount + missionSentCount}
+      pronScores={pronScores}
+      usedVoiceOnly={usedVoiceOnly}
+      grammarNotes={grammarNotes}
+      insets={insets}
     />;
   }
 
@@ -154,6 +168,12 @@ export default function RudyLessonScreen() {
       sentenceCount={sentenceCount}
       setSentenceCount={setSentenceCount}
       onStepComplete={handleStepComplete}
+      onMissionComplete={(cnt, voiceOnly, notes) => {
+        setMissionSentCount(cnt);
+        if (!voiceOnly) setUsedVoiceOnly(false);
+        setGrammarNotes(notes);
+      }}
+      onReviewComplete={(scores) => setPronScores(scores)}
       insets={insets}
     />
   );
@@ -227,12 +247,12 @@ function BriefingScreen({
 
 // ── Lesson Screen ────────────────────────────────────────────────────────────
 
-// Steps 0 (Listen&Repeat) and 1 (KeyPoint) drive their own completion
-const SELF_COMPLETING_STEPS = [0, 1];
+// Steps 0, 1, 2, 3 all drive their own completion
+const SELF_COMPLETING_STEPS = [0, 1, 2, 3];
 
 function LessonScreen({
   day, nativeLang, lc, learningLang, currentStep, totalSteps, stepLabels, stepAnim,
-  sentenceCount, setSentenceCount, onStepComplete, insets,
+  sentenceCount, setSentenceCount, onStepComplete, onMissionComplete, onReviewComplete, insets,
 }: {
   day: DayData; nativeLang: string; lc: "ko" | "en" | "es"; learningLang: string;
   currentStep: number; totalSteps: number;
@@ -240,6 +260,8 @@ function LessonScreen({
   sentenceCount: number;
   setSentenceCount: (n: number) => void;
   onStepComplete: () => void;
+  onMissionComplete: (cnt: number, voiceOnly: boolean, notes: string[]) => void;
+  onReviewComplete: (scores: number[]) => void;
   insets: ReturnType<typeof useSafeAreaInsets>;
 }) {
   const sentenceLabel = nativeLang === "korean" ? "문장 완료"
@@ -314,6 +336,8 @@ function LessonScreen({
           stepLabels={stepLabels}
           onStepComplete={onStepComplete}
           onSentenceSpoken={(n) => setSentenceCount(sentenceCount + n)}
+          onMissionComplete={onMissionComplete}
+          onReviewComplete={onReviewComplete}
         />
       </ScrollView>
 
@@ -345,12 +369,15 @@ function LessonScreen({
 // ── Step Content ──────────────────────────────────────────────────────────────
 
 function StepContent({
-  stepIndex, day, nativeLang, lc, learningLang, stepLabels, onStepComplete, onSentenceSpoken,
+  stepIndex, day, nativeLang, lc, learningLang, stepLabels,
+  onStepComplete, onSentenceSpoken, onMissionComplete, onReviewComplete,
 }: {
   stepIndex: number; day: DayData; nativeLang: string; lc: "ko" | "en" | "es";
   learningLang: string;
   stepLabels: string[]; onStepComplete: () => void;
   onSentenceSpoken: (n: number) => void;
+  onMissionComplete: (cnt: number, voiceOnly: boolean, notes: string[]) => void;
+  onReviewComplete: (scores: number[]) => void;
 }) {
   const dayContent = LESSON_CONTENT[day.id];
   const langContent = dayContent?.[learningLang as LearningLangKey];
@@ -410,35 +437,66 @@ function StepContent({
     );
   }
 
-  // ── STEP 3 & 4: Placeholder (Mission Talk & Review) ───────────────────────
-  const stepIcons = ["mic", "refresh-circle"] as const;
-  const stepDescriptions: Record<string, string[]> = {
-    korean: ["배운 표현으로 루디와 자유롭게 대화해보세요.", "오늘 배운 내용을 최종 복습해보세요."],
-    english: ["Have a free conversation with Rudy using what you've learned.", "Do a final review of everything learned today."],
-    spanish: ["Conversa libremente con Rudy usando lo que has aprendido.", "Haz un repaso final de todo lo aprendido hoy."],
-  };
-  const descs = stepDescriptions[nativeLang] ?? stepDescriptions.english;
-  const relIdx = stepIndex - 2;
-  const comingLabel = nativeLang === "korean" ? "곧 업데이트될 예정이에요 🛠️"
-    : nativeLang === "spanish" ? "Próximamente 🛠️"
-    : "Coming soon 🛠️";
-
-  return (
-    <View style={stepContentStyles.container}>
-      <View style={stepContentStyles.header}>
-        <View style={stepContentStyles.iconWrap}>
-          <Ionicons name={stepIcons[relIdx]} size={26} color={C.gold} />
+  // ── STEP 3: 미션 토크 ─────────────────────────────────────────────────────
+  if (stepIndex === 2) {
+    const missionData = MISSION_CONTENT[day.id]?.[learningLang as LearningLangKey];
+    if (!missionData) {
+      return <NoContentCard nativeLang={nativeLang} step={3} onSkip={onStepComplete} />;
+    }
+    return (
+      <View style={stepContentStyles.container}>
+        <View style={stepContentStyles.header}>
+          <View style={stepContentStyles.iconWrap}>
+            <Ionicons name="mic" size={26} color={C.gold} />
+          </View>
+          <Text style={stepContentStyles.stepTitle}>STEP 3: {stepLabels[2]}</Text>
+          <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
         </View>
-        <Text style={stepContentStyles.stepTitle}>STEP {stepIndex + 1}: {stepLabels[stepIndex]}</Text>
-        <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
-        <Text style={stepContentStyles.stepDesc}>{descs[relIdx]}</Text>
+        <Step3MissionTalk
+          data={missionData}
+          nativeLang={nativeLang}
+          lc={lc}
+          learningLang={learningLang}
+          onComplete={(cnt, voiceOnly, notes) => {
+            onSentenceSpoken(cnt);
+            onMissionComplete(cnt, voiceOnly, notes);
+            onStepComplete();
+          }}
+        />
       </View>
-      <View style={stepContentStyles.placeholder}>
-        <Text style={stepContentStyles.placeholderEmoji}>🦊</Text>
-        <Text style={stepContentStyles.placeholderText}>{comingLabel}</Text>
+    );
+  }
+
+  // ── STEP 4: 퀵 리뷰 ──────────────────────────────────────────────────────
+  if (stepIndex === 3) {
+    const reviewQuestions = REVIEW_CONTENT[day.id]?.[learningLang as LearningLangKey];
+    if (!reviewQuestions?.length) {
+      return <NoContentCard nativeLang={nativeLang} step={4} onSkip={onStepComplete} />;
+    }
+    return (
+      <View style={stepContentStyles.container}>
+        <View style={stepContentStyles.header}>
+          <View style={stepContentStyles.iconWrap}>
+            <Ionicons name="refresh-circle" size={26} color={C.gold} />
+          </View>
+          <Text style={stepContentStyles.stepTitle}>STEP 4: {stepLabels[3]}</Text>
+          <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
+        </View>
+        <Step4QuickReview
+          questions={reviewQuestions}
+          nativeLang={nativeLang}
+          lc={lc}
+          learningLang={learningLang}
+          onComplete={(scores) => {
+            onReviewComplete(scores);
+            onStepComplete();
+          }}
+        />
       </View>
-    </View>
-  );
+    );
+  }
+
+  return null;
 }
 
 // ── No Content Card ───────────────────────────────────────────────────────────
@@ -469,10 +527,11 @@ function NoContentCard({
 // ── Complete Screen ──────────────────────────────────────────────────────────
 
 function CompleteScreen({
-  day, nativeLang, lc, sentenceCount, insets,
+  day, nativeLang, lc, sentenceCount, pronScores, usedVoiceOnly, grammarNotes, insets,
 }: {
   day: DayData; nativeLang: string; lc: "ko" | "en" | "es";
-  sentenceCount: number; insets: ReturnType<typeof useSafeAreaInsets>;
+  sentenceCount: number; pronScores: number[]; usedVoiceOnly: boolean;
+  grammarNotes: string[]; insets: ReturnType<typeof useSafeAreaInsets>;
 }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.7)).current;
@@ -484,15 +543,33 @@ function CompleteScreen({
     ]).start();
   }, []);
 
+  // Compute rewards
+  const rewards = DAY_REWARDS[day.id] ?? { xp: 100, bonusAllVoice: 50, bonusPronunciation: 30 };
+  const avgPron = pronScores.length > 0
+    ? Math.round(pronScores.reduce((a, b) => a + b, 0) / pronScores.length)
+    : 0;
+  const pronBonus = avgPron >= 90;
+  const totalXP = rewards.xp + (usedVoiceOnly ? rewards.bonusAllVoice : 0) + (pronBonus ? rewards.bonusPronunciation : 0);
+
+  // Find next day topic
+  const allDays = UNITS.flatMap((u) => u.days);
+  const idx = allDays.findIndex((d) => d.id === day.id);
+  const nextDay = idx >= 0 ? allDays[idx + 1] : null;
+  const nextTopic = nextDay ? getTri(nextDay.topic, lc) : "";
+  const rudyMsg = getCompletionMessage(nativeLang, sentenceCount, nextTopic);
+
   const homeLabel = nativeLang === "korean" ? "홈으로"
-    : nativeLang === "spanish" ? "Volver al Inicio"
-    : "Go Home";
-  const previewLabel = nativeLang === "korean" ? "내일 미션 미리보기"
-    : nativeLang === "spanish" ? "Vista Previa de Mañana"
-    : "Preview Tomorrow";
-  const rudyMsg = nativeLang === "korean" ? `오늘도 수고했어! 내일은 더 멋지게 해낼 거야. 내일 봐, 파트너! 🦊`
-    : nativeLang === "spanish" ? `¡Buen trabajo hoy! Mañana lo harás aún mejor. ¡Hasta mañana, compañero! 🦊`
-    : `Great work today! Tomorrow you'll do even better. See you tomorrow, partner! 🦊`;
+    : nativeLang === "spanish" ? "Volver al Inicio" : "Go Home";
+  const courseLabel = nativeLang === "korean" ? "코스 보기"
+    : nativeLang === "spanish" ? "Ver Curso" : "View Course";
+  const statsTitle = nativeLang === "korean" ? "📊 오늘의 성과"
+    : nativeLang === "spanish" ? "📊 Resultados de Hoy" : "📊 Today's Results";
+  const sentLabel = nativeLang === "korean" ? "말한 문장" : nativeLang === "spanish" ? "Oraciones habladas" : "Sentences spoken";
+  const pronLabel = nativeLang === "korean" ? "평균 발음 점수" : nativeLang === "spanish" ? "Pronunciación promedio" : "Avg. pronunciation";
+  const xpLabel   = nativeLang === "korean" ? "XP 획득" : nativeLang === "spanish" ? "XP ganado" : "XP earned";
+  const bonusVoiceLabel = nativeLang === "korean" ? "🎤 음성 전용 보너스" : nativeLang === "spanish" ? "🎤 Bono todo voz" : "🎤 All-voice bonus";
+  const bonusPronLabel  = nativeLang === "korean" ? "🌟 발음 완벽 보너스" : nativeLang === "spanish" ? "🌟 Bono pronunciación" : "🌟 Pronunciation bonus";
+  const grammarTitle = nativeLang === "korean" ? "💡 오늘의 문법 포인트" : nativeLang === "spanish" ? "💡 Puntos gramaticales" : "💡 Grammar notes";
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -506,14 +583,38 @@ function CompleteScreen({
 
           {/* Stats */}
           <View style={completeStyles.statsCard}>
-            <Text style={completeStyles.statsTitle}>
-              {nativeLang === "korean" ? "📊 오늘의 성과" : nativeLang === "spanish" ? "📊 Resultados de Hoy" : "📊 Today's Results"}
-            </Text>
+            <Text style={completeStyles.statsTitle}>{statsTitle}</Text>
             <View style={completeStyles.divider} />
-            <StatRow emoji="🗣️" label={nativeLang === "korean" ? "말한 문장" : nativeLang === "spanish" ? "Oraciones habladas" : "Sentences spoken"} value={`${sentenceCount}`} />
-            <StatRow emoji="📅" label={nativeLang === "korean" ? "완료한 Day" : nativeLang === "spanish" ? "Day completado" : "Day completed"} value={`Day ${day.dayNumber}`} />
-            <StatRow emoji="⭐" label={nativeLang === "korean" ? "XP 획득" : nativeLang === "spanish" ? "XP ganado" : "XP earned"} value="+100" gold />
+            <StatRow emoji="🗣️" label={sentLabel} value={`${sentenceCount}`} />
+            {avgPron > 0 && (
+              <StatRow emoji="🎯" label={pronLabel} value={`${avgPron}점`} />
+            )}
+            <StatRow emoji="⭐" label={xpLabel} value={`+${rewards.xp}`} gold />
+            {usedVoiceOnly && (
+              <StatRow emoji="🎤" label={bonusVoiceLabel} value={`+${rewards.bonusAllVoice}`} gold />
+            )}
+            {pronBonus && (
+              <StatRow emoji="🌟" label={bonusPronLabel} value={`+${rewards.bonusPronunciation}`} gold />
+            )}
           </View>
+
+          {/* Total XP badge */}
+          <View style={completeStyles.totalXPBadge}>
+            <Text style={completeStyles.totalXPLabel}>
+              {nativeLang === "korean" ? "총 획득 XP" : nativeLang === "spanish" ? "XP Total" : "Total XP"}
+            </Text>
+            <Text style={completeStyles.totalXPValue}>+{totalXP} XP</Text>
+          </View>
+
+          {/* Grammar notes */}
+          {grammarNotes.filter(Boolean).length > 0 && (
+            <View style={completeStyles.grammarCard}>
+              <Text style={completeStyles.grammarTitle}>{grammarTitle}</Text>
+              {grammarNotes.filter(Boolean).map((note, i) => (
+                <Text key={i} style={completeStyles.grammarNote}>• {note}</Text>
+              ))}
+            </View>
+          )}
 
           {/* Rudy message */}
           <View style={completeStyles.rudySpeech}>
@@ -542,7 +643,7 @@ function CompleteScreen({
               router.replace("/rudy-course" as any);
             }}
           >
-            <Text style={completeStyles.previewBtnText}>{previewLabel}</Text>
+            <Text style={completeStyles.previewBtnText}>{courseLabel}</Text>
             <Ionicons name="arrow-forward" size={14} color={C.bg1} />
           </Pressable>
         </View>
@@ -696,6 +797,18 @@ const completeStyles = StyleSheet.create({
   statEmoji: { fontSize: 18, width: 26 },
   statLabel: { flex: 1, fontSize: 14, fontFamily: F.body, color: C.goldDim },
   statValue: { fontSize: 15, fontFamily: F.header, color: C.parchment },
+  totalXPBadge: {
+    backgroundColor: "rgba(201,162,39,0.15)", borderRadius: 16, paddingVertical: 14, paddingHorizontal: 24,
+    width: "100%", alignItems: "center", borderWidth: 1.5, borderColor: C.goldDim, gap: 4,
+  },
+  totalXPLabel: { fontSize: 12, fontFamily: F.label, color: C.goldDim, letterSpacing: 0.5 },
+  totalXPValue: { fontSize: 32, fontFamily: F.title, color: C.gold, letterSpacing: 1 },
+  grammarCard: {
+    backgroundColor: C.bg2, borderRadius: 16, padding: 16, width: "100%", gap: 8,
+    borderWidth: 1, borderColor: C.border,
+  },
+  grammarTitle: { fontSize: 14, fontFamily: F.header, color: C.parchment },
+  grammarNote:  { fontSize: 13, fontFamily: F.body, color: C.goldDim, lineHeight: 20 },
   rudySpeech: {
     flexDirection: "row", alignItems: "flex-start", gap: 12, width: "100%",
   },

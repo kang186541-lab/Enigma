@@ -876,6 +876,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ── Mission Talk Chat (STEP 3) ────────────────────────────────────────────
+  app.post("/api/mission-chat", async (req: Request, res: Response) => {
+    try {
+      const { systemPrompt, targetLang, messages } = req.body as {
+        systemPrompt: string;
+        targetLang: string;
+        messages: { role: "user" | "assistant"; content: string }[];
+      };
+
+      if (!systemPrompt || !targetLang || !Array.isArray(messages)) {
+        return res.status(400).json({ error: "systemPrompt, targetLang, and messages are required" });
+      }
+
+      const LANG_FULL: Record<string, string> = {
+        english: "English", spanish: "Spanish", korean: "Korean",
+        "en-US": "English", "es-ES": "Spanish", "ko-KR": "Korean",
+      };
+      const langName = LANG_FULL[targetLang] ?? "English";
+
+      const commonRules = [
+        ``,
+        `Common rules for all Mission Talk:`,
+        `- Speak ONLY in ${langName}`,
+        `- Keep sentences short and simple (A1/A2 level)`,
+        `- If the player makes grammar mistakes, gently model the correct version in your next line (never say "wrong" or "incorrect")`,
+        `- Encourage full sentences, not single words`,
+        `- After 5-6 exchanges total, naturally wrap up the conversation`,
+        `- IMPORTANT: After EVERY response, you MUST append on a new line exactly this format:`,
+        `  [EVAL]{"sentenceCount":N,"grammarNote":"...","shouldEnd":false}[/EVAL]`,
+        `  Where N = number of complete sentences the USER has said so far (0 on first message).`,
+        `  Set shouldEnd:true after the 5th-6th exchange to close the conversation.`,
+        `  grammarNote = brief note on any grammar correction (empty string if none).`,
+      ].join("\n");
+
+      const fullSystemPrompt = systemPrompt.replace("{targetLang}", langName) + commonRules;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-5.1",
+        max_completion_tokens: 400,
+        messages: [
+          { role: "system", content: fullSystemPrompt },
+          ...messages,
+        ],
+      });
+
+      const raw = completion.choices[0]?.message?.content ?? "";
+
+      // Parse [EVAL]{...}[/EVAL] block
+      const evalMatch = raw.match(/\[EVAL\]([\s\S]*?)\[\/EVAL\]/);
+      let sentenceCount = 0;
+      let grammarNote = "";
+      let shouldEnd = false;
+      if (evalMatch) {
+        try {
+          const evalData = JSON.parse(evalMatch[1]);
+          sentenceCount = typeof evalData.sentenceCount === "number" ? evalData.sentenceCount : 0;
+          grammarNote = evalData.grammarNote ?? "";
+          shouldEnd = evalData.shouldEnd === true;
+        } catch {}
+      }
+
+      // Strip the [EVAL] block from reply shown to user
+      const reply = raw.replace(/\s*\[EVAL\][\s\S]*?\[\/EVAL\]/g, "").trim();
+
+      res.json({ reply, sentenceCount, grammarNote, shouldEnd });
+    } catch (err) {
+      console.error("Mission chat error:", err);
+      res.status(500).json({ error: "Mission chat failed" });
+    }
+  });
+
   app.post("/api/word-lookup", async (req: Request, res: Response) => {
     try {
       const { word, targetLanguage, nativeLanguage, sentence } = req.body as {

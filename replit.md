@@ -11,7 +11,27 @@ Enigma is a mobile-first AI language learning app built with Expo (React Native)
 - AI Chat with 6 GPT-powered tutors (formal/casual styles, different languages)
 - Pronunciation practice screen with IPA phonetics, listen + record
 - Daily Lesson flow with XP rewards
+- **Rudy's Training Camp — 루디의 훈련소** (see below)
 - **Story Mode — "The Language Conspiracy"** (see below)
+
+### Rudy's Training Camp — 루디의 훈련소
+
+Structured 18-day curriculum (3 UNITS × 6 days). Each day has 4 STEPs:
+
+- **STEP 1: 듣고 따라하기 (Listen & Repeat)** — 5 sentences per day with Azure TTS at slow/normal speed + mic recording + Azure pronunciation assessment (0-100 score → ⭐ stars). `components/rudy/Step1ListenRepeat.tsx`
+- **STEP 2: 핵심 포인트 (Key Point)** — Grammar explanation card + fill-in-the-blank quizzes (select or text input) + speak-after-reading with mic. `components/rudy/Step2KeyPoint.tsx`
+- **STEP 3: 미션 토크 (Mission Talk)** — Scenario-based AI roleplay with Rudy (GPT-5.1 via `/api/mission-chat`). User speaks (STT) or types. Rudy responds with TTS. [EVAL] block tracks sentence count, grammar notes, shouldEnd. Voice-only bonus XP. `components/rudy/Step3MissionTalk.tsx`
+- **STEP 4: 퀵 리뷰 (Quick Review)** — 5 questions per day (mix of speak + fill-blank). 15s countdown timer. Yesterday's 2 sentences + today's 3. Pronunciation scoring for speak questions. `components/rudy/Step4QuickReview.tsx`
+
+**Content data:** `lib/lessonContent.ts` has Day 1-6 content for English/Spanish/Korean. Includes `LESSON_CONTENT`, `MISSION_CONTENT`, `REVIEW_CONTENT`, `DAY_REWARDS`, `getCompletionMessage()`.
+
+**Complete screen:** Shows sentences spoken, avg pronunciation score, XP earned + bonuses (all-voice: +50 XP, pronunciation ≥90: +30 XP), grammar notes from STEP 3.
+
+**API endpoints for training:**
+- `GET /api/pronunciation-tts?text=...&lang=...&mode=slow|normal` — Azure TTS for lesson sentences
+- `POST /api/pronunciation-assess` — Azure pronunciation assessment
+- `POST /api/stt` — Azure STT for voice input
+- `POST /api/mission-chat` — GPT-5.1 mission talk with [EVAL] block parsing
 
 ### The Language Conspiracy — Story Mode
 
