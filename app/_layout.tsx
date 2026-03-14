@@ -113,6 +113,8 @@ function RootLayoutNav() {
       <Stack.Screen name="npc-list"     options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="npc-mission"  options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="basic-course" options={{ headerShown: false, gestureEnabled: false }} />
+      <Stack.Screen name="rudy-course"  options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="rudy-lesson"  options={{ headerShown: false, presentation: "card" }} />
     </Stack>
   );
 }

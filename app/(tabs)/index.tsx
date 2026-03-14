@@ -20,6 +20,13 @@ import { useLanguage, getLevel, getLevelProgress, NativeLanguage } from "@/conte
 import { RudyMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
 import { C, F } from "@/constants/theme";
+import {
+  loadProgress,
+  UNITS,
+  getTri,
+  langToCode,
+  type DailyCourseProgress,
+} from "@/lib/dailyCourseData";
 
 const { width } = Dimensions.get("window");
 const rudyBadgeImg = require("@/assets/rudy_badge.png");
@@ -133,6 +140,7 @@ export default function HomeScreen() {
   const xpForLvl = level.num < 5 ? level.maxXP - level.minXP : 1;
 
   const [courseCompleted, setCourseCompleted] = React.useState<boolean | null>(null);
+  const [dailyProgress, setDailyProgress] = React.useState<DailyCourseProgress | null>(null);
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
@@ -148,6 +156,10 @@ export default function HomeScreen() {
     const key = `basicCourseCompleted_${learningLanguage ?? "english"}`;
     AsyncStorage.getItem(key).then(v => setCourseCompleted(v === "true"));
   }, [learningLanguage]);
+
+  useEffect(() => {
+    loadProgress().then(setDailyProgress);
+  }, []);
 
   useEffect(() => {
     if (courseCompleted === false) {
@@ -215,7 +227,7 @@ export default function HomeScreen() {
     { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
   ];
 
-  const missionLabel  = nativeLang === "korean" ? "오늘의 임무" : nativeLang === "spanish" ? "Misión de Hoy" : "Today's Mission";
+  const missionLabel  = nativeLang === "korean" ? "오늘의 훈련" : nativeLang === "spanish" ? "Entrenamiento de Hoy" : "Today's Training";
   const npcMissionLabel = nativeLang === "korean" ? "실전 미션" : nativeLang === "spanish" ? "Misión Real" : "Real Mission";
   const npcMissionDesc  = nativeLang === "korean" ? "NPC와 실전 대화로 레벨업!" : nativeLang === "spanish" ? "¡Habla con NPC en escenarios reales!" : "Practice real-world conversations with NPCs!";
 
@@ -360,36 +372,17 @@ export default function HomeScreen() {
         </View>
       )}
 
-      {/* ── DAILY MISSION CARD ────────────────────────── */}
+      {/* ── DAILY TRAINING CARD (루디의 훈련소) ─────────── */}
       <GoldDivider label={missionLabel} />
       <View style={[styles.pad, { marginTop: 0 }]}>
-        <Pressable
-          style={({ pressed }) => [styles.dailyCard, pressed && { transform: [{ scale: 0.985 }] }]}
+        <RudyTrainingCard
+          nativeLang={nativeLang}
+          dailyProgress={dailyProgress}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            router.push("/daily-lesson" as any);
+            router.push("/rudy-course" as any);
           }}
-        >
-          <View style={styles.dailyContent}>
-            <View style={styles.dailyTopRow}>
-              <View style={styles.dailyPill}>
-                <Text style={styles.dailyPillText}>🕯️</Text>
-                <Text style={styles.dailyPillLabel}>
-                  {nativeLang === "korean" ? "오늘의 수업" : nativeLang === "spanish" ? "Lección de hoy" : "Today's Lesson"}
-                </Text>
-              </View>
-              <View style={styles.xpPill}>
-                <Text style={styles.xpPillText}>+50 XP</Text>
-              </View>
-            </View>
-            <Text style={styles.dailyTitle}>{t("daily_desc")}</Text>
-            <View style={styles.dailyBtn}>
-              <Text style={styles.dailyBtnText}>{t("start_lesson")}</Text>
-              <Ionicons name="arrow-forward" size={14} color={C.bg1} />
-            </View>
-          </View>
-          <Text style={styles.dailyBookEmoji}>📜</Text>
-        </Pressable>
+        />
       </View>
 
       {/* ── NPC REAL MISSION ──────────────────────────── */}
@@ -462,6 +455,105 @@ export default function HomeScreen() {
       onClose={clearLevelUp}
     />
     </>
+  );
+}
+
+// ── RudyTrainingCard ──────────────────────────────────────────────────────────
+
+function RudyTrainingCard({
+  nativeLang, dailyProgress, onPress,
+}: {
+  nativeLang: string;
+  dailyProgress: DailyCourseProgress | null;
+  onPress: () => void;
+}) {
+  const lc = langToCode(nativeLang);
+  const trainingLabel = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : "Rudy's Training Camp";
+  const startLabel    = nativeLang === "korean" ? "훈련 시작 →" : nativeLang === "spanish" ? "Comenzar →" : "Start Training →";
+  const doneMsg       = nativeLang === "korean" ? "오늘의 훈련 완료! 내일 봐, 파트너! 🦊"
+    : nativeLang === "spanish" ? "¡Entrenamiento completado! ¡Hasta mañana! 🦊"
+    : "Training complete! See you tomorrow, partner! 🦊";
+
+  if (!dailyProgress) {
+    return (
+      <Pressable
+        style={({ pressed }) => [styles.dailyCard, pressed && { transform: [{ scale: 0.985 }] }]}
+        onPress={onPress}
+      >
+        <View style={styles.dailyContent}>
+          <View style={styles.dailyTopRow}>
+            <View style={styles.dailyPill}>
+              <Text style={styles.dailyPillText}>🦊</Text>
+              <Text style={styles.dailyPillLabel}>{trainingLabel}</Text>
+            </View>
+            <View style={styles.xpPill}>
+              <Text style={styles.xpPillText}>+100 XP</Text>
+            </View>
+          </View>
+          <Text style={styles.dailyTitle}>{startLabel}</Text>
+        </View>
+        <Text style={styles.dailyBookEmoji}>🦊</Text>
+      </Pressable>
+    );
+  }
+
+  const todayDone = dailyProgress.todayCompleted;
+  const currentUnit = UNITS[dailyProgress.currentUnitIndex] ?? UNITS[0];
+  const currentDay = currentUnit.days[dailyProgress.currentDayIndex] ?? currentUnit.days[0];
+  const stepsCompleted = Object.values(dailyProgress.todayStepsCompleted).filter(Boolean).length;
+  const totalSteps = 4;
+
+  const levelLabel = nativeLang === "korean" ? `${currentUnit.level} · ${getTri(currentUnit.title, lc)}`
+    : nativeLang === "spanish" ? `${currentUnit.level} · ${getTri(currentUnit.title, lc)}`
+    : `${currentUnit.level} · ${getTri(currentUnit.title, lc)}`;
+
+  const dayLabel = nativeLang === "korean"
+    ? `Day ${currentDay.dayNumber}: ${getTri(currentDay.topic, lc)}`
+    : `Day ${currentDay.dayNumber}: ${getTri(currentDay.topic, lc)}`;
+
+  // progress bar blocks
+  const blocks = Array.from({ length: totalSteps }, (_, i) => i < stepsCompleted);
+
+  return (
+    <Pressable
+      style={({ pressed }) => [styles.dailyCard, pressed && { transform: [{ scale: 0.985 }] }]}
+      onPress={onPress}
+    >
+      <View style={styles.dailyContent}>
+        <View style={styles.dailyTopRow}>
+          <View style={styles.dailyPill}>
+            <Text style={styles.dailyPillText}>🦊</Text>
+            <Text style={styles.dailyPillLabel}>{trainingLabel}</Text>
+          </View>
+          <View style={styles.xpPill}>
+            <Text style={styles.xpPillText}>{todayDone ? "✅ +100 XP" : "+100 XP"}</Text>
+          </View>
+        </View>
+
+        {todayDone ? (
+          <Text style={[styles.dailyTitle, { color: "#5a9", fontSize: 14 }]}>{doneMsg}</Text>
+        ) : (
+          <>
+            <Text style={styles.dailyTitle}>{dayLabel}</Text>
+            <Text style={{ fontSize: 11, fontFamily: F.label, color: C.goldDim }}>{levelLabel}</Text>
+            <View style={styles.rudyStepBar}>
+              {blocks.map((filled, i) => (
+                <View key={i} style={[styles.rudyStepBlock, filled && styles.rudyStepBlockFilled]} />
+              ))}
+              <Text style={styles.rudyStepLabel}>STEP {stepsCompleted}/{totalSteps}</Text>
+            </View>
+          </>
+        )}
+
+        {!todayDone && (
+          <View style={styles.dailyBtn}>
+            <Text style={styles.dailyBtnText}>{startLabel}</Text>
+            <Ionicons name="arrow-forward" size={14} color={C.bg1} />
+          </View>
+        )}
+      </View>
+      <Text style={styles.dailyBookEmoji}>🦊</Text>
+    </Pressable>
   );
 }
 
@@ -608,6 +700,15 @@ const styles = StyleSheet.create({
   },
   dailyBtnText: { fontSize: 13, fontFamily: F.header, color: C.bg1, letterSpacing: 0.5 },
   dailyBookEmoji: { fontSize: 52, marginLeft: 8 },
+
+  /* ─ RUDY STEP BAR ─ */
+  rudyStepBar: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
+  rudyStepBlock: {
+    width: 22, height: 8, borderRadius: 4,
+    backgroundColor: "rgba(201,162,39,0.18)", borderWidth: 0.5, borderColor: C.border,
+  },
+  rudyStepBlockFilled: { backgroundColor: C.gold },
+  rudyStepLabel: { fontSize: 10, fontFamily: F.label, color: C.goldDim, marginLeft: 4 },
 
   /* ─ NPC MISSION CARD ─ */
   npcMissionCard: {
