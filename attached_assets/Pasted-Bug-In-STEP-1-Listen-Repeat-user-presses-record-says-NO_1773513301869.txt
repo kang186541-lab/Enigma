@@ -1,0 +1,64 @@
+Bug: In STEP 1 (Listen & Repeat), user presses record, says NOTHING, stops immediately, and gets a high score (83%, 92%, 99%). The empty audio validation we added to STEP 4 is not applied to STEP 1.
+
+## Fix: Apply empty audio check to STEP 1 scoring
+
+Find the scoring/pronunciation assessment function in STEP 1 and add the same validation:
+
+```javascript
+// Before sending to Azure, check if audio is valid
+if (!base64 || base64.length < 2000) {
+  console.warn('[STEP1] Audio too short — user probably said nothing');
+  // Show 0% score
+  setPronScore(0);
+  setStars(0);
+  // Continue normally — let user tap "다음" to move on or try again
+}
+```
+
+Also, after getting Azure response, check if speech was actually recognized:
+
+```javascript
+const data = await res.json();
+const recognizedText = data.recognizedText ?? data.text ?? data.displayText ?? "";
+
+if (!recognizedText || recognizedText.trim().length === 0) {
+  console.warn('[STEP1] Azure returned score but no recognized text');
+  // Show 0% score instead of fake high score
+  setPronScore(0);
+  setStars(0);
+  setQPhase("revealed");
+  return;
+}
+
+// Only show real score if Azure actually heard speech
+const score = data.pronunciationScore ?? data.score ?? 70;
+```
+
+## Apply to ALL steps that have recording + scoring
+
+This same check must exist in:
+
+- ✅ STEP 4 (already fixed — change from “다시 말해주세요” to 0% too)
+- ❌ STEP 1 (fix now)
+- ❌ STEP 2 (if it has speakAfter recording, fix too)
+- ❌ STEP 3 (Mission Talk — if recording is empty, show 0% or don’t send to GPT)
+
+When score is 0%, show:
+
+- ⭐ 0 stars (all empty)
+- “0%”
+- No feedback message (or just “음성이 감지되지 않았어요”)
+- User can still tap “다음 →” to continue
+
+Create a shared validation function and use it everywhere:
+
+```javascript
+function isValidAudio(base64) {
+  return base64 && base64.length >= 2000;
+}
+
+function hasRecognizedSpeech(azureResponse) {
+  const text = azureResponse.recognizedText ?? azureResponse.text ?? azureResponse.displayText ?? "";
+  return text.trim().length > 0;
+}
+```

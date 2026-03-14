@@ -183,6 +183,8 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
     setPhase("assessing");
     try {
       await rec.stopAndUnloadAsync();
+      // 300ms delay — ensure file is fully flushed to disk before reading
+      await new Promise(resolve => setTimeout(resolve, 300));
       const uri = rec.getURI();
       nativeRecRef.current = null;
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
@@ -212,7 +214,21 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
     }
   }
 
+  function isValidAudio(b64: string) { return !!b64 && b64.length >= 2000; }
+  function hasRecognizedSpeech(data: Record<string, any>) {
+    const t = data.recognizedText ?? data.text ?? data.displayText ?? "";
+    return typeof t === "string" && t.trim().length > 0;
+  }
+
   async function submitAssessment(base64: string, mimeType: string) {
+    // Empty audio guard
+    if (!isValidAudio(base64)) {
+      console.warn('[STEP1] Audio too short — user probably said nothing');
+      setScore(0);
+      setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
+      setPhase("result");
+      return;
+    }
     try {
       const apiUrl = new URL("/api/pronunciation-assess", apiBase).toString();
       const res = await fetch(apiUrl, {
@@ -220,8 +236,16 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word: sentence.text, lang: sentence.speechLang, audio: base64, mimeType }),
       });
-      const data = res.ok ? await res.json() : { score: 50 };
-      const s: number = data.pronunciationScore ?? data.score ?? 50;
+      const data = res.ok ? await res.json() : {};
+      // No speech recognized → 0 score
+      if (!hasRecognizedSpeech(data)) {
+        console.warn('[STEP1] Azure returned no recognized speech');
+        setScore(0);
+        setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
+        setPhase("result");
+        return;
+      }
+      const s: number = data.pronunciationScore ?? data.score ?? 0;
       setScore(s);
       setFeedback(s >= 90 ? getRandomFeedback("excellent", nativeLang)
         : s >= 70 ? getRandomFeedback("good", nativeLang)
@@ -229,8 +253,8 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
       setPhase("result");
       Haptics.notificationAsync(s >= 70 ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning);
     } catch {
-      setScore(60);
-      setFeedback(getRandomFeedback("needsWork", nativeLang));
+      setScore(0);
+      setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
       setPhase("result");
     }
   }

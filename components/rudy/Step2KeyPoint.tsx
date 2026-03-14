@@ -202,6 +202,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     setSpeakPhase("assessing");
     try {
       await rec.stopAndUnloadAsync();
+      // 300ms delay — ensure file is fully flushed to disk before reading
+      await new Promise(resolve => setTimeout(resolve, 300));
       const uri = rec.getURI();
       nativeRecRef.current = null;
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
@@ -227,7 +229,20 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     } catch { setSpeakPhase("done"); }
   }
 
+  function isValidAudio(b64: string) { return !!b64 && b64.length >= 2000; }
+  function hasRecognizedSpeech(data: Record<string, any>) {
+    const t = data.recognizedText ?? data.text ?? data.displayText ?? "";
+    return typeof t === "string" && t.trim().length > 0;
+  }
+
   async function submitSpeakAssessment(base64: string, mimeType: string) {
+    // Empty audio guard
+    if (!isValidAudio(base64)) {
+      console.warn('[STEP2] Audio too short — user probably said nothing');
+      setSpeakScore(0);
+      setSpeakPhase("done");
+      return;
+    }
     try {
       const apiUrl = new URL("/api/pronunciation-assess", apiBase).toString();
       const res = await fetch(apiUrl, {
@@ -235,9 +250,16 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word: quiz.fullSentence, lang: speechLang, audio: base64, mimeType }),
       });
-      const data = res.ok ? await res.json() : { score: 60 };
-      setSpeakScore(data.pronunciationScore ?? data.score ?? 60);
-    } catch { setSpeakScore(60); }
+      const data = res.ok ? await res.json() : {};
+      // No speech recognized → 0 score
+      if (!hasRecognizedSpeech(data)) {
+        console.warn('[STEP2] Azure returned no recognized speech');
+        setSpeakScore(0);
+        setSpeakPhase("done");
+        return;
+      }
+      setSpeakScore(data.pronunciationScore ?? data.score ?? 0);
+    } catch { setSpeakScore(0); }
     finally { setSpeakPhase("done"); }
   }
 

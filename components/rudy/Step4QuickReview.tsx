@@ -316,9 +316,23 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     } catch { fallbackReveal(); }
   }
 
+  function isValidAudio(b64: string) { return !!b64 && b64.length >= 2000; }
+  function hasRecognizedSpeech(data: Record<string, any>) {
+    const t = data.recognizedText ?? data.text ?? data.displayText ?? "";
+    return typeof t === "string" && t.trim().length > 0;
+  }
+
   async function assessPronunciation(base64: string, mimeType: string, currentQ: ReviewQuestion) {
     const word = (currentQ.type === "speak" ? currentQ.sentence : currentQ.fullSentence) ?? "";
     const lang = sttLang;
+
+    // Empty audio guard
+    if (!isValidAudio(base64)) {
+      console.warn('[STEP4] Audio too short — user probably said nothing');
+      setPronScore(0); setAllScores((prev) => [...prev, 0]); setStars(0);
+      if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
+      setCanSkipScoring(false); setQPhase("revealed"); return;
+    }
 
     // Show skip button after 5 seconds
     setCanSkipScoring(false);
@@ -331,8 +345,6 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       const timeoutId = setTimeout(() => abortCtrl.abort(), 10000);
       let data: Record<string, any> = {};
       try {
-        console.log('[STEP4] Sending to API...', { word, lang, base64Len: base64.length });
-        const startTime = Date.now();
         const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -340,27 +352,27 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
           signal: abortCtrl.signal,
         });
         clearTimeout(timeoutId);
-        console.log('[STEP4] API responded in', Date.now() - startTime, 'ms, status:', res.status);
-        if (res.ok) {
-          data = await res.json();
-          console.log('[STEP4] Azure FULL response:', JSON.stringify(data));
-        } else {
-          const errorText = await res.text();
-          console.log('[STEP4] Azure ERROR response:', res.status, errorText);
-        }
+        if (res.ok) data = await res.json();
       } catch (e) {
         clearTimeout(timeoutId);
-        console.error('[STEP4] Azure call EXCEPTION:', e);
       }
-      const score: number = data.pronunciationScore ?? data.score ?? -1;
-      console.log('[STEP4] Final score:', score, '(if -1, Azure returned nothing)');
+
+      // No speech recognized → 0 score
+      if (!hasRecognizedSpeech(data)) {
+        console.warn('[STEP4] Azure returned no recognized speech');
+        setPronScore(0); setAllScores((prev) => [...prev, 0]); setStars(0);
+        if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
+        setCanSkipScoring(false); setQPhase("revealed"); return;
+      }
+
+      const score: number = data.pronunciationScore ?? data.score ?? 0;
       setPronScore(score);
       setAllScores((prev) => [...prev, score]);
-      setStars(score >= 90 ? 3 : score >= 75 ? 2 : 1);
+      setStars(score >= 90 ? 3 : score >= 75 ? 2 : score > 0 ? 1 : 0);
     } catch {
-      setPronScore(70);
-      setAllScores((prev) => [...prev, 70]);
-      setStars(2);
+      setPronScore(0);
+      setAllScores((prev) => [...prev, 0]);
+      setStars(0);
     }
     if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
     setCanSkipScoring(false);
