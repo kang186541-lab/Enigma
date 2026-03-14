@@ -294,8 +294,10 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       } catch {
         fallbackReveal();
       }
+    } else {
+      // Web: manually trigger stop → ondataavailable fires with all buffered audio → onstop → handleWebStop
+      if (mediaRecRef.current?.state === "recording") mediaRecRef.current.stop();
     }
-    // web handled by onstop
   }
 
   async function handleWebStop(mime: string, stream: MediaStream, currentQ: ReviewQuestion) {
