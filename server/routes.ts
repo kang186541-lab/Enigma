@@ -987,6 +987,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ── Quiz Evaluate (GPT-4o) ──────────────────────────────────────────────────
+  app.post("/api/quiz-evaluate", async (req: Request, res: Response) => {
+    try {
+      const { systemPrompt, userMessage } = req.body as {
+        systemPrompt: string;
+        userMessage: string;
+      };
+      if (!systemPrompt || !userMessage) {
+        return res.status(400).json({ error: "systemPrompt and userMessage required" });
+      }
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage },
+        ],
+        temperature: 0.4,
+        max_tokens: 400,
+      });
+      const raw = completion.choices[0]?.message?.content ?? "";
+      res.json({ reply: raw });
+    } catch (err) {
+      console.error("Quiz evaluate error:", err);
+      res.status(500).json({ error: "Evaluation failed" });
+    }
+  });
+
+  // ── Quiz Roleplay Chat (GPT-4o, custom system prompt) ───────────────────────
+  app.post("/api/quiz-roleplay", async (req: Request, res: Response) => {
+    try {
+      const { npcSystemPrompt, userMessage, history } = req.body as {
+        npcSystemPrompt: string;
+        userMessage: string;
+        history?: { role: "user" | "assistant"; content: string }[];
+      };
+      if (!npcSystemPrompt || !userMessage) {
+        return res.status(400).json({ error: "npcSystemPrompt and userMessage required" });
+      }
+      const msgs: { role: "system" | "user" | "assistant"; content: string }[] = [
+        { role: "system", content: npcSystemPrompt },
+        ...(history ?? []).map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
+        { role: "user", content: userMessage },
+      ];
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: msgs,
+        temperature: 0.7,
+        max_tokens: 600,
+      });
+      const raw = completion.choices[0]?.message?.content ?? "...";
+      let parsedReply = raw;
+      let extra: Record<string, unknown> = {};
+      try {
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const json = JSON.parse(jsonMatch[0]);
+          parsedReply = json.npcResponse ?? json.reply ?? raw;
+          extra = json;
+        }
+      } catch { /* not JSON, use raw */ }
+      res.json({ reply: parsedReply, ...extra });
+    } catch (err) {
+      console.error("Quiz roleplay error:", err);
+      res.status(500).json({ error: "Roleplay failed" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

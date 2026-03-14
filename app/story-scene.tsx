@@ -4042,7 +4042,7 @@ const styles = StyleSheet.create({
   },
   hwBtnText: {
     fontSize: 15,
-    fontFamily: F.semibold,
+    fontFamily: F.bodySemi,
   },
 
   /* ── Writing Mission Puzzle ── */
