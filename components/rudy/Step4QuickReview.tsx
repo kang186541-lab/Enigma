@@ -311,7 +311,6 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       setPronScore(score);
       setAllScores((prev) => [...prev, score]);
       setStars(score >= 90 ? 3 : score >= 75 ? 2 : 1);
-      await playTTS(word, lang);
     } catch {
       setPronScore(70);
       setAllScores((prev) => [...prev, 70]);
@@ -320,6 +319,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
     setCanSkipScoring(false);
     setQPhase("revealed");
+    // Play TTS after revealing so the spinner doesn't hang waiting for audio load
+    playTTS(word, lang).catch(() => {});
   }
 
   function skipScoring() {
