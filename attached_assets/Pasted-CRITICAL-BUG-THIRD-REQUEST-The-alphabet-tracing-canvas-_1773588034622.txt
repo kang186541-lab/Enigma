@@ -1,0 +1,114 @@
+CRITICAL BUG — THIRD REQUEST. The alphabet tracing canvas is STILL broken. Two problems:
+
+## Problem 1: Cannot draw on the canvas
+
+When I touch the canvas area to trace the letter “A”, the screen scrolls instead of drawing. Drawing does not work at all.
+
+## Problem 2: Buttons overlap the canvas
+
+The “다시 해볼게요” and “잘했어요!” buttons and the “1/26” text are ON TOP of the canvas drawing area, blocking it.
+
+## THESE HAVE BEEN REPORTED TWICE BEFORE AND NOT FIXED. Fix them now.
+
+### Fix for Problem 1: Canvas scrolling
+
+Find the alphabet tracing screen component. Find the canvas/drawing area. Do EXACTLY this:
+
+1. Find the parent ScrollView of this screen
+1. Add a state variable:
+
+```javascript
+const [scrollEnabled, setScrollEnabled] = useState(true);
+```
+
+1. Pass it to ScrollView:
+
+```jsx
+<ScrollView scrollEnabled={scrollEnabled}>
+```
+
+1. Wrap the canvas with touch handlers:
+
+```jsx
+<View
+  onTouchStart={() => setScrollEnabled(false)}
+  onTouchEnd={() => setScrollEnabled(true)}
+  onTouchCancel={() => setScrollEnabled(true)}
+  style={{ /* canvas container styles */ }}
+>
+  {/* Canvas component here */}
+</View>
+```
+
+1. If the canvas uses a PanResponder or gesture handler, make sure it claims the touch:
+
+```javascript
+onStartShouldSetPanResponder: () => true,
+onMoveShouldSetPanResponder: () => true,
+onPanResponderTerminationRequest: () => false,
+```
+
+### Fix for Problem 2: Button overlap
+
+The layout must be:
+
+```
+[Letter card with pronunciation] — fixed height
+[듣기 button]
+[따라 써보기 label]
+[Canvas area] — takes remaining space, NO buttons on top of it
+[1/26 counter] — BELOW canvas
+[다시 해볼게요 / 잘했어요! buttons] — BELOW counter
+[건너뛰기] — BELOW buttons
+```
+
+The canvas and buttons must NOT overlap. Use this layout:
+
+```jsx
+<View style={{ flex: 1 }}>
+  <ScrollView 
+    scrollEnabled={scrollEnabled}
+    contentContainerStyle={{ paddingBottom: 120 }}
+  >
+    {/* Letter card */}
+    {/* 듣기 button */}
+    {/* 따라 써보기 label */}
+    
+    {/* Canvas — give it a fixed height */}
+    <View
+      onTouchStart={() => setScrollEnabled(false)}
+      onTouchEnd={() => setScrollEnabled(true)}
+      style={{ height: 250, marginHorizontal: 16 }}
+    >
+      {/* Drawing canvas component */}
+    </View>
+    
+    {/* Counter */}
+    <Text style={{ textAlign: 'center', marginTop: 8 }}>1 / 26</Text>
+    
+    {/* Buttons — BELOW canvas, not on top */}
+    <View style={{ flexDirection: 'row', gap: 12, marginTop: 12, paddingHorizontal: 16 }}>
+      <TouchableOpacity style={{ flex: 1 }}>
+        <Text>다시 해볼게요</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={{ flex: 1 }}>
+        <Text>잘했어요!</Text>
+      </TouchableOpacity>
+    </View>
+    
+    {/* Skip */}
+    <TouchableOpacity style={{ marginTop: 8 }}>
+      <Text>건너뛰기</Text>
+    </TouchableOpacity>
+  </ScrollView>
+</View>
+```
+
+### VERIFY after fixing:
+
+1. Touch the canvas and drag — drawing appears, screen does NOT scroll
+1. Buttons are visible BELOW the canvas, not on top of it
+1. The “1/26” counter is between canvas and buttons
+1. All elements are visible without overlapping
+
+Show me the changed code so I can verify.

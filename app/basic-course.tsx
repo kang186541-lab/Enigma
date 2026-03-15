@@ -471,21 +471,8 @@ export default function BasicCourseScreen() {
   const [flipped,     setFlipped]     = useState(false);
   const [traced,      setTraced]      = useState(false);  // step 0: user has drawn enough
   const [audioPlayed, setAudioPlayed] = useState(false);
-  const [canvasKey,   setCanvasKey]   = useState(0);     // increment to reset canvas
-
-  // Blocks parent scroll when drawing on canvas
-  const canvasBlocker = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder:        () => true,
-      onMoveShouldSetPanResponder:         () => true,
-      onStartShouldSetPanResponderCapture: () => true,
-      onMoveShouldSetPanResponderCapture:  () => true,
-      onPanResponderTerminationRequest:    () => false,
-      onPanResponderGrant:                 () => {},
-      onPanResponderMove:                  () => {},
-      onPanResponderRelease:               () => {},
-    })
-  ).current;
+  const [canvasKey,     setCanvasKey]     = useState(0);   // increment to reset canvas
+  const [scrollEnabled, setScrollEnabled] = useState(true); // disabled while drawing
 
   // Greetings step pronunciation flow
   type GreetPhase = "listen" | "speak" | "recording" | "processing" | "pass" | "fail";
@@ -793,45 +780,7 @@ export default function BasicCourseScreen() {
   const NavBar = () => (
     <View style={[s.navArea, { paddingBottom: bottomPad + 8 }]}>
 
-      {/* ── Step 0: canvas self-check buttons replace Next ── */}
-      {step === 0 && (
-        <>
-          {/* Counter sits above buttons, never overlapping */}
-          <Text style={s.counter}>{subIdx + 1} / {course.chars.length}</Text>
-
-          <View style={s.navRow}>
-            {/* 🔄 Try again — always visible, clears canvas */}
-            <Pressable
-              style={({ pressed }) => [s.retryBtn, { flex: 1 }, pressed && { opacity: 0.7 }]}
-              onPress={handleRetry}
-            >
-              <Text style={s.retryBtnTxt}>
-                {native === "korean" ? "🔄  다시 해볼게요" : native === "spanish" ? "🔄  Otra vez" : "🔄  Try again"}
-              </Text>
-            </Pressable>
-
-            {/* ✅ Looks good! — always visible, disabled until drawn */}
-            <Pressable
-              style={({ pressed }) => [s.nextBtn, !traced && s.nextBtnOff, pressed && traced && { opacity: 0.85 }]}
-              onPress={traced ? goNext : undefined}
-              disabled={!traced}
-            >
-              <Text style={s.nextBtnTxt}>
-                {native === "korean" ? "✅  잘했어요!" : native === "spanish" ? "✅  ¡Bien hecho!" : "✅  Looks good!"}
-              </Text>
-            </Pressable>
-          </View>
-
-          {/* Skip writing step */}
-          <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
-            <Text style={s.inlineSkip}>
-              {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
-            </Text>
-          </Pressable>
-        </>
-      )}
-
-      {/* ── Steps 1–3: normal Next button ── */}
+      {/* ── Steps 1–3: normal Next button (step 0 buttons are inside the ScrollView) ── */}
       {step > 0 && (
         <>
           {!canNext && step < 3 && (
@@ -1059,44 +1008,89 @@ export default function BasicCourseScreen() {
       </View>
 
       {/* ════════════════════════════════════════
-          STEP 0 — Fixed, no-scroll layout
+          STEP 0 — Scrollable layout, canvas blocks scroll while drawing
           ════════════════════════════════════════ */}
       {step === 0 && charItem && (
-        <Animated.View style={[s.step0, { opacity: fadeAnim }]}>
+        <ScrollView
+          scrollEnabled={scrollEnabled}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24, gap: 10 }}
+        >
+          <Animated.View style={{ opacity: fadeAnim, gap: 10 }}>
 
-          {/* Char info row */}
-          <View style={s.charInfoRow}>
-            <Text style={s.charBig}>{charItem.char}</Text>
-            <View style={s.charMeta}>
-              <Text style={s.charRoman}>{charItem.roman}</Text>
-              <Text style={s.charTip}>{getCharTip(charItem.char, lang, native)}</Text>
+            {/* Char info row */}
+            <View style={s.charInfoRow}>
+              <Text style={s.charBig}>{charItem.char}</Text>
+              <View style={s.charMeta}>
+                <Text style={s.charRoman}>{charItem.roman}</Text>
+                <Text style={s.charTip}>{getCharTip(charItem.char, lang, native)}</Text>
+              </View>
             </View>
-          </View>
 
-          {/* Listen button */}
-          <Pressable
-            style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.75 }]}
-            onPress={() => playAudio(charItem.char)}
-          >
-            <Ionicons name="volume-medium-outline" size={18} color={C.bg1} />
-            <Text style={s.listenBtnTxt}>{listenLabel}</Text>
-          </Pressable>
+            {/* Listen button */}
+            <Pressable
+              style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.75 }]}
+              onPress={() => playAudio(charItem.char)}
+            >
+              <Ionicons name="volume-medium-outline" size={18} color={C.bg1} />
+              <Text style={s.listenBtnTxt}>{listenLabel}</Text>
+            </Pressable>
 
-          {/* Divider + label */}
-          <View style={s.traceLabelRow}>
-            <View style={s.traceLine} />
-            <Text style={s.traceLabel}>{traceLabel}</Text>
-            <View style={s.traceLine} />
-          </View>
+            {/* Divider + label */}
+            <View style={s.traceLabelRow}>
+              <View style={s.traceLine} />
+              <Text style={s.traceLabel}>{traceLabel}</Text>
+              <View style={s.traceLine} />
+            </View>
 
-          {/* ── CANVAS fills remaining space — wrapper blocks parent scroll ── */}
-          <View
-            style={[{ flex: 1 }, Platform.OS === "web" ? ({ touchAction: "none" } as object) : {}]}
-            {...canvasBlocker.panHandlers}
-          >
-            <TracingCanvas key={canvasKey} char={charItem.char} onDrawn={() => setTraced(true)} />
-          </View>
-        </Animated.View>
+            {/* ── CANVAS: fixed height, disables scroll while finger is on it ── */}
+            <View
+              onTouchStart={() => setScrollEnabled(false)}
+              onTouchEnd={() => setScrollEnabled(true)}
+              onTouchCancel={() => setScrollEnabled(true)}
+              style={[
+                { height: 250 },
+                Platform.OS === "web" ? ({ touchAction: "none" } as object) : {},
+              ]}
+            >
+              <TracingCanvas key={canvasKey} char={charItem.char} onDrawn={() => setTraced(true)} />
+            </View>
+
+            {/* Counter — BELOW canvas */}
+            <Text style={s.counter}>{subIdx + 1} / {course.chars.length}</Text>
+
+            {/* Retry + done buttons — BELOW counter */}
+            <View style={s.navRow}>
+              <Pressable
+                style={({ pressed }) => [s.retryBtn, { flex: 1 }, pressed && { opacity: 0.7 }]}
+                onPress={handleRetry}
+              >
+                <Text style={s.retryBtnTxt}>
+                  {native === "korean" ? "🔄  다시 해볼게요" : native === "spanish" ? "🔄  Otra vez" : "🔄  Try again"}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [s.nextBtn, !traced && s.nextBtnOff, pressed && traced && { opacity: 0.85 }]}
+                onPress={traced ? goNext : undefined}
+                disabled={!traced}
+              >
+                <Text style={s.nextBtnTxt}>
+                  {native === "korean" ? "✅  잘했어요!" : native === "spanish" ? "✅  ¡Bien hecho!" : "✅  Looks good!"}
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Skip — BELOW buttons */}
+            <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+              <Text style={s.inlineSkip}>
+                {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+              </Text>
+            </Pressable>
+
+          </Animated.View>
+        </ScrollView>
       )}
 
       {/* ════════════════════════════════════════
