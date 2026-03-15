@@ -1,0 +1,67 @@
+The alphabet tracing screen now works for drawing, but the buttons are below the visible area — user has to scroll down to see them. This screen should fit entirely on one screen with NO scrolling needed.
+
+## Fix: Make everything fit on screen without scrolling
+
+Remove the ScrollView entirely. Use flex layout to fit all elements on one screen:
+
+```jsx
+<View style={{ flex: 1, backgroundColor: '#1a0a05' }}>
+  
+  {/* Header — Listen then trace */}
+  <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 8 }}>
+    <Text>🦊 Listen then trace the letter! 🦊</Text>
+    <Text>건너뛰기 ›</Text>
+  </View>
+
+  {/* Letter card — compact */}
+  <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
+    {/* A, a, '에이' — Apple 의 첫 글자 */}
+  </View>
+
+  {/* 듣기 button */}
+  <TouchableOpacity style={{ alignSelf: 'center', paddingVertical: 6 }}>
+    <Text>🔊 듣기</Text>
+  </TouchableOpacity>
+
+  {/* 따라 써보기 label */}
+  <Text style={{ textAlign: 'center', marginVertical: 4 }}>✏️ 따라 써보기</Text>
+
+  {/* Canvas — takes ALL remaining space */}
+  <View
+    style={{ flex: 1, marginHorizontal: 16 }}
+    onTouchStart={() => {/* disable scroll if needed */}}
+  >
+    {/* Drawing canvas */}
+  </View>
+
+  {/* Bottom section — fixed at bottom, NO scrolling */}
+  <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+    {/* Counter */}
+    <Text style={{ textAlign: 'center', marginBottom: 8 }}>1 / 26</Text>
+    
+    {/* Buttons */}
+    <View style={{ flexDirection: 'row', gap: 12 }}>
+      <TouchableOpacity style={{ flex: 1 }}>
+        <Text>🔄 다시 해볼게요</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={{ flex: 1 }}>
+        <Text>✅ 잘했어요!</Text>
+      </TouchableOpacity>
+    </View>
+    
+    {/* Skip */}
+    <TouchableOpacity style={{ marginTop: 8 }}>
+      <Text style={{ textAlign: 'center' }}>건너뛰기 ›</Text>
+    </TouchableOpacity>
+  </View>
+
+</View>
+```
+
+Key points:
+
+- **No ScrollView** — the entire screen is a flex container
+- **Canvas gets `flex: 1`** — it takes all remaining space between the letter card and buttons
+- **Buttons are at the bottom** — always visible, no scrolling needed
+- **Letter card and header are compact** — reduce padding to save space
+- Make the letter card smaller if needed to give more room to the canvas

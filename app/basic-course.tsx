@@ -471,8 +471,7 @@ export default function BasicCourseScreen() {
   const [flipped,     setFlipped]     = useState(false);
   const [traced,      setTraced]      = useState(false);  // step 0: user has drawn enough
   const [audioPlayed, setAudioPlayed] = useState(false);
-  const [canvasKey,     setCanvasKey]     = useState(0);   // increment to reset canvas
-  const [scrollEnabled, setScrollEnabled] = useState(true); // disabled while drawing
+  const [canvasKey, setCanvasKey] = useState(0); // increment to reset canvas
 
   // Greetings step pronunciation flow
   type GreetPhase = "listen" | "speak" | "recording" | "processing" | "pass" | "fail";
@@ -780,7 +779,7 @@ export default function BasicCourseScreen() {
   const NavBar = () => (
     <View style={[s.navArea, { paddingBottom: bottomPad + 8 }]}>
 
-      {/* ── Steps 1–3: normal Next button (step 0 buttons are inside the ScrollView) ── */}
+      {/* ── Steps 1–3: normal Next button (step 0 has its own bottom bar) ── */}
       {step > 0 && (
         <>
           {!canNext && step < 3 && (
@@ -1008,60 +1007,49 @@ export default function BasicCourseScreen() {
       </View>
 
       {/* ════════════════════════════════════════
-          STEP 0 — Scrollable layout, canvas blocks scroll while drawing
+          STEP 0 — Pure flex layout, no scroll, canvas fills remaining space
           ════════════════════════════════════════ */}
       {step === 0 && charItem && (
-        <ScrollView
-          scrollEnabled={scrollEnabled}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24, gap: 10 }}
-        >
-          <Animated.View style={{ opacity: fadeAnim, gap: 10 }}>
+        <Animated.View style={{ flex: 1, opacity: fadeAnim, gap: 8 }}>
 
-            {/* Char info row */}
-            <View style={s.charInfoRow}>
-              <Text style={s.charBig}>{charItem.char}</Text>
-              <View style={s.charMeta}>
-                <Text style={s.charRoman}>{charItem.roman}</Text>
-                <Text style={s.charTip}>{getCharTip(charItem.char, lang, native)}</Text>
-              </View>
+          {/* Char info card — compact */}
+          <View style={[s.charInfoRow, { marginHorizontal: 16, paddingVertical: 10 }]}>
+            <Text style={[s.charBig, { fontSize: 56 }]}>{charItem.char}</Text>
+            <View style={s.charMeta}>
+              <Text style={s.charRoman}>{charItem.roman}</Text>
+              <Text style={s.charTip}>{getCharTip(charItem.char, lang, native)}</Text>
             </View>
+          </View>
 
-            {/* Listen button */}
-            <Pressable
-              style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.75 }]}
-              onPress={() => playAudio(charItem.char)}
-            >
-              <Ionicons name="volume-medium-outline" size={18} color={C.bg1} />
-              <Text style={s.listenBtnTxt}>{listenLabel}</Text>
-            </Pressable>
+          {/* Listen button */}
+          <Pressable
+            style={({ pressed }) => [s.listenBtn, { paddingVertical: 7 }, pressed && { opacity: 0.75 }]}
+            onPress={() => playAudio(charItem.char)}
+          >
+            <Ionicons name="volume-medium-outline" size={18} color={C.bg1} />
+            <Text style={s.listenBtnTxt}>{listenLabel}</Text>
+          </Pressable>
 
-            {/* Divider + label */}
-            <View style={s.traceLabelRow}>
-              <View style={s.traceLine} />
-              <Text style={s.traceLabel}>{traceLabel}</Text>
-              <View style={s.traceLine} />
-            </View>
+          {/* Trace label */}
+          <View style={[s.traceLabelRow, { marginHorizontal: 16 }]}>
+            <View style={s.traceLine} />
+            <Text style={s.traceLabel}>{traceLabel}</Text>
+            <View style={s.traceLine} />
+          </View>
 
-            {/* ── CANVAS: fixed height, disables scroll while finger is on it ── */}
-            <View
-              onTouchStart={() => setScrollEnabled(false)}
-              onTouchEnd={() => setScrollEnabled(true)}
-              onTouchCancel={() => setScrollEnabled(true)}
-              style={[
-                { height: 250 },
-                Platform.OS === "web" ? ({ touchAction: "none" } as object) : {},
-              ]}
-            >
-              <TracingCanvas key={canvasKey} char={charItem.char} onDrawn={() => setTraced(true)} />
-            </View>
+          {/* Canvas — flex:1 fills ALL remaining vertical space */}
+          <View
+            style={[
+              { flex: 1, marginHorizontal: 16 },
+              Platform.OS === "web" ? ({ touchAction: "none" } as object) : {},
+            ]}
+          >
+            <TracingCanvas key={canvasKey} char={charItem.char} onDrawn={() => setTraced(true)} />
+          </View>
 
-            {/* Counter — BELOW canvas */}
+          {/* Bottom bar — always pinned above the screen edge */}
+          <View style={{ paddingHorizontal: 16, paddingBottom: bottomPad + 8, paddingTop: 8, gap: 6, borderTopWidth: 1, borderTopColor: C.border }}>
             <Text style={s.counter}>{subIdx + 1} / {course.chars.length}</Text>
-
-            {/* Retry + done buttons — BELOW counter */}
             <View style={s.navRow}>
               <Pressable
                 style={({ pressed }) => [s.retryBtn, { flex: 1 }, pressed && { opacity: 0.7 }]}
@@ -1081,16 +1069,14 @@ export default function BasicCourseScreen() {
                 </Text>
               </Pressable>
             </View>
-
-            {/* Skip — BELOW buttons */}
             <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
               <Text style={s.inlineSkip}>
                 {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
               </Text>
             </Pressable>
+          </View>
 
-          </Animated.View>
-        </ScrollView>
+        </Animated.View>
       )}
 
       {/* ════════════════════════════════════════
@@ -1264,8 +1250,8 @@ export default function BasicCourseScreen() {
         </ScrollView>
       )}
 
-      {/* ── FIXED BOTTOM NAV (all steps) ── */}
-      <NavBar />
+      {/* ── FIXED BOTTOM NAV (steps 1-3 only; step 0 has its own bottom bar) ── */}
+      {step > 0 && <NavBar />}
     </View>
   );
 }
