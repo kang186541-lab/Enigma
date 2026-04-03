@@ -22,6 +22,7 @@ import { useLanguage, getDefaultLearning, NativeLanguage } from "@/context/Langu
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
 import { C, F } from "@/constants/theme";
+import { PhonemeCoaching } from "@/components/rudy/PhonemeCoaching";
 
 const TAB_BAR_HEIGHT = 49;
 const SESSION_SIZE = 8;
@@ -721,7 +722,7 @@ export default function SpeakScreen() {
   const [completenessScore, setCompletenessScore] = useState<number | null>(null);
   const [gptFeedback, setGptFeedback] = useState("");
   const [recognizedText, setRecognizedText] = useState("");
-  const [wordResults, setWordResults] = useState<{ word: string; score: number; errorType: string }[]>([]);
+  const [wordResults, setWordResults] = useState<{ word: string; score: number; errorType: string; phonemes?: { phoneme: string; score: number }[] }[]>([]);
   const [sttError, setSttError] = useState("");
   const [hasListened, setHasListened] = useState(false);
 
@@ -1420,20 +1421,14 @@ export default function SpeakScreen() {
                     </View>
                   )}
 
-                  {/* Word-level chips */}
-                  {wordResults.length > 0 && (
-                    <View style={styles.wordChipsRow}>
-                      {wordResults.map((w, i) => {
-                        const chipColor = w.score >= 80 ? "#10B981" : w.score >= 55 ? "#F59E0B" : "#EF4444";
-                        return (
-                          <View key={i} style={[styles.wordChip, { borderColor: chipColor }]}>
-                            <Text style={[styles.wordChipText, { color: chipColor }]}>{w.word}</Text>
-                            <Text style={[styles.wordChipScore, { color: chipColor }]}>{w.score}</Text>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  )}
+                  {/* Word-level breakdown + phoneme coaching */}
+                  <PhonemeCoaching
+                    wordScores={wordResults}
+                    nativeLang={nativeLang}
+                    targetLang={activeLang}
+                    speechLang={phrase.speechLang}
+                    onRetry={resetPracticeState}
+                  />
 
                   {gptFeedback ? (
                     <Text style={styles.feedbackText}>{gptFeedback}</Text>
