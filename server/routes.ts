@@ -165,8 +165,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Unknown tutorId" });
       }
 
-      const azureKey = process.env.AZURE_SPEECH_KEY;
-      const azureRegion = process.env.AZURE_SPEECH_REGION;
+      const azureKey = process.env.AZURE_SPEECH_KEY?.trim();
+      const azureRegion = process.env.AZURE_SPEECH_REGION?.trim();
       if (!azureKey || !azureRegion) {
         return res.status(502).json({ error: "TTS unavailable — no Azure credentials" });
       }
@@ -205,7 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!azureRes.ok) {
         const azureErr = await azureRes.text();
         console.error("Azure TTS error:", azureRes.status, azureErr);
-        return res.status(502).json({ error: "TTS failed" });
+        return res.status(502).json({ error: "TTS failed", azureStatus: azureRes.status, azureError: azureErr, region: azureRegion });
       }
 
       res.set("Content-Type", "audio/mpeg");
@@ -302,8 +302,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "text and lang required" });
       }
 
-      const key = process.env.AZURE_SPEECH_KEY;
-      const region = process.env.AZURE_SPEECH_REGION;
+      const key = process.env.AZURE_SPEECH_KEY?.trim();
+      const region = process.env.AZURE_SPEECH_REGION?.trim();
       if (!key || !region) {
         return res.status(500).json({ error: "Azure credentials not configured" });
       }
@@ -374,8 +374,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!audio || !language) {
         return res.status(400).json({ error: "audio and language required" });
       }
-      const key = process.env.AZURE_SPEECH_KEY;
-      const region = process.env.AZURE_SPEECH_REGION;
+      const key = process.env.AZURE_SPEECH_KEY?.trim();
+      const region = process.env.AZURE_SPEECH_REGION?.trim();
       if (!key || !region) {
         return res.status(500).json({ error: "Azure credentials not configured" });
       }
@@ -464,8 +464,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "word, lang, and audio are required" });
       }
 
-      const key = process.env.AZURE_SPEECH_KEY;
-      const region = process.env.AZURE_SPEECH_REGION;
+      const key = process.env.AZURE_SPEECH_KEY?.trim();
+      const region = process.env.AZURE_SPEECH_REGION?.trim();
       if (!key || !region) {
         return res.status(500).json({ error: "Azure credentials not configured" });
       }
@@ -760,8 +760,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!text || !npcId || !npcLang) {
         return res.status(400).json({ error: "text, npcId, npcLang required" });
       }
-      const key    = process.env.AZURE_SPEECH_KEY;
-      const region = process.env.AZURE_SPEECH_REGION;
+      const key    = process.env.AZURE_SPEECH_KEY?.trim();
+      const region = process.env.AZURE_SPEECH_REGION?.trim();
       if (!key || !region) return res.status(500).json({ error: "Azure credentials not configured" });
 
       const npcVoices = NPC_AZURE_VOICES[npcId];

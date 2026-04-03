@@ -35,13 +35,14 @@ function setupCors(app: express.Application) {
       origin?.startsWith("http://localhost:") ||
       origin?.startsWith("http://127.0.0.1:");
 
-    // Allow Railway/production domains
+    // Allow Railway/production domains and Vercel
     const isRailway = origin?.endsWith(".railway.app");
+    const isVercel = origin?.endsWith(".vercel.app");
 
     // Allow requests with no origin (mobile apps, Expo Go, curl)
     const noOrigin = !origin;
 
-    if (noOrigin || origins.has(origin!) || isLocalhost || isRailway) {
+    if (noOrigin || origins.has(origin!) || isLocalhost || isRailway || isVercel) {
       if (origin) {
         res.header("Access-Control-Allow-Origin", origin);
       } else {

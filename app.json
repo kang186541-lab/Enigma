@@ -27,7 +27,9 @@
       "permissions": [
         "RECORD_AUDIO",
         "WRITE_EXTERNAL_STORAGE",
-        "READ_EXTERNAL_STORAGE"
+        "READ_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -41,7 +43,7 @@
       [
         "expo-router",
         {
-          "origin": "https://replit.com/"
+          "origin": "https://enigma-production-ea19.up.railway.app"
         }
       ],
       "expo-font",
@@ -56,6 +58,21 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://enigma-production-ea19.up.railway.app"
+      },
+      "eas": {
+        "projectId": "e368a20b-e6fb-46b2-b059-ee12f642f9f7"
+      }
+    },
+    "owner": "franksoul",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e368a20b-e6fb-46b2-b059-ee12f642f9f7"
     }
   }
 }
