@@ -478,7 +478,6 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
             nativeLang={nativeLang}
             targetLang={sentence.speechLang.startsWith("ko") ? "korean" : sentence.speechLang.startsWith("es") ? "spanish" : "english"}
             speechLang={sentence.speechLang}
-            onRetry={() => { setPhase("idle"); setScore(null); setFeedback(""); setWordScores([]); }}
           />
 
           <View style={s.resultBtns}>

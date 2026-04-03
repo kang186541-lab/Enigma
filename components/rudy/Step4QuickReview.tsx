@@ -601,7 +601,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
             wordScores={wordScores}
             nativeLang={nativeLang}
             targetLang={learningLang}
-            speechLang={sttLang}
+            speechLang={speechLang}
           />
         </View>
       )}
