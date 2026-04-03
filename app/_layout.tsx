@@ -12,6 +12,8 @@ import {
 } from "@expo-google-fonts/crimson-text";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Asset } from "expo-asset";
+import { useFonts as useIconFonts } from "expo-font";
+import { Ionicons, Feather } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef } from "react";
@@ -129,9 +131,10 @@ const PRELOAD_IMAGES = [
 export default function RootLayout() {
   const [cinzelLoaded,  cinzelError]  = useCinzel({ Cinzel_400Regular, Cinzel_700Bold, Cinzel_900Black });
   const [crimsonLoaded, crimsonError] = useCrimson({ CrimsonText_400Regular, CrimsonText_600SemiBold, CrimsonText_700Bold });
+  const [iconsLoaded,   iconsError]   = useIconFonts({ ...Ionicons.font, ...Feather.font });
 
-  const fontsLoaded = cinzelLoaded  && crimsonLoaded;
-  const fontError   = cinzelError   || crimsonError;
+  const fontsLoaded = cinzelLoaded  && crimsonLoaded && iconsLoaded;
+  const fontError   = cinzelError   || crimsonError  || iconsError;
 
   useEffect(() => {
     Asset.loadAsync(PRELOAD_IMAGES).catch(() => {});
