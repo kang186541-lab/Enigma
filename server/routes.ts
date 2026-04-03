@@ -573,30 +573,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: "Azure assessment failed" });
       }
 
-      // Azure returns scores FLAT on NBest[0] (not in a nested PronunciationAssessment sub-object)
+      // Azure returns scores nested under PronunciationAssessment on NBest[0]
       const data = (await azureRes.json()) as {
         RecognitionStatus: string;
         DisplayText?: string;
         NBest?: Array<{
-          AccuracyScore?: number;
-          FluencyScore?: number;
-          CompletenessScore?: number;
-          PronScore?: number;
+          PronunciationAssessment?: {
+            AccuracyScore?: number;
+            FluencyScore?: number;
+            CompletenessScore?: number;
+            PronScore?: number;
+          };
           Words?: Array<{
             Word: string;
-            AccuracyScore?: number;
-            ErrorType?: string;
+            PronunciationAssessment?: {
+              AccuracyScore?: number;
+              ErrorType?: string;
+            };
             Phonemes?: Array<{
               Phoneme: string;
-              AccuracyScore?: number;
+              PronunciationAssessment?: {
+                AccuracyScore?: number;
+              };
             }>;
           }>;
         }>;
       };
 
       const nb0 = data.NBest?.[0];
-      const hasPronScore = nb0 != null && nb0.PronScore != null;
-      console.log(`[assess] Azure status=${data.RecognitionStatus}  display="${data.DisplayText}"  hasPronScore=${hasPronScore}  PronScore=${nb0?.PronScore}`);
+      const pa = nb0?.PronunciationAssessment;
+      const hasPronScore = pa != null && pa.PronScore != null;
+      console.log(`[assess] Azure status=${data.RecognitionStatus}  display="${data.DisplayText}"  hasPronScore=${hasPronScore}  PronScore=${pa?.PronScore}`);
 
       if (data.RecognitionStatus !== "Success" || !hasPronScore) {
         return res.json({
@@ -610,10 +617,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const pronScore = Math.round(nb0!.PronScore!);
-      const accuracyScore = Math.round(nb0!.AccuracyScore ?? 0);
-      const fluencyScore = Math.round(nb0!.FluencyScore ?? 0);
-      const completenessScore = Math.round(nb0!.CompletenessScore ?? 0);
+      const pronScore = Math.round(pa!.PronScore!);
+      const accuracyScore = Math.round(pa!.AccuracyScore ?? 0);
+      const fluencyScore = Math.round(pa!.FluencyScore ?? 0);
+      const completenessScore = Math.round(pa!.CompletenessScore ?? 0);
 
       let feedback: string;
       if (pronScore >= 90) {
@@ -635,11 +642,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         feedback,
         words: (nb0!.Words ?? []).map((w) => ({
           word: w.Word,
-          score: Math.round(w.AccuracyScore ?? 0),
-          errorType: w.ErrorType ?? "None",
+          score: Math.round(w.PronunciationAssessment?.AccuracyScore ?? 0),
+          errorType: w.PronunciationAssessment?.ErrorType ?? "None",
           phonemes: (w.Phonemes ?? []).map((p) => ({
             phoneme: p.Phoneme,
-            score: Math.round(p.AccuracyScore ?? 0),
+            score: Math.round(p.PronunciationAssessment?.AccuracyScore ?? 0),
           })),
         })),
       });
