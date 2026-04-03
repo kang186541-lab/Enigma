@@ -53,6 +53,10 @@ async function playWordTTS(word: string, lang: string) {
   } catch { /* ignore */ }
 }
 
+function L(nl: string, ko: string, es: string, en: string): string {
+  return nl === "korean" ? ko : nl === "spanish" ? es : en;
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang, onRetry }: Props) {
@@ -61,41 +65,17 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
   if (wordScores.length === 0) return null;
 
   const weakWords = wordScores.filter((w) => w.score < 70);
-
-  const retryLabel = nativeLang === "korean"
-    ? "다시 해볼까? 🔄"
-    : nativeLang === "spanish"
-      ? "¿Intentar de nuevo? 🔄"
-      : "Try again? 🔄";
-
-  const listenSlowLabel = nativeLang === "korean"
-    ? "느리게 듣기"
-    : nativeLang === "spanish"
-      ? "Escuchar lento"
-      : "Listen slow";
-
-  const feedbackHeader = nativeLang === "korean"
-    ? "발음 피드백"
-    : nativeLang === "spanish"
-      ? "Retroalimentación"
-      : "Pronunciation Feedback";
-
-  const tapHint = weakWords.length > 0
-    ? (nativeLang === "korean"
-      ? "⚠️ 표시된 단어를 탭하면 상세 코칭을 볼 수 있어요"
-      : nativeLang === "spanish"
-        ? "Toca las palabras con ⚠️ para ver consejos detallados"
-        : "Tap words with ⚠️ to see detailed coaching")
-    : null;
+  const hasWeak = weakWords.length > 0;
 
   return (
     <View style={s.container}>
       {/* Header */}
       <View style={s.headerRow}>
-        <Text style={s.headerIcon}>📊</Text>
-        <Text style={s.headerText}>{feedbackHeader}</Text>
+        <Ionicons name="analytics-outline" size={16} color={C.gold} />
+        <Text style={s.headerText}>
+          {L(nativeLang, "발음 피드백", "Retroalimentación", "Pronunciation Feedback")}
+        </Text>
       </View>
-      {tapHint && <Text style={s.tapHint}>{tapHint}</Text>}
 
       {/* Word-level breakdown */}
       {wordScores.map((w, i) => {
@@ -119,12 +99,21 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
               <Text style={s.wordIcon}>{w.score >= 70 ? "✅" : "⚠️"}</Text>
               <Text style={[s.wordText, isWeak && s.wordTextWeak]}>{w.word}</Text>
               <Text style={[s.wordScore, isWeak && s.wordScoreWeak]}>{w.score}%</Text>
-              {isWeak && (
-                <Ionicons
-                  name={isExpanded ? "chevron-up" : "chevron-down"}
-                  size={14}
-                  color="#e5a940"
-                />
+              {isWeak ? (
+                <View style={s.expandHint}>
+                  <Text style={s.expandHintText}>
+                    {isExpanded
+                      ? L(nativeLang, "접기", "Cerrar", "Close")
+                      : L(nativeLang, "코칭 보기", "Ver consejo", "View tips")}
+                  </Text>
+                  <Ionicons
+                    name={isExpanded ? "chevron-up" : "chevron-down"}
+                    size={12}
+                    color="#e5a940"
+                  />
+                </View>
+              ) : (
+                <Ionicons name="volume-medium-outline" size={14} color={C.goldDim} />
               )}
             </Pressable>
 
@@ -142,30 +131,39 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
 
                 {/* Phoneme bars */}
                 {w.phonemes && w.phonemes.length > 0 && (
-                  <View style={s.phonemeList}>
-                    {w.phonemes.map((p, pi) => {
-                      const isLowest = lowestPhoneme?.phoneme === p.phoneme && p.score < 70;
-                      return (
-                        <View key={pi} style={s.phonemeRow}>
-                          <Text style={[s.phonemeLabel, isLowest && s.phonemeLabelWeak]}>
-                            /{p.phoneme}/
-                          </Text>
-                          <View style={s.phonemeBarBg}>
-                            <View
-                              style={[
-                                s.phonemeBarFill,
-                                { width: `${Math.max(p.score, 5)}%` },
-                                p.score >= 70 ? s.phonemeBarGood : s.phonemeBarBad,
-                              ]}
-                            />
+                  <View style={s.phonemeSection}>
+                    <Text style={s.phonemeSectionTitle}>
+                      {L(nativeLang, "음소별 점수", "Puntuación por fonema", "Phoneme Scores")}
+                    </Text>
+                    <View style={s.phonemeList}>
+                      {w.phonemes.map((p, pi) => {
+                        const isLowest = lowestPhoneme?.phoneme === p.phoneme && p.score < 70;
+                        return (
+                          <View key={pi} style={[s.phonemeRow, isLowest && s.phonemeRowHighlight]}>
+                            <Text style={[s.phonemeLabel, isLowest && s.phonemeLabelWeak]}>
+                              /{p.phoneme}/
+                            </Text>
+                            <View style={s.phonemeBarBg}>
+                              <View
+                                style={[
+                                  s.phonemeBarFill,
+                                  { width: `${Math.max(p.score, 5)}%` },
+                                  p.score >= 70 ? s.phonemeBarGood : s.phonemeBarBad,
+                                ]}
+                              />
+                            </View>
+                            <Text style={[s.phonemeScore, isLowest && s.phonemeScoreWeak]}>
+                              {p.score}%
+                            </Text>
+                            {isLowest && (
+                              <Text style={s.lowestTag}>
+                                {L(nativeLang, "집중!", "¡Foco!", "Focus!")}
+                              </Text>
+                            )}
                           </View>
-                          <Text style={[s.phonemeScore, isLowest && s.phonemeScoreWeak]}>
-                            {p.score}%
-                          </Text>
-                          {isLowest && <Text style={s.lowestTag}>←</Text>}
-                        </View>
-                      );
-                    })}
+                        );
+                      })}
+                    </View>
                   </View>
                 )}
 
@@ -176,7 +174,10 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                   return (
                     <View style={s.coachingBox}>
                       <View style={s.coachingHeader}>
-                        <Text style={s.coachingIcon}>🗣️</Text>
+                        <Text style={s.coachingIcon}>💡</Text>
+                        <Text style={s.coachingTitle}>
+                          {L(nativeLang, "발음 코칭", "Consejo", "Coaching Tip")}
+                        </Text>
                         <Text style={s.coachingPhoneme}>/{lowestPhoneme.phoneme}/</Text>
                       </View>
                       <Text style={s.coachingText}>{tip}</Text>
@@ -190,7 +191,9 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                   onPress={() => playWordTTS(w.word, speechLang)}
                 >
                   <Ionicons name="volume-low" size={16} color={C.gold} />
-                  <Text style={s.slowTtsText}>{listenSlowLabel}</Text>
+                  <Text style={s.slowTtsText}>
+                    {L(nativeLang, "느리게 듣기", "Escuchar lento", "Listen slow")}
+                  </Text>
                 </Pressable>
               </View>
             )}
@@ -199,12 +202,15 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
       })}
 
       {/* Retry button for weak words */}
-      {weakWords.length > 0 && onRetry && (
+      {hasWeak && onRetry && (
         <Pressable
           style={({ pressed }) => [s.retryBtn, pressed && { opacity: 0.8 }]}
           onPress={onRetry}
         >
-          <Text style={s.retryText}>{retryLabel}</Text>
+          <Ionicons name="refresh" size={14} color="#e5a940" />
+          <Text style={s.retryText}>
+            {L(nativeLang, "다시 도전하기", "Intentar de nuevo", "Try again")}
+          </Text>
         </Pressable>
       )}
     </View>
@@ -217,15 +223,17 @@ const s = StyleSheet.create({
   container: { width: "100%", gap: 4, marginTop: 8 },
 
   // Header
-  headerRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 },
-  headerIcon: { fontSize: 16 },
-  headerText: { fontSize: 14, fontFamily: F.header, color: C.gold },
-  tapHint: { fontSize: 12, fontFamily: F.body, color: C.goldDim, marginBottom: 4 },
+  headerRow: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    marginBottom: 2, paddingBottom: 4,
+    borderBottomWidth: 1, borderBottomColor: "rgba(201,162,39,0.12)",
+  },
+  headerText: { fontSize: 13, fontFamily: F.header, color: C.gold },
 
   // Word row
   wordRow: {
     flexDirection: "row", alignItems: "center", gap: 8,
-    paddingVertical: 6, paddingHorizontal: 10, borderRadius: 8,
+    paddingVertical: 8, paddingHorizontal: 10, borderRadius: 8,
     backgroundColor: "rgba(201,162,39,0.06)",
   },
   wordRowWeak: {
@@ -237,6 +245,14 @@ const s = StyleSheet.create({
   wordTextWeak: { color: "#e5a940" },
   wordScore: { fontSize: 13, fontFamily: F.label, color: C.goldDim, minWidth: 36, textAlign: "right" },
   wordScoreWeak: { color: "#e5a940", fontFamily: F.bodySemi },
+
+  // Expand hint (replaces bare chevron)
+  expandHint: {
+    flexDirection: "row", alignItems: "center", gap: 3,
+    backgroundColor: "rgba(229,169,64,0.12)",
+    paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6,
+  },
+  expandHintText: { fontSize: 11, fontFamily: F.bodySemi, color: "#e5a940" },
 
   // Phoneme panel (expanded)
   phonemePanel: {
@@ -254,9 +270,18 @@ const s = StyleSheet.create({
   },
   errorBadgeText: { fontSize: 11, fontFamily: F.bodySemi, color: "#e88" },
 
+  // Phoneme section
+  phonemeSection: { gap: 6 },
+  phonemeSectionTitle: { fontSize: 11, fontFamily: F.label, color: C.goldDim, letterSpacing: 0.3 },
+
   // Phoneme bars
   phonemeList: { gap: 6 },
-  phonemeRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  phonemeRow: { flexDirection: "row", alignItems: "center", gap: 6, paddingVertical: 2 },
+  phonemeRowHighlight: {
+    backgroundColor: "rgba(229,169,64,0.08)",
+    borderRadius: 6, paddingHorizontal: 4,
+    marginHorizontal: -4,
+  },
   phonemeLabel: {
     fontSize: 13, fontFamily: F.bodySemi, color: C.parchment,
     width: 40, textAlign: "center",
@@ -272,17 +297,23 @@ const s = StyleSheet.create({
   phonemeBarBad: { backgroundColor: "rgba(229,169,64,0.8)" },
   phonemeScore: { fontSize: 11, fontFamily: F.label, color: C.goldDim, width: 32, textAlign: "right" },
   phonemeScoreWeak: { color: "#e5a940", fontFamily: F.bodySemi },
-  lowestTag: { fontSize: 11, color: "#e5a940" },
+  lowestTag: {
+    fontSize: 10, fontFamily: F.bodySemi, color: "#e5a940",
+    backgroundColor: "rgba(229,169,64,0.15)",
+    paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4,
+    overflow: "hidden",
+  },
 
   // Coaching box
   coachingBox: {
     backgroundColor: "rgba(201,162,39,0.1)",
-    borderRadius: 10, padding: 10, gap: 6,
+    borderRadius: 10, padding: 12, gap: 6,
     borderWidth: 1, borderColor: "rgba(201,162,39,0.2)",
   },
   coachingHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
-  coachingIcon: { fontSize: 18 },
-  coachingPhoneme: { fontSize: 14, fontFamily: F.header, color: C.gold },
+  coachingIcon: { fontSize: 16 },
+  coachingTitle: { fontSize: 12, fontFamily: F.header, color: C.gold },
+  coachingPhoneme: { fontSize: 13, fontFamily: F.bodySemi, color: C.goldDim },
   coachingText: { fontSize: 13, fontFamily: F.body, color: C.parchment, lineHeight: 20 },
 
   // Slow TTS button
@@ -299,7 +330,7 @@ const s = StyleSheet.create({
     marginTop: 6, paddingVertical: 10, borderRadius: 10,
     borderWidth: 1.5, borderColor: "rgba(229,169,64,0.4)",
     backgroundColor: "rgba(229,169,64,0.08)",
-    alignItems: "center",
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
   },
   retryText: { fontSize: 13, fontFamily: F.bodySemi, color: "#e5a940" },
 });
