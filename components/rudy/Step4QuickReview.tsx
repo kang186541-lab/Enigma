@@ -11,6 +11,7 @@ import { getApiUrl } from "@/lib/query-client";
 import type { ReviewQuestion } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
+import { PhonemeCoaching } from "./PhonemeCoaching";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -596,17 +597,12 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
               <Ionicons name="volume-medium" size={14} color={C.gold} />
             </Pressable>
           </View>
-          {wordScores.length > 0 && (
-            <View style={s.wordBreakdown}>
-              {wordScores.map((w, i) => (
-                <Pressable key={i} style={s.wordRow} onPress={() => playTTS(w.word, speechLang)}>
-                  <Text style={s.wordIcon}>{w.score >= 75 ? "✅" : "⚠️"}</Text>
-                  <Text style={[s.wordText, w.score < 75 && s.wordTextWeak]}>{w.word}</Text>
-                  <Text style={[s.wordScoreText, w.score < 75 && s.wordScoreWeak]}>{w.score}%</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
+          <PhonemeCoaching
+            wordScores={wordScores}
+            nativeLang={nativeLang}
+            targetLang={learningLang}
+            speechLang={sttLang}
+          />
         </View>
       )}
 
@@ -707,13 +703,6 @@ const s = StyleSheet.create({
   resultSentence:     { flexDirection: "row", alignItems: "center", gap: 8 },
   resultSentenceText: { fontSize: 14, fontFamily: F.body, color: C.parchment },
 
-  wordBreakdown: { width: "100%", gap: 3, marginTop: 6 },
-  wordRow: { flexDirection: "row", alignItems: "center", gap: 6, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6, backgroundColor: "rgba(201,162,39,0.06)" },
-  wordIcon: { fontSize: 12, width: 20 },
-  wordText: { fontSize: 13, fontFamily: F.bodySemi, color: C.parchment, flex: 1 },
-  wordTextWeak: { color: "#e5a940" },
-  wordScoreText: { fontSize: 12, fontFamily: F.label, color: C.goldDim, minWidth: 34, textAlign: "right" },
-  wordScoreWeak: { color: "#e5a940", fontFamily: F.bodySemi },
 
   micBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,

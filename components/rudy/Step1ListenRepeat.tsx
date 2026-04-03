@@ -11,6 +11,7 @@ import { getApiUrl } from "@/lib/query-client";
 import { type LessonSentence, type Step1Config, getRandomFeedback } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
+import { PhonemeCoaching } from "./PhonemeCoaching";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -358,49 +359,6 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
     }
   }
 
-  // ── Word-level TTS & tip ──────────────────────────────────────────────────────
-
-  async function playWordTTS(word: string) {
-    try {
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
-      const url = new URL("/api/pronunciation-tts", apiBase);
-      url.searchParams.set("text", word);
-      url.searchParams.set("lang", sentence.speechLang);
-      if (Platform.OS === "web") {
-        const res = await fetch(url.toString());
-        if (!res.ok) return;
-        const blob = await res.blob();
-        const objUrl = URL.createObjectURL(blob);
-        const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
-        registerGlobalWebAudio(audio);
-        await audio.play();
-      } else {
-        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
-        registerGlobalSound(sound);
-      }
-    } catch { /* ignore */ }
-  }
-
-  function getPronTip(): string | null {
-    if (wordScores.length === 0) return null;
-    const weak = wordScores.filter((w) => w.score < 75);
-    if (weak.length === 0) return null;
-    const lowest = weak.reduce((a, b) => (a.score < b.score ? a : b));
-    const phonemeHint = lowest.phonemes?.length
-      ? lowest.phonemes.reduce((a, b) => (a.score < b.score ? a : b))
-      : null;
-    if (phonemeHint && phonemeHint.score < 70) {
-      if (nativeLang === "korean") return `"${lowest.word}"의 "${phonemeHint.phoneme}" 발음에 집중해보세요`;
-      if (nativeLang === "spanish") return `Enfócate en el sonido "${phonemeHint.phoneme}" en "${lowest.word}"`;
-      return `Focus on the "${phonemeHint.phoneme}" sound in "${lowest.word}"`;
-    }
-    if (nativeLang === "korean") return `"${lowest.word}"을 탭해서 다시 듣고 천천히 따라해보세요`;
-    if (nativeLang === "spanish") return `Toca "${lowest.word}" para escucharlo y repite despacio`;
-    return `Tap "${lowest.word}" to hear it again, then try slowly`;
-  }
-
-  const practiceLabel = nativeLang === "korean" ? "← 연습!" : nativeLang === "spanish" ? "← ¡practica!" : "← practice!";
-
   // ── Labels ────────────────────────────────────────────────────────────────────
 
   const slowLabel   = nativeLang === "korean" ? "느리게 듣기" : nativeLang === "spanish" ? "Escuchar despacio" : "Listen slow";
@@ -514,26 +472,14 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
           </View>
           <Text style={s.feedbackText}>{feedback}</Text>
 
-          {/* Word-by-word breakdown */}
-          {wordScores.length > 0 && (
-            <View style={s.wordBreakdown}>
-              {wordScores.map((w, i) => (
-                <Pressable key={i} style={s.wordRow} onPress={() => playWordTTS(w.word)}>
-                  <Text style={s.wordIcon}>{w.score >= 75 ? "✅" : "⚠️"}</Text>
-                  <Text style={[s.wordText, w.score < 75 && s.wordTextWeak]}>{w.word}</Text>
-                  <Text style={[s.wordScore, w.score < 75 && s.wordScoreWeak]}>{w.score}%</Text>
-                  {w.score < 75 && <Text style={s.wordPracticeTag}>{practiceLabel}</Text>}
-                </Pressable>
-              ))}
-            </View>
-          )}
-
-          {/* Pronunciation tip */}
-          {(() => { const tip = getPronTip(); return tip ? (
-            <View style={s.tipBox}>
-              <Text style={s.tipText}>💡 {tip}</Text>
-            </View>
-          ) : null; })()}
+          {/* Word-by-word breakdown + phoneme coaching */}
+          <PhonemeCoaching
+            wordScores={wordScores}
+            nativeLang={nativeLang}
+            targetLang={sentence.speechLang.startsWith("ko") ? "korean" : sentence.speechLang.startsWith("es") ? "spanish" : "english"}
+            speechLang={sentence.speechLang}
+            onRetry={() => { setPhase("idle"); setScore(null); setFeedback(""); setWordScores([]); }}
+          />
 
           <View style={s.resultBtns}>
             {score < 70 && (
@@ -628,24 +574,6 @@ const s = StyleSheet.create({
   scoreNum:  { fontSize: 14, fontFamily: F.header, color: C.parchment, marginLeft: 8 },
   feedbackText: { fontSize: 14, fontFamily: F.body, color: C.parchment, textAlign: "center", fontStyle: "italic" },
 
-  wordBreakdown: { width: "100%", gap: 4, marginTop: 4 },
-  wordRow: {
-    flexDirection: "row", alignItems: "center", gap: 8,
-    paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8,
-    backgroundColor: "rgba(201,162,39,0.06)",
-  },
-  wordIcon: { fontSize: 14, width: 22 },
-  wordText: { fontSize: 14, fontFamily: F.bodySemi, color: C.parchment, flex: 1 },
-  wordTextWeak: { color: "#e5a940" },
-  wordScore: { fontSize: 13, fontFamily: F.label, color: C.goldDim, minWidth: 36, textAlign: "right" },
-  wordScoreWeak: { color: "#e5a940", fontFamily: F.bodySemi },
-  wordPracticeTag: { fontSize: 11, fontFamily: F.label, color: "#e5a940" },
-
-  tipBox: {
-    width: "100%", backgroundColor: "rgba(201,162,39,0.1)", borderRadius: 10,
-    paddingVertical: 8, paddingHorizontal: 12, borderWidth: 1, borderColor: "rgba(201,162,39,0.2)",
-  },
-  tipText: { fontSize: 13, fontFamily: F.body, color: C.parchment, lineHeight: 19 },
 
   resultBtns: { flexDirection: "row", gap: 10, marginTop: 4 },
   retryBtn: {

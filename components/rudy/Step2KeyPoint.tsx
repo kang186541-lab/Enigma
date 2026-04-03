@@ -11,6 +11,7 @@ import { getApiUrl } from "@/lib/query-client";
 import { type Step2Data, type FillBlankQuiz, type GrammarExplanation } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
+import { PhonemeCoaching } from "./PhonemeCoaching";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -169,49 +170,6 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         });
       }
     } catch {}
-  }
-
-  // ── Word-level TTS (tap individual word to hear it) ───────────────────────────
-
-  async function playWordTTS(word: string) {
-    try {
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
-      const url = new URL("/api/pronunciation-tts", apiBase);
-      url.searchParams.set("text", word);
-      url.searchParams.set("lang", speechLang);
-      if (Platform.OS === "web") {
-        const res = await fetch(url.toString());
-        if (!res.ok) return;
-        const blob = await res.blob();
-        const objUrl = URL.createObjectURL(blob);
-        const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
-        registerGlobalWebAudio(audio);
-        await audio.play();
-      } else {
-        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
-        registerGlobalSound(sound);
-      }
-    } catch {}
-  }
-
-  // ── Phoneme-level pronunciation hint ─────────────────────────────────────────
-
-  function getPronTip(): string | null {
-    if (speakWords.length === 0) return null;
-    const weak = speakWords.filter((w) => w.score < 75);
-    if (weak.length === 0) return null;
-    const lowest = weak.reduce((a, b) => (a.score < b.score ? a : b));
-    const phonemeHint = lowest.phonemes?.length
-      ? lowest.phonemes.reduce((a, b) => (a.score < b.score ? a : b))
-      : null;
-    if (phonemeHint && phonemeHint.score < 70) {
-      if (nativeLang === "korean") return `"${lowest.word}"의 "${phonemeHint.phoneme}" 발음에 집중해보세요`;
-      if (nativeLang === "spanish") return `Enfócate en el sonido "${phonemeHint.phoneme}" en "${lowest.word}"`;
-      return `Focus on the "${phonemeHint.phoneme}" sound in "${lowest.word}"`;
-    }
-    if (nativeLang === "korean") return `"${lowest.word}" 발음을 다시 연습해보세요`;
-    if (nativeLang === "spanish") return `Practica la pronunciación de "${lowest.word}"`;
-    return `Practice the pronunciation of "${lowest.word}"`;
   }
 
   // ── Speak-after recording ─────────────────────────────────────────────────────
@@ -606,29 +564,19 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
             </Animated.View>
           </View>
 
-          {/* Speak score + word breakdown */}
+          {/* Speak score + phoneme coaching */}
           {speakPhase === "done" && speakScore !== null && (
             <View style={s.speakResultBox}>
               <View style={s.speakScoreRow}>
                 <Ionicons name="star" size={14} color={C.gold} />
                 <Text style={s.speakScoreText}>{speakScore}%</Text>
               </View>
-              {speakWords.length > 0 && (
-                <View style={s.speakWordList}>
-                  {speakWords.map((w, i) => (
-                    <Pressable key={i} style={s.speakWordRow} onPress={() => playWordTTS(w.word)}>
-                      <Text style={s.speakWordIcon}>{w.score >= 75 ? "✅" : "⚠️"}</Text>
-                      <Text style={[s.speakWordText, w.score < 75 && { color: "#e5a940" }]}>{w.word}</Text>
-                      <Text style={[s.speakWordScore, w.score < 75 && { color: "#e5a940" }]}>{w.score}%</Text>
-                    </Pressable>
-                  ))}
-                </View>
-              )}
-              {(() => { const tip = getPronTip(); return tip ? (
-                <View style={s.pronTipBox}>
-                  <Text style={s.pronTipText}>💡 {tip}</Text>
-                </View>
-              ) : null; })()}
+              <PhonemeCoaching
+                wordScores={speakWords}
+                nativeLang={nativeLang}
+                targetLang={learningLang}
+                speechLang={SPEECH_LANG_MAP[learningLang] ?? "en-US"}
+              />
             </View>
           )}
 
@@ -769,14 +717,7 @@ const s = StyleSheet.create({
   speakResultBox: { width: "100%", gap: 6 },
   speakScoreRow: { flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" },
   speakScoreText: { fontSize: 13, fontFamily: F.bodySemi, color: C.gold },
-  speakWordList: { gap: 2 },
-  speakWordRow: { flexDirection: "row", alignItems: "center", gap: 6, paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, backgroundColor: "rgba(201,162,39,0.06)" },
-  speakWordIcon: { fontSize: 11, width: 18 },
-  speakWordText: { fontSize: 12, fontFamily: F.bodySemi, color: C.parchment, flex: 1 },
-  speakWordScore: { fontSize: 11, fontFamily: F.label, color: C.goldDim, minWidth: 32, textAlign: "right" },
 
-  pronTipBox: { marginTop: 6, padding: 8, borderRadius: 8, backgroundColor: "rgba(201,162,39,0.08)", borderWidth: 1, borderColor: "rgba(201,162,39,0.15)" },
-  pronTipText: { fontSize: 12, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
 
   speakNav: { flexDirection: "row", gap: 10, justifyContent: "flex-end" },
   skipBtn: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, borderWidth: 1, borderColor: C.border },
