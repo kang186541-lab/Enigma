@@ -239,7 +239,7 @@ async function speak(text: string, courseLang: string) {
   url.searchParams.set("text", ttsText);
   url.searchParams.set("lang", courseLang);
   if (voice) url.searchParams.set("voice", voice);
-  if (isSingleChar) url.searchParams.set("mode", "letter");
+  // Don't set mode=letter — phonetic name is already expanded (e.g. "A" → "ay")
 
   try {
     if (Platform.OS === "web") {
@@ -694,7 +694,7 @@ export default function BasicCourseScreen() {
       url.searchParams.set("text", ttsText);
       url.searchParams.set("lang", course.lang);
       if (voice) url.searchParams.set("voice", voice);
-      if (isSingleChar) url.searchParams.set("mode", "letter");
+      // Don't set mode=letter — phonetic name is already expanded (e.g. "A" → "ay")
 
       if (Platform.OS === "web") {
         const res = await fetch(url.toString());
@@ -1102,12 +1102,49 @@ export default function BasicCourseScreen() {
         {/* ⏭️ Skip button */}
         <Pressable
           style={({ pressed }) => [intro.skipBtn, pressed && { opacity: 0.75 }]}
-          onPress={handleSkip}
+          onPress={() => setShowSkipConfirm(true)}
         >
           <Text style={intro.skipBtnTxt}>⏭️  {skipLabel}</Text>
         </Pressable>
 
         <Text style={intro.skipNote}>{skipNote}</Text>
+
+        {/* Skip confirmation modal (reused from main screen) */}
+        <Modal visible={showSkipConfirm} transparent animationType="fade" onRequestClose={() => setShowSkipConfirm(false)}>
+          <View style={s.modalOverlay}>
+            <View style={s.modalBox}>
+              <Text style={s.modalTitle}>
+                {native === "korean" ? "홈으로 이동할까요?" : native === "spanish" ? "¿Ir a inicio?" : "Go to Home?"}
+              </Text>
+              <Text style={s.modalDesc}>
+                {native === "korean"
+                  ? "기초 과정 학습은 홈에서 다시 가능합니다."
+                  : native === "spanish"
+                    ? "Puedes retomar el curso básico desde inicio."
+                    : "You can resume the basic course from home anytime."}
+              </Text>
+              <View style={s.modalBtns}>
+                <Pressable
+                  style={({ pressed }) => [s.modalCancel, pressed && { opacity: 0.8 }]}
+                  onPress={() => setShowSkipConfirm(false)}
+                >
+                  <Text style={s.modalCancelTxt}>
+                    {native === "korean" ? "계속 학습" : native === "spanish" ? "Continuar" : "Continue"}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [s.modalConfirm, { flexDirection: "row", gap: 6, justifyContent: "center" }, pressed && { opacity: 0.8 }]}
+                  onPress={handleSkip}
+                >
+                  <Ionicons name="home" size={14} color={C.gold} />
+                  <Text style={s.modalConfirmTxt}>
+                    {native === "korean" ? "홈으로" : native === "spanish" ? "Ir a inicio" : "Go Home"}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
@@ -1147,6 +1184,9 @@ export default function BasicCourseScreen() {
                 </Text>
               </Pressable>
             )}
+            <Pressable onPress={() => setShowSkipConfirm(true)} hitSlop={10}>
+              <Ionicons name="home-outline" size={18} color={C.goldDim} />
+            </Pressable>
           </View>
         )}
       </View>
@@ -1466,6 +1506,43 @@ export default function BasicCourseScreen() {
 
       {/* ── FIXED BOTTOM NAV (steps 1-3 only; step 0 has its own bottom bar) ── */}
       {step > 0 && <NavBar />}
+
+      {/* ── SKIP TO HOME CONFIRMATION MODAL ── */}
+      <Modal visible={showSkipConfirm} transparent animationType="fade" onRequestClose={() => setShowSkipConfirm(false)}>
+        <View style={s.modalOverlay}>
+          <View style={s.modalBox}>
+            <Text style={s.modalTitle}>
+              {native === "korean" ? "홈으로 이동할까요?" : native === "spanish" ? "¿Ir a inicio?" : "Go to Home?"}
+            </Text>
+            <Text style={s.modalDesc}>
+              {native === "korean"
+                ? "기초 과정 학습은 홈에서 다시 가능합니다."
+                : native === "spanish"
+                  ? "Puedes retomar el curso básico desde inicio."
+                  : "You can resume the basic course from home anytime."}
+            </Text>
+            <View style={s.modalBtns}>
+              <Pressable
+                style={({ pressed }) => [s.modalCancel, pressed && { opacity: 0.8 }]}
+                onPress={() => setShowSkipConfirm(false)}
+              >
+                <Text style={s.modalCancelTxt}>
+                  {native === "korean" ? "계속 학습" : native === "spanish" ? "Continuar" : "Continue"}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [s.modalConfirm, { flexDirection: "row", gap: 6, justifyContent: "center" }, pressed && { opacity: 0.8 }]}
+                onPress={handleSkip}
+              >
+                <Ionicons name="home" size={14} color={C.gold} />
+                <Text style={s.modalConfirmTxt}>
+                  {native === "korean" ? "홈으로" : native === "spanish" ? "Ir a inicio" : "Go Home"}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
