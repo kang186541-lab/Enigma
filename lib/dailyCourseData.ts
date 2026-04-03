@@ -153,6 +153,32 @@ export const UNITS: UnitData[] = [
       { id: "day_18", dayNumber: 18, topic: { ko: "종합 복습", en: "Unit Review", es: "Repaso de Unidad" }, unitIndex: 2 },
     ],
   },
+  {
+    id: "unit_4",
+    level: "A1",
+    title: { ko: "Unit 4: 장소 & 길 찾기", en: "Unit 4: Places & Directions", es: "Unidad 4: Lugares y Direcciones" },
+    days: [
+      { id: "day_19", dayNumber: 19, topic: { ko: "도시 장소", en: "Places in the City", es: "Lugares en la Ciudad" }, unitIndex: 3 },
+      { id: "day_20", dayNumber: 20, topic: { ko: "길 안내 기초", en: "Basic Directions", es: "Direcciones Básicas" }, unitIndex: 3 },
+      { id: "day_21", dayNumber: 21, topic: { ko: "길 안내 심화", en: "More Directions", es: "Más Direcciones" }, unitIndex: 3 },
+      { id: "day_22", dayNumber: 22, topic: { ko: "교통수단", en: "Transportation", es: "Transporte" }, unitIndex: 3 },
+      { id: "day_23", dayNumber: 23, topic: { ko: "길 묻기", en: "Asking for Help Getting Around", es: "Pedir Ayuda para Orientarse" }, unitIndex: 3 },
+      { id: "day_24", dayNumber: 24, topic: { ko: "종합 복습", en: "Unit Review", es: "Repaso de Unidad" }, unitIndex: 3 },
+    ],
+  },
+  {
+    id: "unit_5",
+    level: "A2",
+    title: { ko: "Unit 5: 사람 & 사교", en: "Unit 5: People & Social", es: "Unidad 5: Personas y Social" },
+    days: [
+      { id: "day_25", dayNumber: 25, topic: { ko: "가족 소개", en: "Family & People", es: "Familia y Personas" }, unitIndex: 4 },
+      { id: "day_26", dayNumber: 26, topic: { ko: "사람 묘사", en: "Describing People", es: "Describir Personas" }, unitIndex: 4 },
+      { id: "day_27", dayNumber: 27, topic: { ko: "취미 & 여가", en: "Hobbies & Free Time", es: "Pasatiempos y Tiempo Libre" }, unitIndex: 4 },
+      { id: "day_28", dayNumber: 28, topic: { ko: "감정 표현", en: "Feelings & Emotions", es: "Sentimientos y Emociones" }, unitIndex: 4 },
+      { id: "day_29", dayNumber: 29, topic: { ko: "약속 잡기", en: "Making Plans", es: "Hacer Planes" }, unitIndex: 4 },
+      { id: "day_30", dayNumber: 30, topic: { ko: "A1 완료 복습", en: "Final Review & A1 Complete", es: "Repaso Final y A1 Completo" }, unitIndex: 4 },
+    ],
+  },
 ];
 
 export function getAllDays(): DayData[] {

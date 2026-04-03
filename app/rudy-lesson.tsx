@@ -493,6 +493,7 @@ function StepContent({
         </View>
         <Step1ListenRepeat
           sentences={langContent.step1Sentences}
+          step1Config={langContent.step1Config}
           nativeLang={nativeLang}
           lc={lc}
           onComplete={(spoken) => {

@@ -175,11 +175,11 @@ async function playWordTTS(text: string, lang: string, apiBase: string) {
         _nativeLessonSound = null;
       }
       await Audio.setAudioModeAsync({ playsInSilentModeIOS: true, allowsRecordingIOS: false });
-      const { sound } = await Audio.Sound.createAsync({ uri: urlStr }, { shouldPlay: true });
+      const { sound } = await Audio.Sound.createAsync({ uri: urlStr }, { shouldPlay: true, volume: 1.0 });
       _nativeLessonSound = sound;
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync();
+          sound.unloadAsync().catch(() => {});
           _nativeLessonSound = null;
         }
       });

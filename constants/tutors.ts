@@ -1,4 +1,6 @@
-import { ImageSourcePropType } from "react-native";
+import { ImageSourcePropType, Platform } from "react-native";
+import { Audio } from "expo-av";
+import { getApiUrl } from "@/lib/query-client";
 
 export type TutorLanguage = "english" | "spanish" | "korean";
 
@@ -170,15 +172,58 @@ export function getTutor(id: string): Tutor | undefined {
   return TUTORS.find((t) => t.id === id);
 }
 
-export async function speakText(text: string, lang: string, muted: boolean) {
+let _speakSound: Audio.Sound | null = null;
+let _speakWebAudio: HTMLAudioElement | null = null;
+
+export async function speakText(
+  text: string,
+  tutorId: string,
+  muted: boolean,
+  speed: number = 1.0,
+) {
   if (muted) return;
   try {
-    const { isSpeakingAsync, stop, speak } = await import("expo-speech");
-    const isSpeaking = await isSpeakingAsync();
-    if (isSpeaking) {
-      stop();
-      await new Promise((r) => setTimeout(r, 80));
+    const apiBase = getApiUrl();
+    const url = new URL("/api/tts", apiBase);
+    url.searchParams.set("text", text.slice(0, 5000));
+    url.searchParams.set("tutorId", tutorId);
+    url.searchParams.set("speed", speed.toString());
+
+    if (Platform.OS === "web") {
+      // Stop any previous web playback
+      if (_speakWebAudio) {
+        try { _speakWebAudio.pause(); _speakWebAudio.src = ""; } catch {}
+        _speakWebAudio = null;
+      }
+      const res = await fetch(url.toString());
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const objUrl = URL.createObjectURL(blob);
+      const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+      _speakWebAudio = audio;
+      audio.onended = () => { URL.revokeObjectURL(objUrl); _speakWebAudio = null; };
+      audio.onerror = () => { URL.revokeObjectURL(objUrl); _speakWebAudio = null; };
+      await audio.play().catch(() => {});
+    } else {
+      // Stop any previous native playback
+      if (_speakSound) {
+        const prev = _speakSound;
+        _speakSound = null;
+        try { await prev.stopAsync(); } catch {}
+        try { await prev.unloadAsync(); } catch {}
+      }
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: url.toString() },
+        { shouldPlay: true },
+      );
+      _speakSound = sound;
+      sound.setOnPlaybackStatusUpdate((st) => {
+        if (st.isLoaded && st.didJustFinish) {
+          sound.unloadAsync().catch(() => {});
+          _speakSound = null;
+        }
+      });
     }
-    speak(text, { language: lang, rate: 0.88 });
   } catch {}
 }

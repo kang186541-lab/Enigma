@@ -1,0 +1,773 @@
+{
+  "chapterId": "ch4",
+  "title": {
+    "ko": "카이로의 유산",
+    "en": "The Cairo Legacy",
+    "es": "El Legado de El Cairo"
+  },
+  "setting": "Cairo",
+  "vocabularyPool": "Day 1-48: All previous + daily routines, shopping, travel, directions, transport",
+  "meta": {
+    "version": "3.0",
+    "author": "story-creator-agent",
+    "date": "2026-03-23",
+    "pacingTemplate": "Calm -> Curiosity -> Tension -> Quiz Moment -> Reveal -> Cliffhanger",
+    "plotHook": "Chapter INVERTS the formula. Rudy arrives already being watched. Miss Penny reappears. Mr. Black's first extended in-person scene — his philosophy revealed.",
+    "chapterTheme": "Trust, forgiveness, and the question: can the enemy have a point?"
+  },
+
+  "npcs": [
+    {
+      "id": "amira",
+      "name": "Amira",
+      "role": { "ko": "고고학자 / 수호석 보호자", "en": "Archaeologist / Stone Guardian", "es": "Arqueologa / Guardiana de la Piedra" },
+      "idiomStyle": "Arabic proverbs bridging ancient and modern",
+      "collection": "Amira_Cairo_Wisdom"
+    },
+    {
+      "id": "hassan",
+      "name": "Hassan",
+      "role": { "ko": "아미라의 사촌 / 시장 상인", "en": "Amira's Cousin / Market Merchant", "es": "Primo de Amira / Comerciante del Mercado" },
+      "idiomStyle": "Bargaining expressions and accidental honesty",
+      "collection": "Hassan_Souk_Expressions"
+    },
+    {
+      "id": "penny",
+      "name": "Miss Penny",
+      "role": { "ko": "이중 스파이 — 루디를 찾아온다", "en": "Double Agent — seeks Rudy out", "es": "Agente Doble — busca a Rudy" },
+      "idiomStyle": "Literary quotes, now as confessions",
+      "collection": "Penny_Literary_Quotes"
+    },
+    {
+      "id": "mr_black",
+      "name": "Mr. Black",
+      "role": { "ko": "첫 번째 확장된 대면", "en": "First extended in-person scene", "es": "Primera escena extendida en persona" },
+      "idiomStyle": "Basic vocabulary weaponized + philosophy"
+    }
+  ],
+
+  "scenes": [
+    {
+      "id": "ch4_scene1",
+      "title": {
+        "ko": "빈 페이지",
+        "en": "The Blank Pages",
+        "es": "Las Paginas en Blanco"
+      },
+      "beats": [
+        {
+          "id": "ch4_s1_opening",
+          "beat": "CALM",
+          "narration": {
+            "ko": "카이로 공항. 루디가 가방에서 아랍어 회화집을 꺼낸다. 서울 출발 전에 산 것이다. 펼친다. 비어 있다. 모든 페이지가. 표지만 남고 내용이 전부 사라졌다. 마치 누군가 모든 글자를 지운 것처럼.",
+            "en": "Cairo Airport. Rudy pulls his Arabic phrasebook from his bag. Bought it before leaving Seoul. He opens it. Empty. Every page. The cover remains but every word inside is gone. As if someone erased every letter.",
+            "es": "Aeropuerto de El Cairo. Rudy saca su libro de frases en arabe de su bolsa. Lo compro antes de salir de Seul. Lo abre. Vacio. Cada pagina. La portada queda pero cada palabra dentro desaparecio. Como si alguien borrara cada letra."
+          }
+        },
+        {
+          "id": "ch4_s1_d1",
+          "beat": "CALM",
+          "charId": "lingo",
+          "text": {
+            "en": "My phrasebook is blank. My phrasebook, which I specifically bought for Cairo, is completely blank. The pages are there. The words aren't. Either I bought the world's worst phrasebook, or someone removed the pages. On purpose. Before I even landed.",
+            "ko": "회화집이 비어있어. 카이로를 위해 특별히 산 회화집이 완전히 비어있어. 페이지는 있어. 단어가 없어. 세계 최악의 회화집을 샀거나, 누군가 일부러 페이지를 지웠어. 내가 도착하기도 전에.",
+            "es": "Mi libro de frases esta en blanco. Mi libro de frases, que compre especificamente para El Cairo, esta completamente en blanco. Las paginas estan ahi. Las palabras no. O compre el peor libro del mundo, o alguien quito las paginas. A proposito. Antes de que aterrizara."
+          }
+        },
+        {
+          "id": "ch4_s1_d2",
+          "beat": "CURIOSITY",
+          "charId": "lingo",
+          "isThought": true,
+          "text": {
+            "en": "(He erased my phrasebook. Mr. Black erased my phrasebook. Because of course he did. He wants me to arrive in Cairo without any Arabic. Defenseless. Dependent on whoever he's placed here to 'help' me. He's not just ahead of me anymore — he's arranging the board before I even sit down. Fine. I've survived London with no clues, Madrid with no stone, and Seoul with no phone. Cairo with no phrasebook? Just another Tuesday.)",
+            "ko": "(내 회화집을 지웠어. 미스터 블랙이 내 회화집을 지운 거야. 당연하지. 아랍어 없이 카이로에 도착하길 원한 거야. 무방비 상태로. 여기서 '도와주러' 배치해둔 사람에게 의지하게. 더 이상 나보다 앞서 있는 게 아니야 — 내가 앉기도 전에 판을 짜고 있어. 좋아. 런던에선 단서 없이, 마드리드에선 수호석 없이, 서울에선 핸드폰 없이 살아남았어. 카이로에서 회화집 없이? 그냥 또 하나의 화요일이야.)",
+            "es": "(Borro mi libro de frases. Mr. Black borro mi libro de frases. Porque por supuesto que lo hizo. Quiere que llegue a El Cairo sin arabe. Indefenso. Dependiente de quien haya puesto aqui para 'ayudarme.' Ya no solo va adelante — esta armando el tablero antes de que me siente. Bien. Sobrevivi Londres sin pistas, Madrid sin piedra, y Seul sin telefono. El Cairo sin libro de frases? Solo otro martes.)"
+          }
+        },
+        {
+          "id": "ch4_s1_d3",
+          "beat": "TENSION",
+          "narration": {
+            "ko": "공항 출구에서 한 여자가 루디를 기다리고 있다. 서른대 후반. 날카로운 눈. 팔짱을 끼고 루디를 아래위로 훑어본다. 친절한 표정이 아니다.",
+            "en": "At the airport exit, a woman waits for Rudy. Late thirties. Sharp eyes. Arms crossed, looking Rudy up and down. Not a friendly expression.",
+            "es": "En la salida del aeropuerto, una mujer espera a Rudy. Final de los treinta. Ojos afilados. Brazos cruzados, mirando a Rudy de arriba abajo. No es una expresion amigable."
+          }
+        },
+        {
+          "id": "ch4_s1_d4",
+          "beat": "TENSION",
+          "charId": "amira",
+          "text": {
+            "en": "You're Rudy. The fox detective. Sujin told me about you. She also told me about London, Madrid, and Seoul. Three cities. Zero stones recovered. Forgive me if I'm not impressed.",
+            "ko": "루디지. 여우 탐정. 수진이 말해줬어. 런던, 마드리드, 서울에 대해서도. 세 도시. 되찾은 수호석 제로. 감동 안 받은 거 이해해줘.",
+            "es": "Eres Rudy. El detective zorro. Sujin me hablo de ti. Tambien me conto de Londres, Madrid y Seul. Tres ciudades. Cero piedras recuperadas. Perdoname si no estoy impresionada."
+          }
+        },
+        {
+          "id": "ch4_s1_d5",
+          "beat": "TENSION",
+          "charId": "lingo",
+          "text": {
+            "en": "Zero stones recovered. That's... technically accurate. And painful. I'm working on it. You must be Amira.",
+            "ko": "되찾은 수호석 제로. 그건... 기술적으로 정확해. 그리고 아파. 노력 중이야. 아미라지?",
+            "es": "Cero piedras recuperadas. Eso es... tecnicamente correcto. Y doloroso. Estoy trabajando en ello. Debes ser Amira."
+          }
+        },
+        {
+          "id": "ch4_s1_d6",
+          "beat": "TENSION",
+          "charId": "amira",
+          "text": {
+            "en": "Professor Amira. My family has protected the Cairo stone for four generations. My grandmother hid it. My mother guarded it. I study it. And now some man in a black coat wants to take it. That's not going to happen. But before I trust you with anything — prove you can communicate. Tell me the name of this object in three languages.",
+            "ko": "아미라 교수. 우리 가족은 4대에 걸쳐 카이로 수호석을 지켜왔어. 할머니가 숨겼고. 어머니가 지켰고. 나는 연구해. 이제 검은 코트 입은 남자가 가져가려 해. 그런 일은 없을 거야. 하지만 널 믿기 전에 — 증명해. 이 물건의 이름을 세 개 언어로 말해봐.",
+            "es": "Profesora Amira. Mi familia ha protegido la piedra de El Cairo por cuatro generaciones. Mi abuela la escondio. Mi madre la guardo. Yo la estudio. Y ahora un hombre de abrigo negro quiere tomarla. Eso no va a pasar. Pero antes de confiarte cualquier cosa — demuestra que puedes comunicarte. Dime el nombre de este objeto en tres idiomas."
+          }
+        },
+        {
+          "id": "ch4_s1_quiz_intro",
+          "beat": "QUIZ_MOMENT",
+          "narration": {
+            "ko": "아미라가 가방에서 물건들을 하나씩 꺼낸다. 지도, 열쇠, 물병. 루디의 시험: 세 개 언어로 이름을 말할 수 있는가? 아미라의 신뢰는 여기서 결정된다.",
+            "en": "Amira pulls objects from her bag one by one. A map, a key, a water bottle. Rudy's test: can he name them in three languages? Amira's trust is decided here.",
+            "es": "Amira saca objetos de su bolsa uno por uno. Un mapa, una llave, una botella de agua. La prueba de Rudy: puede nombrarlos en tres idiomas? La confianza de Amira se decide aqui."
+          }
+        },
+        {
+          "id": "ch4_s1_post_quiz",
+          "beat": "REVEAL",
+          "charId": "amira",
+          "text": {
+            "en": "Not bad. Not perfect, but not bad. You actually know more than Sujin warned me about. Come. My cousin Hassan is waiting at the souk. He talks too much, knows too much, and can't keep a secret to save his life. He's perfect for what we need.",
+            "ko": "나쁘지 않아. 완벽하지는 않지만 나쁘지 않아. 수진이 경고한 것보다 많이 아네. 가자. 사촌 하산이 수크에서 기다리고 있어. 말이 너무 많고, 아는 게 너무 많고, 비밀을 절대 못 지켜. 우리한테 필요한 사람이야.",
+            "es": "Nada mal. No perfecto, pero nada mal. Realmente sabes mas de lo que Sujin me advirtio. Ven. Mi primo Hassan espera en el zoco. Habla demasiado, sabe demasiado, y no puede guardar un secreto ni para salvar su vida. Es perfecto para lo que necesitamos."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "ch4_scene2",
+      "title": {
+        "ko": "발굴 현장의 시험",
+        "en": "The Dig Site Test",
+        "es": "La Prueba del Sitio de Excavacion"
+      },
+      "beats": [
+        {
+          "id": "ch4_s2_opening",
+          "beat": "CALM",
+          "narration": {
+            "ko": "기자 피라미드 근처 발굴 현장. 아미라의 영역. 모래와 고대 돌벽, 작업 도구가 정리되어 있다. 아미라가 루디를 현장 한가운데로 데려간다.",
+            "en": "A dig site near the Giza pyramids. Amira's domain. Sand and ancient stone walls, tools neatly arranged. Amira leads Rudy to the center of the site.",
+            "es": "Un sitio de excavacion cerca de las piramides de Giza. El dominio de Amira. Arena y muros de piedra antigua, herramientas ordenadas. Amira lleva a Rudy al centro del sitio."
+          }
+        },
+        {
+          "id": "ch4_s2_d1",
+          "beat": "CALM",
+          "charId": "amira",
+          "text": {
+            "en": "The Cairo stone is here. Buried where my grandmother left it sixty years ago. But there's a problem. Someone has been digging at night. Not professionals — they leave tracks, damage the strata. And they always dig in the wrong places. Almost as if someone is sending them to the wrong spots on purpose.",
+            "ko": "카이로 수호석이 여기 있어. 할머니가 60년 전에 묻어둔 곳에. 근데 문제가 있어. 누군가 밤에 파고 있어. 전문가는 아니야 — 흔적을 남기고 지층을 손상시켜. 항상 엉뚱한 곳을 파. 마치 누가 일부러 틀린 장소로 보내는 것처럼.",
+            "es": "La piedra de El Cairo esta aqui. Enterrada donde mi abuela la dejo hace sesenta anos. Pero hay un problema. Alguien ha estado excavando de noche. No son profesionales — dejan huellas, danan los estratos. Y siempre excavan en los lugares equivocados. Casi como si alguien los enviara a los sitios incorrectos a proposito."
+          }
+        },
+        {
+          "id": "ch4_s2_d2",
+          "beat": "CURIOSITY",
+          "charId": "lingo",
+          "text": {
+            "en": "Sending them to the wrong spots. That sounds like Mr. Black. He doesn't dig himself — he lets others do the work and watches where they fail. Then he digs where they didn't.",
+            "ko": "틀린 장소로 보낸다고. 미스터 블랙 스타일이야. 직접 파지 않아 — 다른 사람들이 실패하는 걸 지켜보고. 그 사람들이 안 판 곳을 파지.",
+            "es": "Enviarlos a los sitios incorrectos. Eso suena como Mr. Black. El no excava — deja que otros trabajen y observa donde fallan. Luego excava donde ellos no lo hicieron."
+          }
+        },
+        {
+          "id": "ch4_s2_d3",
+          "beat": "CURIOSITY",
+          "charId": "amira",
+          "text": {
+            "en": "Smart fox. My grandmother left instructions to find the stone — but they're written in a mix of Arabic, English, and Korean. She was a linguist, like Sujin. She believed the stone should only be found by someone who understood that languages work together, not apart. So — read this. Tell me what it says. Prove my grandmother right.",
+            "ko": "똑똑한 여우네. 할머니가 수호석을 찾는 방법을 남겼어 — 근데 아랍어, 영어, 한국어가 섞여 있어. 수진처럼 언어학자였거든. 언어가 따로가 아니라 함께 작동한다는 걸 이해하는 사람만 수호석을 찾아야 한다고 믿었어. 자 — 이거 읽어. 뭐라고 써있는지 말해. 할머니가 옳았다는 걸 증명해.",
+            "es": "Zorro listo. Mi abuela dejo instrucciones para encontrar la piedra — pero estan escritas en una mezcla de arabe, ingles y coreano. Era linguista, como Sujin. Creia que la piedra solo deberia ser encontrada por alguien que entendiera que los idiomas trabajan juntos, no separados. Asi que — lee esto. Dime que dice. Demuestra que mi abuela tenia razon."
+          },
+          "idiom": {
+            "phrase": { "en": "Languages work together, not apart", "ko": "언어는 함께 작동한다, 따로가 아니라", "es": "Los idiomas trabajan juntos, no separados" },
+            "meaning": { "en": "Amira's grandmother's philosophy — the opposite of Mr. Black's belief. The core thematic conflict of the story.", "ko": "아미라 할머니의 철학 — 미스터 블랙의 신념과 정반대. 이야기의 핵심 주제적 갈등.", "es": "La filosofia de la abuela de Amira — lo opuesto a la creencia de Mr. Black. El conflicto tematico central." },
+            "collection": "Amira_Cairo_Wisdom",
+            "addToExpressionBook": true
+          }
+        },
+        {
+          "id": "ch4_s2_quiz_intro",
+          "beat": "QUIZ_MOMENT",
+          "narration": {
+            "ko": "아미라가 오래된 양피지를 펼친다. 세 개 언어가 섞인 지도 겸 지시문. 각 문장의 빈칸을 채우면 수호석의 정확한 위치가 드러난다.",
+            "en": "Amira unfolds an ancient parchment. A map-instruction hybrid written in three mixed languages. Fill in each sentence's blanks to reveal the stone's exact location.",
+            "es": "Amira despliega un pergamino antiguo. Un mapa-instruccion hibrido escrito en tres idiomas mezclados. Completa los espacios de cada oracion para revelar la ubicacion exacta de la piedra."
+          }
+        },
+        {
+          "id": "ch4_s2_post_quiz",
+          "beat": "REVEAL",
+          "charId": "amira",
+          "text": {
+            "en": "You did it. My grandmother would have liked you. The stone is thirty meters north, two meters deep, under the stone marked with the eye of Horus. Let's go get it — before someone else does.",
+            "ko": "해냈네. 할머니가 좋아했을 거야. 수호석은 북쪽 30미터, 깊이 2미터, 호루스의 눈이 새겨진 돌 아래에 있어. 다른 사람이 찾기 전에 가자.",
+            "es": "Lo lograste. A mi abuela le habrias caido bien. La piedra esta treinta metros al norte, dos metros de profundidad, bajo la piedra marcada con el ojo de Horus. Vamos a buscarla — antes de que alguien mas lo haga."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "ch4_scene3",
+      "title": {
+        "ko": "하산의 수크",
+        "en": "Hassan's Souk",
+        "es": "El Zoco de Hassan"
+      },
+      "beats": [
+        {
+          "id": "ch4_s3_opening",
+          "beat": "CALM",
+          "narration": {
+            "ko": "칸 엘 칼릴리 시장. 향신료 냄새, 금속 세공품의 반짝임, 흥정하는 목소리들. 아미라가 루디를 사촌 하산의 가게로 데려간다. 하산은 환한 미소로 양팔을 벌린다.",
+            "en": "Khan el-Khalili market. The smell of spices, gleaming metalwork, voices bargaining. Amira takes Rudy to her cousin Hassan's shop. Hassan opens both arms with a radiant smile.",
+            "es": "Mercado Khan el-Khalili. El olor de especias, metalurgia brillante, voces regateando. Amira lleva a Rudy a la tienda de su primo Hassan. Hassan abre los brazos con una sonrisa radiante."
+          }
+        },
+        {
+          "id": "ch4_s3_d1",
+          "beat": "CALM",
+          "charId": "hassan",
+          "text": {
+            "en": "Cousin! And the famous fox! Welcome, welcome, welcome! Please, sit. Tea? Of course tea. Nobody says no to tea in my shop. That's my second rule. My first rule is that everything is negotiable. Even the rules.",
+            "ko": "사촌! 유명한 여우도! 환영, 환영, 환영! 앉아, 앉아. 차? 당연히 차지. 내 가게에서 차를 거절하는 사람은 없어. 내 두 번째 규칙이야. 첫 번째 규칙은 모든 게 협상 가능하다는 거야. 규칙까지도.",
+            "es": "Prima! Y el famoso zorro! Bienvenido, bienvenido, bienvenido! Por favor, sientate. Te? Por supuesto te. Nadie dice no al te en mi tienda. Esa es mi segunda regla. Mi primera regla es que todo es negociable. Incluso las reglas."
+          }
+        },
+        {
+          "id": "ch4_s3_d2",
+          "beat": "CALM",
+          "charId": "lingo",
+          "text": {
+            "en": "I like him already. He reminds me of Don Miguel. Except louder. Significantly louder.",
+            "ko": "벌써 마음에 들어. 돈 미겔 생각나. 더 시끄럽다는 것만 빼면. 확실히 더 시끄러워.",
+            "es": "Ya me cae bien. Me recuerda a Don Miguel. Excepto mas ruidoso. Significativamente mas ruidoso."
+          }
+        },
+        {
+          "id": "ch4_s3_d3",
+          "beat": "CURIOSITY",
+          "charId": "amira",
+          "text": {
+            "en": "Hassan. Focus. The man in the black coat. You said you saw him near the pyramids last week.",
+            "ko": "하산. 집중해. 검은 코트 입은 남자. 지난주에 피라미드 근처에서 봤다고 했잖아.",
+            "es": "Hassan. Concentrate. El hombre del abrigo negro. Dijiste que lo viste cerca de las piramides la semana pasada."
+          }
+        },
+        {
+          "id": "ch4_s3_d4",
+          "beat": "CURIOSITY",
+          "charId": "hassan",
+          "text": {
+            "en": "Yes, yes! The tall man! Very polite. Bought a lamp from me. Paid exactly. Didn't bargain — which is how I knew something was wrong. Everyone bargains at Khan el-Khalili. Everyone. He just said 'How much? Thank you. Goodbye.' Perfect Arabic. Too perfect. And then — okay, Amira is going to be angry at me — he asked where I live. And I... may have told him. And where you work. And where the dig site is. He was very friendly! The words just came out!",
+            "ko": "그래, 그래! 키 큰 남자! 아주 공손했어. 내한테 램프를 샀어. 정확하게 지불했고. 흥정을 안 했어 — 그래서 뭔가 이상하다는 걸 알았지. 칸 엘 칼릴리에서는 모두가 흥정해. 모두. 그냥 '얼마예요? 감사합니다. 안녕히 계세요.'라고 했어. 완벽한 아랍어. 너무 완벽한. 그리고 — 아미라가 화낼 건데 — 내가 어디 사는지 물었어. 그리고 나는... 말했을 수도 있어. 네가 어디서 일하는지도. 발굴 현장이 어디인지도. 아주 친절했거든! 말이 그냥 나왔어!",
+            "es": "Si, si! El hombre alto! Muy educado. Me compro una lampara. Pago exacto. No regateo — asi supe que algo estaba mal. Todos regatean en Khan el-Khalili. Todos. Solo dijo 'Cuanto? Gracias. Adios.' Arabe perfecto. Demasiado perfecto. Y luego — Amira se va a enojar — pregunto donde vivo. Y yo... puede que le haya dicho. Y donde trabajas. Y donde esta el sitio de excavacion. Era muy amigable! Las palabras simplemente salieron!"
+          }
+        },
+        {
+          "id": "ch4_s3_d5",
+          "beat": "TENSION",
+          "charId": "amira",
+          "text": {
+            "en": "Hassan. You told the most dangerous man in the world where I keep the stone.",
+            "ko": "하산. 세상에서 가장 위험한 남자에게 내가 수호석을 어디 두는지 말한 거야.",
+            "es": "Hassan. Le dijiste al hombre mas peligroso del mundo donde guardo la piedra."
+          }
+        },
+        {
+          "id": "ch4_s3_d6",
+          "beat": "TENSION",
+          "charId": "hassan",
+          "text": {
+            "en": "I know, I know! But listen — I also heard where HE goes every night. See? Information goes both ways! As we say, 'el-kalaam zay el-asal' — words are like honey. And I collected some honey too! He goes to a building on Sharia el-Muizz every night at nine o'clock. Third door. Blue sign. He's there right now. Probably.",
+            "ko": "알아, 알아! 근데 들어봐 — 그 사람이 매일 밤 어디 가는지도 들었어. 봐? 정보는 양방향이야! 속담에 '말은 꿀과 같다'라고 하잖아. 나도 꿀을 좀 모았어! 매일 밤 9시에 무이즈 거리의 건물에 가. 세 번째 문. 파란 간판. 아마 지금 거기 있을 거야.",
+            "es": "Lo se, lo se! Pero escucha — tambien escuche adonde VA el cada noche. Ves? La informacion va en ambas direcciones! Como decimos, 'el-kalaam zay el-asal' — las palabras son como miel. Y yo tambien recolecte algo de miel! Va a un edificio en Sharia el-Muizz cada noche a las nueve. Tercera puerta. Letrero azul. Esta ahi ahora mismo. Probablemente."
+          },
+          "idiom": {
+            "phrase": { "en": "el-kalaam zay el-asal — words are like honey", "ko": "말은 꿀과 같다", "es": "las palabras son como miel" },
+            "meaning": { "en": "Arabic proverb: The sweeter you speak, the more you get. Hassan uses it to justify accidentally helping both sides.", "ko": "아랍 속담: 말을 달콤하게 하면 더 많이 얻는다. 하산이 양쪽을 도운 걸 정당화하는 데 사용.", "es": "Proverbio arabe: Cuanto mas dulce hablas, mas obtienes. Hassan lo usa para justificar ayudar accidentalmente a ambos bandos." },
+            "collection": "Hassan_Souk_Expressions",
+            "addToExpressionBook": true
+          }
+        },
+        {
+          "id": "ch4_s3_d7",
+          "beat": "TENSION",
+          "charId": "lingo",
+          "text": {
+            "en": "Hassan, you are simultaneously the most helpful and the most dangerous person I've ever met. Don't ever change.",
+            "ko": "하산, 넌 내가 만난 사람 중 동시에 가장 도움이 되고 가장 위험한 사람이야. 절대 변하지 마.",
+            "es": "Hassan, eres simultaneamente la persona mas util y mas peligrosa que he conocido. No cambies nunca."
+          }
+        },
+        {
+          "id": "ch4_s3_quiz_intro",
+          "beat": "QUIZ_MOMENT",
+          "narration": {
+            "ko": "하산이 흥분해서 미스터 블랙의 은신처 방향을 설명하지만, 너무 빨리 말해서 단어가 뒤섞인다. 쇼핑 표현과 방향 지시가 뒤죽박죽이다. 루디가 핵심을 정리해야 한다.",
+            "en": "Hassan excitedly explains directions to Mr. Black's hideout, but he speaks so fast the words tumble together. Shopping expressions and directions all jumbled. Rudy must sort out the essentials.",
+            "es": "Hassan explica con entusiasmo las direcciones al escondite de Mr. Black, pero habla tan rapido que las palabras se mezclan. Expresiones de compras y direcciones revueltas. Rudy debe ordenar lo esencial."
+          }
+        },
+        {
+          "id": "ch4_s3_post_quiz",
+          "beat": "REVEAL",
+          "charId": "lingo",
+          "text": {
+            "en": "Muizz Street. Third door. Blue sign. Nine o'clock. Got it. Amira — we go tonight.",
+            "ko": "무이즈 거리. 세 번째 문. 파란 간판. 9시. 알겠어. 아미라 — 오늘 밤 간다.",
+            "es": "Calle Muizz. Tercera puerta. Letrero azul. Nueve en punto. Entendido. Amira — vamos esta noche."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "ch4_scene4",
+      "title": {
+        "ko": "미스 페니의 귀환",
+        "en": "Miss Penny Returns",
+        "es": "El Regreso de Miss Penny"
+      },
+      "beats": [
+        {
+          "id": "ch4_s4_opening",
+          "beat": "CALM",
+          "narration": {
+            "ko": "아미라의 연구실. 루디가 오늘 밤 작전을 준비하고 있다. 문을 두드리는 소리. 아미라가 열면 — 미스 페니가 서 있다. 런던의 서점 주인. 렉시콘의 내부자. 배신자. 여기 카이로에.",
+            "en": "Amira's lab. Rudy is preparing for tonight's operation. A knock at the door. Amira opens it — and Miss Penny is standing there. The London bookshop owner. Lexicon's insider. The traitor. Here in Cairo.",
+            "es": "El laboratorio de Amira. Rudy prepara la operacion de esta noche. Un golpe en la puerta. Amira abre — y Miss Penny esta ahi. La duena de la libreria de Londres. La infiltrada de Lexicon. La traidora. Aqui en El Cairo."
+          }
+        },
+        {
+          "id": "ch4_s4_d1",
+          "beat": "TENSION",
+          "charId": "lingo",
+          "text": {
+            "en": "You. What are you doing in Cairo?",
+            "ko": "너. 카이로에서 뭐 하는 거야?",
+            "es": "Tu. Que haces en El Cairo?"
+          }
+        },
+        {
+          "id": "ch4_s4_d2",
+          "beat": "TENSION",
+          "charId": "penny",
+          "text": {
+            "en": "I know you have every reason to slam this door in my face. And I know that nothing I say will undo what I did. As Dostoevsky wrote, 'The soul is healed by being with children.' I don't have children, but I have the truth. And I'm tired of carrying it alone.",
+            "ko": "내 얼굴에 문을 닫을 이유가 충분하다는 거 알아. 내가 한 일을 되돌릴 말은 없다는 것도 알아. 도스토예프스키가 썼듯이, '영혼은 아이들과 함께 있을 때 치유된다.' 나는 아이가 없지만, 진실이 있어. 혼자 지는 게 지쳤어.",
+            "es": "Se que tienes toda razon para cerrar esta puerta en mi cara. Y se que nada de lo que diga deshara lo que hice. Como escribio Dostoievski, 'El alma se cura estando con ninos.' No tengo hijos, pero tengo la verdad. Y estoy cansada de cargarla sola."
+          },
+          "idiom": {
+            "phrase": { "en": "The soul is healed by being with children", "ko": "영혼은 아이들과 함께 있을 때 치유된다 (도스토예프스키)", "es": "El alma se cura estando con ninos (Dostoievski)" },
+            "meaning": { "en": "From Dostoevsky. Miss Penny means: innocence and honesty are healing. She's choosing honesty.", "ko": "도스토예프스키에서. 미스 페니의 의미: 순수함과 정직함이 치유한다. 그녀는 정직을 선택했다.", "es": "De Dostoievski. Miss Penny quiere decir: la inocencia y la honestidad curan. Ella elige la honestidad." },
+            "collection": "Penny_Literary_Quotes",
+            "addToExpressionBook": true
+          }
+        },
+        {
+          "id": "ch4_s4_d3",
+          "beat": "TENSION",
+          "charId": "penny",
+          "text": {
+            "en": "Mr. Black held my bookshop hostage. My collection — thirty years of manuscripts from dying languages. He funded it, then used it as leverage. 'Help me, or I burn every book.' I was weak. I chose the books over my conscience. But after Seoul... after watching you READ that Korean note on the tower... I understood what I was helping him destroy. Not words on paper. Living understanding between people. I can't be part of that anymore.",
+            "ko": "미스터 블랙이 내 서점을 볼모로 잡았어. 내 컬렉션 — 사라지는 언어의 원고 30년치. 그가 자금을 대고, 그걸 지렛대로 썼어. '도와라, 아니면 모든 책을 태운다.' 나는 약했어. 양심보다 책을 택했어. 하지만 서울 이후에... 네가 타워에서 그 한국어 쪽지를 읽는 걸 본 후에... 내가 뭘 파괴하는 걸 돕고 있었는지 이해했어. 종이 위의 글자가 아니야. 사람들 사이의 살아있는 이해. 더 이상 그 일부가 될 수 없어.",
+            "es": "Mr. Black tomo mi libreria como rehen. Mi coleccion — treinta anos de manuscritos de idiomas moribundos. El la financio, luego la uso como palanca. 'Ayudame, o quemo cada libro.' Fui debil. Elegi los libros sobre mi conciencia. Pero despues de Seul... despues de verte LEER esa nota en coreano en la torre... entendi lo que estaba ayudando a destruir. No palabras en papel. Comprension viva entre personas. No puedo ser parte de eso mas."
+          }
+        },
+        {
+          "id": "ch4_s4_d4",
+          "beat": "REVEAL",
+          "charId": "lingo",
+          "isThought": true,
+          "text": {
+            "en": "(She's either telling the truth or she's the best actress in the world. The literary quotes — in London they were hiding lies. Now they sound like confessions. She helped him in London. She reported my location. But she also warned me, didn't she? 'One may smile and be a villain.' 'Not every reader has your best interests at heart.' She was telling me the truth the whole time. I just wasn't reading carefully enough.)",
+            "ko": "(진실을 말하고 있거나 세계 최고의 연기자야. 문학 인용구들 — 런던에서는 거짓을 숨기고 있었어. 지금은 고백처럼 들려. 런던에서 그를 도왔어. 내 위치를 보고했어. 하지만 나에게 경고도 했잖아? '웃으면서도 악당일 수 있다.' '모든 독자가 네 편인 건 아니다.' 처음부터 진실을 말하고 있었어. 내가 제대로 읽지 못한 거야.)",
+            "es": "(Esta diciendo la verdad o es la mejor actriz del mundo. Las citas literarias — en Londres ocultaban mentiras. Ahora suenan como confesiones. Lo ayudo en Londres. Reporto mi ubicacion. Pero tambien me advirtio, no? 'Uno puede sonreir y ser villano.' 'No todo lector tiene tus mejores intereses.' Me estaba diciendo la verdad todo el tiempo. Yo no estaba leyendo con suficiente cuidado.)"
+          }
+        },
+        {
+          "id": "ch4_s4_d5",
+          "beat": "REVEAL",
+          "charId": "penny",
+          "text": {
+            "en": "I can help you find the stone tonight. I know his security systems. I know the codes. And I'm asking for nothing in return. Not forgiveness. Not trust. Just a chance to stop being the villain in someone else's story.",
+            "ko": "오늘 밤 수호석을 찾는 걸 도울 수 있어. 그의 보안 시스템을 알아. 코드도 알아. 그리고 대가는 아무것도 안 바래. 용서도. 신뢰도. 다른 사람의 이야기에서 악당이기를 멈출 기회만.",
+            "es": "Puedo ayudarte a encontrar la piedra esta noche. Conozco sus sistemas de seguridad. Conozco los codigos. Y no pido nada a cambio. Ni perdon. Ni confianza. Solo una oportunidad de dejar de ser la villana en la historia de alguien mas."
+          }
+        },
+        {
+          "id": "ch4_s4_d6",
+          "beat": "CLIFFHANGER",
+          "charId": "lingo",
+          "text": {
+            "en": "I don't trust you. But I don't need to. I need your codes. Amira — your call. She's your dig site, your stone, your family's legacy.",
+            "ko": "널 믿지 않아. 하지만 믿을 필요도 없어. 네 코드가 필요해. 아미라 — 네가 결정해. 네 발굴 현장이고, 네 수호석이고, 네 가족의 유산이니까.",
+            "es": "No confio en ti. Pero no necesito hacerlo. Necesito tus codigos. Amira — tu decides. Es tu sitio de excavacion, tu piedra, el legado de tu familia."
+          }
+        },
+        {
+          "id": "ch4_s4_d7",
+          "beat": "CLIFFHANGER",
+          "charId": "amira",
+          "text": {
+            "en": "My grandmother said: 'Trust the person who tells you what they've done wrong. Liars only tell you what they've done right.' Miss Penny just told us everything she did wrong. Let her help. But I'm watching.",
+            "ko": "할머니가 말했어: '자기가 뭘 잘못했는지 말하는 사람을 믿어라. 거짓말쟁이는 뭘 잘했는지만 말한다.' 미스 페니는 방금 자기가 한 모든 잘못을 말했어. 도와주게 해. 하지만 지켜볼 거야.",
+            "es": "Mi abuela decia: 'Confia en la persona que te dice lo que hizo mal. Los mentirosos solo te dicen lo que hicieron bien.' Miss Penny acaba de decirnos todo lo que hizo mal. Dejala ayudar. Pero la vigilo."
+          },
+          "idiom": {
+            "phrase": { "en": "Trust the person who tells you what they've done wrong", "ko": "자기가 뭘 잘못했는지 말하는 사람을 믿어라", "es": "Confia en quien te dice lo que hizo mal" },
+            "meaning": { "en": "Amira's grandmother's wisdom. Honest people confess mistakes; liars hide them.", "ko": "아미라 할머니의 지혜. 정직한 사람은 실수를 고백하고, 거짓말쟁이는 숨긴다.", "es": "Sabiduria de la abuela de Amira. La gente honesta confiesa errores; los mentirosos los esconden." },
+            "collection": "Amira_Cairo_Wisdom",
+            "addToExpressionBook": true
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "ch4_scene5",
+      "title": {
+        "ko": "편집자의 철학",
+        "en": "The Editor's Philosophy",
+        "es": "La Filosofia del Editor"
+      },
+      "isBoss": true,
+      "beats": [
+        {
+          "id": "ch4_s5_opening",
+          "beat": "CALM",
+          "narration": {
+            "ko": "무이즈 거리. 밤 9시. 미스 페니의 코드로 문이 열린다. 안에는 — 도서관. 모든 벽이 책으로 가득하다. 하지만 이상한 점이 있다. 책들의 제목이 보이지 않는다. 표지만 남고 제목이 지워져 있다. 그리고 방 중앙에, 미스터 블랙이 의자에 앉아 있다. 루디를 기다리고 있었다. 차가 두 잔 놓여 있다.",
+            "en": "Muizz Street. Nine PM. Miss Penny's code opens the door. Inside — a library. Every wall covered in books. But something is wrong. The titles on the books are invisible. Only covers remain, titles erased. And in the center of the room, Mr. Black sits in a chair. He was waiting for Rudy. Two cups of tea are set.",
+            "es": "Calle Muizz. Nueve de la noche. El codigo de Miss Penny abre la puerta. Dentro — una biblioteca. Cada pared cubierta de libros. Pero algo esta mal. Los titulos de los libros son invisibles. Solo quedan las portadas, titulos borrados. Y en el centro de la habitacion, Mr. Black esta sentado en una silla. Esperaba a Rudy. Dos tazas de te estan servidas."
+          }
+        },
+        {
+          "id": "ch4_s5_d1",
+          "beat": "CALM",
+          "charId": "mr_black",
+          "text": {
+            "en": "Good evening, Rudy. Please, sit. I made tea. I hoped we could talk. Really talk. Not just 'Where is the stone? Goodbye.' You deserve more than that. You've earned it.",
+            "ko": "안녕하세요, 루디. 앉으세요. 차를 만들었어요. 진짜 대화를 할 수 있길 바랐어요. '수호석 어디예요? 안녕히 계세요'만 아니라. 당신은 그 이상을 받을 자격이 있어요. 그걸 증명했어요.",
+            "es": "Buenas noches, Rudy. Por favor, sientese. Hice te. Esperaba que pudieramos hablar. Realmente hablar. No solo 'Donde esta la piedra? Adios.' Mereces mas que eso. Te lo has ganado."
+          }
+        },
+        {
+          "id": "ch4_s5_d2",
+          "beat": "CURIOSITY",
+          "charId": "lingo",
+          "text": {
+            "en": "You want to chat. Over tea. The man who erased Carlos's languages, who stole three stones, who turned Miss Penny into a spy... wants to have a nice conversation.",
+            "ko": "대화를 원한다고. 차 마시면서. 카를로스의 언어를 지우고, 수호석 세 개를 훔치고, 미스 페니를 스파이로 만든 남자가... 좋은 대화를 하고 싶다고.",
+            "es": "Quieres charlar. Con te. El hombre que borro los idiomas de Carlos, que robo tres piedras, que convirtio a Miss Penny en espia... quiere tener una conversacion agradable."
+          }
+        },
+        {
+          "id": "ch4_s5_d3",
+          "beat": "CURIOSITY",
+          "charId": "mr_black",
+          "text": {
+            "en": "I was a UN interpreter. Twelve languages. Perfect in all of them. I spent twenty years translating for peace talks, refugee hearings, disaster relief. Do you know what I learned? That a single mistranslated word can collapse a peace treaty. That a refugee who can't explain their symptoms in the doctor's language dies on a hospital floor. That a mother calling for help in a language nobody understands watches her child suffer in silence. Seven thousand languages, Rudy. Seven thousand chances for misunderstanding. I don't hate language. I hate what it does to people who can't cross the wall.",
+            "ko": "나는 유엔 통역사였어요. 12개 언어. 모두 완벽하게. 20년간 평화 협상, 난민 심사, 재난 구호를 통역했어요. 뭘 배웠는지 알아요? 잘못 번역된 단어 하나가 평화 조약을 무너뜨릴 수 있다는 것. 의사의 언어로 증상을 설명하지 못하는 난민이 병원 바닥에서 죽는다는 것. 아무도 이해하지 못하는 언어로 도움을 요청하는 어머니가 아이의 고통을 침묵 속에서 지켜본다는 것. 7천 개의 언어, 루디. 7천 번의 오해 기회. 나는 언어를 미워하지 않아요. 벽을 넘지 못하는 사람들에게 언어가 하는 일을 미워하는 거예요.",
+            "es": "Fui interprete de la ONU. Doce idiomas. Perfecto en todos. Pase veinte anos traduciendo para negociaciones de paz, audiencias de refugiados, ayuda humanitaria. Sabes lo que aprendi? Que una sola palabra mal traducida puede derrumbar un tratado de paz. Que un refugiado que no puede explicar sus sintomas en el idioma del doctor muere en el piso de un hospital. Que una madre pidiendo ayuda en un idioma que nadie entiende ve a su hijo sufrir en silencio. Siete mil idiomas, Rudy. Siete mil oportunidades de malentendido. No odio el idioma. Odio lo que le hace a la gente que no puede cruzar el muro."
+          }
+        },
+        {
+          "id": "ch4_s5_d4",
+          "beat": "TENSION",
+          "charId": "lingo",
+          "isThought": true,
+          "text": {
+            "en": "(He's not ranting. He's not monologuing. He's... explaining. And the worst part is — the refugees, the peace talks, the mother — those are real. Those happen. He's not lying about the problem. He's wrong about the solution. But the problem is real. Stay focused, Rudy. He's trying to convince you. Don't let him.)",
+            "ko": "(횡설수설하는 게 아니야. 독백도 아니야. 그는... 설명하고 있어. 최악인 건 — 난민, 평화 협상, 어머니 — 전부 진짜야. 실제로 일어나는 일이야. 문제에 대해 거짓말하는 게 아니야. 해법이 틀린 거야. 하지만 문제는 진짜야. 집중해, 루디. 널 설득하려고 해. 당하지 마.)",
+            "es": "(No esta delirando. No esta dando un monologo. Esta... explicando. Y lo peor es — los refugiados, las negociaciones de paz, la madre — son reales. Suceden. No esta mintiendo sobre el problema. Se equivoca sobre la solucion. Pero el problema es real. Concentrate, Rudy. Intenta convencerte. No lo permitas.)"
+          }
+        },
+        {
+          "id": "ch4_s5_d5",
+          "beat": "TENSION",
+          "charId": "mr_black",
+          "text": {
+            "en": "I'm offering you a choice, detective. Join me. Help me build one language that everyone understands. No more walls. No more misunderstanding. No more children dying because their mother spoke the wrong words. Or... refuse. Watch the tower fall. And know that every wall that remains between people is one you chose to keep standing.",
+            "ko": "선택을 드릴게요, 탐정. 합류해요. 모두가 이해하는 하나의 언어를 만드는 걸 도와줘요. 더 이상의 벽 없이. 오해 없이. 엄마가 틀린 말을 했다고 죽는 아이 없이. 아니면... 거부해요. 탑이 무너지는 걸 지켜봐요. 그리고 사람들 사이에 남은 모든 벽은 당신이 세워두기로 선택한 것이라는 걸 알아요.",
+            "es": "Le ofrezco una opcion, detective. Unase a mi. Ayudeme a construir un idioma que todos entiendan. Sin mas muros. Sin mas malentendidos. Sin mas ninos muriendo porque su madre dijo las palabras equivocadas. O... rechace. Mire la torre caer. Y sepa que cada muro que queda entre personas es uno que usted eligio mantener en pie."
+          }
+        },
+        {
+          "id": "ch4_s5_d6",
+          "beat": "REVEAL",
+          "charId": "lingo",
+          "text": {
+            "en": "You're wrong. Not about the problem. About the solution. The answer to 'people don't understand each other' isn't to destroy every language and replace it with yours. The answer is to LEARN. The way I learned Korean in Seoul. Badly. Embarrassingly. One word at a time. And it worked. Not because the wall disappeared — because I climbed over it. That's what language learning IS. Not erasing walls. Building bridges. One clumsy, mispronounced word at a time.",
+            "ko": "틀렸어. 문제에 대해서가 아니라. 해법에 대해서. '사람들이 서로를 이해하지 못한다'에 대한 답은 모든 언어를 파괴하고 당신 것으로 대체하는 게 아니야. 답은 배우는 거야. 내가 서울에서 한국어를 배운 것처럼. 엉망으로. 창피하게. 한 단어씩. 그리고 통했어. 벽이 사라져서가 아니라 — 내가 넘었으니까. 언어 학습이 그거야. 벽을 지우는 게 아니라. 다리를 놓는 거야. 서툴고, 발음 틀린, 한 단어씩.",
+            "es": "Te equivocas. No sobre el problema. Sobre la solucion. La respuesta a 'la gente no se entiende' no es destruir cada idioma y reemplazarlo con el tuyo. La respuesta es APRENDER. Como yo aprendi coreano en Seul. Mal. Vergonzosamente. Una palabra a la vez. Y funciono. No porque el muro desaparecio — porque lo escale. Eso ES el aprendizaje de idiomas. No borrar muros. Construir puentes. Una torpe palabra mal pronunciada a la vez."
+          }
+        },
+        {
+          "id": "ch4_s5_d7",
+          "beat": "REVEAL",
+          "charId": "mr_black",
+          "text": {
+            "en": "Beautiful speech. But you're one fox. There are eight billion people on this planet. They don't all have your time, your luxury, your patience. The stone, please.",
+            "ko": "아름다운 연설이에요. 하지만 당신은 여우 한 마리야. 이 행성에 80억 명이 있어요. 모두가 당신의 시간, 여유, 인내심이 있는 건 아니에요. 수호석을 주세요.",
+            "es": "Hermoso discurso. Pero eres un solo zorro. Hay ocho mil millones de personas en este planeta. No todas tienen tu tiempo, tu lujo, tu paciencia. La piedra, por favor."
+          }
+        },
+        {
+          "id": "ch4_s5_boss_intro",
+          "beat": "QUIZ_MOMENT",
+          "narration": {
+            "ko": "미스터 블랙이 손을 뻗는다. 하지만 이번에는 다르다. 아미라가 옆에 있다. 루디는 아미라에게 학습 언어로만 소통해야 한다 — 영어 없이. 미스터 블랙이 영어를 이해하기 때문에. 아미라와 루디의 탈출 좌표, 행동 시점, 신호를 학습 언어로 맞춰야 한다.",
+            "en": "Mr. Black extends his hand. But this time is different. Amira is beside Rudy. They must communicate in ONLY the target language — no English. Because Mr. Black understands English. Coordinate escape routes, timing, and signals with Amira in the target language only.",
+            "es": "Mr. Black extiende su mano. Pero esta vez es diferente. Amira esta junto a Rudy. Deben comunicarse SOLO en el idioma objetivo — sin ingles. Porque Mr. Black entiende ingles. Coordinar rutas de escape, tiempos y senales con Amira solo en el idioma objetivo."
+          }
+        },
+        {
+          "id": "ch4_s5_post_boss",
+          "beat": "REVEAL",
+          "narration": {
+            "ko": "루디와 아미라가 탈출에 성공한다. 수호석을 가지고. 미스터 블랙은 놀란 표정 — 루디가 학습 언어만으로 복잡한 행동을 조율했다는 것에. 미스 페니의 코드가 뒷문을 열었다. 그녀의 도움이 진짜였다.",
+            "en": "Rudy and Amira escape successfully. With the stone. Mr. Black looks surprised — Rudy coordinated a complex action using only the target language. Miss Penny's code opened the back door. Her help was real.",
+            "es": "Rudy y Amira escapan exitosamente. Con la piedra. Mr. Black parece sorprendido — Rudy coordino una accion compleja usando solo el idioma objetivo. El codigo de Miss Penny abrio la puerta trasera. Su ayuda fue real."
+          }
+        },
+        {
+          "id": "ch4_s5_cliffhanger_d1",
+          "beat": "CLIFFHANGER",
+          "charId": "amira",
+          "text": {
+            "en": "Rudy. There's something I haven't told you. The Cairo stone — it's not just one of seven. It's one of eight. My grandmother's notes mention an eighth stone that nobody knew about. One that Mr. Black found before any of us. He's not just collecting them, Rudy. He's building something. And the eighth stone was the first piece.",
+            "ko": "루디. 말하지 않은 게 있어. 카이로 수호석은 — 일곱 중 하나가 아니야. 여덟 중 하나야. 할머니의 기록에 아무도 몰랐던 여덟 번째 수호석이 언급되어 있어. 미스터 블랙이 우리보다 먼저 찾은 것. 그는 수집만 하는 게 아니야, 루디. 뭔가를 만들고 있어. 여덟 번째 수호석이 첫 번째 조각이었어.",
+            "es": "Rudy. Hay algo que no te he dicho. La piedra de El Cairo — no es solo una de siete. Es una de ocho. Las notas de mi abuela mencionan una octava piedra que nadie conocia. Una que Mr. Black encontro antes que todos. No solo las recolecta, Rudy. Esta construyendo algo. Y la octava piedra fue la primera pieza."
+          }
+        },
+        {
+          "id": "ch4_s5_cliffhanger_d2",
+          "beat": "CLIFFHANGER",
+          "charId": "lingo",
+          "isThought": true,
+          "text": {
+            "en": "(Eight stones. Not seven. He already has the eighth. He's not collecting a set — he's building a machine. The Language Erasure Device we found in Madrid was a prototype. The real one needs all eight stones. And he has a head start we didn't even know about. Everything I thought I understood about this game just changed. The board is bigger than I imagined. And we're further behind than I feared.)",
+            "ko": "(여덟 개. 일곱이 아니라. 여덟 번째는 이미 가지고 있어. 세트를 모으는 게 아니야 — 기계를 만들고 있어. 마드리드에서 찾은 언어 삭제 장치는 시제품이었어. 진짜는 여덟 개의 수호석이 전부 필요해. 우리가 몰랐던 선수를 치고 있었어. 이 게임에 대해 안다고 생각했던 모든 것이 바뀌었어. 판이 생각보다 커. 그리고 우리는 두려워한 것보다 더 뒤처져 있어.)",
+            "es": "(Ocho piedras. No siete. El ya tiene la octava. No esta coleccionando un set — esta construyendo una maquina. El Dispositivo de Borrado que encontramos en Madrid era un prototipo. El real necesita las ocho piedras. Y tiene una ventaja que ni sabiamos. Todo lo que crei entender sobre este juego acaba de cambiar. El tablero es mas grande de lo que imagine. Y estamos mas atras de lo que temia.)"
+          }
+        },
+        {
+          "id": "ch4_s5_end",
+          "beat": "CLIFFHANGER",
+          "narration": {
+            "ko": "[다음 챕터: 바벨 타워 — 최후의 언어]",
+            "en": "[Next Chapter: Babel Tower — The Last Language]",
+            "es": "[Siguiente Capitulo: Torre de Babel — El Ultimo Idioma]"
+          }
+        }
+      ]
+    }
+  ],
+
+  "quizzes": [
+    {
+      "id": "ch4_quiz_a",
+      "scene": "ch4_scene1",
+      "type": "matching",
+      "title": { "ko": "아미라의 시험", "en": "Amira's Test", "es": "La Prueba de Amira" },
+      "storyContext": {
+        "ko": "아미라가 물건을 보여주며 세 개 언어로 이름을 말하라고 한다. 그녀의 신뢰를 얻어야 한다.",
+        "en": "Amira shows objects and asks you to name them in three languages. Earn her trust.",
+        "es": "Amira muestra objetos y pide que los nombres en tres idiomas. Gana su confianza."
+      },
+      "consequence": {
+        "ko": "아미라가 루디를 인정하고 수호석 찾기에 동참시킨다.",
+        "en": "Amira accepts Rudy and lets him join the stone search.",
+        "es": "Amira acepta a Rudy y lo deja unirse a la busqueda de la piedra."
+      },
+      "vocabularyUsed": "Day 31-36: travel objects + Day 1-6: basic words",
+      "questions": [
+        {
+          "object": { "en": "map", "ko": "지도", "es": "mapa" },
+          "matchTo": [
+            { "en": "map", "ko": "지도", "es": "mapa", "correct": true },
+            { "en": "key", "ko": "열쇠", "es": "llave", "correct": false },
+            { "en": "book", "ko": "책", "es": "libro", "correct": false }
+          ]
+        },
+        {
+          "object": { "en": "key", "ko": "열쇠", "es": "llave" },
+          "matchTo": [
+            { "en": "door", "ko": "문", "es": "puerta", "correct": false },
+            { "en": "key", "ko": "열쇠", "es": "llave", "correct": true },
+            { "en": "stone", "ko": "돌", "es": "piedra", "correct": false }
+          ]
+        },
+        {
+          "object": { "en": "water", "ko": "물", "es": "agua" },
+          "matchTo": [
+            { "en": "coffee", "ko": "커피", "es": "cafe", "correct": false },
+            { "en": "tea", "ko": "차", "es": "te", "correct": false },
+            { "en": "water", "ko": "물", "es": "agua", "correct": true }
+          ]
+        }
+      ],
+      "difficulty": 2,
+      "rewards": { "xp": 100, "npcRelation": { "amira": 2 } }
+    },
+    {
+      "id": "ch4_quiz_b",
+      "scene": "ch4_scene2",
+      "type": "fill_blank",
+      "title": { "ko": "할머니의 지도", "en": "Grandmother's Map", "es": "El Mapa de la Abuela" },
+      "storyContext": {
+        "ko": "아미라 할머니의 다국어 지시문. 빈칸을 채워 수호석의 위치를 알아내라.",
+        "en": "Amira's grandmother's multilingual instructions. Fill blanks to locate the stone.",
+        "es": "Las instrucciones multilingues de la abuela de Amira. Completa los espacios para localizar la piedra."
+      },
+      "consequence": {
+        "ko": "수호석의 정확한 매장 위치가 밝혀진다.",
+        "en": "The stone's exact burial location is revealed.",
+        "es": "La ubicacion exacta de entierro de la piedra se revela."
+      },
+      "vocabularyUsed": "Day 19-30: directions, places + Day 7-12: numbers",
+      "questions": [
+        {
+          "sentence": { "en": "Go ___ meters to the ___.", "ko": "___미터 ___으로 가세요.", "es": "Ve ___ metros al ___." },
+          "blanks": [
+            { "answer": { "en": "thirty", "ko": "30", "es": "treinta" }, "opts": [{ "en": "ten", "ko": "10", "es": "diez" }, { "en": "fifty", "ko": "50", "es": "cincuenta" }] },
+            { "answer": { "en": "north", "ko": "북쪽", "es": "norte" }, "opts": [{ "en": "south", "ko": "남쪽", "es": "sur" }, { "en": "east", "ko": "동쪽", "es": "este" }] }
+          ]
+        },
+        {
+          "sentence": { "en": "Dig ___ meters ___.", "ko": "___미터 ___으로 파세요.", "es": "Excava ___ metros hacia ___." },
+          "blanks": [
+            { "answer": { "en": "two", "ko": "2", "es": "dos" }, "opts": [{ "en": "five", "ko": "5", "es": "cinco" }, { "en": "one", "ko": "1", "es": "uno" }] },
+            { "answer": { "en": "down", "ko": "아래", "es": "abajo" }, "opts": [{ "en": "up", "ko": "위", "es": "arriba" }, { "en": "left", "ko": "왼쪽", "es": "izquierda" }] }
+          ]
+        },
+        {
+          "sentence": { "en": "The stone is ___ the ___ of Horus.", "ko": "수호석은 호루스의 ___ ___에 있다.", "es": "La piedra esta ___ el ___ de Horus." },
+          "blanks": [
+            { "answer": { "en": "under", "ko": "눈", "es": "bajo" }, "opts": [{ "en": "above", "ko": "입", "es": "sobre" }, { "en": "beside", "ko": "귀", "es": "al lado" }] },
+            { "answer": { "en": "eye", "ko": "아래", "es": "ojo" }, "opts": [{ "en": "hand", "ko": "옆", "es": "mano" }, { "en": "foot", "ko": "위", "es": "pie" }] }
+          ]
+        }
+      ],
+      "difficulty": 3,
+      "rewards": { "xp": 150 }
+    },
+    {
+      "id": "ch4_quiz_c",
+      "scene": "ch4_scene3",
+      "type": "word_rearrange",
+      "title": { "ko": "하산의 혼란스러운 길 안내", "en": "Hassan's Chaotic Directions", "es": "Las Direcciones Caoticas de Hassan" },
+      "storyContext": {
+        "ko": "하산이 미스터 블랙의 은신처 방향을 너무 빨리 말해서 뒤섞였다. 정리해서 주소를 알아내라.",
+        "en": "Hassan spoke so fast about Mr. Black's hideout that the directions got scrambled. Sort them out.",
+        "es": "Hassan hablo tan rapido sobre el escondite de Mr. Black que las direcciones se revolvieron. Ordenalas."
+      },
+      "consequence": {
+        "ko": "미스터 블랙의 은신처 정확한 위치가 밝혀진다.",
+        "en": "Mr. Black's hideout location is confirmed.",
+        "es": "La ubicacion del escondite de Mr. Black se confirma."
+      },
+      "vocabularyUsed": "Day 31-42: shopping, directions, daily routines + Day 7-12: numbers, time",
+      "questions": [
+        {
+          "instruction": { "en": "Unscramble the street:", "ko": "거리를 해독하세요:", "es": "Descifra la calle:" },
+          "scrambled": { "en": ["Muizz", "Sharia", "el-", "Street"], "ko": ["무이즈", "거리"], "es": ["Muizz", "Calle", "el-"] },
+          "answer": { "en": "Sharia el-Muizz Street", "ko": "무이즈 거리", "es": "Calle el-Muizz" }
+        },
+        {
+          "instruction": { "en": "Unscramble the details:", "ko": "세부 정보를 해독하세요:", "es": "Descifra los detalles:" },
+          "scrambled": { "en": ["door", "blue", "third", "sign"], "ko": ["문", "파란", "세 번째", "간판"], "es": ["puerta", "azul", "tercera", "letrero"] },
+          "answer": { "en": "Third door blue sign", "ko": "세 번째 문 파란 간판", "es": "Tercera puerta letrero azul" }
+        },
+        {
+          "instruction": { "en": "Unscramble the time:", "ko": "시간을 해독하세요:", "es": "Descifra la hora:" },
+          "scrambled": { "en": ["night", "nine", "o'clock", "every"], "ko": ["밤", "매일", "9시"], "es": ["noche", "nueve", "cada"] },
+          "answer": { "en": "Every night nine o'clock", "ko": "매일 밤 9시", "es": "Cada noche nueve" }
+        }
+      ],
+      "difficulty": 2,
+      "rewards": { "xp": 150 }
+    },
+    {
+      "id": "ch4_quiz_d",
+      "scene": "ch4_scene5",
+      "type": "roleplay",
+      "isBoss": true,
+      "title": { "ko": "학습 언어로만 탈출하라", "en": "Escape in Target Language Only", "es": "Escapa Solo en el Idioma Objetivo" },
+      "storyContext": {
+        "ko": "미스터 블랙이 영어를 이해하기 때문에, 아미라와 학습 언어로만 소통하여 탈출을 조율해야 한다. 올바른 문장을 선택하라.",
+        "en": "Because Mr. Black understands English, you must coordinate the escape with Amira in ONLY the target language. Choose the right phrases.",
+        "es": "Porque Mr. Black entiende ingles, debes coordinar el escape con Amira SOLO en el idioma objetivo. Elige las frases correctas."
+      },
+      "consequence": {
+        "ko": "미스터 블랙을 속이고 수호석을 가지고 탈출에 성공한다.",
+        "en": "You outsmart Mr. Black and escape with the stone.",
+        "es": "Enganas a Mr. Black y escapas con la piedra."
+      },
+      "vocabularyUsed": "Day 1-48: ALL vocabulary — this is the cumulative test",
+      "stages": [
+        {
+          "stageNum": 1,
+          "stageType": "dialogue_choice",
+          "label": { "en": "Tell Amira: 'Go to the back door'", "ko": "아미라에게: '뒷문으로 가'", "es": "Dile a Amira: 'Ve a la puerta trasera'" },
+          "correct": { "en": "뒷문으로 가세요 / Ve a la puerta de atras", "ko": "뒷문으로 가세요", "es": "Ve a la puerta de atras" },
+          "wrong": [
+            { "en": "Go to the back door (English — Mr. Black understands!)", "ko": "Go to the back door (영어 — 미스터 블랙이 알아듣는다!)", "es": "Go to the back door (ingles — Mr. Black entiende!)" },
+            { "en": "앞문으로 가세요 / Ve a la puerta de enfrente (Wrong door!)", "ko": "앞문으로 가세요 (틀린 문!)", "es": "Ve a la puerta de enfrente (Puerta equivocada!)" }
+          ]
+        },
+        {
+          "stageNum": 2,
+          "stageType": "dialogue_choice",
+          "label": { "en": "Tell Amira: 'I have the stone. Run now.'", "ko": "아미라에게: '수호석이 있어. 지금 뛰어'", "es": "Dile a Amira: 'Tengo la piedra. Corre ahora.'" },
+          "correct": { "en": "수호석 있어요. 지금 뛰세요! / Tengo la piedra. Corre ahora!", "ko": "수호석 있어요. 지금 뛰세요!", "es": "Tengo la piedra. Corre ahora!" },
+          "wrong": [
+            { "en": "I have the stone, run! (English — intercepted!)", "ko": "I have the stone, run! (영어 — 차단당한다!)", "es": "I have the stone, run! (ingles — interceptado!)" },
+            { "en": "수호석 없어요. 기다리세요. / No tengo la piedra. Espera. (Wrong info!)", "ko": "수호석 없어요. 기다리세요. (잘못된 정보!)", "es": "No tengo la piedra. Espera. (Informacion incorrecta!)" }
+          ]
+        },
+        {
+          "stageNum": 3,
+          "stageType": "dialogue_choice",
+          "label": { "en": "Tell Amira: 'Thank you. Let's go. Goodbye, Mr. Black.'", "ko": "아미라에게: '감사합니다. 가자. 안녕히 계세요, 미스터 블랙.'", "es": "Dile a Amira: 'Gracias. Vamos. Adios, Mr. Black.'" },
+          "correct": { "en": "감사합니다. 가요. 안녕히 계세요, 미스터 블랙. / Gracias. Vamos. Adios, Mr. Black.", "ko": "감사합니다. 가요. 안녕히 계세요, 미스터 블랙.", "es": "Gracias. Vamos. Adios, Mr. Black." },
+          "wrong": [
+            { "en": "Thanks. Let's go. Bye, Black. (English again!)", "ko": "Thanks. Let's go. Bye, Black. (또 영어!)", "es": "Thanks. Let's go. Bye, Black. (Ingles otra vez!)" },
+            { "en": "죄송합니다. 여기 있을게요. / Perdon. Me quedo aqui. (Giving up!)", "ko": "죄송합니다. 여기 있을게요. (포기!)", "es": "Perdon. Me quedo aqui. (Rindiendote!)" }
+          ]
+        }
+      ],
+      "timeLimit": 90,
+      "difficulty": 4,
+      "rewards": { "xp": 350, "badge": "cairo_escape", "unlockChapter": "ch5" },
+      "resultVariants": {
+        "perfect": {
+          "en": "Mr. Black watches, stunned. Rudy just coordinated a perfect escape in a language he barely knew three months ago. 'Impressive, detective. Truly.'",
+          "ko": "미스터 블랙이 놀란 표정으로 지켜본다. 루디가 3개월 전만 해도 거의 몰랐던 언어로 완벽한 탈출을 조율했다. '인상적이에요, 탐정. 진심으로.'",
+          "es": "Mr. Black observa, aturdido. Rudy acaba de coordinar un escape perfecto en un idioma que apenas conocia hace tres meses. 'Impresionante, detective. De verdad.'"
+        },
+        "good": {
+          "en": "They escape, but barely. Mr. Black caught one phrase in English and almost cut them off. Close call.",
+          "ko": "탈출했지만 간신히. 미스터 블랙이 영어 한 문장을 잡아내서 거의 차단할 뻔했다. 아슬아슬.",
+          "es": "Escapan, pero por poco. Mr. Black capto una frase en ingles y casi los intercepta. Por los pelos."
+        }
+      }
+    }
+  ]
+}

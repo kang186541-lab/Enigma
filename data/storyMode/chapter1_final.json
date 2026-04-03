@@ -1,0 +1,569 @@
+{
+  "chapterId": "ch1",
+  "title": {
+    "ko": "런던의 암호",
+    "en": "The London Cipher",
+    "es": "El Cifrado de Londres"
+  },
+  "setting": "London",
+  "vocabularyPool": "Day 1-6: Greetings, self-intro, where you're from, jobs/occupations, goodbye, asking how someone is, please, thank you, sorry, my name is, I'm from, help, where is, yes/no",
+  "meta": {
+    "version": "4.0",
+    "author": "story-creator-agent",
+    "date": "2026-03-23",
+    "pacingTemplate": "Hook -> Tension -> Puzzle -> Reveal -> Cliffhanger"
+  },
+
+  "npcs": [
+    {
+      "id": "ellis",
+      "name": "Dr. Ellis",
+      "role": { "ko": "박물관 큐레이터", "en": "Museum Curator", "es": "Curadora del Museo" },
+      "idiomStyle": "Academic, fragmented after the incident"
+    },
+    {
+      "id": "tom",
+      "name": "Tom",
+      "role": { "ko": "젊은 경비원", "en": "Young Security Guard", "es": "Guardia de Seguridad Joven" },
+      "idiomStyle": "Street slang, cocky but good-hearted",
+      "collection": "Tom_London_Slang"
+    }
+  ],
+
+  "scenes": [
+    {
+      "id": "ch1_scene1",
+      "title": {
+        "ko": "긴급 호출",
+        "en": "The Wake-Up Call",
+        "es": "La Llamada de Emergencia"
+      },
+      "beats": [
+        {
+          "id": "ch1_s1_hook",
+          "beat": "HOOK",
+          "narration": {
+            "en": "3:47 AM. Your phone screams. Not a ring — a scream. The kind of sound that means someone already tried calling three times before this.",
+            "ko": "새벽 3시 47분. 핸드폰이 비명을 질러. 벨소리가 아니야 — 비명. 이미 세 번이나 전화한 뒤에야 들리는 종류의 소리.",
+            "es": "3:47 AM. Tu telefono grita. No suena — grita. Esa clase de sonido que significa que alguien ya intento llamar tres veces antes."
+          }
+        },
+        {
+          "id": "ch1_s1_rudy_urgent",
+          "beat": "HOOK",
+          "charId": "rudy",
+          "text": {
+            "en": "Partner! Wake up. Now. Something happened at the British Museum — something bad. A linguist named Dr. Ellis was found twenty minutes ago. She's alive, but... she can't speak. Not a single word. Not in English, not in any language. Just silence. Like someone reached into her brain and pulled the plug on language itself.",
+            "ko": "파트너! 일어나. 지금 당장. 대영박물관에서 무슨 일이 생겼어 — 안 좋은 일. 엘리스 박사라는 언어학자가 20분 전에 발견됐어. 살아 있긴 한데... 말을 못 해. 단어 하나도. 영어로도, 어떤 언어로도 안 돼. 그냥 침묵. 마치 누군가 뇌에 손을 넣어서 언어의 플러그를 뽑아버린 것처럼.",
+            "es": "Companero! Despierta. Ahora. Algo paso en el Museo Britanico — algo malo. Una linguista llamada Dra. Ellis fue encontrada hace veinte minutos. Esta viva, pero... no puede hablar. Ni una palabra. Ni en ingles, ni en ningun idioma. Solo silencio. Como si alguien entrara en su cerebro y desconectara el lenguaje."
+          }
+        },
+        {
+          "id": "ch1_s1_rudy_stone",
+          "beat": "HOOK",
+          "charId": "rudy",
+          "text": {
+            "en": "And partner — the Language Stone is gone. You know, the relic in the Ancient Languages wing? The one they say holds the power to erase languages from human memory? Yeah. That one. Gone. Witnesses saw a man in a black coat leaving the building. No rush. No running. Just... walking out like he owned the place.",
+            "ko": "그리고 파트너 — 언어석이 사라졌어. 알지, 고대 언어관에 있던 유물? 인간의 기억에서 언어를 지울 수 있는 힘을 가졌다는 그것 말이야. 응. 그거. 사라졌어. 목격자들이 검은 코트를 입은 남자가 건물을 나가는 걸 봤대. 서두르지도 않고. 뛰지도 않고. 그냥... 자기 집인 것처럼 걸어 나갔대.",
+            "es": "Y companero — la Piedra del Lenguaje desaparecio. Ya sabes, la reliquia del ala de Lenguas Antiguas? La que dicen que tiene el poder de borrar idiomas de la memoria humana? Si. Esa. Desaparecio. Testigos vieron a un hombre con abrigo negro saliendo del edificio. Sin prisa. Sin correr. Solo... caminando como si fuera el dueno del lugar."
+          }
+        },
+        {
+          "id": "ch1_s1_rudy_mission",
+          "beat": "HOOK",
+          "charId": "rudy",
+          "text": {
+            "en": "Get dressed. We're going to the museum. I know it's the middle of the night and I know you just started learning. But that's exactly why I need you. Whoever did this is playing a game with language — and I need someone with fresh eyes. Someone who's still learning the basics. Trust me, that's going to matter. I'll explain on the way.",
+            "ko": "옷 입어. 박물관으로 가자. 한밤중인 거 알고, 방금 공부 시작한 것도 알아. 하지만 그래서 네가 필요한 거야. 이걸 한 놈은 언어를 가지고 게임을 하고 있어 — 나한테는 신선한 눈이 필요해. 아직 기초를 배우고 있는 사람. 날 믿어, 그게 중요해질 거야. 가면서 설명할게.",
+            "es": "Vistete. Vamos al museo. Se que es de madrugada y se que recien empezaste a aprender. Pero por eso te necesito. Quien hizo esto esta jugando con el lenguaje — y necesito a alguien con ojos frescos. Alguien que todavia este aprendiendo lo basico. Creeme, eso va a importar. Te explico en el camino."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "ch1_scene2",
+      "title": {
+        "ko": "박물관 입구",
+        "en": "The Museum Entrance",
+        "es": "La Entrada del Museo"
+      },
+      "beats": [
+        {
+          "id": "ch1_s2_arrival",
+          "beat": "CALM",
+          "narration": {
+            "en": "4:30 AM. The British Museum. Police tape flutters in the cold wind. The building is dark except for emergency lights. A young security guard stands at the entrance, arms crossed, jaw clenched. He looks like he's been awake for twelve hours and angry for all of them.",
+            "ko": "새벽 4시 30분. 대영박물관. 차가운 바람에 경찰 테이프가 펄럭인다. 비상등 외에는 건물이 어둡다. 젊은 경비원이 입구에 서 있다. 팔짱을 끼고, 이를 악물고. 12시간째 깨어 있으면서 내내 화가 나 있는 것 같다.",
+            "es": "4:30 AM. El Museo Britanico. La cinta policial ondea con el viento frio. El edificio esta oscuro excepto por las luces de emergencia. Un joven guardia de seguridad esta en la entrada, brazos cruzados, mandibula apretada. Parece que lleva doce horas despierto y enfadado durante todas ellas."
+          }
+        },
+        {
+          "id": "ch1_s2_tom_block",
+          "beat": "TENSION",
+          "charId": "tom",
+          "text": {
+            "en": "Oi. Museum's closed, yeah? Crime scene. No visitors, no press, no exceptions. I don't care if you're the Queen's cousin — nobody gets past me tonight. So who are you, then?",
+            "ko": "야. 박물관 닫았어, 알겠지? 범죄 현장이야. 방문객도 안 돼, 기자도 안 돼, 예외 없어. 여왕 사촌이래도 상관없어 — 오늘 밤엔 아무도 나를 지나갈 수 없어. 그래서 누구야, 넌?",
+            "es": "Oye. El museo esta cerrado, vale? Escena del crimen. No visitantes, no prensa, sin excepciones. Me da igual si eres primo de la Reina — nadie pasa esta noche. Asi que, quien eres?"
+          }
+        },
+        {
+          "id": "ch1_s2_rudy_whisper",
+          "beat": "TENSION",
+          "charId": "rudy",
+          "isThought": true,
+          "text": {
+            "en": "(Psst. Partner — this is Tom. Young, cocky, but good at his job. He's not going to let us in unless we introduce ourselves properly. Show him you know the basics. Tell him who you are and what you do. Nice and clear.)",
+            "ko": "(쉿. 파트너 — 이 사람이 톰이야. 젊고, 건방지지만, 일은 잘해. 우리가 제대로 자기소개를 하지 않으면 안 들여보내줄 거야. 기본을 아는 걸 보여줘. 네가 누구고 뭘 하는지 말해. 깔끔하게.)",
+            "es": "(Psst. Companero — este es Tom. Joven, engreido, pero bueno en su trabajo. No nos dejara pasar a menos que nos presentemos correctamente. Muestrale que sabes lo basico. Dile quien eres y que haces. Claro y limpio.)"
+          }
+        },
+        {
+          "id": "ch1_s2_quiz_intro",
+          "beat": "QUIZ_MOMENT",
+          "narration": {
+            "en": "Tom stares you down. Arms still crossed. He's waiting. You need to introduce yourself — name, where you're from, what you do. Get it right, and he might let you through. Get it wrong, and you're standing in the cold until sunrise.",
+            "ko": "톰이 너를 노려본다. 팔짱은 여전히 끼고 있다. 기다리고 있어. 자기소개를 해야 해 — 이름, 어디서 왔는지, 뭘 하는지. 제대로 하면 들여보내줄지도 몰라. 틀리면 해 뜰 때까지 추위 속에 서 있어야 해.",
+            "es": "Tom te mira fijamente. Brazos aun cruzados. Esta esperando. Necesitas presentarte — nombre, de donde eres, que haces. Hazlo bien y quizas te deje pasar. Hazlo mal y te quedas en el frio hasta el amanecer."
+          }
+        },
+        {
+          "id": "ch1_s2_tom_impressed",
+          "beat": "REVEAL",
+          "charId": "tom",
+          "text": {
+            "en": "Huh. Alright then. Didn't expect that, to be honest. Most people who show up at 4 AM can't even string a sentence together. You lot? Not bad. Not bad at all. Go on in, then. Break a leg, mate!",
+            "ko": "흠. 그래. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 제대로 못 만들거든. 너희? 나쁘지 않아. 전혀. 들어가, 그럼. 행운을 빌어!",
+            "es": "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoria de los que aparecen a las 4 AM ni pueden armar una frase. Ustedes? Nada mal. Nada mal. Pasen, entonces. Mucha suerte, colega!"
+          },
+          "idiom": {
+            "phrase": { "en": "Break a leg!", "ko": "대박 나라! (영국 표현)", "es": "Mucha mierda! (expresion)" },
+            "meaning": { "en": "An encouraging expression meaning 'Good luck!' — originally from theatre, where saying 'good luck' is considered bad luck.", "ko": "영국 표현: '행운을 빌어!'라는 뜻. 원래 극장에서 '행운을 빌어'라고 하면 불운하다고 여겨서 반대로 말하는 것.", "es": "Expresion de animo que significa 'Buena suerte!' — originalmente del teatro, donde decir 'buena suerte' se considera mala suerte." },
+            "collection": "Tom_London_Slang",
+            "addToExpressionBook": true
+          }
+        },
+        {
+          "id": "ch1_s2_clue_idiom",
+          "beat": "REVEAL",
+          "type": "clue",
+          "title": { "ko": "수사 노트: 영국 표현", "en": "Investigation Notes: British Expression", "es": "Notas de Investigacion: Expresion Britanica" },
+          "body": {
+            "en": "'Break a leg' — Tom just wished you good luck, but in a very British way. In English-speaking theatre, saying 'good luck' is considered bad luck. So actors say 'break a leg' instead. It means the opposite of what it sounds like. Tom's a guard, not an actor, but old habits die hard in London.",
+            "ko": "'Break a leg' — 톰이 방금 행운을 빌어줬어, 아주 영국적인 방식으로. 영어권 극장에서는 '행운을 빌어'라고 하면 불운하다고 여겨. 그래서 배우들은 'break a leg(다리를 부러뜨려)'라고 대신 말해. 들리는 것과 정반대 뜻이야. 톰은 배우가 아니라 경비원이지만, 런던에선 오래된 습관이 쉽게 안 죽어.",
+            "es": "'Break a leg' — Tom te deseo buena suerte, pero de una forma muy britanica. En el teatro de habla inglesa, decir 'buena suerte' se considera mala suerte. Asi que los actores dicen 'break a leg (rompete una pierna)' en su lugar. Significa lo opuesto a lo que suena. Tom es guardia, no actor, pero las viejas costumbres no mueren facilmente en Londres."
+          },
+          "icon": "theatre_masks"
+        }
+      ]
+    },
+
+    {
+      "id": "ch1_scene3",
+      "title": {
+        "ko": "범죄 현장",
+        "en": "The Crime Scene",
+        "es": "La Escena del Crimen"
+      },
+      "beats": [
+        {
+          "id": "ch1_s3_inside",
+          "beat": "TENSION",
+          "narration": {
+            "en": "Inside the museum. Emergency lights cast long shadows across the marble floors. The Ancient Languages wing is behind police tape. In the center of the room: an empty display case. The glass isn't broken. The lock isn't forced. The Language Stone simply isn't there anymore, as if it decided to leave.",
+            "ko": "박물관 내부. 비상등이 대리석 바닥 위로 긴 그림자를 드리운다. 고대 언어관이 경찰 테이프 뒤에 있다. 방 한가운데: 빈 진열장. 유리는 깨지지 않았다. 자물쇠도 강제로 열리지 않았다. 언어석이 그냥 사라졌다, 마치 스스로 떠나기로 한 것처럼.",
+            "es": "Dentro del museo. Las luces de emergencia proyectan sombras largas sobre los pisos de marmol. El ala de Lenguas Antiguas esta detras de la cinta policial. En el centro de la sala: una vitrina vacia. El vidrio no esta roto. La cerradura no fue forzada. La Piedra del Lenguaje simplemente ya no esta, como si decidiera irse."
+          }
+        },
+        {
+          "id": "ch1_s3_ellis",
+          "beat": "TENSION",
+          "narration": {
+            "en": "Dr. Ellis sits on a bench near the case. A blanket around her shoulders. She stares at nothing. Her lips move but no sound comes out. A paramedic crouches beside her, helpless. Twenty years of research into ancient languages, and now she can't produce a single syllable.",
+            "ko": "엘리스 박사가 진열장 근처 벤치에 앉아 있다. 어깨에 담요를 두르고. 아무것도 보지 않는 눈으로 응시한다. 입술이 움직이지만 소리는 나지 않는다. 구급대원이 옆에 쭈그리고 앉아 있다, 속수무책으로. 20년간 고대 언어를 연구해온 사람이, 이제 음절 하나도 만들어내지 못한다.",
+            "es": "La Dra. Ellis esta sentada en un banco cerca de la vitrina. Una manta sobre sus hombros. Mira a la nada. Sus labios se mueven pero no sale ningun sonido. Un paramedico esta agachado a su lado, impotente. Veinte anos investigando lenguas antiguas, y ahora no puede producir una sola silaba."
+          }
+        },
+        {
+          "id": "ch1_s3_rudy_react",
+          "beat": "TENSION",
+          "charId": "rudy",
+          "text": {
+            "en": "Partner. Look at her. That's what the Language Stone can do. Or rather, that's what someone who knows how to use it can do. Steal a person's ability to speak. Every language, gone. Like it was never there. We need to find out what happened before this gets worse.",
+            "ko": "파트너. 저 분을 봐. 언어석이 할 수 있는 일이야. 정확히는, 그걸 쓸 줄 아는 누군가가 할 수 있는 일. 말하는 능력을 빼앗는 거야. 모든 언어가, 사라진 거야. 처음부터 없었던 것처럼. 상황이 더 나빠지기 전에 무슨 일이 있었는지 알아내야 해.",
+            "es": "Companero. Mirala. Eso es lo que la Piedra del Lenguaje puede hacer. O mejor dicho, lo que alguien que sabe usarla puede hacer. Robar la capacidad de hablar de una persona. Cada idioma, desaparecido. Como si nunca hubiera existido. Necesitamos averiguar que paso antes de que esto empeore."
+          }
+        },
+        {
+          "id": "ch1_s3_torn_paper",
+          "beat": "CURIOSITY",
+          "narration": {
+            "en": "Rudy notices something on the floor near the display case. A torn piece of paper. It must have fallen from the thief's pocket — or been left on purpose. The handwriting is careful, deliberate. This wasn't dropped by accident.",
+            "ko": "루디가 진열장 근처 바닥에서 뭔가를 발견한다. 찢어진 종이 한 장. 도둑의 주머니에서 떨어졌거나 — 일부러 남긴 것이다. 필체가 정성스럽고 의도적이다. 실수로 떨어뜨린 게 아니다.",
+            "es": "Rudy nota algo en el piso cerca de la vitrina. Un trozo de papel rasgado. Debio caerse del bolsillo del ladron — o fue dejado a proposito. La escritura es cuidadosa, deliberada. Esto no se cayo por accidente."
+          }
+        },
+        {
+          "id": "ch1_s3_rudy_paper",
+          "beat": "CURIOSITY",
+          "charId": "rudy",
+          "text": {
+            "en": "Well, well. Our thief left a note. How polite. Let me see... the words are scrambled. Mixed up on purpose. It's a message, but the words are out of order. Like a puzzle. Partner — whoever did this WANTS us to read it. This is either a trap or an invitation. Honestly? Probably both.",
+            "ko": "이런, 이런. 우리 도둑이 쪽지를 남겼네. 참 예의 바르지. 어디 보자... 단어들이 뒤섞여 있어. 일부러 섞어놨어. 메시지인데, 단어 순서가 엉망이야. 퍼즐처럼. 파트너 — 이걸 한 사람은 우리가 읽기를 원해. 이건 함정이거나 초대장이야. 솔직히? 아마 둘 다.",
+            "es": "Vaya, vaya. Nuestro ladron dejo una nota. Que educado. A ver... las palabras estan revueltas. Mezcladas a proposito. Es un mensaje, pero las palabras estan desordenadas. Como un rompecabezas. Companero — quien hizo esto QUIERE que lo leamos. Es una trampa o una invitacion. Sinceramente? Probablemente ambas."
+          }
+        },
+        {
+          "id": "ch1_s3_clue_note",
+          "beat": "CURIOSITY",
+          "type": "clue",
+          "title": { "ko": "수사 노트: 도둑의 메시지", "en": "Investigation Notes: The Thief's Message", "es": "Notas de Investigacion: El Mensaje del Ladron" },
+          "body": {
+            "en": "A torn piece of paper found at the crime scene. The words are written in careful handwriting but scrambled out of order. The vocabulary is surprisingly simple — basic greetings and introductions. Why would a thief capable of stealing a priceless relic write like a beginner language student? Unless the simplicity IS the message.",
+            "ko": "범죄 현장에서 발견된 찢어진 종이. 단어들은 정성스러운 필체로 쓰여 있지만 순서가 뒤섞여 있다. 어휘가 놀라울 정도로 단순하다 — 기초 인사와 자기소개. 값을 매길 수 없는 유물을 훔칠 수 있는 도둑이 왜 초급 학생처럼 글을 쓸까? 단순함 자체가 메시지가 아니라면.",
+            "es": "Un trozo de papel rasgado encontrado en la escena del crimen. Las palabras estan escritas con caligrafia cuidadosa pero desordenadas. El vocabulario es sorprendentemente simple — saludos basicos y presentaciones. Por que un ladron capaz de robar una reliquia invaluable escribiria como un estudiante principiante? A menos que la simplicidad SEA el mensaje."
+          },
+          "icon": "torn_paper"
+        }
+      ]
+    },
+
+    {
+      "id": "ch1_scene4",
+      "title": {
+        "ko": "메시지 해독",
+        "en": "Decoding the Message",
+        "es": "Descifrando el Mensaje"
+      },
+      "beats": [
+        {
+          "id": "ch1_s4_setup",
+          "beat": "QUIZ_MOMENT",
+          "charId": "rudy",
+          "text": {
+            "en": "Alright partner, let's crack this. The words on the paper — they're all basic phrases. Greetings, introductions, saying where you're from. Our thief wrote a self-introduction... but scrambled it. Like a language exercise from hell. Help me put these words back in order. Let's find out who we're dealing with.",
+            "ko": "좋아 파트너, 이거 풀어보자. 종이 위의 단어들 — 전부 기초 표현이야. 인사, 자기소개, 출신 말하기. 도둑이 자기소개를 썼는데... 뒤섞어 놨어. 지옥에서 온 언어 연습문제처럼. 단어를 다시 순서대로 맞춰줘. 우리 상대가 누구인지 알아내자.",
+            "es": "Bien companero, descifremos esto. Las palabras en el papel — son todas frases basicas. Saludos, presentaciones, decir de donde eres. Nuestro ladron escribio una autopresentacion... pero la revolvio. Como un ejercicio de idioma del infierno. Ayudame a poner estas palabras en orden. Averiguemos con quien estamos lidiando."
+          }
+        },
+        {
+          "id": "ch1_s4_post_quiz",
+          "beat": "REVEAL",
+          "charId": "rudy",
+          "text": {
+            "en": "You got it. Listen to this: 'Hello, detective. My name is Mr. Black. I am from everywhere. How are you? I am fine. Goodbye, London.' He introduced himself. Like a student in lesson one. But perfect grammar, three languages. He's not a beginner — he's MOCKING beginners. He's mocking US. And the worst part? 'Goodbye, London' means he's already gone.",
+            "ko": "해냈어. 이거 들어봐: '안녕하세요, 탐정. 제 이름은 미스터 블랙입니다. 저는 모든 곳에서 왔습니다. 잘 지내세요? 저는 잘 지냅니다. 안녕히 계세요, 런던.' 자기소개를 했어. 첫 수업 학생처럼. 하지만 완벽한 문법, 세 개 언어. 초보자가 아니야 — 초보자를 조롱하고 있어. 우리를 조롱하는 거야. 최악인 건? '안녕히 계세요, 런던'은 이미 떠났다는 뜻이야.",
+            "es": "Lo lograste. Escucha esto: 'Hola, detective. Mi nombre es Mr. Black. Soy de todas partes. Como estas? Estoy bien. Adios, Londres.' Se presento. Como un estudiante en la leccion uno. Pero gramatica perfecta, tres idiomas. No es principiante — se esta BURLANDO de los principiantes. Se burla de NOSOTROS. Y lo peor? 'Adios, Londres' significa que ya se fue."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "ch1_scene5",
+      "title": {
+        "ko": "위협",
+        "en": "The Threat",
+        "es": "La Amenaza"
+      },
+      "beats": [
+        {
+          "id": "ch1_s5_footage",
+          "beat": "TENSION",
+          "narration": {
+            "en": "Tom pulls up the security footage on his phone. Grainy black and white. A figure in a long black coat moves through the museum with impossible confidence. He doesn't sneak. He doesn't hide. He walks like a man browsing an art gallery. Then, just before leaving, he stops. He turns to the camera. And he looks directly into the lens.",
+            "ko": "톰이 핸드폰으로 보안 영상을 보여준다. 거칠고 흑백인 화면. 긴 검은 코트를 입은 인물이 믿을 수 없는 자신감으로 박물관을 이동한다. 몰래 다니지 않는다. 숨지 않는다. 미술관을 구경하는 사람처럼 걷는다. 그리고 나가기 직전, 멈춘다. 카메라를 향해 돈다. 렌즈를 똑바로 바라본다.",
+            "es": "Tom saca las grabaciones de seguridad en su telefono. Imagen granulada en blanco y negro. Una figura con un largo abrigo negro se mueve por el museo con una confianza imposible. No se esconde. No se escabulle. Camina como quien pasea por una galeria de arte. Entonces, justo antes de irse, se detiene. Se gira hacia la camara. Y mira directamente al lente."
+          }
+        },
+        {
+          "id": "ch1_s5_tom_reaction",
+          "beat": "TENSION",
+          "charId": "tom",
+          "text": {
+            "en": "See that? He looked RIGHT at the camera. He KNEW it was there. Most thieves avoid cameras. This bloke? He posed for one. Like he wanted us to see his face. Except — you can't actually see his face. Just the coat and the smile. Gives me the creeps, mate.",
+            "ko": "저거 봤어? 카메라를 정면으로 봤어. 카메라가 있는 걸 알았던 거야. 대부분의 도둑들은 카메라를 피해. 이 놈은? 포즈를 취했어. 자기 얼굴을 보여주고 싶었던 것처럼. 근데 — 사실 얼굴은 안 보여. 코트랑 미소만 보여. 소름 돋아, 진짜.",
+            "es": "Ves eso? Miro DIRECTO a la camara. SABIA que estaba ahi. La mayoria de los ladrones evitan las camaras. Este tipo? Poso para una. Como si quisiera que vieramos su cara. Pero — en realidad no puedes ver su cara. Solo el abrigo y la sonrisa. Me pone los pelos de punta."
+          }
+        },
+        {
+          "id": "ch1_s5_card",
+          "beat": "TENSION",
+          "narration": {
+            "en": "Rudy spots something else. On the floor where the stone used to sit — a single playing card. The Ace of Spades. Someone has written on it in red ink. One word: MADRID.",
+            "ko": "루디가 다른 것을 발견한다. 수호석이 있던 바닥 위에 — 카드 한 장. 스페이드 에이스. 누군가 빨간 잉크로 적었다. 단어 하나: MADRID.",
+            "es": "Rudy nota algo mas. En el piso donde solia estar la piedra — una sola carta de juego. El As de Espadas. Alguien ha escrito en ella con tinta roja. Una palabra: MADRID."
+          }
+        },
+        {
+          "id": "ch1_s5_rudy_card",
+          "beat": "CURIOSITY",
+          "charId": "rudy",
+          "text": {
+            "en": "Madrid. He left us a destination. The Ace of Spades — in card games, it's the death card. The highest card in the deck. He's telling us two things at once: where he's going, and that he thinks he's already won. Cocky. Very cocky. Partner, there might be more clues here. Let's match what we know so far.",
+            "ko": "마드리드. 목적지를 남겨줬네. 스페이드 에이스 — 카드 게임에서 죽음의 카드야. 덱에서 가장 높은 카드. 두 가지를 동시에 말하고 있어: 어디로 가는지, 그리고 이미 이겼다고 생각한다는 것. 건방져. 아주 건방져. 파트너, 여기 단서가 더 있을 수 있어. 지금까지 알아낸 걸 정리해보자.",
+            "es": "Madrid. Nos dejo un destino. El As de Espadas — en los juegos de cartas, es la carta de la muerte. La carta mas alta de la baraja. Nos dice dos cosas a la vez: adonde va, y que cree que ya gano. Arrogante. Muy arrogante. Companero, puede haber mas pistas aqui. Organicemos lo que sabemos hasta ahora."
+          }
+        },
+        {
+          "id": "ch1_s5_quiz_intro",
+          "beat": "QUIZ_MOMENT",
+          "narration": {
+            "en": "Scattered around the crime scene are fragments of evidence — words, phrases, locations. Match each clue to its meaning to piece together Mr. Black's trail.",
+            "ko": "범죄 현장 곳곳에 증거의 파편들이 흩어져 있다 — 단어, 표현, 장소. 각 단서를 의미와 맞춰서 미스터 블랙의 흔적을 조합해야 한다.",
+            "es": "Dispersos por la escena del crimen hay fragmentos de evidencia — palabras, frases, lugares. Empareja cada pista con su significado para reconstruir el rastro de Mr. Black."
+          }
+        },
+        {
+          "id": "ch1_s5_post_quiz",
+          "beat": "REVEAL",
+          "charId": "rudy",
+          "text": {
+            "en": "The pieces are coming together. Mr. Black stole the London Language Stone. He silenced Dr. Ellis — probably as a demonstration. He left his name, a playing card marked 'Madrid,' and a self-introduction written in beginner vocabulary. He's heading to Madrid. And he wants us to follow.",
+            "ko": "퍼즐이 맞춰지고 있어. 미스터 블랙이 런던 언어석을 훔쳤어. 엘리스 박사의 목소리를 빼앗았어 — 아마 시범으로. 자기 이름을 남기고, '마드리드'라고 적힌 카드를 남기고, 초급 어휘로 자기소개를 남겼어. 마드리드로 향하고 있어. 그리고 우리가 따라오길 원해.",
+            "es": "Las piezas se estan juntando. Mr. Black robo la Piedra del Lenguaje de Londres. Silencio a la Dra. Ellis — probablemente como demostracion. Dejo su nombre, una carta marcada 'Madrid,' y una autopresentacion escrita en vocabulario de principiante. Se dirige a Madrid. Y quiere que lo sigamos."
+          }
+        },
+        {
+          "id": "ch1_s5_clue_madrid",
+          "beat": "REVEAL",
+          "type": "clue",
+          "title": { "ko": "수사 노트: 마드리드 석", "en": "Investigation Notes: The Madrid Stone", "es": "Notas de Investigacion: La Piedra de Madrid" },
+          "body": {
+            "en": "Rudy's deduction: If the London Language Stone was the first target, Madrid must be next. The Ace of Spades card is both a taunt and a map. Mr. Black isn't hiding — he's inviting pursuit. Why? What does he gain from being followed? Unless collecting the stones requires someone else to be there. Unless he needs US.",
+            "ko": "루디의 추론: 런던 언어석이 첫 번째 목표였다면, 마드리드가 다음이다. 스페이드 에이스 카드는 도발이자 지도다. 미스터 블랙은 숨지 않는다 — 추격을 초대하고 있다. 왜? 쫓기면 뭐가 좋은 거지? 돌을 모으려면 다른 사람이 있어야 하는 게 아닐까. 우리가 필요한 게 아닐까.",
+            "es": "Deduccion de Rudy: Si la Piedra del Lenguaje de Londres fue el primer objetivo, Madrid debe ser el siguiente. La carta del As de Espadas es una provocacion y un mapa. Mr. Black no se esconde — esta invitando a la persecucion. Por que? Que gana siendo perseguido? A menos que recolectar las piedras requiera que alguien mas este ahi. A menos que nos necesite a NOSOTROS."
+          },
+          "icon": "playing_card"
+        }
+      ]
+    },
+
+    {
+      "id": "ch1_scene6",
+      "title": {
+        "ko": "절벽 끝에서",
+        "en": "The Edge",
+        "es": "Al Borde"
+      },
+      "beats": [
+        {
+          "id": "ch1_s6_ellis_grab",
+          "beat": "CLIFFHANGER",
+          "narration": {
+            "en": "You're about to leave the museum when it happens. Dr. Ellis — silent, broken, staring-at-nothing Dr. Ellis — suddenly grabs your arm. Her grip is iron. Her eyes are wide and wild. And for one impossible moment, she speaks.",
+            "ko": "박물관을 나가려는 순간 그것이 일어난다. 엘리스 박사 — 침묵하고, 부서지고, 허공을 응시하던 엘리스 박사가 — 갑자기 네 팔을 붙잡는다. 쇠처럼 세게. 눈이 크게 뜨여 있고 거칠다. 그리고 불가능한 한 순간, 그녀가 말한다.",
+            "es": "Estas a punto de salir del museo cuando sucede. La Dra. Ellis — silenciosa, rota, mirando-a-la-nada Dra. Ellis — de repente agarra tu brazo. Su agarre es de hierro. Sus ojos estan abiertos y salvajes. Y por un momento imposible, habla."
+          }
+        },
+        {
+          "id": "ch1_s6_ellis_speaks",
+          "beat": "CLIFFHANGER",
+          "charId": "ellis",
+          "text": {
+            "en": "He said... there are SIX stones. London was just the first. He said... when he has all six... no one will speak again. No one. Ever.",
+            "ko": "그가 말했어... 돌이 여섯 개래. 런던은 첫 번째일 뿐이래. 그가 말했어... 여섯 개를 모두 모으면... 아무도 다시 말하지 못할 거래. 아무도. 영원히.",
+            "es": "El dijo... que hay SEIS piedras. Londres fue solo la primera. Dijo... que cuando tenga las seis... nadie volvera a hablar. Nadie. Nunca."
+          }
+        },
+        {
+          "id": "ch1_s6_ellis_silence",
+          "beat": "CLIFFHANGER",
+          "narration": {
+            "en": "Then silence again. Dr. Ellis's hand falls from your arm. Her eyes go blank. The moment is over. She's gone back to wherever Mr. Black sent her.",
+            "ko": "그리고 다시 침묵. 엘리스 박사의 손이 팔에서 떨어진다. 눈이 다시 텅 빈다. 순간이 끝났다. 미스터 블랙이 보낸 곳으로 다시 돌아갔다.",
+            "es": "Luego silencio otra vez. La mano de la Dra. Ellis cae de tu brazo. Sus ojos quedan vacios. El momento termino. Volvio a donde Mr. Black la envio."
+          }
+        },
+        {
+          "id": "ch1_s6_rudy_final",
+          "beat": "CLIFFHANGER",
+          "charId": "rudy",
+          "text": {
+            "en": "Six stones. Six languages. If he collects them all... Partner, you heard her. This isn't about one stolen relic anymore. This is about every language on Earth. Every word anyone has ever spoken or will ever speak. And right now, Mr. Black has a head start and we have a playing card that says Madrid. So. Are you coming?",
+            "ko": "돌이 여섯 개. 언어가 여섯 개. 전부 모으면... 파트너, 들었지. 이건 더 이상 유물 하나가 도난당한 것이 아니야. 지구상의 모든 언어에 관한 거야. 누구든 지금까지 말했거나 앞으로 말할 모든 단어. 그리고 지금, 미스터 블랙은 앞서 있고 우리에게는 마드리드라고 적힌 카드 한 장이 있어. 그래서. 갈 거야?",
+            "es": "Seis piedras. Seis idiomas. Si las reune todas... Companero, la escuchaste. Esto ya no es sobre una reliquia robada. Es sobre cada idioma en la Tierra. Cada palabra que alguien haya dicho o dira jamas. Y ahora mismo, Mr. Black nos lleva ventaja y nosotros tenemos una carta que dice Madrid. Entonces. Vienes?"
+          }
+        },
+        {
+          "id": "ch1_s6_end",
+          "beat": "CLIFFHANGER",
+          "narration": {
+            "en": "[Next Chapter: The Madrid Disappearance — People are losing their words]",
+            "ko": "[다음 챕터: 마드리드의 실종 — 사람들이 말을 잃고 있다]",
+            "es": "[Siguiente Capitulo: La Desaparicion de Madrid — La gente esta perdiendo sus palabras]"
+          }
+        }
+      ]
+    }
+  ],
+
+  "quizzes": [
+    {
+      "id": "ch1_quiz_a",
+      "scene": "ch1_scene2",
+      "type": "dialogue_choice",
+      "title": { "ko": "톰을 설득하라", "en": "Convince Tom", "es": "Convence a Tom" },
+      "storyContext": {
+        "ko": "경비원 톰이 입구를 막고 있다. 자기소개를 올바르게 해서 안으로 들어가야 한다.",
+        "en": "Guard Tom is blocking the entrance. You need to introduce yourself correctly to get inside.",
+        "es": "El guardia Tom bloquea la entrada. Necesitas presentarte correctamente para entrar."
+      },
+      "consequence": {
+        "ko": "제대로 소개하면 톰이 감명받아서 안으로 들여보내준다.",
+        "en": "A proper introduction impresses Tom and he lets you through.",
+        "es": "Una presentacion adecuada impresiona a Tom y te deja pasar."
+      },
+      "vocabularyUsed": "Day 1-3: Hello, My name is, I'm from, I am a (job), Nice to meet you",
+      "questions": [
+        {
+          "prompt": { "en": "Tom asks: 'Who are you?' How do you greet him?", "ko": "톰이 묻는다: '넌 누구야?' 어떻게 인사할까?", "es": "Tom pregunta: 'Quien eres?' Como lo saludas?" },
+          "context": { "en": "You need to make a good first impression on the guard.", "ko": "경비원에게 좋은 첫인상을 남겨야 한다.", "es": "Necesitas causar una buena primera impresion al guardia." },
+          "answer": { "en": "Hello! My name is... Nice to meet you.", "ko": "안녕하세요! 제 이름은... 만나서 반갑습니다.", "es": "Hola! Mi nombre es... Mucho gusto." },
+          "wrong": [
+            { "en": "Goodbye! I don't understand!", "ko": "안녕히 계세요! 이해 못 해요!", "es": "Adios! No entiendo!" },
+            { "en": "Sorry! Where is the exit?", "ko": "죄송합니다! 출구가 어디예요?", "es": "Perdon! Donde esta la salida?" }
+          ]
+        },
+        {
+          "prompt": { "en": "Tom asks: 'Where are you from?'", "ko": "톰이 묻는다: '어디서 왔어?'", "es": "Tom pregunta: 'De donde eres?'" },
+          "context": { "en": "Tell him where you're from to build trust.", "ko": "어디서 왔는지 말해서 신뢰를 쌓아야 한다.", "es": "Dile de donde eres para generar confianza." },
+          "answer": { "en": "I'm from... I am here to help with the investigation.", "ko": "저는...에서 왔습니다. 수사를 도우러 왔어요.", "es": "Soy de... Estoy aqui para ayudar con la investigacion." },
+          "wrong": [
+            { "en": "I'm fine, thank you. How are you?", "ko": "잘 지내요, 감사합니다. 어떻게 지내세요?", "es": "Estoy bien, gracias. Como estas?" },
+            { "en": "Goodbye! See you tomorrow!", "ko": "안녕히 계세요! 내일 봐요!", "es": "Adios! Nos vemos manana!" }
+          ]
+        },
+        {
+          "prompt": { "en": "Tom asks: 'What do you do? What's your job?'", "ko": "톰이 묻는다: '뭐하는 사람이야? 직업이 뭐야?'", "es": "Tom pregunta: 'A que te dedicas? Cual es tu trabajo?'" },
+          "context": { "en": "Tell him your role to prove you belong here.", "ko": "여기 있을 이유가 있다는 걸 증명하기 위해 역할을 말해야 한다.", "es": "Dile tu rol para probar que perteneces aqui." },
+          "answer": { "en": "I am a detective's partner. I work with Rudy.", "ko": "저는 탐정의 파트너입니다. 루디와 일해요.", "es": "Soy companero del detective. Trabajo con Rudy." },
+          "wrong": [
+            { "en": "I am a tourist. Where is the gift shop?", "ko": "저는 관광객이에요. 기념품 가게가 어디예요?", "es": "Soy turista. Donde esta la tienda de regalos?" },
+            { "en": "I don't understand. Please help.", "ko": "이해 못 해요. 도와주세요.", "es": "No entiendo. Por favor ayuda." }
+          ]
+        }
+      ],
+      "difficulty": 1,
+      "rewards": { "xp": 100, "expressionUnlock": "selfIntroduction" }
+    },
+    {
+      "id": "ch1_quiz_b",
+      "scene": "ch1_scene4",
+      "type": "word_rearrange",
+      "title": { "ko": "미스터 블랙의 메시지", "en": "Mr. Black's Message", "es": "El Mensaje de Mr. Black" },
+      "storyContext": {
+        "ko": "범죄 현장에서 발견된 찢어진 종이의 뒤섞인 단어를 올바른 순서로 배열해서 도둑의 자기소개를 해독해야 한다.",
+        "en": "Arrange the scrambled words from the torn paper found at the crime scene to decode the thief's self-introduction.",
+        "es": "Ordena las palabras revueltas del papel rasgado encontrado en la escena del crimen para descifrar la autopresentacion del ladron."
+      },
+      "consequence": {
+        "ko": "메시지를 해독하면 미스터 블랙이 기초 어휘로 자기소개를 남겼다는 사실이 드러난다 — 우리를 조롱하고 있다.",
+        "en": "Decoding reveals Mr. Black left a self-introduction using beginner vocabulary — he's mocking us.",
+        "es": "Descifrar revela que Mr. Black dejo una autopresentacion con vocabulario de principiante — se burla de nosotros."
+      },
+      "vocabularyUsed": "Day 1-2, Day 5: Hello, My name is, I'm from, How are you, I am fine, Goodbye",
+      "questions": [
+        {
+          "instruction": { "en": "The thief's first line:", "ko": "도둑의 첫 번째 줄:", "es": "La primera linea del ladron:" },
+          "scrambled": { "en": ["detective", "Hello", ","], "ko": ["탐정", ",", "안녕하세요"], "es": ["detective", ",", "Hola"] },
+          "answer": { "en": "Hello, detective", "ko": "안녕하세요, 탐정", "es": "Hola, detective" },
+          "hint": { "en": "Greetings come first.", "ko": "인사가 먼저야.", "es": "Los saludos van primero." }
+        },
+        {
+          "instruction": { "en": "The thief's second line:", "ko": "도둑의 두 번째 줄:", "es": "La segunda linea del ladron:" },
+          "scrambled": { "en": ["name", "is", "My", "Black", "Mr."], "ko": ["블랙", "미스터", "이름은", "제", "입니다"], "es": ["nombre", "es", "Mi", "Black", "Mr."] },
+          "answer": { "en": "My name is Mr. Black", "ko": "제 이름은 미스터 블랙입니다", "es": "Mi nombre es Mr. Black" },
+          "hint": { "en": "Self-introduction: 'My name is...'", "ko": "자기소개: '제 이름은...'", "es": "Presentacion: 'Mi nombre es...'" }
+        },
+        {
+          "instruction": { "en": "The thief's third line:", "ko": "도둑의 세 번째 줄:", "es": "La tercera linea del ladron:" },
+          "scrambled": { "en": ["everywhere", "from", "I'm"], "ko": ["왔어요", "모든 곳에서", "저는"], "es": ["todas partes", "de", "Soy"] },
+          "answer": { "en": "I'm from everywhere", "ko": "저는 모든 곳에서 왔어요", "es": "Soy de todas partes" },
+          "hint": { "en": "'I'm from...' — Day 2 vocabulary", "ko": "'저는...에서 왔어요' — 2일차 어휘", "es": "'Soy de...' — vocabulario del Dia 2" }
+        },
+        {
+          "instruction": { "en": "The thief's fourth line:", "ko": "도둑의 네 번째 줄:", "es": "La cuarta linea del ladron:" },
+          "scrambled": { "en": ["are", "?", "How", "you"], "ko": ["지내세요", "어떻게", "?"], "es": ["estas", "?", "Como"] },
+          "answer": { "en": "How are you?", "ko": "어떻게 지내세요?", "es": "Como estas?" },
+          "hint": { "en": "A common way to ask about someone's well-being.", "ko": "안부를 묻는 흔한 표현.", "es": "Una forma comun de preguntar como esta alguien." }
+        },
+        {
+          "instruction": { "en": "The thief's final line:", "ko": "도둑의 마지막 줄:", "es": "La ultima linea del ladron:" },
+          "scrambled": { "en": ["London", ",", "Goodbye"], "ko": ["런던", ",", "안녕히 계세요"], "es": ["Londres", ",", "Adios"] },
+          "answer": { "en": "Goodbye, London", "ko": "안녕히 계세요, 런던", "es": "Adios, Londres" },
+          "hint": { "en": "A farewell to the city.", "ko": "도시에 대한 작별 인사.", "es": "Una despedida a la ciudad." }
+        }
+      ],
+      "fullMessage": {
+        "en": "Hello, detective. My name is Mr. Black. I'm from everywhere. How are you? Goodbye, London.",
+        "ko": "안녕하세요, 탐정. 제 이름은 미스터 블랙입니다. 저는 모든 곳에서 왔어요. 어떻게 지내세요? 안녕히 계세요, 런던.",
+        "es": "Hola, detective. Mi nombre es Mr. Black. Soy de todas partes. Como estas? Adios, Londres."
+      },
+      "difficulty": 1,
+      "rewards": { "xp": 100, "expressionUnlock": "selfIntroduction" }
+    },
+    {
+      "id": "ch1_quiz_c",
+      "scene": "ch1_scene5",
+      "type": "word_match",
+      "title": { "ko": "범죄 현장 분석", "en": "Crime Scene Analysis", "es": "Analisis de la Escena del Crimen" },
+      "storyContext": {
+        "ko": "범죄 현장에 흩어진 단서들을 정리해야 한다. 각 단서의 의미를 맞춰서 미스터 블랙의 흔적을 추적하자.",
+        "en": "Organize the scattered clues at the crime scene. Match each clue to its meaning to track Mr. Black's trail.",
+        "es": "Organiza las pistas dispersas en la escena del crimen. Empareja cada pista con su significado para rastrear a Mr. Black."
+      },
+      "consequence": {
+        "ko": "단서를 정리하면 미스터 블랙이 마드리드로 향하고 있다는 것이 확인된다.",
+        "en": "Organizing the clues confirms Mr. Black is heading to Madrid.",
+        "es": "Organizar las pistas confirma que Mr. Black se dirige a Madrid."
+      },
+      "vocabularyUsed": "Day 1-6: Hello, Goodbye, Thank you, Sorry, Where is, My name is, How are you, Please, Help",
+      "questions": [
+        {
+          "word": { "en": "Hello", "ko": "안녕하세요", "es": "Hola" },
+          "context": { "en": "The first word on Mr. Black's note", "ko": "미스터 블랙의 쪽지에 적힌 첫 단어", "es": "La primera palabra en la nota de Mr. Black" },
+          "meaning": { "en": "a greeting when you meet someone", "ko": "누군가를 만날 때 하는 인사", "es": "un saludo cuando conoces a alguien" },
+          "wrong": [
+            { "en": "a farewell when leaving", "ko": "떠날 때 하는 작별 인사", "es": "una despedida al irse" },
+            { "en": "an apology for a mistake", "ko": "실수에 대한 사과", "es": "una disculpa por un error" },
+            { "en": "a request for help", "ko": "도움 요청", "es": "una peticion de ayuda" }
+          ]
+        },
+        {
+          "word": { "en": "Goodbye", "ko": "안녕히 계세요", "es": "Adios" },
+          "context": { "en": "The last word on Mr. Black's note — directed at London", "ko": "미스터 블랙 쪽지의 마지막 단어 — 런던에게 향한", "es": "La ultima palabra en la nota de Mr. Black — dirigida a Londres" },
+          "meaning": { "en": "a farewell, said when leaving", "ko": "떠날 때 하는 작별 인사", "es": "una despedida, dicha al irse" },
+          "wrong": [
+            { "en": "a greeting when arriving", "ko": "도착할 때 하는 인사", "es": "un saludo al llegar" },
+            { "en": "an expression of thanks", "ko": "감사 표현", "es": "una expresion de agradecimiento" },
+            { "en": "asking for directions", "ko": "길을 묻는 것", "es": "pedir direcciones" }
+          ]
+        },
+        {
+          "word": { "en": "Where is...?", "ko": "어디에 있어요...?", "es": "Donde esta...?" },
+          "context": { "en": "Written on the Ace of Spades — pointing to the next target", "ko": "스페이드 에이스에 적혀 있던 — 다음 목표를 가리키는", "es": "Escrito en el As de Espadas — senalando el siguiente objetivo" },
+          "meaning": { "en": "asking about a location or place", "ko": "장소나 위치를 묻는 표현", "es": "preguntar sobre un lugar o ubicacion" },
+          "wrong": [
+            { "en": "asking about someone's name", "ko": "누군가의 이름을 묻는 것", "es": "preguntar el nombre de alguien" },
+            { "en": "asking about the time", "ko": "시간을 묻는 것", "es": "preguntar la hora" },
+            { "en": "asking about someone's job", "ko": "직업을 묻는 것", "es": "preguntar el trabajo de alguien" }
+          ]
+        },
+        {
+          "word": { "en": "I am a...", "ko": "저는...입니다", "es": "Soy un/una..." },
+          "context": { "en": "How you introduced yourself to Tom — telling him your role", "ko": "톰에게 자기소개 할 때 — 역할을 말하는 방법", "es": "Como te presentaste a Tom — diciendo tu rol" },
+          "meaning": { "en": "stating your job or role", "ko": "직업이나 역할을 말하는 것", "es": "decir tu trabajo o rol" },
+          "wrong": [
+            { "en": "saying where you live", "ko": "사는 곳을 말하는 것", "es": "decir donde vives" },
+            { "en": "asking how someone is feeling", "ko": "누군가의 기분을 묻는 것", "es": "preguntar como se siente alguien" },
+            { "en": "saying thank you", "ko": "감사하다고 말하는 것", "es": "dar las gracias" }
+          ]
+        }
+      ],
+      "difficulty": 1,
+      "rewards": { "xp": 100, "expressionUnlock": "crimeSceneVocab" }
+    }
+  ]
+}

@@ -136,18 +136,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ── Locked voice map — NEVER changes based on mode, language, or personality ──
   // Voice identity is determined by tutorId ONLY. Adding or reading `mode` here
   // is forbidden — it must remain irrelevant to voice selection.
-  const TUTOR_VOICES: Record<string, string> = {
-    sarah:  "XB0fDUnXU5powFXDhCwa", // Charlotte — British female (genuine UK accent)
-    jake:   "TxGEqnHWrfWFTfGW9XjX", // Josh      — American male
-    jane:   "EXAVITQu4vr4xnSDxMaL", // Bella     — Spanish female
-    alex:   "ErXwobaYiN019PkySvjV",  // Antoni    — Latin male
-    jisu:   "21m00Tcm4TlvDq8ikWAM", // Rachel    — Korean female
-    minjun: "TxGEqnHWrfWFTfGW9XjX", // Josh      — Korean male
-  };
-
-  // Azure voice fallback map — used when ElevenLabs quota is exhausted.
-  // Male tutors (Jake, Alex, 민준) use Azure male neural voices.
-  const TUTOR_AZURE_FALLBACK: Record<string, { voice: string; lang: string }> = {
+  // Azure Neural TTS is the sole TTS provider for all tutors.
+  const TUTOR_AZURE_VOICES: Record<string, { voice: string; lang: string }> = {
     sarah:  { voice: "en-GB-SoniaNeural",  lang: "en-GB" }, // female ✓
     jake:   { voice: "en-US-GuyNeural",    lang: "en-US" }, // male  ✓
     jane:   { voice: "es-ES-ElviraNeural", lang: "es-ES" }, // female ✓
@@ -159,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/tts", async (req: Request, res: Response) => {
     try {
       // mode is intentionally NOT read here — voice identity is locked to tutorId.
-      // See TUTOR_VOICES above. Mode belongs only in /api/chat (system prompt).
+      // See TUTOR_AZURE_VOICES above. Mode belongs only in /api/chat (system prompt).
       const { text, tutorId, speed } = req.query as {
         text?: string;
         tutorId?: string;
@@ -170,48 +160,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "text and tutorId required" });
       }
 
-      const voiceId = TUTOR_VOICES[tutorId] ?? "21m00Tcm4TlvDq8ikWAM";
-      const stability = 0.5;
-      const similarity_boost = 0.75;
-      const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.1")));
-
-      const xiRes = await fetch(
-        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`,
-        {
-          method: "POST",
-          headers: {
-            "xi-api-key": process.env.ELEVENLABS_API_KEY ?? "",
-            "Content-Type": "application/json",
-            Accept: "audio/mpeg",
-          },
-          body: JSON.stringify({
-            text: text.slice(0, 5000),
-            model_id: "eleven_multilingual_v2",
-            voice_settings: { stability, similarity_boost, speaking_rate },
-          }),
-        }
-      );
-
-      if (xiRes.ok) {
-        res.set("Content-Type", "audio/mpeg");
-        res.set("Cache-Control", "public, max-age=300");
-        const buf = Buffer.from(await xiRes.arrayBuffer());
-        return res.send(buf);
-      }
-
-      // ElevenLabs failed (quota exceeded, auth error, etc.) — fall back to Azure Neural TTS
-      const errBody = await xiRes.text();
-      console.warn(`ElevenLabs unavailable (${xiRes.status}), falling back to Azure TTS:`, errBody);
-
-      const azureFallback = TUTOR_AZURE_FALLBACK[tutorId];
-      if (!azureFallback) {
-        return res.status(502).json({ error: "TTS unavailable" });
+      const azureVoice = TUTOR_AZURE_VOICES[tutorId];
+      if (!azureVoice) {
+        return res.status(400).json({ error: "Unknown tutorId" });
       }
 
       const azureKey = process.env.AZURE_SPEECH_KEY;
       const azureRegion = process.env.AZURE_SPEECH_REGION;
       if (!azureKey || !azureRegion) {
-        return res.status(502).json({ error: "TTS unavailable — no fallback credentials" });
+        return res.status(502).json({ error: "TTS unavailable — no Azure credentials" });
       }
 
       const safeText = text.slice(0, 5000)
@@ -221,13 +178,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Convert client speed multiplier (0.8-1.4) to Azure prosody rate string.
       // e.g. 0.8 → "-20%", 1.0 → "+0%", 1.2 → "+20%", 1.4 → "+40%"
+      const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.1")));
       const speedPct = Math.round((speaking_rate - 1) * 100);
       const speedRate = (speedPct >= 0 ? "+" : "") + speedPct + "%";
       console.log(`TTS called with speed: ${speaking_rate} → Azure prosody rate: ${speedRate}`);
 
       // Pass tutorId and speedRate — mode excluded so voice stays consistent across modes.
-      const ssml = buildSsml(azureFallback.voice, azureFallback.lang, safeText, tutorId, undefined, speedRate);
+      const ssml = buildSsml(azureVoice.voice, azureVoice.lang, safeText, tutorId, undefined, speedRate);
 
+      const ttsController = new AbortController();
+      setTimeout(() => ttsController.abort(), 15000);
       const azureRes = await fetch(
         `https://${azureRegion}.tts.speech.microsoft.com/cognitiveservices/v1`,
         {
@@ -238,12 +198,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
           },
           body: ssml,
+          signal: ttsController.signal,
         }
       );
 
       if (!azureRes.ok) {
         const azureErr = await azureRes.text();
-        console.error("Azure TTS fallback error:", azureRes.status, azureErr);
+        console.error("Azure TTS error:", azureRes.status, azureErr);
         return res.status(502).json({ error: "TTS failed" });
       }
 
@@ -272,7 +233,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "en-GB-SoniaNeural":  { style: "customerservice", degree: "1.5" }, // Sarah
     "en-US-GuyNeural":    { style: "friendly",         degree: "2"   }, // Jake (male fallback)
     "en-US-JennyNeural":  { style: "friendly",         degree: "2"   }, // Jake legacy
-    "es-ES-ElviraNeural": { style: "cheerful",          degree: "1.5" }, // Jane
+    "es-ES-ElviraNeural": { style: "neutral",            degree: "1"   }, // Jane
     "es-MX-JorgeNeural":  { style: "excited",           degree: "1.5" }, // Alex (male fallback)
     "es-MX-DaliaNeural":  { style: "excited",           degree: "1.5" }, // Alex legacy
     "ko-KR-SunHiNeural":  { style: "friendly",          degree: "1.5" }, // 지수
@@ -314,6 +275,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const rate  = speedRate ?? modeStyle?.rate ?? "+0%";
     const pitch = modeStyle?.pitch ?? "0%";
 
+    // For single-letter pronunciation, wrap with say-as="characters" so Azure
+    // speaks the letter name (e.g. "A" → "ay") instead of interpreting it as a word.
+    const textContent = mode === "letter"
+      ? `<say-as interpret-as="characters">${safeText}</say-as>`
+      : safeText;
+
     return [
       `<speak version="1.0"`,
       ` xmlns="http://www.w3.org/2001/10/synthesis"`,
@@ -321,7 +288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ` xml:lang="${lang}">`,
       `<voice name="${voiceName}">`,
       `<mstts:express-as style="${ssmlStyle.style}" styledegree="${ssmlStyle.degree}">`,
-      `<prosody rate="${rate}" pitch="${pitch}">${safeText}</prosody>`,
+      `<prosody rate="${rate}" pitch="${pitch}">${textContent}</prosody>`,
       `</mstts:express-as>`,
       `</voice>`,
       `</speak>`,
@@ -347,8 +314,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-      const ssml = buildSsml(voiceName, lang, safeText, tutorId, mode);
+      // pronunciation-tts is for clear educational speech — always use plain SSML.
+      // mstts:express-as styles are voice-specific and many voices return 400.
+      const prosodyRate = mode === "slow" ? "-30%" : "-5%";
+      const textContent = mode === "letter"
+        ? `<say-as interpret-as="characters">${safeText}</say-as>`
+        : safeText;
+      const ssml = [
+        `<speak version="1.0"`,
+        ` xmlns="http://www.w3.org/2001/10/synthesis"`,
+        ` xml:lang="${lang}">`,
+        `<voice name="${voiceName}">`,
+        `<prosody rate="${prosodyRate}">${textContent}</prosody>`,
+        `</voice>`,
+        `</speak>`,
+      ].join("");
 
+      const ttsController = new AbortController();
+      setTimeout(() => ttsController.abort(), 15000);
       const azureRes = await fetch(
         `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`,
         {
@@ -359,6 +342,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
           },
           body: ssml,
+          signal: ttsController.signal,
         }
       );
 
@@ -436,6 +420,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         `https://${region}.stt.speech.microsoft.com/speech/recognition/interactive` +
         `/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed`;
 
+      const sttController = new AbortController();
+      setTimeout(() => sttController.abort(), 15000);
       const azureRes = await fetch(azureUrl, {
         method: "POST",
         headers: {
@@ -443,6 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000",
         },
         body: wavBuffer,
+        signal: sttController.signal,
       });
 
       if (!azureRes.ok) {
@@ -490,14 +477,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { tmpdir } = await import("os");
       const { join } = await import("path");
 
+      // Azure Pronunciation Assessment only supports en-US for English (not en-GB, en-AU etc.)
+      const sttLang = lang.startsWith("en-") ? "en-US"
+                    : lang.startsWith("es-") ? "es-ES"
+                    : lang.startsWith("ko-") ? "ko-KR"
+                    : lang;
+
       const rawBuffer = Buffer.from(audio, "base64");
       const detectedFormat = detectAudioFormat(rawBuffer);
-      console.log(`[assess] raw=${rawBuffer.length}B  fmt=${detectedFormat}  mime=${mimeType}  lang=${lang}  word="${word}"`);
+      console.log(`[assess] raw=${rawBuffer.length}B  fmt=${detectedFormat}  mime=${mimeType}  lang=${lang}→${sttLang}  word="${word}"`);
 
-      // Convert to speech-optimised 16kHz WAV with normalisation + silence trim
+      // Determine Azure content type from client-reported mime type.
+      // iOS clients now send WAV (LINEARPCM 16kHz); Android sends MPEG-4/AAC.
+      // Azure Speech REST supports both natively without ffmpeg.
+      function getAzureContentType(mime: string | undefined): string {
+        if (!mime) return "audio/wav; codecs=audio/pcm; samplerate=16000";
+        if (mime.includes("wav") || mime.includes("pcm")) return "audio/wav; codecs=audio/pcm; samplerate=16000";
+        if (mime.includes("mp4") || mime.includes("m4a") || mime.includes("aac")) return "audio/mp4";
+        if (mime.includes("ogg") || mime.includes("opus")) return "audio/ogg; codecs=opus";
+        if (mime.includes("webm")) return "audio/webm; codecs=opus";
+        return "audio/wav; codecs=audio/pcm; samplerate=16000";
+      }
+
+      // Try ffmpeg conversion (best quality) — fall back gracefully if unavailable.
       const inputPath = join(tmpdir(), `pa-in-${randomUUID()}`);
       const outputPath = join(tmpdir(), `pa-out-${randomUUID()}.wav`);
       let wavBuffer: Buffer;
+      let azureContentType = getAzureContentType(mimeType);
       try {
         await writeFile(inputPath, rawBuffer);
         const ffmpegArgs = [
@@ -521,15 +527,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ff.on("error", reject);
         });
         wavBuffer = await readFile(outputPath);
+        azureContentType = "audio/wav; codecs=audio/pcm; samplerate=16000";
         console.log(`[assess] ffmpeg ok → ${wavBuffer.length}B`);
       } catch (convErr) {
-        console.error("[assess] ffmpeg failed:", convErr);
-        // Fall back — send raw buffer and hope Azure can handle it
+        console.error("[assess] ffmpeg unavailable, sending raw audio:", (convErr as Error).message);
+        // Send raw buffer with the correct Content-Type for the format Azure received
         wavBuffer = rawBuffer;
+        // azureContentType already set from mimeType above
       } finally {
         await unlink(inputPath).catch(() => {});
         await unlink(outputPath).catch(() => {});
       }
+
+      console.log(`[assess] sending to Azure  contentType=${azureContentType}  bytes=${wavBuffer.length}`);
 
       const assessmentConfig = Buffer.from(
         JSON.stringify({
@@ -541,16 +551,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ).toString("base64");
 
       // Use "interactive" mode — designed for short words/phrases, lower silence threshold
+      const assessController = new AbortController();
+      setTimeout(() => assessController.abort(), 15000);
       const azureRes = await fetch(
-        `https://${region}.stt.speech.microsoft.com/speech/recognition/interactive/cognitiveservices/v1?language=${lang}&format=detailed`,
+        `https://${region}.stt.speech.microsoft.com/speech/recognition/interactive/cognitiveservices/v1?language=${sttLang}&format=detailed`,
         {
           method: "POST",
           headers: {
             "Ocp-Apim-Subscription-Key": key,
-            "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000",
+            "Content-Type": azureContentType,
             "Pronunciation-Assessment": assessmentConfig,
           },
           body: wavBuffer,
+          signal: assessController.signal,
         }
       );
 
@@ -573,6 +586,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             Word: string;
             AccuracyScore?: number;
             ErrorType?: string;
+            Phonemes?: Array<{
+              Phoneme: string;
+              AccuracyScore?: number;
+            }>;
           }>;
         }>;
       };
@@ -620,6 +637,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           word: w.Word,
           score: Math.round(w.AccuracyScore ?? 0),
           errorType: w.ErrorType ?? "None",
+          phonemes: (w.Phonemes ?? []).map((p) => ({
+            phoneme: p.Phoneme,
+            score: Math.round(p.AccuracyScore ?? 0),
+          })),
         })),
       });
     } catch (err) {
@@ -658,7 +679,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         ],
         temperature: 0.7,
-        max_tokens: 120,
+        max_completion_tokens: 120,
         response_format: { type: "json_object" },
       });
 
@@ -687,19 +708,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     lisa:         { english: { voice: "en-US-SaraNeural",         lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
     marco:        { english: { voice: "en-US-ChristopherNeural",  lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-ES-AlvaroNeural",      lang: "es-ES" } },
     tom:          { english: { voice: "en-US-TonyNeural",         lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" } },
+    // Story-mode NPCs
+    amira:        { english: { voice: "en-US-AriaNeural",         lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    carlos:       { english: { voice: "en-US-GuyNeural",          lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" } },
+    ellis:        { english: { voice: "en-GB-SoniaNeural",        lang: "en-GB" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    hassan:       { english: { voice: "en-US-BrandonNeural",      lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-ES-AlvaroNeural",      lang: "es-ES" } },
+    isabel:       { english: { voice: "en-US-JennyNeural",        lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    miguel:       { english: { voice: "en-US-ChristopherNeural",  lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" } },
+    minho:        { english: { voice: "en-US-JasonNeural",        lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" } },
+    mr_black:     { english: { voice: "en-US-DavisNeural",        lang: "en-US" }, korean: { voice: "ko-KR-HyunsuNeural",  lang: "ko-KR" }, spanish: { voice: "es-ES-AlvaroNeural",      lang: "es-ES" } },
+    penny:        { english: { voice: "en-GB-LibbyNeural",        lang: "en-GB" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    sujin:        { english: { voice: "en-US-MichelleNeural",     lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    youngsook:    { english: { voice: "en-US-SaraNeural",         lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" } },
+    lingo:        { english: { voice: "en-US-TonyNeural",         lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" } },
   };
 
+  // NPC SSML express-as styles — applied only for English voices.
+  // Korean and Spanish Azure voices do not support all express-as styles;
+  // for non-English voices the endpoint uses prosody adjustments instead.
   const NPC_SSML_STYLES: Record<string, { style: string; degree: string }> = {
-    emma:         { style: "cheerful",                degree: "2"   },
-    james:        { style: "customerservice",          degree: "1"   },
-    officer_park: { style: "unfriendly",              degree: "1.5" },
-    bar_alex:     { style: "friendly",                degree: "2"   },
-    sofia:        { style: "customerservice",          degree: "1.5" },
-    mia:          { style: "cheerful",                degree: "2"   },
-    dr_kim:       { style: "narration-professional",  degree: "1"   },
-    lisa:         { style: "customerservice",          degree: "2"   },
-    marco:        { style: "friendly",                degree: "2"   },
-    tom:          { style: "excited",                 degree: "1.5" },
+    tom:          { style: "cheerful",  degree: "1.3" },
+    emma:         { style: "friendly",  degree: "1.2" },
+    james:        { style: "friendly",  degree: "1.0" },
+    sofia:        { style: "cheerful",  degree: "1.5" },
+    dr_kim:       { style: "serious",   degree: "1.0" },
+    marco:        { style: "friendly",  degree: "1.2" },
+    officer_park: { style: "serious",   degree: "1.0" },
+    bar_alex:     { style: "friendly",  degree: "1.2" },
+    mia:          { style: "friendly",  degree: "1.3" },
+    lisa:         { style: "cheerful",  degree: "1.2" },
+    // Story-mode NPCs
+    amira:        { style: "friendly",  degree: "1.2" },
+    carlos:       { style: "cheerful",  degree: "1.3" },
+    ellis:        { style: "sad",       degree: "1.5" },
+    hassan:       { style: "friendly",  degree: "1.0" },
+    isabel:       { style: "cheerful",  degree: "1.3" },
+    miguel:       { style: "friendly",  degree: "1.2" },
+    minho:        { style: "cheerful",  degree: "1.5" },
+    mr_black:     { style: "serious",   degree: "1.5" },
+    penny:        { style: "sad",       degree: "1.2" },
+    sujin:        { style: "friendly",  degree: "1.3" },
+    youngsook:    { style: "friendly",  degree: "1.0" },
+    lingo:        { style: "cheerful",  degree: "1.3" },
   };
 
   app.get("/api/npc-tts", async (req: Request, res: Response) => {
@@ -725,16 +775,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const safeText = text.slice(0, 3000)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-      const npcStyle = NPC_SSML_STYLES[npcId] ?? { style: "friendly", degree: "1.5" };
+      const npcStyle = NPC_SSML_STYLES[npcId] ?? { style: "friendly", degree: "1.2" };
 
-      const ssml = [
-        `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"`,
-        ` xmlns:mstts="http://www.w3.org/2001/mstts" xml:lang="${voiceInfo.lang}">`,
-        `<voice name="${voiceInfo.voice}">`,
-        `<mstts:express-as style="${npcStyle.style}" styledegree="${npcStyle.degree}">`,
-        `<prosody rate="${speedRate}">${safeText}</prosody>`,
-        `</mstts:express-as></voice></speak>`,
-      ].join("");
+      // express-as styles only work reliably with English Azure voices.
+      // For Korean/Spanish voices, use prosody adjustments only.
+      const isEnglish = voiceInfo.lang.startsWith("en-");
+
+      const ssml = isEnglish
+        ? [
+            `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"`,
+            ` xmlns:mstts="http://www.w3.org/2001/mstts" xml:lang="${voiceInfo.lang}">`,
+            `<voice name="${voiceInfo.voice}">`,
+            `<mstts:express-as style="${npcStyle.style}" styledegree="${npcStyle.degree}">`,
+            `<prosody rate="${speedRate}">${safeText}</prosody>`,
+            `</mstts:express-as></voice></speak>`,
+          ].join("")
+        : [
+            `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"`,
+            ` xml:lang="${voiceInfo.lang}">`,
+            `<voice name="${voiceInfo.voice}">`,
+            `<prosody rate="${speedRate}">${safeText}</prosody>`,
+            `</voice></speak>`,
+          ].join("");
 
       const azureRes = await fetch(
         `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`,
@@ -1111,7 +1173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           { role: "user", content: userMessage },
         ],
         temperature: 0.4,
-        max_tokens: 400,
+        max_completion_tokens: 400,
       });
       const raw = completion.choices[0]?.message?.content ?? "";
       res.json({ reply: raw });
@@ -1141,7 +1203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         model: "gpt-4o",
         messages: msgs,
         temperature: 0.7,
-        max_tokens: 600,
+        max_completion_tokens: 600,
       });
       const raw = completion.choices[0]?.message?.content ?? "...";
       let parsedReply = raw;

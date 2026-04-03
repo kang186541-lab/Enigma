@@ -4,7 +4,7 @@ import {
   TextInput, Animated, Platform, ActivityIndicator, KeyboardAvoidingView,
 } from "react-native";
 import { Audio } from "expo-av";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
@@ -221,8 +221,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         const objUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
         registerGlobalWebAudio(audio);
-        audio.onended = () => setTtsPlaying(false);
-        audio.onerror = () => setTtsPlaying(false);
+        audio.onended = () => { URL.revokeObjectURL(objUrl); setTtsPlaying(false); };
+        audio.onerror = () => { URL.revokeObjectURL(objUrl); setTtsPlaying(false); };
         audio.play().catch(() => setTtsPlaying(false));
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
@@ -230,6 +230,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
           if (st.isLoaded && st.didJustFinish) {
+            sound.unloadAsync().catch(() => {});
             soundRef.current = null;
             setTtsPlaying(false);
           }
@@ -279,7 +280,22 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
           playsInSilentModeIOS: true,
         });
         const rec = new Audio.Recording();
-        await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+        const recOptions: Audio.RecordingOptions = Platform.OS === "ios" ? {
+          android: Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+          ios: {
+            extension: ".wav",
+            outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+            audioQuality: Audio.IOSAudioQuality.HIGH,
+            sampleRate: 16000,
+            numberOfChannels: 1,
+            bitRate: 256000,
+            linearPCMBitDepth: 16,
+            linearPCMIsBigEndian: false,
+            linearPCMIsFloat: false,
+          },
+          web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
+        } : Audio.RecordingOptionsPresets.HIGH_QUALITY;
+        await rec.prepareToRecordAsync(recOptions);
         await rec.startAsync();
         nativeRecRef.current = rec;
         console.log("[MissionTalk] 녹음 시작 성공 (native)");
@@ -322,8 +338,15 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
       if (!uri) throw new Error("no uri");
       console.log("[MissionTalk] 녹음 중지 성공, 파일:", uri);
-      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
-      await submitSTT(base64, "audio/m4a", true);
+      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      // Empty audio guard
+      if (!base64 || base64.length < 2000) {
+        console.warn('[MissionTalk] Audio too short — user probably said nothing');
+        showSttError();
+        return;
+      }
+      const mimeType = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
+      await submitSTT(base64, mimeType, true);
     } catch (e) { console.error("[MissionTalk] native 중지 실패:", e); showSttError(); }
   }
 
@@ -342,6 +365,12 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         r.onerror = rej;
         r.readAsDataURL(blob);
       });
+      // Empty audio guard
+      if (!base64 || base64.length < 2000) {
+        console.warn('[MissionTalk] Audio too short — user probably said nothing');
+        showSttError();
+        return;
+      }
       await submitSTT(base64, mime, true);
     } catch (e) { console.error("[MissionTalk] handleWebStop 실패:", e); showSttError(); }
   }
@@ -545,7 +574,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
               <Pressable
                 key={i}
                 style={({ pressed }) => [s.suggestBtn, pressed && { opacity: 0.75 }]}
-                onPress={() => startRecording()}
+                onPress={() => sendUserMessage(ans, false)}
               >
                 <Text style={s.suggestBtnText}>{ans}</Text>
                 <Ionicons name="mic" size={11} color={C.gold} />

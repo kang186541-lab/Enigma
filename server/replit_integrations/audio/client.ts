@@ -106,7 +106,7 @@ export async function ensureCompatibleFormat(
 
 /**
  * Voice Chat: User speaks, LLM responds with audio (audio-in, audio-out).
- * Uses gpt-audio model via Replit AI Integrations.
+ * Uses gpt-4o-audio-preview model via Replit AI Integrations.
  * Note: Browser records WebM/opus - convert to WAV using ffmpeg before calling this.
  */
 export async function voiceChat(
@@ -181,7 +181,7 @@ export async function voiceChatStream(
 
 /**
  * Text-to-Speech: Converts text to speech verbatim.
- * Uses gpt-audio model via Replit AI Integrations.
+ * Uses gpt-4o-audio-preview model via Replit AI Integrations.
  */
 export async function textToSpeech(
   text: string,
@@ -203,7 +203,7 @@ export async function textToSpeech(
 
 /**
  * Streaming Text-to-Speech: Converts text to speech with real-time streaming.
- * Uses gpt-audio model via Replit AI Integrations.
+ * Uses gpt-4o-audio-preview model via Replit AI Integrations.
  * Note: Streaming only supports pcm16 output format.
  */
 export async function textToSpeechStream(
@@ -234,7 +234,7 @@ export async function textToSpeechStream(
 
 /**
  * Speech-to-Text: Transcribes audio using dedicated transcription model.
- * Uses gpt-4o-mini-transcribe for accurate transcription.
+ * Uses whisper-1 for accurate transcription.
  */
 export async function speechToText(
   audioBuffer: Buffer,
@@ -250,7 +250,7 @@ export async function speechToText(
 
 /**
  * Streaming Speech-to-Text: Transcribes audio with real-time streaming.
- * Uses gpt-4o-mini-transcribe for accurate transcription.
+ * Uses whisper-1 for accurate transcription.
  */
 export async function speechToTextStream(
   audioBuffer: Buffer,

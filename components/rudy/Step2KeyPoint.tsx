@@ -3,12 +3,12 @@ import {
   View, Text, StyleSheet, Pressable, TextInput, Animated, Platform, ActivityIndicator,
 } from "react-native";
 import { Audio } from "expo-av";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
-import { type Step2Data, type FillBlankQuiz } from "@/lib/lessonContent";
+import { type Step2Data, type FillBlankQuiz, type GrammarExplanation } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 
@@ -17,6 +17,7 @@ import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/l
 type ScreenPhase = "explanation" | "quiz";
 type QuizPhase = "question" | "checking" | "correct" | "wrong" | "speak";
 type SpeakPhase = "idle" | "recording" | "assessing" | "done";
+type WordScore = { word: string; score: number; errorType: string; phonemes?: { phoneme: string; score: number }[] };
 
 interface Props {
   data: Step2Data;
@@ -36,6 +37,10 @@ function getExplanation(explanation: Tri, lc: "ko" | "en" | "es"): string {
   return explanation[lc] ?? explanation.en;
 }
 
+function isRichExplanation(exp: Tri | GrammarExplanation): exp is GrammarExplanation {
+  return "pattern" in exp && "examples" in exp;
+}
+
 const SPEECH_LANG_MAP: Record<string, string> = {
   english: "en-US",
   spanish: "es-ES",
@@ -53,6 +58,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   const [correctCount, setCorrectCount] = useState(0);
   const [speakPhase,  setSpeakPhase]  = useState<SpeakPhase>("idle");
   const [speakScore,  setSpeakScore]  = useState<number | null>(null);
+  const [speakWords, setSpeakWords]  = useState<WordScore[]>([]);
   const [wrongFeedback, setWrongFeedback] = useState("");
   const [inputError,  setInputError]  = useState(false);
 
@@ -147,17 +153,65 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
           const objUrl = URL.createObjectURL(blob);
           const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
           registerGlobalWebAudio(audio);
-          audio.play().catch(() => {});
+          audio.onended = () => URL.revokeObjectURL(objUrl);
+          audio.onerror = () => URL.revokeObjectURL(objUrl);
+          await audio.play().catch(() => {});
         }
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
         registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
-          if (st.isLoaded && st.didJustFinish) soundRef.current = null;
+          if (st.isLoaded && st.didJustFinish) {
+            sound.unloadAsync().catch(() => {});
+            soundRef.current = null;
+          }
         });
       }
     } catch {}
+  }
+
+  // ── Word-level TTS (tap individual word to hear it) ───────────────────────────
+
+  async function playWordTTS(word: string) {
+    try {
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      const url = new URL("/api/pronunciation-tts", apiBase);
+      url.searchParams.set("text", word);
+      url.searchParams.set("lang", speechLang);
+      if (Platform.OS === "web") {
+        const res = await fetch(url.toString());
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const objUrl = URL.createObjectURL(blob);
+        const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+        registerGlobalWebAudio(audio);
+        await audio.play();
+      } else {
+        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
+        registerGlobalSound(sound);
+      }
+    } catch {}
+  }
+
+  // ── Phoneme-level pronunciation hint ─────────────────────────────────────────
+
+  function getPronTip(): string | null {
+    if (speakWords.length === 0) return null;
+    const weak = speakWords.filter((w) => w.score < 75);
+    if (weak.length === 0) return null;
+    const lowest = weak.reduce((a, b) => (a.score < b.score ? a : b));
+    const phonemeHint = lowest.phonemes?.length
+      ? lowest.phonemes.reduce((a, b) => (a.score < b.score ? a : b))
+      : null;
+    if (phonemeHint && phonemeHint.score < 70) {
+      if (nativeLang === "korean") return `"${lowest.word}"의 "${phonemeHint.phoneme}" 발음에 집중해보세요`;
+      if (nativeLang === "spanish") return `Enfócate en el sonido "${phonemeHint.phoneme}" en "${lowest.word}"`;
+      return `Focus on the "${phonemeHint.phoneme}" sound in "${lowest.word}"`;
+    }
+    if (nativeLang === "korean") return `"${lowest.word}" 발음을 다시 연습해보세요`;
+    if (nativeLang === "spanish") return `Practica la pronunciación de "${lowest.word}"`;
+    return `Practice the pronunciation of "${lowest.word}"`;
   }
 
   // ── Speak-after recording ─────────────────────────────────────────────────────
@@ -174,7 +228,22 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       try {
         await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
         const rec = new Audio.Recording();
-        await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+        const recOptions: Audio.RecordingOptions = Platform.OS === "ios" ? {
+          android: Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+          ios: {
+            extension: ".wav",
+            outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+            audioQuality: Audio.IOSAudioQuality.HIGH,
+            sampleRate: 16000,
+            numberOfChannels: 1,
+            bitRate: 256000,
+            linearPCMBitDepth: 16,
+            linearPCMIsBigEndian: false,
+            linearPCMIsFloat: false,
+          },
+          web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
+        } : Audio.RecordingOptionsPresets.HIGH_QUALITY;
+        await rec.prepareToRecordAsync(recOptions);
         await rec.startAsync();
         nativeRecRef.current = rec;
         autoStopRef.current = setTimeout(() => stopSpeakNativeRecording(), 4000);
@@ -208,8 +277,9 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       nativeRecRef.current = null;
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
       if (!uri) throw new Error("no uri");
-      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
-      await submitSpeakAssessment(base64, "audio/m4a");
+      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      const mimeType = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
+      await submitSpeakAssessment(base64, mimeType);
     } catch { setSpeakPhase("done"); }
   }
 
@@ -244,21 +314,25 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       return;
     }
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const apiUrl = new URL("/api/pronunciation-assess", apiBase).toString();
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word: quiz.fullSentence, lang: speechLang, audio: base64, mimeType }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       const data = res.ok ? await res.json() : {};
       // No speech recognized → 0 score
       if (!hasRecognizedSpeech(data)) {
         console.warn('[STEP2] Azure returned no recognized speech');
         setSpeakScore(0);
-        setSpeakPhase("done");
         return;
       }
       setSpeakScore(data.pronunciationScore ?? data.score ?? 0);
+      setSpeakWords(data.words ?? []);
     } catch { setSpeakScore(0); }
     finally { setSpeakPhase("done"); }
   }
@@ -300,6 +374,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     setInputVal("");
     setWrongFeedback("");
     setInputError(false);
+    setSpeakWords([]);
   }
 
   // ── Labels ────────────────────────────────────────────────────────────────────
@@ -319,6 +394,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   // ── Render ────────────────────────────────────────────────────────────────────
 
   if (screenPhase === "explanation") {
+    const rich = isRichExplanation(data.explanation) ? data.explanation : null;
+
     return (
       <View style={s.container}>
         <View style={s.rudyRow}>
@@ -330,10 +407,37 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
           </View>
         </View>
 
-        <View style={s.explainCard}>
-          <Ionicons name="bulb" size={22} color={C.gold} style={{ marginBottom: 4 }} />
-          <Text style={s.explainText}>{getExplanation(data.explanation, lc)}</Text>
-        </View>
+        {rich ? (
+          <View style={s.richExplainWrap}>
+            {/* Pattern */}
+            <View style={s.explainCard}>
+              <Ionicons name="bulb" size={20} color={C.gold} style={{ marginBottom: 2 }} />
+              <Text style={s.explainText}>{getExplanation(rich.pattern, lc)}</Text>
+            </View>
+
+            {/* Examples */}
+            <View style={s.exSection}>
+              <Text style={s.exLabel}>{nativeLang === "korean" ? "📝 실전 예문" : nativeLang === "spanish" ? "📝 Ejemplos reales" : "📝 Real examples"}</Text>
+              <Text style={s.exText}>{getExplanation(rich.examples, lc)}</Text>
+            </View>
+
+            {/* Mistakes */}
+            <View style={s.mistakeSection}>
+              <Text style={s.mistakeLabel}>{nativeLang === "korean" ? "🚫 흔한 실수" : nativeLang === "spanish" ? "🚫 Errores comunes" : "🚫 Common mistakes"}</Text>
+              <Text style={s.mistakeText}>{getExplanation(rich.mistakes, lc)}</Text>
+            </View>
+
+            {/* Rudy tip */}
+            <View style={s.rudyTipBox}>
+              <Text style={s.rudyTipText}>🦊 {getExplanation(rich.rudyTip, lc)}</Text>
+            </View>
+          </View>
+        ) : (
+          <View style={s.explainCard}>
+            <Ionicons name="bulb" size={22} color={C.gold} style={{ marginBottom: 4 }} />
+            <Text style={s.explainText}>{getExplanation(data.explanation as Tri, lc)}</Text>
+          </View>
+        )}
 
         <Pressable
           style={({ pressed }) => [s.okBtn, pressed && { opacity: 0.85 }]}
@@ -502,11 +606,29 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
             </Animated.View>
           </View>
 
-          {/* Speak score */}
+          {/* Speak score + word breakdown */}
           {speakPhase === "done" && speakScore !== null && (
-            <View style={s.speakScoreRow}>
-              <Ionicons name="star" size={14} color={C.gold} />
-              <Text style={s.speakScoreText}>{speakScore}%</Text>
+            <View style={s.speakResultBox}>
+              <View style={s.speakScoreRow}>
+                <Ionicons name="star" size={14} color={C.gold} />
+                <Text style={s.speakScoreText}>{speakScore}%</Text>
+              </View>
+              {speakWords.length > 0 && (
+                <View style={s.speakWordList}>
+                  {speakWords.map((w, i) => (
+                    <Pressable key={i} style={s.speakWordRow} onPress={() => playWordTTS(w.word)}>
+                      <Text style={s.speakWordIcon}>{w.score >= 75 ? "✅" : "⚠️"}</Text>
+                      <Text style={[s.speakWordText, w.score < 75 && { color: "#e5a940" }]}>{w.word}</Text>
+                      <Text style={[s.speakWordScore, w.score < 75 && { color: "#e5a940" }]}>{w.score}%</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
+              {(() => { const tip = getPronTip(); return tip ? (
+                <View style={s.pronTipBox}>
+                  <Text style={s.pronTipText}>💡 {tip}</Text>
+                </View>
+              ) : null; })()}
             </View>
           )}
 
@@ -546,6 +668,25 @@ const s = StyleSheet.create({
     shadowColor: C.gold, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 4,
   },
   explainText: { fontSize: 15, fontFamily: F.body, color: C.parchment, lineHeight: 24, textAlign: "center" },
+
+  richExplainWrap: { gap: 12 },
+  exSection: {
+    backgroundColor: C.bg2, borderRadius: 14, padding: 16,
+    borderWidth: 1, borderColor: C.border, gap: 6,
+  },
+  exLabel: { fontSize: 13, fontFamily: F.header, color: C.gold },
+  exText: { fontSize: 14, fontFamily: F.body, color: C.parchment, lineHeight: 22 },
+  mistakeSection: {
+    backgroundColor: "rgba(200,70,70,0.08)", borderRadius: 14, padding: 16,
+    borderWidth: 1, borderColor: "rgba(200,70,70,0.2)", gap: 6,
+  },
+  mistakeLabel: { fontSize: 13, fontFamily: F.header, color: "#e88" },
+  mistakeText: { fontSize: 14, fontFamily: F.body, color: C.parchment, lineHeight: 22 },
+  rudyTipBox: {
+    backgroundColor: "rgba(201,162,39,0.12)", borderRadius: 14, padding: 14,
+    borderWidth: 1, borderColor: "rgba(201,162,39,0.25)",
+  },
+  rudyTipText: { fontSize: 14, fontFamily: F.bodySemi, color: C.parchment, lineHeight: 22, fontStyle: "italic" },
 
   okBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
@@ -625,8 +766,17 @@ const s = StyleSheet.create({
   speakMicActive: { backgroundColor: "#e55", shadowColor: "#e55" },
   speakMicText: { fontSize: 13, fontFamily: F.header, color: C.bg1 },
 
+  speakResultBox: { width: "100%", gap: 6 },
   speakScoreRow: { flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" },
   speakScoreText: { fontSize: 13, fontFamily: F.bodySemi, color: C.gold },
+  speakWordList: { gap: 2 },
+  speakWordRow: { flexDirection: "row", alignItems: "center", gap: 6, paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, backgroundColor: "rgba(201,162,39,0.06)" },
+  speakWordIcon: { fontSize: 11, width: 18 },
+  speakWordText: { fontSize: 12, fontFamily: F.bodySemi, color: C.parchment, flex: 1 },
+  speakWordScore: { fontSize: 11, fontFamily: F.label, color: C.goldDim, minWidth: 32, textAlign: "right" },
+
+  pronTipBox: { marginTop: 6, padding: 8, borderRadius: 8, backgroundColor: "rgba(201,162,39,0.08)", borderWidth: 1, borderColor: "rgba(201,162,39,0.15)" },
+  pronTipText: { fontSize: 12, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
 
   speakNav: { flexDirection: "row", gap: 10, justifyContent: "flex-end" },
   skipBtn: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, borderWidth: 1, borderColor: C.border },

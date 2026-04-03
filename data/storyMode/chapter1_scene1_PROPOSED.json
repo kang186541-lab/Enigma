@@ -1,0 +1,785 @@
+{
+  "meta": {
+    "version": "3.1",
+    "author": "story-creator-agent",
+    "date": "2026-03-23",
+    "scope": "Chapter 1, Scene 1 — DEFINITIVE VERSION (replaces TSX content)",
+    "pacingTemplate": "ROLLER COASTER: Calm -> Curiosity -> Tension -> Quiz moment -> Reveal -> Cliffhanger",
+    "vocabularyPool": "Day 1-6 ONLY: Greetings, self-intro, goodbye, good morning/evening, thank you, sorry, please, my name is ___, I'm from ___, I don't understand, help, where is ___?, yes/no, how much?",
+    "evaluatorFeedback_v2": [
+      "SPEAKING INTEGRATION: Quizzes must feel like DOING, not just selecting. Sentence builder + pronunciation at peaks.",
+      "MR. BLACK MENACE: Show irreversible consequences. Dr. Ellis permanently losing speech = visceral horror.",
+      "EMOTIONAL INVESTMENT: Opening must be viscerally shocking. Player must CARE.",
+      "STORY-JUSTIFIED QUIZZES: Every quiz must fail without its narrative context. No standalone vocabulary drills.",
+      "TSX vs JSON: This file IS the definitive version."
+    ]
+  },
+
+  "originalVersion": {
+    "summary": "The existing chapter1_improved.json Scene 1 opens with Eleanor telling Rudy about a cipher. Dialogue is competent but uses cryptographic jargon (polyalphabetic substitution, Aramaic base) that violates Day 1-6 vocabulary. Pacing is flat. No visceral stakes — just a missing stone. No irreversible consequences shown. Quizzes are mostly tap-to-select. No emotional hook that makes the player CARE.",
+    "issues": [
+      "VOCABULARY VIOLATION: Cryptography jargon not in Day 1-6",
+      "FLAT PACING: Immediate exposition, no calm-to-tension arc",
+      "NO VISCERAL STAKES: A stone is missing but nobody is hurt. Abstract threat.",
+      "QUIZ DESIGN: Too many tap-to-select. Not enough active construction.",
+      "SPEAKING: No pronunciation or sentence-building at emotional peaks.",
+      "MR. BLACK: Mentioned but not felt. No demonstration of what he can do.",
+      "EMOTIONAL INVESTMENT: Player has no reason to care about a stolen rock."
+    ]
+  },
+
+  "proposedVersion": {
+    "pacing_map": {
+      "calm": "Rudy arrives at the museum on a normal morning. Coffee, routine, mundane details.",
+      "curiosity": "The door is open. The display case is empty. But something else is wrong — Dr. Ellis, the night researcher, is sitting on the floor. Staring at nothing.",
+      "tension_visceral": "Dr. Ellis opens his mouth to speak and CANNOT. He tries. His lips move. No words come out. Not in English. Not in any language. He holds up his notebook — his last written words: 'The man in the black coat touched the stone. Then he touched my face. And the words... the words are gone.' THE STONE DOESN'T JUST PROTECT LANGUAGE IN THE ABSTRACT. LOSING IT TAKES LANGUAGE FROM REAL PEOPLE.",
+      "quiz_moment": "The thief left a message on the display case in scrambled words. The player must BUILD the sentences to decode it — active construction, not selection. The message uses Day 1-6 vocabulary as mockery.",
+      "reveal": "The decoded message is a polite self-introduction: 'Hello, detective. My name is Mr. Black. I'm from everywhere. Goodbye, London. P.S. — Ask Dr. Ellis how he's feeling. Oh wait. He can't tell you.' The simplicity is the threat. The cruelty is the postscript.",
+      "cliffhanger": "Lights go out. Phone buzzes. Mr. Black texts: 'Good evening, detective. I can give Dr. Ellis his words back. If you can find me. Where is the next stone? That's your homework.' He's offering a deal — and he's in the building."
+    },
+
+    "scenes": [
+      {
+        "id": "ch1_s1_arrival",
+        "beat": "CALM",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "Monday morning. Rudy arrives at the museum. His coffee is lukewarm, his tie is crooked, and his mood is average. A normal Monday. The kind where the biggest problem should be a jammed photocopier or a tourist asking where the toilets are.",
+          "ko": "월요일 아침. 루디가 박물관에 도착한다. 커피가 미지근하고, 넥타이가 비뚤어져 있고, 기분은 보통이다. 보통의 월요일. 가장 큰 문제가 복사기 고장이나 관광객의 화장실 위치 질문인 그런 월요일.",
+          "es": "Lunes por la manana. Rudy llega al museo. Su cafe esta tibio, su corbata esta torcida y su animo es normal. Un lunes normal. De esos en que el mayor problema deberia ser una fotocopiadora atascada o un turista preguntando donde estan los banos."
+        }
+      },
+      {
+        "id": "ch1_s1_door",
+        "beat": "CALM_TO_CURIOSITY",
+        "kind": "scene",
+        "charId": "lingo",
+        "text": {
+          "en": "But the front door is open. I always lock the door when I leave. Always. It's the one thing I never forget. Well. Apparently today is a day of firsts.",
+          "ko": "하지만 현관문이 열려 있다. 나는 퇴근할 때 항상 문을 잠근다. 항상. 절대 잊지 않는 딱 하나. 뭐. 오늘은 처음 겪는 일들의 날인가 보다.",
+          "es": "Pero la puerta principal esta abierta. Yo siempre cierro la puerta cuando me voy. Siempre. Es lo unico que nunca olvido. Bueno. Al parecer hoy es un dia de primeras veces."
+        }
+      },
+      {
+        "id": "ch1_s1_discovery",
+        "beat": "CURIOSITY",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "Rudy walks into the exhibition hall. Everything is in its place — except one empty display case. Where the Guardian Stone used to sit. The glass isn't broken. The lock is intact. As if the stone walked out on its own. But that isn't what stops Rudy cold.",
+          "ko": "루디가 전시실로 걸어간다. 모든 것이 제자리에 있다 — 빈 진열장 하나만 빼고. 수호석이 있던 자리. 유리는 깨지지 않았다. 자물쇠도 멀쩡하다. 마치 돌이 스스로 걸어 나간 것처럼. 하지만 루디를 얼어붙게 만든 건 그게 아니다.",
+          "es": "Rudy camina hacia la sala de exhibicion. Todo esta en su lugar — excepto una vitrina vacia. Donde solia estar la Piedra Guardian. El vidrio no esta roto. La cerradura esta intacta. Como si la piedra hubiera salido sola. Pero eso no es lo que paraliza a Rudy."
+        }
+      },
+      {
+        "id": "ch1_s1_ellis",
+        "beat": "TENSION_VISCERAL",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "Dr. Ellis is sitting on the floor next to the empty case. The night researcher. Sixty-three years old. Speaks five languages. Wrote the definitive book on the Rosetta Stone. Right now, he is staring at the wall. His mouth is moving. No sound comes out.",
+          "ko": "엘리스 박사가 빈 진열장 옆 바닥에 앉아 있다. 야간 연구원. 63세. 5개 국어를 한다. 로제타석에 관한 결정적 저서를 쓴 사람. 지금 그는 벽을 응시하고 있다. 입이 움직이고 있다. 소리가 나오지 않는다.",
+          "es": "El Dr. Ellis esta sentado en el piso junto a la vitrina vacia. El investigador nocturno. Sesenta y tres anos. Habla cinco idiomas. Escribio el libro definitivo sobre la Piedra Rosetta. Ahora mismo, esta mirando la pared. Su boca se mueve. No sale ningun sonido."
+        }
+      },
+      {
+        "id": "ch1_s1_ellis_d1",
+        "beat": "TENSION_VISCERAL",
+        "kind": "scene",
+        "charId": "lingo",
+        "text": {
+          "en": "Dr. Ellis? It's Rudy. Can you hear me? What happened?",
+          "ko": "엘리스 박사? 루디예요. 제 말 들려요? 무슨 일이에요?",
+          "es": "Dr. Ellis? Soy Rudy. Me escucha? Que paso?"
+        }
+      },
+      {
+        "id": "ch1_s1_ellis_d2",
+        "beat": "TENSION_VISCERAL",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "Dr. Ellis looks up. Recognition in his eyes — he knows Rudy. He opens his mouth. His jaw moves. His tongue shapes syllables. Nothing. Not a whisper. Not in English. Not in French, or Arabic, or Greek, or any of the five languages he's spoken his entire life. He reaches into his coat pocket with shaking hands and holds up his notebook. His last written words, scrawled in a hand that was clearly trembling:",
+          "ko": "엘리스 박사가 올려다본다. 눈에 인식이 있다 — 루디를 알아본다. 입을 연다. 턱이 움직인다. 혀가 음절을 만든다. 아무것도. 속삭임조차 없다. 영어도 안 된다. 프랑스어, 아랍어, 그리스어, 평생 사용해온 5개 국어 어느 것도. 떨리는 손으로 코트 주머니에서 노트를 꺼내 든다. 분명히 떨리는 손으로 쓴 마지막 글:",
+          "es": "El Dr. Ellis levanta la mirada. Reconocimiento en sus ojos — conoce a Rudy. Abre la boca. Su mandibula se mueve. Su lengua forma silabas. Nada. Ni un susurro. Ni en ingles. Ni en frances, ni arabe, ni griego, ni en ninguno de los cinco idiomas que ha hablado toda su vida. Busca en el bolsillo de su abrigo con manos temblorosas y levanta su cuaderno. Sus ultimas palabras escritas, garabateadas con una mano claramente temblorosa:"
+        }
+      },
+      {
+        "id": "ch1_s1_ellis_note",
+        "beat": "TENSION_VISCERAL",
+        "kind": "scene",
+        "charId": "ellis",
+        "isWrittenNote": true,
+        "text": {
+          "en": "The man in the black coat came at 3 AM. He took the stone. Then he put his hand on my shoulder and said: 'Thank you for guarding it, Doctor. I'm sorry. But I need your words too.' And the words... the words are gone. I can think them. I can write them. But I cannot say them. Please help me.",
+          "ko": "검은 코트의 남자가 새벽 3시에 왔다. 수호석을 가져갔다. 그리고 내 어깨에 손을 얹으며 말했다: '지켜주셔서 감사합니다, 박사님. 죄송합니다. 하지만 당신의 말도 필요합니다.' 그리고 말이... 말이 사라졌다. 생각할 수는 있다. 쓸 수는 있다. 하지만 말할 수가 없다. 도와주세요.",
+          "es": "El hombre del abrigo negro vino a las 3 AM. Se llevo la piedra. Luego puso su mano en mi hombro y dijo: 'Gracias por custodiarla, Doctor. Lo siento. Pero necesito sus palabras tambien.' Y las palabras... las palabras se fueron. Puedo pensarlas. Puedo escribirlas. Pero no puedo decirlas. Por favor, ayudenme."
+        },
+        "designNote": "THIS IS THE EMOTIONAL HOOK. Mr. Black didn't just steal a stone. He stole a man's ability to SPEAK. Five languages, gone from his mouth in an instant. And he used Day 1-6 vocabulary to do it: 'Thank you', 'I'm sorry', 'Please', 'Help'. The most basic, polite phrases in any language — used to announce something monstrous. The player sees that THIS is what's at stake. Not an abstract 'languages will disappear.' A real person. Unable to speak. Right in front of you."
+      },
+      {
+        "id": "ch1_s1_rudy_reaction",
+        "beat": "TENSION_VISCERAL",
+        "kind": "scene",
+        "charId": "lingo",
+        "text": {
+          "en": "'Thank you.' 'I'm sorry.' He stole five languages from a man's mouth and said 'I'm sorry' like he'd bumped into him in a queue. Who DOES that?",
+          "ko": "'감사합니다.' '죄송합니다.' 사람의 입에서 다섯 개 언어를 훔쳐놓고 '죄송합니다'라고 했어. 마치 줄에서 부딪힌 것처럼. 누가 이런 짓을 해?",
+          "es": "'Gracias.' 'Lo siento.' Le robo cinco idiomas de la boca a un hombre y dijo 'lo siento' como si lo hubiera empujado en una fila. Quien HACE eso?"
+        }
+      },
+      {
+        "id": "ch1_s1_eleanor_arrives",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "Footsteps behind him. Fast ones. Lady Eleanor is running. In twenty years, Rudy has never seen Eleanor run. Not once.",
+          "ko": "뒤에서 발소리가 들린다. 빠른 발소리. 엘리너 경이 달려오고 있다. 루디는 20년 동안 엘리너가 뛰는 것을 본 적이 없다. 한 번도.",
+          "es": "Pasos detras de el. Rapidos. Lady Eleanor viene corriendo. En veinte anos, Rudy nunca ha visto a Eleanor correr. Ni una vez."
+        }
+      },
+      {
+        "id": "ch1_s1_eleanor_d1",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "eleanor",
+        "text": {
+          "en": "Rudy. Thank goodness. I tried calling — I couldn't get through. How is he? How is Dr. Ellis?",
+          "ko": "루디. 다행이다. 전화했는데 — 안 됐어. 그는 어때? 엘리스 박사는?",
+          "es": "Rudy. Gracias a Dios. Intente llamar — no pude comunicarme. Como esta? Como esta el Dr. Ellis?"
+        }
+      },
+      {
+        "id": "ch1_s1_eleanor_d2",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "lingo",
+        "text": {
+          "en": "He can't speak, Eleanor. Five languages. Gone. He can still write, still think — but he can't get a single word out. The man in the black coat did this to him. The same man who took the stone.",
+          "ko": "말을 못 해, 엘리너. 다섯 개 언어가. 사라졌어. 아직 쓸 수는 있고, 생각할 수는 있어 — 하지만 단 한 마디도 입 밖으로 못 내. 검은 코트의 남자가 이런 짓을 했어. 수호석을 가져간 바로 그 놈이.",
+          "es": "No puede hablar, Eleanor. Cinco idiomas. Desaparecidos. Aun puede escribir, aun puede pensar — pero no puede sacar ni una palabra. El hombre del abrigo negro le hizo esto. El mismo que se llevo la piedra."
+        }
+      },
+      {
+        "id": "ch1_s1_eleanor_d3",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "eleanor",
+        "text": {
+          "en": "Then the stone isn't just a relic. It's connected to language itself. And losing it means... Oh. Oh no. Rudy, how many of these stones are there?",
+          "ko": "그러면 수호석은 단순한 유물이 아니야. 언어 자체와 연결되어 있어. 그리고 잃는다는 건... 아. 안 돼. 루디, 이런 수호석이 몇 개야?",
+          "es": "Entonces la piedra no es solo una reliquia. Esta conectada al lenguaje mismo. Y perderla significa... Oh. Oh no. Rudy, cuantas de estas piedras hay?"
+        }
+      },
+      {
+        "id": "ch1_s1_rudy_guilt",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "lingo",
+        "isThought": true,
+        "text": {
+          "en": "(I was supposed to be guarding this stone. I was supposed to be HERE. Instead I was two rooms away cataloguing pottery. Pottery. And now Dr. Ellis — a man who spent his life with words — can't say a single one. Because of me.)",
+          "ko": "(내가 이 수호석을 지키고 있었어야 했어. 내가 여기 있었어야 했어. 대신 두 방 건너에서 도자기를 분류하고 있었지. 도자기. 그리고 이제 엘리스 박사 — 평생을 말과 함께 살아온 사람이 — 단 한 마디도 하지 못해. 내 때문에.)",
+          "es": "(Se suponia que yo custodiaba esta piedra. Se suponia que debia estar AQUI. En cambio estaba dos salas mas alla catalogando ceramica. Ceramica. Y ahora el Dr. Ellis — un hombre que paso su vida con las palabras — no puede decir ni una. Por mi culpa.)"
+        }
+      },
+      {
+        "id": "ch1_s1_message_discovery",
+        "beat": "QUIZ_MOMENT",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "Eleanor points to the display case. Words are scrawled across the glass in thick black marker — scrambled, broken up, scattered across three languages. English. Spanish. Korean. All jumbled together like a puzzle left by someone who wanted to be found. Rudy squints at the mess of words. This isn't a code. It's an introduction.",
+          "ko": "엘리너가 진열장을 가리킨다. 두꺼운 검은 마커로 유리 위에 단어들이 휘갈겨져 있다 — 뒤섞이고, 흩어지고, 세 개 언어에 걸쳐 흩뿌려져 있다. 영어. 스페인어. 한국어. 찾아지길 원하는 자가 남긴 퍼즐처럼 뒤죽박죽이다. 루디가 단어들의 난잡함을 눈을 가늘게 뜨고 살핀다. 이건 암호가 아니야. 자기소개야.",
+          "es": "Eleanor senala la vitrina. Hay palabras garabateadas en el vidrio con marcador negro grueso — desordenadas, separadas, dispersas en tres idiomas. Ingles. Espanol. Coreano. Todo mezclado como un rompecabezas dejado por alguien que queria ser encontrado. Rudy entrecierra los ojos ante el desorden de palabras. Esto no es un codigo. Es una presentacion."
+        }
+      },
+      {
+        "id": "ch1_s1_quiz1",
+        "beat": "QUIZ_MOMENT",
+        "kind": "puzzle",
+        "puzzleNum": 1,
+        "pType": "sentence_builder",
+        "storyContext": {
+          "ko": "도둑이 진열장 유리 위에 뒤섞인 단어로 메시지를 남겼다. 단어를 직접 배열해서 도둑의 메시지를 재구성해야 한다. 이 메시지에 도둑의 정체가 담겨 있다.",
+          "en": "The thief left a scrambled message on the display glass. Build the sentences yourself by dragging words into the correct order. The thief's identity is hidden in this message.",
+          "es": "El ladron dejo un mensaje desordenado en el vidrio. Construye las oraciones tu mismo arrastrando las palabras al orden correcto. La identidad del ladron esta oculta en este mensaje."
+        },
+        "storyReason": "This quiz CANNOT exist without the story. You are literally reading a criminal's message left at a crime scene. The emotional weight comes from knowing this person just stole Dr. Ellis's voice. Every word you decode was written by the man who did that.",
+        "mechanic": "SENTENCE BUILDER — player drags and drops word tiles into correct order. Active construction, not passive selection. The physical act of building the thief's words creates complicity — you are assembling his message with your own hands.",
+        "consequence": {
+          "ko": "메시지를 해독하자 도둑의 자기소개가 드러난다 — 그리고 마지막 줄에서 소름끼치는 추신이 나타난다.",
+          "en": "Decoding reveals the thief's self-introduction — and a chilling postscript in the final line.",
+          "es": "Descifrar revela la presentacion del ladron — y una escalofriante posdata en la ultima linea."
+        },
+        "vocabularyUsed": "Day 1-2: Greetings, self-intro (Hello, My name is, I'm from, Goodbye). Day 3-4: Thank you, Sorry, Help, Please",
+        "questions": [
+          {
+            "instruction": {
+              "en": "Build the thief's first line from the scattered words:",
+              "ko": "흩어진 단어로 도둑의 첫 번째 줄을 만드세요:",
+              "es": "Construye la primera linea del ladron con las palabras dispersas:"
+            },
+            "words": {
+              "en": ["detective", "Hello", ","],
+              "ko": ["탐정", ",", "안녕"],
+              "es": ["detective", ",", "Hola"]
+            },
+            "answer": {
+              "en": "Hello, detective",
+              "ko": "안녕, 탐정",
+              "es": "Hola, detective"
+            },
+            "hint": {
+              "en": "Greetings come first. How do you greet someone?",
+              "ko": "인사가 먼저야. 어떻게 인사하지?",
+              "es": "Los saludos van primero. Como saludas a alguien?"
+            }
+          },
+          {
+            "instruction": {
+              "en": "Build the thief's second line:",
+              "ko": "도둑의 두 번째 줄을 만드세요:",
+              "es": "Construye la segunda linea del ladron:"
+            },
+            "words": {
+              "en": ["name", "is", "My", "Black", "Mr."],
+              "ko": ["블랙", "미스터", "이름은", "제", "입니다"],
+              "es": ["nombre", "es", "Mi", "Black", "Mr."]
+            },
+            "answer": {
+              "en": "My name is Mr. Black",
+              "ko": "제 이름은 미스터 블랙입니다",
+              "es": "Mi nombre es Mr. Black"
+            },
+            "hint": {
+              "en": "A self-introduction. 'My name is...'",
+              "ko": "자기소개야. '제 이름은...'",
+              "es": "Una presentacion. 'Mi nombre es...'"
+            },
+            "grammarNote": {
+              "en": "Self-introduction pattern: My + name + is + [name].",
+              "ko": "자기소개 패턴: 제 + 이름은 + [이름] + 입니다.",
+              "es": "Patron de presentacion: Mi + nombre + es + [nombre]."
+            }
+          },
+          {
+            "instruction": {
+              "en": "Build the thief's third line:",
+              "ko": "도둑의 세 번째 줄을 만드세요:",
+              "es": "Construye la tercera linea del ladron:"
+            },
+            "words": {
+              "en": ["everywhere", "from", "I'm"],
+              "ko": ["왔어요", "모든 곳에서", "저는"],
+              "es": ["todas partes", "de", "Soy"]
+            },
+            "answer": {
+              "en": "I'm from everywhere",
+              "ko": "저는 모든 곳에서 왔어요",
+              "es": "Soy de todas partes"
+            },
+            "hint": {
+              "en": "Where is the thief from? 'I'm from...'",
+              "ko": "도둑은 어디서 왔을까? '저는...에서 왔어요'",
+              "es": "De donde es el ladron? 'Soy de...'"
+            },
+            "grammarNote": {
+              "en": "Origin expression: I'm from + [place].",
+              "ko": "출신 표현: 저는 + [장소]에서 + 왔어요.",
+              "es": "Expresion de origen: Soy de + [lugar]."
+            }
+          },
+          {
+            "instruction": {
+              "en": "Build the thief's farewell:",
+              "ko": "도둑의 마지막 인사를 만드세요:",
+              "es": "Construye la despedida del ladron:"
+            },
+            "words": {
+              "en": ["London", "Goodbye", ","],
+              "ko": ["런던", ",", "안녕히 계세요"],
+              "es": ["Londres", ",", "Adios"]
+            },
+            "answer": {
+              "en": "Goodbye, London",
+              "ko": "안녕히 계세요, 런던",
+              "es": "Adios, Londres"
+            },
+            "hint": {
+              "en": "The thief is leaving London. How do you say farewell?",
+              "ko": "도둑이 런던을 떠나고 있어. 작별 인사는?",
+              "es": "El ladron se va de Londres. Como te despides?"
+            }
+          }
+        ],
+        "fullMessage": {
+          "en": "Hello, detective.\nMy name is Mr. Black.\nI'm from everywhere.\nGoodbye, London.",
+          "ko": "안녕, 탐정.\n제 이름은 미스터 블랙입니다.\n저는 모든 곳에서 왔어요.\n안녕히 계세요, 런던.",
+          "es": "Hola, detective.\nMi nombre es Mr. Black.\nSoy de todas partes.\nAdios, Londres."
+        },
+        "postscript": {
+          "instruction": {
+            "en": "There's one more line, smaller, at the bottom of the glass. Build it:",
+            "ko": "유리 아래쪽에 더 작은 글씨로 한 줄이 더 있다. 만들어봐:",
+            "es": "Hay una linea mas, mas pequena, en la parte inferior del vidrio. Construyela:"
+          },
+          "words": {
+            "en": ["how", "he's", "Ask", "feeling", "Ellis", "Dr.", ".", "wait", "Oh", ".", "tell", "He", "can't", "you"],
+            "ko": ["어떤지", "엘리스", "물어봐", "기분이", "박사한테", ".", "아", ".", "못해", "말", "그는"],
+            "es": ["como", "esta", "al", "Dr.", "Ellis", "Preguntale", ".", "Oh", "espera", ".", "decirtelo", "No", "puede"]
+          },
+          "answer": {
+            "en": "Ask Dr. Ellis how he's feeling. Oh wait. He can't tell you.",
+            "ko": "엘리스 박사한테 기분이 어떤지 물어봐. 아. 그는 말 못해.",
+            "es": "Preguntale al Dr. Ellis como esta. Oh espera. No puede decirtelo."
+          },
+          "hint": {
+            "en": "The thief is being cruel about Dr. Ellis. He's suggesting you ask Ellis something... but Ellis can't speak.",
+            "ko": "도둑이 엘리스 박사에 대해 잔인하게 말하고 있어. 엘리스한테 뭔가를 물어보라고 하지만... 엘리스는 말을 못 해.",
+            "es": "El ladron esta siendo cruel sobre el Dr. Ellis. Sugiere que le preguntes algo a Ellis... pero Ellis no puede hablar."
+          }
+        },
+        "difficulty": 1,
+        "rewards": { "xp": 120, "expressionUnlock": "selfIntroduction" }
+      },
+      {
+        "id": "ch1_s1_post_quiz1",
+        "beat": "REVEAL",
+        "kind": "scene",
+        "charId": "lingo",
+        "text": {
+          "en": "He introduced himself. He actually introduced himself. 'Hello. My name is Mr. Black.' First-day language class phrases. And then that postscript — 'Ask Dr. Ellis how he's feeling. Oh wait. He can't tell you.' This isn't arrogance. This is cruelty wrapped in good manners.",
+          "ko": "자기소개를 했어. 실제로 자기소개를 남긴 거야. '안녕. 제 이름은 미스터 블랙입니다.' 어학 수업 첫날에 배우는 표현들. 그리고 그 추신 — '엘리스 박사한테 기분이 어떤지 물어봐. 아. 그는 말 못해.' 이건 오만이 아니야. 예의로 포장한 잔인함이야.",
+          "es": "Se presento. Realmente se presento. 'Hola. Mi nombre es Mr. Black.' Frases de primer dia de clase de idiomas. Y luego esa posdata — 'Preguntale al Dr. Ellis como esta. Oh espera. No puede decirtelo.' Esto no es arrogancia. Es crueldad envuelta en buenos modales."
+        }
+      },
+      {
+        "id": "ch1_s1_eleanor_insight",
+        "beat": "REVEAL",
+        "kind": "scene",
+        "charId": "eleanor",
+        "text": {
+          "en": "He used 'thank you' and 'sorry' and 'please' and 'goodbye.' The most basic words in any language. The first things you learn. Rudy — he's not just showing off. He's making a point. These simple words are the foundation of human connection. And he's demonstrating that he can take them away.",
+          "ko": "'감사합니다'와 '죄송합니다'와 '부탁합니다'와 '안녕히 계세요'를 썼어. 어떤 언어에서든 가장 기본적인 단어들. 가장 먼저 배우는 것들. 루디 — 그는 과시하는 게 아니야. 주장을 하는 거야. 이 간단한 단어들이 인간 소통의 기반인데. 그걸 빼앗을 수 있다는 걸 보여주고 있는 거야.",
+          "es": "Uso 'gracias' y 'lo siento' y 'por favor' y 'adios.' Las palabras mas basicas en cualquier idioma. Lo primero que aprendes. Rudy — no esta solo presumiendo. Esta haciendo un punto. Estas palabras simples son la base de la conexion humana. Y esta demostrando que puede quitarlas."
+        }
+      },
+      {
+        "id": "ch1_s1_rudy_chess",
+        "beat": "REVEAL",
+        "kind": "scene",
+        "charId": "lingo",
+        "isThought": true,
+        "text": {
+          "en": "(She's right. This is a chess move. He took the stone. He took Dr. Ellis's voice. He left his name. He's saying: 'I know who you are, now you know who I am, and here's what I can do.' First move, his. My turn next. Except I don't even know what game we're playing. And one of the pieces on the board is a man who can't speak anymore.)",
+          "ko": "(맞아. 이건 체스 수야. 수호석을 가져갔어. 엘리스 박사의 목소리를 가져갔어. 이름을 남겼어. '나는 네가 누군지 알아, 이제 넌 내가 누군지 알아, 그리고 이게 내가 할 수 있는 일이야'라고 말하는 거야. 첫 수는 그가 뒀어. 다음은 내 차례. 문제는 무슨 게임인지 모른다는 거야. 그리고 판 위의 말 중 하나는 더 이상 말을 할 수 없는 사람이야.)",
+          "es": "(Tiene razon. Es una jugada de ajedrez. Se llevo la piedra. Se llevo la voz del Dr. Ellis. Dejo su nombre. Esta diciendo: 'Se quien eres, ahora sabes quien soy, y esto es lo que puedo hacer.' Primer movimiento, suyo. Mi turno. Excepto que no se que juego estamos jugando. Y una de las piezas en el tablero es un hombre que ya no puede hablar.)"
+        }
+      },
+      {
+        "id": "ch1_s1_tom_arrives",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "Heavy breathing from the corridor. Guard Tom comes running. Still in his night shift uniform, coffee stain on his collar. Eyes wide. He skids to a stop when he sees Dr. Ellis on the floor.",
+          "ko": "복도에서 헐떡이는 소리가 들린다. 경비원 톰이 달려온다. 아직 야간 근무복 차림에 옷깃에 커피 얼룩. 눈이 휘둥그레져 있다. 바닥에 앉은 엘리스 박사를 보고 급정거한다.",
+          "es": "Respiracion agitada desde el pasillo. El guardia Tom viene corriendo. Todavia con su uniforme del turno nocturno, mancha de cafe en el cuello. Ojos bien abiertos. Se detiene en seco cuando ve al Dr. Ellis en el suelo."
+        }
+      },
+      {
+        "id": "ch1_s1_tom_d1",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "tom",
+        "text": {
+          "en": "Rudy! Is he alright? I found him like that an hour ago — tried to get him to talk but he just... couldn't. I called 999 but they said he's not hurt, just... Mate, I've never seen anyone look that scared.",
+          "ko": "루디! 괜찮은 거야? 한 시간 전에 이렇게 발견했어 — 말 좀 시키려고 했는데 그냥... 못 하더라. 119에 전화했는데 다친 건 아니라고, 그냥... 임마, 저렇게 무서워하는 사람은 처음 봤어.",
+          "es": "Rudy! Esta bien? Lo encontre asi hace una hora — intente que hablara pero simplemente... no podia. Llame al 112 pero dijeron que no esta herido, solo... Tio, nunca he visto a nadie con tanto miedo."
+        }
+      },
+      {
+        "id": "ch1_s1_tom_d2",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "lingo",
+        "text": {
+          "en": "Tom, did you see anyone last night? Anything unusual?",
+          "ko": "톰, 어젯밤에 누구 봤어? 뭔가 이상한 거?",
+          "es": "Tom, viste a alguien anoche? Algo inusual?"
+        }
+      },
+      {
+        "id": "ch1_s1_tom_d3",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "tom",
+        "text": {
+          "en": "That's what I came to tell you! Around 3 AM, some dodgy bloke was having a butcher's at the case. Tall geezer, black coat, moved like he owned the place. Dead calm. Didn't rush, didn't sneak. Just walked in like it was his living room. When he clocked me watching, he didn't run. He just... smiled. And walked out the front door.",
+          "ko": "그거 말하려고 온 거야! 새벽 3시쯤에 수상한 놈이 진열장을 뚫어지게 보고 있었어. 키 큰 놈, 검은 코트, 자기 집인 줄 아는 것처럼 돌아다녔어. 완전 침착했어. 서두르지도 않고, 몰래 다니지도 않고. 거실에 들어오듯 걸어왔어. 내가 보고 있는 걸 알아챘을 때도 도망 안 갔어. 그냥... 웃었어. 그리고 정문으로 걸어 나갔어.",
+          "es": "Eso vine a contarte! Alrededor de las 3 AM, un tipo sospechoso estaba mirando la vitrina. Un tipo alto, abrigo negro, se movia como si fuera el dueno. Completamente calmado. No se apuro, no se escondio. Camino como si fuera su sala. Cuando noto que lo estaba observando, no corrio. Solo... sonrio. Y salio por la puerta principal."
+        },
+        "idiom": {
+          "phrase": {
+            "en": "having a butcher's",
+            "ko": "자세히 보다 (코크니 슬랭)",
+            "es": "echar un vistazo (jerga cockney)"
+          },
+          "meaning": {
+            "en": "Cockney rhyming slang: butcher's hook = look. 'Having a butcher's' means 'having a look.'",
+            "ko": "코크니 라이밍 슬랭: butcher's hook = look. 'Having a butcher's'는 '자세히 보다'라는 뜻.",
+            "es": "Jerga cockney: butcher's hook = look. 'Having a butcher's' significa 'echar un vistazo.'"
+          },
+          "collection": "Tom_London_Slang",
+          "addToExpressionBook": true
+        }
+      },
+      {
+        "id": "ch1_s1_tom_d4",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "lingo",
+        "text": {
+          "en": "He smiled. He smiled and walked out the front door. He didn't even run. Tom — I understood about sixty percent of that. The important sixty, for once. Did he say anything?",
+          "ko": "웃었다고. 웃고 정문으로 걸어 나갔다고. 뛰지도 않고. 톰 — 방금 말의 60%는 알아들었어. 이번엔 중요한 60%. 그 놈이 뭐라고 말은 안 했어?",
+          "es": "Sonrio. Sonrio y salio por la puerta. Ni siquiera corrio. Tom — entendi como el sesenta por ciento. El sesenta por ciento importante, por una vez. Dijo algo?"
+        }
+      },
+      {
+        "id": "ch1_s1_tom_d5",
+        "beat": "TENSION",
+        "kind": "scene",
+        "charId": "tom",
+        "text": {
+          "en": "Yeah. When he walked past me, he stopped. Looked right at me. And said — I swear, mate — he said: 'Good evening. Thank you. I'm sorry about Dr. Ellis. Please tell the detective: where is the next stone? That's his homework. Goodbye.' Then he legged it. But not like he was running FROM something. Like he was walking TO something. Gave me the proper willies.",
+          "ko": "응. 나 옆을 지나갈 때 멈췄어. 날 똑바로 봤어. 그리고 말하길 — 맹세해, 임마 — '안녕하세요. 감사합니다. 엘리스 박사 건은 죄송합니다. 부탁인데 탐정에게 전해줘요: 다음 수호석은 어디에 있을까요? 숙제예요. 안녕히 계세요.' 그러고 갔어. 근데 뭔가에서 도망치는 게 아니라. 뭔가를 향해 걸어가는 것처럼. 소름 돋았어, 루디. 진짜.",
+          "es": "Si. Cuando paso junto a mi, se detuvo. Me miro directamente. Y dijo — te lo juro, tio — dijo: 'Buenas noches. Gracias. Lo siento por el Dr. Ellis. Por favor dile al detective: donde esta la siguiente piedra? Esa es su tarea. Adios.' Luego se fue. Pero no como huyendo DE algo. Como caminando HACIA algo. Me puso los pelos de punta, Rudy. De verdad."
+        },
+        "idiom": {
+          "phrase": {
+            "en": "legged it",
+            "ko": "도망치다 (영국 슬랭)",
+            "es": "salir corriendo (jerga britanica)"
+          },
+          "meaning": {
+            "en": "British slang: to leave quickly. 'He legged it' = 'He left quickly/ran away.'",
+            "ko": "영국 슬랭: 빨리 떠나다. 'He legged it' = '빨리 떠났다/도망쳤다.'",
+            "es": "Jerga britanica: irse rapidamente. 'He legged it' = 'Se fue rapido/salio corriendo.'"
+          },
+          "collection": "Tom_London_Slang",
+          "addToExpressionBook": true
+        },
+        "designNote": "Mr. Black's spoken words to Tom use EXCLUSIVELY Day 1-6 vocabulary: Good evening, Thank you, I'm sorry, Please, Where is ___?, Goodbye. Every single phrase is a beginner language lesson phrase. But in context, they're terrifying. He's demonstrating that the simplest words in any language can carry the heaviest weight."
+      },
+      {
+        "id": "ch1_s1_quiz2",
+        "beat": "QUIZ_MOMENT",
+        "kind": "puzzle",
+        "puzzleNum": 2,
+        "pType": "investigation",
+        "storyContext": {
+          "ko": "톰의 증언에서 핵심 정보를 추출해야 한다. 도둑이 톰에게 한 말을 분석하면 그의 다음 행선지와 의도를 알 수 있다.",
+          "en": "Extract the key information from Tom's testimony. Analyzing what the thief said to Tom reveals his next destination and intentions.",
+          "es": "Extrae la informacion clave del testimonio de Tom. Analizar lo que el ladron le dijo a Tom revela su proximo destino e intenciones."
+        },
+        "storyReason": "This quiz is an INVESTIGATION. The player is Rudy's partner, piecing together witness testimony. Without the story — without Dr. Ellis on the floor unable to speak, without the stolen stone, without Tom's terrified face — this is just vocabulary. WITH the story, every correct answer brings you closer to a man who can steal languages from people's mouths.",
+        "mechanic": "EVIDENCE BOARD — player drags testimony fragments onto an investigation board, categorizing them: WHO (identity clues), WHAT (actions), WHERE (next destination), HOW (method). Active sorting and reasoning, not multiple choice.",
+        "questions": [
+          {
+            "category": "WHO",
+            "evidence": {
+              "en": "The thief said: 'My name is Mr. Black.'",
+              "ko": "도둑이 말했다: '제 이름은 미스터 블랙입니다.'",
+              "es": "El ladron dijo: 'Mi nombre es Mr. Black.'"
+            },
+            "question": {
+              "en": "What does 'My name is Mr. Black' tell us about the thief?",
+              "ko": "'제 이름은 미스터 블랙입니다'가 도둑에 대해 알려주는 것은?",
+              "es": "Que nos dice 'Mi nombre es Mr. Black' sobre el ladron?"
+            },
+            "answer": {
+              "en": "He gave his name willingly — he wants to be known. This is not a thief hiding in shadows.",
+              "ko": "자발적으로 이름을 알려줬다 — 알려지길 원한다. 그림자에 숨는 도둑이 아니다.",
+              "es": "Dio su nombre voluntariamente — quiere ser conocido. Este no es un ladron que se esconde en las sombras."
+            },
+            "wrong": [
+              {
+                "en": "His real name is probably not Mr. Black, so this tells us nothing.",
+                "ko": "진짜 이름은 미스터 블랙이 아닐 테니 아무 의미 없다.",
+                "es": "Su nombre real probablemente no es Mr. Black, asi que no nos dice nada."
+              }
+            ]
+          },
+          {
+            "category": "WHAT",
+            "evidence": {
+              "en": "The thief said to Tom: 'Thank you. I'm sorry about Dr. Ellis.'",
+              "ko": "도둑이 톰에게 말했다: '감사합니다. 엘리스 박사 건은 죄송합니다.'",
+              "es": "El ladron le dijo a Tom: 'Gracias. Lo siento por el Dr. Ellis.'"
+            },
+            "question": {
+              "en": "Why would the thief apologize about Dr. Ellis?",
+              "ko": "도둑이 왜 엘리스 박사에 대해 사과했을까?",
+              "es": "Por que se disculparia el ladron por el Dr. Ellis?"
+            },
+            "answer": {
+              "en": "He knows what he did to Dr. Ellis and feels it needs acknowledgment. He has a code of conduct — polite, even about terrible things.",
+              "ko": "엘리스 박사에게 자신이 한 일을 알고 있고 인정해야 한다고 느낀다. 끔찍한 일에 대해서도 예의 바른, 자신만의 규칙이 있다.",
+              "es": "Sabe lo que le hizo al Dr. Ellis y siente que necesita reconocerlo. Tiene un codigo de conducta — educado, incluso sobre cosas terribles."
+            },
+            "wrong": [
+              {
+                "en": "He accidentally hurt Dr. Ellis and feels guilty.",
+                "ko": "실수로 엘리스 박사를 다치게 해서 죄책감을 느낀다.",
+                "es": "Hirio accidentalmente al Dr. Ellis y se siente culpable."
+              }
+            ]
+          },
+          {
+            "category": "WHERE",
+            "evidence": {
+              "en": "The thief said: 'Where is the next stone? That's his homework.'",
+              "ko": "도둑이 말했다: '다음 수호석은 어디에 있을까요? 숙제예요.'",
+              "es": "El ladron dijo: 'Donde esta la siguiente piedra? Esa es su tarea.'"
+            },
+            "question": {
+              "en": "'Where is the next stone?' — what does this tell us?",
+              "ko": "'다음 수호석은 어디에 있을까요?' — 이것이 알려주는 것은?",
+              "es": "'Donde esta la siguiente piedra?' — que nos dice esto?"
+            },
+            "answer": {
+              "en": "There are MORE stones. He already knows where they are. He's challenging Rudy to find them too — this is a game to him.",
+              "ko": "수호석이 더 있다. 그는 이미 어디 있는지 안다. 루디에게도 찾아보라고 도전하는 것이다 — 그에게 이건 게임이다.",
+              "es": "Hay MAS piedras. El ya sabe donde estan. Esta desafiando a Rudy a encontrarlas tambien — para el esto es un juego."
+            },
+            "wrong": [
+              {
+                "en": "He doesn't know where the next stone is and is asking for help.",
+                "ko": "다음 수호석이 어디 있는지 몰라서 도움을 구하는 것이다.",
+                "es": "No sabe donde esta la siguiente piedra y esta pidiendo ayuda."
+              }
+            ]
+          }
+        ],
+        "difficulty": 1,
+        "rewards": { "xp": 120, "expressionUnlock": "tomSlang_set1" }
+      },
+      {
+        "id": "ch1_s1_post_quiz2",
+        "beat": "REVEAL",
+        "kind": "scene",
+        "charId": "lingo",
+        "text": {
+          "en": "So. We have a name: Mr. Black. We have a method: he can steal language from people. We have a challenge: 'Where is the next stone?' And we have a victim sitting on the floor who can't say 'help' even though his eyes are screaming it.",
+          "ko": "그래서. 이름이 있어: 미스터 블랙. 방법도 알아: 사람에게서 언어를 빼앗을 수 있어. 도전장도 받았어: '다음 수호석은 어디에 있을까?' 그리고 바닥에 앉아서 '도와주세요'라고 말하지 못하는 피해자가 있어. 눈은 비명을 지르고 있는데.",
+          "es": "Asi que. Tenemos un nombre: Mr. Black. Tenemos un metodo: puede robar el lenguaje de las personas. Tenemos un desafio: 'Donde esta la siguiente piedra?' Y tenemos una victima sentada en el suelo que no puede decir 'ayuda' aunque sus ojos lo gritan."
+        }
+      },
+      {
+        "id": "ch1_s1_pronunciation_moment",
+        "beat": "REVEAL",
+        "kind": "puzzle",
+        "puzzleNum": 3,
+        "pType": "pronunciation",
+        "storyContext": {
+          "ko": "루디가 엘리스 박사 앞에 무릎을 꿇는다. 노트에 한 문장을 적어 보여준다. '이걸 읽어보세요, 박사님. 목소리로.' 엘리스가 시도한다. 아무 소리도 나오지 않는다. 루디가 대신 읽어야 한다 — 엘리스를 위해.",
+          "en": "Rudy kneels in front of Dr. Ellis. He writes a sentence in the notebook and shows it. 'Try reading this, Doctor. Out loud.' Ellis tries. No sound. Rudy must read it for him — for Ellis.",
+          "es": "Rudy se arrodilla frente al Dr. Ellis. Escribe una oracion en el cuaderno y la muestra. 'Intente leer esto, Doctor. En voz alta.' Ellis lo intenta. Sin sonido. Rudy debe leerlo por el — por Ellis."
+        },
+        "storyReason": "This pronunciation quiz is an ACT OF EMPATHY. Dr. Ellis cannot speak. Rudy reads the words out loud FOR him. The player isn't just practicing pronunciation — they are giving voice to someone who lost theirs. This quiz is meaningless without the story. It only works because you've just watched a man try to speak and fail.",
+        "mechanic": "SPEAK FOR ELLIS — the player reads words aloud that Dr. Ellis cannot say. Each word the player speaks is a word Ellis has lost. The app uses speech recognition to verify pronunciation. The emotional weight makes the player CARE about getting it right.",
+        "questions": [
+          {
+            "ellisWrites": {
+              "en": "Help.",
+              "ko": "도와주세요.",
+              "es": "Ayuda."
+            },
+            "rudyInstruction": {
+              "en": "He can't say it. Say it for him.",
+              "ko": "그는 말할 수 없어. 대신 말해줘.",
+              "es": "El no puede decirlo. Dilo por el."
+            },
+            "word": { "en": "Help", "ko": "도와주세요", "es": "Ayuda" }
+          },
+          {
+            "ellisWrites": {
+              "en": "My name is Dr. Ellis.",
+              "ko": "제 이름은 엘리스 박사입니다.",
+              "es": "Mi nombre es Dr. Ellis."
+            },
+            "rudyInstruction": {
+              "en": "His own name. He can't even say his own name.",
+              "ko": "자기 이름도. 자기 이름조차 말할 수가 없어.",
+              "es": "Su propio nombre. Ni siquiera puede decir su propio nombre."
+            },
+            "word": { "en": "My name is Dr. Ellis", "ko": "제 이름은 엘리스 박사입니다", "es": "Mi nombre es Dr. Ellis" }
+          },
+          {
+            "ellisWrites": {
+              "en": "Please find him.",
+              "ko": "부탁입니다, 그를 찾아주세요.",
+              "es": "Por favor, encuentralo."
+            },
+            "rudyInstruction": {
+              "en": "Read it clearly. He needs you to be his voice right now.",
+              "ko": "또렷하게 읽어줘. 지금 그에게는 네 목소리가 필요해.",
+              "es": "Leelo claramente. Ahora mismo necesita que seas su voz."
+            },
+            "word": { "en": "Please find him", "ko": "부탁입니다, 그를 찾아주세요", "es": "Por favor, encuentralo" }
+          }
+        ],
+        "difficulty": 1,
+        "rewards": { "xp": 80, "emotionalImpact": "high" },
+        "consequence": {
+          "en": "Dr. Ellis grips Rudy's hand. Tears in his eyes. He mouths two words. No sound. But Rudy reads his lips: 'Thank you.'",
+          "ko": "엘리스 박사가 루디의 손을 잡는다. 눈에 눈물이 고인다. 소리 없이 두 마디를 입 모양으로 만든다. 루디가 입술을 읽는다: '감사합니다.'",
+          "es": "El Dr. Ellis agarra la mano de Rudy. Lagrimas en sus ojos. Articula dos palabras. Sin sonido. Pero Rudy lee sus labios: 'Gracias.'"
+        }
+      },
+      {
+        "id": "ch1_s1_cliffhanger_setup",
+        "beat": "CLIFFHANGER",
+        "kind": "scene",
+        "charId": "tom",
+        "text": {
+          "en": "Rudy — almost forgot. Found something else. Under the display case. He must've dropped it on his way out.",
+          "ko": "루디 — 깜빡할 뻔했다. 다른 거 하나 더 찾았어. 진열장 밑에. 나가면서 떨어뜨린 것 같아.",
+          "es": "Rudy — casi se me olvida. Encontre otra cosa. Debajo de la vitrina. Se le debio caer al salir."
+        }
+      },
+      {
+        "id": "ch1_s1_cliffhanger_note",
+        "beat": "CLIFFHANGER",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "Tom hands over a crumpled piece of paper. On it, in the same black marker: words in a language Rudy doesn't recognize. And a sketch — rough, quick, but unmistakable. A building with grand columns. A museum. Not this one.",
+          "ko": "톰이 구겨진 종이 한 장을 건넨다. 같은 검은 마커로 적혀 있다: 루디가 알아볼 수 없는 언어의 단어들. 그리고 스케치 — 거칠고, 빠르지만, 틀림없는. 웅장한 기둥이 있는 건물. 박물관. 이 박물관은 아니다.",
+          "es": "Tom le entrega un papel arrugado. En el, con el mismo marcador negro: palabras en un idioma que Rudy no reconoce. Y un boceto — tosco, rapido, pero inconfundible. Un edificio con columnas grandes. Un museo. No este."
+        }
+      },
+      {
+        "id": "ch1_s1_cliffhanger_lights",
+        "beat": "CLIFFHANGER",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "Rudy reaches for the note — and every light in the museum goes dark. The exhibition hall plunges into blackness. Eleanor gasps. Tom swears. Dr. Ellis grips Rudy's arm. And Rudy's phone buzzes. Unknown number. A text message.",
+          "ko": "루디가 쪽지에 손을 뻗는 순간 — 박물관의 모든 불이 꺼진다. 전시실이 암흑에 잠긴다. 엘리너가 숨을 들이쉰다. 톰이 욕을 한다. 엘리스 박사가 루디의 팔을 잡는다. 그리고 루디의 핸드폰이 울린다. 모르는 번호. 문자 메시지.",
+          "es": "Rudy alcanza la nota — y todas las luces del museo se apagan. La sala de exhibicion se sumerge en la oscuridad. Eleanor jadea. Tom maldice. El Dr. Ellis agarra el brazo de Rudy. Y el telefono de Rudy vibra. Numero desconocido. Un mensaje de texto."
+        }
+      },
+      {
+        "id": "ch1_s1_black_text",
+        "beat": "CLIFFHANGER",
+        "kind": "scene",
+        "charId": "mr_black",
+        "isTextMessage": true,
+        "text": {
+          "en": "Good evening, detective. I can give Dr. Ellis his words back. All five languages. But you'll have to find me first. The note has your next destination. Don't read it in the dark — you might miss the important part. Homework is due soon. - B",
+          "ko": "안녕하세요, 탐정님. 엘리스 박사에게 말을 돌려줄 수 있어요. 다섯 개 언어 전부. 하지만 먼저 저를 찾아야 해요. 쪽지에 다음 목적지가 있어요. 어둠 속에서 읽지 마세요 — 중요한 부분을 놓칠 수 있으니까. 숙제 마감이 곧이에요. - B",
+          "es": "Buenas noches, detective. Puedo devolverle sus palabras al Dr. Ellis. Los cinco idiomas. Pero primero tendras que encontrarme. La nota tiene tu proximo destino. No la leas en la oscuridad — podrias perder la parte importante. La tarea se entrega pronto. - B"
+        },
+        "designNote": "Mr. Black's text uses ONLY Day 1-6 vocabulary as the primary phrases: 'Good evening' (greeting), 'Please' (implied politeness), 'find' (Where is?), 'Help' (Dr. Ellis needs it). He's offering a DEAL — find me and I'll restore Ellis's voice. This gives the player personal motivation: it's not just about saving abstract 'language diversity.' It's about helping a specific person they just watched suffer. And the lights going out proves he's still HERE. Still watching. Still in control."
+      },
+      {
+        "id": "ch1_s1_final",
+        "beat": "CLIFFHANGER",
+        "kind": "scene",
+        "charId": "lingo",
+        "isThought": true,
+        "text": {
+          "en": "(He's here. Right now. In this building. He turned off the lights to prove it. And he just offered to give Dr. Ellis his voice back — IF I can find him. 'Good evening.' 'Thank you.' 'I'm sorry.' 'Goodbye.' He keeps using the simplest words. The first words anyone learns. And every time he uses them, something terrible follows. I need to find this man. Not just for the stones. For Dr. Ellis. For every person who might be next.)",
+          "ko": "(그가 여기 있어. 지금. 이 건물 안에. 불을 꺼서 증명했어. 그리고 엘리스 박사에게 목소리를 돌려주겠다고 했어 — 내가 찾을 수 있다면. '안녕하세요.' '감사합니다.' '죄송합니다.' '안녕히 계세요.' 계속 가장 간단한 단어들을 써. 누구나 가장 먼저 배우는 말들. 그런데 그가 그 말을 쓸 때마다 끔찍한 일이 뒤따라. 이 남자를 찾아야 해. 수호석 때문만이 아니야. 엘리스 박사를 위해. 다음 희생자가 될 수 있는 모든 사람을 위해.)",
+          "es": "(Esta aqui. Ahora mismo. En este edificio. Apago las luces para demostrarlo. Y acaba de ofrecer devolverle la voz al Dr. Ellis — SI puedo encontrarlo. 'Buenas noches.' 'Gracias.' 'Lo siento.' 'Adios.' Sigue usando las palabras mas simples. Las primeras que cualquiera aprende. Y cada vez que las usa, algo terrible sigue. Necesito encontrar a este hombre. No solo por las piedras. Por el Dr. Ellis. Por cada persona que podria ser la siguiente.)"
+        }
+      },
+      {
+        "id": "ch1_s1_end",
+        "beat": "CLIFFHANGER",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "In the darkness of the museum, Rudy holds the crumpled note in one hand and his phone in the other. The screen glows. Mr. Black's message blinks. Dr. Ellis's hand is still on his arm. Somewhere in this building, a man who speaks every language is waiting to see what Rudy does next.",
+          "ko": "어두운 박물관에서 루디는 한 손에 구겨진 쪽지를, 다른 손에 핸드폰을 들고 있다. 화면이 빛난다. 미스터 블랙의 메시지가 깜빡인다. 엘리스 박사의 손이 아직 그의 팔 위에 있다. 이 건물 어딘가에서, 모든 언어를 하는 남자가 루디의 다음 행동을 지켜보고 있다.",
+          "es": "En la oscuridad del museo, Rudy sostiene la nota arrugada en una mano y su telefono en la otra. La pantalla brilla. El mensaje de Mr. Black parpadea. La mano del Dr. Ellis sigue en su brazo. En alguna parte de este edificio, un hombre que habla todos los idiomas esta esperando para ver que hace Rudy a continuacion."
+        }
+      },
+      {
+        "id": "ch1_s1_next",
+        "kind": "scene",
+        "charId": "lingo",
+        "isNarration": true,
+        "text": {
+          "en": "[Next: Scene 2 — The Bookshop in the Dark. Miss Penny knows more than she should.]",
+          "ko": "[다음: 장면 2 — 어둠 속의 서점. 미스 페니는 알아야 할 것보다 더 많이 알고 있다.]",
+          "es": "[Siguiente: Escena 2 — La Libreria en la Oscuridad. Miss Penny sabe mas de lo que deberia.]"
+        }
+      }
+    ]
+  },
+
+  "changeNotes": {
+    "summary": "Major revision of Scene 1 incorporating evaluator v2 feedback: visceral emotional hook via Dr. Ellis losing speech, active quiz mechanics (sentence builder + investigation board + speak-for-Ellis pronunciation), Mr. Black shown as genuinely menacing through irreversible consequences, every quiz deeply story-justified.",
+    "changes_from_v3_to_v3_1": [
+      {
+        "what": "ADDED: Dr. Ellis — visceral emotional hook",
+        "detail": "The scene now opens with Dr. Ellis sitting on the floor, unable to speak. A 63-year-old man who spoke five languages, reduced to writing in a notebook with shaking hands. His note reveals Mr. Black said 'Thank you' and 'I'm sorry' while stealing his ability to speak. This makes the threat PERSONAL and VISCERAL. The player doesn't just see a missing stone — they see a human being who lost his voice. This is the emotional investment the evaluator demanded."
+      },
+      {
+        "what": "ADDED: Mr. Black's irreversible consequences",
+        "detail": "Mr. Black didn't just steal a stone. He stole a man's ability to speak. Five languages, gone from his mouth permanently. And he was POLITE about it — 'Thank you for guarding it, Doctor. I'm sorry. But I need your words too.' The Day 1-6 vocabulary (Thank you, I'm sorry, Please) used in the context of stealing someone's voice is deeply unsettling. He later offers to restore Ellis's voice IF Rudy can find him — creating a personal stakes-driven motivation."
+      },
+      {
+        "what": "UPGRADED: Quiz 1 from word_rearrange to sentence_builder",
+        "detail": "Player now BUILDS the sentences by dragging word tiles, not selecting from options. Active construction creates complicity — you're assembling the thief's words with your own hands. Added the cruel postscript ('Ask Dr. Ellis how he's feeling. Oh wait. He can't tell you.') as a bonus sentence to decode."
+      },
+      {
+        "what": "UPGRADED: Quiz 2 from word_match to investigation board",
+        "detail": "Player sorts testimony fragments into WHO/WHAT/WHERE/HOW categories on an evidence board. Active reasoning and sorting, not multiple choice. Each piece of evidence connects to the larger mystery."
+      },
+      {
+        "what": "ADDED: Quiz 3 — Speak for Ellis (pronunciation)",
+        "detail": "The most emotionally charged quiz. Dr. Ellis writes words in his notebook that he can't say. The player reads them out loud FOR him. 'Help.' 'My name is Dr. Ellis.' 'Please find him.' This is pronunciation practice as an act of empathy. The quiz is MEANINGLESS without the story — it only works because you just watched a man lose his voice. Speaking integration at its most powerful."
+      },
+      {
+        "what": "STRENGTHENED: Story-justified quizzes",
+        "detail": "Every quiz now has a 'storyReason' field explaining why it cannot exist without the narrative. Quiz 1: You're decoding a criminal's message at a crime scene. Quiz 2: You're investigating witness testimony. Quiz 3: You're giving voice to a man who lost his. Remove the story and none of these make sense as 'vocabulary practice.'"
+      },
+      {
+        "what": "STRENGTHENED: Cliffhanger",
+        "detail": "Mr. Black's text now offers a DEAL — find me and I'll restore Ellis's voice. This gives the player personal motivation beyond 'save language diversity.' It's: help THIS PERSON you just met. The lights going out proves Black is still in the building. The crumpled note with a sketch of another museum sets up Scene 2."
+      }
+    ],
+    "vocabularyAudit": {
+      "quizVocabulary": [
+        "Hello / 안녕 / Hola",
+        "My name is / 제 이름은 / Mi nombre es",
+        "I'm from / 저는...에서 왔어요 / Soy de",
+        "Goodbye / 안녕히 계세요 / Adios",
+        "Good evening / 안녕하세요 / Buenas noches",
+        "Thank you / 감사합니다 / Gracias",
+        "I'm sorry / 죄송합니다 / Lo siento",
+        "Please / 부탁합니다 / Por favor",
+        "Help / 도와주세요 / Ayuda",
+        "Where is...? / 어디에 있어요? / Donde esta?"
+      ],
+      "compliance": "100% Day 1-6 vocabulary in all quiz content. 0% impossible words.",
+      "designPhilosophy": "Basic vocabulary used in terrifying context. 'Thank you' after stealing someone's voice. 'I'm sorry' while committing a crime. 'Good evening' from a man who just turned off the lights. The horror is in the gap between the simplicity of the words and the weight of their context."
+    }
+  }
+}

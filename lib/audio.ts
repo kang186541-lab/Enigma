@@ -1,5 +1,6 @@
 import { Audio } from "expo-av";
 import { Platform } from "react-native";
+import * as FileSystem from "expo-file-system/legacy";
 
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -170,24 +171,53 @@ async function recordWeb(durationMs: number): Promise<{ base64: string; mimeType
   return { base64: await blobToBase64(wavBlob), mimeType: "audio/wav" };
 }
 
+// iOS: record as 16kHz Linear PCM WAV — Azure Speech accepts this directly, no ffmpeg needed.
+// Android: keep MPEG-4/AAC (Azure accepts audio/mp4 natively).
+const IOS_WAV_OPTIONS: Audio.RecordingOptions = {
+  android: {
+    extension: ".m4a",
+    outputFormat: Audio.AndroidOutputFormat.MPEG_4,
+    audioEncoder: Audio.AndroidAudioEncoder.AAC,
+    sampleRate: 16000,
+    numberOfChannels: 1,
+    bitRate: 128000,
+  },
+  ios: {
+    extension: ".wav",
+    outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+    audioQuality: Audio.IOSAudioQuality.HIGH,
+    sampleRate: 16000,
+    numberOfChannels: 1,
+    bitRate: 256000,
+    linearPCMBitDepth: 16,
+    linearPCMIsBigEndian: false,
+    linearPCMIsFloat: false,
+  },
+  web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
+};
+
 async function recordNative(durationMs: number): Promise<{ base64: string; mimeType: string }> {
   const { granted } = await Audio.requestPermissionsAsync();
-  if (!granted) throw new Error("Microphone permission denied");
+  if (!granted) throw new Error("PERMISSION_DENIED");
 
   await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
 
-  const { recording } = await Audio.Recording.createAsync(
-    Audio.RecordingOptionsPresets.HIGH_QUALITY
-  );
+  const { recording } = await Audio.Recording.createAsync(IOS_WAV_OPTIONS);
 
   await new Promise((r) => setTimeout(r, durationMs));
   await recording.stopAndUnloadAsync();
+  // Wait for the OS to flush the recording file before reading
+  await new Promise((r) => setTimeout(r, 300));
   await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
 
   const uri = recording.getURI();
   if (!uri) throw new Error("No recording URI");
 
-  const res = await fetch(uri);
-  const blob = await res.blob();
-  return { base64: await blobToBase64(blob), mimeType: "audio/x-m4a" };
+  // FileSystem.readAsStringAsync is reliable in Expo Go for native file URIs.
+  // fetch(uri) → blob → FileReader is unreliable on native (FileReader may be absent).
+  const base64 = await FileSystem.readAsStringAsync(uri, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+  const mimeType = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
+  return { base64, mimeType };
 }

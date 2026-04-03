@@ -6,7 +6,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { C, F } from "@/constants/theme";
 import type { LoadedQuiz, LangCode } from "@/constants/storyTypes";
 import { fillGptPrompt } from "@/lib/storyUtils";
@@ -69,17 +69,24 @@ async function playTTS(
   apiBase: string,
   onPlay?: (v: boolean) => void
 ) {
-  const url = new URL("/api/tts", apiBase);
+  const url = new URL("/api/pronunciation-tts", apiBase);
   url.searchParams.set("text", script);
-  url.searchParams.set("voice", voice);
+  url.searchParams.set("lang", "en-US");
+  if (voice) url.searchParams.set("voice", voice);
   onPlay?.(true);
   try {
     if (Platform.OS === "web") {
-      const audio = new (window as { Audio: new (src: string) => HTMLAudioElement }).Audio(url.toString());
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error(`TTS ${res.status}`);
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
       audio.volume = 1.0;
-      audio.onended = () => onPlay?.(false);
+      audio.onended = () => { URL.revokeObjectURL(objectUrl); onPlay?.(false); };
+      audio.onerror = () => { URL.revokeObjectURL(objectUrl); onPlay?.(false); };
       await audio.play();
     } else {
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
       const { sound } = await Audio.Sound.createAsync(
         { uri: url.toString() },
         { shouldPlay: true, volume: 1.0 }
@@ -87,7 +94,7 @@ async function playTTS(
       sound.setOnPlaybackStatusUpdate((st) => {
         if ("didJustFinish" in st && st.didJustFinish) {
           onPlay?.(false);
-          sound.unloadAsync();
+          sound.unloadAsync().catch(() => {});
         }
       });
     }
@@ -110,9 +117,9 @@ async function callGPT(systemPrompt: string, userMessage: string): Promise<strin
 // ─── Result Screen ─────────────────────────────────────────────────────────────
 
 function ResultView({
-  xp, correct, total, badge, onContinue,
+  xp, correct, total, badge, nativeLang, onContinue,
 }: {
-  xp: number; correct: number; total: number; badge?: string; onContinue: () => void;
+  xp: number; correct: number; total: number; badge?: string; nativeLang: LangCode; onContinue: () => void;
 }) {
   const scale = useRef(new Animated.Value(0.5)).current;
   const opacity = useRef(new Animated.Value(0)).current;
@@ -131,11 +138,13 @@ function ResultView({
     <Animated.View style={[styles.resultContainer, { transform: [{ scale }], opacity }]}>
       <Text style={styles.resultEmoji}>{passed ? "🎉" : "💪"}</Text>
       <Text style={styles.resultTitle}>
-        {passed ? "Great job!" : "Keep trying!"}
+        {passed
+          ? (nativeLang === "ko" ? "잘했어요!" : nativeLang === "es" ? "¡Buen trabajo!" : "Great job!")
+          : (nativeLang === "ko" ? "계속 도전해요!" : nativeLang === "es" ? "¡Sigue intentando!" : "Keep trying!")}
       </Text>
       <Text style={styles.resultScore}>{pct}%</Text>
       <Text style={styles.resultSub}>
-        {correct}/{total} correct
+        {correct}/{total} {nativeLang === "ko" ? "정답" : nativeLang === "es" ? "correctas" : "correct"}
       </Text>
       <View style={styles.xpBubble}>
         <Text style={styles.xpText}>+{xp} XP</Text>
@@ -146,7 +155,9 @@ function ResultView({
         </View>
       )}
       <Pressable style={styles.continueBtn} onPress={onContinue}>
-        <Text style={styles.continueBtnText}>Continue →</Text>
+        <Text style={styles.continueBtnText}>
+          {nativeLang === "ko" ? "계속하기 →" : nativeLang === "es" ? "Continuar →" : "Continue →"}
+        </Text>
       </Pressable>
     </Animated.View>
   );
@@ -195,7 +206,7 @@ function MatchingQuizView({
   function handleSelect(choice: string) {
     if (feedback) return;
     setSelected(choice);
-    const isCorrect = choice === pair.right;
+    const isCorrect = normalise(choice) === normalise(pair.right);
     setFeedback(isCorrect ? "correct" : "wrong");
     Haptics.impactAsync(isCorrect ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light);
     if (isCorrect) setCorrect(c => c + 1);
@@ -220,7 +231,7 @@ function MatchingQuizView({
       <View style={styles.choicesGrid}>
         {pair.choices.map((ch) => {
           const isSelected = selected === ch;
-          const isCorrectChoice = ch === pair.right;
+          const isCorrectChoice = normalise(ch) === normalise(pair.right);
           let bg = C.bg2;
           if (isSelected && feedback === "correct") bg = "#2e7d32";
           else if (isSelected && feedback === "wrong") bg = "#c62828";
@@ -270,7 +281,7 @@ function FillBlankQuizView({
 
   function checkAnswers() {
     setChecking(true);
-    const correct = blanks.filter(b => answers[b.id] === b.answer).length;
+    const correct = blanks.filter(b => normalise(answers[b.id] ?? "") === normalise(b.answer)).length;
     setDone(true);
     setTimeout(() => onDone(correct, blanks.length), 1500);
   }
@@ -288,8 +299,8 @@ function FillBlankQuizView({
               <Text style={[
                 styles.blankSlot,
                 answers[blanks[i].id] != null && { backgroundColor: C.gold + "33" },
-                done && answers[blanks[i].id] === blanks[i].answer && { backgroundColor: "#2e7d3233" },
-                done && answers[blanks[i].id] !== blanks[i].answer && answers[blanks[i].id] != null && { backgroundColor: "#c6282833" },
+                done && normalise(answers[blanks[i].id] ?? "") === normalise(blanks[i].answer) && { backgroundColor: "#2e7d3233" },
+                done && normalise(answers[blanks[i].id] ?? "") !== normalise(blanks[i].answer) && answers[blanks[i].id] != null && { backgroundColor: "#c6282833" },
               ]}>
                 {answers[blanks[i].id] ?? "___"}
               </Text>
@@ -317,9 +328,9 @@ function FillBlankQuizView({
             {blank.options.map((opt) => {
               const chosen = answers[blank.id] === opt;
               let bg = C.bg2;
-              if (done && chosen && opt === blank.answer) bg = "#2e7d32";
-              else if (done && chosen && opt !== blank.answer) bg = "#c62828";
-              else if (done && opt === blank.answer) bg = "#2e7d32";
+              if (done && chosen && normalise(opt) === normalise(blank.answer)) bg = "#2e7d32";
+              else if (done && chosen && normalise(opt) !== normalise(blank.answer)) bg = "#c62828";
+              else if (done && normalise(opt) === normalise(blank.answer)) bg = "#2e7d32";
               else if (chosen) bg = C.gold;
               return (
                 <Pressable key={opt} style={[styles.choiceBtn, { backgroundColor: bg }]}
@@ -327,7 +338,7 @@ function FillBlankQuizView({
                     selectAnswer(blank.id, opt);
                     if (activeBlank < blanks.length - 1) setActiveBlank(i => i + 1);
                   }}>
-                  <Text style={[styles.choiceBtnText, (chosen || (done && opt === blank.answer)) && { color: "#fff" }]}>{opt}</Text>
+                  <Text style={[styles.choiceBtnText, (chosen || (done && normalise(opt) === normalise(blank.answer))) && { color: "#fff" }]}>{opt}</Text>
                 </Pressable>
               );
             })}
@@ -373,9 +384,10 @@ function WordRearrangeView({
   const [qIdx, setQIdx] = useState(0);
   const [bank, setBank] = useState(() => shuffle(questions[0]?.scrambled ?? []));
   const [built, setBuilt] = useState<string[]>([]);
-  const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [feedback, setFeedback] = useState<"correct" | "wrong" | "penalized" | null>(null);
   const [correct, setCorrect] = useState(0);
   const [showHint, setShowHint] = useState(false);
+  const [hintUsedThisQ, setHintUsedThisQ] = useState(false);
 
   const q = questions[qIdx];
 
@@ -384,6 +396,7 @@ function WordRearrangeView({
     setBuilt([]);
     setFeedback(null);
     setShowHint(false);
+    setHintUsedThisQ(false);
   }, [qIdx]);
 
   function tapWord(word: string, from: "bank" | "built", idx: number) {
@@ -400,12 +413,13 @@ function WordRearrangeView({
   function checkAnswer() {
     const userAnswer = built.join(" ");
     const isCorrect = normalise(userAnswer) === normalise(q.answer);
-    setFeedback(isCorrect ? "correct" : "wrong");
+    const penalized = isCorrect && hintUsedThisQ;
+    setFeedback(penalized ? "penalized" : isCorrect ? "correct" : "wrong");
     Haptics.impactAsync(isCorrect ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light);
-    if (isCorrect) setCorrect(c => c + 1);
+    if (isCorrect && !hintUsedThisQ) setCorrect(c => c + 1);
     setTimeout(() => {
       if (qIdx + 1 >= questions.length) {
-        onDone(isCorrect ? correct + 1 : correct, questions.length);
+        onDone(isCorrect && !hintUsedThisQ ? correct + 1 : correct, questions.length);
       } else {
         setQIdx(i => i + 1);
       }
@@ -441,8 +455,10 @@ function WordRearrangeView({
       </View>
 
       {/* Hint */}
-      <Pressable onPress={() => setShowHint(h => !h)} style={styles.hintToggle}>
-        <Text style={styles.hintToggleText}>💡 {showHint ? "Hide hint" : "Show hint"}</Text>
+      <Pressable onPress={() => { setShowHint(h => !h); setHintUsedThisQ(true); }} style={styles.hintToggle}>
+        <Text style={styles.hintToggleText}>
+          💡 {showHint ? "Hide hint" : "Show hint"}{hintUsedThisQ ? " ⚠️ -XP" : ""}
+        </Text>
       </Pressable>
       {showHint && q.hint && (
         <Text style={styles.hintText}>{q.hint[nativeLang] ?? q.hint.en}</Text>
@@ -450,8 +466,12 @@ function WordRearrangeView({
 
       {/* Feedback */}
       {feedback && (
-        <View style={[styles.feedbackBanner, { backgroundColor: feedback === "correct" ? "#2e7d32" : "#c62828" }]}>
-          <Text style={styles.feedbackText}>{feedback === "correct" ? "✓ Correct!" : `✗ Answer: ${q.answer}`}</Text>
+        <View style={[styles.feedbackBanner, {
+          backgroundColor: feedback === "correct" ? "#2e7d32" : feedback === "penalized" ? "#f57c00" : "#c62828",
+        }]}>
+          <Text style={styles.feedbackText}>
+            {feedback === "correct" ? "✓ Correct!" : feedback === "penalized" ? "✓ Correct — hint used, no XP 💡" : `✗ Answer: ${q.answer}`}
+          </Text>
         </View>
       )}
 
@@ -1170,16 +1190,25 @@ function PronunciationQuizView({
     setRecordState("processing");
     try {
       await rec.stopAndUnloadAsync();
+      // 300ms delay — ensure file is fully flushed to disk before reading
+      await new Promise(resolve => setTimeout(resolve, 300));
       const uri = rec.getURI();
       nativeRecordingRef.current = null;
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
       if (!uri) throw new Error("No URI");
       const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
+      // Empty audio guard — show 0% instead of sending to Azure
+      if (!base64 || base64.length < 2000) {
+        setScore(0);
+        setRecordState("done");
+        return;
+      }
+      const nativeMime = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
       const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: sentence?.text ?? "", lang: speechLang, audio: base64, mimeType: "audio/m4a" }),
+        body: JSON.stringify({ word: sentence?.text ?? "", lang: speechLang, audio: base64, mimeType: nativeMime }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -1218,7 +1247,23 @@ function PronunciationQuizView({
           }
           await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
           const recording = new Audio.Recording();
-          await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+          // iOS: record as 16kHz WAV (LINEARPCM) — Azure accepts directly, no ffmpeg needed
+          const recOptions: Audio.RecordingOptions = Platform.OS === "ios" ? {
+            android: Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+            ios: {
+              extension: ".wav",
+              outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+              audioQuality: Audio.IOSAudioQuality.HIGH,
+              sampleRate: 16000,
+              numberOfChannels: 1,
+              bitRate: 256000,
+              linearPCMBitDepth: 16,
+              linearPCMIsBigEndian: false,
+              linearPCMIsFloat: false,
+            },
+            web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
+          } : Audio.RecordingOptionsPresets.HIGH_QUALITY;
+          await recording.prepareToRecordAsync(recOptions);
           await recording.startAsync();
           nativeRecordingRef.current = recording;
           setRecordState("recording");
@@ -1252,6 +1297,12 @@ function PronunciationQuizView({
           reader.onloadend = () => resolve((reader.result as string).split(",")[1] ?? "");
           reader.readAsDataURL(blob);
         });
+        // Empty audio guard — show 0% instead of sending to Azure
+        if (!base64 || base64.length < 2000) {
+          setScore(0);
+          setRecordState("done");
+          return;
+        }
         try {
           const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
           const res = await fetch(apiUrl, {
@@ -1469,6 +1520,7 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
                 correct={resultData.correct}
                 total={resultData.total}
                 badge={quiz.rewards.badge}
+                nativeLang={quiz.nativeLang}
                 onContinue={() => onComplete(xpFinal)}
               />
           }

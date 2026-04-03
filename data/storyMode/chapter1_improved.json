@@ -1,0 +1,863 @@
+{
+  "chapter": "london",
+  "title": {
+    "ko": "런던의 암호",
+    "en": "The London Cipher",
+    "es": "El Cifrado de Londres"
+  },
+  "scenes": [
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isNarration": true,
+      "text": "Three hours ago, a stone that had protected human language for a thousand years was stolen from a museum vault. Nobody heard a thing. Nobody saw a thing. Except one fox — who was supposed to be guarding it.",
+      "textKo": "세 시간 전, 천 년간 인류의 언어를 지켜온 수호석이 박물관 금고에서 도난당했다. 아무도 듣지 못했다. 아무도 보지 못했다. 그것을 지키고 있어야 했던 여우 한 마리만 빼고.",
+      "textEs": "Hace tres horas, una piedra que habia protegido el lenguaje humano durante mil anos fue robada de la boveda de un museo. Nadie oyo nada. Nadie vio nada. Excepto un zorro — que se suponia debia custodiarla."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Right. So. The Guardian Stone was stolen on my watch. Mine. Twenty years of detective work and I let someone walk out with a glowing rock while I was two rooms away cataloguing pottery. Pottery.",
+      "textKo": "좋아. 그래. 수호석이 내 근무 중에 도난당했어. 내 근무 중에. 20년간 탐정 일을 해왔는데, 내가 두 방 건너에서 도자기 분류하는 동안 누군가 빛나는 돌을 들고 나갔다고. 도자기라니.",
+      "textEs": "Bien. Asi que. La Piedra Guardian fue robada bajo mi vigilancia. La mia. Veinte anos de trabajo como detective y deje que alguien se llevara una roca brillante mientras yo estaba dos salas mas alla catalogando ceramica. Ceramica."
+    },
+    {
+      "kind": "scene",
+      "charId": "eleanor",
+      "text": "Rudy. I didn't call you because I was curious. I called because I'm frightened. And I don't frighten easily.",
+      "textKo": "루디. 궁금해서 부른 게 아니야. 무서워서 부른 거야. 나는 쉽게 무서워하지 않는데.",
+      "textEs": "Rudy. No te llame por curiosidad. Te llame porque estoy asustada. Y no me asusto facilmente."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Eleanor frightened. Right. That's not good. That's the opposite of good. What happened — besides the obvious catastrophic failure that was entirely my fault?",
+      "textKo": "엘리너가 무서워한다고. 좋아. 안 좋은 거네. 좋은 것의 정반대야. 무슨 일이야 — 전적으로 내 잘못인 명백한 대참사 말고?",
+      "textEs": "Eleanor asustada. Bien. Eso no es bueno. Es lo opuesto a bueno. Que paso — aparte del obvio fracaso catastrofico que fue enteramente mi culpa?"
+    },
+    {
+      "kind": "scene",
+      "charId": "eleanor",
+      "text": "Someone left an encrypted message on the Rosetta replica. The cipher uses a polyalphabetic substitution — third century, possibly Aramaic base. Whoever did this is not an amateur, Rudy. And there's something else. The message mentions six more stones.",
+      "textKo": "누군가 로제타 복제본에 암호화된 메시지를 남겼어. 다중 알파벳 치환 — 3세기, 아마 아람어 기반이야. 이걸 남긴 사람은 아마추어가 아니야, 루디. 그리고 하나 더 있어. 메시지에 수호석이 여섯 개 더 있다고 나와.",
+      "textEs": "Alguien dejo un mensaje cifrado en la replica de Rosetta. Usa sustitucion polialfabetica — siglo tercero, posiblemente base aramea. Quien hizo esto no es un aficionado, Rudy. Y hay algo mas. El mensaje menciona seis piedras mas."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isThought": true,
+      "text": "(A cipher on the Rosetta replica. Someone with a sense of irony, at least. Seven stones total. And people who show off always leave more clues than they intend to.)",
+      "textKo": "(로제타 복제본에 암호라. 아이러니 감각은 있는 놈이네. 수호석이 총 일곱 개. 과시하는 놈들은 항상 의도한 것보다 더 많은 단서를 남기지.)",
+      "textEs": "(Un cifrado en la replica de Rosetta. Al menos alguien con sentido de la ironia. Siete piedras en total. Y los que se lucen siempre dejan mas pistas de las que pretenden.)"
+    },
+    {
+      "kind": "puzzle",
+      "puzzleNum": 1,
+      "pType": "cipher",
+      "storyContext": {
+        "ko": "도둑이 로제타 복제본에 암호 메시지를 남겼다. 해독해야 도둑의 정체를 알 수 있다.",
+        "en": "The thief left a coded message on the Rosetta replica. Decode it to learn who they are.",
+        "es": "El ladron dejo un mensaje cifrado en la replica de Rosetta. Descifra el mensaje para saber quien es."
+      },
+      "consequence": {
+        "ko": "암호를 해독하자 비밀 조직의 이름이 드러난다 — 렉시콘 소사이어티.",
+        "en": "Decoding the cipher reveals the name of a secret organization — the Lexicon Society.",
+        "es": "Descifrar el codigo revela el nombre de una organizacion secreta — la Sociedad Lexicon."
+      },
+      "questions": [
+        {
+          "encoded": { "en": "IFMMP", "es": "IPMB" },
+          "answer": { "en": "HELLO", "ko": "안녕", "es": "HOLA" },
+          "shift": 1,
+          "hint": { "en": "Move each letter one step backward in the alphabet", "ko": "각 글자를 알파벳에서 한 칸 뒤로 당겨봐", "es": "Retrocede cada letra una posicion en el alfabeto" },
+          "opts": [
+            { "en": "HELLO", "ko": "안녕", "es": "HOLA" },
+            { "en": "WORLD", "ko": "세계", "es": "MUNDO" },
+            { "en": "GREAT", "ko": "훌륭한", "es": "GENIAL" },
+            { "en": "NEVER", "ko": "절대", "es": "NUNCA" }
+          ]
+        },
+        {
+          "encoded": { "en": "MFYJDPO", "es": "MFYJDP" },
+          "answer": { "en": "LEXICON", "ko": "렉시콘", "es": "LEXICO" },
+          "shift": 1,
+          "hint": { "en": "The secret society's name — one step backward", "ko": "비밀 결사의 이름 — 한 칸 뒤로", "es": "El nombre de la sociedad secreta — un paso atras" },
+          "opts": [
+            { "en": "MISSION", "ko": "임무", "es": "MISION" },
+            { "en": "SECTION", "ko": "부문", "es": "SECCION" },
+            { "en": "LEXICON", "ko": "렉시콘", "es": "LEXICO" },
+            { "en": "FICTION", "ko": "소설", "es": "FICCION" }
+          ]
+        },
+        {
+          "encoded": { "en": "TUPOFT", "es": "TUPOFT" },
+          "answer": { "en": "STONES", "ko": "수호석", "es": "STONES" },
+          "shift": 1,
+          "hint": { "en": "What the thief is after — one step backward", "ko": "도둑이 노리는 것 — 한 칸 뒤로", "es": "Lo que el ladron busca — un paso atras" },
+          "opts": [
+            { "en": "STOLEN", "ko": "도난", "es": "STOLEN" },
+            { "en": "STONES", "ko": "수호석", "es": "STONES" },
+            { "en": "STORMS", "ko": "폭풍", "es": "STORMS" },
+            { "en": "STOVES", "ko": "난로", "es": "STOVES" }
+          ]
+        }
+      ],
+      "hints": {
+        "h1": { "ko": "알파벳 순서에서 각 글자의 바로 앞 글자를 찾아봐! 예: B는 A가 돼", "en": "Find the letter right before each one in the alphabet! e.g., B becomes A", "es": "Encuentra la letra anterior en el alfabeto! ej: B se convierte en A" },
+        "h2": { "ko": "I는 H, F는 E, M은 L, M은 L, P는 O가 돼", "en": "I becomes H, F becomes E, M becomes L, M becomes L, P becomes O", "es": "I se convierte en H, P en O, M en L, B en A" }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Lexicon. The Lexicon Society. Eleanor, have you heard of them?",
+      "textKo": "렉시콘. 렉시콘 소사이어티. 엘리너, 들어본 적 있어?",
+      "textEs": "Lexicon. La Sociedad Lexicon. Eleanor, has oido hablar de ellos?"
+    },
+    {
+      "kind": "scene",
+      "charId": "eleanor",
+      "text": "Once. Years ago. A colleague mentioned them at a conference — and then never mentioned them again. She retired the next month. Moved to a village with no internet. I thought it was strange then. Now I think it was smart.",
+      "textKo": "한 번. 몇 년 전에. 동료가 학회에서 한 번 언급했어 — 그리고 다시는 말하지 않았어. 다음 달에 은퇴하고 인터넷 없는 마을로 이사했지. 그때는 이상하다고 생각했는데. 지금 생각하면 현명했어.",
+      "textEs": "Una vez. Hace anos. Una colega los menciono en una conferencia — y luego nunca mas los menciono. Se jubilo al mes siguiente. Se mudo a un pueblo sin internet. Entonces pense que era extrano. Ahora creo que fue inteligente."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Well, that's not terrifying at all. Right. I need to talk to Tom. The night guard. If anyone saw something, it would be the man who was actually here while I was playing with clay pots.",
+      "textKo": "뭐, 전혀 무섭지 않네. 좋아. 톰한테 물어봐야겠어. 야간 경비원. 누군가 본 사람이 있다면 내가 점토 항아리 만지작거리는 동안 실제로 여기 있었던 사람이겠지.",
+      "textEs": "Bueno, eso no es aterrador en absoluto. Bien. Necesito hablar con Tom. El guardia nocturno. Si alguien vio algo, seria el hombre que realmente estaba aqui mientras yo jugaba con vasijas de barro."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isNarration": true,
+      "text": "Guard Tom comes running, still in his night shift uniform. Coffee stain on his collar. The look on his face says he's been waiting to tell someone this story all morning.",
+      "textKo": "경비원 톰이 달려온다. 아직 야간 근무복 차림이다. 옷깃에 커피 얼룩이 있다. 그의 표정은 아침 내내 누군가에게 이 이야기를 하고 싶었다는 걸 말해준다.",
+      "textEs": "El guardia Tom viene corriendo, todavia con su uniforme del turno nocturno. Mancha de cafe en el cuello. Su cara dice que ha estado esperando contarle esta historia a alguien toda la manana."
+    },
+    {
+      "kind": "scene",
+      "charId": "tom",
+      "text": "Oi Rudy! Mate, you ain't gonna believe this. Last night, some dodgy bloke was having a butcher's at the replica. Proper sus, yeah? Tall geezer, black coat, moved like he owned the place. He legged it when he clocked me.",
+      "textKo": "야 루디! 임마, 이거 안 믿을 거야. 어젯밤에 수상한 놈이 복제본을 뚫어지게 보고 있었다고. 완전 수상했어. 키 큰 놈, 검은 코트, 자기 집인 줄 아는 것처럼 돌아다녔는데 나 보더니 바로 튀었어.",
+      "textEs": "Eh Rudy! Tio, no te lo vas a creer. Anoche, un tipo sospechoso estaba mirando la replica. Muy fuerte, sabes? Un tipo alto, abrigo negro, se movia como si fuera el dueno. Se piro cuando me vio.",
+      "idiom": {
+        "phrase": { "en": "having a butcher's", "ko": "자세히 보다 (코크니 슬랭)", "es": "mirar de cerca (jerga cockney)" },
+        "meaning": { "en": "Cockney rhyming slang: butcher's hook = look. 'Having a butcher's' means 'having a look.'", "ko": "코크니 라이밍 슬랭: butcher's hook = look. 'Having a butcher's'는 '자세히 보다'라는 뜻.", "es": "Jerga cockney: butcher's hook = look (mirar). 'Having a butcher's' significa 'echar un vistazo.'" }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Tom, I understood about sixty percent of that. The sixty percent that wasn't the important part. Can you describe him in words that exist in a dictionary?",
+      "textKo": "톰, 방금 말의 60% 정도 알아들었어. 중요하지 않은 60%를. 사전에 있는 단어로 설명해줄 수 있어?",
+      "textEs": "Tom, entendi como el sesenta por ciento. El sesenta por ciento que no era la parte importante. Puedes describirlo con palabras que existan en un diccionario?"
+    },
+    {
+      "kind": "scene",
+      "charId": "tom",
+      "text": "Ha! That IS proper English, mate. You just need to get out more. Right, so: suspicious man, tall, black coat, was studying the replica closely, ran when I appeared. Oh, and one more thing — he muttered something. 'One down, six to go.' Proper weird.",
+      "textKo": "하! 이게 진짜 한국어야, 임마. 좀 더 나가서 놀아. 알겠어, 정리하면: 수상한 남자, 키 큼, 검은 코트, 복제본을 자세히 살핌, 내가 나타나자 도망감. 아, 한 가지 더 — 뭐라고 중얼거렸어. '하나 끝났어, 여섯 남았어.' 완전 이상했어.",
+      "textEs": "Ja! ESO ES espanol de verdad, tio. Necesitas salir mas. Vale, pues: hombre sospechoso, alto, abrigo negro, estudiaba la replica de cerca, corrio cuando apareci. Ah, y una cosa mas — murmuro algo. 'Uno menos, faltan seis.' Raro de narices.",
+      "idiom": {
+        "phrase": { "en": "legged it", "ko": "도망치다 (영국 슬랭)", "es": "salir corriendo (jerga britanica)" },
+        "meaning": { "en": "British slang: to run away quickly. 'He legged it' = 'He ran away.'", "ko": "영국 슬랭: 빨리 도망치다. 'He legged it' = '그가 도망쳤다.'", "es": "Jerga britanica: salir corriendo. 'He legged it' = 'Salio corriendo.'" }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isThought": true,
+      "text": "(One down, six to go. Seven things total. And he was looking at the Rosetta replica — but the real Rosetta is in the British Museum. So what was he really after? The Guardian Stone was in this museum. He already took it. He was admiring his work. This isn't a thief. This is a collector.)",
+      "textKo": "(하나 끝, 여섯 남았다. 총 일곱 개. 그리고 로제타 복제본을 보고 있었어 — 하지만 진짜 로제타석은 대영박물관에 있는데. 그러면 진짜 노린 건 뭐지? 수호석이 이 박물관에 있었어. 이미 가져갔고. 자기 작품을 감상하고 있었던 거야. 이건 도둑이 아니야. 수집가야.)",
+      "textEs": "(Uno menos, faltan seis. Siete cosas en total. Y estaba mirando la replica de Rosetta — pero la Rosetta real esta en el Museo Britanico. Entonces, que buscaba realmente? La Piedra Guardian estaba en este museo. Ya la tomo. Estaba admirando su trabajo. Esto no es un ladron. Es un coleccionista.)"
+    },
+    {
+      "kind": "puzzle",
+      "puzzleNum": 2,
+      "pType": "word_match",
+      "storyContext": {
+        "ko": "톰의 증언을 제대로 이해하려면 그가 사용한 영국 슬랭의 뜻을 파악해야 한다.",
+        "en": "To properly understand Tom's testimony, you need to decode the British slang he used.",
+        "es": "Para entender bien el testimonio de Tom, necesitas descifrar la jerga britanica que uso."
+      },
+      "consequence": {
+        "ko": "슬랭을 해독하자 톰의 증언에서 핵심 단서가 드러난다 — 범인은 '수집가'처럼 행동했다.",
+        "en": "Decoding the slang reveals the key detail in Tom's testimony — the suspect behaved like a 'collector.'",
+        "es": "Descifrar la jerga revela el detalle clave del testimonio de Tom — el sospechoso actuaba como un 'coleccionista.'"
+      },
+      "questions": [
+        {
+          "word": { "en": "dodgy", "ko": "수상한 (영국 슬랭)", "es": "sospechoso (jerga)" },
+          "meaning": { "en": "suspicious, untrustworthy", "ko": "의심스러운, 믿을 수 없는", "es": "sospechoso, no confiable" },
+          "wrong": [
+            { "en": "friendly and kind", "ko": "친절한", "es": "amable y amistoso" },
+            { "en": "very tired", "ko": "매우 피곤한", "es": "muy cansado" },
+            { "en": "extremely hungry", "ko": "매우 배고픈", "es": "hambriento" }
+          ]
+        },
+        {
+          "word": { "en": "clocked", "ko": "알아채다 (영국 슬랭)", "es": "notar (jerga)" },
+          "meaning": { "en": "noticed, spotted, saw", "ko": "알아차리다, 발견하다", "es": "notar, descubrir, ver" },
+          "wrong": [
+            { "en": "hit with force", "ko": "세게 때리다", "es": "golpear con fuerza" },
+            { "en": "checked the time", "ko": "시간을 확인하다", "es": "revisar la hora" },
+            { "en": "locked a door", "ko": "문을 잠그다", "es": "cerrar una puerta" }
+          ]
+        },
+        {
+          "word": { "en": "geezer", "ko": "남자 (영국 슬랭)", "es": "tipo (jerga)" },
+          "meaning": { "en": "a man, a fellow", "ko": "남자, 녀석", "es": "un hombre, un tipo" },
+          "wrong": [
+            { "en": "a type of bird", "ko": "새의 종류", "es": "un tipo de pajaro" },
+            { "en": "an old book", "ko": "오래된 책", "es": "un libro viejo" },
+            { "en": "a cold wind", "ko": "차가운 바람", "es": "un viento frio" }
+          ]
+        },
+        {
+          "word": { "en": "sus", "ko": "수상한 (속어)", "es": "sospechoso (coloquial)" },
+          "meaning": { "en": "suspicious, sketchy", "ko": "수상한, 의심스러운", "es": "sospechoso, raro" },
+          "wrong": [
+            { "en": "delicious food", "ko": "맛있는 음식", "es": "comida deliciosa" },
+            { "en": "a type of bus", "ko": "버스의 종류", "es": "un tipo de autobus" },
+            { "en": "very happy", "ko": "매우 행복한", "es": "muy feliz" }
+          ]
+        }
+      ],
+      "hints": {
+        "h1": { "ko": "톰이 이 단어들을 어떤 상황에서 사용했는지 떠올려봐", "en": "Think about the situation Tom used these words in", "es": "Piensa en la situacion en que Tom uso estas palabras" },
+        "h2": { "ko": "모두 수상한 남자를 묘사하는 데 사용된 단어야 — 긍정적인 뜻은 아니야", "en": "All used to describe a suspicious man — none are positive", "es": "Todas se usaron para describir a un hombre sospechoso — ninguna es positiva" }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Thanks, Tom. If that man shows up again, don't be a hero. Just call me.",
+      "textKo": "고마워, 톰. 그 남자 다시 나타나면 영웅 놀이 하지 마. 그냥 나한테 전화해.",
+      "textEs": "Gracias, Tom. Si ese hombre vuelve, no te hagas el heroe. Solo llamame."
+    },
+    {
+      "kind": "scene",
+      "charId": "tom",
+      "text": "Hero? Nah mate. I was bricking it, to be honest. Something about him felt... wrong. Like the air got colder when he walked past. Gave me the proper willies.",
+      "textKo": "영웅? 아니 임마. 솔직히 무서웠어. 그 놈한테서 뭔가... 이상한 느낌이 났어. 그 놈이 지나가면 공기가 차가워지는 것 같았다고. 완전 소름 돋았어.",
+      "textEs": "Heroe? No, tio. Estaba cagado de miedo, la verdad. Algo en el se sentia... mal. Como si el aire se enfriara cuando pasaba. Me puso los pelos de punta.",
+      "idiom": {
+        "phrase": { "en": "bricking it", "ko": "겁에 질리다 (영국 슬랭)", "es": "estar muerto de miedo (jerga)" },
+        "meaning": { "en": "British slang: to be extremely scared. 'I was bricking it' = 'I was terrified.'", "ko": "영국 슬랭: 극도로 무서워하다. 'I was bricking it' = '나는 겁에 질렸다.'", "es": "Jerga britanica: estar aterrorizado. 'I was bricking it' = 'Estaba muerto de miedo.'" }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isNarration": true,
+      "text": "Following Tom's lead, Rudy heads to the antique bookshop on Baker Lane. The sign reads 'Penny's Pages — Rare Books and Rarer Conversations.' The bell chimes as Rudy enters. Dust particles dance in the afternoon light. Behind the counter, a woman arranges books with the precision of a surgeon.",
+      "textKo": "톰의 단서를 따라 루디는 베이커가 골목의 고서점으로 향한다. 간판에는 '페니의 책방 — 희귀한 책과 더 희귀한 대화'라고 적혀 있다. 루디가 들어서자 종이 울린다. 먼지 입자들이 오후 햇살 속에서 춤춘다. 카운터 뒤에서 한 여인이 외과의사처럼 정확하게 책을 정리하고 있다.",
+      "textEs": "Siguiendo la pista de Tom, Rudy se dirige a la libreria antigua de Baker Lane. El letrero dice 'Paginas de Penny — Libros Raros y Conversaciones mas Raras.' La campana suena cuando Rudy entra. Las particulas de polvo danzan en la luz de la tarde. Detras del mostrador, una mujer ordena libros con la precision de un cirujano."
+    },
+    {
+      "kind": "scene",
+      "charId": "penny",
+      "text": "Ah, the famous fox detective. I've been expecting a visit, though I hoped it would be under happier circumstances. As Shakespeare wrote, 'one may smile, and smile, and be a villain.' But I'm sure that doesn't apply to anyone in this shop.",
+      "textKo": "아, 유명한 여우 탐정이시군. 방문을 기다리고 있었어요, 더 좋은 상황에서 만나길 바랐지만. 셰익스피어가 말했듯이, '웃고 또 웃으면서도 악당일 수 있다.' 물론 이 가게에서는 해당 사항 없겠지만.",
+      "textEs": "Ah, el famoso detective zorro. Esperaba una visita, aunque deseaba que fuera en circunstancias mas felices. Como escribio Shakespeare, 'uno puede sonreir, y sonreir, y ser un villano.' Pero estoy segura de que eso no aplica a nadie en esta tienda.",
+      "idiom": {
+        "phrase": { "en": "One may smile, and smile, and be a villain", "ko": "웃으면서도 악당일 수 있다 (셰익스피어, 햄릿)", "es": "Uno puede sonreir y ser un villano (Shakespeare, Hamlet)" },
+        "meaning": { "en": "From Shakespeare's Hamlet. Means that a friendly face can hide evil intentions.", "ko": "셰익스피어 <햄릿>에서. 친절한 얼굴 뒤에 악의를 숨길 수 있다는 뜻.", "es": "De Hamlet de Shakespeare. Significa que una cara amable puede esconder malas intenciones." }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Shakespeare before noon. You don't do small talk, do you, Miss Penny?",
+      "textKo": "정오도 안 됐는데 셰익스피어라니. 잡담은 안 하시는 분이군요, 미스 페니?",
+      "textEs": "Shakespeare antes del mediodia. No eres de charlar de cosas triviales, verdad, Miss Penny?"
+    },
+    {
+      "kind": "scene",
+      "charId": "penny",
+      "text": "Small talk is for small minds, dear. Now, I can help you with your cipher — I've seen similar ones in my collection. But knowledge has a price. I need you to translate a passage from this manuscript. My old eyes aren't what they used to be.",
+      "textKo": "잡담은 얕은 사람들이나 하는 거죠. 자, 그 암호는 도와줄 수 있어요 — 내 컬렉션에서 비슷한 걸 본 적 있거든. 하지만 지식에는 대가가 있어요. 이 고문서의 한 구절을 번역해줘요. 늙은 눈이 예전 같지 않아서.",
+      "textEs": "Las charlas triviales son para mentes triviales, querido. Ahora, puedo ayudarte con tu cifrado — he visto similares en mi coleccion. Pero el conocimiento tiene un precio. Necesito que traduzcas un pasaje de este manuscrito. Mis viejos ojos ya no son lo que eran."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "A trade. Fair enough. I've solved murders with less to go on. Although, admittedly, the victims spoke my language.",
+      "textKo": "거래라. 괜찮지. 이것보다 단서 없이 살인 사건도 풀어봤어. 물론... 피해자들은 내 말을 알아들었지만.",
+      "textEs": "Un intercambio. Justo. He resuelto asesinatos con menos pistas. Aunque, es cierto, las victimas hablaban mi idioma."
+    },
+    {
+      "kind": "puzzle",
+      "puzzleNum": 3,
+      "pType": "fill_blank",
+      "storyContext": {
+        "ko": "미스 페니가 건넨 고문서의 빈칸을 채워야 한다. 이 문서에 암호 해독의 열쇠가 숨어 있다.",
+        "en": "Fill in the missing words in Miss Penny's manuscript. The key to decoding the cipher is hidden in this document.",
+        "es": "Completa las palabras que faltan en el manuscrito de Miss Penny. La clave para descifrar el codigo esta oculta en este documento."
+      },
+      "consequence": {
+        "ko": "문서를 완성하자 고대 수호석에 대한 기록이 드러난다 — 수호석은 언어의 다양성을 지키는 마법석이다.",
+        "en": "Completing the manuscript reveals records about the Guardian Stones — magical stones that protect linguistic diversity.",
+        "es": "Completar el manuscrito revela registros sobre las Piedras Guardianas — piedras magicas que protegen la diversidad linguistica."
+      },
+      "questions": [
+        {
+          "sentence": { "en": "The stone ___ language from destruction.", "ko": "수호석은 언어를 파괴로부터 ___.", "es": "La piedra ___ el lenguaje de la destruccion." },
+          "answer": { "en": "protects", "ko": "보호한다", "es": "protege" },
+          "opts": [
+            { "en": "destroys", "ko": "파괴한다", "es": "destruye" },
+            { "en": "ignores", "ko": "무시한다", "es": "ignora" }
+          ]
+        },
+        {
+          "sentence": { "en": "Without the stones, all languages will ___.", "ko": "수호석 없이는, 모든 언어가 ___.", "es": "Sin las piedras, todos los idiomas ___." },
+          "answer": { "en": "disappear", "ko": "사라진다", "es": "desapareceran" },
+          "opts": [
+            { "en": "multiply", "ko": "늘어난다", "es": "se multiplicaran" },
+            { "en": "improve", "ko": "좋아진다", "es": "mejoraran" }
+          ]
+        },
+        {
+          "sentence": { "en": "Seven ___ are hidden across the world.", "ko": "일곱 개의 ___이/가 전 세계에 숨겨져 있다.", "es": "Siete ___ estan escondidas por el mundo." },
+          "answer": { "en": "stones", "ko": "수호석", "es": "piedras" },
+          "opts": [
+            { "en": "books", "ko": "책", "es": "libros" },
+            { "en": "keys", "ko": "열쇠", "es": "llaves" }
+          ]
+        }
+      ],
+      "hints": {
+        "h1": { "ko": "문맥을 잘 읽어봐 — 수호석이 무엇을 하는지 생각해", "en": "Read the context carefully — think about what the Guardian Stones do", "es": "Lee el contexto con cuidado — piensa en que hacen las Piedras Guardianas" },
+        "h2": { "ko": "수호석은 언어를 지키는 돌이야. '파괴'의 반대를 생각해봐", "en": "The Guardian Stones protect language. Think about the opposite of 'destruction.'", "es": "Las Piedras Guardianas protegen el lenguaje. Piensa en lo opuesto a 'destruccion.'" }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Seven Guardian Stones that protect language itself. And one of them was in my museum. Was. Past tense. Because someone took it while I was labeling Etruscan ceramics. Brilliant, Rudy. Just brilliant.",
+      "textKo": "언어 자체를 지키는 일곱 개의 수호석. 그 중 하나가 내 박물관에 있었어. '있었어.' 과거형이야. 내가 에트루리아 도자기에 라벨을 붙이는 동안 누군가 가져갔으니까. 훌륭해, 루디. 정말 훌륭해.",
+      "textEs": "Siete Piedras Guardianas que protegen el lenguaje mismo. Y una de ellas estaba en mi museo. Estaba. Tiempo pasado. Porque alguien se la llevo mientras yo etiquetaba ceramica etrusca. Brillante, Rudy. Simplemente brillante."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isNarration": true,
+      "text": "While Rudy translates the rest of the manuscript, a sound drifts from Miss Penny's back room. A phone call. She thinks Rudy can't hear. She's wrong.",
+      "textKo": "루디가 고문서를 번역하는 동안, 미스 페니의 뒷방에서 소리가 흘러온다. 전화 통화. 그녀는 루디가 듣지 못한다고 생각한다. 틀렸다.",
+      "textEs": "Mientras Rudy traduce el resto del manuscrito, un sonido llega desde la trastienda de Miss Penny. Una llamada telefonica. Ella cree que Rudy no puede oir. Se equivoca."
+    },
+    {
+      "kind": "scene",
+      "charId": "penny",
+      "isOverheard": true,
+      "text": "Yes, I understand. The fox is here now. No, he doesn't suspect anything. The London stone is already secured... I know, I know. But he's clever. More clever than you give him credit for.",
+      "textKo": "네, 알겠습니다. 여우가 지금 여기 있어요. 아니, 의심 안 해요. 런던 수호석은 이미 확보했고... 알아요, 알아요. 하지만 그는 똑똑해요. 당신이 생각하는 것보다 훨씬.",
+      "textEs": "Si, entiendo. El zorro esta aqui ahora. No, no sospecha nada. La piedra de Londres ya esta asegurada... Lo se, lo se. Pero es listo. Mas listo de lo que crees."
+    },
+    {
+      "kind": "puzzle",
+      "puzzleNum": 4,
+      "pType": "listen_choose",
+      "storyContext": {
+        "ko": "미스 페니의 전화 통화를 도청하고 있다. 핵심 단어를 정확히 들어야 그녀가 누구와 무슨 이야기를 하는지 알 수 있다.",
+        "en": "You're eavesdropping on Miss Penny's phone call. Listen carefully to catch the key words and understand who she's talking to and what about.",
+        "es": "Estas espiando la llamada telefonica de Miss Penny. Escucha con atencion para captar las palabras clave y entender con quien habla y de que."
+      },
+      "consequence": {
+        "ko": "도청에 성공하면 미스 페니가 누군가에게 루디의 위치를 보고하고 있다는 사실이 드러난다. 그녀는 아군이 아닐지도 모른다.",
+        "en": "Successfully eavesdropping reveals that Miss Penny is reporting Rudy's location to someone. She may not be an ally after all.",
+        "es": "Espiar con exito revela que Miss Penny esta informando la ubicacion de Rudy a alguien. Puede que no sea una aliada despues de todo."
+      },
+      "questions": [
+        {
+          "word": { "en": "suspect", "ko": "의심하다", "es": "sospechar" },
+          "opts": [
+            { "en": "to doubt or distrust", "ko": "의심하거나 불신하다", "es": "dudar o desconfiar" },
+            { "en": "to celebrate happily", "ko": "즐겁게 축하하다", "es": "celebrar con alegria" },
+            { "en": "to sleep deeply", "ko": "깊이 잠들다", "es": "dormir profundamente" },
+            { "en": "to cook dinner", "ko": "저녁을 요리하다", "es": "cocinar la cena" }
+          ],
+          "answerIdx": 0
+        },
+        {
+          "word": { "en": "secured", "ko": "확보하다", "es": "asegurar" },
+          "opts": [
+            { "en": "lost forever", "ko": "영원히 잃다", "es": "perdido para siempre" },
+            { "en": "safely obtained", "ko": "안전하게 확보하다", "es": "obtenido de forma segura" },
+            { "en": "broken apart", "ko": "산산조각 나다", "es": "roto en pedazos" },
+            { "en": "thrown away", "ko": "버리다", "es": "tirado a la basura" }
+          ],
+          "answerIdx": 1
+        },
+        {
+          "word": { "en": "clever", "ko": "똑똑한", "es": "listo" },
+          "opts": [
+            { "en": "very weak", "ko": "매우 약한", "es": "muy debil" },
+            { "en": "extremely loud", "ko": "극도로 시끄러운", "es": "extremadamente ruidoso" },
+            { "en": "intelligent and quick-thinking", "ko": "지적이고 빠르게 생각하는", "es": "inteligente y de pensamiento rapido" },
+            { "en": "completely invisible", "ko": "완전히 보이지 않는", "es": "completamente invisible" }
+          ],
+          "answerIdx": 2
+        }
+      ],
+      "hints": {
+        "h1": { "ko": "미스 페니가 루디에 대해 말하고 있어 — 그녀의 말투에서 단서를 찾아봐", "en": "Miss Penny is talking about Rudy — find clues in the way she speaks about him", "es": "Miss Penny esta hablando de Rudy — busca pistas en la forma en que habla de el" },
+        "h2": { "ko": "세 단어 모두 미스 페니의 전화 통화에서 나왔어. 그 상황을 떠올려봐", "en": "All three words came from Miss Penny's phone call. Think about that context.", "es": "Las tres palabras vinieron de la llamada de Miss Penny. Piensa en ese contexto." }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isThought": true,
+      "text": "(The London stone. Secured. She's talking about me — 'the fox.' And she said I don't suspect anything. Well. I do now. But don't react, Rudy. A detective who shows his hand too early catches nothing. Keep translating. Smile. And remember every word.)",
+      "textKo": "(런던 수호석. 확보됐다고. 나에 대해 얘기하고 있어 — '여우'라고. 그리고 내가 아무것도 의심하지 않는다고. 글쎄. 지금은 의심하는데. 하지만 반응하지 마, 루디. 패를 너무 빨리 보여주는 탐정은 아무것도 못 잡아. 계속 번역해. 웃어. 그리고 모든 말을 기억해.)",
+      "textEs": "(La piedra de Londres. Asegurada. Habla de mi — 'el zorro.' Y dijo que no sospecho nada. Bueno. Ahora si. Pero no reacciones, Rudy. Un detective que muestra sus cartas muy pronto no atrapa nada. Sigue traduciendo. Sonrie. Y recuerda cada palabra.)"
+    },
+    {
+      "kind": "scene",
+      "charId": "penny",
+      "text": "Sorry about that, dear. Old supplier calling about a rare edition. Now, where were we? Ah yes — be careful who you trust with your story, detective. Not every reader has your best interests at heart.",
+      "textKo": "미안해요. 오래된 거래처에서 희귀본 때문에 전화가 와서. 자, 어디까지 했죠? 아 맞아 — 네 이야기를 누구에게 맡기는지 조심해, 탐정. 모든 독자가 네 편인 건 아니니까.",
+      "textEs": "Perdona, querido. Un viejo proveedor llamando por una edicion rara. Ahora, donde estabamos? Ah si — ten cuidado a quien le confias tu historia, detective. No todo lector tiene tus mejores intereses en mente.",
+      "idiom": {
+        "phrase": { "en": "Not every reader has your best interests at heart", "ko": "모든 독자가 네 편인 건 아니다", "es": "No todo lector tiene tus mejores intereses en mente" },
+        "meaning": { "en": "A warning: not everyone who seems to be helping you actually wants what's best for you.", "ko": "경고: 당신을 돕는 것처럼 보이는 모든 사람이 실제로 당신에게 좋은 것을 원하는 건 아니다.", "es": "Una advertencia: no todos los que parecen ayudarte realmente quieren lo mejor para ti." }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Interesting choice of words. I'll keep that in mind.",
+      "textKo": "흥미로운 표현이네요. 기억해둘게요.",
+      "textEs": "Interesante eleccion de palabras. Lo tendre en cuenta."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isNarration": true,
+      "text": "Miss Penny smiles. Rudy smiles back. Both of them are acting. Rudy pockets the cipher key she gave him and steps back into the London fog. His phone buzzes — a text from Tom.",
+      "textKo": "미스 페니가 미소짓는다. 루디도 미소로 답한다. 둘 다 연기하고 있다. 루디는 그녀가 준 암호 열쇠를 주머니에 넣고 런던의 안개 속으로 나선다. 핸드폰이 울린다 — 톰의 문자다.",
+      "textEs": "Miss Penny sonrie. Rudy le devuelve la sonrisa. Ambos estan actuando. Rudy guarda la clave del cifrado que ella le dio y sale a la niebla londinense. Su telefono vibra — un mensaje de Tom."
+    },
+    {
+      "kind": "scene",
+      "charId": "tom",
+      "text": "Oi Rudy forgot to mention - that bloke? He dropped something. Found it wedged under the display case. Looks like a coin but it's got weird writing on it. Come have a dekko when you get back.",
+      "textKo": "야 루디 깜빡했는데 - 그 놈? 뭔가 떨어뜨렸어. 진열장 밑에 끼여 있던 거 찾았어. 동전처럼 생겼는데 이상한 글씨가 새겨져 있어. 돌아오면 한번 봐.",
+      "textEs": "Eh Rudy se me olvido decirte - ese tipo? Se le cayo algo. Lo encontre metido debajo de la vitrina. Parece una moneda pero tiene escritura rara. Ven a verlo cuando vuelvas.",
+      "idiom": {
+        "phrase": { "en": "have a dekko", "ko": "구경하다 (영국 슬랭)", "es": "echar un vistazo (jerga)" },
+        "meaning": { "en": "British slang from Hindi: to have a look at something. 'Have a dekko' = 'take a look.'", "ko": "힌디어에서 온 영국 슬랭: 무언가를 살펴보다. 'Have a dekko' = '한번 보다.'", "es": "Jerga britanica del hindi: mirar algo. 'Have a dekko' = 'echar un vistazo.'" }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isNarration": true,
+      "text": "The Guardian Stone chamber beneath the museum. The stone is gone — an empty pedestal with a faint glow where it once sat. But the thief left something behind: three riddles carved into the wall. Not by the thief. By the stone itself. The Guardian Stone only reveals its next location to those who prove they understand language deeply enough.",
+      "textKo": "박물관 지하의 수호석 방. 수호석은 사라졌다 — 한때 놓여 있던 자리에 희미한 빛만 남은 빈 받침대. 하지만 도둑이 무언가를 남겼다. 아니, 도둑이 아니라 수호석 자체가 벽에 세 개의 수수께끼를 새겼다. 수호석은 언어를 깊이 이해하는 자에게만 다음 위치를 알려준다.",
+      "textEs": "La camara de la Piedra Guardian bajo el museo. La piedra desaparecio — un pedestal vacio con un debil resplandor donde alguna vez estuvo. Pero el ladron dejo algo atras. No, no el ladron. La piedra misma tallo tres acertijos en la pared. La Piedra Guardian solo revela su siguiente ubicacion a quienes demuestren comprender el lenguaje profundamente."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "The stone left a test. Of course it did. Stolen ancient stone, global conspiracy, magic riddles. Tuesday.",
+      "textKo": "수호석이 시험을 남겼다고. 그럴 줄 알았어. 고대 수호석 도난, 글로벌 음모, 마법 수수께끼. 화요일이네.",
+      "textEs": "La piedra dejo una prueba. Por supuesto. Piedra antigua robada, conspiracion global, acertijos magicos. Martes."
+    },
+    {
+      "kind": "scene",
+      "charId": "eleanor",
+      "text": "The riddles are in your target language, Rudy. The stone tests whether you can think in the language, not just translate it. This is beyond decoding — this is comprehension. And Rudy? The coin Tom found — it has coordinates on the back. Madrid.",
+      "textKo": "수수께끼가 학습 언어로 되어 있어, 루디. 수호석은 네가 그 언어로 생각할 수 있는지를 시험하는 거야, 단순히 번역하는 게 아니라. 이건 해독이 아니야 — 이해력이야. 그리고 루디? 톰이 찾은 동전 — 뒷면에 좌표가 있어. 마드리드야.",
+      "textEs": "Los acertijos estan en tu idioma objetivo, Rudy. La piedra prueba si puedes pensar en el idioma, no solo traducirlo. Esto va mas alla de descifrar — esto es comprension. Y Rudy? La moneda que encontro Tom — tiene coordenadas en el reverso. Madrid."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isThought": true,
+      "text": "(Think in the language. Don't translate, think. Easier said than done when your brain wants to do everything in English. But if this is what it takes to fix my mistake...)",
+      "textKo": "(언어로 생각하라. 번역하지 말고, 생각해. 머릿속이 전부 영어로 하고 싶어할 때 말은 쉽지. 하지만 내 실수를 만회하려면 이게 필요한 거라면...)",
+      "textEs": "(Pensar en el idioma. No traducir, pensar. Mas facil decirlo que hacerlo cuando tu cerebro quiere hacerlo todo en ingles. Pero si es lo que se necesita para arreglar mi error...)"
+    },
+    {
+      "kind": "puzzle",
+      "puzzleNum": 5,
+      "pType": "sentence_builder",
+      "isBoss": true,
+      "storyContext": {
+        "ko": "수호석의 시험: 벽에 새겨진 흩어진 단어들을 올바른 순서로 배열해야 다음 수호석의 위치가 나타난다.",
+        "en": "The Guardian Stone's test: arrange the scattered words carved into the wall in the correct order to reveal the next stone's location.",
+        "es": "La prueba de la Piedra Guardian: ordena las palabras dispersas talladas en la pared en el orden correcto para revelar la ubicacion de la siguiente piedra."
+      },
+      "consequence": {
+        "ko": "수수께끼를 풀자 벽에서 세계 지도가 빛나며 나타난다 — 마드리드의 프라도 미술관이 붉게 표시되어 있다.",
+        "en": "Solving the riddles causes a world map to glow on the wall — Madrid's Prado Museum is marked in red.",
+        "es": "Resolver los acertijos hace que un mapa del mundo brille en la pared — el Museo del Prado de Madrid esta marcado en rojo."
+      },
+      "questions": [
+        {
+          "instruction": { "en": "Arrange the words to reveal the guardian's message:", "ko": "단어를 배열해서 수호석의 메시지를 밝혀내세요:", "es": "Ordena las palabras para revelar el mensaje del guardian:" },
+          "words": [
+            { "en": "The", "ko": "언어의", "es": "La" },
+            { "en": "guardian", "ko": "수호자는", "es": "piedra" },
+            { "en": "protects", "ko": "다양성을", "es": "guardiana" },
+            { "en": "the", "ko": "보호한다", "es": "protege" },
+            { "en": "diversity", "ko": "", "es": "la" },
+            { "en": "of", "ko": "", "es": "diversidad" },
+            { "en": "language", "ko": "", "es": "del lenguaje" }
+          ],
+          "answerOrder": [0, 1, 2, 3, 4, 5, 6]
+        },
+        {
+          "instruction": { "en": "Arrange the words to reveal the warning:", "ko": "단어를 배열해서 경고를 밝혀내세요:", "es": "Ordena las palabras para revelar la advertencia:" },
+          "words": [
+            { "en": "Find", "ko": "마드리드에서", "es": "Encuentra" },
+            { "en": "the", "ko": "다음", "es": "la" },
+            { "en": "next", "ko": "수호석을", "es": "siguiente" },
+            { "en": "stone", "ko": "찾아라", "es": "piedra" },
+            { "en": "in", "ko": "시간이", "es": "en" },
+            { "en": "Madrid", "ko": "없다", "es": "Madrid" },
+            { "en": "before", "ko": "", "es": "antes" },
+            { "en": "time", "ko": "", "es": "de que" },
+            { "en": "runs out", "ko": "", "es": "se acabe el tiempo" }
+          ],
+          "answerOrder": [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        }
+      ],
+      "hints": {
+        "h1": { "ko": "문장 1은 수호석이 무엇을 하는지에 대한 거야. 문장 2는 다음 목적지를 알려줘", "en": "Sentence 1 is about what the guardian does. Sentence 2 tells you the next destination.", "es": "La frase 1 es sobre lo que hace el guardian. La frase 2 te dice el proximo destino." },
+        "h2": { "ko": "문장 1: 주어(수호자) + 동사(보호한다) + 목적어(다양성). 문장 2: 동사(찾아라) + 장소(마드리드)", "en": "Sentence 1: Subject(guardian) + verb(protects) + object(diversity). Sentence 2: verb(find) + place(Madrid)", "es": "Frase 1: Sujeto(piedra) + verbo(protege) + objeto(diversidad). Frase 2: verbo(encuentra) + lugar(Madrid)" }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isNarration": true,
+      "text": "The wall cracks. Light spills through. A world map shimmers into existence, cities glowing like embers. One burns brighter than the rest — Madrid, Spain. The Prado Museum. But before Rudy can study the map, his phone rings. An unknown number. A voice he's never heard but will never forget.",
+      "textKo": "벽이 갈라진다. 빛이 새어 나온다. 세계 지도가 떠오르며, 도시들이 불씨처럼 빛난다. 하나가 다른 것들보다 더 밝게 타오른다 — 스페인, 마드리드. 프라도 미술관. 하지만 루디가 지도를 살펴보기도 전에 전화가 울린다. 모르는 번호. 처음 듣지만 절대 잊지 못할 목소리.",
+      "textEs": "La pared se agrieta. La luz se derrama. Un mapa del mundo aparece brillando, ciudades encendidas como brasas. Una arde mas que el resto — Madrid, Espana. El Museo del Prado. Pero antes de que Rudy pueda estudiar el mapa, su telefono suena. Un numero desconocido. Una voz que nunca ha oido pero que nunca olvidara."
+    },
+    {
+      "kind": "scene",
+      "charId": "mr_black",
+      "isPhoneCall": true,
+      "text": "Congratulations, detective. You solved the riddles. I'm genuinely impressed — most people take twice as long. But here's the thing: I already have London's stone. You're not trying to prevent a theft. You're trying to catch up to one.",
+      "textKo": "축하해, 탐정. 수수께끼를 풀었군. 진심으로 감탄해 — 대부분은 두 배는 걸리거든. 하지만 이런 거야: 나는 이미 런던 수호석을 가지고 있어. 넌 도난을 막으려는 게 아니야. 따라잡으려는 거지.",
+      "textEs": "Felicidades, detective. Resolviste los acertijos. Estoy genuinamente impresionado — la mayoria tarda el doble. Pero aqui esta la cosa: ya tengo la piedra de Londres. No estas intentando prevenir un robo. Estas intentando alcanzar uno."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "text": "Who are you?",
+      "textKo": "당신은 누구야?",
+      "textEs": "Quien eres?"
+    },
+    {
+      "kind": "scene",
+      "charId": "mr_black",
+      "isPhoneCall": true,
+      "text": "Someone who speaks your language. All of them, actually. You know, Rudy, I don't want to destroy language. I want to perfect it. Seven thousand languages, seven thousand walls between people. Wars fought over misunderstandings. Refugees who can't ask for help because no one speaks their words. Surely you, of all foxes, understand the frustration of being misunderstood.",
+      "textKo": "네 언어를 하는 사람이야. 사실 모든 언어를. 루디, 나는 언어를 파괴하려는 게 아니야. 완성하려는 거지. 7천 개의 언어, 7천 개의 벽. 오해 때문에 일어나는 전쟁. 아무도 자기 말을 못 알아들어서 도움을 요청하지 못하는 난민들. 오해받는 게 얼마나 답답한지, 너야말로 잘 알잖아.",
+      "textEs": "Alguien que habla tu idioma. Todos, en realidad. Sabes, Rudy, no quiero destruir el lenguaje. Quiero perfeccionarlo. Siete mil idiomas, siete mil muros entre personas. Guerras por malentendidos. Refugiados que no pueden pedir ayuda porque nadie habla sus palabras. Seguramente tu, de entre todos los zorros, entiendes la frustracion de ser malinterpretado."
+    },
+    {
+      "kind": "puzzle",
+      "puzzleNum": 6,
+      "pType": "dialogue_choice",
+      "storyContext": {
+        "ko": "미스터 블랙이 전화로 루디를 도발하고 있다. 올바른 응답을 선택해서 블랙의 논리에 대응해야 한다.",
+        "en": "Mr. Black is provoking Rudy on the phone. Choose the right response to counter Black's twisted logic.",
+        "es": "Mr. Black esta provocando a Rudy por telefono. Elige la respuesta correcta para contrarrestar la logica retorcida de Black."
+      },
+      "consequence": {
+        "ko": "루디의 대답이 블랙을 잠시 침묵하게 만든다. 블랙은 웃으며 전화를 끊는다 — 하지만 루디가 만만한 상대가 아니라는 걸 인정한다.",
+        "en": "Rudy's response silences Black for a moment. Black laughs and hangs up — but acknowledges that Rudy is not to be underestimated.",
+        "es": "La respuesta de Rudy hace callar a Black por un momento. Black se rie y cuelga — pero reconoce que Rudy no debe ser subestimado."
+      },
+      "questions": [
+        {
+          "prompt": { "en": "Mr. Black says: 'Languages divide us. My Universal Code will unite humanity.'", "ko": "미스터 블랙이 말한다: '언어가 우리를 갈라놓는다. 내 유니버설 코드가 인류를 통합할 것이다.'", "es": "Mr. Black dice: 'Los idiomas nos dividen. Mi Codigo Universal unira a la humanidad.'" },
+          "context": { "en": "How does Rudy respond?", "ko": "루디는 어떻게 대답할까?", "es": "Como responde Rudy?" },
+          "answer": { "en": "The walls aren't built by languages. They're built by people who refuse to learn them.", "ko": "벽을 세우는 건 언어가 아니야. 언어를 배우기를 거부하는 사람들이 세우는 거지.", "es": "Los muros no los construyen los idiomas. Los construyen las personas que se niegan a aprenderlos." },
+          "wrong": [
+            { "en": "You're right, maybe we should just have one language.", "ko": "네 말이 맞아, 아마 하나의 언어만 있어야 하는 건지도.", "es": "Tienes razon, quizas deberiamos tener un solo idioma." },
+            { "en": "I don't understand what you're saying.", "ko": "무슨 말인지 모르겠어.", "es": "No entiendo lo que dices." }
+          ]
+        }
+      ],
+      "hints": {
+        "h1": { "ko": "블랙은 언어가 문제라고 해. 하지만 진짜 문제는 언어가 아니야 — 사람들의 태도야", "en": "Black says language is the problem. But the real problem isn't language — it's people's attitude.", "es": "Black dice que el idioma es el problema. Pero el problema real no es el idioma — es la actitud de la gente." },
+        "h2": { "ko": "루디는 언어를 사랑하는 탐정이야. 그는 절대 '언어를 없애자'는 말에 동의하지 않을 거야", "en": "Rudy is a detective who loves language. He would never agree to 'get rid of languages.'", "es": "Rudy es un detective que ama los idiomas. Nunca estaria de acuerdo con 'eliminar los idiomas.'" }
+      }
+    },
+    {
+      "kind": "scene",
+      "charId": "mr_black",
+      "isPhoneCall": true,
+      "text": "Hmm. You're quicker than I expected. Good. I do so hate a boring opponent. See you in Madrid, detective — if you can keep up. Oh, and Rudy? Ask Miss Penny about the book she didn't show you. The one behind the counter. Third shelf from the bottom.",
+      "textKo": "흠. 예상보다 빠르군. 좋아. 지루한 상대는 정말 싫거든. 마드리드에서 보자, 탐정 — 따라올 수 있으면. 아, 그리고 루디? 미스 페니에게 너에게 보여주지 않은 책에 대해 물어봐. 카운터 뒤, 아래서 세 번째 선반.",
+      "textEs": "Hmm. Eres mas rapido de lo que esperaba. Bien. Detesto a un oponente aburrido. Nos vemos en Madrid, detective — si puedes seguirme el paso. Ah, y Rudy? Preguntale a Miss Penny sobre el libro que no te mostro. El que esta detras del mostrador. Tercer estante desde abajo."
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isThought": true,
+      "text": "(He speaks every language. He already has the stone. He knows Miss Penny is hiding something. And he has a point about being misunderstood — NO. Focus, Rudy. A villain who makes sense is more dangerous than one who doesn't. Madrid. The Prado. And in my pocket sits a train ticket that Miss Penny slipped me 'just in case.' She knew. She knew everything.)",
+      "textKo": "(그는 모든 언어를 해. 수호석도 이미 가지고 있고. 미스 페니가 뭔가를 숨기고 있다는 것도 알고 있어. 그리고 오해받는 게 답답하다는 말도 맞 — 아니. 집중해, 루디. 말이 되는 악당이 말이 안 되는 악당보다 더 위험해. 마드리드. 프라도. 그리고 내 주머니에는 미스 페니가 '만약을 위해' 건넨 마드리드행 열차표가 있어. 그녀는 알고 있었어. 전부.)",
+      "textEs": "(Habla todos los idiomas. Ya tiene la piedra. Sabe que Miss Penny oculta algo. Y tiene razon sobre ser malinterpretado — NO. Concentrate, Rudy. Un villano que tiene sentido es mas peligroso que uno que no. Madrid. El Prado. Y en mi bolsillo hay un boleto de tren a Madrid que Miss Penny me deslizo 'por si acaso.' Ella sabia. Sabia todo.)"
+    },
+    {
+      "kind": "scene",
+      "charId": "lingo",
+      "isNarration": true,
+      "text": "Rudy stares at the glowing map. Madrid burns red. The phone is silent now, but the voice lingers. Somewhere in the fog, Mr. Black is smiling. Somewhere in the bookshop, Miss Penny is choosing between guilt and survival. And somewhere inside Rudy, the guilt of losing the London stone hardens into something sharper. Determination. Next stop: Madrid.",
+      "textKo": "루디가 빛나는 지도를 바라본다. 마드리드가 붉게 타오른다. 전화는 침묵했지만 목소리가 남아 있다. 안개 어딘가에서 미스터 블랙은 웃고 있다. 서점 어딘가에서 미스 페니는 죄책감과 생존 사이에서 갈등하고 있다. 그리고 루디 안 어딘가에서 런던 수호석을 잃은 죄책감이 더 날카로운 무언가로 변한다. 결의. 다음 목적지: 마드리드.",
+      "textEs": "Rudy mira el mapa brillante. Madrid arde en rojo. El telefono esta en silencio ahora, pero la voz persiste. En alguna parte de la niebla, Mr. Black esta sonriendo. En alguna parte de la libreria, Miss Penny esta eligiendo entre la culpa y la supervivencia. Y en alguna parte dentro de Rudy, la culpa de perder la piedra de Londres se endurece en algo mas afilado. Determinacion. Proxima parada: Madrid."
+    },
+    {
+      "kind": "puzzle",
+      "puzzleNum": 7,
+      "pType": "pronunciation",
+      "storyContext": {
+        "ko": "마드리드로 떠나기 전, 루디는 핵심 단어들의 발음을 연습한다. 이 단어들은 마드리드에서 필요할 것이다.",
+        "en": "Before leaving for Madrid, Rudy practices pronouncing key words. He'll need them in Madrid.",
+        "es": "Antes de partir a Madrid, Rudy practica la pronunciacion de palabras clave. Las necesitara en Madrid."
+      },
+      "consequence": {
+        "ko": "발음 연습을 마친 루디는 마드리드로 출발할 준비를 마친다.",
+        "en": "With pronunciation practice complete, Rudy is ready to depart for Madrid.",
+        "es": "Con la practica de pronunciacion completa, Rudy esta listo para partir a Madrid."
+      },
+      "questions": [
+        {
+          "word": { "en": "investigate", "ko": "조사하다", "es": "investigar" }
+        },
+        {
+          "word": { "en": "guardian", "ko": "수호자", "es": "guardian" }
+        },
+        {
+          "word": { "en": "disappear", "ko": "사라지다", "es": "desaparecer" }
+        }
+      ],
+      "hints": {
+        "h1": { "ko": "단어의 철자를 떠올려 보세요", "en": "Try to recall the spelling of the word", "es": "Intenta recordar la ortografia de la palabra" },
+        "h2": { "ko": "첫 글자부터 천천히 소리내 보세요", "en": "Start from the first letter and sound it out slowly", "es": "Empieza por la primera letra y pronunciala despacio" }
+      }
+    }
+  ],
+
+  "quizzes": [
+    {
+      "id": "ch1_quiz_a",
+      "chapter": "ch1",
+      "type": "word_rearrange",
+      "title": { "ko": "도둑의 암호 메시지", "en": "The Thief's Coded Message", "es": "El Mensaje Cifrado del Ladrón" },
+      "storyContext": {
+        "ko": "도둑이 로제타 복제본에 여러 언어로 뒤섞인 메시지를 남겼다. 단어를 올바른 순서로 배열하여 메시지를 해독해야 한다.",
+        "en": "The thief left a scrambled multilingual message on the Rosetta replica. Arrange the words in the correct order to decode it.",
+        "es": "El ladrón dejó un mensaje desordenado en varios idiomas en la réplica de Rosetta. Ordena las palabras correctamente para descifrarlo."
+      },
+      "content": {
+        "en": {
+          "questions": [
+            { "scrambled": ["am", "I", "a", "detective"], "answer": "I am a detective", "hint": { "ko": "주어가 먼저 옵니다. 'I'로 시작하세요.", "en": "The subject comes first. Start with 'I'.", "es": "El sujeto va primero. Empieza con 'I'." }, "grammarNote": { "ko": "영어 어순: 주어(I) + 동사(am) + 보어(a detective).", "en": "English word order: Subject (I) + Verb (am) + Complement (a detective).", "es": "Orden en inglés: Sujeto (I) + Verbo (am) + Complemento (a detective)." } },
+            { "scrambled": ["is", "my", "name", "Rudy"], "answer": "My name is Rudy", "hint": { "ko": "'My name'이 주어입니다.", "en": "'My name' is the subject.", "es": "'My name' es el sujeto." }, "grammarNote": { "ko": "소유격(My) + 명사(name) + 동사(is) + 이름 순서입니다.", "en": "Possessive (My) + Noun (name) + Verb (is) + Name.", "es": "Posesivo (My) + Sustantivo (name) + Verbo (is) + Nombre." } },
+            { "scrambled": ["from", "am", "I", "London"], "answer": "I am from London", "hint": { "ko": "'I am from...'은 출신지를 말하는 표현입니다.", "en": "'I am from...' tells where you are from.", "es": "'I am from...' indica de dónde eres." }, "grammarNote": { "ko": "출신지 표현: I am from + 장소.", "en": "Origin expression: I am from + place.", "es": "Expresión de origen: I am from + lugar." } }
+          ]
+        },
+        "es": {
+          "questions": [
+            { "scrambled": ["soy", "detective", "un"], "answer": "Soy un detective", "hint": { "ko": "스페인어에서는 주어를 생략하고 동사로 시작할 수 있습니다.", "en": "In Spanish, the subject can be dropped. Start with the verb.", "es": "En español se puede omitir el sujeto. Empieza con el verbo." }, "grammarNote": { "ko": "스페인어: 동사(Soy) + 관사(un) + 명사(detective).", "en": "Spanish: Verb (Soy) + Article (un) + Noun (detective).", "es": "Español: Verbo (Soy) + Artículo (un) + Sustantivo (detective)." } },
+            { "scrambled": ["me", "Rudy", "llamo"], "answer": "Me llamo Rudy", "hint": { "ko": "'Me llamo'는 '내 이름은'이라는 뜻입니다.", "en": "'Me llamo' means 'My name is'.", "es": "'Me llamo' significa 'Mi nombre es'." }, "grammarNote": { "ko": "자기소개: Me llamo + 이름.", "en": "Self-introduction: Me llamo + name.", "es": "Presentación: Me llamo + nombre." } },
+            { "scrambled": ["de", "soy", "Londres"], "answer": "Soy de Londres", "hint": { "ko": "'Soy de...'는 출신지를 말하는 표현입니다.", "en": "'Soy de...' tells where you are from.", "es": "'Soy de...' indica de dónde eres." }, "grammarNote": { "ko": "출신지 표현: Soy de + 장소.", "en": "Origin expression: Soy de + place.", "es": "Expresión de origen: Soy de + lugar." } }
+          ]
+        },
+        "ko": {
+          "questions": [
+            { "scrambled": ["탐정입니다", "저는"], "answer": "저는 탐정입니다", "hint": { "en": "Korean order: Subject + Verb. '저는' is 'I am'.", "es": "Orden coreano: Sujeto + Verbo. '저는' es 'Yo soy'.", "ko": "'저는'이 주어입니다. 주어를 먼저 놓으세요." }, "grammarNote": { "en": "Korean SOV order: 저는 (I) + 탐정입니다 (am a detective).", "es": "Orden SOV coreano: 저는 (Yo) + 탐정입니다 (soy detective).", "ko": "한국어 어순: 주어(저는) + 서술어(탐정입니다)." } },
+            { "scrambled": ["루디입니다", "이름은", "제"], "answer": "제 이름은 루디입니다", "hint": { "en": "'제 이름은' means 'My name is'.", "es": "'제 이름은' significa 'Mi nombre es'.", "ko": "'제 이름은'으로 시작하세요." }, "grammarNote": { "en": "제 (my) + 이름은 (name) + 루디입니다 (is Rudy).", "es": "제 (mi) + 이름은 (nombre) + 루디입니다 (es Rudy).", "ko": "소유격(제) + 명사(이름은) + 서술어(루디입니다)." } },
+            { "scrambled": ["왔어요", "런던에서", "저는"], "answer": "저는 런던에서 왔어요", "hint": { "en": "'저는...에서 왔어요' means 'I am from...'.", "es": "'저는...에서 왔어요' significa 'Soy de...'.", "ko": "'저는'으로 시작하고 '왔어요'로 끝나요." }, "grammarNote": { "en": "저는 (I) + 런던에서 (from London) + 왔어요 (came/am from).", "es": "저는 (Yo) + 런던에서 (de Londres) + 왔어요 (vengo de).", "ko": "출신지 표현: 저는 + 장소에서 + 왔어요." } }
+          ]
+        }
+      },
+      "difficulty": 1,
+      "rewards": { "xp": 100 },
+      "consequence": { "ko": "메시지를 해독하자 도둑이 자기소개를 남겼다는 것이 드러난다 — 도둑은 자신의 정체를 과시하고 있다.", "en": "Decoding the message reveals the thief left a self-introduction — they are showing off their identity.", "es": "Descifrar el mensaje revela que el ladrón dejó una autopresentación — está presumiendo de su identidad." }
+    },
+    {
+      "id": "ch1_quiz_b",
+      "chapter": "ch1",
+      "type": "matching",
+      "title": { "ko": "목격자의 대화", "en": "The Witness Conversation", "es": "La Conversación del Testigo" },
+      "storyContext": {
+        "ko": "톰이 수상한 인물이 외국인 방문객과 나눈 대화를 엿들었다. 영어, 스페인어, 한국어가 섞인 인사말을 매칭해야 단서를 얻을 수 있다.",
+        "en": "Tom overheard the suspect speaking with an international visitor. Match the greetings across English, Spanish, and Korean to piece together the clue.",
+        "es": "Tom escuchó al sospechoso hablando con un visitante internacional. Empareja los saludos en inglés, español y coreano para descifrar la pista."
+      },
+      "content": {
+        "en": {
+          "pairs": [
+            { "left": "Hello", "right": "Hola", "wrongOptions": ["Adiós", "Buenas noches", "Hasta luego"] },
+            { "left": "Good morning", "right": "Buenos días", "wrongOptions": ["Buenas tardes", "Buenas noches", "Hola"] },
+            { "left": "How are you?", "right": "¿Cómo estás?", "wrongOptions": ["¿De dónde eres?", "Me llamo...", "Adiós"] },
+            { "left": "Nice to meet you", "right": "Mucho gusto", "wrongOptions": ["Hasta luego", "Estoy bien", "Buenos días"] },
+            { "left": "Goodbye", "right": "Adiós", "wrongOptions": ["Hola", "Buenos días", "Mucho gusto"] }
+          ]
+        },
+        "es": {
+          "pairs": [
+            { "left": "Hola", "right": "안녕하세요", "wrongOptions": ["안녕히 가세요", "잘 지내요?", "만나서 반갑습니다"] },
+            { "left": "Buenos días", "right": "좋은 아침", "wrongOptions": ["안녕히 가세요", "안녕", "다음에 봐요"] },
+            { "left": "¿Cómo estás?", "right": "잘 지내요?", "wrongOptions": ["어디서 왔어요?", "제 이름은...", "안녕히 가세요"] },
+            { "left": "Mucho gusto", "right": "만나서 반갑습니다", "wrongOptions": ["다음에 봐요", "잘 지내요?", "좋은 아침"] },
+            { "left": "Adiós", "right": "안녕히 가세요", "wrongOptions": ["안녕하세요", "좋은 아침", "만나서 반갑습니다"] }
+          ]
+        },
+        "ko": {
+          "pairs": [
+            { "left": "안녕하세요", "right": "Hello", "wrongOptions": ["Goodbye", "Good night", "See you later"] },
+            { "left": "좋은 아침", "right": "Good morning", "wrongOptions": ["Good evening", "Good night", "Hello"] },
+            { "left": "잘 지내요?", "right": "How are you?", "wrongOptions": ["Where are you from?", "My name is...", "Goodbye"] },
+            { "left": "만나서 반갑습니다", "right": "Nice to meet you", "wrongOptions": ["See you later", "I'm fine", "Good morning"] },
+            { "left": "안녕히 가세요", "right": "Goodbye", "wrongOptions": ["Hello", "Good morning", "Nice to meet you"] }
+          ]
+        }
+      },
+      "difficulty": 1,
+      "rewards": { "xp": 100 },
+      "consequence": { "ko": "인사말을 매칭하자 톰의 증언이 완성된다 — 용의자는 여러 언어로 '안녕히 가세요'를 말하며 사라졌다.", "en": "Matching the greetings completes Tom's testimony — the suspect said 'Goodbye' in multiple languages before vanishing.", "es": "Emparejar los saludos completa el testimonio de Tom — el sospechoso dijo 'Adiós' en varios idiomas antes de desaparecer." }
+    },
+    {
+      "id": "ch1_quiz_c",
+      "chapter": "ch1",
+      "type": "roleplay",
+      "title": { "ko": "미스 페니와의 만남", "en": "Meeting Miss Penny", "es": "Encuentro con Miss Penny" },
+      "storyContext": {
+        "ko": "미스 페니의 고서점에 도착한 루디. 제한 구역의 자료에 접근하려면 먼저 예의 바르게 자기소개를 해야 한다. 미스 페니는 예의를 중시하는 사람이다.",
+        "en": "Rudy arrives at Miss Penny's bookshop. To access the restricted archives, he must introduce himself properly. Miss Penny values good manners above all.",
+        "es": "Rudy llega a la librería de Miss Penny. Para acceder a los archivos restringidos, debe presentarse correctamente. Miss Penny valora los buenos modales por encima de todo."
+      },
+      "content": {
+        "en": {
+          "npc": "penny",
+          "dialogue": [
+            { "npcLine": "Good afternoon. I don't believe we've met. And I don't let strangers into my rare books collection.", "prompt": "Introduce yourself politely to Miss Penny.", "options": [ { "text": "Good afternoon. My name is Rudy. I'm a detective. Nice to meet you.", "correct": true, "feedback": "Perfect! Polite and professional. Miss Penny nods approvingly." }, { "text": "Hey. I'm Rudy. Let me see the books.", "correct": false, "feedback": "Too informal! Miss Penny frowns. Try a more polite greeting." }, { "text": "Hi. Where are you from?", "correct": false, "feedback": "That's not the right approach. She asked who you are, not where she's from." } ] },
+            { "npcLine": "A detective? How interesting. And where are you from, dear?", "prompt": "Tell Miss Penny where you are from.", "options": [ { "text": "I'm from London. I live in Baker Lane.", "correct": true, "feedback": "Miss Penny smiles. 'A local! Even better.'" }, { "text": "Good night.", "correct": false, "feedback": "That's a farewell, not an answer to her question!" }, { "text": "I'm fine, thank you.", "correct": false, "feedback": "She asked where you're from, not how you are." } ] },
+            { "npcLine": "Very well. And how are you holding up, with all this dreadful business at the museum?", "prompt": "Respond to her question about how you are.", "options": [ { "text": "I'm not bad, thank you. And you?", "correct": true, "feedback": "Miss Penny softens. 'I'm fine, dear. Now, let me show you those archives.'" }, { "text": "Goodbye! See you later!", "correct": false, "feedback": "You can't leave now! She's about to help you." }, { "text": "My name is Rudy.", "correct": false, "feedback": "You already introduced yourself. She's asking how you feel." } ] }
+          ]
+        },
+        "es": {
+          "npc": "penny",
+          "dialogue": [
+            { "npcLine": "Buenas tardes. No creo que nos conozcamos. Y no dejo entrar a desconocidos a mi colección.", "prompt": "Preséntate educadamente a Miss Penny.", "options": [ { "text": "Buenas tardes. Me llamo Rudy. Soy detective. Mucho gusto.", "correct": true, "feedback": "¡Perfecto! Educado y profesional. Miss Penny asiente con aprobación." }, { "text": "Hola. Soy Rudy. Déjame ver los libros.", "correct": false, "feedback": "¡Demasiado informal! Miss Penny frunce el ceño." }, { "text": "Hola. ¿De dónde eres?", "correct": false, "feedback": "No es el momento. Ella preguntó quién eres." } ] },
+            { "npcLine": "¿Detective? Qué interesante. ¿Y de dónde eres, querido?", "prompt": "Dile a Miss Penny de dónde eres.", "options": [ { "text": "Soy de Londres. Vivo en Baker Lane.", "correct": true, "feedback": "Miss Penny sonríe. '¡Un local! Aún mejor.'" }, { "text": "Buenas noches.", "correct": false, "feedback": "Eso es una despedida, ¡no una respuesta!" }, { "text": "Estoy bien, gracias.", "correct": false, "feedback": "Preguntó de dónde eres, no cómo estás." } ] },
+            { "npcLine": "Muy bien. ¿Y cómo estás, con todo este asunto terrible del museo?", "prompt": "Responde a su pregunta sobre cómo estás.", "options": [ { "text": "Estoy bien, gracias. ¿Y usted?", "correct": true, "feedback": "Miss Penny se ablanda. 'Estoy bien, querido. Déjame mostrarte los archivos.'" }, { "text": "¡Adiós! ¡Hasta luego!", "correct": false, "feedback": "¡No puedes irte ahora! Está a punto de ayudarte." }, { "text": "Me llamo Rudy.", "correct": false, "feedback": "Ya te presentaste. Ella pregunta cómo te sientes." } ] }
+          ]
+        },
+        "ko": {
+          "npc": "penny",
+          "dialogue": [
+            { "npcLine": "안녕하세요. 처음 뵙는 것 같군요. 모르는 분은 제 희귀 서적 컬렉션에 들여보내지 않아요.", "prompt": "미스 페니에게 예의 바르게 자기소개를 하세요.", "options": [ { "text": "안녕하세요. 제 이름은 루디입니다. 저는 탐정입니다. 만나서 반갑습니다.", "correct": true, "feedback": "완벽해요! 예의 바르고 전문적이에요. 미스 페니가 고개를 끄덕입니다." }, { "text": "안녕. 나 루디야. 책 보여줘.", "correct": false, "feedback": "너무 격식 없어요! 미스 페니가 인상을 찌푸립니다." }, { "text": "안녕. 어디서 왔어요?", "correct": false, "feedback": "지금은 적절하지 않아요. 그녀가 물은 것은 당신이 누구냐는 거예요." } ] },
+            { "npcLine": "탐정이라고요? 흥미롭군요. 어디서 왔어요?", "prompt": "미스 페니에게 어디서 왔는지 말하세요.", "options": [ { "text": "저는 런던에서 왔어요. 베이커가에 살아요.", "correct": true, "feedback": "미스 페니가 미소 짓습니다. '현지인이군요! 더 좋아요.'" }, { "text": "안녕히 가세요.", "correct": false, "feedback": "그건 작별 인사예요, 대답이 아니에요!" }, { "text": "잘 지내요, 감사해요.", "correct": false, "feedback": "그녀가 물은 것은 어디서 왔냐는 거예요, 어떻게 지내냐가 아니에요." } ] },
+            { "npcLine": "그렇군요. 박물관에서 이런 끔찍한 일이 있었는데, 잘 지내요?", "prompt": "어떻게 지내는지 대답하세요.", "options": [ { "text": "잘 지내요, 감사해요. 페니 씨는요?", "correct": true, "feedback": "미스 페니가 부드러워집니다. '저도 괜찮아요. 자, 자료를 보여드릴게요.'" }, { "text": "안녕히 가세요! 다음에 봐요!", "correct": false, "feedback": "지금 갈 수 없어요! 그녀가 도와주려는 참이에요." }, { "text": "제 이름은 루디입니다.", "correct": false, "feedback": "이미 자기소개를 했어요. 그녀가 물은 것은 기분이 어떠냐는 거예요." } ] }
+          ]
+        }
+      },
+      "difficulty": 1,
+      "rewards": { "xp": 100 },
+      "consequence": { "ko": "미스 페니가 루디의 예의 바른 태도에 감동받아 제한 구역 자료실의 문을 열어준다.", "en": "Impressed by Rudy's manners, Miss Penny unlocks the restricted archives for him.", "es": "Impresionada por los modales de Rudy, Miss Penny abre los archivos restringidos para él." }
+    },
+    {
+      "id": "ch1_quiz_d",
+      "chapter": "ch1",
+      "type": "investigation",
+      "title": { "ko": "국제 학자의 증언", "en": "The International Scholar's Testimony", "es": "El Testimonio del Académico Internacional" },
+      "storyContext": {
+        "ko": "박물관에 국제 학자가 도착했다. 학자는 도둑을 목격했지만, 증언을 영어, 스페인어, 한국어로 나눠 말한다. 각 증언의 빈칸을 채워 도둑의 정체에 대한 핵심 단서를 완성해야 한다.",
+        "en": "An international scholar arrives at the museum. They witnessed the thief but give their testimony split across English, Spanish, and Korean. Fill in the blanks to piece together the crucial clue about the thief's identity.",
+        "es": "Un académico internacional llega al museo. Presenció al ladrón pero da su testimonio dividido entre inglés, español y coreano. Completa los espacios para reconstruir la pista crucial sobre la identidad del ladrón."
+      },
+      "content": {
+        "en": {
+          "clues": [
+            { "text": "The scholar says: 'Good evening. My name is Dr. Park. I ___ a researcher.'", "blank": "am", "options": ["am", "is", "are", "from"] },
+            { "text": "The scholar continues: 'I ___ from Seoul. I saw the thief last night.'", "blank": "am", "options": ["am", "is", "live", "from"] },
+            { "text": "The scholar adds: 'The thief said ___. Just that one word. Then he disappeared.'", "blank": "Goodbye", "options": ["Goodbye", "Hello", "Good morning", "Yes"] }
+          ],
+          "conclusion": { "ko": "학자의 증언이 완성됐다: 도둑은 떠나기 전에 항상 정중히 인사한다 — 매너 있는 범죄자.", "en": "The scholar's testimony is complete: the thief always says a polite farewell before leaving — a criminal with manners.", "es": "El testimonio del académico está completo: el ladrón siempre se despide educadamente antes de irse — un criminal con modales." }
+        },
+        "es": {
+          "clues": [
+            { "text": "El académico dice: 'Buenas tardes. ___ el Dr. Park. Soy investigador.'", "blank": "Me llamo", "options": ["Me llamo", "Soy de", "Estoy bien", "Hola"] },
+            { "text": "El académico continúa: '___ Seúl. Vi al ladrón anoche.'", "blank": "Soy de", "options": ["Soy de", "Me llamo", "Estoy en", "Hola"] },
+            { "text": "El académico añade: 'El ladrón dijo ___. Solo esa palabra. Y desapareció.'", "blank": "Adiós", "options": ["Adiós", "Hola", "Buenos días", "Sí"] }
+          ],
+          "conclusion": { "ko": "학자의 증언이 완성됐다.", "en": "The scholar's testimony is complete.", "es": "El testimonio del académico está completo: el ladrón siempre se despide educadamente." }
+        },
+        "ko": {
+          "clues": [
+            { "text": "학자가 말합니다: '안녕하세요. ___ 박 박사입니다. 저는 연구원입니다.'", "blank": "제 이름은", "options": ["제 이름은", "저는...에서", "잘 지내요", "안녕"] },
+            { "text": "학자가 계속합니다: '저는 서울___ 왔어요. 어젯밤 도둑을 봤어요.'", "blank": "에서", "options": ["에서", "에", "은", "를"] },
+            { "text": "학자가 덧붙입니다: '도둑이 ___ 라고 말했어요. 그 한마디만 하고 사라졌어요.'", "blank": "안녕히 가세요", "options": ["안녕히 가세요", "안녕하세요", "좋은 아침", "네"] }
+          ],
+          "conclusion": { "ko": "학자의 증언 완성: 도둑은 떠나기 전에 항상 정중하게 인사한다.", "en": "The scholar's testimony is complete: the thief always says a polite farewell.", "es": "El testimonio completo: el ladrón siempre se despide educadamente." }
+        }
+      },
+      "difficulty": 2,
+      "rewards": { "xp": 100 },
+      "consequence": { "ko": "증언을 완성하자 패턴이 보인다 — 도둑은 항상 세 가지 언어로 작별 인사를 남긴다. 이것이 다음 범행 장소의 단서다.", "en": "Completing the testimony reveals a pattern — the thief always leaves farewell greetings in three languages. This is the clue to their next target.", "es": "Completar el testimonio revela un patrón — el ladrón siempre deja despedidas en tres idiomas. Esta es la pista hacia su próximo objetivo." }
+    },
+    {
+      "id": "ch1_quiz_e",
+      "chapter": "ch1",
+      "type": "mixed",
+      "title": { "ko": "도둑의 작별 선언", "en": "The Thief's Farewell Declaration", "es": "La Declaración de Despedida del Ladrón" },
+      "storyContext": {
+        "ko": "수호석이 있던 금고에서 도둑이 남긴 마지막 메시지가 발견됐다. 영어, 스페인어, 한국어로 작성된 다국어 작별 선언문이다. 모든 언어 능력을 동원해 메시지를 해독하고 도둑의 다음 행선지를 알아내야 한다.",
+        "en": "A final message from the thief has been found in the vault where the Guardian Stone was kept. It's a multilingual farewell declaration written in English, Spanish, and Korean. Use all your language skills to decode it and discover where the thief is heading next.",
+        "es": "Se encontró un mensaje final del ladrón en la bóveda donde estaba la Piedra Guardiana. Es una declaración de despedida multilingüe escrita en inglés, español y coreano. Usa todas tus habilidades lingüísticas para descifrarlo y descubrir adónde se dirige el ladrón."
+      },
+      "content": {
+        "en": {
+          "rounds": [
+            { "type": "fill_blank", "instruction": "The thief's note begins in English. Fill in the blank.", "text": "Hello, detective. My name is Mr. Black. I am ___ London. See you soon.", "blank": "from", "options": ["from", "in", "at", "to"] },
+            { "type": "matching", "instruction": "The note switches to multilingual greetings. Match each farewell to its language.", "pairs": [ { "left": "Goodbye", "right": "English", "wrongOptions": ["Spanish", "Korean"] }, { "left": "Hasta luego", "right": "Spanish", "wrongOptions": ["English", "Korean"] }, { "left": "다음에 봐요", "right": "Korean", "wrongOptions": ["English", "Spanish"] } ] },
+            { "type": "word_rearrange", "instruction": "The final line is scrambled. Arrange it to reveal the thief's farewell.", "scrambled": ["you", "See", "later"], "answer": "See you later" },
+            { "type": "fill_blank", "instruction": "Decode the Spanish line from the thief's note.", "text": "Soy ___ museo curador. Adiós, detective.", "blank": "un", "options": ["un", "el", "de", "a"] },
+            { "type": "word_rearrange", "instruction": "The Korean line is scrambled. Arrange it correctly.", "scrambled": ["가세요", "안녕히", "탐정님"], "answer": "탐정님 안녕히 가세요" }
+          ]
+        },
+        "es": {
+          "rounds": [
+            { "type": "fill_blank", "instruction": "La nota del ladrón comienza en español. Completa el espacio.", "text": "Hola, detective. ___ Mr. Black. Soy de Londres. Hasta pronto.", "blank": "Me llamo", "options": ["Me llamo", "Soy de", "Estoy en", "Hola"] },
+            { "type": "matching", "instruction": "La nota cambia a saludos multilingües. Empareja cada despedida con su idioma.", "pairs": [ { "left": "Take care", "right": "English", "wrongOptions": ["Spanish", "Korean"] }, { "left": "Adiós", "right": "Spanish", "wrongOptions": ["English", "Korean"] }, { "left": "안녕히 가세요", "right": "Korean", "wrongOptions": ["English", "Spanish"] } ] },
+            { "type": "word_rearrange", "instruction": "La línea final está desordenada. Ordénala.", "scrambled": ["luego", "Hasta"], "answer": "Hasta luego" },
+            { "type": "fill_blank", "instruction": "Decode the English line.", "text": "I am ___ museum curator. Goodbye, detective.", "blank": "a", "options": ["a", "the", "from", "is"] },
+            { "type": "word_rearrange", "instruction": "La línea en coreano está desordenada.", "scrambled": ["봐요", "다음에"], "answer": "다음에 봐요" }
+          ]
+        },
+        "ko": {
+          "rounds": [
+            { "type": "fill_blank", "instruction": "도둑의 메모가 한국어로 시작됩니다. 빈칸을 채우세요.", "text": "안녕하세요, 탐정님. ___ 미스터 블랙입니다. 저는 런던에서 왔어요.", "blank": "제 이름은", "options": ["제 이름은", "저는...에서", "잘 지내요", "안녕히"] },
+            { "type": "matching", "instruction": "메모에 다국어 작별 인사가 나옵니다. 각 인사를 언어와 매칭하세요.", "pairs": [ { "left": "See you soon", "right": "English", "wrongOptions": ["Spanish", "Korean"] }, { "left": "Hasta luego", "right": "Spanish", "wrongOptions": ["English", "Korean"] }, { "left": "안녕히 가세요", "right": "Korean", "wrongOptions": ["English", "Spanish"] } ] },
+            { "type": "word_rearrange", "instruction": "마지막 줄이 뒤섞여 있습니다.", "scrambled": ["가세요", "안녕히"], "answer": "안녕히 가세요" },
+            { "type": "fill_blank", "instruction": "영어 줄을 해독하세요.", "text": "I ___ a museum curator. Goodbye, detective.", "blank": "am", "options": ["am", "is", "are", "from"] },
+            { "type": "word_rearrange", "instruction": "스페인어 줄을 올바르게 배열하세요.", "scrambled": ["luego", "Hasta"], "answer": "Hasta luego" }
+          ]
+        }
+      },
+      "difficulty": 2,
+      "rewards": { "xp": 100 },
+      "consequence": { "ko": "도둑의 작별 선언을 해독했다! 미스터 블랙은 자신이 박물관 큐레이터라고 밝혔다. 메시지 마지막에 '다음에 봐요'라는 말이 있다 — 이것은 끝이 아니다. 루디의 여정은 이제 시작이다.", "en": "The thief's farewell is decoded! Mr. Black reveals he is a museum curator. His message ends with 'See you later' — this is not over. Rudy's journey has just begun.", "es": "¡La despedida del ladrón está descifrada! Mr. Black revela que es un curador de museo. Su mensaje termina con 'Hasta luego' — esto no ha terminado. El viaje de Rudy acaba de comenzar." }
+    }
+  ],
+
+  "beforeAfter": {
+    "sceneName": "Tom's Testimony",
+    "before": "Tom: 'Oi Rudy! Some dodgy bloke was having a butcher's at the replica.' — Rudy: 'Interesting. Tell me more.' (flat, no personality, no humor, generic response)",
+    "after": "Tom: 'Oi Rudy! Mate, you ain't gonna believe this. Last night, some dodgy bloke was having a butcher's at the replica. Proper sus, yeah? Tall geezer, black coat, moved like he owned the place. He legged it when he clocked me.' — Rudy: 'Tom, I understood about sixty percent of that. The sixty percent that wasn't the important part. Can you describe him in words that exist in a dictionary?' (Rudy has dry wit, self-deprecating humor about his own comprehension failure. Tom's slang is vibrant and consistent. The exchange has rhythm and reveals both characters' personalities. A slang-decoding quiz naturally follows from the scene because the user genuinely needs to decode Tom's testimony to continue the investigation.)"
+  }
+}

@@ -39,3 +39,9 @@ yarn-error.*
 .vercel
 
 .env
+
+# build output
+server_dist/
+
+# claude local settings
+.claude/settings.local.json

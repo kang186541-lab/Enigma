@@ -49,9 +49,10 @@ export default function NpcListScreen() {
   const native = nativeLanguage ?? "english";
 
   const getScenarioLabel = (npc: NPC) => {
-    if (lang === "korean") return npc.scenarioKo;
-    if (lang === "spanish") return npc.scenarioEs;
-    return npc.scenario;
+    const nativeName = native === "korean" ? npc.scenarioKo : native === "spanish" ? npc.scenarioEs : npc.scenario;
+    const learnName  = lang === "korean" ? npc.scenarioKo : lang === "spanish" ? npc.scenarioEs : npc.scenario;
+    if (native === lang) return nativeName;
+    return `${nativeName} (${learnName})`;
   };
 
   const headerTitle = native === "korean" ? "실전 미션" : native === "spanish" ? "Misión Real" : "Real Missions";

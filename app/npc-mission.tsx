@@ -22,7 +22,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import * as Speech from "expo-speech";
+import { Audio, AVPlaybackStatus } from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
 import { getNPC, NPC, NPC_EMOTIONS, NPC_REL_LEVELS, getRelTier, getRelLabel, RelationshipTier } from "@/constants/npcs";
@@ -54,12 +54,18 @@ interface NpcMessage {
 }
 
 let _webAudioEl: HTMLAudioElement | null = null;
+let _nativeSound: Audio.Sound | null = null;
 
 function stopAudio() {
-  if (Platform.OS !== "web") {
-    try { Speech.stop(); } catch {}
-  } else {
+  if (Platform.OS === "web") {
     if (_webAudioEl) { _webAudioEl.pause(); _webAudioEl.src = ""; _webAudioEl = null; }
+  } else {
+    if (_nativeSound) {
+      const prev = _nativeSound;
+      _nativeSound = null;
+      prev.stopAsync().catch(() => {});
+      prev.unloadAsync().catch(() => {});
+    }
   }
 }
 
@@ -199,13 +205,36 @@ export default function NpcMissionScreen() {
         })
         .catch(() => setSpeakingId(null));
     } else {
-      const voiceInfo = npc.voice[language as keyof typeof npc.voice] ?? npc.voice.english;
-      Speech.speak(ttsText, {
-        language: voiceInfo.lang,
-        rate: 1.0,
-        onDone: () => setSpeakingId(null),
-        onError: () => setSpeakingId(null),
-      });
+      (async () => {
+        try {
+          if (_nativeSound) {
+            await _nativeSound.stopAsync().catch(() => {});
+            await _nativeSound.unloadAsync().catch(() => {});
+            _nativeSound = null;
+          }
+          const url = new URL("/api/npc-tts", getApiUrl());
+          url.searchParams.set("text", ttsText);
+          url.searchParams.set("npcId", npc.id);
+          url.searchParams.set("npcLang", language);
+          url.searchParams.set("speed", "1.0");
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+          const { sound } = await Audio.Sound.createAsync(
+            { uri: url.toString() },
+            { shouldPlay: true, volume: 1.0 },
+          );
+          _nativeSound = sound;
+          sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+            if (status.isLoaded && status.didJustFinish) {
+              sound.unloadAsync().catch(() => {});
+              _nativeSound = null;
+              setSpeakingId(null);
+            }
+          });
+        } catch {
+          _nativeSound = null;
+          setSpeakingId(null);
+        }
+      })();
     }
   }, [muted, npc, language]);
 
@@ -322,13 +351,36 @@ export default function NpcMissionScreen() {
           })
           .catch(() => setPopupPlaying(false));
       } else {
-        const voiceInfo = npc.voice[language as keyof typeof npc.voice] ?? npc.voice.english;
-        Speech.speak(ttsText, {
-          language: voiceInfo.lang,
-          rate: 1.0,
-          onDone: () => setPopupPlaying(false),
-          onError: () => setPopupPlaying(false),
-        });
+        (async () => {
+          try {
+            if (_nativeSound) {
+              await _nativeSound.stopAsync().catch(() => {});
+              await _nativeSound.unloadAsync().catch(() => {});
+              _nativeSound = null;
+            }
+            const url = new URL("/api/npc-tts", getApiUrl());
+            url.searchParams.set("text", ttsText);
+            url.searchParams.set("npcId", npc.id);
+            url.searchParams.set("npcLang", language);
+            url.searchParams.set("speed", "1.0");
+            await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+            const { sound } = await Audio.Sound.createAsync(
+              { uri: url.toString() },
+              { shouldPlay: true, volume: 1.0 },
+            );
+            _nativeSound = sound;
+            sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+              if (status.isLoaded && status.didJustFinish) {
+                sound.unloadAsync().catch(() => {});
+                _nativeSound = null;
+                setPopupPlaying(false);
+              }
+            });
+          } catch {
+            _nativeSound = null;
+            setPopupPlaying(false);
+          }
+        })();
       }
     }
   }, [muted, npc, language]);
@@ -355,13 +407,36 @@ export default function NpcMissionScreen() {
         })
         .catch(() => setPopupPlaying(false));
     } else {
-      const voiceInfo = npc.voice[language as keyof typeof npc.voice] ?? npc.voice.english;
-      Speech.speak(ttsText, {
-        language: voiceInfo.lang,
-        rate: 1.0,
-        onDone: () => setPopupPlaying(false),
-        onError: () => setPopupPlaying(false),
-      });
+      (async () => {
+        try {
+          if (_nativeSound) {
+            await _nativeSound.stopAsync().catch(() => {});
+            await _nativeSound.unloadAsync().catch(() => {});
+            _nativeSound = null;
+          }
+          const url = new URL("/api/npc-tts", getApiUrl());
+          url.searchParams.set("text", ttsText);
+          url.searchParams.set("npcId", npc.id);
+          url.searchParams.set("npcLang", language);
+          url.searchParams.set("speed", "1.0");
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+          const { sound } = await Audio.Sound.createAsync(
+            { uri: url.toString() },
+            { shouldPlay: true, volume: 1.0 },
+          );
+          _nativeSound = sound;
+          sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+            if (status.isLoaded && status.didJustFinish) {
+              sound.unloadAsync().catch(() => {});
+              _nativeSound = null;
+              setPopupPlaying(false);
+            }
+          });
+        } catch {
+          _nativeSound = null;
+          setPopupPlaying(false);
+        }
+      })();
     }
   }, [pendingChoice, npc, language]);
 
@@ -438,13 +513,36 @@ export default function NpcMissionScreen() {
         })
         .catch(() => setWordPronPlaying(false));
     } else {
-      const voiceInfo = npc.voice[language as keyof typeof npc.voice] ?? npc.voice.english;
-      Speech.speak(word, {
-        language: voiceInfo.lang,
-        rate: 0.8,
-        onDone: () => setWordPronPlaying(false),
-        onError: () => setWordPronPlaying(false),
-      });
+      (async () => {
+        try {
+          if (_nativeSound) {
+            await _nativeSound.stopAsync().catch(() => {});
+            await _nativeSound.unloadAsync().catch(() => {});
+            _nativeSound = null;
+          }
+          const url = new URL("/api/npc-tts", getApiUrl());
+          url.searchParams.set("text", word);
+          url.searchParams.set("npcId", npc.id);
+          url.searchParams.set("npcLang", language);
+          url.searchParams.set("speed", "0.8");
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+          const { sound } = await Audio.Sound.createAsync(
+            { uri: url.toString() },
+            { shouldPlay: true, volume: 1.0 },
+          );
+          _nativeSound = sound;
+          sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+            if (status.isLoaded && status.didJustFinish) {
+              sound.unloadAsync().catch(() => {});
+              _nativeSound = null;
+              setWordPronPlaying(false);
+            }
+          });
+        } catch {
+          _nativeSound = null;
+          setWordPronPlaying(false);
+        }
+      })();
     }
   }, [npc, language]);
 
@@ -470,13 +568,36 @@ export default function NpcMissionScreen() {
         })
         .catch(() => setWordExPlaying(false));
     } else {
-      const voiceInfo = npc.voice[language as keyof typeof npc.voice] ?? npc.voice.english;
-      Speech.speak(ttsText, {
-        language: voiceInfo.lang,
-        rate: 0.9,
-        onDone: () => setWordExPlaying(false),
-        onError: () => setWordExPlaying(false),
-      });
+      (async () => {
+        try {
+          if (_nativeSound) {
+            await _nativeSound.stopAsync().catch(() => {});
+            await _nativeSound.unloadAsync().catch(() => {});
+            _nativeSound = null;
+          }
+          const url = new URL("/api/npc-tts", getApiUrl());
+          url.searchParams.set("text", ttsText);
+          url.searchParams.set("npcId", npc.id);
+          url.searchParams.set("npcLang", language);
+          url.searchParams.set("speed", "0.9");
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+          const { sound } = await Audio.Sound.createAsync(
+            { uri: url.toString() },
+            { shouldPlay: true, volume: 1.0 },
+          );
+          _nativeSound = sound;
+          sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+            if (status.isLoaded && status.didJustFinish) {
+              sound.unloadAsync().catch(() => {});
+              _nativeSound = null;
+              setWordExPlaying(false);
+            }
+          });
+        } catch {
+          _nativeSound = null;
+          setWordExPlaying(false);
+        }
+      })();
     }
   }, [npc, language]);
 
@@ -661,7 +782,9 @@ export default function NpcMissionScreen() {
     ? "Para comentarios gramaticales detallados, habla con un tutor. 💬"
     : "For detailed grammar feedback, chat with a tutor! 💬";
 
-  const scenario = language === "korean" ? npc?.scenarioKo : language === "spanish" ? npc?.scenarioEs : npc?.scenario;
+  const nativeScenario = native === "korean" ? npc?.scenarioKo : native === "spanish" ? npc?.scenarioEs : npc?.scenario;
+  const learnScenario  = language === "korean" ? npc?.scenarioKo : language === "spanish" ? npc?.scenarioEs : npc?.scenario;
+  const scenario = native === language ? nativeScenario : `${nativeScenario} (${learnScenario})`;
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>

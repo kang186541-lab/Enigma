@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
@@ -34,8 +35,18 @@ function setupCors(app: express.Application) {
       origin?.startsWith("http://localhost:") ||
       origin?.startsWith("http://127.0.0.1:");
 
-    if (origin && (origins.has(origin) || isLocalhost)) {
-      res.header("Access-Control-Allow-Origin", origin);
+    // Allow Railway/production domains
+    const isRailway = origin?.endsWith(".railway.app");
+
+    // Allow requests with no origin (mobile apps, Expo Go, curl)
+    const noOrigin = !origin;
+
+    if (noOrigin || origins.has(origin!) || isLocalhost || isRailway) {
+      if (origin) {
+        res.header("Access-Control-Allow-Origin", origin);
+      } else {
+        res.header("Access-Control-Allow-Origin", "*");
+      }
       res.header(
         "Access-Control-Allow-Methods",
         "GET, POST, PUT, DELETE, OPTIONS",
@@ -242,7 +253,6 @@ function setupErrorHandler(app: express.Application) {
     {
       port,
       host: "0.0.0.0",
-      reusePort: true,
     },
     () => {
       log(`express server serving on port ${port}`);

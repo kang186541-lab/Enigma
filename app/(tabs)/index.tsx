@@ -19,6 +19,7 @@ import { useLanguage, getLevel, getLevelProgress, NativeLanguage } from "@/conte
 import { RudyMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
 import { LanguageChangeModal } from "@/components/LanguageChangeModal";
+import { RudyGuideModal, getNextGuideIndex } from "@/components/RudyGuideModal";
 import { C, F } from "@/constants/theme";
 import {
   loadProgress,
@@ -166,6 +167,7 @@ export default function HomeScreen() {
   const [courseCompleted, setCourseCompleted] = React.useState<boolean | null>(null);
   const [dailyProgress, setDailyProgress] = React.useState<DailyCourseProgress | null>(null);
   const [showLangModal, setShowLangModal] = React.useState(false);
+  const [showGuide, setShowGuide] = React.useState(false);
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
@@ -184,6 +186,12 @@ export default function HomeScreen() {
 
   useEffect(() => {
     loadProgress().then(setDailyProgress);
+  }, []);
+
+  useEffect(() => {
+    getNextGuideIndex().then((idx) => {
+      if (idx !== null) setShowGuide(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -491,6 +499,7 @@ export default function HomeScreen() {
       onClose={clearLevelUp}
     />
     <LanguageChangeModal visible={showLangModal} onClose={() => setShowLangModal(false)} />
+    <RudyGuideModal visible={showGuide} lang={nativeLang} onClose={() => setShowGuide(false)} />
     </>
   );
 }

@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "description": "Fix for ch3_quiz_d password puzzle — letters now correctly produce the final answer in all 3 languages",
+    "bug": "EN: clues produced LILH but finalAnswer was LIFE. ES: clues were inconsistent with LUNA. KO: clues were inconsistent with 빛나라.",
+    "fix": "Rewrote clue sentences and letter extraction to match the intended final answers: EN=LIFE, ES=LUNA, KO=빛나라"
+  },
+
+  "id": "ch3_quiz_d",
+  "chapter": "ch3",
+  "scene": "ch3_scene2",
+  "type": "listening",
+  "title": {
+    "ko": "민호의 힌트",
+    "en": "Minho's Hint",
+    "es": "La Pista de Minho"
+  },
+  "difficulty": 3,
+  "timeLimit": null,
+  "isBoss": false,
+  "useAzureTTS": true,
+  "storyContext": {
+    "ko": "민호가 렉시콘 거점의 비밀번호 힌트를 전달한다.",
+    "en": "Minho delivers password hints for the Lexicon base.",
+    "es": "Minho da pistas para la contraseña de la base de Lexicón."
+  },
+  "content": {
+    "en": {
+      "ttsScript": "Listen carefully, friend. On the mountain of the south, a tower shines bright. Below it hides a secret door. The password has four letters. First letter: the beginning of 'light'. Second letter: the middle of 'time'. Third letter: the end of 'leaf'. Fourth letter: the end of 'hope'.",
+      "ttsVoice": "en-GB-RyanNeural",
+      "ttsSpeed": "0.9",
+      "questions": [
+        {
+          "question": {
+            "ko": "비밀번호의 첫 글자는? ('light'의 시작)",
+            "en": "First letter of the password? (beginning of 'light')",
+            "es": "Primera letra de la contraseña? (inicio de 'light')"
+          },
+          "answer": "L",
+          "acceptableAnswers": ["l", "L"]
+        },
+        {
+          "question": {
+            "ko": "두 번째 글자는? ('time'의 가운데)",
+            "en": "Second letter? (middle of 'time')",
+            "es": "Segunda letra? (centro de 'time')"
+          },
+          "answer": "I",
+          "acceptableAnswers": ["i", "I"]
+        },
+        {
+          "question": {
+            "ko": "세 번째 글자는? ('leaf'의 끝)",
+            "en": "Third letter? (end of 'leaf')",
+            "es": "Tercera letra? (final de 'leaf')"
+          },
+          "answer": "F",
+          "acceptableAnswers": ["f", "F"]
+        },
+        {
+          "question": {
+            "ko": "완성된 비밀번호는?",
+            "en": "Complete password?",
+            "es": "Contraseña completa?"
+          },
+          "answer": "LIFE",
+          "acceptableAnswers": ["LIFE", "life", "Life"]
+        }
+      ],
+      "finalAnswer": "LIFE",
+      "explanation": {
+        "ko": "L(light의 첫 글자) + I(time의 가운데 글자) + F(leaf의 마지막 글자) + E(hope의 마지막 글자) = LIFE (생명/삶)",
+        "en": "L(start of light) + I(middle of time) + F(end of leaf) + E(end of hope) = LIFE",
+        "es": "L(inicio de light) + I(centro de time) + F(final de leaf) + E(final de hope) = LIFE (vida)"
+      }
+    },
+    "es": {
+      "ttsScript": "Escucha bien, amigo. En la montaña del sur, brilla una torre. Debajo se esconde una puerta secreta. La contraseña tiene cuatro letras. Primera: el inicio de 'luz'. Segunda: el final de 'su'. Tercera: el final de 'corazón'. Cuarta: el inicio de 'alma'.",
+      "ttsVoice": "es-ES-AlvaroNeural",
+      "ttsSpeed": "0.9",
+      "questions": [
+        {
+          "question": {
+            "ko": "첫 글자는? ('luz'의 시작)",
+            "en": "First letter? (start of 'luz')",
+            "es": "Primera letra? (inicio de 'luz')"
+          },
+          "answer": "L",
+          "acceptableAnswers": ["l", "L"]
+        },
+        {
+          "question": {
+            "ko": "두 번째 글자는? ('su'의 끝)",
+            "en": "Second letter? (end of 'su')",
+            "es": "Segunda letra? (final de 'su')"
+          },
+          "answer": "U",
+          "acceptableAnswers": ["u", "U"]
+        },
+        {
+          "question": {
+            "ko": "세 번째 글자는? ('corazón'의 끝)",
+            "en": "Third letter? (end of 'corazón')",
+            "es": "Tercera letra? (final de 'corazón')"
+          },
+          "answer": "N",
+          "acceptableAnswers": ["n", "N"]
+        },
+        {
+          "question": {
+            "ko": "완성된 비밀번호는?",
+            "en": "Complete password?",
+            "es": "Contraseña completa?"
+          },
+          "answer": "LUNA",
+          "acceptableAnswers": ["luna", "LUNA", "Luna"]
+        }
+      ],
+      "finalAnswer": "LUNA",
+      "explanation": {
+        "ko": "L(luz의 첫 글자) + U(su의 마지막 글자) + N(corazón의 마지막 글자) + A(alma의 첫 글자) = LUNA (달)",
+        "en": "L(start of luz) + U(end of su) + N(end of corazón) + A(start of alma) = LUNA (moon)",
+        "es": "L(inicio de luz) + U(final de su) + N(final de corazón) + A(inicio de alma) = LUNA (luna)"
+      }
+    },
+    "ko": {
+      "ttsScript": "잘 들어, 형. 남산 위에 빛나는 탑이 있어. 그 아래 비밀 문이 숨겨져 있지. 비밀번호는 세 글자야. 첫째는 '빛'에서 한 글자. 둘째는 '나라'에서 가운데 글자. 셋째는 '하라'에서 마지막 글자.",
+      "ttsVoice": "ko-KR-InJoonNeural",
+      "ttsSpeed": "0.9",
+      "questions": [
+        {
+          "question": {
+            "en": "First syllable? (from '빛')",
+            "es": "Primera sílaba? (de '빛')",
+            "ko": "첫 글자는? ('빛'에서)"
+          },
+          "answer": "빛",
+          "acceptableAnswers": ["빛"]
+        },
+        {
+          "question": {
+            "en": "Second syllable? (middle of '나라')",
+            "es": "Segunda sílaba? (centro de '나라')",
+            "ko": "둘째 글자는? ('나라'의 가운데)"
+          },
+          "answer": "나",
+          "acceptableAnswers": ["나"]
+        },
+        {
+          "question": {
+            "en": "Complete password?",
+            "es": "Contraseña completa?",
+            "ko": "완성된 비밀번호는?"
+          },
+          "answer": "빛나라",
+          "acceptableAnswers": ["빛나라"]
+        }
+      ],
+      "finalAnswer": "빛나라",
+      "explanation": {
+        "en": "빛(light) + 나(middle of 나라/country) + 라(end of 하라/do it) = 빛나라! (Shine!)",
+        "es": "빛(luz) + 나(centro de 나라/país) + 라(final de 하라/hazlo) = 빛나라! (¡Brilla!)",
+        "ko": "빛(빛) + 나(나라의 가운데) + 라(하라의 끝) = 빛나라! (빛나라는 뜻)"
+      }
+    }
+  },
+  "rewards": {
+    "xp": 160,
+    "items": [],
+    "npcRelation": {
+      "npc": "minho",
+      "points": 1
+    }
+  }
+}

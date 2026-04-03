@@ -10,11 +10,12 @@ import {
   ScrollView,
   Dimensions,
   Image,
+  Modal,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import * as Speech from "expo-speech";
+import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
@@ -26,6 +27,8 @@ const CARD_W = Math.min(SW - 48, 360);
 
 const PROGRESS_KEY = (lang: string) => `basicCourseProgress_${lang}`;
 const DONE_KEY     = (lang: string) => `basicCourseCompleted_${lang}`;
+
+let _bcNativeSound: Audio.Sound | null = null;
 
 interface CharItem    { char: string; roman: string; tip: string; }
 interface WordItem    { word: string; meaning: string; emoji: string; }
@@ -181,28 +184,88 @@ const COURSES: Record<string, CourseData> = {
   },
 };
 
-const PHONETICS: Record<string, string> = {
-  A:"ay", B:"bee", C:"see", D:"dee", E:"ee", F:"ef",
-  G:"jee", H:"aitch", I:"eye", J:"jay", K:"kay", L:"el",
-  M:"em", N:"en", O:"oh", P:"pee", Q:"cue", R:"ar",
-  S:"es", T:"tee", U:"you", V:"vee", W:"double-u",
-  X:"ex", Y:"why", Z:"zee",
+
+/** Azure voice mapping by language for the basic course */
+const BC_VOICES: Record<string, string> = {
+  "en-US": "en-GB-RyanNeural",
+  "en-GB": "en-GB-RyanNeural",
+  "es-ES": "es-ES-AlvaroNeural",
+  "ko-KR": "ko-KR-InJoonNeural",
 };
 
-function speak(text: string, courseLang: string) {
-  try { Speech.stop(); } catch {}
-  // For English: use phonetic alphabet name (e.g. "P" → "pee")
-  // For other languages: lowercase single chars so TTS engine pronounces the letter name correctly
-  //   e.g. Spanish "P" → "p" so the engine says "pe" not the English "pee"
-  let toSay: string;
-  if (courseLang.startsWith("en")) {
-    toSay = PHONETICS[text.toUpperCase()] ?? text;
-  } else if (text.length === 1) {
-    toSay = text.toLowerCase();
-  } else {
-    toSay = text;
+/** Stop and unload the module-level native sound */
+async function stopBcSound() {
+  if (_bcNativeSound) {
+    const s = _bcNativeSound;
+    _bcNativeSound = null;
+    await s.stopAsync().catch(() => {});
+    await s.unloadAsync().catch(() => {});
   }
-  Speech.speak(toSay, { language: courseLang, rate: 0.8 });
+}
+
+/** Web audio element ref for cleanup */
+let _bcWebAudio: HTMLAudioElement | null = null;
+
+function stopBcWebAudio() {
+  if (_bcWebAudio) {
+    try { _bcWebAudio.pause(); _bcWebAudio.src = ""; } catch {}
+    _bcWebAudio = null;
+  }
+}
+
+/** Stop all basic-course TTS (native + web) */
+function stopBcTTS() {
+  stopBcWebAudio();
+  if (_bcNativeSound) {
+    const s = _bcNativeSound;
+    _bcNativeSound = null;
+    s.stopAsync().catch(() => {});
+    s.unloadAsync().catch(() => {});
+  }
+}
+
+/** Play TTS via Azure /api/pronunciation-tts endpoint.
+ *  For single letters, uses phonetic name + letter mode for best results. */
+async function speak(text: string, courseLang: string) {
+  try { await stopBcSound(); } catch {}
+  stopBcWebAudio();
+
+  const isSingleChar = text.length === 1;
+  // Use phonetic name for letters so Azure says "ay" for "A", not just the letter sound
+  const ttsText = isSingleChar ? getPhoneticName(text, courseLang) : text;
+  const voice = BC_VOICES[courseLang];
+
+  const url = new URL("/api/pronunciation-tts", getApiUrl());
+  url.searchParams.set("text", ttsText);
+  url.searchParams.set("lang", courseLang);
+  if (voice) url.searchParams.set("voice", voice);
+  if (isSingleChar) url.searchParams.set("mode", "letter");
+
+  try {
+    if (Platform.OS === "web") {
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error("tts-fail");
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
+      _bcWebAudio = audio;
+      audio.onended = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
+      audio.onerror = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
+      await audio.play();
+    } else {
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch(() => {});
+      const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true, volume: 1.0 });
+      _bcNativeSound = sound;
+      sound.setOnPlaybackStatusUpdate((st: any) => {
+        if (st.isLoaded && st.didJustFinish) {
+          sound.unloadAsync().catch(() => {});
+          _bcNativeSound = null;
+        }
+      });
+    }
+  } catch {
+    // Azure TTS failed — silently ignore since expo-speech is removed
+  }
 }
 
 /* ─────────────────────────────────────────────
@@ -301,6 +364,35 @@ const KO_LET: Record<string, KoData> = {
   ㅡ:{name:"으",   enSound:"eu",  esSound:"eu", enWord:"Ugh",  esWord:"Euro",   emoji:"😑"},
   ㅣ:{name:"이",   enSound:"ee",  esSound:"i",  enWord:"Eat",  esWord:"Isla",   emoji:"🍽️"},
 };
+
+/* ─────────────────────────────────────────────
+   Map single letter → phonetic name for pronunciation assessment.
+   Azure can't match raw "A" when user says "ay", so we send the spoken name instead.
+   ───────────────────────────────────────────── */
+const EN_PHONETIC: Record<string, string> = {
+  A:"ay", B:"bee", C:"see", D:"dee", E:"ee", F:"eff", G:"jee", H:"aitch",
+  I:"eye", J:"jay", K:"kay", L:"ell", M:"em", N:"en", O:"oh", P:"pee",
+  Q:"cue", R:"ar", S:"ess", T:"tee", U:"you", V:"vee", W:"double you",
+  X:"ex", Y:"why", Z:"zee",
+};
+
+const ES_PHONETIC: Record<string, string> = {
+  A:"a", B:"be", C:"ce", D:"de", E:"e", F:"efe", G:"ge", H:"hache",
+  I:"i", J:"jota", K:"ka", L:"ele", M:"eme", N:"ene", "\u00D1":"e\u00F1e",
+  O:"o", P:"pe", Q:"cu", R:"erre", S:"ese", T:"te", U:"u", V:"uve",
+  W:"doble uve", X:"equis", Y:"ye", Z:"zeta",
+};
+
+/** Return the spoken name of a single letter for pronunciation assessment.
+ *  e.g. "A" + "en-US" → "ay",  "ㄱ" + "ko-KR" → "기역",  "B" + "es-ES" → "be"
+ *  For multi-char words, returns the word unchanged. */
+function getPhoneticName(word: string, courseLang: string): string {
+  if (word.length !== 1) return word;
+  if (courseLang.startsWith("en")) return EN_PHONETIC[word.toUpperCase()] ?? word;
+  if (courseLang.startsWith("ko")) return KO_LET[word]?.name ?? word;
+  if (courseLang.startsWith("es")) return ES_PHONETIC[word.toUpperCase()] ?? ES_PHONETIC[word] ?? word;
+  return word;
+}
 
 function getCharTip(char: string, learning: string, native: string): string {
   const up = char.toUpperCase();
@@ -465,7 +557,8 @@ export default function BasicCourseScreen() {
     write: null, listen: null, speak: null, full: null,
   });
 
-  const [showIntro,   setShowIntro]   = useState(!isReviewMode);  // skip intro in review mode
+  const [showIntro,        setShowIntro]        = useState(!isReviewMode);
+  const [showSkipConfirm,  setShowSkipConfirm]  = useState(false);
   const [step,        setStep]        = useState(0);
   const [subIdx,      setSubIdx]      = useState(0);
   const [flipped,     setFlipped]     = useState(false);
@@ -569,19 +662,39 @@ export default function BasicCourseScreen() {
     } catch {}
   };
 
+  // Set audio mode once when screen mounts (avoids per-press delay)
+  useEffect(() => {
+    if (Platform.OS !== "web") {
+      Audio.setAudioModeAsync({ playsInSilentModeIOS: true, allowsRecordingIOS: false }).catch(() => {});
+    }
+  }, []);
+
+  // ── BUG-M2: Stop TTS & unload sounds on unmount ──
+  useEffect(() => {
+    return () => {
+      stopBcTTS();
+    };
+  }, []);
+
   const playAudio = useCallback(async (rawText: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setAudioPlayed(true);
 
-    // Lowercase single chars for non-English so TTS names them correctly (e.g. "p" → "pe" in Spanish)
-    const text = (!course.lang.startsWith("en") && rawText.length === 1)
-      ? rawText.toLowerCase()
-      : rawText;
+    // For single letters, use phonetic name for better TTS results
+    const isSingleChar = rawText.length === 1;
+    const ttsText = isSingleChar ? getPhoneticName(rawText, course.lang) : rawText;
+    const voice = BC_VOICES[course.lang];
 
     try {
+      // Stop any previous sound to prevent overlapping playback
+      await stopBcSound();
+      stopBcWebAudio();
+
       const url = new URL("/api/pronunciation-tts", getApiUrl());
-      url.searchParams.set("text", text);
+      url.searchParams.set("text", ttsText);
       url.searchParams.set("lang", course.lang);
+      if (voice) url.searchParams.set("voice", voice);
+      if (isSingleChar) url.searchParams.set("mode", "letter");
 
       if (Platform.OS === "web") {
         const res = await fetch(url.toString());
@@ -589,18 +702,23 @@ export default function BasicCourseScreen() {
         const blob = await res.blob();
         const objectUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
-        audio.onended = () => URL.revokeObjectURL(objectUrl);
-        audio.onerror = () => URL.revokeObjectURL(objectUrl);
-        audio.play();
+        _bcWebAudio = audio;
+        audio.onended = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
+        audio.onerror = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
+        await audio.play();
       } else {
-        const { Audio } = await import("expo-av") as any;
-        await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
-        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
-        sound.setOnPlaybackStatusUpdate((st: any) => { if (st.didJustFinish) sound.unloadAsync(); });
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch(() => {});
+        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true, volume: 1.0 });
+        _bcNativeSound = sound;
+        sound.setOnPlaybackStatusUpdate((st: any) => {
+          if (st.isLoaded && st.didJustFinish) {
+            sound.unloadAsync().catch(() => {});
+            _bcNativeSound = null;
+          }
+        });
       }
     } catch {
-      // Fallback to expo-speech only if Azure fails
-      speak(text, course.lang);
+      // Azure TTS failed — silently ignore since expo-speech is removed
     }
   }, [course.lang]);
 
@@ -608,13 +726,23 @@ export default function BasicCourseScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (step === 3) { finishCourse(); return; }
     if (subIdx >= currentItems.length - 1) {
-      // In review mode: return to section menu after finishing items
+      // In review mode: "full" section advances through all steps (0→1→2→3),
+      // other sections return to the review menu after finishing items.
       if (isReviewMode) {
-        Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
-          setShowReviewMenu(true);
-          setReviewSection(null);
-          Animated.timing(fadeAnim, { toValue: 1, duration: 220, useNativeDriver: true }).start();
-        });
+        if (reviewSection === "full" && step < 2) {
+          // Advance to next step within full review (0→1→2, then done after greetings)
+          Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
+            setStep(s => s + 1);
+            setSubIdx(0);
+            Animated.timing(fadeAnim, { toValue: 1, duration: 220, useNativeDriver: true }).start();
+          });
+        } else {
+          Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
+            setShowReviewMenu(true);
+            setReviewSection(null);
+            Animated.timing(fadeAnim, { toValue: 1, duration: 220, useNativeDriver: true }).start();
+          });
+        }
         return;
       }
       Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
@@ -653,24 +781,40 @@ export default function BasicCourseScreen() {
     if (!greetItem) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setAudioPlayed(true);
+    const voice = BC_VOICES[course.lang];
     try {
+      // Stop any previous sound to prevent overlapping playback
+      await stopBcSound();
+      stopBcWebAudio();
+
       const url = new URL("/api/pronunciation-tts", getApiUrl());
       url.searchParams.set("text", greetItem.phrase);
       url.searchParams.set("lang", course.lang);
+      if (voice) url.searchParams.set("voice", voice);
+
       if (Platform.OS === "web") {
         const res = await fetch(url.toString());
+        if (!res.ok) throw new Error("tts-fail");
         const blob = await res.blob();
         const objectUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
-        audio.onended = () => URL.revokeObjectURL(objectUrl);
-        audio.play();
+        _bcWebAudio = audio;
+        audio.onended = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
+        audio.onerror = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
+        await audio.play();
       } else {
-        const { Audio } = await import("expo-av") as any;
-        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
-        sound.setOnPlaybackStatusUpdate((s: any) => { if (s.didJustFinish) sound.unloadAsync(); });
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch(() => {});
+        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true, volume: 1.0 });
+        _bcNativeSound = sound;
+        sound.setOnPlaybackStatusUpdate((s: any) => {
+          if (s.isLoaded && s.didJustFinish) {
+            sound.unloadAsync().catch(() => {});
+            _bcNativeSound = null;
+          }
+        });
       }
     } catch {
-      Speech.speak(greetItem.phrase, { language: course.lang, rate: 0.8 });
+      // Azure TTS failed — silently ignore since expo-speech is removed
     }
     setGreetPhase("speak");
   };
@@ -722,7 +866,7 @@ export default function BasicCourseScreen() {
         const res = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word: greetItem.phrase, lang: course.lang, audio: base64, mimeType }),
+          body: JSON.stringify({ word: getPhoneticName(greetItem.phrase, course.lang), lang: course.lang, audio: base64, mimeType }),
         });
         const data = res.ok ? await res.json() : { score: 60 };
         const scoreVal = data.score ?? 60;
@@ -862,16 +1006,16 @@ export default function BasicCourseScreen() {
       },
       {
         section: "listen",
-        icon: "👂",
-        title: native === "korean" ? "듣기 연습" : native === "spanish" ? "Escucha" : "Listening",
-        desc:  native === "korean" ? "발음을 듣고 글자 확인하기" : native === "spanish" ? "Escucha y revisa" : "Listen to pronunciation",
+        icon: "🔊",
+        title: native === "korean" ? "알파벳 듣기" : native === "spanish" ? "Escuchar Alfabeto" : "Listen to Alphabet",
+        desc:  native === "korean" ? "글자 발음을 듣고 확인하기" : native === "spanish" ? "Escucha la pronunciación de las letras" : "Listen to letter pronunciations",
         sub:   `${charCount}${native === "korean" ? "개" : native === "spanish" ? " letras" : " letters"}`,
       },
       {
         section: "speak",
         icon: "🎤",
         title: native === "korean" ? "발음 연습" : native === "spanish" ? "Pronunciación" : "Speaking",
-        desc:  native === "korean" ? "글자를 보고 따라 말하기" : native === "spanish" ? "Repite en voz alta" : "Say the phrase aloud",
+        desc:  native === "korean" ? "듣고 따라 말하기" : native === "spanish" ? "Escucha y repite" : "Listen & speak aloud",
         sub:   `${course.greetings.length}${native === "korean" ? "개" : native === "spanish" ? " frases" : " phrases"}`,
       },
       {
@@ -886,7 +1030,10 @@ export default function BasicCourseScreen() {
       <View style={[s.screen, { paddingTop: topPad, paddingBottom: bottomPad + 8 }]}>
         {/* Header */}
         <View style={rv.header}>
-          <Pressable style={({ pressed }) => [rv.backBtn, pressed && { opacity: 0.7 }]} onPress={() => router.back()}>
+          <Pressable style={({ pressed }) => [rv.backBtn, pressed && { opacity: 0.7 }]} onPress={() => {
+            stopBcTTS();
+            router.back();
+          }}>
             <Ionicons name="arrow-back" size={22} color={C.gold} />
           </Pressable>
           <Text style={rv.headerTitle}>
@@ -971,7 +1118,10 @@ export default function BasicCourseScreen() {
       {/* ── TOP BAR ── */}
       <View style={s.topBar}>
         {isReviewMode ? (
-          <Pressable style={({ pressed }) => [s.reviewBackBtn, pressed && { opacity: 0.7 }]} onPress={() => setShowReviewMenu(true)}>
+          <Pressable style={({ pressed }) => [s.reviewBackBtn, pressed && { opacity: 0.7 }]} onPress={() => {
+            stopBcTTS();
+            setShowReviewMenu(true);
+          }}>
             <Ionicons name="arrow-back" size={18} color={C.goldDark} />
           </Pressable>
         ) : (
@@ -1007,9 +1157,72 @@ export default function BasicCourseScreen() {
       </View>
 
       {/* ════════════════════════════════════════
-          STEP 0 — Pure flex layout, no scroll, canvas fills remaining space
+          STEP 0 — Listen mode: audio-only card; Write mode: tracing canvas
           ════════════════════════════════════════ */}
       {step === 0 && charItem && (
+
+        /* ── LISTEN REVIEW MODE ── */
+        isReviewMode && reviewSection === "listen" ? (
+          <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 24, gap: 20, paddingBottom: bottomPad + 80 }}
+              showsVerticalScrollIndicator={false}
+            >
+              {/* Large letter display */}
+              <View style={{ alignItems: "center", gap: 8 }}>
+                <Text style={[s.charBig, { fontSize: 100, lineHeight: 120 }]}>{charItem.char}</Text>
+                <Text style={{ fontFamily: F.body, color: C.gold, fontSize: 20 }}>{charItem.roman}</Text>
+                <Text style={{ fontFamily: F.body, color: C.goldDim, fontSize: 14, textAlign: "center" }}>
+                  {getCharTip(charItem.char, lang, native)}
+                </Text>
+              </View>
+
+              {/* Counter */}
+              <Text style={s.counter}>{subIdx + 1} / {course.chars.length}</Text>
+
+              {/* Listen button — large */}
+              <Pressable
+                style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]}
+                onPress={() => playAudio(charItem.char)}
+              >
+                <Ionicons name="volume-high-outline" size={24} color={C.bg1} />
+                <Text style={s.listenBtnTxt}>
+                  {native === "korean" ? "🔊  발음 듣기" : native === "spanish" ? "🔊  Escuchar" : "🔊  Listen"}
+                </Text>
+              </Pressable>
+
+              {audioPlayed && (
+                <Text style={{ fontFamily: F.body, color: C.goldDim, fontSize: 12, textAlign: "center" }}>
+                  {native === "korean" ? "다시 들으려면 버튼을 탭하세요" : native === "spanish" ? "Toca para escuchar de nuevo" : "Tap to listen again"}
+                </Text>
+              )}
+            </ScrollView>
+
+            {/* Bottom bar */}
+            <View style={{ paddingHorizontal: 16, paddingBottom: bottomPad + 8, paddingTop: 8, gap: 6, borderTopWidth: 1, borderTopColor: C.border }}>
+              <View style={s.navRow}>
+                <Pressable
+                  style={({ pressed }) => [s.nextBtn, !audioPlayed && s.nextBtnOff, pressed && audioPlayed && { opacity: 0.85 }]}
+                  onPress={audioPlayed ? goNext : undefined}
+                  disabled={!audioPlayed}
+                >
+                  <Text style={s.nextBtnTxt}>
+                    {isLastOfStep
+                      ? (native === "korean" ? "완료 ✓" : native === "spanish" ? "Listo ✓" : "Done ✓")
+                      : (native === "korean" ? "다음 →" : native === "spanish" ? "Siguiente →" : "Next →")}
+                  </Text>
+                </Pressable>
+              </View>
+              <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+                <Text style={s.inlineSkip}>
+                  {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                </Text>
+              </Pressable>
+            </View>
+          </Animated.View>
+        ) : (
+
+        /* ── WRITE / FULL MODE: tracing canvas ── */
         <Animated.View style={{ flex: 1, opacity: fadeAnim, gap: 8 }}>
 
           {/* Char info card — compact */}
@@ -1077,6 +1290,7 @@ export default function BasicCourseScreen() {
           </View>
 
         </Animated.View>
+        )
       )}
 
       {/* ════════════════════════════════════════
@@ -1500,6 +1714,68 @@ const intro = StyleSheet.create({
     color: "rgba(201,162,39,0.5)",
     textAlign: "center",
     lineHeight: 18,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.65)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
+  modalBox: {
+    backgroundColor: C.bg2,
+    borderRadius: 16,
+    padding: 24,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontFamily: F.title,
+    color: C.gold,
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  modalDesc: {
+    fontSize: 13,
+    fontFamily: F.body,
+    color: C.goldDim,
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  modalBtns: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  modalCancel: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: C.border,
+    alignItems: "center",
+  },
+  modalCancelTxt: {
+    fontSize: 14,
+    fontFamily: F.body,
+    color: C.goldDim,
+  },
+  modalConfirm: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: "rgba(201,162,39,0.15)",
+    borderWidth: 1,
+    borderColor: C.gold,
+    alignItems: "center",
+  },
+  modalConfirmTxt: {
+    fontSize: 14,
+    fontFamily: F.body,
+    color: C.gold,
+    fontWeight: "600",
   },
 });
 

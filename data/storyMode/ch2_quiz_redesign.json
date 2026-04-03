@@ -1,0 +1,651 @@
+{
+  "meta": {
+    "version": "2.0",
+    "description": "Chapter 2 Madrid quiz redesign — uses only Day 1-12 vocabulary",
+    "replaces": ["ch2_quiz_a", "ch2_quiz_b", "ch2_quiz_c", "ch2_quiz_d", "ch2_quiz_e"],
+    "vocabularyScope": "Day 1-12 (Unit 1: First Encounters + Unit 2: Everyday Expressions)"
+  },
+  "quizzes": [
+    {
+      "id": "ch2_quiz_a",
+      "chapter": "ch2",
+      "scene": "ch2_scene1",
+      "type": "fill_blank",
+      "title": {
+        "ko": "이사벨의 목격 증언",
+        "en": "Isabel's Witness Testimony",
+        "es": "Testimonio de Isabel"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "이사벨이 카를로스 실종 당시를 증언한다. 빈칸을 채워 증언을 완성하라.",
+        "en": "Isabel testifies about Carlos's disappearance. Fill in the blanks to complete her testimony.",
+        "es": "Isabel testifica sobre la desaparición de Carlos. Completa los espacios en blanco."
+      },
+      "content": {
+        "en": {
+          "passage": "Last night, at ___(1)___ o'clock, I saw Carlos leave the museum with a ___(2)___ man. The man wore a ___(3)___ coat. They went toward ___(4)___ Park. I need ___(5)___!",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "ten",
+              "options": ["seven", "nine", "ten", "three"],
+              "hint": { "ko": "숫자 10", "en": "The number 10", "es": "El número 10" }
+            },
+            {
+              "id": 2,
+              "answer": "tall",
+              "options": ["small", "tall", "old", "young"],
+              "hint": { "ko": "키가 큰", "en": "The opposite of small (height)", "es": "Lo opuesto de pequeño (altura)" }
+            },
+            {
+              "id": 3,
+              "answer": "black",
+              "options": ["black", "red", "blue", "white"],
+              "hint": { "ko": "검은색", "en": "The darkest colour", "es": "El color más oscuro" }
+            },
+            {
+              "id": 4,
+              "answer": "Retiro",
+              "options": ["Hyde", "Central", "Retiro", "Ueno"],
+              "hint": { "ko": "마드리드의 유명한 공원", "en": "Famous park in Madrid", "es": "Parque famoso de Madrid" }
+            },
+            {
+              "id": 5,
+              "answer": "help",
+              "options": ["help", "time", "water", "name"],
+              "hint": { "ko": "도움", "en": "What you ask for in an emergency", "es": "Lo que pides en una emergencia" }
+            }
+          ]
+        },
+        "es": {
+          "passage": "Anoche, a las ___(1)___, vi a Carlos salir del museo con un hombre ___(2)___. El hombre llevaba un abrigo ___(3)___. Fueron hacia el Parque del ___(4)___. ¡Necesito ___(5)___!",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "diez",
+              "options": ["siete", "nueve", "diez", "tres"],
+              "hint": { "ko": "숫자 10", "en": "The number 10", "es": "El número 10" }
+            },
+            {
+              "id": 2,
+              "answer": "alto",
+              "options": ["pequeño", "alto", "viejo", "joven"],
+              "hint": { "ko": "키가 큰", "en": "Tall", "es": "De gran estatura" }
+            },
+            {
+              "id": 3,
+              "answer": "negro",
+              "options": ["negro", "rojo", "azul", "blanco"],
+              "hint": { "ko": "검은색", "en": "The darkest colour", "es": "El color más oscuro" }
+            },
+            {
+              "id": 4,
+              "answer": "Retiro",
+              "options": ["Retiro", "Sol", "Prado", "Real"],
+              "hint": { "ko": "마드리드의 유명한 공원", "en": "Famous park in Madrid", "es": "Parque famoso de Madrid" }
+            },
+            {
+              "id": 5,
+              "answer": "ayuda",
+              "options": ["ayuda", "tiempo", "agua", "nombre"],
+              "hint": { "ko": "도움", "en": "Help", "es": "Lo que pides en una emergencia" }
+            }
+          ]
+        },
+        "ko": {
+          "passage": "어젯밤 ___(1)___시에, 카를로스가 ___(2)___ 남자와 박물관에서 나왔어. 남자는 ___(3)___ 코트를 입고 있었어. ___(4)___ 공원 쪽으로 갔어. ___(5)___!",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "열",
+              "options": ["일곱", "아홉", "열", "세"],
+              "hint": { "en": "The number 10", "es": "El número 10", "ko": "숫자 10" }
+            },
+            {
+              "id": 2,
+              "answer": "키 큰",
+              "options": ["작은", "키 큰", "나이 든", "젊은"],
+              "hint": { "en": "Tall", "es": "Alto", "ko": "키가 크다" }
+            },
+            {
+              "id": 3,
+              "answer": "검은색",
+              "options": ["검은색", "빨간색", "파란색", "하얀색"],
+              "hint": { "en": "The darkest colour", "es": "El color más oscuro", "ko": "가장 어두운 색" }
+            },
+            {
+              "id": 4,
+              "answer": "레티로",
+              "options": ["하이드", "센트럴", "레티로", "우에노"],
+              "hint": { "en": "Famous Madrid park", "es": "Parque famoso de Madrid", "ko": "마드리드의 유명한 공원" }
+            },
+            {
+              "id": 5,
+              "answer": "도와주세요",
+              "options": ["도와주세요", "시간", "물", "이름"],
+              "hint": { "en": "What you ask for in an emergency", "es": "Lo que pides en una emergencia", "ko": "긴급할 때 요청하는 것" }
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 100,
+        "items": [],
+        "npcRelation": { "npc": "isabel", "points": 1 }
+      }
+    },
+    {
+      "id": "ch2_quiz_b",
+      "chapter": "ch2",
+      "scene": "ch2_scene1",
+      "type": "dialogue_choice",
+      "title": {
+        "ko": "돈 미겔의 시장 대화",
+        "en": "Talking to Don Miguel",
+        "es": "Hablando con Don Miguel"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "돈 미겔에게 정보를 얻으려면 올바른 대화를 해야 한다. 적절한 응답을 선택하라.",
+        "en": "To get information from Don Miguel, you must have a proper conversation. Choose the right responses.",
+        "es": "Para obtener información de Don Miguel, debes tener una conversación apropiada. Elige las respuestas correctas."
+      },
+      "content": {
+        "en": {
+          "rounds": [
+            {
+              "npcLine": "Hello! How are you today?",
+              "correct": "I'm fine, thank you. Nice to meet you.",
+              "wrong": ["Where is the bathroom?", "Goodbye!", "A little bit."],
+              "vocabSource": "Day 1 + Day 5"
+            },
+            {
+              "npcLine": "What do you do? Are you from here?",
+              "correct": "I'm a student. I'm from Korea.",
+              "wrong": ["It's three o'clock.", "I don't understand.", "How much is this?"],
+              "vocabSource": "Day 2 + Day 3"
+            },
+            {
+              "npcLine": "Do you speak Spanish? Un poquito?",
+              "correct": "A little bit. Can you say that again, please?",
+              "wrong": ["Take care!", "Where is the exit?", "Yes. / No."],
+              "vocabSource": "Day 3 + Day 2"
+            },
+            {
+              "npcLine": "I saw something last night. Do you need help?",
+              "correct": "Yes! I need help, please. Thank you!",
+              "wrong": ["How old are you?", "It's cold today.", "See you later!"],
+              "vocabSource": "Day 5 + Day 1"
+            }
+          ]
+        },
+        "es": {
+          "rounds": [
+            {
+              "npcLine": "¡Hola! ¿Cómo estás hoy?",
+              "correct": "Estoy bien, gracias. Mucho gusto.",
+              "wrong": ["¿Dónde está el baño?", "¡Adiós!", "Un poquito."],
+              "vocabSource": "Day 1 + Day 5"
+            },
+            {
+              "npcLine": "¿A qué te dedicas? ¿De dónde eres?",
+              "correct": "Soy estudiante. Soy de Corea.",
+              "wrong": ["Son las tres.", "No entiendo.", "¿Cuánto cuesta esto?"],
+              "vocabSource": "Day 2 + Day 3"
+            },
+            {
+              "npcLine": "¿Hablas español?",
+              "correct": "Un poquito. ¿Puede repetir eso, por favor?",
+              "wrong": ["¡Cuídate!", "¿Dónde está la salida?", "Sí. / No."],
+              "vocabSource": "Day 3 + Day 2"
+            },
+            {
+              "npcLine": "Vi algo anoche. ¿Necesitas ayuda?",
+              "correct": "¡Sí! Necesito ayuda, por favor. ¡Gracias!",
+              "wrong": ["¿Cuántos años tienes?", "Hace frío hoy.", "¡Hasta luego!"],
+              "vocabSource": "Day 5 + Day 1"
+            }
+          ]
+        },
+        "ko": {
+          "rounds": [
+            {
+              "npcLine": "안녕하세요! 오늘 어떻게 지내요?",
+              "correct": "잘 지내요, 감사합니다. 만나서 반갑습니다.",
+              "wrong": ["화장실이 어디예요?", "안녕히 가세요!", "조금이요."],
+              "vocabSource": "Day 1 + Day 5"
+            },
+            {
+              "npcLine": "무슨 일 하세요? 어디에서 오셨어요?",
+              "correct": "저는 학생이에요. 한국에서 왔어요.",
+              "wrong": ["세 시예요.", "이해를 못 했어요.", "이거 얼마예요?"],
+              "vocabSource": "Day 2 + Day 3"
+            },
+            {
+              "npcLine": "한국어 할 줄 아세요?",
+              "correct": "조금이요. 다시 한번 말해 주시겠어요?",
+              "wrong": ["잘 가요!", "출구가 어디예요?", "네. / 아니요."],
+              "vocabSource": "Day 3 + Day 2"
+            },
+            {
+              "npcLine": "어젯밤에 뭔가 봤어요. 도움이 필요해요?",
+              "correct": "네! 도와주세요. 감사합니다!",
+              "wrong": ["몇 살이에요?", "오늘 추워요.", "다음에 봐요!"],
+              "vocabSource": "Day 5 + Day 1"
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 120,
+        "items": ["miguels_map"],
+        "npcRelation": { "npc": "miguel", "points": 1 }
+      }
+    },
+    {
+      "id": "ch2_quiz_c",
+      "chapter": "ch2",
+      "scene": "ch2_scene2",
+      "type": "word_match",
+      "title": {
+        "ko": "레티로 공원 표지판 해독",
+        "en": "Retiro Park Sign Decoding",
+        "es": "Descifrando Carteles del Retiro"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "레티로 공원의 분수대에 다국어 표지판이 새겨져 있다. 표현과 의미를 올바르게 연결하면 비밀 통로가 열린다.",
+        "en": "Multilingual signs are carved on the Retiro Park fountain. Match the expressions to their meanings to open the secret passage.",
+        "es": "Hay carteles multilingües grabados en la fuente del Retiro. Conecta las expresiones con sus significados para abrir el pasaje secreto."
+      },
+      "content": {
+        "en": {
+          "pairs": [
+            {
+              "left": "Where is...?",
+              "right": "a question about location",
+              "wrongOptions": ["a question about price", "a question about time", "a greeting"],
+              "meaning": { "ko": "장소를 묻는 표현", "en": "Asking about location", "es": "Pregunta sobre ubicación" }
+            },
+            {
+              "left": "How much is this?",
+              "right": "asking about price",
+              "wrongOptions": ["asking about age", "asking about the day", "a farewell"],
+              "meaning": { "ko": "가격을 묻는 표현", "en": "Asking about price", "es": "Pregunta sobre precio" }
+            },
+            {
+              "left": "What day is it?",
+              "right": "asking about the day",
+              "wrongOptions": ["asking about the hour", "asking about location", "asking about language"],
+              "meaning": { "ko": "요일을 묻는 표현", "en": "Asking about the day", "es": "Pregunta sobre el día" }
+            },
+            {
+              "left": "What time is it?",
+              "right": "asking about the hour",
+              "wrongOptions": ["asking about the day", "asking about price", "asking about age"],
+              "meaning": { "ko": "시간을 묻는 표현", "en": "Asking about the hour", "es": "Pregunta sobre la hora" }
+            },
+            {
+              "left": "Do you speak English?",
+              "right": "asking about language",
+              "wrongOptions": ["asking about location", "a greeting", "asking about the weather"],
+              "meaning": { "ko": "언어 능력을 묻는 표현", "en": "Asking about language ability", "es": "Pregunta sobre idioma" }
+            }
+          ]
+        },
+        "es": {
+          "pairs": [
+            {
+              "left": "¿Dónde está...?",
+              "right": "pregunta sobre ubicación",
+              "wrongOptions": ["pregunta sobre precio", "pregunta sobre la hora", "un saludo"],
+              "meaning": { "ko": "장소를 묻는 표현", "en": "Asking about location", "es": "Pregunta sobre ubicación" }
+            },
+            {
+              "left": "¿Cuánto cuesta esto?",
+              "right": "pregunta sobre precio",
+              "wrongOptions": ["pregunta sobre edad", "pregunta sobre el día", "una despedida"],
+              "meaning": { "ko": "가격을 묻는 표현", "en": "Asking about price", "es": "Pregunta sobre precio" }
+            },
+            {
+              "left": "¿Qué día es hoy?",
+              "right": "pregunta sobre el día",
+              "wrongOptions": ["pregunta sobre la hora", "pregunta sobre ubicación", "pregunta sobre idioma"],
+              "meaning": { "ko": "요일을 묻는 표현", "en": "Asking about the day", "es": "Pregunta sobre el día" }
+            },
+            {
+              "left": "¿Qué hora es?",
+              "right": "pregunta sobre la hora",
+              "wrongOptions": ["pregunta sobre el día", "pregunta sobre precio", "pregunta sobre edad"],
+              "meaning": { "ko": "시간을 묻는 표현", "en": "Asking about the hour", "es": "Pregunta sobre la hora" }
+            },
+            {
+              "left": "¿Hablas español?",
+              "right": "pregunta sobre idioma",
+              "wrongOptions": ["pregunta sobre ubicación", "un saludo", "pregunta sobre el clima"],
+              "meaning": { "ko": "언어 능력을 묻는 표현", "en": "Asking about language ability", "es": "Pregunta sobre idioma" }
+            }
+          ]
+        },
+        "ko": {
+          "pairs": [
+            {
+              "left": "어디예요?",
+              "right": "장소를 묻는 표현",
+              "wrongOptions": ["가격을 묻는 표현", "시간을 묻는 표현", "인사 표현"],
+              "meaning": { "en": "Asking about location", "es": "Pregunta sobre ubicación", "ko": "장소를 묻는 표현" }
+            },
+            {
+              "left": "얼마예요?",
+              "right": "가격을 묻는 표현",
+              "wrongOptions": ["나이를 묻는 표현", "요일을 묻는 표현", "작별 인사"],
+              "meaning": { "en": "Asking about price", "es": "Pregunta sobre precio", "ko": "가격을 묻는 표현" }
+            },
+            {
+              "left": "무슨 요일이에요?",
+              "right": "요일을 묻는 표현",
+              "wrongOptions": ["시간을 묻는 표현", "장소를 묻는 표현", "언어 능력을 묻는 표현"],
+              "meaning": { "en": "Asking about the day", "es": "Pregunta sobre el día", "ko": "요일을 묻는 표현" }
+            },
+            {
+              "left": "몇 시예요?",
+              "right": "시간을 묻는 표현",
+              "wrongOptions": ["요일을 묻는 표현", "가격을 묻는 표현", "나이를 묻는 표현"],
+              "meaning": { "en": "Asking about the hour", "es": "Pregunta sobre la hora", "ko": "시간을 묻는 표현" }
+            },
+            {
+              "left": "할 줄 아세요?",
+              "right": "언어 능력을 묻는 표현",
+              "wrongOptions": ["장소를 묻는 표현", "인사 표현", "날씨를 묻는 표현"],
+              "meaning": { "en": "Asking about language ability", "es": "Pregunta sobre idioma", "ko": "언어 능력을 묻는 표현" }
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 150,
+        "items": ["secret_passage_key"],
+        "npcRelation": null
+      }
+    },
+    {
+      "id": "ch2_quiz_d",
+      "chapter": "ch2",
+      "scene": "ch2_scene2",
+      "type": "sentence_builder",
+      "title": {
+        "ko": "숨겨진 방의 단서",
+        "en": "The Hidden Room Clues",
+        "es": "Las Pistas de la Sala Oculta"
+      },
+      "difficulty": 3,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "숨겨진 방의 벽에 흩어진 단어들이 있다. 올바른 순서로 배열하면 문이 열린다.",
+        "en": "Scattered words are on the walls of the hidden room. Arrange them in the correct order to open the door.",
+        "es": "Hay palabras dispersas en las paredes de la sala oculta. Ordénalas correctamente para abrir la puerta."
+      },
+      "content": {
+        "en": {
+          "rounds": [
+            {
+              "scrambled": ["is", "name", "My", "Rudy", "."],
+              "answer": "My name is Rudy.",
+              "vocabSource": "Day 1"
+            },
+            {
+              "scrambled": ["the", "Where", "museum", "is", "?"],
+              "answer": "Where is the museum?",
+              "vocabSource": "Day 4"
+            },
+            {
+              "scrambled": ["today", "is", "It", "cold", "."],
+              "answer": "It is cold today.",
+              "vocabSource": "Day 10"
+            },
+            {
+              "scrambled": ["you", "speak", "Do", "Spanish", "?"],
+              "answer": "Do you speak Spanish?",
+              "vocabSource": "Day 3"
+            },
+            {
+              "scrambled": ["I", "at", "work", "museum", "a", "."],
+              "answer": "I work at a museum.",
+              "vocabSource": "Day 3"
+            }
+          ]
+        },
+        "es": {
+          "rounds": [
+            {
+              "scrambled": ["llamo", "Me", "Rudy", "."],
+              "answer": "Me llamo Rudy.",
+              "vocabSource": "Day 1"
+            },
+            {
+              "scrambled": ["está", "museo", "el", "¿Dónde", "?"],
+              "answer": "¿Dónde está el museo?",
+              "vocabSource": "Day 4"
+            },
+            {
+              "scrambled": ["frío", "Hace", "hoy", "."],
+              "answer": "Hace frío hoy.",
+              "vocabSource": "Day 10"
+            },
+            {
+              "scrambled": ["español", "¿Hablas", "?"],
+              "answer": "¿Hablas español?",
+              "vocabSource": "Day 3"
+            },
+            {
+              "scrambled": ["museo", "en", "Trabajo", "un", "."],
+              "answer": "Trabajo en un museo.",
+              "vocabSource": "Day 3"
+            }
+          ]
+        },
+        "ko": {
+          "rounds": [
+            {
+              "scrambled": ["루디예요", "이름은", "제", "."],
+              "answer": "제 이름은 루디예요.",
+              "vocabSource": "Day 1"
+            },
+            {
+              "scrambled": ["어디예요", "박물관이", "?"],
+              "answer": "박물관이 어디예요?",
+              "vocabSource": "Day 4"
+            },
+            {
+              "scrambled": ["추워요", "오늘", "."],
+              "answer": "오늘 추워요.",
+              "vocabSource": "Day 10"
+            },
+            {
+              "scrambled": ["아세요", "할 줄", "스페인어", "?"],
+              "answer": "스페인어 할 줄 아세요?",
+              "vocabSource": "Day 3"
+            },
+            {
+              "scrambled": ["일해요", "박물관에서", "."],
+              "answer": "박물관에서 일해요.",
+              "vocabSource": "Day 3"
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 200,
+        "items": ["restorers_key"],
+        "npcRelation": null
+      }
+    },
+    {
+      "id": "ch2_quiz_e",
+      "chapter": "ch2",
+      "scene": "ch2_scene3_boss",
+      "type": "timed",
+      "title": {
+        "ko": "렉시콘의 함정 — 카를로스 구출",
+        "en": "The Lexicon Trap — Rescuing Carlos",
+        "es": "La Trampa de Lexicón — Rescatando a Carlos"
+      },
+      "difficulty": 4,
+      "timeLimit": 60,
+      "isBoss": true,
+      "useAzureTTS": true,
+      "storyContext": {
+        "ko": "카를로스를 구하려면 60초 안에 5개의 언어 함정을 해제해야 한다!",
+        "en": "Save Carlos by disabling 5 language traps within 60 seconds!",
+        "es": "¡Salva a Carlos desactivando 5 trampas lingüísticas en 60 segundos!"
+      },
+      "content": {
+        "en": {
+          "rounds": [
+            {
+              "type": "fill_blank",
+              "question": "Excuse me, ___ is the museum?",
+              "answer": "where",
+              "options": ["where", "what", "how", "when"],
+              "vocabSource": "Day 4"
+            },
+            {
+              "type": "listening",
+              "ttsScript": "It's ten o'clock. The weather is cold today. Bring a jacket!",
+              "ttsVoice": "en-GB-SoniaNeural",
+              "question": "What's the weather like?",
+              "answer": "cold",
+              "acceptableAnswers": ["cold", "it's cold", "cold today"],
+              "vocabSource": "Day 9 + Day 10"
+            },
+            {
+              "type": "fill_blank",
+              "question": "I'm ___ Korea. I work at a museum.",
+              "answer": "from",
+              "options": ["from", "in", "at", "to"],
+              "vocabSource": "Day 2 + Day 3"
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "도와주세요! 도움이 필요해요.",
+                "es": "¡Ayuda! Necesito ayuda, por favor."
+              },
+              "answer": "Help! I need help, please.",
+              "acceptableAnswers": ["Help! I need help, please.", "Help! I need help please.", "I need help, please!"],
+              "vocabSource": "Day 5"
+            },
+            {
+              "type": "fill_blank",
+              "question": "How ___ is this? I'll take the black one.",
+              "answer": "much",
+              "options": ["much", "many", "old", "big"],
+              "vocabSource": "Day 5 + Day 11"
+            }
+          ]
+        },
+        "es": {
+          "rounds": [
+            {
+              "type": "fill_blank",
+              "question": "Disculpe, ¿___ está el museo?",
+              "answer": "dónde",
+              "options": ["dónde", "qué", "cómo", "cuándo"],
+              "vocabSource": "Day 4"
+            },
+            {
+              "type": "listening",
+              "ttsScript": "Son las diez. Hace frío hoy. ¡Trae una chaqueta!",
+              "ttsVoice": "es-ES-ElviraNeural",
+              "question": "¿Cómo está el clima?",
+              "answer": "frío",
+              "acceptableAnswers": ["frío", "hace frío", "frío hoy"],
+              "vocabSource": "Day 9 + Day 10"
+            },
+            {
+              "type": "fill_blank",
+              "question": "___ de Corea. Trabajo en un museo.",
+              "answer": "Soy",
+              "options": ["Soy", "Estoy", "Vivo", "Tengo"],
+              "vocabSource": "Day 2 + Day 3"
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "도와주세요! 도움이 필요해요.",
+                "en": "Help! I need help, please."
+              },
+              "answer": "¡Ayuda! Necesito ayuda, por favor.",
+              "acceptableAnswers": ["¡Ayuda! Necesito ayuda, por favor.", "Ayuda! Necesito ayuda por favor.", "Necesito ayuda, por favor!"],
+              "vocabSource": "Day 5"
+            },
+            {
+              "type": "fill_blank",
+              "question": "¿___ cuesta esto? Me llevo el negro.",
+              "answer": "Cuánto",
+              "options": ["Cuánto", "Cuándo", "Cómo", "Dónde"],
+              "vocabSource": "Day 5 + Day 11"
+            }
+          ]
+        },
+        "ko": {
+          "rounds": [
+            {
+              "type": "fill_blank",
+              "question": "실례합니다, 박물관이 ___예요?",
+              "answer": "어디",
+              "options": ["어디", "뭐", "어떻게", "언제"],
+              "vocabSource": "Day 4"
+            },
+            {
+              "type": "listening",
+              "ttsScript": "열 시예요. 오늘 추워요. 재킷 가져가세요!",
+              "ttsVoice": "ko-KR-SunHiNeural",
+              "question": "오늘 날씨가 어때요?",
+              "answer": "추워요",
+              "acceptableAnswers": ["추워요", "오늘 추워요", "추운 날씨"],
+              "vocabSource": "Day 9 + Day 10"
+            },
+            {
+              "type": "fill_blank",
+              "question": "저는 한국___ 왔어요. 박물관에서 일해요.",
+              "answer": "에서",
+              "options": ["에서", "에", "을", "이"],
+              "vocabSource": "Day 2 + Day 3"
+            },
+            {
+              "type": "translation",
+              "source": {
+                "en": "Help! I need help, please.",
+                "es": "¡Ayuda! Necesito ayuda, por favor."
+              },
+              "answer": "도와주세요! 도움이 필요해요.",
+              "acceptableAnswers": ["도와주세요! 도움이 필요해요.", "도와주세요! 도움이 필요해요", "도움이 필요해요!"],
+              "vocabSource": "Day 5"
+            },
+            {
+              "type": "fill_blank",
+              "question": "이거 ___예요? 검은색 걸로 할게요.",
+              "answer": "얼마",
+              "options": ["얼마", "뭐", "몇", "어디"],
+              "vocabSource": "Day 5 + Day 11"
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 250,
+        "items": [],
+        "npcRelation": { "npc": "carlos", "points": 2 }
+      }
+    }
+  ]
+}

@@ -15,7 +15,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import * as Speech from "expo-speech";
+import { Audio } from "expo-av";
 import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
@@ -918,6 +918,7 @@ const ADVANCED_CARDS: Record<NativeLanguage, FlashCard[]> = {
 };
 
 let _cardAudio: HTMLAudioElement | null = null;
+let _cardNativeSound: Audio.Sound | null = null;
 
 async function speakWord(word: string, lang: string) {
   try {
@@ -940,14 +941,38 @@ async function speakWord(word: string, lang: string) {
       audio.onerror = () => { URL.revokeObjectURL(objectUrl); _cardAudio = null; };
       await audio.play();
     } else {
-      const isSpeaking = await Speech.isSpeakingAsync();
-      if (isSpeaking) {
-        Speech.stop();
-        await new Promise((r) => setTimeout(r, 80));
+      // Stop any previous sound
+      if (_cardNativeSound) {
+        await _cardNativeSound.stopAsync().catch(() => {});
+        await _cardNativeSound.unloadAsync().catch(() => {});
+        _cardNativeSound = null;
       }
-      Speech.speak(word, { language: lang, rate: 0.85 });
+      // Use Audio.Sound (expo-av) instead of expo-speech so iOS audio session
+      // is properly activated in speaker/playback mode after recording
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: false,
+        playThroughEarpieceAndroid: false,
+      });
+      const url = new URL("/api/pronunciation-tts", getApiUrl());
+      url.searchParams.set("text", word);
+      url.searchParams.set("lang", lang);
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: url.toString() },
+        { shouldPlay: true, volume: 1.0 }
+      );
+      _cardNativeSound = sound;
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync().catch(() => {});
+          _cardNativeSound = null;
+        }
+      });
     }
-  } catch {}
+  } catch (err) {
+    console.warn("Card TTS error:", err);
+  }
 }
 
 const DAILY_GOAL = 10;

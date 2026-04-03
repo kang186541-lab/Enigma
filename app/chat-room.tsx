@@ -18,7 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import * as Speech from "expo-speech";
+import { Audio, AVPlaybackStatus } from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getTutor, TUTOR_IMAGES, Tutor } from "@/constants/tutors";
 import { useLanguage } from "@/context/LanguageContext";
@@ -57,14 +57,62 @@ const LANG_NAMES: Record<string, string> = {
   korean: "Korean",
 };
 
-// ── ElevenLabs TTS helpers ───────────────────────────────────────────────────
+// ── Azure TTS helpers ────────────────────────────────────────────────────────
 // Strategy:
 //  - Web: fetch /api/tts → MP3 blob → HTML5 Audio element (no gesture restriction
 //    because we are playing a fetched blob, not SpeechSynthesis)
-//  - Native (Expo Go): expo-speech as fallback (ElevenLabs audio via fetch not
-//    reliable in Expo Go; proper native build would use expo-av)
+//  - Native: fetch /api/tts → play via expo-av Audio.Sound
 
 let _webAudioEl: HTMLAudioElement | null = null;
+let _nativeSound: Audio.Sound | null = null;
+
+/**
+ * Native TTS via Azure (expo-av) — gives gender-correct voices:
+ * Sarah → en-GB-SoniaNeural (female), Jake → en-US-GuyNeural (male), etc.
+ * Fails silently if the server is unreachable.
+ */
+async function azureNativePlay(
+  text: string,
+  tutorId: string,
+  apiBase: string,
+  speed: number,
+  onStart?: () => void,
+  onEnd?: () => void,
+) {
+  // Stop any currently playing native sound
+  if (_nativeSound) {
+    const prev = _nativeSound;
+    _nativeSound = null;
+    try { await prev.stopAsync(); } catch {}
+    try { await prev.unloadAsync(); } catch {}
+  }
+
+  const url = new URL("/api/tts", apiBase);
+  url.searchParams.set("text", text.slice(0, 5000));
+  url.searchParams.set("tutorId", tutorId);
+  url.searchParams.set("speed", speed.toString());
+
+  try {
+    onStart?.();
+    await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+    const { sound } = await Audio.Sound.createAsync(
+      { uri: url.toString() },
+      { shouldPlay: true },
+    );
+    _nativeSound = sound;
+    sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+      if (status.isLoaded && status.didJustFinish) {
+        sound.unloadAsync().catch(() => {});
+        _nativeSound = null;
+        onEnd?.();
+      }
+    });
+  } catch {
+    // Server unreachable — fail silently
+    _nativeSound = null;
+    onEnd?.();
+  }
+}
 
 /** Strip common markdown formatting so tutor messages render as plain text. */
 function stripMarkdown(text: string): string {
@@ -100,7 +148,11 @@ function stripForTTS(text: string): string {
 
 function stopSpeech() {
   if (Platform.OS !== "web") {
-    try { Speech.stop(); } catch {}
+    if (_nativeSound) {
+      const s = _nativeSound;
+      _nativeSound = null;
+      s.stopAsync().catch(() => {}).finally(() => s.unloadAsync().catch(() => {}));
+    }
   } else {
     if (_webAudioEl) {
       _webAudioEl.pause();
@@ -110,7 +162,7 @@ function stopSpeech() {
   }
 }
 
-async function elevenLabsPlay(
+async function azureWebPlay(
   text: string,
   tutorId: string,
   apiBase: string,
@@ -119,10 +171,8 @@ async function elevenLabsPlay(
   onEnd?: () => void,
   onPlaybackStart?: (durationSecs: number) => void,
   // NOTE: mode is intentionally NOT sent to /api/tts.
-  // Voice identity is locked to tutorId. Sending mode would create separate
-  // cache entries per mode, allowing ElevenLabs vs Azure fallback to differ
-  // between modes — making the voice sound like it's changing. Mode only
-  // belongs in /api/chat (system prompt). Azure SSML uses per-tutor defaults.
+  // Voice identity is locked to tutorId. Mode only belongs in /api/chat
+  // (system prompt). Azure SSML uses per-tutor defaults.
 ) {
   try {
     const url = new URL("/api/tts", apiBase);
@@ -363,8 +413,8 @@ export default function ChatRoomScreen() {
     }, msPerWord);
   }, [clearSubtitle]);
 
-  /** Native (Expo Speech) subtitle — still uses estimated wpm because expo-speech
-   *  gives no duration information. */
+  /** Native subtitle — uses estimated wpm because expo-av on native does not
+   *  expose reliable playback-position callbacks for word-sync. */
   const startNativeSubtitle = useCallback((text: string, speechRate: number) => {
     clearSubtitle();
     const words = text.trim().split(/\s+/);
@@ -404,10 +454,10 @@ export default function ChatRoomScreen() {
     };
 
     if (Platform.OS === "web") {
-      // ElevenLabs via fetch — no gesture lock on blob playback.
+      // Azure via fetch — no gesture lock on blob playback.
       // Word highlights start inside onPlaybackStart (audio.onplay) using the
       // real audio duration, so they stay perfectly in sync.
-      elevenLabsPlay(
+      azureWebPlay(
         ttsText,
         tutor.id,
         getApiUrl(),
@@ -418,15 +468,16 @@ export default function ChatRoomScreen() {
         // mode NOT passed — voice identity is locked to tutorId only
       );
     } else {
-      // Native: expo-speech fallback (works in Expo Go without native build)
+      // Native: Azure TTS via expo-av — proper female/male voices per tutor
       startNativeSubtitle(ttsText, rate);
-      try { Speech.stop(); } catch {}
-      Speech.speak(ttsText, {
-        language: tutor.speechLang,
+      azureNativePlay(
+        ttsText,
+        tutor.id,
+        getApiUrl(),
         rate,
-        onDone: onEnd,
-        onError: onEnd,
-      });
+        () => setLoadingAudioId(msgId),
+        onEnd,
+      );
     }
   }, [tutor, rate, clearSubtitle, startAudioSyncedSubtitle, startNativeSubtitle]);
 
@@ -484,7 +535,12 @@ export default function ChatRoomScreen() {
   };
 
   const handleVoiceInput = async () => {
-    if (isRecording) return;
+    if (isRecording || speakingId) return;
+    // Stop any active TTS before recording to avoid iOS audio session conflicts
+    stopSpeech();
+    clearSubtitle();
+    setSpeakingId(null);
+    setLoadingAudioId(null);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setIsRecording(true);
 
@@ -890,7 +946,7 @@ export default function ChatRoomScreen() {
             <Animated.View style={{ transform: [{ scale: micPulse }] }}>
               <Pressable
                 onPress={handleVoiceInput}
-                disabled={isRecording || isTyping}
+                disabled={isRecording || isTyping || !!speakingId}
                 style={({ pressed }) => [
                   styles.micInputBtn,
                   isRecording && styles.micInputBtnActive,

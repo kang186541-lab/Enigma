@@ -3,28 +3,30 @@ import {
   View, Text, StyleSheet, Pressable, Animated, Platform, ActivityIndicator,
 } from "react-native";
 import { Audio } from "expo-av";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
-import { type LessonSentence, getRandomFeedback } from "@/lib/lessonContent";
+import { type LessonSentence, type Step1Config, getRandomFeedback } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type Phase = "idle" | "playing" | "recording" | "assessing" | "result";
+type WordScore = { word: string; score: number; errorType: string; phonemes?: { phoneme: string; score: number }[] };
 
 interface Props {
   sentences: LessonSentence[];
+  step1Config?: Step1Config;
   nativeLang: string;
   lc: "ko" | "en" | "es";
   onComplete: (spokeSentences: number) => void;
 }
 
-// 3 sentences × 2 rounds (slow + normal) = 6 total
-const TOTAL_ROUNDS = 2;
+// Base rounds: 0 = slow, 1 = normal. Round 2 = audio-only recall (if enabled).
+const BASE_ROUNDS = 2;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -42,14 +44,50 @@ function getMeaning(meaning: Tri, lc: "ko" | "en" | "es"): string {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Props) {
+export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onComplete }: Props) {
   const [sentIdx, setSentIdx] = useState(0);
-  const [round, setRound] = useState(0);      // 0 = slow, 1 = normal
+  const [round, setRound] = useState(0);      // 0 = slow, 1 = normal, 2 = audio-only recall
   const [phase, setPhase] = useState<Phase>("idle");
   const [score, setScore] = useState<number | null>(null);
   const [feedback, setFeedback] = useState("");
+  const [wordScores, setWordScores] = useState<WordScore[]>([]);
   const [totalSpoken, setTotalSpoken] = useState(0);
   const [playingMode, setPlayingMode] = useState<"slow" | "normal" | null>(null);
+  const [textRevealed, setTextRevealed] = useState(false); // for round 3: reveal text after attempt
+
+  // ── Round 3 (audio-only recall) configuration ───────────────────────────────
+  const hasRound3 = step1Config?.hasAudioOnlyRound === true;
+
+  // Determine which sentences get round 3 treatment
+  const sentencesWithRound3 = React.useMemo(() => {
+    if (!hasRound3) return new Set<number>();
+    const recallIndices: number[] = [];
+    sentences.forEach((s, i) => { if (s.recallRound) recallIndices.push(i); });
+    if (recallIndices.length > 0) {
+      // If audioOnlyCount is set, take only that many (from the end of the list)
+      const count = step1Config?.audioOnlyCount ?? recallIndices.length;
+      return new Set(recallIndices.slice(-count));
+    }
+    // Fallback: last N sentences if no recallRound flags
+    const count = step1Config?.audioOnlyCount ?? 2;
+    const startIdx = Math.max(0, sentences.length - count);
+    const indices = new Set<number>();
+    for (let i = startIdx; i < sentences.length; i++) indices.add(i);
+    return indices;
+  }, [sentences, hasRound3, step1Config]);
+
+  // Total rounds for the current sentence
+  const totalRoundsForSentence = (idx: number) =>
+    hasRound3 && sentencesWithRound3.has(idx) ? 3 : BASE_ROUNDS;
+
+  // Is the current round the audio-only recall round?
+  const isAudioOnlyRound = round === 2 && hasRound3 && sentencesWithRound3.has(sentIdx);
+
+  // Audio-only placeholder text
+  const audioOnlyPlaceholder =
+    nativeLang === "korean" ? "\uD83D\uDD0A \uB4E3\uACE0 \uB530\uB77C\uD558\uC138\uC694"
+    : nativeLang === "spanish" ? "\uD83D\uDD0A Escucha y repite"
+    : "\uD83D\uDD0A Listen and repeat";
 
   const nativeRecRef  = useRef<Audio.Recording | null>(null);
   const soundRef      = useRef<Audio.Sound | null>(null);
@@ -152,7 +190,23 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
         if (!granted) { stopPulse(); setPhase("idle"); return; }
         await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
         const rec = new Audio.Recording();
-        await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+        // iOS: record as 16kHz WAV so Azure accepts it without ffmpeg conversion
+        const recOptions: Audio.RecordingOptions = Platform.OS === "ios" ? {
+          android: Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+          ios: {
+            extension: ".wav",
+            outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+            audioQuality: Audio.IOSAudioQuality.HIGH,
+            sampleRate: 16000,
+            numberOfChannels: 1,
+            bitRate: 256000,
+            linearPCMBitDepth: 16,
+            linearPCMIsBigEndian: false,
+            linearPCMIsFloat: false,
+          },
+          web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
+        } : Audio.RecordingOptionsPresets.HIGH_QUALITY;
+        await rec.prepareToRecordAsync(recOptions);
         await rec.startAsync();
         nativeRecRef.current = rec;
         autoStopRef.current = setTimeout(() => stopNativeRecording(), 4000);
@@ -187,10 +241,11 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
       await new Promise(resolve => setTimeout(resolve, 300));
       const uri = rec.getURI();
       nativeRecRef.current = null;
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false });
       if (!uri) throw new Error("no URI");
-      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
-      await submitAssessment(base64, "audio/m4a");
+      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      const mimeType = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
+      await submitAssessment(base64, mimeType);
     } catch {
       setPhase("idle");
     }
@@ -230,32 +285,37 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
       return;
     }
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const apiUrl = new URL("/api/pronunciation-assess", apiBase).toString();
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word: sentence.text, lang: sentence.speechLang, audio: base64, mimeType }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       const data = res.ok ? await res.json() : {};
       // No speech recognized → 0 score
       if (!hasRecognizedSpeech(data)) {
         console.warn('[STEP1] Azure returned no recognized speech');
         setScore(0);
         setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
-        setPhase("result");
         return;
       }
       const s: number = data.pronunciationScore ?? data.score ?? 0;
       setScore(s);
+      setWordScores(data.words ?? []);
       setFeedback(s >= 90 ? getRandomFeedback("excellent", nativeLang)
         : s >= 70 ? getRandomFeedback("good", nativeLang)
         : getRandomFeedback("needsWork", nativeLang));
-      setPhase("result");
       Haptics.notificationAsync(s >= 70 ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning);
     } catch {
       setScore(0);
       setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
+    } finally {
       setPhase("result");
+      if (isAudioOnlyRound) setTextRevealed(true);
     }
   }
 
@@ -276,24 +336,70 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
     const newSpoken = totalSpoken + 1;
     setTotalSpoken(newSpoken);
 
-    if (round < TOTAL_ROUNDS - 1) {
-      // Move to next round of same sentence
+    const maxRounds = totalRoundsForSentence(sentIdx);
+    if (round < maxRounds - 1) {
       setRound(round + 1);
       setPhase("idle");
       setScore(null);
       setFeedback("");
+      setWordScores([]);
+      setTextRevealed(false);
     } else if (sentIdx < sentences.length - 1) {
-      // Next sentence
       setSentIdx(sentIdx + 1);
       setRound(0);
       setPhase("idle");
       setScore(null);
       setFeedback("");
+      setWordScores([]);
+      setTextRevealed(false);
     } else {
       // All done
       onComplete(newSpoken);
     }
   }
+
+  // ── Word-level TTS & tip ──────────────────────────────────────────────────────
+
+  async function playWordTTS(word: string) {
+    try {
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      const url = new URL("/api/pronunciation-tts", apiBase);
+      url.searchParams.set("text", word);
+      url.searchParams.set("lang", sentence.speechLang);
+      if (Platform.OS === "web") {
+        const res = await fetch(url.toString());
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const objUrl = URL.createObjectURL(blob);
+        const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+        registerGlobalWebAudio(audio);
+        await audio.play();
+      } else {
+        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
+        registerGlobalSound(sound);
+      }
+    } catch { /* ignore */ }
+  }
+
+  function getPronTip(): string | null {
+    if (wordScores.length === 0) return null;
+    const weak = wordScores.filter((w) => w.score < 75);
+    if (weak.length === 0) return null;
+    const lowest = weak.reduce((a, b) => (a.score < b.score ? a : b));
+    const phonemeHint = lowest.phonemes?.length
+      ? lowest.phonemes.reduce((a, b) => (a.score < b.score ? a : b))
+      : null;
+    if (phonemeHint && phonemeHint.score < 70) {
+      if (nativeLang === "korean") return `"${lowest.word}"의 "${phonemeHint.phoneme}" 발음에 집중해보세요`;
+      if (nativeLang === "spanish") return `Enfócate en el sonido "${phonemeHint.phoneme}" en "${lowest.word}"`;
+      return `Focus on the "${phonemeHint.phoneme}" sound in "${lowest.word}"`;
+    }
+    if (nativeLang === "korean") return `"${lowest.word}"을 탭해서 다시 듣고 천천히 따라해보세요`;
+    if (nativeLang === "spanish") return `Toca "${lowest.word}" para escucharlo y repite despacio`;
+    return `Tap "${lowest.word}" to hear it again, then try slowly`;
+  }
+
+  const practiceLabel = nativeLang === "korean" ? "← 연습!" : nativeLang === "spanish" ? "← ¡practica!" : "← practice!";
 
   // ── Labels ────────────────────────────────────────────────────────────────────
 
@@ -301,15 +407,31 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
   const normalLabel = nativeLang === "korean" ? "자연 속도 듣기" : nativeLang === "spanish" ? "Velocidad normal" : "Normal speed";
   const micLabel    = phase === "recording"
     ? (nativeLang === "korean" ? "탭하여 중지 ■" : nativeLang === "spanish" ? "Toca para parar ■" : "Tap to stop ■")
-    : (nativeLang === "korean" ? "따라 말하기 🎤" : nativeLang === "spanish" ? "Repetir 🎤" : "Repeat 🎤");
-  const nextLabel   = nativeLang === "korean" ? "다음 →" : nativeLang === "spanish" ? "Siguiente →" : "Next →";
+    : isAudioOnlyRound
+      ? (nativeLang === "korean" ? "기억해서 말하기 🧠" : nativeLang === "spanish" ? "Di de memoria 🧠" : "Say from memory 🧠")
+    : round === 0
+      ? (nativeLang === "korean" ? "따라 말하기 🎤" : nativeLang === "spanish" ? "Repetir 🎤" : "Repeat 🎤")
+      : (nativeLang === "korean" ? "한번 더 말하기 🔄" : nativeLang === "spanish" ? "Repetir una vez más 🔄" : "Say it again 🔄");
+
+  // Determine whether "next" advances to next round of same sentence, or to a new sentence
+  const TOTAL_ROUNDS_FOR_SENT = totalRoundsForSentence(sentIdx);
+  const isLastRound = round >= TOTAL_ROUNDS_FOR_SENT - 1;
+  const isLastSentence = sentIdx >= sentences.length - 1;
+  const nextLabel = isLastRound
+    ? (isLastSentence
+        ? (nativeLang === "korean" ? "완료 ✓" : nativeLang === "spanish" ? "Completar ✓" : "Finish ✓")
+        : (nativeLang === "korean" ? "다음 문장 →" : nativeLang === "spanish" ? "Siguiente frase →" : "Next sentence →"))
+    : (nativeLang === "korean" ? "다음 →" : nativeLang === "spanish" ? "Siguiente →" : "Next →");
   const retryLabel  = nativeLang === "korean" ? "한번 더 🔄" : nativeLang === "spanish" ? "Otro intento 🔄" : "Try again 🔄";
   const roundLabel  = round === 0
     ? (nativeLang === "korean" ? "느린 속도로 따라하기" : nativeLang === "spanish" ? "Repite despacio" : "Repeat at slow speed")
-    : (nativeLang === "korean" ? "자연 속도로 따라하기" : nativeLang === "spanish" ? "Repite a velocidad normal" : "Repeat at normal speed");
+    : round === 1
+    ? (nativeLang === "korean" ? "자연 속도로 따라하기" : nativeLang === "spanish" ? "Repite a velocidad normal" : "Repeat at normal speed")
+    : (nativeLang === "korean" ? "기억해서 말하기" : nativeLang === "spanish" ? "Di de memoria" : "Say from memory");
 
-  const totalUtterances = sentences.length * TOTAL_ROUNDS;
-  const doneUtterances  = sentIdx * TOTAL_ROUNDS + round + (phase === "result" && (score ?? 0) >= 70 ? 1 : 0);
+  const totalUtterances = sentences.reduce((sum, _, i) => sum + totalRoundsForSentence(i), 0);
+  const doneUtterances  = sentences.slice(0, sentIdx).reduce((sum, _, i) => sum + totalRoundsForSentence(i), 0)
+    + round + (phase === "result" && (score ?? 0) >= 70 ? 1 : 0);
 
   const stars = score !== null ? getStars(score) : 0;
 
@@ -326,8 +448,12 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
       {/* Sentence card */}
       <View style={s.sentenceCard}>
         <Text style={s.sentenceCounter}>{sentIdx + 1}/{sentences.length}</Text>
-        <Text style={s.sentenceText}>{sentence.text}</Text>
-        <Text style={s.sentenceMeaning}>{getMeaning(sentence.meaning, lc)}</Text>
+        <Text style={s.sentenceText}>
+          {isAudioOnlyRound && !textRevealed ? audioOnlyPlaceholder : sentence.text}
+        </Text>
+        {!(isAudioOnlyRound && !textRevealed) && (
+          <Text style={s.sentenceMeaning}>{getMeaning(sentence.meaning, lc)}</Text>
+        )}
       </View>
 
       {/* Listen buttons */}
@@ -388,11 +514,32 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
           </View>
           <Text style={s.feedbackText}>{feedback}</Text>
 
+          {/* Word-by-word breakdown */}
+          {wordScores.length > 0 && (
+            <View style={s.wordBreakdown}>
+              {wordScores.map((w, i) => (
+                <Pressable key={i} style={s.wordRow} onPress={() => playWordTTS(w.word)}>
+                  <Text style={s.wordIcon}>{w.score >= 75 ? "✅" : "⚠️"}</Text>
+                  <Text style={[s.wordText, w.score < 75 && s.wordTextWeak]}>{w.word}</Text>
+                  <Text style={[s.wordScore, w.score < 75 && s.wordScoreWeak]}>{w.score}%</Text>
+                  {w.score < 75 && <Text style={s.wordPracticeTag}>{practiceLabel}</Text>}
+                </Pressable>
+              ))}
+            </View>
+          )}
+
+          {/* Pronunciation tip */}
+          {(() => { const tip = getPronTip(); return tip ? (
+            <View style={s.tipBox}>
+              <Text style={s.tipText}>💡 {tip}</Text>
+            </View>
+          ) : null; })()}
+
           <View style={s.resultBtns}>
             {score < 70 && (
               <Pressable
                 style={({ pressed }) => [s.retryBtn, pressed && { opacity: 0.8 }]}
-                onPress={() => { setPhase("idle"); setScore(null); setFeedback(""); }}
+                onPress={() => { setPhase("idle"); setScore(null); setFeedback(""); setWordScores([]); }}
               >
                 <Text style={s.retryBtnText}>{retryLabel}</Text>
               </Pressable>
@@ -412,7 +559,7 @@ export function Step1ListenRepeat({ sentences, nativeLang, lc, onComplete }: Pro
       <View style={s.progressRow}>
         <Text style={s.progressText}>
           {doneUtterances}/{totalUtterances}{" "}
-          {nativeLang === "korean" ? "발화 완료" : nativeLang === "spanish" ? "frases completadas" : "utterances done"}
+          {nativeLang === "korean" ? "문장 완료" : nativeLang === "spanish" ? "frases completadas" : "sentences done"}
         </Text>
         <View style={s.progressDots}>
           {Array.from({ length: totalUtterances }, (_, i) => (
@@ -480,6 +627,26 @@ const s = StyleSheet.create({
   starEmpty:  { color: "rgba(201,162,39,0.2)" },
   scoreNum:  { fontSize: 14, fontFamily: F.header, color: C.parchment, marginLeft: 8 },
   feedbackText: { fontSize: 14, fontFamily: F.body, color: C.parchment, textAlign: "center", fontStyle: "italic" },
+
+  wordBreakdown: { width: "100%", gap: 4, marginTop: 4 },
+  wordRow: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8,
+    backgroundColor: "rgba(201,162,39,0.06)",
+  },
+  wordIcon: { fontSize: 14, width: 22 },
+  wordText: { fontSize: 14, fontFamily: F.bodySemi, color: C.parchment, flex: 1 },
+  wordTextWeak: { color: "#e5a940" },
+  wordScore: { fontSize: 13, fontFamily: F.label, color: C.goldDim, minWidth: 36, textAlign: "right" },
+  wordScoreWeak: { color: "#e5a940", fontFamily: F.bodySemi },
+  wordPracticeTag: { fontSize: 11, fontFamily: F.label, color: "#e5a940" },
+
+  tipBox: {
+    width: "100%", backgroundColor: "rgba(201,162,39,0.1)", borderRadius: 10,
+    paddingVertical: 8, paddingHorizontal: 12, borderWidth: 1, borderColor: "rgba(201,162,39,0.2)",
+  },
+  tipText: { fontSize: 13, fontFamily: F.body, color: C.parchment, lineHeight: 19 },
+
   resultBtns: { flexDirection: "row", gap: 10, marginTop: 4 },
   retryBtn: {
     paddingHorizontal: 16, paddingVertical: 9, borderRadius: 10,
@@ -493,8 +660,8 @@ const s = StyleSheet.create({
   nextBtnText: { fontSize: 13, fontFamily: F.header, color: C.bg1 },
 
   progressRow: { alignItems: "center", gap: 6 },
-  progressText: { fontSize: 12, fontFamily: F.label, color: C.goldDim },
+  progressText: { fontSize: 15, fontFamily: F.label, color: C.goldDim },
   progressDots: { flexDirection: "row", gap: 5 },
-  dot:          { width: 8, height: 8, borderRadius: 4, backgroundColor: "rgba(201,162,39,0.2)", borderWidth: 0.5, borderColor: C.border },
+  dot:          { width: 10, height: 10, borderRadius: 5, backgroundColor: "rgba(201,162,39,0.2)", borderWidth: 0.5, borderColor: C.border },
   dotFilled:    { backgroundColor: C.gold },
 });

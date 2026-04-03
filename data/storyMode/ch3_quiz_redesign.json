@@ -1,0 +1,690 @@
+{
+  "meta": {
+    "version": "2.0",
+    "description": "Chapter 3 Seoul quiz redesign — uses only Day 1-12 vocabulary",
+    "replaces": ["ch3_quiz_a", "ch3_quiz_b", "ch3_quiz_c", "ch3_quiz_d", "ch3_quiz_e"],
+    "vocabularyScope": "Day 1-12 (Unit 1: First Encounters + Unit 2: Everyday Expressions)",
+    "note": "ch3_quiz_d_fix.json is superseded by this redesign"
+  },
+  "quizzes": [
+    {
+      "id": "ch3_quiz_a",
+      "chapter": "ch3",
+      "scene": "ch3_scene1",
+      "type": "dialogue_choice",
+      "title": {
+        "ko": "서울 도착 — 수진과의 첫 만남",
+        "en": "Arriving in Seoul — Meeting Sujin",
+        "es": "Llegando a Seúl — Conociendo a Sujin"
+      },
+      "difficulty": 1,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "인천공항에서 수진을 만난다. 적절한 응답을 선택하여 대화를 완성하라.",
+        "en": "You meet Sujin at Incheon Airport. Choose the right responses to complete the conversation.",
+        "es": "Conoces a Sujin en el Aeropuerto de Incheon. Elige las respuestas correctas para completar la conversación."
+      },
+      "content": {
+        "en": {
+          "rounds": [
+            {
+              "npcLine": "Hello! Are you Rudy? Nice to meet you.",
+              "correct": "Nice to meet you too. I'm from London.",
+              "wrong": ["How much is this?", "What day is it?", "It's cold today."],
+              "vocabSource": "Day 1 + Day 2"
+            },
+            {
+              "npcLine": "How are you? Was the flight long?",
+              "correct": "I'm fine, thank you. A little tired.",
+              "wrong": ["Where is the exit?", "I'm twenty-five.", "See you on Wednesday!"],
+              "vocabSource": "Day 5"
+            },
+            {
+              "npcLine": "What do you do? Carlos told me you're a detective.",
+              "correct": "Yes, I work at a museum. Do you speak English?",
+              "wrong": ["It's half past seven.", "I need a large.", "Goodbye!"],
+              "vocabSource": "Day 3"
+            },
+            {
+              "npcLine": "Your Korean... do you speak Korean?",
+              "correct": "A little bit. Can you say that again, please?",
+              "wrong": ["How old are you?", "Take care!", "It's sunny today."],
+              "vocabSource": "Day 3 + Day 2"
+            }
+          ]
+        },
+        "es": {
+          "rounds": [
+            {
+              "npcLine": "¡Hola! ¿Eres Rudy? Mucho gusto.",
+              "correct": "Mucho gusto. Soy de Londres.",
+              "wrong": ["¿Cuánto cuesta esto?", "¿Qué día es hoy?", "Hace frío hoy."],
+              "vocabSource": "Day 1 + Day 2"
+            },
+            {
+              "npcLine": "¿Cómo estás? ¿Fue largo el vuelo?",
+              "correct": "Estoy bien, gracias. Un poco cansado.",
+              "wrong": ["¿Dónde está la salida?", "Tengo veinticinco años.", "¡Te veo el miércoles!"],
+              "vocabSource": "Day 5"
+            },
+            {
+              "npcLine": "¿A qué te dedicas? Carlos me dijo que eres detective.",
+              "correct": "Sí, trabajo en un museo. ¿Hablas español?",
+              "wrong": ["Son las siete y media.", "Necesito una grande.", "¡Adiós!"],
+              "vocabSource": "Day 3"
+            },
+            {
+              "npcLine": "Tu coreano... ¿hablas coreano?",
+              "correct": "Un poquito. ¿Puede repetir eso, por favor?",
+              "wrong": ["¿Cuántos años tienes?", "¡Cuídate!", "Está soleado hoy."],
+              "vocabSource": "Day 3 + Day 2"
+            }
+          ]
+        },
+        "ko": {
+          "rounds": [
+            {
+              "npcLine": "안녕하세요! 루디 씨? 만나서 반갑습니다.",
+              "correct": "만나서 반갑습니다. 런던에서 왔어요.",
+              "wrong": ["이거 얼마예요?", "무슨 요일이에요?", "오늘 추워요."],
+              "vocabSource": "Day 1 + Day 2"
+            },
+            {
+              "npcLine": "어떻게 지내요? 비행기 오래 탔어요?",
+              "correct": "잘 지내요, 감사합니다. 조금 피곤해요.",
+              "wrong": ["출구가 어디예요?", "스물다섯 살이에요.", "수요일에 봐요!"],
+              "vocabSource": "Day 5"
+            },
+            {
+              "npcLine": "무슨 일 하세요? 카를로스한테 탐정이라고 들었어요.",
+              "correct": "네, 박물관에서 일해요. 한국어 할 줄 아세요?",
+              "wrong": ["일곱 시 반이에요.", "큰 거 필요해요.", "안녕히 가세요!"],
+              "vocabSource": "Day 3"
+            },
+            {
+              "npcLine": "한국어는... 할 줄 아세요?",
+              "correct": "조금이요. 다시 한번 말해 주시겠어요?",
+              "wrong": ["몇 살이에요?", "잘 가요!", "맑고 따뜻해요."],
+              "vocabSource": "Day 3 + Day 2"
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 80,
+        "items": [],
+        "npcRelation": { "npc": "sujin", "points": 1 }
+      }
+    },
+    {
+      "id": "ch3_quiz_b",
+      "chapter": "ch3",
+      "scene": "ch3_scene1",
+      "type": "fill_blank",
+      "title": {
+        "ko": "광장시장에서 영숙 할머니",
+        "en": "Grandma Youngsook at the Market",
+        "es": "Abuela Youngsook en el Mercado"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "영숙 할머니의 시장 가게에서 대화하며 정보를 얻어야 한다. 빈칸을 채워라.",
+        "en": "Chat with Grandma Youngsook at her market stall to get information. Fill in the blanks.",
+        "es": "Conversa con la Abuela Youngsook en su puesto del mercado para obtener información. Completa los espacios."
+      },
+      "content": {
+        "en": {
+          "passage": "Grandma Youngsook's market stall is warm and colorful. She asks: 'How are you today?' You reply: 'I'm ___(1)___, thank you.' The food looks delicious. 'How ___(2)___ is the kimbap?' you ask. She smiles: 'It's ___(3)___ won.' You look at the clock — it's ___(4)___ o'clock. She whispers: 'Come back at ___(5)___ in the evening. I'll tell you about the suspicious people.'",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "fine",
+              "options": ["fine", "cold", "big", "old"],
+              "hint": { "ko": "잘 지내요", "en": "A common reply to 'How are you?'", "es": "Respuesta común a '¿Cómo estás?'" }
+            },
+            {
+              "id": 2,
+              "answer": "much",
+              "options": ["much", "many", "old", "big"],
+              "hint": { "ko": "가격을 물을 때", "en": "Asking about price", "es": "Preguntando el precio" }
+            },
+            {
+              "id": 3,
+              "answer": "three",
+              "options": ["one", "two", "three", "ten"],
+              "hint": { "ko": "숫자 3", "en": "The number 3", "es": "El número 3" }
+            },
+            {
+              "id": 4,
+              "answer": "five",
+              "options": ["three", "five", "seven", "nine"],
+              "hint": { "ko": "숫자 5", "en": "The number 5", "es": "El número 5" }
+            },
+            {
+              "id": 5,
+              "answer": "seven",
+              "options": ["five", "seven", "nine", "ten"],
+              "hint": { "ko": "숫자 7", "en": "The number 7", "es": "El número 7" }
+            }
+          ]
+        },
+        "es": {
+          "passage": "El puesto de la Abuela Youngsook es cálido y colorido. Ella pregunta: '¿Cómo estás hoy?' Respondes: 'Estoy ___(1)___, gracias.' La comida se ve deliciosa. '¿___(2)___ cuesta el kimbap?' preguntas. Ella sonríe: 'Son ___(3)___ won.' Miras el reloj — son las ___(4)___. Ella susurra: 'Vuelve a las ___(5)___ de la noche. Te contaré sobre las personas sospechosas.'",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "bien",
+              "options": ["bien", "frío", "grande", "viejo"],
+              "hint": { "ko": "잘 지내요", "en": "A common reply to 'How are you?'", "es": "Respuesta común a '¿Cómo estás?'" }
+            },
+            {
+              "id": 2,
+              "answer": "Cuánto",
+              "options": ["Cuánto", "Cuándo", "Cómo", "Dónde"],
+              "hint": { "ko": "가격을 물을 때", "en": "Asking about price", "es": "Preguntando el precio" }
+            },
+            {
+              "id": 3,
+              "answer": "tres",
+              "options": ["uno", "dos", "tres", "diez"],
+              "hint": { "ko": "숫자 3", "en": "The number 3", "es": "El número 3" }
+            },
+            {
+              "id": 4,
+              "answer": "cinco",
+              "options": ["tres", "cinco", "siete", "nueve"],
+              "hint": { "ko": "숫자 5", "en": "The number 5", "es": "El número 5" }
+            },
+            {
+              "id": 5,
+              "answer": "siete",
+              "options": ["cinco", "siete", "nueve", "diez"],
+              "hint": { "ko": "숫자 7", "en": "The number 7", "es": "El número 7" }
+            }
+          ]
+        },
+        "ko": {
+          "passage": "영숙 할머니의 시장 가게는 따뜻하고 다채로워요. 할머니가 물어요: '오늘 어떻게 지내요?' 대답해요: '___(1)___, 감사합니다.' 음식이 맛있어 보여요. '김밥 ___(2)___?' 물어봐요. 할머니가 웃어요: '___(3)___ 원이에요.' 시계를 봐요 — ___(4)___시예요. 할머니가 속삭여요: '저녁 ___(5)___시에 다시 와. 수상한 사람들 얘기해줄게.'",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "잘 지내요",
+              "options": ["잘 지내요", "추워요", "커요", "오래됐어요"],
+              "hint": { "en": "A common reply to 'How are you?'", "es": "Respuesta común", "ko": "안부 인사의 대답" }
+            },
+            {
+              "id": 2,
+              "answer": "얼마예요",
+              "options": ["얼마예요", "언제예요", "어디예요", "뭐예요"],
+              "hint": { "en": "Asking about price", "es": "Preguntando precio", "ko": "가격을 물을 때" }
+            },
+            {
+              "id": 3,
+              "answer": "세",
+              "options": ["하나", "둘", "세", "열"],
+              "hint": { "en": "The number 3", "es": "El número 3", "ko": "숫자 3" }
+            },
+            {
+              "id": 4,
+              "answer": "다섯",
+              "options": ["세", "다섯", "일곱", "아홉"],
+              "hint": { "en": "The number 5", "es": "El número 5", "ko": "숫자 5" }
+            },
+            {
+              "id": 5,
+              "answer": "일곱",
+              "options": ["다섯", "일곱", "아홉", "열"],
+              "hint": { "en": "The number 7", "es": "El número 7", "ko": "숫자 7" }
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 120,
+        "items": [],
+        "npcRelation": { "npc": "youngsook", "points": 1 }
+      }
+    },
+    {
+      "id": "ch3_quiz_c",
+      "chapter": "ch3",
+      "scene": "ch3_scene2",
+      "type": "word_match",
+      "title": {
+        "ko": "북촌한옥마을의 문",
+        "en": "The Bukchon Hanok Doors",
+        "es": "Las Puertas de Bukchon Hanok"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "storyContext": {
+        "ko": "북촌한옥마을의 5개 문에 질문이 적혀 있다. 올바른 대답을 매칭하면 문이 열린다.",
+        "en": "Five doors in Bukchon bear questions. Match the correct answers to open them.",
+        "es": "Cinco puertas en Bukchon tienen preguntas. Conecta las respuestas correctas para abrirlas."
+      },
+      "content": {
+        "en": {
+          "pairs": [
+            {
+              "left": "Where is the museum?",
+              "right": "Excuse me, it's over there.",
+              "wrongOptions": ["I'm fine.", "It's ten o'clock.", "I'm from Korea."],
+              "meaning": { "ko": "장소를 묻고 대답하기", "en": "Asking and answering about location", "es": "Preguntar y responder sobre ubicación" }
+            },
+            {
+              "left": "How are you today?",
+              "right": "Not bad, how about you?",
+              "wrongOptions": ["It's Monday.", "A little bit.", "Where is the exit?"],
+              "meaning": { "ko": "안부 묻고 대답하기", "en": "Greeting and responding", "es": "Saludar y responder" }
+            },
+            {
+              "left": "What time is it?",
+              "right": "It's half past seven.",
+              "wrongOptions": ["I'm a student.", "It's cold.", "See you later."],
+              "meaning": { "ko": "시간 묻고 대답하기", "en": "Asking and telling time", "es": "Preguntar y decir la hora" }
+            },
+            {
+              "left": "What colour is this?",
+              "right": "It's red. I like blue.",
+              "wrongOptions": ["Thank you.", "How much?", "Nice to meet you."],
+              "meaning": { "ko": "색상 묻고 대답하기", "en": "Asking and answering about colour", "es": "Preguntar y responder sobre color" }
+            },
+            {
+              "left": "How much is this?",
+              "right": "I'll take the black one, please.",
+              "wrongOptions": ["Goodbye!", "It's sunny.", "What do you do?"],
+              "meaning": { "ko": "가격 묻고 구매하기", "en": "Asking price and buying", "es": "Preguntar precio y comprar" }
+            }
+          ]
+        },
+        "es": {
+          "pairs": [
+            {
+              "left": "¿Dónde está el museo?",
+              "right": "Disculpe, está por allí.",
+              "wrongOptions": ["Estoy bien.", "Son las diez.", "Soy de Corea."],
+              "meaning": { "ko": "장소를 묻고 대답하기", "en": "Asking and answering about location", "es": "Preguntar y responder sobre ubicación" }
+            },
+            {
+              "left": "¿Cómo estás hoy?",
+              "right": "No está mal, ¿y tú?",
+              "wrongOptions": ["Es lunes.", "Un poquito.", "¿Dónde está la salida?"],
+              "meaning": { "ko": "안부 묻고 대답하기", "en": "Greeting and responding", "es": "Saludar y responder" }
+            },
+            {
+              "left": "¿Qué hora es?",
+              "right": "Son las siete y media.",
+              "wrongOptions": ["Soy estudiante.", "Hace frío.", "Hasta luego."],
+              "meaning": { "ko": "시간 묻고 대답하기", "en": "Asking and telling time", "es": "Preguntar y decir la hora" }
+            },
+            {
+              "left": "¿De qué color es esto?",
+              "right": "Es rojo. Me gusta el azul.",
+              "wrongOptions": ["Gracias.", "¿Cuánto cuesta?", "Mucho gusto."],
+              "meaning": { "ko": "색상 묻고 대답하기", "en": "Asking and answering about colour", "es": "Preguntar y responder sobre color" }
+            },
+            {
+              "left": "¿Cuánto cuesta esto?",
+              "right": "Me llevo el negro, por favor.",
+              "wrongOptions": ["¡Adiós!", "Está soleado.", "¿A qué te dedicas?"],
+              "meaning": { "ko": "가격 묻고 구매하기", "en": "Asking price and buying", "es": "Preguntar precio y comprar" }
+            }
+          ]
+        },
+        "ko": {
+          "pairs": [
+            {
+              "left": "박물관이 어디예요?",
+              "right": "실례합니다, 저쪽이에요.",
+              "wrongOptions": ["잘 지내요.", "열 시예요.", "한국에서 왔어요."],
+              "meaning": { "en": "Asking and answering about location", "es": "Preguntar y responder sobre ubicación", "ko": "장소를 묻고 대답하기" }
+            },
+            {
+              "left": "오늘 어떻게 지내요?",
+              "right": "괜찮아요, 당신은요?",
+              "wrongOptions": ["월요일이에요.", "조금이요.", "출구가 어디예요?"],
+              "meaning": { "en": "Greeting and responding", "es": "Saludar y responder", "ko": "안부 묻고 대답하기" }
+            },
+            {
+              "left": "몇 시예요?",
+              "right": "일곱 시 반이에요.",
+              "wrongOptions": ["학생이에요.", "추워요.", "다음에 봐요."],
+              "meaning": { "en": "Asking and telling time", "es": "Preguntar y decir la hora", "ko": "시간 묻고 대답하기" }
+            },
+            {
+              "left": "이건 무슨 색이에요?",
+              "right": "빨간색이에요. 파란색을 좋아해요.",
+              "wrongOptions": ["감사합니다.", "얼마예요?", "만나서 반갑습니다."],
+              "meaning": { "en": "Asking and answering about colour", "es": "Preguntar y responder sobre color", "ko": "색상 묻고 대답하기" }
+            },
+            {
+              "left": "이거 얼마예요?",
+              "right": "검은색 걸로 할게요.",
+              "wrongOptions": ["안녕히 가세요!", "맑고 따뜻해요.", "무슨 일 하세요?"],
+              "meaning": { "en": "Asking price and buying", "es": "Preguntar precio y comprar", "ko": "가격 묻고 구매하기" }
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 180,
+        "items": ["secret_hanok_key"],
+        "npcRelation": null
+      }
+    },
+    {
+      "id": "ch3_quiz_d",
+      "chapter": "ch3",
+      "scene": "ch3_scene2",
+      "type": "listening",
+      "title": {
+        "ko": "민호의 힌트",
+        "en": "Minho's Hint",
+        "es": "La Pista de Minho"
+      },
+      "difficulty": 3,
+      "timeLimit": null,
+      "isBoss": false,
+      "useAzureTTS": true,
+      "storyContext": {
+        "ko": "민호가 렉시콘 거점에 대한 중요한 정보를 전달한다. 잘 듣고 질문에 답하라.",
+        "en": "Minho delivers critical information about the Lexicon base. Listen carefully and answer the questions.",
+        "es": "Minho entrega información crítica sobre la base de Lexicón. Escucha atentamente y responde las preguntas."
+      },
+      "content": {
+        "en": {
+          "ttsScript": "Listen carefully, friend. The Lexicon people meet every Wednesday at nine o'clock. The meeting place? It's near Namsan Tower. The weather is cold there, so bring a jacket. And remember — if you need help, just say 'help' loudly.",
+          "ttsVoice": "en-GB-RyanNeural",
+          "ttsSpeed": "0.9",
+          "questions": [
+            {
+              "type": "select",
+              "question": { "ko": "무슨 요일에 만나요?", "en": "What day do they meet?", "es": "¿Qué día se reúnen?" },
+              "answer": "Wednesday",
+              "options": ["Monday", "Wednesday", "Friday", "Sunday"],
+              "vocabSource": "Day 8"
+            },
+            {
+              "type": "select",
+              "question": { "ko": "몇 시에?", "en": "What time?", "es": "¿A qué hora?" },
+              "answer": "nine",
+              "options": ["seven", "eight", "nine", "ten"],
+              "vocabSource": "Day 9"
+            },
+            {
+              "type": "free",
+              "question": { "ko": "어디서 만나요?", "en": "Where is the meeting place?", "es": "¿Dónde es la reunión?" },
+              "answer": "near Namsan Tower",
+              "acceptableAnswers": ["near Namsan Tower", "Namsan Tower", "Namsan"],
+              "vocabSource": "Day 4"
+            },
+            {
+              "type": "free",
+              "question": { "ko": "거기 날씨가 어때요?", "en": "How's the weather there?", "es": "¿Cómo está el clima allí?" },
+              "answer": "cold",
+              "acceptableAnswers": ["cold", "it's cold", "cold there"],
+              "vocabSource": "Day 10"
+            },
+            {
+              "type": "select",
+              "question": { "ko": "도움이 필요하면 뭐라고 해요?", "en": "If you need ___, just say it loudly.", "es": "Si necesitas ___, solo dilo fuerte." },
+              "answer": "help",
+              "options": ["help", "time", "food", "water"],
+              "vocabSource": "Day 5"
+            }
+          ]
+        },
+        "es": {
+          "ttsScript": "Escucha bien, amigo. La gente de Lexicón se reúne cada miércoles a las nueve. ¿El lugar? Está cerca de la Torre Namsan. Hace frío allí, así que trae una chaqueta. Y recuerda — si necesitas ayuda, solo di 'ayuda' fuerte.",
+          "ttsVoice": "es-ES-AlvaroNeural",
+          "ttsSpeed": "0.9",
+          "questions": [
+            {
+              "type": "select",
+              "question": { "ko": "무슨 요일에 만나요?", "en": "What day do they meet?", "es": "¿Qué día se reúnen?" },
+              "answer": "miércoles",
+              "options": ["lunes", "miércoles", "viernes", "domingo"],
+              "vocabSource": "Day 8"
+            },
+            {
+              "type": "select",
+              "question": { "ko": "몇 시에?", "en": "What time?", "es": "¿A qué hora?" },
+              "answer": "nueve",
+              "options": ["siete", "ocho", "nueve", "diez"],
+              "vocabSource": "Day 9"
+            },
+            {
+              "type": "free",
+              "question": { "ko": "어디서 만나요?", "en": "Where is the meeting place?", "es": "¿Dónde es la reunión?" },
+              "answer": "cerca de la Torre Namsan",
+              "acceptableAnswers": ["cerca de la Torre Namsan", "Torre Namsan", "Namsan"],
+              "vocabSource": "Day 4"
+            },
+            {
+              "type": "free",
+              "question": { "ko": "거기 날씨가 어때요?", "en": "How's the weather there?", "es": "¿Cómo está el clima allí?" },
+              "answer": "frío",
+              "acceptableAnswers": ["frío", "hace frío", "frío allí"],
+              "vocabSource": "Day 10"
+            },
+            {
+              "type": "select",
+              "question": { "ko": "도움이 필요하면 뭐라고 해요?", "en": "If you need ___, just say it loudly.", "es": "Si necesitas ___, solo dilo fuerte." },
+              "answer": "ayuda",
+              "options": ["ayuda", "tiempo", "comida", "agua"],
+              "vocabSource": "Day 5"
+            }
+          ]
+        },
+        "ko": {
+          "ttsScript": "잘 들어, 형. 렉시콘 사람들은 매주 수요일 아홉 시에 만나. 장소? 남산타워 근처야. 거기 추우니까 재킷 가져가. 그리고 기억해 — 도움이 필요하면 '도와주세요'라고 크게 말해.",
+          "ttsVoice": "ko-KR-InJoonNeural",
+          "ttsSpeed": "0.9",
+          "questions": [
+            {
+              "type": "select",
+              "question": { "en": "What day do they meet?", "es": "¿Qué día se reúnen?", "ko": "무슨 요일에 만나요?" },
+              "answer": "수요일",
+              "options": ["월요일", "수요일", "금요일", "일요일"],
+              "vocabSource": "Day 8"
+            },
+            {
+              "type": "select",
+              "question": { "en": "What time?", "es": "¿A qué hora?", "ko": "몇 시에?" },
+              "answer": "아홉",
+              "options": ["일곱", "여덟", "아홉", "열"],
+              "vocabSource": "Day 9"
+            },
+            {
+              "type": "free",
+              "question": { "en": "Where is the meeting place?", "es": "¿Dónde es la reunión?", "ko": "어디서 만나요?" },
+              "answer": "남산타워 근처",
+              "acceptableAnswers": ["남산타워 근처", "남산타워", "남산"],
+              "vocabSource": "Day 4"
+            },
+            {
+              "type": "free",
+              "question": { "en": "How's the weather there?", "es": "¿Cómo está el clima?", "ko": "거기 날씨가 어때요?" },
+              "answer": "추워요",
+              "acceptableAnswers": ["추워요", "추운", "거기 추워요"],
+              "vocabSource": "Day 10"
+            },
+            {
+              "type": "select",
+              "question": { "en": "If you need ___, say it loudly.", "es": "Si necesitas ___, dilo fuerte.", "ko": "___이 필요하면 크게 말해." },
+              "answer": "도움",
+              "options": ["도움", "시간", "음식", "물"],
+              "vocabSource": "Day 5"
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 160,
+        "items": [],
+        "npcRelation": { "npc": "minho", "points": 1 }
+      }
+    },
+    {
+      "id": "ch3_quiz_e",
+      "chapter": "ch3",
+      "scene": "ch3_scene3_boss",
+      "type": "timed",
+      "title": {
+        "ko": "남산타워 결전 — 수호석 시험",
+        "en": "Namsan Tower Showdown — The Guardian Stone Trial",
+        "es": "Batalla en Namsan — La Prueba de la Piedra Guardiana"
+      },
+      "difficulty": 4,
+      "timeLimit": 90,
+      "isBoss": true,
+      "useAzureTTS": true,
+      "storyContext": {
+        "ko": "남산타워 지하에서 수호석을 지키기 위한 최종 시험! 90초 안에 5개의 시험을 통과하라!",
+        "en": "The final trial beneath Namsan Tower to protect the Guardian Stone! Pass 5 tests in 90 seconds!",
+        "es": "¡La prueba final bajo la Torre Namsan para proteger la Piedra Guardiana! ¡Pasa 5 pruebas en 90 segundos!"
+      },
+      "content": {
+        "en": {
+          "rounds": [
+            {
+              "type": "sentence_builder",
+              "scrambled": ["meet", "Nice", "you", "to", "."],
+              "answer": "Nice to meet you.",
+              "vocabSource": "Day 1"
+            },
+            {
+              "type": "fill_blank",
+              "question": "It's ___ and warm today. I like this weather.",
+              "answer": "sunny",
+              "options": ["sunny", "rainy", "cold", "snowy"],
+              "vocabSource": "Day 10"
+            },
+            {
+              "type": "listening",
+              "ttsScript": "Hello, my name is Rudy. I'm from London. I work at a museum. I'm fine, thank you.",
+              "ttsVoice": "en-GB-RyanNeural",
+              "question": "Where does Rudy work?",
+              "answer": "at a museum",
+              "acceptableAnswers": ["at a museum", "a museum", "museum"],
+              "vocabSource": "Day 1 + Day 2 + Day 3"
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "실례합니다, 박물관이 어디예요?",
+                "es": "Disculpe, ¿dónde está el museo?"
+              },
+              "answer": "Excuse me, where is the museum?",
+              "acceptableAnswers": ["Excuse me, where is the museum?", "Excuse me where is the museum?", "Excuse me, where is the museum"],
+              "vocabSource": "Day 4"
+            },
+            {
+              "type": "fill_blank",
+              "question": "What ___ is it today? It's Wednesday.",
+              "answer": "day",
+              "options": ["day", "time", "colour", "name"],
+              "vocabSource": "Day 8"
+            }
+          ]
+        },
+        "es": {
+          "rounds": [
+            {
+              "type": "sentence_builder",
+              "scrambled": ["gusto", "Mucho", "."],
+              "answer": "Mucho gusto.",
+              "vocabSource": "Day 1"
+            },
+            {
+              "type": "fill_blank",
+              "question": "Está ___ y cálido hoy. Me gusta este clima.",
+              "answer": "soleado",
+              "options": ["soleado", "lluvioso", "frío", "nublado"],
+              "vocabSource": "Day 10"
+            },
+            {
+              "type": "listening",
+              "ttsScript": "Hola, me llamo Rudy. Soy de Londres. Trabajo en un museo. Estoy bien, gracias.",
+              "ttsVoice": "es-ES-AlvaroNeural",
+              "question": "¿Dónde trabaja Rudy?",
+              "answer": "en un museo",
+              "acceptableAnswers": ["en un museo", "un museo", "museo"],
+              "vocabSource": "Day 1 + Day 2 + Day 3"
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "실례합니다, 박물관이 어디예요?",
+                "en": "Excuse me, where is the museum?"
+              },
+              "answer": "Disculpe, ¿dónde está el museo?",
+              "acceptableAnswers": ["Disculpe, ¿dónde está el museo?", "Disculpe, donde esta el museo?", "Disculpe donde está el museo"],
+              "vocabSource": "Day 4"
+            },
+            {
+              "type": "fill_blank",
+              "question": "¿Qué ___ es hoy? Es miércoles.",
+              "answer": "día",
+              "options": ["día", "hora", "color", "nombre"],
+              "vocabSource": "Day 8"
+            }
+          ]
+        },
+        "ko": {
+          "rounds": [
+            {
+              "type": "sentence_builder",
+              "scrambled": ["반갑습니다", "만나서", "."],
+              "answer": "만나서 반갑습니다.",
+              "vocabSource": "Day 1"
+            },
+            {
+              "type": "fill_blank",
+              "question": "오늘 맑고 ___해요. 이 날씨 좋아요.",
+              "answer": "따뜻",
+              "options": ["따뜻", "비", "추운", "눈"],
+              "vocabSource": "Day 10"
+            },
+            {
+              "type": "listening",
+              "ttsScript": "안녕하세요, 제 이름은 루디예요. 런던에서 왔어요. 박물관에서 일해요. 잘 지내요, 감사합니다.",
+              "ttsVoice": "ko-KR-SunHiNeural",
+              "question": "루디는 어디서 일해요?",
+              "answer": "박물관에서",
+              "acceptableAnswers": ["박물관에서", "박물관", "박물관에서 일해요"],
+              "vocabSource": "Day 1 + Day 2 + Day 3"
+            },
+            {
+              "type": "translation",
+              "source": {
+                "en": "Excuse me, where is the museum?",
+                "es": "Disculpe, ¿dónde está el museo?"
+              },
+              "answer": "실례합니다, 박물관이 어디예요?",
+              "acceptableAnswers": ["실례합니다, 박물관이 어디예요?", "실례합니다 박물관이 어디예요?", "박물관이 어디예요?"],
+              "vocabSource": "Day 4"
+            },
+            {
+              "type": "fill_blank",
+              "question": "오늘 무슨 ___이에요? 수요일이에요.",
+              "answer": "요일",
+              "options": ["요일", "시간", "색", "이름"],
+              "vocabSource": "Day 8"
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 500,
+        "items": ["korea_guardian_stone"],
+        "npcRelation": null,
+        "badge": "seoul_guardian"
+      }
+    }
+  ]
+}

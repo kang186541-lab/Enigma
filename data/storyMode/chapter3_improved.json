@@ -1,0 +1,572 @@
+{
+  "chapterId": "ch3",
+  "title": {
+    "ko": "서울의 비밀",
+    "en": "The Seoul Secret",
+    "es": "El Secreto de Seul"
+  },
+  "setting": "Seoul",
+  "vocabularyPool": "Day 1-30: Greetings, self-intro, numbers, time, food, ordering, colours, weather, places, directions, family, descriptions",
+  "meta": {
+    "version": "3.0",
+    "author": "story-creator-agent",
+    "date": "2026-03-23",
+    "pacingTemplate": "Calm -> Curiosity -> Tension -> Quiz Moment -> Reveal -> Cliffhanger",
+    "changeType": "TARGETED FIXES — not a full rewrite. Fixes: 1) New opening hook, 2) Rudy Korean embarrassment scene, 3) Improved Minho password quiz, 4) New cliffhanger at Namsan Tower",
+    "preserves": "Existing quiz structures from ch3_quiz_redesign.json remain valid. This file adds new scenes and replaces specific weak points."
+  },
+
+  "npcs": [
+    {
+      "id": "sujin",
+      "name": "Sujin",
+      "role": { "ko": "언어학자", "en": "Linguist", "es": "Linguista" },
+      "idiomStyle": "Warm and academic"
+    },
+    {
+      "id": "youngsook",
+      "name": "Grandma Youngsook",
+      "role": { "ko": "광장시장 상인", "en": "Gwangjang Market Vendor", "es": "Vendedora del Mercado Gwangjang" },
+      "idiomStyle": "Traditional Korean wisdom",
+      "collection": "Youngsook_Korean_Wisdom"
+    },
+    {
+      "id": "minho",
+      "name": "Minho",
+      "role": { "ko": "래퍼 / 정보원", "en": "Rapper / Informant", "es": "Rapero / Informante" },
+      "idiomStyle": "Korean trendy expressions",
+      "collection": "Minho_Modern_Korean"
+    }
+  ],
+
+  "scenes": [
+    {
+      "id": "ch3_scene1_NEW",
+      "title": {
+        "ko": "서울 착륙 — 전화가 죽다",
+        "en": "Seoul Landing — Phone Dies",
+        "es": "Aterrizaje en Seul — El Telefono Muere"
+      },
+      "replaces": "ch3_scene1 opening narration (removes travel brochure tone)",
+      "beats": [
+        {
+          "id": "ch3_s1_opening",
+          "beat": "CALM",
+          "narration": {
+            "ko": "인천공항. 루디가 입국장을 나서는 순간 핸드폰이 꺼진다. 배터리 완전 방전. 충전기는 마드리드 호텔에 두고 왔다. 수진이 어딘가에서 기다리고 있을 텐데, 연락할 방법이 없다. 공항 로비에 수백 명의 사람들. 한국어 간판. 한국어 안내 방송. 루디가 아는 한국어는 세 마디.",
+            "en": "Incheon Airport. The moment Rudy steps through arrivals, his phone dies. Battery completely dead. Charger left at the Madrid hotel. Sujin is waiting somewhere, but there's no way to reach her. Hundreds of people in the airport lobby. Korean signs. Korean announcements. Rudy knows three phrases in Korean.",
+            "es": "Aeropuerto de Incheon. En el momento en que Rudy sale por llegadas, su telefono muere. Bateria completamente agotada. El cargador quedo en el hotel de Madrid. Sujin espera en algun lugar, pero no hay forma de contactarla. Cientos de personas en el vestibulo del aeropuerto. Letreros en coreano. Anuncios en coreano. Rudy sabe tres frases en coreano."
+          }
+        },
+        {
+          "id": "ch3_s1_d1",
+          "beat": "CALM",
+          "charId": "lingo",
+          "text": {
+            "en": "Right. So I know 'hello,' 'thank you,' and 'where is the bathroom.' Let's see if that's enough to find one specific person in a city of ten million. Confidence level: historically low.",
+            "ko": "좋아. 나는 '안녕하세요,' '감사합니다,' 그리고 '화장실이 어디예요'를 알아. 천만 명 도시에서 특정 한 사람을 찾기에 충분한지 보자. 자신감 수준: 역사적 최저.",
+            "es": "Bien. Se 'hola,' 'gracias,' y 'donde esta el bano.' Veamos si eso es suficiente para encontrar a una persona especifica en una ciudad de diez millones. Nivel de confianza: historicamente bajo."
+          }
+        },
+        {
+          "id": "ch3_s1_d2",
+          "beat": "CURIOSITY",
+          "narration": {
+            "ko": "루디는 안내 데스크를 찾는다. 직원이 한국어로 말한다. 루디는 심호흡을 한다. 이건 퀴즈가 아니야 — 이건 실전이야.",
+            "en": "Rudy finds an information desk. The attendant speaks in Korean. Rudy takes a deep breath. This isn't a quiz — this is real.",
+            "es": "Rudy encuentra un puesto de informacion. La empleada habla en coreano. Rudy respira hondo. Esto no es un quiz — esto es real."
+          }
+        },
+        {
+          "id": "ch3_s1_d3",
+          "beat": "CURIOSITY",
+          "charId": "lingo",
+          "text": {
+            "en": "Excuse me — 'annyeonghaseyo.' Hello. I'm looking for... okay, I don't know the word for 'looking for.' Um. My friend. Sujin. 'Where is'... no, that's for places. Think, Rudy. You're a detective. You've decoded ciphers. You can ask a simple question in Korean.",
+            "ko": "실례합니다 — '안녕하세요.' 안녕하세요. 저는 찾고 있는... 아, '찾고 있다'라는 단어를 모르겠어. 음. 제 친구. 수진. '어디에'... 아니, 그건 장소에 쓰는 거잖아. 생각해, 루디. 넌 탐정이야. 암호도 풀었잖아. 간단한 한국어 질문 하나 할 수 있어.",
+            "es": "Disculpe — 'annyeonghaseyo.' Hola. Busco a... vale, no se la palabra para 'busco.' Um. Mi amiga. Sujin. 'Donde esta'... no, eso es para lugares. Piensa, Rudy. Eres detective. Has descifrado codigos. Puedes hacer una pregunta simple en coreano."
+          }
+        },
+        {
+          "id": "ch3_s1_d4",
+          "beat": "TENSION",
+          "narration": {
+            "ko": "루디가 용기를 내어 안내 직원에게 말한다. 한국어로. 떨리는 목소리로. 교과서에서 배운 것을 기억하며.",
+            "en": "Rudy gathers his courage and speaks to the attendant. In Korean. Voice trembling. Remembering what he learned from his lessons.",
+            "es": "Rudy reune su coraje y habla con la empleada. En coreano. Voz temblorosa. Recordando lo que aprendio en sus lecciones."
+          }
+        },
+        {
+          "id": "ch3_s1_quiz_intro",
+          "beat": "QUIZ_MOMENT",
+          "narration": {
+            "ko": "이건 진짜다. 루디가 처음으로 한국어를 실제 상황에서 사용해야 한다. 안내 직원에게 수진을 찾고 있다고 말해야 한다. 올바른 응답을 선택하라.",
+            "en": "This is real. Rudy must use Korean for the first time in a real situation. Tell the attendant you're looking for Sujin. Choose the correct response.",
+            "es": "Esto es real. Rudy debe usar coreano por primera vez en una situacion real. Dile a la empleada que buscas a Sujin. Elige la respuesta correcta."
+          }
+        },
+        {
+          "id": "ch3_s1_post_quiz",
+          "beat": "REVEAL",
+          "narration": {
+            "ko": "안내 직원이 미소짓는다. 이해했다! 안내 방송을 해준다. 1분 후, 짧은 머리에 안경을 쓴 여자가 루디를 향해 달려온다. 수진이다.",
+            "en": "The attendant smiles. She understood! She makes an announcement. One minute later, a woman with short hair and glasses rushes toward Rudy. It's Sujin.",
+            "es": "La empleada sonrie. Entendio! Hace un anuncio. Un minuto despues, una mujer con pelo corto y gafas corre hacia Rudy. Es Sujin."
+          }
+        },
+        {
+          "id": "ch3_s1_d5",
+          "beat": "REVEAL",
+          "charId": "sujin",
+          "text": {
+            "en": "Rudy! I've been waiting for an hour! Why didn't you call? And... did you just ask for me in Korean? Your pronunciation was terrible. But it worked. That's what matters.",
+            "ko": "루디! 한 시간이나 기다렸어요! 왜 전화 안 했어요? 그리고... 방금 한국어로 저를 찾았어요? 발음은 끔찍했지만. 근데 통했잖아요. 그게 중요한 거예요.",
+            "es": "Rudy! He estado esperando una hora! Por que no llamaste? Y... acabas de preguntar por mi en coreano? Tu pronunciacion fue terrible. Pero funciono. Eso es lo que importa."
+          }
+        },
+        {
+          "id": "ch3_s1_d6",
+          "beat": "REVEAL",
+          "charId": "lingo",
+          "text": {
+            "en": "My phone died. My charger's in Madrid. And yes, I just had my first real Korean conversation. It was three words long and I'm sweating through my shirt. But it worked. Let's never speak of it again.",
+            "ko": "핸드폰이 죽었어. 충전기는 마드리드에 두고 왔고. 그리고 맞아, 방금 첫 실전 한국어 대화를 했어. 세 단어짜리였고 셔츠에 땀이 흠뻑이야. 하지만 통했어. 이 얘기는 다시 하지 말자.",
+            "es": "Mi telefono murio. El cargador esta en Madrid. Y si, acabo de tener mi primera conversacion real en coreano. Fueron tres palabras y estoy empapado en sudor. Pero funciono. No hablemos de esto nunca mas."
+          }
+        },
+        {
+          "id": "ch3_s1_cliffhanger",
+          "beat": "CLIFFHANGER",
+          "charId": "sujin",
+          "text": {
+            "en": "You'll need more than three words, Rudy. The situation here is worse than Carlos described. People in Seoul are forgetting words too. And there's someone you need to meet — a rapper named Minho. He knows things. But he doesn't trust strangers. You'll need to earn it.",
+            "ko": "세 단어로는 안 돼요, 루디. 여기 상황은 카를로스가 말한 것보다 심각해요. 서울 사람들도 단어를 잊고 있어요. 그리고 만나야 할 사람이 있어요 — 민호라는 래퍼. 아는 게 많아요. 근데 낯선 사람은 안 믿어요. 신뢰를 얻어야 해요.",
+            "es": "Necesitaras mas que tres palabras, Rudy. La situacion aqui es peor de lo que Carlos describio. La gente en Seul tambien olvida palabras. Y hay alguien que necesitas conocer — un rapero llamado Minho. Sabe cosas. Pero no confia en desconocidos. Tendras que ganartelo."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "ch3_scene_embarrassment_NEW",
+      "title": {
+        "ko": "루디의 한국어 도전",
+        "en": "Rudy's Korean Challenge",
+        "es": "El Desafio Coreano de Rudy"
+      },
+      "insertAfter": "ch3_scene1",
+      "beats": [
+        {
+          "id": "ch3_emb_opening",
+          "beat": "CALM",
+          "narration": {
+            "ko": "홍대입구역 근처. 수진이 루디를 민호의 아지트로 데려가고 있다. 좁은 골목길에 네온사인이 반짝인다. 수진의 전화가 울린다 — 대학에서 긴급 전화. 5분만 기다려달라고 한다. 루디 혼자. 서울 한복판에서.",
+            "en": "Near Hongdae Station. Sujin is taking Rudy to Minho's hideout. Neon signs flash in narrow alleys. Sujin's phone rings — an emergency call from her university. She says wait five minutes. Rudy alone. In the middle of Seoul.",
+            "es": "Cerca de la estacion Hongdae. Sujin lleva a Rudy al escondite de Minho. Luces de neon brillan en callejones estrechos. Suena el telefono de Sujin — una llamada de emergencia de su universidad. Dice que espere cinco minutos. Rudy solo. En medio de Seul."
+          }
+        },
+        {
+          "id": "ch3_emb_d1",
+          "beat": "CALM",
+          "charId": "lingo",
+          "text": {
+            "en": "Five minutes alone in Hongdae. That's fine. I'm a detective. I've survived London fog, Madrid sun, and a face-to-face chat with a man who wants to erase all languages. I can handle a Seoul alleyway.",
+            "ko": "홍대에서 혼자 5분. 괜찮아. 나는 탐정이야. 런던 안개, 마드리드 태양, 모든 언어를 지우려는 남자와의 대면을 살아남았어. 서울 골목길 정도는 감당할 수 있어.",
+            "es": "Cinco minutos solo en Hongdae. Esta bien. Soy detective. He sobrevivido la niebla de Londres, el sol de Madrid, y una charla cara a cara con un hombre que quiere borrar todos los idiomas. Puedo con un callejon de Seul."
+          }
+        },
+        {
+          "id": "ch3_emb_d2",
+          "beat": "CURIOSITY",
+          "narration": {
+            "ko": "한 젊은이가 다가온다. 후드티에 헤드폰. 루디를 아래위로 훑어본다. 루디는 한국어로 말해보기로 결심한다. 자신감을 가지고. 당당하게.",
+            "en": "A young man approaches. Hoodie and headphones. Looks Rudy up and down. Rudy decides to try Korean. Confidently. Boldly.",
+            "es": "Un joven se acerca. Sudadera con capucha y auriculares. Mira a Rudy de arriba abajo. Rudy decide intentar coreano. Con confianza. Con audacia."
+          }
+        },
+        {
+          "id": "ch3_emb_d3",
+          "beat": "CURIOSITY",
+          "charId": "lingo",
+          "text": {
+            "en": "Annyeonghaseyo! I am... looking for my... chingu. Contact? My contact chingu. Sujin imnida? No wait — Sujin-eul chatgo isseoyo? I'm looking for Sujin?",
+            "ko": "안녕하세요! 저는... 찾고 있는... 친구. 연락처? 제 연락처 친구. 수진입니다? 아니 잠깐 — 수진을 찾고 있어요?",
+            "es": "Annyeonghaseyo! Yo estoy... buscando mi... chingu. Contacto? Mi contacto chingu. Sujin imnida? No espera — Sujin-eul chatgo isseoyo? Busco a Sujin?"
+          }
+        },
+        {
+          "id": "ch3_emb_d4",
+          "beat": "TENSION",
+          "narration": {
+            "ko": "젊은이가 루디를 3초 동안 본다. 그리고 웃는다. 크게. 히죽히죽. 그러나 비웃음이 아니다 — 진심으로 즐거워하는 웃음이다.",
+            "en": "The young man stares at Rudy for three seconds. Then laughs. Loudly. A cackle. But it's not mocking — it's genuinely delighted laughter.",
+            "es": "El joven mira a Rudy por tres segundos. Luego se rie. Fuerte. A carcajadas. Pero no es burla — es risa genuinamente encantada."
+          }
+        },
+        {
+          "id": "ch3_emb_d5",
+          "beat": "TENSION",
+          "charId": "minho",
+          "text": {
+            "en": "Bro. BRO. You just said 'I am the looking for of my friend contact Sujin is it me.' That was the best thing I've heard all week. Your Korean is... brave. I respect that. I'm Minho, by the way. Sujin's friend. She told me a fox detective was coming. Didn't expect the comedy show though.",
+            "ko": "형. 형아. 방금 '저는 찾고 있는 것의 친구 연락처 수진 저입니다'라고 했어요. 이번 주에 들은 것 중 최고였어요. 형 한국어는... 용감해요. 존경해요. 저는 민호, 참고로. 수진 누나 친구. 여우 탐정이 온다고 들었는데. 코미디쇼까지 올 줄은 몰랐어요.",
+            "es": "Tio. TIO. Acabas de decir 'Yo soy el buscando de mi amigo contacto Sujin soy yo.' Fue lo mejor que escuche toda la semana. Tu coreano es... valiente. Lo respeto. Soy Minho, por cierto. Amigo de Sujin. Me dijo que venia un detective zorro. No esperaba el show de comedia."
+          },
+          "idiom": {
+            "phrase": { "en": "Your Korean is brave", "ko": "한국어가 용감해요", "es": "Tu coreano es valiente" },
+            "meaning": { "en": "A kind way of saying 'your Korean is terrible but I admire you for trying.' Common encouragement in Korean learning culture.", "ko": "한국어가 엉망이지만 도전하는 게 멋지다는 친절한 표현.", "es": "Una forma amable de decir 'tu coreano es terrible pero te admiro por intentar.'" },
+            "collection": "Minho_Modern_Korean",
+            "addToExpressionBook": true
+          }
+        },
+        {
+          "id": "ch3_emb_d6",
+          "beat": "TENSION",
+          "charId": "lingo",
+          "text": {
+            "en": "I'm glad my linguistic suffering entertains you. So how do I actually say it? Properly? So that humans can understand me?",
+            "ko": "내 언어적 고통이 즐거운 모양이네. 그래서 실제로 어떻게 말해야 해? 제대로? 사람이 알아듣게?",
+            "es": "Me alegra que mi sufrimiento linguistico te entretenga. Entonces como lo digo realmente? Bien? Para que humanos puedan entenderme?"
+          }
+        },
+        {
+          "id": "ch3_emb_d7",
+          "beat": "QUIZ_MOMENT",
+          "charId": "minho",
+          "text": {
+            "en": "Okay okay. Listen and repeat, yeah? Watch my mouth. '수진을 찾고 있어요.' Su-jin-eul chat-go iss-eo-yo. 'I'm looking for Sujin.' Simple. Clean. No word salad. Try it.",
+            "ko": "알겠어 알겠어. 듣고 따라해봐, 네? 내 입 봐. '수진을 찾고 있어요.' 수-진-을 찾-고 있-어-요. '수진을 찾고 있어요.' 간단하지. 깔끔하고. 단어 샐러드 없이. 해봐.",
+            "es": "Vale vale. Escucha y repite, si? Mira mi boca. 'Su-jin-eul chat-go iss-eo-yo.' 'Busco a Sujin.' Simple. Limpio. Sin ensalada de palabras. Intentalo."
+          }
+        },
+        {
+          "id": "ch3_emb_quiz_intro",
+          "beat": "QUIZ_MOMENT",
+          "narration": {
+            "ko": "민호가 정확한 발음을 알려준다. 루디의 도전: 올바른 한국어 문장을 선택하고 따라 말해라.",
+            "en": "Minho teaches the correct pronunciation. Rudy's challenge: select and repeat the correct Korean phrase.",
+            "es": "Minho ensena la pronunciacion correcta. El desafio de Rudy: selecciona y repite la frase correcta en coreano."
+          }
+        },
+        {
+          "id": "ch3_emb_post_quiz",
+          "beat": "REVEAL",
+          "charId": "minho",
+          "text": {
+            "en": "JMT! Not bad, detective fox. Not bad at all. You'll survive Seoul. Barely. Come on — I've got something to show you. Something about the man in the black coat.",
+            "ko": "JMT! 나쁘지 않아요, 여우 탐정. 전혀 나쁘지 않아. 서울에서 살아남을 수 있을 거야. 간신히. 가자 — 보여줄 게 있어. 검은 코트 입은 남자에 대한 거야.",
+            "es": "JMT! Nada mal, detective zorro. Nada mal. Sobreviviras Seul. Por poco. Ven — tengo algo que mostrarte. Algo sobre el hombre del abrigo negro."
+          },
+          "idiom": {
+            "phrase": { "en": "JMT (존맛탱)", "ko": "JMT (존맛탱)", "es": "JMT (존맛탱)" },
+            "meaning": { "en": "Korean slang: 'Jon-Mat-Taeng' = extremely delicious/awesome. Used like 'chef's kiss' to praise something great.", "ko": "한국 인터넷 슬랭: 존나 맛있다의 줄임말. 뭔가 대단할 때 쓰는 표현.", "es": "Jerga coreana: 'Jon-Mat-Taeng' = extremadamente delicioso/genial. Se usa como 'obra maestra' para elogiar algo." },
+            "collection": "Minho_Modern_Korean",
+            "addToExpressionBook": true
+          }
+        },
+        {
+          "id": "ch3_emb_d8",
+          "beat": "CLIFFHANGER",
+          "charId": "lingo",
+          "isThought": true,
+          "text": {
+            "en": "(That was humiliating. And also... kind of wonderful? I said something in Korean and a human being laughed, corrected me, and taught me the right way. That's how language works. Not from textbooks. From embarrassment and trying again. Don Miguel would approve. Now — what does Minho know about Mr. Black?)",
+            "ko": "(창피했어. 그리고 동시에... 좀 멋졌어? 한국어로 뭔가 말했더니 사람이 웃고, 고쳐주고, 올바른 방법을 알려줬어. 언어가 그렇게 작동하는 거야. 교과서에서가 아니라. 창피함과 다시 시도하기에서. 돈 미겔이 좋아할 거야. 자 — 민호는 미스터 블랙에 대해 뭘 알고 있지?)",
+            "es": "(Fue humillante. Y tambien... algo maravilloso? Dije algo en coreano y un ser humano se rio, me corrigio, y me enseno la forma correcta. Asi funciona el idioma. No de libros. De la verguenza y volver a intentar. Don Miguel aprobaria. Ahora — que sabe Minho sobre Mr. Black?)"
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "ch3_minho_password_IMPROVED",
+      "title": {
+        "ko": "민호의 비밀번호 — 개선판",
+        "en": "Minho's Password — Improved",
+        "es": "La Contrasena de Minho — Mejorada"
+      },
+      "replaces": "ch3_quiz_d password scene",
+      "beats": [
+        {
+          "id": "ch3_pw_intro",
+          "beat": "TENSION",
+          "charId": "minho",
+          "text": {
+            "en": "The Lexicon hideout is in Bukchon. But the door has a voice-activated lock. You need to say a password. Here's the thing — the password CHANGES based on what language you speak. English speakers hear one password. Spanish speakers hear another. Korean speakers hear a third. Each password means the same thing in a different language. That's the point. Mr. Black built it to prove that languages are just... walls.",
+            "ko": "렉시콘 아지트가 북촌에 있어. 근데 문에 음성 인식 잠금이 걸려있어. 비밀번호를 말해야 해. 문제는 — 비밀번호가 사용하는 언어에 따라 바뀌어. 영어 사용자는 다른 비밀번호를 듣고. 스페인어 사용자는 또 다른 걸 듣고. 한국어 사용자는 세 번째를 들어. 각 비밀번호는 같은 뜻이야. 다른 언어로. 그게 핵심이야. 미스터 블랙이 언어는 그냥... 벽이라는 걸 증명하려고 만든 거야.",
+            "es": "El escondite de Lexicon esta en Bukchon. Pero la puerta tiene un candado activado por voz. Necesitas decir una contrasena. El tema es — la contrasena CAMBIA segun el idioma que hablas. Los hablantes de ingles escuchan una. Los de espanol otra. Los de coreano una tercera. Cada contrasena significa lo mismo en un idioma diferente. Esa es la cuestion. Mr. Black lo construyo para probar que los idiomas son solo... muros."
+          }
+        },
+        {
+          "id": "ch3_pw_d1",
+          "beat": "TENSION",
+          "charId": "lingo",
+          "text": {
+            "en": "Walls he wants to tear down. Except he's wrong — they're not walls. They're windows. Different views of the same world. What's the password?",
+            "ko": "그가 허물고 싶어하는 벽. 근데 틀렸어 — 그건 벽이 아니야. 창문이야. 같은 세상을 다른 시각으로 보는. 비밀번호가 뭔데?",
+            "es": "Muros que quiere derribar. Excepto que se equivoca — no son muros. Son ventanas. Diferentes vistas del mismo mundo. Cual es la contrasena?"
+          }
+        },
+        {
+          "id": "ch3_pw_d2",
+          "beat": "QUIZ_MOMENT",
+          "charId": "minho",
+          "text": {
+            "en": "Listen to my clues. Each clue gives you one letter. Four letters, one word. But — and this is the second layer — once you get the word, you need to say it in ALL THREE languages to open the final lock. Because Mr. Black made one mistake: he built a door that proves languages are CONNECTED, not divided. Ready?",
+            "ko": "내 힌트를 들어. 각 힌트가 글자 하나를 알려줘. 네 글자, 한 단어. 근데 — 이게 두 번째 층인데 — 단어를 알아내면, 최종 잠금을 열려면 세 개 언어 모두로 말해야 해. 미스터 블랙이 실수한 게 하나 있어: 언어가 나뉜 게 아니라 연결되어 있다는 걸 증명하는 문을 만들었거든. 준비됐어?",
+            "es": "Escucha mis pistas. Cada pista te da una letra. Cuatro letras, una palabra. Pero — y esta es la segunda capa — una vez que tengas la palabra, necesitas decirla en LOS TRES idiomas para abrir la cerradura final. Porque Mr. Black cometio un error: construyo una puerta que prueba que los idiomas estan CONECTADOS, no divididos. Listo?"
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "ch3_cliffhanger_NEW",
+      "title": {
+        "ko": "남산타워의 그림자",
+        "en": "Shadow at Namsan Tower",
+        "es": "Sombra en la Torre Namsan"
+      },
+      "replaces": "ch3 final scene / cliffhanger",
+      "beats": [
+        {
+          "id": "ch3_cliff_opening",
+          "beat": "CALM",
+          "narration": {
+            "ko": "남산타워. 서울의 야경이 보석처럼 빛난다. 루디, 수진, 민호가 서울 수호석을 가지고 전망대에 서 있다. 드디어. 한 개를 되찾았다. 루디는 처음으로 미소짓는다 — 진심으로.",
+            "en": "Namsan Tower. Seoul's night skyline glitters like jewels. Rudy, Sujin, and Minho stand on the observation deck with Seoul's Guardian Stone. Finally. They recovered one. Rudy smiles for the first time — genuinely.",
+            "es": "Torre Namsan. El horizonte nocturno de Seul brilla como joyas. Rudy, Sujin y Minho estan en la plataforma de observacion con la Piedra Guardian de Seul. Por fin. Recuperaron una. Rudy sonrie por primera vez — genuinamente."
+          }
+        },
+        {
+          "id": "ch3_cliff_d1",
+          "beat": "CALM",
+          "charId": "lingo",
+          "text": {
+            "en": "We did it. We actually did it. One stone recovered. That's one more than Madrid. Progress.",
+            "ko": "해냈어. 진짜 해냈어. 수호석 하나 되찾았어. 마드리드보다 하나 많아. 진전이야.",
+            "es": "Lo logramos. Realmente lo logramos. Una piedra recuperada. Eso es una mas que en Madrid. Progreso."
+          }
+        },
+        {
+          "id": "ch3_cliff_d2",
+          "beat": "CURIOSITY",
+          "charId": "minho",
+          "text": {
+            "en": "Uh, detective? There's someone behind you. Don't turn around fast. Just... look at the reflection in the glass.",
+            "ko": "어, 탐정? 뒤에 사람 있어. 빨리 돌아보지 마. 그냥... 유리에 비친 거 봐.",
+            "es": "Eh, detective? Hay alguien detras de ti. No te gires rapido. Solo... mira el reflejo en el vidrio."
+          }
+        },
+        {
+          "id": "ch3_cliff_d3",
+          "beat": "TENSION",
+          "narration": {
+            "ko": "루디가 유리창을 본다. 반사 속에 익숙한 실루엣. 키가 크다. 은발. 검은 코트. 미스터 블랙이 전망대 반대편에 서 있다. 미소짓고 있다.",
+            "en": "Rudy looks at the glass. A familiar silhouette in the reflection. Tall. Silver hair. Black coat. Mr. Black stands on the opposite side of the deck. Smiling.",
+            "es": "Rudy mira el vidrio. Una silueta familiar en el reflejo. Alto. Pelo plateado. Abrigo negro. Mr. Black esta en el lado opuesto de la plataforma. Sonriendo."
+          }
+        },
+        {
+          "id": "ch3_cliff_d4",
+          "beat": "TENSION",
+          "charId": "mr_black",
+          "text": {
+            "en": "Good evening, detective. The stone, please. Thank you.",
+            "ko": "안녕하세요, 탐정. 수호석을 주세요. 감사합니다.",
+            "es": "Buenas noches, detective. La piedra, por favor. Gracias."
+          },
+          "designNote": "Day 1-6: Good evening, please, thank you. Three words. A polite robbery."
+        },
+        {
+          "id": "ch3_cliff_d5",
+          "beat": "TENSION",
+          "narration": {
+            "ko": "미스터 블랙이 손을 뻗는다. 루디가 반응하기도 전에, 수호석이 루디의 손에서 미끄러진다. 마치 자력에 끌린 것처럼 미스터 블랙의 손으로 날아간다. 마법인지 장치인지 모른다. 하지만 수호석이 사라졌다.",
+            "en": "Mr. Black extends his hand. Before Rudy can react, the stone slides from Rudy's grasp. As if pulled by magnetism, it flies to Mr. Black's palm. Magic or device, Rudy doesn't know. But the stone is gone.",
+            "es": "Mr. Black extiende su mano. Antes de que Rudy pueda reaccionar, la piedra se desliza de sus manos. Como atraida por magnetismo, vuela a la palma de Mr. Black. Magia o dispositivo, Rudy no sabe. Pero la piedra se fue."
+          }
+        },
+        {
+          "id": "ch3_cliff_d6",
+          "beat": "REVEAL",
+          "narration": {
+            "ko": "미스터 블랙이 수호석을 주머니에 넣고 돌아선다. 벤치 위에 종이 한 장을 남긴다. 한국어로 적혀 있다. 한국어로만.",
+            "en": "Mr. Black pockets the stone and turns to leave. He places a single paper on the bench. Written in Korean. Only Korean.",
+            "es": "Mr. Black guarda la piedra y se da la vuelta para irse. Deja un papel en el banco. Escrito en coreano. Solo coreano."
+          }
+        },
+        {
+          "id": "ch3_cliff_d7",
+          "beat": "REVEAL",
+          "charId": "lingo",
+          "narration": {
+            "ko": "루디가 종이를 집어든다. 한국어. 몇 주 전이었으면 읽을 수 없었을 것이다. 하지만 지금은 —",
+            "en": "Rudy picks up the paper. Korean. A few weeks ago he couldn't have read it. But now —",
+            "es": "Rudy toma el papel. Coreano. Hace unas semanas no habria podido leerlo. Pero ahora —"
+          }
+        },
+        {
+          "id": "ch3_cliff_note",
+          "beat": "REVEAL",
+          "charId": "mr_black",
+          "isNote": true,
+          "text": {
+            "ko": "잘했어요. 다음은 카이로예요. 안녕히 계세요, 서울.",
+            "en": "잘했어요. 다음은 카이로예요. 안녕히 계세요, 서울.",
+            "es": "잘했어요. 다음은 카이로예요. 안녕히 계세요, 서울."
+          },
+          "designNote": "The note is in Korean ONLY across all language versions. The user must understand Korean text. This is the payoff moment."
+        },
+        {
+          "id": "ch3_cliff_d8",
+          "beat": "REVEAL",
+          "charId": "lingo",
+          "text": {
+            "en": "'잘했어요.' That means... 'good job.' He said 'good job' in Korean. '다음은 카이로예요.' 'Next is Cairo.' '안녕히 계세요, 서울.' 'Goodbye, Seoul.' I... I read that. I just read Korean. On my own.",
+            "ko": "'잘했어요.' '잘했어요'... 한국어로 '잘했어요'라고 했어. '다음은 카이로예요.' '다음은 카이로.' '안녕히 계세요, 서울.' '서울아 안녕.' 나... 읽었어. 방금 한국어를 읽었어. 혼자서.",
+            "es": "'잘했어요.' Eso significa... 'buen trabajo.' Dijo 'buen trabajo' en coreano. '다음은 카이로예요.' 'El siguiente es El Cairo.' '안녕히 계세요, 서울.' 'Adios, Seul.' Yo... lo lei. Acabo de leer coreano. Solo."
+          }
+        },
+        {
+          "id": "ch3_cliff_d9",
+          "beat": "CLIFFHANGER",
+          "charId": "lingo",
+          "isThought": true,
+          "text": {
+            "en": "(I can read it. After all these weeks, after all these lessons, I can actually READ the target language. Enough to understand a villain's note at midnight on a tower in Seoul. That should feel like victory. But he took the stone. He took the stone while complimenting me. 'Good job.' I hate that I understood that. I hate that it felt good to understand it. And I hate that he's right — I AM getting better. But not fast enough. Cairo. He said Cairo. Let's go.)",
+            "ko": "(읽을 수 있어. 이 몇 주 동안, 이 모든 수업 후에, 실제로 학습 언어를 읽을 수 있어. 한밤중 서울의 타워에서 악당의 쪽지를 이해할 만큼. 승리감이 느껴져야 하는데. 하지만 그는 수호석을 가져갔어. 나를 칭찬하면서 가져갔어. '잘했어요.' 그걸 이해한 게 싫어. 이해해서 기분이 좋았던 게 싫어. 그리고 그가 맞다는 게 싫어 — 나는 정말 나아지고 있어. 하지만 충분히 빠르지 않아. 카이로. 카이로라고 했어. 가자.)",
+            "es": "(Puedo leerlo. Despues de todas estas semanas, todas estas lecciones, realmente puedo LEER el idioma objetivo. Suficiente para entender la nota de un villano a medianoche en una torre en Seul. Deberia sentirse como victoria. Pero se llevo la piedra. Se la llevo mientras me felicitaba. 'Buen trabajo.' Odio haber entendido eso. Odio que se sintio bien entenderlo. Y odio que tenga razon — ESTOY mejorando. Pero no lo suficientemente rapido. El Cairo. Dijo El Cairo. Vamos.)"
+          }
+        },
+        {
+          "id": "ch3_cliff_end",
+          "beat": "CLIFFHANGER",
+          "narration": {
+            "ko": "[다음 챕터: 카이로의 유산 — 아미라가 기다린다]",
+            "en": "[Next Chapter: The Cairo Legacy — Amira awaits]",
+            "es": "[Siguiente Capitulo: El Legado de El Cairo — Amira espera]"
+          }
+        }
+      ]
+    }
+  ],
+
+  "quizzes": [
+    {
+      "id": "ch3_quiz_new_arrival",
+      "scene": "ch3_scene1_NEW",
+      "type": "dialogue_choice",
+      "title": { "ko": "공항에서 살아남기", "en": "Surviving the Airport", "es": "Sobreviviendo el Aeropuerto" },
+      "storyContext": {
+        "ko": "핸드폰이 죽었다. 수진을 찾으려면 공항 안내 직원에게 한국어로 말해야 한다.",
+        "en": "Your phone is dead. To find Sujin, you must speak Korean to the airport attendant.",
+        "es": "Tu telefono murio. Para encontrar a Sujin, debes hablar coreano con la empleada del aeropuerto."
+      },
+      "consequence": {
+        "ko": "안내 직원이 이해하고 수진을 찾아준다. 한국어가 통했다!",
+        "en": "The attendant understands and finds Sujin. Your Korean worked!",
+        "es": "La empleada entiende y encuentra a Sujin. Tu coreano funciono!"
+      },
+      "vocabularyUsed": "Day 1-6: Hello, please, help, my name is, where is",
+      "questions": [
+        {
+          "npcLine": { "en": "(in Korean) Can I help you?", "ko": "도와드릴까요?", "es": "(en coreano) Puedo ayudarle?" },
+          "correct": { "en": "Hello. My name is Rudy. Please help. Where is Sujin?", "ko": "안녕하세요. 제 이름은 루디예요. 도와주세요. 수진이 어디에 있어요?", "es": "Hola. Mi nombre es Rudy. Ayuda, por favor. Donde esta Sujin?" },
+          "wrong": [
+            { "en": "Goodbye! Thank you very much!", "ko": "안녕히 계세요! 감사합니다!", "es": "Adios! Muchas gracias!" },
+            { "en": "How much is the coffee?", "ko": "커피 얼마예요?", "es": "Cuanto cuesta el cafe?" },
+            { "en": "I'm sorry. I don't understand.", "ko": "죄송합니다. 이해 못 해요.", "es": "Lo siento. No entiendo." }
+          ],
+          "vocabSource": "Day 1-6"
+        }
+      ],
+      "difficulty": 1,
+      "rewards": { "xp": 80 }
+    },
+    {
+      "id": "ch3_quiz_embarrassment",
+      "scene": "ch3_scene_embarrassment_NEW",
+      "type": "pronunciation",
+      "title": { "ko": "민호의 한국어 수업", "en": "Minho's Korean Lesson", "es": "La Leccion de Coreano de Minho" },
+      "storyContext": {
+        "ko": "민호가 올바른 한국어 표현을 알려준다. 올바른 문장을 선택하고 따라 말해라.",
+        "en": "Minho teaches you the correct Korean phrase. Select the right sentence and repeat it.",
+        "es": "Minho te ensena la frase correcta en coreano. Selecciona la oracion correcta y repitela."
+      },
+      "consequence": {
+        "ko": "민호가 인정한다. 루디의 한국어가 통했다 — 이번에는 제대로.",
+        "en": "Minho approves. Rudy's Korean worked — correctly this time.",
+        "es": "Minho aprueba. El coreano de Rudy funciono — correctamente esta vez."
+      },
+      "vocabularyUsed": "Day 1-6: I am looking for + name",
+      "questions": [
+        {
+          "instruction": { "en": "Which is correct? 'I'm looking for Sujin.'", "ko": "어떤 게 맞아? '수진을 찾고 있어요.'", "es": "Cual es correcta? 'Busco a Sujin.'" },
+          "correct": { "en": "수진을 찾고 있어요", "ko": "수진을 찾고 있어요", "es": "수진을 찾고 있어요" },
+          "wrong": [
+            { "en": "수진 이름은 찾고 저는", "ko": "수진 이름은 찾고 저는", "es": "수진 이름은 찾고 저는" },
+            { "en": "저는 수진 있어요 찾고", "ko": "저는 수진 있어요 찾고", "es": "저는 수진 있어요 찾고" },
+            { "en": "찾고 수진을 저는 있어요", "ko": "찾고 수진을 저는 있어요", "es": "찾고 수진을 저는 있어요" }
+          ],
+          "vocabSource": "Day 1-6 KO"
+        }
+      ],
+      "difficulty": 2,
+      "rewards": { "xp": 100, "npcRelation": { "minho": 2 } }
+    },
+    {
+      "id": "ch3_quiz_password_IMPROVED",
+      "scene": "ch3_minho_password_IMPROVED",
+      "type": "listening",
+      "title": { "ko": "다국어 비밀번호", "en": "The Multilingual Password", "es": "La Contrasena Multilingue" },
+      "storyContext": {
+        "ko": "렉시콘 아지트의 음성 인식 잠금. 비밀번호는 언어마다 다르지만 같은 뜻이다. 힌트를 듣고 단어를 맞춘 후, 세 개 언어로 말해야 한다.",
+        "en": "Voice-activated lock at the Lexicon hideout. The password changes per language but means the same thing. Listen to clues, find the word, then say it in all three languages.",
+        "es": "Cerradura por voz del escondite de Lexicon. La contrasena cambia por idioma pero significa lo mismo. Escucha las pistas, encuentra la palabra, luego dila en tres idiomas."
+      },
+      "consequence": {
+        "ko": "문이 열린다. 미스터 블랙이 실수로 언어가 연결되어 있다는 것을 증명하는 잠금장치를 만들었다.",
+        "en": "The door opens. Mr. Black accidentally built a lock that proves languages are connected.",
+        "es": "La puerta se abre. Mr. Black accidentalmente construyo una cerradura que prueba que los idiomas estan conectados."
+      },
+      "vocabularyUsed": "Day 1-12 + cultural",
+      "stages": [
+        {
+          "stageNum": 1,
+          "stageType": "listening_letters",
+          "label": { "en": "STAGE 1: Find the English word", "ko": "단계 1: 영어 단어 찾기", "es": "ETAPA 1: Encuentra la palabra en ingles" },
+          "clues": [
+            { "clue": { "en": "First letter: beginning of 'light'", "ko": "첫 글자: 'light'의 시작", "es": "Primera letra: inicio de 'light'" }, "answer": "L" },
+            { "clue": { "en": "Second letter: middle of 'time'", "ko": "둘째 글자: 'time'의 가운데", "es": "Segunda letra: centro de 'time'" }, "answer": "I" },
+            { "clue": { "en": "Third letter: end of 'leaf'", "ko": "셋째 글자: 'leaf'의 끝", "es": "Tercera letra: final de 'leaf'" }, "answer": "F" },
+            { "clue": { "en": "Fourth letter: end of 'hope'", "ko": "넷째 글자: 'hope'의 끝", "es": "Cuarta letra: final de 'hope'" }, "answer": "E" }
+          ],
+          "word": "LIFE"
+        },
+        {
+          "stageNum": 2,
+          "stageType": "multilingual_match",
+          "label": { "en": "STAGE 2: Say it in all three languages", "ko": "단계 2: 세 개 언어로 말하기", "es": "ETAPA 2: Dilo en tres idiomas" },
+          "prompt": { "en": "The word is LIFE. Now match it in Spanish and Korean:", "ko": "단어는 LIFE야. 스페인어와 한국어로 매칭해:", "es": "La palabra es LIFE. Ahora emparejala en espanol y coreano:" },
+          "matches": [
+            { "language": "EN", "word": "LIFE", "alreadyGiven": true },
+            {
+              "language": "ES",
+              "correct": "VIDA",
+              "wrong": ["LUNA", "ROJO", "MESA"]
+            },
+            {
+              "language": "KO",
+              "correct": "생명",
+              "wrong": ["빛", "시간", "나무"]
+            }
+          ],
+          "designNote": "The second layer: knowing the word isn't enough. You must know it across languages. This proves Mr. Black's own door wrong — languages aren't walls, they're bridges to the same meaning."
+        }
+      ],
+      "difficulty": 3,
+      "rewards": { "xp": 200, "expressionUnlock": "multilingual_life" }
+    }
+  ]
+}

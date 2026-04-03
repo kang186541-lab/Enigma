@@ -61,21 +61,21 @@ const UI: Record<NativeLanguage, {
     step1Sub:   "더 나은 학습 경험을 위해 모국어를 알려주세요",
     step2Title: "어떤 언어를 배우고 싶으세요?",
     step2Sub:   "학습할 언어를 선택하세요",
-    cta1: "다음", cta2: "시작하기 🚀", back: "뒤로",
+    cta1: "다음", cta2: "다음", back: "뒤로",
   },
   english: {
     step1Title: "What's your native language?",
     step1Sub:   "Choose the language you speak at home",
     step2Title: "What do you want to learn?",
     step2Sub:   "Pick the language you'd like to master",
-    cta1: "Next", cta2: "Let's go 🚀", back: "Back",
+    cta1: "Next", cta2: "Next", back: "Back",
   },
   spanish: {
-    step1Title: "¿Cuál es tu idioma nativo?",
+    step1Title: "¿Cual es tu idioma nativo?",
     step1Sub:   "Elige el idioma que hablas en casa",
-    step2Title: "¿Qué idioma quieres aprender?",
+    step2Title: "¿Que idioma quieres aprender?",
     step2Sub:   "Selecciona el idioma que quieres dominar",
-    cta1: "Siguiente", cta2: "¡Vamos! 🚀", back: "Atrás",
+    cta1: "Siguiente", cta2: "Siguiente", back: "Atras",
   },
 };
 

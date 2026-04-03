@@ -118,7 +118,7 @@ export function checkAnswer(
 ): AnswerResult {
   const { acceptableAnswers = [], learningLang = "english" } = options ?? {};
 
-  const norm = (s: string) => s.trim().toLowerCase();
+  const norm = (s: string) => s.trim().toLowerCase().replace(/[.,!?;:'"]/g, "");
   const userNorm = norm(userInput);
   const correctNorm = norm(correctAnswer);
 

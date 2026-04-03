@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, Pressable, Animated, Platform, ActivityIndicator,
 } from "react-native";
 import { Audio } from "expo-av";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
@@ -15,6 +15,7 @@ import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/l
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type QPhase = "ready" | "recording" | "assessing" | "revealed" | "done";
+type WordScore = { word: string; score: number; errorType: string; phonemes?: { phoneme: string; score: number }[] };
 
 interface Props {
   questions: ReviewQuestion[];
@@ -75,6 +76,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   const [pronScore, setPronScore]     = useState<number | null>(null);
   const [allScores, setAllScores]     = useState<number[]>([]);
   const [stars, setStars]             = useState(0);
+  const [wordScores, setWordScores]   = useState<WordScore[]>([]);
   const [timerRunning, setTimerRunning] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
   const [canSkipScoring, setCanSkipScoring] = useState(false);
@@ -204,13 +206,18 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         const objUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
         registerGlobalWebAudio(audio);
-        audio.play().catch(() => {});
+        audio.onended = () => URL.revokeObjectURL(objUrl);
+        audio.onerror = () => URL.revokeObjectURL(objUrl);
+        await audio.play().catch(() => {});
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
         registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
-          if (st.isLoaded && st.didJustFinish) soundRef.current = null;
+          if (st.isLoaded && st.didJustFinish) {
+            sound.unloadAsync().catch(() => {});
+            soundRef.current = null;
+          }
         });
       }
     } catch {}
@@ -240,7 +247,22 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
           playsInSilentModeIOS: true,
         });
         const rec = new Audio.Recording();
-        await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+        const recOptions: Audio.RecordingOptions = Platform.OS === "ios" ? {
+          android: Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+          ios: {
+            extension: ".wav",
+            outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+            audioQuality: Audio.IOSAudioQuality.HIGH,
+            sampleRate: 16000,
+            numberOfChannels: 1,
+            bitRate: 256000,
+            linearPCMBitDepth: 16,
+            linearPCMIsBigEndian: false,
+            linearPCMIsFloat: false,
+          },
+          web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
+        } : Audio.RecordingOptionsPresets.HIGH_QUALITY;
+        await rec.prepareToRecordAsync(recOptions);
         await rec.startAsync();
         nativeRecRef.current = rec;
         autoStopRef.current = setTimeout(() => stopRecordAndAssess(q), 7000);
@@ -289,8 +311,9 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         nativeRecRef.current = null;
         await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
         if (!uri) throw new Error("no uri");
-        const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
-        await assessPronunciation(base64, "audio/m4a", currentQ);
+        const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+        const nativeMime = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
+        await assessPronunciation(base64, nativeMime, currentQ);
       } catch {
         fallbackReveal();
       }
@@ -348,7 +371,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word, lang, audio: base64, mimeType: "audio/m4a" }),
+          body: JSON.stringify({ word, lang, audio: base64, mimeType }),
           signal: abortCtrl.signal,
         });
         clearTimeout(timeoutId);
@@ -367,6 +390,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
 
       const score: number = data.pronunciationScore ?? data.score ?? 0;
       setPronScore(score);
+      setWordScores(data.words ?? []);
       setAllScores((prev) => [...prev, score]);
       setStars(score >= 90 ? 3 : score >= 75 ? 2 : score > 0 ? 1 : 0);
     } catch {
@@ -396,7 +420,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     if (qPhase !== "ready") return;
     setTimerRunning(false);
     setSelected(option);
-    const correct = option === q.answer;
+    const correct = option.trim().toLowerCase() === (q.answer ?? "").trim().toLowerCase();
     setPronScore(correct ? 100 : 50);
     setAllScores((prev) => [...prev, correct ? 100 : 50]);
     setStars(correct ? 3 : 1);
@@ -429,6 +453,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     setPronScore(null);
     setSelected(null);
     setStars(0);
+    setWordScores([]);
     setQPhase("ready");
     setTimerRunning(false);
   }
@@ -520,8 +545,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
             <View style={s.optionsRow}>
               {(q.options ?? []).map((opt, i) => {
                 const isSelected = selectedOption === opt;
-                const isCorrect  = qPhase === "revealed" && opt === q.answer;
-                const isWrong    = qPhase === "revealed" && isSelected && opt !== q.answer;
+                const isCorrect  = qPhase === "revealed" && opt.trim().toLowerCase() === (q.answer ?? "").trim().toLowerCase();
+                const isWrong    = qPhase === "revealed" && isSelected && opt.trim().toLowerCase() !== (q.answer ?? "").trim().toLowerCase();
                 return (
                   <Pressable
                     key={i}
@@ -564,13 +589,24 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       {qPhase === "revealed" && pronScore !== null && isSpeakQ && (
         <View style={s.resultCard}>
           <Text style={s.resultStars}>{"⭐".repeat(stars).padEnd(3, "☆")}</Text>
-          <Text style={s.resultScore}>{pronScore}점</Text>
+          <Text style={s.resultScore}>{pronScore}{nativeLang === "korean" ? "점" : "pts"}</Text>
           <View style={s.resultSentence}>
             <Text style={s.resultSentenceText}>{sentence}</Text>
             <Pressable onPress={() => playTTS(sentence, speechLang)}>
               <Ionicons name="volume-medium" size={14} color={C.gold} />
             </Pressable>
           </View>
+          {wordScores.length > 0 && (
+            <View style={s.wordBreakdown}>
+              {wordScores.map((w, i) => (
+                <Pressable key={i} style={s.wordRow} onPress={() => playTTS(w.word, speechLang)}>
+                  <Text style={s.wordIcon}>{w.score >= 75 ? "✅" : "⚠️"}</Text>
+                  <Text style={[s.wordText, w.score < 75 && s.wordTextWeak]}>{w.word}</Text>
+                  <Text style={[s.wordScoreText, w.score < 75 && s.wordScoreWeak]}>{w.score}%</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
         </View>
       )}
 
@@ -670,6 +706,14 @@ const s = StyleSheet.create({
   resultScore:        { fontSize: 28, fontFamily: F.title, color: C.gold },
   resultSentence:     { flexDirection: "row", alignItems: "center", gap: 8 },
   resultSentenceText: { fontSize: 14, fontFamily: F.body, color: C.parchment },
+
+  wordBreakdown: { width: "100%", gap: 3, marginTop: 6 },
+  wordRow: { flexDirection: "row", alignItems: "center", gap: 6, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6, backgroundColor: "rgba(201,162,39,0.06)" },
+  wordIcon: { fontSize: 12, width: 20 },
+  wordText: { fontSize: 13, fontFamily: F.bodySemi, color: C.parchment, flex: 1 },
+  wordTextWeak: { color: "#e5a940" },
+  wordScoreText: { fontSize: 12, fontFamily: F.label, color: C.goldDim, minWidth: 34, textAlign: "right" },
+  wordScoreWeak: { color: "#e5a940", fontFamily: F.bodySemi },
 
   micBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,

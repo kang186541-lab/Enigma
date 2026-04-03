@@ -17,7 +17,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { useLanguage, getDefaultLearning, NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
@@ -528,7 +528,7 @@ async function preloadPronunciationTTS(text: string, lang: string, apiBase: stri
     try {
       const { sound } = await Audio.Sound.createAsync(
         { uri: urlStr },
-        { shouldPlay: false }
+        { shouldPlay: false, volume: 1.0 }
       );
       _pronNativeCache.set(key, sound);
     } catch {}
@@ -576,6 +576,8 @@ async function playPronunciationTTS(text: string, lang: string, apiBase: string)
         await _nativePronSound.unloadAsync().catch(() => {});
         _nativePronSound = null;
       }
+      // Ensure audio mode is set for playback (recording may have left allowsRecordingIOS: true)
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
       const cached = _pronNativeCache.get(key);
       if (cached) {
         // Seek to start and replay the preloaded sound
@@ -587,7 +589,7 @@ async function playPronunciationTTS(text: string, lang: string, apiBase: string)
         });
       } else {
         // Fallback: create on demand
-        const { sound } = await Audio.Sound.createAsync({ uri: urlStr }, { shouldPlay: true });
+        const { sound } = await Audio.Sound.createAsync({ uri: urlStr }, { shouldPlay: true, volume: 1.0 });
         _pronNativeCache.set(key, sound);
         _nativePronSound = sound;
         sound.setOnPlaybackStatusUpdate((status) => {
@@ -878,13 +880,30 @@ export default function SpeakScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await rec.stopAndUnloadAsync();
+      // 300ms delay — ensure file is fully flushed to disk before reading
+      await new Promise((r) => setTimeout(r, 300));
       const uri = rec.getURI();
       nativeRecordingRef.current = null;
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: false,
+        playThroughEarpieceAndroid: false,
+        staysActiveInBackground: false,
+      });
       if (!uri) throw new Error("No audio URI");
       const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: "base64" as any,
+        encoding: FileSystem.EncodingType.Base64,
       });
+      // Empty audio guard — show 0% instead of sending to Azure
+      if (!base64 || base64.length < 2000) {
+        setScore(0);
+        setSttError("음성이 감지되지 않았어요. 다시 시도해 주세요.");
+        setRecordState("done");
+        recordStateRef.current = "done";
+        return;
+      }
+      const nativeMime = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
       const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
       const apiRes = await fetch(apiUrl, {
         method: "POST",
@@ -893,7 +912,7 @@ export default function SpeakScreen() {
           word: phrase?.word ?? "",
           lang: phrase?.speechLang ?? "en-US",
           audio: base64,
-          mimeType: "audio/m4a",
+          mimeType: nativeMime,
         }),
       });
       if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
@@ -917,6 +936,8 @@ export default function SpeakScreen() {
         setLevelUpShow(true);
       }
     } catch {
+      // Always restore audio mode so NPC/tutor sounds work after a failed recording
+      Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch(() => {});
       setSttError("채점 중 오류가 발생했습니다. 다시 시도해 주세요.");
     } finally {
       setRecordState("done");
@@ -953,7 +974,23 @@ export default function SpeakScreen() {
           }
           await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
           const recording = new Audio.Recording();
-          await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+          // iOS: record as 16kHz WAV (LINEARPCM) — Azure accepts directly, no ffmpeg needed
+          const recOptions: Audio.RecordingOptions = Platform.OS === "ios" ? {
+            android: Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+            ios: {
+              extension: ".wav",
+              outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+              audioQuality: Audio.IOSAudioQuality.HIGH,
+              sampleRate: 16000,
+              numberOfChannels: 1,
+              bitRate: 256000,
+              linearPCMBitDepth: 16,
+              linearPCMIsBigEndian: false,
+              linearPCMIsFloat: false,
+            },
+            web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
+          } : Audio.RecordingOptionsPresets.HIGH_QUALITY;
+          await recording.prepareToRecordAsync(recOptions);
           await recording.startAsync();
           nativeRecordingRef.current = recording;
           setRecordState("listening");
@@ -969,6 +1006,8 @@ export default function SpeakScreen() {
           startPulse();
           autoStopTimerRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
         } catch {
+          // Restore audio mode so other sounds (NPC, tutor) can play again
+          Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch(() => {});
           setSttError("마이크를 시작할 수 없습니다. 다시 시도해 주세요.");
           setRecordState("done");
           recordStateRef.current = "done";
@@ -1019,6 +1058,14 @@ export default function SpeakScreen() {
           reader.readAsDataURL(blob);
         });
 
+        // Empty audio guard — show 0% instead of sending to Azure
+        if (!base64 || base64.length < 2000) {
+          setScore(0);
+          setSttError("음성이 감지되지 않았어요. 다시 시도해 주세요.");
+          setRecordState("done");
+          recordStateRef.current = "done";
+          return;
+        }
         try {
           const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
           const apiRes = await fetch(apiUrl, {
