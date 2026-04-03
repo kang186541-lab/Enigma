@@ -895,7 +895,7 @@ export default function SpeakScreen() {
       // Empty audio guard — show 0% instead of sending to Azure
       if (!base64 || base64.length < 2000) {
         setScore(0);
-        setSttError("음성이 감지되지 않았어요. 다시 시도해 주세요.");
+        setSttError(nativeLang === "korean" ? "음성이 감지되지 않았어요. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se detectó voz. Inténtalo de nuevo." : "No voice detected. Please try again.");
         setRecordState("done");
         recordStateRef.current = "done";
         return;
@@ -935,7 +935,7 @@ export default function SpeakScreen() {
     } catch {
       // Always restore audio mode so NPC/tutor sounds work after a failed recording
       Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch(() => {});
-      setSttError("채점 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
     } finally {
       setRecordState("done");
       recordStateRef.current = "done";
@@ -1005,7 +1005,7 @@ export default function SpeakScreen() {
         } catch {
           // Restore audio mode so other sounds (NPC, tutor) can play again
           Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch(() => {});
-          setSttError("마이크를 시작할 수 없습니다. 다시 시도해 주세요.");
+          setSttError(nativeLang === "korean" ? "마이크를 시작할 수 없습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se pudo iniciar el micrófono." : "Could not start microphone. Please try again.");
           setRecordState("done");
           recordStateRef.current = "done";
         }
@@ -1014,7 +1014,7 @@ export default function SpeakScreen() {
     }
 
     if (!navigator?.mediaDevices?.getUserMedia) {
-      setSttError("이 브라우저는 마이크 녹음을 지원하지 않습니다.\nChrome을 사용해 주세요.");
+      setSttError(nativeLang === "korean" ? "이 브라우저는 마이크 녹음을 지원하지 않습니다.\nChrome을 사용해 주세요." : nativeLang === "spanish" ? "Este navegador no soporta grabación.\nUsa Chrome." : "This browser doesn't support recording.\nPlease use Chrome.");
       setRecordState("done");
       recordStateRef.current = "done";
       return;
@@ -1058,7 +1058,7 @@ export default function SpeakScreen() {
         // Empty audio guard — show 0% instead of sending to Azure
         if (!base64 || base64.length < 2000) {
           setScore(0);
-          setSttError("음성이 감지되지 않았어요. 다시 시도해 주세요.");
+          setSttError(nativeLang === "korean" ? "음성이 감지되지 않았어요. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se detectó voz. Inténtalo de nuevo." : "No voice detected. Please try again.");
           setRecordState("done");
           recordStateRef.current = "done";
           return;
@@ -1097,7 +1097,7 @@ export default function SpeakScreen() {
             setLevelUpShow(true);
           }
         } catch {
-          setSttError("채점 중 오류가 발생했습니다. 다시 시도해 주세요.");
+          setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
         } finally {
           setRecordState("done");
           recordStateRef.current = "done";
@@ -1125,7 +1125,7 @@ export default function SpeakScreen() {
         }
       }, 8000);
     }).catch(() => {
-      setSttError("마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)");
+      setSttError(nativeLang === "korean" ? "마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)" : nativeLang === "spanish" ? "Permite el acceso al micrófono.\n(Configuración del navegador → Micrófono)" : "Please allow microphone access.\n(Browser settings → Microphone)");
       setRecordState("done");
       recordStateRef.current = "done";
     });
@@ -1411,19 +1411,19 @@ export default function SpeakScreen() {
                       {accuracyScore !== null && (
                         <View style={styles.subScoreBox}>
                           <Text style={[styles.subScoreNum, { color: accuracyScore >= 75 ? "#10B981" : accuracyScore >= 50 ? "#F59E0B" : "#EF4444" }]}>{accuracyScore}</Text>
-                          <Text style={styles.subScoreLabel}>정확도</Text>
+                          <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "정확도" : nativeLang === "spanish" ? "Precisión" : "Accuracy"}</Text>
                         </View>
                       )}
                       {fluencyScore !== null && (
                         <View style={styles.subScoreBox}>
                           <Text style={[styles.subScoreNum, { color: fluencyScore >= 75 ? "#10B981" : fluencyScore >= 50 ? "#F59E0B" : "#EF4444" }]}>{fluencyScore}</Text>
-                          <Text style={styles.subScoreLabel}>유창성</Text>
+                          <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "유창성" : nativeLang === "spanish" ? "Fluidez" : "Fluency"}</Text>
                         </View>
                       )}
                       {completenessScore !== null && (
                         <View style={styles.subScoreBox}>
                           <Text style={[styles.subScoreNum, { color: completenessScore >= 75 ? "#10B981" : completenessScore >= 50 ? "#F59E0B" : "#EF4444" }]}>{completenessScore}</Text>
-                          <Text style={styles.subScoreLabel}>완성도</Text>
+                          <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "완성도" : nativeLang === "spanish" ? "Integridad" : "Completeness"}</Text>
                         </View>
                       )}
                     </View>
@@ -1445,7 +1445,7 @@ export default function SpeakScreen() {
               ) : (
                 <View style={styles.errorRow}>
                   <Ionicons name="warning-outline" size={16} color="#EF4444" />
-                  <Text style={styles.errorText}>{sttError || "음성 인식 실패. 다시 시도해 주세요."}</Text>
+                  <Text style={styles.errorText}>{sttError || (nativeLang === "korean" ? "음성 인식 실패. 다시 시도해 주세요." : nativeLang === "spanish" ? "Fallo en reconocimiento de voz." : "Speech recognition failed. Please try again.")}</Text>
                 </View>
               )}
 
@@ -1456,7 +1456,7 @@ export default function SpeakScreen() {
                 testID="retry-button"
               >
                 <Ionicons name="refresh" size={13} color={tabInfo.color} />
-                <Text style={[styles.retryChipText, { color: tabInfo.color }]}>다시 시도</Text>
+                <Text style={[styles.retryChipText, { color: tabInfo.color }]}>{nativeLang === "korean" ? "다시 시도" : nativeLang === "spanish" ? "Reintentar" : "Retry"}</Text>
               </Pressable>
             </ScrollView>
           ) : (
@@ -1482,7 +1482,12 @@ export default function SpeakScreen() {
               </Animated.View>
 
               <Text style={styles.micHint}>
-                {isRecording ? "녹음 중… 탭하여 정지" : isProcessing ? rudyListeningMsg : hasListened ? "탭하여 발음 녹음" : "먼저 듣기를 눌러보세요"}
+                {isRecording
+                  ? (nativeLang === "korean" ? "녹음 중… 탭하여 정지" : nativeLang === "spanish" ? "Grabando… toca para parar" : "Recording… tap to stop")
+                  : isProcessing ? rudyListeningMsg
+                  : hasListened
+                    ? (nativeLang === "korean" ? "탭하여 발음 녹음" : nativeLang === "spanish" ? "Toca para grabar" : "Tap to record")
+                    : (nativeLang === "korean" ? "먼저 듣기를 눌러보세요" : nativeLang === "spanish" ? "Primero toca escuchar" : "Press listen first")}
               </Text>
             </View>
           )}

@@ -304,6 +304,67 @@ const KOREAN_PHONEMES: PhonemeMap = {
     en: "Combine 'w' + 'uh'. Round lips for 'w', then open to ㅓ.",
     es: "Como 'uo' pero el segundo sonido es ㅓ (entre 'o' y 'a').",
   },
+  // ── IPA symbols Azure returns for Korean ───
+  ɾ: { // flap ㄹ between vowels
+    en: "Quick tongue tap behind upper teeth. Like 't' in American 'butter'. Very fast and light.",
+    es: "Toque rápido de lengua. Igual que la 'r' simple española en 'pero'.",
+  },
+  ŋ: { // final ㅇ nasal
+    en: "Nasal 'ng' like in English 'sing'. Don't release with a 'g' sound at the end.",
+    es: "Nasal como 'ng' en inglés 'sing'. No suelte con sonido 'g' al final.",
+  },
+  tɕ: { // ㅈ as IPA
+    en: "Like 'j' in 'judge' but lighter. Tongue touches the roof of mouth briefly.",
+    es: "Como 'ch' suave. La lengua toca el paladar brevemente.",
+  },
+  tɕʰ: { // ㅊ as IPA
+    en: "Like 'ch' in 'church' with a strong puff of air. Aspirated.",
+    es: "Como 'ch' en 'chico' pero con mucho aire. Aspirada.",
+  },
+  dʑ: { // voiced ㅈ
+    en: "Voiced version of 'j'. Like English 'j' in 'judge'. Vocal cords vibrate.",
+    es: "Versión sonora de 'j'. Como la 'y' en 'yo' (Argentina).",
+  },
+  ɕ: { // ㅅ before i/y
+    en: "Like 'sh' but with tongue closer to teeth. Korean ㅅ before 'i' sounds.",
+    es: "Como 'sh' pero con la lengua más cerca de los dientes.",
+  },
+  s͈: { // tense ㅆ
+    en: "Tense 'ss'. Tighten your throat and hold the 's' longer. No air puff.",
+    es: "Tensa la garganta y alarga la 's'. Sin aire extra.",
+  },
+  p͈: { // tense ㅃ
+    en: "Tense 'pp'. Tighten throat, NO air puff. Like 'sp' in 'spy' without the 's'.",
+    es: "Tensa la garganta. Como 'p' después de 's' en 'spy'.",
+  },
+  t͈: { // tense ㄸ
+    en: "Tense 'tt'. Tighten throat, NO air puff. Like 'st' in 'stop' without the 's'.",
+    es: "Tensa la garganta. Como 't' después de 's' en 'stop'.",
+  },
+  k͈: { // tense ㄲ
+    en: "Tense 'kk'. Tighten throat, NO air puff. Like 'sk' in 'sky' without the 's'.",
+    es: "Tensa la garganta. Como 'k' después de 's' en 'sky'.",
+  },
+  kʰ: { // ㅋ as IPA
+    en: "Aspirated 'k'. Strong puff of air. Like English 'k' in 'key'.",
+    es: "Como 'k' con mucho aire. Ponga la mano delante y sienta el aire.",
+  },
+  tʰ: { // ㅌ as IPA
+    en: "Aspirated 't'. Strong puff of air. Like English 't' in 'top'.",
+    es: "Como 't' con mucho aire. Sienta la explosión.",
+  },
+  pʰ: { // ㅍ as IPA
+    en: "Aspirated 'p'. Strong puff of air. Like English 'p' in 'pen'.",
+    es: "Como 'p' con mucho aire. Suelte una bocanada de aire.",
+  },
+  j: { // glide in ㅑ, ㅕ, ㅠ etc.
+    en: "Glide sound like 'y' in 'yes'. Tongue is high and front. Quick transition.",
+    es: "Sonido deslizante como 'y' en 'yo'. Lengua alta y adelante. Transición rápida.",
+  },
+  w: { // glide in ㅘ, ㅚ etc.
+    en: "Glide sound like 'w' in 'water'. Round your lips quickly before the vowel.",
+    es: "Sonido deslizante como 'w' en 'water'. Redondee los labios rápido.",
+  },
 };
 
 // ── Master lookup ────────────────────────────────────────────────────────
