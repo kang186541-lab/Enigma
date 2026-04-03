@@ -638,17 +638,13 @@ function buildSession(
   const userCefr: Phrase["level"] = PRON_LEVELS.includes(pronLevel) ? pronLevel : "B2";
   const levelWords = all.filter((p) => p.level === userCefr);
 
-  const freshFirst = (arr: Phrase[]) => {
-    const notSeen = arr.filter((p) => !lastSet.has(p.word));
-    const seen = arr.filter((p) => lastSet.has(p.word));
-    return [...shuffle(notSeen), ...shuffle(seen)];
-  };
-
-  // Weak words at this level come first, then fresh words at this level
+  // Split into: never-seen > weak-seen > normal-seen
+  const neverSeen = shuffle(levelWords.filter((p) => !lastSet.has(p.word) && !weakSet.has(p.word)));
   const weakAtLevel = shuffle(levelWords.filter((p) => weakSet.has(p.word)));
-  const freshAtLevel = freshFirst(levelWords.filter((p) => !weakSet.has(p.word)));
+  const seenNormal = shuffle(levelWords.filter((p) => lastSet.has(p.word) && !weakSet.has(p.word)));
 
-  const pool = [...weakAtLevel, ...freshAtLevel];
+  // Priority: fresh words first, then weak words for review, then seen words last
+  const pool = [...neverSeen, ...weakAtLevel, ...seenNormal];
 
   const seenSet = new Set<string>();
   const unique: Phrase[] = [];
@@ -1135,12 +1131,24 @@ export default function SpeakScreen() {
     });
   };
 
+  // Save current word to lastSeen (accumulate, keep last 3 sessions worth)
+  const markWordSeen = useCallback(async (word: string) => {
+    try {
+      const raw = await AsyncStorage.getItem(lastSeenKey);
+      const prev: string[] = raw ? JSON.parse(raw) : [];
+      const updated = [...prev.filter((w) => w !== word), word].slice(-(SESSION_SIZE * 3));
+      await AsyncStorage.setItem(lastSeenKey, JSON.stringify(updated));
+    } catch {}
+  }, [lastSeenKey]);
+
   const goNextWord = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Mark current word as seen
+    if (sessionWords[sessionIdx]) {
+      await markWordSeen(sessionWords[sessionIdx].word);
+    }
     const nextIdx = sessionIdx + 1;
     if (nextIdx >= sessionWords.length) {
-      const words = sessionWords.map((p) => p.word);
-      await AsyncStorage.setItem(lastSeenKey, JSON.stringify(words)).catch(() => {});
       setSessionComplete(true);
     } else {
       setSessionIdx(nextIdx);

@@ -74,8 +74,29 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
       ? "Escuchar lento"
       : "Listen slow";
 
+  const feedbackHeader = nativeLang === "korean"
+    ? "발음 피드백"
+    : nativeLang === "spanish"
+      ? "Retroalimentación"
+      : "Pronunciation Feedback";
+
+  const tapHint = weakWords.length > 0
+    ? (nativeLang === "korean"
+      ? "⚠️ 표시된 단어를 탭하면 상세 코칭을 볼 수 있어요"
+      : nativeLang === "spanish"
+        ? "Toca las palabras con ⚠️ para ver consejos detallados"
+        : "Tap words with ⚠️ to see detailed coaching")
+    : null;
+
   return (
     <View style={s.container}>
+      {/* Header */}
+      <View style={s.headerRow}>
+        <Text style={s.headerIcon}>📊</Text>
+        <Text style={s.headerText}>{feedbackHeader}</Text>
+      </View>
+      {tapHint && <Text style={s.tapHint}>{tapHint}</Text>}
+
       {/* Word-level breakdown */}
       {wordScores.map((w, i) => {
         const isWeak = w.score < 70;
@@ -193,7 +214,13 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
 // ── Styles ───────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { width: "100%", gap: 4, marginTop: 4 },
+  container: { width: "100%", gap: 4, marginTop: 8 },
+
+  // Header
+  headerRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 },
+  headerIcon: { fontSize: 16 },
+  headerText: { fontSize: 14, fontFamily: F.header, color: C.gold },
+  tapHint: { fontSize: 12, fontFamily: F.body, color: C.goldDim, marginBottom: 4 },
 
   // Word row
   wordRow: {
