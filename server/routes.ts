@@ -146,6 +146,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     minjun: { voice: "ko-KR-InJoonNeural", lang: "ko-KR" }, // male  ✓
   };
 
+  // ── Google Cloud TTS for Korean voices ──────────────────────────────────
+  const GOOGLE_KO_VOICES: Record<string, string> = {
+    // Tutors
+    jisu:      "ko-KR-Neural2-A",  // 따뜻한 여성
+    minjun:    "ko-KR-Neural2-C",  // 젊은 남성
+    // NPCs with specific voices
+    youngsook: "ko-KR-Neural2-A",  // 할머니 영숙 — 따뜻한 여성
+    sujin:     "ko-KR-Neural2-B",  // 수진 — 차분한 여성
+    minho:     "ko-KR-Neural2-C",  // 민호 — 젊은 남성
+  };
+  // Fallback: Azure Korean voice name → Google voice
+  const AZURE_KO_TO_GOOGLE: Record<string, string> = {
+    "ko-KR-SunHiNeural":  "ko-KR-Neural2-A",
+    "ko-KR-InJoonNeural": "ko-KR-Neural2-C",
+    "ko-KR-HyunsuNeural": "ko-KR-Neural2-C",
+  };
+
+  async function googleTTS(text: string, voiceName: string, speakingRate: number = 1.0): Promise<Buffer> {
+    const apiKey = process.env.GOOGLE_TTS_API_KEY?.trim();
+    if (!apiKey) throw new Error("GOOGLE_TTS_API_KEY not configured");
+
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 15000);
+
+    const res = await fetch(
+      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          input: { text },
+          voice: { languageCode: "ko-KR", name: voiceName },
+          audioConfig: { audioEncoding: "MP3", speakingRate },
+        }),
+        signal: controller.signal,
+      }
+    );
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("Google TTS error:", res.status, errText);
+      throw new Error(`Google TTS failed: ${res.status}`);
+    }
+
+    const data = (await res.json()) as { audioContent: string };
+    return Buffer.from(data.audioContent, "base64");
+  }
+
   app.get("/api/tts", async (req: Request, res: Response) => {
     try {
       // mode is intentionally NOT read here — voice identity is locked to tutorId.
@@ -171,19 +219,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(502).json({ error: "TTS unavailable — no Azure credentials" });
       }
 
+      const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.1")));
+
+      // ── Korean tutors → Google Cloud TTS ──
+      const googleVoice = GOOGLE_KO_VOICES[tutorId];
+      if (azureVoice.lang === "ko-KR" && googleVoice) {
+        console.log(`TTS [Google] tutor=${tutorId} voice=${googleVoice} speed=${speaking_rate}`);
+        const buf = await googleTTS(text.slice(0, 5000), googleVoice, speaking_rate);
+        res.set("Content-Type", "audio/mpeg");
+        res.set("Cache-Control", "public, max-age=300");
+        return res.send(buf);
+      }
+
+      // ── English/Spanish tutors → Azure ──
       const safeText = text.slice(0, 5000)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-      // Convert client speed multiplier (0.8-1.4) to Azure prosody rate string.
-      // e.g. 0.8 → "-20%", 1.0 → "+0%", 1.2 → "+20%", 1.4 → "+40%"
-      const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.1")));
       const speedPct = Math.round((speaking_rate - 1) * 100);
       const speedRate = (speedPct >= 0 ? "+" : "") + speedPct + "%";
-      console.log(`TTS called with speed: ${speaking_rate} → Azure prosody rate: ${speedRate}`);
+      console.log(`TTS [Azure] tutor=${tutorId} voice=${azureVoice.voice} speed=${speedRate}`);
 
-      // Pass tutorId and speedRate — mode excluded so voice stays consistent across modes.
       const ssml = buildSsml(azureVoice.voice, azureVoice.lang, safeText, tutorId, undefined, speedRate);
 
       const ttsController = new AbortController();
@@ -309,13 +366,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const voiceName = voice ?? AZURE_TTS_VOICES[lang] ?? "en-US-JennyNeural";
+
+      // ── Korean pronunciation → Google Cloud TTS ──
+      if (lang?.startsWith("ko")) {
+        const gVoice = (tutorId && GOOGLE_KO_VOICES[tutorId]) || AZURE_KO_TO_GOOGLE[voiceName] || "ko-KR-Neural2-A";
+        const gRate = mode === "slow" ? 0.7 : 0.95;
+        console.log(`Pronunciation TTS [Google] voice=${gVoice} speed=${gRate}`);
+        const buf = await googleTTS(text.slice(0, 500), gVoice, gRate);
+        res.set("Content-Type", "audio/mpeg");
+        res.set("Cache-Control", "public, max-age=600");
+        return res.send(buf);
+      }
+
+      // ── English/Spanish pronunciation → Azure ──
       const safeText = text.slice(0, 500)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-      // pronunciation-tts is for clear educational speech — always use plain SSML.
-      // mstts:express-as styles are voice-specific and many voices return 400.
       const prosodyRate = mode === "slow" ? "-30%" : "-5%";
       const textContent = mode === "letter"
         ? `<say-as interpret-as="characters">${safeText}</say-as>`
@@ -755,6 +823,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const voiceInfo = npcVoices[npcLang] ?? npcVoices["english"];
 
       const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.0")));
+
+      // ── Korean NPC → Google Cloud TTS ──
+      if (voiceInfo.lang === "ko-KR") {
+        const gVoice = GOOGLE_KO_VOICES[npcId] || AZURE_KO_TO_GOOGLE[voiceInfo.voice] || "ko-KR-Neural2-A";
+        console.log(`NPC TTS [Google] npc=${npcId} voice=${gVoice} speed=${speaking_rate}`);
+        const buf = await googleTTS(text.slice(0, 3000), gVoice, speaking_rate);
+        res.set("Content-Type", "audio/mpeg");
+        res.set("Cache-Control", "public, max-age=300");
+        return res.send(buf);
+      }
+
+      // ── English/Spanish NPC → Azure ──
       const speedPct = Math.round((speaking_rate - 1) * 100);
       const speedRate = (speedPct >= 0 ? "+" : "") + speedPct + "%";
 
