@@ -58,6 +58,34 @@ export interface LearnerProfile {
   // Session tracking
   sessionCount: number;
   lastSessionAt: string | null;    // ISO
+
+  // ── Phase 4: Persistent tutor memory ─────────────────────────────────────
+  // Per-tutor state — each tutor remembers their own sessions with the learner,
+  // so switching tutors correctly resets the relationship tier.
+  tutorMemory: Partial<Record<string, TutorMemory>>;  // keyed by tutor.id
+}
+
+/** Relationship tier between learner and a specific tutor. */
+export type TutorRelationshipTier = "stranger" | "familiar" | "close" | "intimate";
+
+export interface SessionSummary {
+  date: string;                    // YYYY-MM-DD
+  topic: string | null;            // lesson topic in target language
+  highlight: string | null;        // "잘한 점" — short sentence in user's native lang
+  focusNextTime: string | null;    // "다음에 주목할 점" — short sentence in user's native lang
+  minutesSpent: number;
+  correctionsMade: number;
+}
+
+export interface TutorMemory {
+  tutorId: string;
+  sessionCount: number;
+  firstMetAt: string;              // ISO
+  lastMetAt: string;               // ISO
+  tier: TutorRelationshipTier;
+  // Most recent 5 session summaries (oldest dropped first). Used by the
+  // server to inject "previously..." memory into the next system prompt.
+  recentSessions: SessionSummary[];
 }
 
 const EMPTY_PROFILE: LearnerProfile = {
@@ -72,6 +100,7 @@ const EMPTY_PROFILE: LearnerProfile = {
   errorPatterns: {},
   sessionCount: 0,
   lastSessionAt: null,
+  tutorMemory: {},
 };
 
 // ── Load / Save ─────────────────────────────────────────────────────────────
@@ -281,4 +310,119 @@ export function buildLearnerSummary(profile: LearnerProfile, learningLang: strin
   }
   if (profile.sessionCount > 0) lines.push(`Sessions so far: ${profile.sessionCount}`);
   return lines.length ? lines.join("\n") : "";
+}
+
+// ── Phase 4: Tutor Memory ──────────────────────────────────────────────────
+
+/** Tier thresholds — tuned so most users reach each tier at a sensible pace. */
+function tierFromSessionCount(n: number): TutorRelationshipTier {
+  if (n >= 20) return "intimate";
+  if (n >= 8)  return "close";
+  if (n >= 3)  return "familiar";
+  return "stranger";
+}
+
+/** Get (or initialize) the tutor memory block for a given tutor.id. */
+export function getTutorMemory(profile: LearnerProfile, tutorId: string): TutorMemory {
+  const existing = profile.tutorMemory?.[tutorId];
+  if (existing) return existing;
+  const now = new Date().toISOString();
+  return {
+    tutorId,
+    sessionCount: 0,
+    firstMetAt: now,
+    lastMetAt: now,
+    tier: "stranger",
+    recentSessions: [],
+  };
+}
+
+/**
+ * Called at the START of a chat session. Bumps the per-tutor session count,
+ * updates lastMetAt, and recomputes tier. Does NOT add a SessionSummary —
+ * that happens at session end via recordSessionSummary().
+ *
+ * Debounce: if the learner re-enters within 10 minutes of the previous
+ * `lastMetAt` we treat it as the SAME session (update `lastMetAt` only, do
+ * not increment count). Prevents tier inflation from rapid re-entries.
+ */
+const SESSION_DEBOUNCE_MS = 10 * 60 * 1000;  // 10 minutes
+export async function bumpTutorSession(tutorId: string): Promise<TutorMemory> {
+  const p = await loadLearnerProfile();
+  const prev = getTutorMemory(p, tutorId);
+  const now = new Date();
+  const lastMet = prev.lastMetAt ? new Date(prev.lastMetAt) : null;
+  const isWithinDebounce =
+    prev.sessionCount > 0 &&
+    lastMet &&
+    !isNaN(lastMet.getTime()) &&
+    now.getTime() - lastMet.getTime() < SESSION_DEBOUNCE_MS;
+
+  const nextCount = isWithinDebounce ? prev.sessionCount : prev.sessionCount + 1;
+  const next: TutorMemory = {
+    ...prev,
+    sessionCount: nextCount,
+    lastMetAt: now.toISOString(),
+    tier: tierFromSessionCount(nextCount),
+  };
+  await saveLearnerProfile({
+    ...p,
+    tutorMemory: { ...(p.tutorMemory ?? {}), [tutorId]: next },
+  });
+  return next;
+}
+
+/**
+ * Called when a lesson completes (phase === "done"). Appends a summary to
+ * recentSessions, keeps only the most-recent 5 entries.
+ */
+export async function recordSessionSummary(tutorId: string, summary: SessionSummary): Promise<void> {
+  const p = await loadLearnerProfile();
+  const prev = getTutorMemory(p, tutorId);
+  const next: TutorMemory = {
+    ...prev,
+    recentSessions: [...prev.recentSessions, summary].slice(-5),
+  };
+  await saveLearnerProfile({
+    ...p,
+    tutorMemory: { ...(p.tutorMemory ?? {}), [tutorId]: next },
+  });
+}
+
+/**
+ * Compact summary of the learner's history with THIS tutor, formatted for the
+ * server system prompt. Returns empty string for stranger-tier with no history.
+ */
+export function buildTutorMemorySummary(
+  profile: LearnerProfile,
+  tutorId: string,
+  nativeLang: "ko" | "en" | "es",
+): string {
+  const mem = profile.tutorMemory?.[tutorId];
+  if (!mem || mem.sessionCount === 0) return "";
+
+  const lines: string[] = [];
+  lines.push(`Tutor-learner relationship tier: ${mem.tier} (sessions together: ${mem.sessionCount}).`);
+
+  const tierGuidance: Record<TutorRelationshipTier, string> = {
+    stranger: "Still getting to know each other — stay polite and discovery-oriented. Don't assume past references.",
+    familiar: "You've met a few times. Natural to say 'last time we...' or 'you mentioned...'. Warmer, less formal.",
+    close:    "A rapport has formed. Use first-name/nickname vibes, inside jokes from past sessions, more personal tone.",
+    intimate: "Long-term learning partner. Deep warmth, banter OK, reference specific past moments. Feels like a friend who happens to teach.",
+  };
+  lines.push(`Tier guidance: ${tierGuidance[mem.tier]}`);
+
+  if (mem.recentSessions.length) {
+    lines.push("Recent sessions (most recent last):");
+    for (const s of mem.recentSessions) {
+      const parts: string[] = [s.date];
+      if (s.topic) parts.push(`topic="${s.topic}"`);
+      if (s.highlight) parts.push(`strength: ${s.highlight}`);
+      if (s.focusNextTime) parts.push(`focus: ${s.focusNextTime}`);
+      lines.push(`- ${parts.join(" · ")}`);
+    }
+    lines.push("Use these only when naturally relevant — do not dump them as a list.");
+  }
+
+  return lines.join("\n");
 }

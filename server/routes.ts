@@ -141,6 +141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tutorId, messages, mode, lessonTopic, nativeLang, isOpening,
         learnerSummary, needsDiagnosis,
         lessonPhase, turnsInPhase,
+        tutorMemorySummary, requestSessionSummary,
       } = req.body as {
         tutorId: string;
         messages: { role: "user" | "assistant"; content: string }[];
@@ -153,7 +154,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         needsDiagnosis?: boolean;
         // Phase 3: Lesson Arc
         lessonPhase?: "connect" | "model" | "guided" | "free" | "reflect" | "done";
-        turnsInPhase?: number;         // how many AI turns the learner has seen in this phase
+        turnsInPhase?: number;
+        // Phase 4: Persistent Tutor
+        tutorMemorySummary?: string;   // "relationship tier + past sessions with THIS tutor"
+        requestSessionSummary?: boolean; // set on the reflect→done turn; AI appends [SESSION_SUMMARY]
       };
 
       if (!tutorId || !Array.isArray(messages)) {
@@ -191,6 +195,21 @@ Use this profile to:
 - Pull example topics from the learner's interests & occupation when natural.
 - Weave the recurring mistakes into the conversation so they get another chance — do not lecture about them unless the learner repeats one in this turn.
 - If the profile is thin, ask one gentle question that fills it (e.g. interests, occupation).`
+        : "";
+
+      // ── Phase 4: Tutor-specific memory (relationship tier + past sessions) ──
+      const memoryBlock = (tutorMemorySummary && tutorMemorySummary.trim())
+        ? `\n\n[RELATIONSHIP MEMORY — your history with THIS learner as THIS tutor]
+${tutorMemorySummary.trim()}
+Weave memory naturally — never dump it. If relevant, start with "Last time..." or "You mentioned...". If nothing fits, don't force a reference.`
+        : "";
+
+      // ── Phase 4: Request end-of-lesson summary emission on the reflect→done turn ──
+      const summaryRequestBlock = (requestSessionSummary === true)
+        ? `\n\n[SESSION SUMMARY REQUEST — emit on this turn only]
+After your reflect-phase reply AND after any [CORRECTION]/[PHASE_ADVANCE] blocks, append on a NEW LINE exactly:
+  [SESSION_SUMMARY]{"highlight":"<one specific positive observation about what the learner did today, 1 sentence in ${nativeLangName}>","focusNextTime":"<one concrete thing to work on next session, 1 sentence in ${nativeLangName}>"}[/SESSION_SUMMARY]
+Both fields MUST be written in ${nativeLangName}, even if the rest of your reply is in the target language. Keep each under 120 characters. This block is silent metadata — never read by TTS.`
         : "";
 
       const diagnosticBlock = (needsDiagnosis === true)
@@ -291,12 +310,19 @@ other
 - Block is silent metadata — never read by TTS. Your conversational reply stays focused on today's topic${lessonTopic ? `: "${lessonTopic}"` : ""}.
 - "explanation" MUST be written in ${nativeLangName}.
 - Even in 독설 mode, the [CORRECTION] block stays neutral and educational.
-- The block is JSON — escape any double quotes inside the strings.`
+- The block is JSON — escape any double quotes inside the strings.
+
+[METADATA EMIT ORDER — when multiple blocks apply in the same reply]
+Emit blocks in this EXACT order, each on its own new line AFTER your conversational reply:
+  1. [PHASE_ADVANCE]...[/PHASE_ADVANCE]    (if the phase is ready to end)
+  2. [CORRECTION]...[/CORRECTION]          (if the user made a mistake)
+  3. [SESSION_SUMMARY]...[/SESSION_SUMMARY] (only when requested in the SESSION SUMMARY REQUEST block)
+Never emit any block inside your conversational reply. Never emit a block that was not requested or not applicable to this turn.`
         : "";
 
       const systemPrompt = (modePrompt
         ? `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}\n\n[PERSONALITY MODE OVERRIDE — apply this interaction style]\n${modePrompt}`
-        : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`) + learnerBlock + diagnosticBlock + openingBlock + phaseInstruction + correctionBlock;
+        : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`) + learnerBlock + memoryBlock + diagnosticBlock + openingBlock + phaseInstruction + summaryRequestBlock + correctionBlock;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
@@ -443,23 +469,43 @@ other
             reason: typeof obj?.reason === "string" ? obj.reason.slice(0, 200) : undefined,
           };
         } catch {
-          // Treat as advance without reason if JSON is malformed.
           phaseAdvance = { reason: undefined };
         }
       }
 
+      // ── Phase 4: [SESSION_SUMMARY] detection ───────────────────────────────
+      let sessionSummary: { highlight?: string; focusNextTime?: string } | null = null;
+      const smatch = raw.match(/\[SESSION_SUMMARY\]([\s\S]*?)\[\/SESSION_SUMMARY\]/);
+      if (smatch) {
+        try {
+          const obj = JSON.parse(smatch[1]);
+          if (obj && typeof obj === "object") {
+            sessionSummary = {
+              highlight: typeof obj.highlight === "string" && obj.highlight.trim()
+                ? obj.highlight.trim().slice(0, 160)
+                : undefined,
+              focusNextTime: typeof obj.focusNextTime === "string" && obj.focusNextTime.trim()
+                ? obj.focusNextTime.trim().slice(0, 160)
+                : undefined,
+            };
+          }
+        } catch (e) {
+          console.warn("[/api/chat] Failed to parse [SESSION_SUMMARY] block:", e);
+        }
+      }
+
       // Always strip metadata blocks from the spoken reply.
-      // Fallback for unclosed tags: everything from a metadata opener to EOS
-      // also gets stripped so TTS never reads metadata aloud.
       const reply = raw
         .replace(/\s*\[CORRECTION\][\s\S]*?\[\/CORRECTION\]/g, "")
         .replace(/\s*\[DIAGNOSIS\][\s\S]*?\[\/DIAGNOSIS\]/g, "")
         .replace(/\s*\[PHASE_ADVANCE\][\s\S]*?\[\/PHASE_ADVANCE\]/g, "")
+        .replace(/\s*\[SESSION_SUMMARY\][\s\S]*?\[\/SESSION_SUMMARY\]/g, "")
         .replace(/\s*\[CORRECTION\][\s\S]*$/g, "")
         .replace(/\s*\[DIAGNOSIS\][\s\S]*$/g, "")
         .replace(/\s*\[PHASE_ADVANCE\][\s\S]*$/g, "")
+        .replace(/\s*\[SESSION_SUMMARY\][\s\S]*$/g, "")
         .trim() || "...";
-      res.json({ reply, correction, diagnosis, phaseAdvance });
+      res.json({ reply, correction, diagnosis, phaseAdvance, sessionSummary });
     } catch (err) {
       console.error("OpenAI error:", err);
       res.status(500).json({ error: "Failed to get AI response" });

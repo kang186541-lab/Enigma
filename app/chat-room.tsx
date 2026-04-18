@@ -32,7 +32,9 @@ import {
   loadLearnerProfile, saveLearnerProfile, markDiagnosed,
   recordErrorPattern, buildLearnerSummary, bumpSession,
   seedDiagnosedIfExistingUser, isValidCefrLevel,
+  bumpTutorSession, recordSessionSummary, buildTutorMemorySummary,
   type LearnerProfile, type CefrLevel, type LearningGoal,
+  type TutorRelationshipTier,
 } from "@/lib/learnerProfile";
 import {
   LESSON_PHASE_ORDER, nextPhase, phaseLabel, shouldAutoAdvance,
@@ -446,6 +448,13 @@ export default function ChatRoomScreen() {
   // of jumping straight to the lesson topic. Flips to false after [DIAGNOSIS].
   const needsDiagnosisRef = useRef<boolean>(false);
 
+  // ── Phase 4: Persistent tutor memory ───────────────────────────────────────
+  const tutorMemorySummaryRef = useRef<string>("");
+  const [tutorTier, setTutorTier] = useState<TutorRelationshipTier>("stranger");
+  // Session summary captured from the AI on the reflect→done turn.
+  // Attached to the lesson report and persisted on modal close.
+  const sessionSummaryRef = useRef<{ highlight?: string; focusNextTime?: string } | null>(null);
+
   // ── Phase 3: Lesson Arc ────────────────────────────────────────────────────
   // Skipped entirely during diagnosis (phase = null until diagnosed+opened).
   const [lessonPhase, setLessonPhase] = useState<LessonPhase | null>(null);
@@ -513,6 +522,18 @@ export default function ChatRoomScreen() {
         console.warn('[ChatRoom] loadLearnerProfile failed:', e);
       }
 
+      // ── Phase 4: bump per-tutor session count + build memory summary ──
+      try {
+        const mem = await bumpTutorSession(tutor.id);
+        if (!cancelled) setTutorTier(mem.tier);
+        // Reload profile after bump so memory summary reflects new count.
+        const refreshed = await loadLearnerProfile();
+        learnerProfileRef.current = refreshed;
+        tutorMemorySummaryRef.current = buildTutorMemorySummary(refreshed, tutor.id, nativeKey);
+      } catch (e) {
+        console.warn('[ChatRoom] bumpTutorSession failed:', e);
+      }
+
       // ── Phase 3: start the lesson arc as soon as we know it's NOT diagnosis.
       // Doing this BEFORE the API fetch means the stepper shows + sendMessage
       // sends lessonPhase even if the API-driven opening fails.
@@ -525,6 +546,9 @@ export default function ChatRoomScreen() {
           userTurnCount: 0,
           corrections: [],
         };
+        // Phase 4: reset per-lesson refs so stale data from a previous in-memory
+        // session (component kept mounted across navigations) can't leak.
+        sessionSummaryRef.current = null;
       }
 
       let lessonTopicLearn: string | null = null;
@@ -563,6 +587,8 @@ export default function ChatRoomScreen() {
             // Phase 1
             learnerSummary: learnerSummary || undefined,
             needsDiagnosis: needsDiagnosis || undefined,
+            // Phase 4
+            tutorMemorySummary: tutorMemorySummaryRef.current || undefined,
           }),
         });
         if (cancelled) return;
@@ -876,6 +902,10 @@ export default function ChatRoomScreen() {
           turnsInPhase: typeof turnsInPhaseRef.current === "number" && turnsInPhaseRef.current > 0
             ? turnsInPhaseRef.current
             : undefined,
+          // Phase 4 — relationship memory + (on the reflect turn) ask the AI
+          // to emit a [SESSION_SUMMARY] metadata block we can persist.
+          tutorMemorySummary: tutorMemorySummaryRef.current || undefined,
+          requestSessionSummary: (lessonPhase === "reflect") || undefined,
         }),
       });
 
@@ -903,6 +933,14 @@ export default function ChatRoomScreen() {
             learnerProfileRef.current = p;
           }).catch((e) => console.warn('[ChatRoom] recordErrorPattern failed:', e));
         }
+      }
+
+      // ── Phase 4: capture [SESSION_SUMMARY] from the reflect-turn reply ──
+      if (res.ok && data?.sessionSummary && typeof data.sessionSummary === "object") {
+        sessionSummaryRef.current = {
+          highlight: typeof data.sessionSummary.highlight === "string" ? data.sessionSummary.highlight : undefined,
+          focusNextTime: typeof data.sessionSummary.focusNextTime === "string" ? data.sessionSummary.focusNextTime : undefined,
+        };
       }
 
       // ── Handle [DIAGNOSIS] metadata from first-session intake ──
@@ -962,9 +1000,20 @@ export default function ChatRoomScreen() {
           setLessonPhase(np);
           turnsInPhaseRef.current = 0;
           if (np === "done") {
+            // Persist the session summary IMMEDIATELY so it survives any exit
+            // path (force-quit, swipe-back, app kill) — not just modal Back.
+            if (tutor) {
+              const todayIso = new Date().toISOString().slice(0, 10);
+              recordSessionSummary(tutor.id, {
+                date: todayIso,
+                topic: lessonTopicRef.current,
+                highlight: sessionSummaryRef.current?.highlight ?? null,
+                focusNextTime: sessionSummaryRef.current?.focusNextTime ?? null,
+                minutesSpent: Math.max(1, Math.round((Date.now() - lessonMetricsRef.current.startedAt) / 60000)),
+                correctionsMade: lessonMetricsRef.current.correctionCount,
+              }).catch((e) => console.warn('[ChatRoom] recordSessionSummary (auto) failed:', e));
+            }
             // Wait for TTS of the farewell to finish before showing the report.
-            // Estimate ~80ms/char reading speed as a conservative upper bound;
-            // capped at 10s so a slow server can't stall the modal forever.
             const estimatedMs = Math.min(10000, Math.max(2500, responseText.length * 80));
             setTimeout(() => setShowLessonReport(true), estimatedMs);
           }
@@ -1250,6 +1299,18 @@ export default function ChatRoomScreen() {
           <View style={styles.headerNameRow}>
             <Text style={styles.headerName}>{tutor.name}</Text>
             <Text style={styles.headerFlag}>{tutor.flag}</Text>
+            {/* Phase 4: relationship tier badge — only once beyond stranger */}
+            {tutorTier !== "stranger" && (
+              <View style={styles.tierBadge}>
+                <Text style={styles.tierBadgeText}>
+                  {tutorTier === "intimate"
+                    ? (userNativeLang === "korean" ? "💛 절친" : userNativeLang === "spanish" ? "💛 Íntimo" : "💛 Close friend")
+                    : tutorTier === "close"
+                    ? (userNativeLang === "korean" ? "🤝 친해짐" : userNativeLang === "spanish" ? "🤝 Cercanos" : "🤝 Close")
+                    : (userNativeLang === "korean" ? "👋 아는 사이" : userNativeLang === "spanish" ? "👋 Conocidos" : "👋 Familiar")}
+                </Text>
+              </View>
+            )}
           </View>
           <Text style={styles.headerRegion}>{tutor.region}</Text>
         </View>
@@ -1416,7 +1477,32 @@ export default function ChatRoomScreen() {
                 </Text>
               </View>
             </View>
-            {lessonMetricsRef.current.corrections.length > 0 && (
+            {/* Phase 4: AI-generated strength highlight */}
+            {sessionSummaryRef.current?.highlight && (
+              <View style={[styles.lessonReportSection, { backgroundColor: "rgba(122,196,136,0.1)", borderColor: "rgba(122,196,136,0.3)" }]}>
+                <Text style={styles.lessonReportSectionTitle}>
+                  {userNativeLang === "korean" ? "✨ 오늘의 잘한 점"
+                    : userNativeLang === "spanish" ? "✨ Lo que hiciste bien"
+                    : "✨ What you did well"}
+                </Text>
+                <Text style={styles.lessonReportItem}>{sessionSummaryRef.current.highlight}</Text>
+              </View>
+            )}
+
+            {/* Phase 4: AI-generated focus-next-time advice (from reflect turn) */}
+            {sessionSummaryRef.current?.focusNextTime && (
+              <View style={styles.lessonReportSection}>
+                <Text style={styles.lessonReportSectionTitle}>
+                  {userNativeLang === "korean" ? "🎯 다음에 주목할 점"
+                    : userNativeLang === "spanish" ? "🎯 A trabajar la próxima vez"
+                    : "🎯 Focus for next time"}
+                </Text>
+                <Text style={styles.lessonReportItem}>{sessionSummaryRef.current.focusNextTime}</Text>
+              </View>
+            )}
+
+            {/* Fallback: show top-3 corrections when the AI didn't provide a summary */}
+            {!sessionSummaryRef.current?.focusNextTime && lessonMetricsRef.current.corrections.length > 0 && (
               <View style={styles.lessonReportSection}>
                 <Text style={styles.lessonReportSectionTitle}>
                   {userNativeLang === "korean" ? "🎯 다음에 주목할 점"
@@ -1432,7 +1518,12 @@ export default function ChatRoomScreen() {
             )}
             <Pressable
               style={({ pressed }) => [styles.lessonReportBtn, pressed && { opacity: 0.85 }]}
-              onPress={() => { stopSpeech(); setShowLessonReport(false); router.back(); }}
+              onPress={() => {
+                // Summary already persisted when phase transitioned to "done".
+                stopSpeech();
+                setShowLessonReport(false);
+                router.back();
+              }}
             >
               <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} />
               <Text style={styles.lessonReportBtnText}>
@@ -2261,6 +2352,23 @@ const styles = StyleSheet.create({
     fontFamily: F.bodySemi,
     color: C.gold,
     textAlign: "center",
+  },
+
+  // ── Phase 4: Tutor relationship tier badge (in header) ────────────────────
+  tierBadge: {
+    backgroundColor: "rgba(201,162,39,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.35)",
+    borderRadius: 10,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    marginLeft: 4,
+  },
+  tierBadgeText: {
+    fontSize: 10,
+    fontFamily: F.bodySemi,
+    color: C.gold,
+    letterSpacing: 0.3,
   },
 
   // ── Phase 3: Lesson Arc stepper ───────────────────────────────────────────
