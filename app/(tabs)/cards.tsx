@@ -1155,7 +1155,7 @@ export default function CardsScreen() {
               <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} borderRadius={14} />
             )}
             <Text style={[styles.deckTabText, deckType === "beginner" && styles.deckTabTextActive]}>
-              Beginner
+              {nativeLang === "korean" ? "초급" : nativeLang === "spanish" ? "Principiante" : "Beginner"}
             </Text>
           </Pressable>
           <Pressable
@@ -1166,7 +1166,7 @@ export default function CardsScreen() {
               <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} borderRadius={14} />
             )}
             <Text style={[styles.deckTabText, deckType === "advanced" && styles.deckTabTextActive]}>
-              Advanced
+              {nativeLang === "korean" ? "고급" : nativeLang === "spanish" ? "Avanzado" : "Advanced"}
             </Text>
           </Pressable>
         </View>

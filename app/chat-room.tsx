@@ -309,7 +309,7 @@ function webSpeechRecognize(lang: string): Promise<string> {
 export default function ChatRoomScreen() {
   const { tutorId } = useLocalSearchParams<{ tutorId: string }>();
   const insets = useSafeAreaInsets();
-  const { t, nativeLanguage, stats, updateStats } = useLanguage();
+  const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
   const [xpGain, setXpGain] = useState(0);
   const statsRef = useRef(stats);
   const sessionXpRef = useRef(0);
@@ -400,13 +400,21 @@ export default function ChatRoomScreen() {
 
   useEffect(() => {
     if (!tutor) return;
-
     let cancelled = false;
 
+    const id = "greeting";
+
+    // ── STEP 1: Show static greeting IMMEDIATELY (proven, never fails) ──────
+    const timer = setTimeout(() => {
+      if (cancelled) return;
+      setMessages([{ id, text: tutor.greeting, isUser: false, isLessonOpening: true }]);
+      conversationHistoryRef.current = [{ role: "assistant", content: tutor.greeting }];
+      speakMsg(tutor.greeting, id, false);
+    }, 400);
+
+    // ── STEP 2: In parallel, fetch today's lesson + API-driven greeting,
+    //           then UPGRADE the greeting if server responds in time. ─────────
     (async () => {
-      // ── Resolve today's lesson topic from daily course progress ─────────────
-      // Use learningLanguage as source of truth (tutor.language as fallback).
-      // Both should match in normal flow (tutor select screen filters by learningLanguage).
       const learnLangRaw = (learningLanguage ?? tutor.language ?? "english").toLowerCase();
       const learnKey: "ko" | "en" | "es" =
         learnLangRaw === "korean" ? "ko" :
@@ -435,15 +443,7 @@ export default function ChatRoomScreen() {
       lessonTopicNativeRef.current = lessonTopicNative;
       lessonDayNumberRef.current = dayNumber;
 
-      if (cancelled) return;
-
-      // Small delay so the screen mounts before showing the greeting (matches old UX).
-      await new Promise((r) => setTimeout(r, 400));
-      if (cancelled) return;
-
-      const id = "greeting";
-
-      // ── Try API-driven opening (proposes today's lesson topic) ──────────────
+      // Fetch server-generated lesson-proposing greeting
       try {
         const apiUrl = new URL("/api/chat", getApiUrl()).toString();
         const res = await fetch(apiUrl, {
@@ -459,38 +459,26 @@ export default function ChatRoomScreen() {
           }),
         });
         if (cancelled) return;
-        if (res.ok) {
-          const data = await res.json();
-          const reply: string = (typeof data?.reply === "string" && data.reply.trim()) ? data.reply : tutor.greeting;
-          setMessages([{
-            id, text: reply, isUser: false,
-            isLessonOpening: true,
-            lessonDayNumber: dayNumber ?? undefined,
-            lessonTopicLabel: lessonTopicNative ?? undefined,
-          }]);
-          conversationHistoryRef.current = [{ role: "assistant", content: reply }];
-          speakMsg(reply, id, false);
-          return;
-        }
-        throw new Error(`opening API HTTP ${res.status}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const reply: string = (typeof data?.reply === "string" && data.reply.trim()) ? data.reply : "";
+        if (!reply || cancelled) return;
+        // Upgrade the existing static greeting with the API-generated one.
+        setMessages([{
+          id, text: reply, isUser: false,
+          isLessonOpening: true,
+          lessonDayNumber: dayNumber ?? undefined,
+          lessonTopicLabel: lessonTopicNative ?? undefined,
+        }]);
+        conversationHistoryRef.current = [{ role: "assistant", content: reply }];
+        // Replace TTS with the new reply
+        speakMsg(reply, id, false);
       } catch (e) {
-        console.warn('[ChatRoom] API-driven opening failed, falling back to static greeting:', e);
+        console.warn('[ChatRoom] API-driven opening failed, keeping static greeting:', e);
       }
-
-      if (cancelled) return;
-
-      // ── Fallback: static tutor.greeting (existing behavior) ─────────────────
-      setMessages([{
-        id, text: tutor.greeting, isUser: false,
-        isLessonOpening: true,
-        lessonDayNumber: dayNumber ?? undefined,
-        lessonTopicLabel: lessonTopicNative ?? undefined,
-      }]);
-      conversationHistoryRef.current = [{ role: "assistant", content: tutor.greeting }];
-      speakMsg(tutor.greeting, id, false);
     })();
 
-    return () => { cancelled = true; };
+    return () => { cancelled = true; clearTimeout(timer); };
   }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Subtitle helpers ──────────────────────────────────────────────────────

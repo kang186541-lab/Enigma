@@ -1373,10 +1373,12 @@ export default function SpeakScreen() {
 
         {/* ── SECTION 3: TIP (12%) ────────────────────────────────────────── */}
         <View style={styles.tipSection}>
-          <View style={styles.tipBox}>
-            <Ionicons name="bulb-outline" size={14} color="#F59E0B" />
-            <Text style={styles.tipText} numberOfLines={2}>{phrase.tip}</Text>
-          </View>
+          {phrase.tip && phrase.tip.trim() ? (
+            <View style={styles.tipBox}>
+              <Ionicons name="bulb-outline" size={14} color="#F59E0B" />
+              <Text style={styles.tipText} numberOfLines={2}>{phrase.tip}</Text>
+            </View>
+          ) : null}
 
           {/* Progress dots */}
           <View style={styles.dotsRow}>
