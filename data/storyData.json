@@ -3,16 +3,37 @@
     "version": "2.0",
     "title": "The Language Conspiracy",
     "description": "Language-adaptive story mode for Enigma Language Adventure",
-    "supportedNativeLangs": ["ko", "en", "es"],
-    "supportedTargetLangs": ["ko", "en", "es"]
+    "supportedNativeLangs": [
+      "ko",
+      "en",
+      "es"
+    ],
+    "supportedTargetLangs": [
+      "ko",
+      "en",
+      "es"
+    ]
   },
-
   "languages": {
-    "ko": { "name": "한국어", "nameEn": "Korean", "nameEs": "Coreano", "flag": "🇰🇷" },
-    "en": { "name": "English", "nameKo": "영어", "nameEs": "Inglés", "flag": "🇬🇧" },
-    "es": { "name": "Español", "nameKo": "스페인어", "nameEn": "Spanish", "flag": "🇪🇸" }
+    "ko": {
+      "name": "한국어",
+      "nameEn": "Korean",
+      "nameEs": "Coreano",
+      "flag": "🇰🇷"
+    },
+    "en": {
+      "name": "English",
+      "nameKo": "영어",
+      "nameEs": "Inglés",
+      "flag": "🇬🇧"
+    },
+    "es": {
+      "name": "Español",
+      "nameKo": "스페인어",
+      "nameEn": "Spanish",
+      "flag": "🇪🇸"
+    }
   },
-
   "uiText": {
     "ko": {
       "storyMode": "스토리 모드",
@@ -72,99 +93,197 @@
       "score": "Puntuación"
     }
   },
-
   "npcs": {
     "eleanor": {
       "id": "eleanor",
       "name": "Lady Eleanor",
-      "role": { "ko": "박물관 큐레이터", "en": "Museum Curator", "es": "Curadora del Museo" },
-      "personality": { "ko": "지적이고 냉철, 루디의 멘토", "en": "Intellectual and sharp, Rudy's mentor", "es": "Intelectual y perspicaz, mentora de Rudy" },
+      "role": {
+        "ko": "박물관 큐레이터",
+        "en": "Museum Curator",
+        "es": "Curadora del Museo"
+      },
+      "personality": {
+        "ko": "지적이고 냉철, 루디의 멘토",
+        "en": "Intellectual and sharp, Rudy's mentor",
+        "es": "Intelectual y perspicaz, mentora de Rudy"
+      },
       "chapter": "ch1",
       "avatar": "eleanor.png"
     },
     "tom": {
       "id": "tom",
       "name": "Tom",
-      "role": { "ko": "박물관 경비원", "en": "Museum Guard", "es": "Guardia del Museo" },
-      "personality": { "ko": "유쾌하고 수다쟁이, 구어체 달인", "en": "Cheerful chatterbox, slang master", "es": "Alegre y parlanchín, maestro del argot" },
+      "role": {
+        "ko": "박물관 경비원",
+        "en": "Museum Guard",
+        "es": "Guardia del Museo"
+      },
+      "personality": {
+        "ko": "유쾌하고 수다쟁이, 구어체 달인",
+        "en": "Cheerful chatterbox, slang master",
+        "es": "Alegre y parlanchín, maestro del argot"
+      },
       "chapter": "ch1",
       "avatar": "tom.png"
     },
     "penny": {
       "id": "penny",
       "name": "Miss Penny",
-      "role": { "ko": "고서점 주인", "en": "Antique Bookshop Owner", "es": "Dueña de Librería Antigua" },
-      "personality": { "ko": "친절하지만 비밀이 많음, 이중 스파이?", "en": "Kind but secretive, double agent?", "es": "Amable pero misteriosa, ¿agente doble?" },
+      "role": {
+        "ko": "고서점 주인",
+        "en": "Antique Bookshop Owner",
+        "es": "Dueña de Librería Antigua"
+      },
+      "personality": {
+        "ko": "친절하지만 비밀이 많음, 이중 스파이?",
+        "en": "Kind but secretive, double agent?",
+        "es": "Amable pero misteriosa, ¿agente doble?"
+      },
       "chapter": "ch1",
       "avatar": "penny.png"
     },
     "carlos": {
       "id": "carlos",
       "name": "Carlos",
-      "role": { "ko": "미술관 복원사", "en": "Museum Restorer", "es": "Restaurador del Museo" },
-      "personality": { "ko": "과묵하지만 정의로움, 수호석 보호자의 후손", "en": "Quiet but righteous, descendant of stone guardians", "es": "Callado pero justo, descendiente de guardianes" },
+      "role": {
+        "ko": "미술관 복원사",
+        "en": "Museum Restorer",
+        "es": "Restaurador del Museo"
+      },
+      "personality": {
+        "ko": "과묵하지만 정의로움, 수호석 보호자의 후손",
+        "en": "Quiet but righteous, descendant of stone guardians",
+        "es": "Callado pero justo, descendiente de guardianes"
+      },
       "chapter": "ch2",
       "avatar": "carlos.png"
     },
     "isabel": {
       "id": "isabel",
       "name": "Isabel",
-      "role": { "ko": "플라멩코 댄서", "en": "Flamenco Dancer", "es": "Bailaora de Flamenco" },
-      "personality": { "ko": "활발하고 대담, 거리 정보통", "en": "Bold and daring, street informant", "es": "Atrevida y audaz, informante callejera" },
+      "role": {
+        "ko": "플라멩코 댄서",
+        "en": "Flamenco Dancer",
+        "es": "Bailaora de Flamenco"
+      },
+      "personality": {
+        "ko": "활발하고 대담, 거리 정보통",
+        "en": "Bold and daring, street informant",
+        "es": "Atrevida y audaz, informante callejera"
+      },
       "chapter": "ch2",
       "avatar": "isabel.png"
     },
     "miguel": {
       "id": "miguel",
       "name": "Don Miguel",
-      "role": { "ko": "시장 상인", "en": "Market Merchant", "es": "Comerciante del Mercado" },
-      "personality": { "ko": "다정한 할아버지, 속담의 달인", "en": "Warm grandfather figure, proverb master", "es": "Abuelo cariñoso, maestro de refranes" },
+      "role": {
+        "ko": "시장 상인",
+        "en": "Market Merchant",
+        "es": "Comerciante del Mercado"
+      },
+      "personality": {
+        "ko": "다정한 할아버지, 속담의 달인",
+        "en": "Warm grandfather figure, proverb master",
+        "es": "Abuelo cariñoso, maestro de refranes"
+      },
       "chapter": "ch2",
       "avatar": "miguel.png"
     },
     "sujin": {
       "id": "sujin",
       "name": "Sujin",
-      "role": { "ko": "대학원생 언어학자", "en": "Graduate Linguist", "es": "Lingüista Universitaria" },
-      "personality": { "ko": "똑똑하고 호기심 많음", "en": "Smart and curious", "es": "Inteligente y curiosa" },
+      "role": {
+        "ko": "대학원생 언어학자",
+        "en": "Graduate Linguist",
+        "es": "Lingüista Universitaria"
+      },
+      "personality": {
+        "ko": "똑똑하고 호기심 많음",
+        "en": "Smart and curious",
+        "es": "Inteligente y curiosa"
+      },
       "chapter": "ch3",
       "avatar": "sujin.png"
     },
     "youngsook": {
       "id": "youngsook",
-      "name": { "ko": "영숙 할머니", "en": "Grandma Youngsook", "es": "Abuela Youngsook" },
-      "role": { "ko": "광장시장 분식집 사장", "en": "Market Food Stall Owner", "es": "Dueña de Puesto en el Mercado" },
-      "personality": { "ko": "따뜻하고 지혜로움", "en": "Warm and wise", "es": "Cálida y sabia" },
+      "name": {
+        "ko": "영숙 할머니",
+        "en": "Grandma Youngsook",
+        "es": "Abuela Youngsook"
+      },
+      "role": {
+        "ko": "광장시장 분식집 사장",
+        "en": "Market Food Stall Owner",
+        "es": "Dueña de Puesto en el Mercado"
+      },
+      "personality": {
+        "ko": "따뜻하고 지혜로움",
+        "en": "Warm and wise",
+        "es": "Cálida y sabia"
+      },
       "chapter": "ch3",
       "avatar": "youngsook.png"
     },
     "minho": {
       "id": "minho",
       "name": "Minho",
-      "role": { "ko": "래퍼 겸 정보상", "en": "Rapper & Informant", "es": "Rapero e Informante" },
-      "personality": { "ko": "쿨하고 영리, 지하 세계 연결책", "en": "Cool and clever, underground contact", "es": "Genial y listo, contacto del bajo mundo" },
+      "role": {
+        "ko": "래퍼 겸 정보상",
+        "en": "Rapper & Informant",
+        "es": "Rapero e Informante"
+      },
+      "personality": {
+        "ko": "쿨하고 영리, 지하 세계 연결책",
+        "en": "Cool and clever, underground contact",
+        "es": "Genial y listo, contacto del bajo mundo"
+      },
       "chapter": "ch3",
       "avatar": "minho.png"
     }
   },
-
   "chapters": [
     {
       "id": "ch1",
-      "title": { "ko": "런던의 암호", "en": "The London Cipher", "es": "El Cifrado de Londres" },
+      "title": {
+        "ko": "런던의 암호",
+        "en": "The London Cipher",
+        "es": "El Cifrado de Londres"
+      },
       "city": "London",
       "flag": "🇬🇧",
       "icon": "🔍",
       "isLocked": false,
       "unlockLevel": 1,
-      "theme": { "ko": "미스터리 & 고전 탐정", "en": "Mystery & Classic Detective", "es": "Misterio y Detective Clásico" },
-      "npcs": ["eleanor", "tom", "penny"],
+      "theme": {
+        "ko": "미스터리 & 고전 탐정",
+        "en": "Mystery & Classic Detective",
+        "es": "Misterio y Detective Clásico"
+      },
+      "npcs": [
+        "eleanor",
+        "tom",
+        "penny"
+      ],
       "totalXP": 730,
-      "badge": { "id": "the_fog_lifts", "name": { "ko": "안개가 걷히다", "en": "The Fog Lifts", "es": "La Niebla Se Disipa" }, "icon": "🌫️" },
+      "badge": {
+        "id": "the_fog_lifts",
+        "name": {
+          "ko": "안개가 걷히다",
+          "en": "The Fog Lifts",
+          "es": "La Niebla Se Disipa"
+        },
+        "icon": "🌫️"
+      },
       "scenes": [
         {
           "id": "ch1_scene1",
-          "title": { "ko": "박물관의 발견", "en": "The Museum Discovery", "es": "El Descubrimiento del Museo" },
+          "title": {
+            "ko": "박물관의 발견",
+            "en": "The Museum Discovery",
+            "es": "El Descubrimiento del Museo"
+          },
           "narration": {
             "ko": "안개 낀 런던의 아침. 루디가 박물관에 출근하자 엘리너 경이 급하게 부른다. 로제타 석판 복제본에 누군가 암호화된 메시지를 남겨놓았다.",
             "en": "A foggy London morning. As Rudy arrives at the museum, Lady Eleanor calls urgently. Someone left an encrypted message on the Rosetta replica.",
@@ -174,9 +293,9 @@
             {
               "npc": "eleanor",
               "text": {
-                "en": "Rudy, come quickly. The stone is gone. And I recognize the method — precise, no damage, no trace. I've seen this work before. I trained the person who did this. Twenty years ago, I thought I was giving a brilliant student a future. I didn't know I was building a thief.",
-                "es": "Rudy, ven rápido. La piedra ha desaparecido. Y reconozco el método — preciso, sin daños, sin rastro. He visto este trabajo antes. Yo entrené a quien hizo esto. Hace veinte años creí que le daba un futuro a un estudiante brillante. No sabía que estaba formando a un ladrón.",
-                "ko": "루디, 빨리 와. 수호석이 사라졌어. 그리고 나는 이 방법을 알아 — 정밀하고, 손상도 없고, 흔적도 없어. 전에 이 솜씨를 본 적이 있어. 내가 이걸 한 사람을 훈련시켰거든. 20년 전에 나는 뛰어난 학생에게 미래를 준다고 생각했어. 내가 도둑을 만들고 있다는 걸 몰랐지."
+                "en": "Rudy, come quickly. The stone is gone. And I recognize the method... precise, no damage, no trace. I've seen this work before. I trained the person who did this. Twenty years ago, I thought I was giving a brilliant student a future. I didn't know I was building a thief.",
+                "es": "Rudy, ven rápido. La piedra ha desaparecido. Y reconozco el método... preciso, sin daños, sin rastro. He visto este trabajo antes. Yo entrené a quien hizo esto. Hace veinte años creí que le daba un futuro a un estudiante brillante. No sabía que estaba formando a un ladrón.",
+                "ko": "루디, 빨리 와. 수호석이 사라졌어. 그리고 나는 이 방법을 알아... 정밀하고, 손상도 없고, 흔적도 없어. 전에 이 솜씨를 본 적이 있어. 내가 이걸 한 사람을 훈련시켰거든. 20년 전에 나는 뛰어난 학생에게 미래를 준다고 생각했어. 내가 도둑을 만들고 있다는 걸 몰랐지."
               }
             },
             {
@@ -186,17 +305,122 @@
                 "es": "¿Un cifrado? ¿En la réplica? Eso es... peculiar.",
                 "ko": "암호? 복제본에? 그건... 이상한데."
               }
+            },
+            {
+              "npc": "eleanor",
+              "text": {
+                "en": "This stone wasn't just any artifact, Rudy. It's called a Guardian Stone. Ancient records say there are seven of them, scattered across the world centuries ago. Each one is tied to a different language. Whoever collects all seven... well. The old texts call it 'The Universal Code.' I always thought it was a myth. Until today.",
+                "es": "Esta piedra no era un artefacto cualquiera, Rudy. Se llama Piedra Guardiana. Los registros antiguos dicen que hay siete, dispersas por el mundo hace siglos. Cada una está ligada a un idioma diferente. Quien reúna las siete... bueno. Los textos antiguos lo llaman 'El Código Universal.' Siempre pensé que era un mito. Hasta hoy.",
+                "ko": "이 수호석은 그냥 유물이 아니야, 루디. '수호석'이라 불리는 거야. 고대 기록에 의하면 세계 곳곳에 일곱 개가 흩어져 있어. 각각 다른 언어에 연결되어 있지. 일곱 개를 모두 모으면... 글쎄. 옛 문헌에서는 '유니버설 코드'라고 불러. 나는 항상 전설이라고 생각했어. 오늘까지는."
+              }
+            },
+            {
+              "npc": "rudy",
+              "text": {
+                "en": "Seven stones. Seven languages. And someone just stole the first one from under your nose. No pressure.",
+                "es": "Siete piedras. Siete idiomas. Y alguien acaba de robar la primera bajo tus narices. Sin presión.",
+                "ko": "수호석 일곱 개. 일곱 개의 언어. 그리고 누군가 방금 첫 번째를 코앞에서 훔쳐갔어. 부담은 없지, 뭐."
+              }
+            },
+            {
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "Tell me everything about the stones first.",
+                    "npcReaction": "Smart. Knowledge is our best weapon right now.",
+                    "npcRelation": {
+                      "npc": "eleanor",
+                      "points": 2
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "No time for history lessons. Where do we start?",
+                    "npcReaction": "Brave, but reckless. You'll wish you'd listened later.",
+                    "npcRelation": {
+                      "npc": "eleanor",
+                      "points": -1
+                    }
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "Cuéntame todo sobre las piedras primero.",
+                    "npcReaction": "Inteligente. El conocimiento es nuestra mejor arma ahora.",
+                    "npcRelation": {
+                      "npc": "eleanor",
+                      "points": 2
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "No hay tiempo para lecciones de historia. ¿Por dónde empezamos?",
+                    "npcReaction": "Valiente, pero imprudente. Ya desearás haber escuchado.",
+                    "npcRelation": {
+                      "npc": "eleanor",
+                      "points": -1
+                    }
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "수호석에 대해 먼저 다 알려줘.",
+                    "npcReaction": "똑똑하네. 지식이 지금 우리의 최고의 무기야.",
+                    "npcRelation": {
+                      "npc": "eleanor",
+                      "points": 2
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "역사 수업 할 시간 없어. 어디서부터 시작해?",
+                    "npcReaction": "용감하긴 한데 무모해. 나중에 듣길 후회할 거야.",
+                    "npcRelation": {
+                      "npc": "eleanor",
+                      "points": -1
+                    }
+                  }
+                ]
+              }
             }
           ],
-          "quizzes": ["ch1_quiz_a", "ch1_quiz_b", "ch1_quiz_speak_a"]
+          "quizzes": [
+            "ch1_quiz_a",
+            "ch1_quiz_b",
+            "ch1_quiz_speak_a"
+          ],
+          "clues": [
+            {
+              "id": "ch1_clue_method",
+              "icon": "🔍",
+              "title": {
+                "en": "Theft Method",
+                "ko": "도난 수법",
+                "es": "Método del Robo"
+              },
+              "description": {
+                "en": "Eleanor recognizes the method: precise, no damage, no trace. She trained the thief.",
+                "ko": "엘리너가 수법을 알아봄: 정밀하고, 손상 없고, 흔적 없음. 범인을 자신이 훈련시켰다.",
+                "es": "Eleanor reconoce el método: preciso, sin daños, sin rastro. Ella entrenó al ladrón."
+              },
+              "chapter": "ch1",
+              "linkedQuiz": "ch1_quiz_a"
+            }
+          ]
         },
         {
           "id": "ch1_scene2",
-          "title": { "ko": "고서점의 비밀", "en": "The Bookshop Secret", "es": "El Secreto de la Librería" },
+          "title": {
+            "ko": "고서점의 비밀",
+            "en": "The Bookshop Secret",
+            "es": "El Secreto de la Librería"
+          },
           "narration": {
-            "ko": "톰의 증언을 따라 루디는 베이커가 골목의 고서점으로 향한다. 미스 페니는 도움을 주겠다지만 대가를 요구한다 — 오래된 문서의 번역.",
-            "en": "Following Tom's testimony, Rudy heads to the antique bookshop on Baker Lane. Miss Penny offers help, but demands a price — translating an old manuscript.",
-            "es": "Siguiendo el testimonio de Tom, Rudy se dirige a la librería antigua en Baker Lane. Miss Penny ofrece ayuda, pero exige un precio — traducir un manuscrito antiguo."
+            "ko": "톰의 증언을 따라 루디는 베이커가 골목의 고서점으로 향한다. 미스 페니는 도움을 주겠다지만 대가를 요구한다... 오래된 문서의 번역.",
+            "en": "Following Tom's testimony, Rudy heads to the antique bookshop on Baker Lane. Miss Penny offers help, but demands a price... translating an old manuscript.",
+            "es": "Siguiendo el testimonio de Tom, Rudy se dirige a la librería antigua en Baker Lane. Miss Penny ofrece ayuda, pero exige un precio... traducir un manuscrito antiguo."
           },
           "dialogues": [
             {
@@ -206,13 +430,83 @@
                 "es": "Bienvenido, querido zorro. ¿Buscas algo específico? Tenemos primeras ediciones, manuscritos raros, y quizás... respuestas que no sabías que necesitabas.",
                 "ko": "어서 와, 여우 씨. 뭔가 특별한 걸 찾나? 초판본, 희귀 원고, 그리고 어쩌면... 네가 필요한 줄도 몰랐던 답을 가지고 있지."
               }
+            },
+            {
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "I appreciate the help, Miss Penny.",
+                    "npcReaction": "Such a polite fox. I do love good manners. Now, let me show you something special.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": 2
+                    },
+                    "gaugeBonus": 3
+                  },
+                  {
+                    "text": "You know more than you're letting on.",
+                    "npcReaction": "Sharp eyes. Careful, dear. Curiosity is a double-edged sword in a bookshop.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": -1
+                    }
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "Agradezco la ayuda, Miss Penny.",
+                    "npcReaction": "Qué zorro tan educado. Me encantan los buenos modales. Ahora, déjame mostrarte algo especial.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": 2
+                    },
+                    "gaugeBonus": 3
+                  },
+                  {
+                    "text": "Sabes más de lo que aparentas.",
+                    "npcReaction": "Ojos agudos. Cuidado, querido. La curiosidad es un arma de doble filo en una librería.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": -1
+                    }
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "도움 감사합니다, 미스 페니.",
+                    "npcReaction": "예의 바른 여우네. 좋은 매너는 늘 반가워. 자, 특별한 걸 보여줄게.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": 2
+                    },
+                    "gaugeBonus": 3
+                  },
+                  {
+                    "text": "숨기고 있는 게 있잖아.",
+                    "npcReaction": "눈이 날카롭네. 조심해, 얘야. 호기심은 서점에서 양날의 검이야.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": -1
+                    }
+                  }
+                ]
+              }
             }
           ],
-          "quizzes": ["ch1_quiz_pronunciation", "ch1_quiz_c"]
+          "quizzes": [
+            "ch1_quiz_pronunciation",
+            "ch1_quiz_c"
+          ]
         },
         {
           "id": "ch1_scene2_twist",
-          "title": { "ko": "도청", "en": "Eavesdropping", "es": "Escucha Secreta" },
+          "title": {
+            "ko": "도청",
+            "en": "Eavesdropping",
+            "es": "Escucha Secreta"
+          },
           "narration": {
             "ko": "미스 페니의 서점 뒷방에서 수상한 전화 통화가 들린다. 루디가 문 너머로 도청한다.",
             "en": "A suspicious phone call can be heard from Miss Penny's back room. Rudy eavesdrops through the door.",
@@ -224,18 +518,44 @@
             "en": "Miss Penny was the Lexicon Society's contact! But feeling guilty, she gives Rudy a train ticket to Madrid and a language handbook.",
             "es": "¡Miss Penny era el contacto de la Sociedad Lexicón! Pero sintiendo culpa, le da a Rudy un boleto de tren a Madrid y un manual de idiomas."
           },
-          "quizzes": ["ch1_quiz_d"]
+          "quizzes": [
+            "ch1_quiz_d"
+          ],
+          "clues": [
+            {
+              "id": "ch1_clue_penny",
+              "icon": "📞",
+              "title": {
+                "en": "Penny's Phone Call",
+                "ko": "페니의 전화",
+                "es": "La Llamada de Penny"
+              },
+              "description": {
+                "en": "Miss Penny made a suspicious call about 'the first stone' and 'moving to Madrid'.",
+                "ko": "미스 페니가 '첫 번째 돌'과 '마드리드로 이동'에 대해 수상한 전화를 했다.",
+                "es": "Miss Penny hizo una llamada sospechosa sobre 'la primera piedra' y 'trasladarse a Madrid'."
+              },
+              "chapter": "ch1",
+              "linkedQuiz": "ch1_quiz_d"
+            }
+          ]
         },
         {
           "id": "ch1_scene3_boss",
-          "title": { "ko": "수호석의 수수께끼", "en": "The Guardian's Riddle", "es": "El Acertijo del Guardián" },
+          "title": {
+            "ko": "수호석의 수수께끼",
+            "en": "The Guardian's Riddle",
+            "es": "El Acertijo del Guardián"
+          },
           "narration": {
             "ko": "박물관 지하에서 수호석 방을 발견하지만 수호석은 이미 사라진 후. 대신 수호석 자리에 수수께끼가 남겨져 있다.",
             "en": "Rudy finds the Guardian Stone chamber beneath the museum, but the stone is already gone. In its place, riddles have been left behind.",
             "es": "Rudy encuentra la cámara de la Piedra Guardiana bajo el museo, pero la piedra ya no está. En su lugar, quedan acertijos."
           },
           "isBoss": true,
-          "quizzes": ["ch1_quiz_e"]
+          "quizzes": [
+            "ch1_quiz_e"
+          ]
         }
       ],
       "cliffhanger": {
@@ -246,25 +566,53 @@
     },
     {
       "id": "ch2",
-      "title": { "ko": "마드리드의 실종", "en": "The Madrid Disappearance", "es": "La Desaparición de Madrid" },
+      "title": {
+        "ko": "마드리드의 실종",
+        "en": "The Madrid Disappearance",
+        "es": "La Desaparición de Madrid"
+      },
       "city": "Madrid",
       "flag": "🇪🇸",
       "icon": "🎭",
       "isLocked": false,
       "unlockLevel": 5,
-      "theme": { "ko": "열정 & 예술", "en": "Passion & Art", "es": "Pasión y Arte" },
-      "npcs": ["carlos", "isabel", "miguel"],
+      "theme": {
+        "ko": "열정 & 예술",
+        "en": "Passion & Art",
+        "es": "Pasión y Arte"
+      },
+      "npcs": [
+        "carlos",
+        "isabel",
+        "miguel"
+      ],
       "totalXP": 1070,
-      "badge": { "id": "madrid_rescuer", "name": { "ko": "마드리드의 구원자", "en": "Madrid Rescuer", "es": "Rescatador de Madrid" }, "icon": "🎭" },
+      "badge": {
+        "id": "madrid_rescuer",
+        "name": {
+          "ko": "마드리드의 구원자",
+          "en": "Madrid Rescuer",
+          "es": "Rescatador de Madrid"
+        },
+        "icon": "🎭"
+      },
       "scenes": [
         {
           "id": "ch2_scene1",
-          "title": { "ko": "피가 끓는 공항", "en": "Blood on the Tarmac", "es": "Sangre en la Pista" },
-          "timelineNote": { "en": "Three days later...", "ko": "3일 후...", "es": "Tres días después..." },
+          "title": {
+            "ko": "피가 끓는 공항",
+            "en": "Blood on the Tarmac",
+            "es": "Sangre en la Pista"
+          },
+          "timelineNote": {
+            "en": "Three days later...",
+            "ko": "3일 후...",
+            "es": "Tres días después..."
+          },
           "narration": {
-            "ko": "비행기가 완전히 멈추기도 전에 핸드폰이 울린다. 사진 한 장. 카를로스의 작업실 — 모든 벽면에 빨간 마커로 'AYUDA. AYUDA. AYUDA.' 수백 번. 가장자리로 갈수록 글씨가 흔들린다. 마치 펜을 잡는 법을 잊어가는 것처럼.",
-            "en": "The plane hasn't stopped taxiing when the phone buzzes. A photo. Carlos's workshop — every surface covered in red marker: 'AYUDA. AYUDA. AYUDA.' Hundreds of times. The handwriting gets worse toward the edges. Like watching someone forget how to hold a pen.",
-            "es": "El avión aún no ha parado cuando el teléfono vibra. Una foto. El taller de Carlos — cada superficie cubierta con marcador rojo: 'AYUDA. AYUDA. AYUDA.' Cientos de veces. La letra empeora hacia los bordes. Como ver a alguien olvidar cómo sostener un bolígrafo."
+            "ko": "비행기가 완전히 멈추기도 전에 핸드폰이 울린다. 사진 한 장. 카를로스의 작업실... 모든 벽면에 빨간 마커로 'AYUDA. AYUDA. AYUDA.' 수백 번. 가장자리로 갈수록 글씨가 흔들린다. 마치 펜을 잡는 법을 잊어가는 것처럼.",
+            "en": "The plane hasn't stopped taxiing when the phone buzzes. A photo. Carlos's workshop... every surface covered in red marker: 'AYUDA. AYUDA. AYUDA.' Hundreds of times. The handwriting gets worse toward the edges. Like watching someone forget how to hold a pen.",
+            "es": "El avión aún no ha parado cuando el teléfono vibra. Una foto. El taller de Carlos... cada superficie cubierta con marcador rojo: 'AYUDA. AYUDA. AYUDA.' Cientos de veces. La letra empeora hacia los bordes. Como ver a alguien olvidar cómo sostener un bolígrafo."
           },
           "dialogues": [
             {
@@ -276,83 +624,259 @@
               }
             },
             {
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "That must have been terrifying. Are you okay?",
+                    "npcReaction": "...Nobody asked me that yet. Yeah. No. I don't know. Let me tell you what happened.",
+                    "npcRelation": {
+                      "npc": "isabel",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "Three days is a long time. What exactly happened?",
+                    "npcReaction": "Straight to the point. Fine. Here's what I know.",
+                    "npcRelation": {
+                      "npc": "isabel",
+                      "points": 0
+                    }
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "Debe haber sido aterrador. ¿Estás bien?",
+                    "npcReaction": "...Nadie me había preguntado eso. Sí. No. No sé. Déjame contarte qué pasó.",
+                    "npcRelation": {
+                      "npc": "isabel",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "Tres días es mucho tiempo. ¿Qué pasó exactamente?",
+                    "npcReaction": "Directo al grano. Bien. Esto es lo que sé.",
+                    "npcRelation": {
+                      "npc": "isabel",
+                      "points": 0
+                    }
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "무서웠겠다. 괜찮아?",
+                    "npcReaction": "...아무도 그런 말 안 했어. 응. 아니. 모르겠어. 무슨 일이 있었는지 말해줄게.",
+                    "npcRelation": {
+                      "npc": "isabel",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "3일이면 오래됐는데. 정확히 무슨 일이야?",
+                    "npcReaction": "바로 본론이네. 좋아. 내가 아는 거 말해줄게.",
+                    "npcRelation": {
+                      "npc": "isabel",
+                      "points": 0
+                    }
+                  }
+                ]
+              }
+            },
+            {
               "npc": "isabel",
               "text": {
-                "en": "He called me three nights ago. Ten o'clock. When I picked up he was screaming — but not words. Basic phrases. 'Hello! Help! Where is the door! Please! Sorry!' Over and over. Then silence.",
-                "es": "Me llamó hace tres noches. A las diez. Cuando contesté estaba gritando — pero no palabras. Frases básicas. 'Hello! Help! Where is the door! Please! Sorry!' Una y otra vez. Luego silencio.",
-                "ko": "3일 전 밤 10시에 전화했어. 받으니까 소리를 지르고 있었어 — 그런데 단어가 아니야. 기초 표현들. 'Hello! Help! Where is the door! Please! Sorry!' 계속 반복. 그리고 침묵."
+                "en": "He called me three nights ago. Ten o'clock. When I picked up he was screaming... but not words. Basic phrases. 'Hello! Help! Where is the door! Please! Sorry!' Over and over. Then silence.",
+                "es": "Me llamó hace tres noches. A las diez. Cuando contesté estaba gritando... pero no palabras. Frases básicas. 'Hello! Help! Where is the door! Please! Sorry!' Una y otra vez. Luego silencio.",
+                "ko": "3일 전 밤 10시에 전화했어. 받으니까 소리를 지르고 있었어... 그런데 단어가 아니야. 기초 표현들. 'Hello! Help! Where is the door! Please! Sorry!' 계속 반복. 그리고 침묵."
               }
             },
             {
               "npc": "rudy",
               "text": {
-                "en": "He wasn't speaking a foreign language, Isabel. He was speaking in the ONLY language he had left. Something stripped away everything — and left him with nothing but Day One vocabulary.",
-                "es": "No hablaba un idioma extranjero, Isabel. Hablaba en el ÚNICO idioma que le quedaba. Algo le arrebató todo — y solo le dejó el vocabulario del Día Uno.",
-                "ko": "외국어를 말한 게 아니야, 이사벨. 남은 유일한 언어로 말한 거야. 뭔가가 모든 걸 빼앗고 — 첫날 배운 표현만 남긴 거야."
+                "en": "He wasn't speaking a foreign language, Isabel. He was speaking in the ONLY language he had left. Something stripped away everything... and left him with nothing but Day One vocabulary.",
+                "es": "No hablaba un idioma extranjero, Isabel. Hablaba en el ÚNICO idioma que le quedaba. Algo le arrebató todo... y solo le dejó el vocabulario del Día Uno.",
+                "ko": "외국어를 말한 게 아니야, 이사벨. 남은 유일한 언어로 말한 거야. 뭔가가 모든 걸 빼앗고... 첫날 배운 표현만 남긴 거야."
               }
             },
             {
               "npc": "isabel",
               "text": {
-                "en": "The photo was sent from Carlos's phone. But Carlos was already gone when it was sent. Whoever took him — they sent it. Signed it: 'Good morning. Thank you for waiting.'",
-                "es": "La foto fue enviada desde el móvil de Carlos. Pero Carlos ya no estaba cuando la enviaron. Quien se lo llevó — la envió él. La firmó: 'Good morning. Thank you for waiting.'",
-                "ko": "사진은 카를로스 폰에서 왔어. 근데 보낼 때 카를로스는 이미 없었어. 데려간 사람이 — 보낸 거야. 서명이 있었어: 'Good morning. Thank you for waiting.'"
+                "en": "The photo was sent from Carlos's phone. But Carlos was already gone when it was sent. Whoever took him... they sent it. Signed it: 'Good morning. Thank you for waiting.'",
+                "es": "La foto fue enviada desde el móvil de Carlos. Pero Carlos ya no estaba cuando la enviaron. Quien se lo llevó... la envió él. La firmó: 'Good morning. Thank you for waiting.'",
+                "ko": "사진은 카를로스 폰에서 왔어. 근데 보낼 때 카를로스는 이미 없었어. 데려간 사람이... 보낸 거야. 서명이 있었어: 'Good morning. Thank you for waiting.'"
               }
             }
           ],
-          "quizzes": ["ch2_quiz_a", "ch2_quiz_b"]
+          "quizzes": [
+            "ch2_quiz_a",
+            "ch2_quiz_b"
+          ],
+          "clues": [
+            {
+              "id": "ch2_clue_time",
+              "icon": "🕐",
+              "title": {
+                "en": "Time of Call",
+                "ko": "전화 시각",
+                "es": "Hora de la Llamada"
+              },
+              "description": {
+                "en": "Carlos called Isabel at 10 PM, screaming basic phrases.",
+                "ko": "카를로스가 밤 10시에 이사벨에게 전화, 기초 표현만 소리침.",
+                "es": "Carlos llamó a Isabel a las 10 PM, gritando frases básicas."
+              },
+              "chapter": "ch2",
+              "linkedQuiz": "ch2_quiz_a"
+            },
+            {
+              "id": "ch2_clue_blackcoat",
+              "icon": "🧥",
+              "title": {
+                "en": "Man in Black Coat",
+                "ko": "검은 코트의 남자",
+                "es": "Hombre de Abrigo Negro"
+              },
+              "description": {
+                "en": "Miguel saw a tall man in a black coat who spoke perfect Spanish with no accent.",
+                "ko": "미겔이 악센트 없는 완벽한 스페인어를 하는 검은 코트의 키 큰 남자를 목격.",
+                "es": "Miguel vio a un hombre alto con abrigo negro que hablaba español perfecto sin acento."
+              },
+              "chapter": "ch2",
+              "linkedQuiz": "ch2_quiz_b"
+            }
+          ]
         },
         {
           "id": "ch2_scene2",
-          "title": { "ko": "돈 미겔의 시장", "en": "Don Miguel's Market", "es": "El Mercado de Don Miguel" },
+          "title": {
+            "ko": "돈 미겔의 시장",
+            "en": "Don Miguel's Market",
+            "es": "El Mercado de Don Miguel"
+          },
           "narration": {
-            "ko": "이사벨이 안내한 라스트로 시장. 향신료와 가죽 냄새. 돈 미겔의 가판대 — 하지만 그의 손이 떨리고 있다. 선반 위 상품들에 붙은 가격표들이 빈 채로 있다. 단어를 잊어버렸다.",
-            "en": "The Rastro market, as Isabel directed. Spices and leather. Don Miguel's stall — but his hands are shaking. Price tags on the shelves sit blank. He forgot the words.",
-            "es": "El mercado del Rastro, como indicó Isabel. Especias y cuero. El puesto de Don Miguel — pero sus manos tiemblan. Las etiquetas de precio en los estantes están en blanco. Olvidó las palabras."
+            "ko": "이사벨이 안내한 라스트로 시장. 향신료와 가죽 냄새. 돈 미겔의 가판대... 하지만 그의 손이 떨리고 있다. 선반 위 상품들에 붙은 가격표들이 빈 채로 있다. 단어를 잊어버렸다.",
+            "en": "The Rastro market, as Isabel directed. Spices and leather. Don Miguel's stall... but his hands are shaking. Price tags on the shelves sit blank. He forgot the words.",
+            "es": "El mercado del Rastro, como indicó Isabel. Especias y cuero. El puesto de Don Miguel... pero sus manos tiemblan. Las etiquetas de precio en los estantes están en blanco. Olvidó las palabras."
           },
           "dialogues": [
             {
-              "npc": "miguel",
-              "text": {
-                "en": "Welcome, welcome! But first — in Spain, a conversation without food is like a song without music. Order something. Then we talk.",
-                "es": "¡Bienvenido, bienvenido! Pero primero — en España, una conversación sin comida es como una canción sin música. Pide algo. Luego hablamos.",
-                "ko": "어서 와, 어서 와! 하지만 먼저 — 스페인에서 음식 없는 대화는 음악 없는 노래야. 뭔가 주문해. 그러면 얘기하지."
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "Something smells amazing. What do you recommend?",
+                    "npcReaction": "NOW you're talking! A detective who eats well thinks well. Try the churros first.",
+                    "npcRelation": {
+                      "npc": "miguel",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "I need information, not food. A man disappeared.",
+                    "npcReaction": "No food, no conversation. That's how it works here. But fine... ask.",
+                    "npcRelation": {
+                      "npc": "miguel",
+                      "points": -1
+                    }
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "Algo huele increíble. ¿Qué recomienda?",
+                    "npcReaction": "¡ASÍ se habla! Un detective que come bien piensa bien. Prueba los churros primero.",
+                    "npcRelation": {
+                      "npc": "miguel",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "Necesito información, no comida. Un hombre desapareció.",
+                    "npcReaction": "Sin comida, sin conversación. Así funciona aquí. Pero bueno... pregunta.",
+                    "npcRelation": {
+                      "npc": "miguel",
+                      "points": -1
+                    }
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "냄새 끝내주는데. 뭐가 맛있어요?",
+                    "npcReaction": "이제야 말이 통하네! 잘 먹는 탐정이 잘 생각해. 츄러스부터 먹어봐.",
+                    "npcRelation": {
+                      "npc": "miguel",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "음식 말고 정보가 필요해요. 사람이 사라졌어요.",
+                    "npcReaction": "밥 없이 대화 없어. 여기선 그래. 근데 뭐... 물어봐.",
+                    "npcRelation": {
+                      "npc": "miguel",
+                      "points": -1
+                    }
+                  }
+                ]
               }
             },
             {
               "npc": "miguel",
               "text": {
-                "en": "Yesterday, I forgot how to say 'friend' in Spanish. My own language. Forty years in this market and the word just — wasn't there. My neighbor forgot 'bread.' Eduardo forgot 'open.' Something is happening to words in this neighborhood.",
-                "es": "Ayer olvidé cómo decir 'amigo' en español. Mi propio idioma. Cuarenta años en este mercado y la palabra simplemente — no estaba. Mi vecina olvidó 'pan.' Eduardo olvidó 'abierto.' Algo le está pasando a las palabras aquí.",
-                "ko": "어제 스페인어로 '친구'를 어떻게 말하는지 잊었어. 내 모국어인데. 40년을 이 시장에 있었는데 그 단어가 그냥 — 없었어. 이웃은 '빵'을 잊었어. 에두아르도는 '열다'를 잊었어. 이 동네 단어들에 뭔가 일어나고 있어."
+                "en": "Welcome, welcome! But first... in Spain, a conversation without food is like a song without music. Order something. Then we talk.",
+                "es": "¡Bienvenido, bienvenido! Pero primero... en España, una conversación sin comida es como una canción sin música. Pide algo. Luego hablamos.",
+                "ko": "어서 와, 어서 와! 하지만 먼저... 스페인에서 음식 없는 대화는 음악 없는 노래야. 뭔가 주문해. 그러면 얘기하지."
               }
             },
             {
               "npc": "miguel",
               "text": {
-                "en": "A tall man in a black coat. He sat right where you're sitting, two hours ago. Ordered bread and jamon — perfect Spanish, no accent. Then he asked about Carlos. When I said I didn't know, he said 'Thank you. Goodbye.' And left.",
-                "es": "Un hombre alto con abrigo negro. Se sentó justo donde tú estás, hace dos horas. Pidió pan y jamón — español perfecto, sin acento. Luego preguntó por Carlos. Cuando dije que no sabía, dijo 'Gracias. Adiós.' Y se fue.",
-                "ko": "검은 코트를 입은 키 큰 남자. 딱 두 시간 전에 네가 앉은 자리에 앉았어. 빵이랑 하몬을 주문했어 — 완벽한 스페인어, 악센트 없이. 그러고 카를로스에 대해 물었어. 모른다고 하니까 '고맙습니다. 안녕히 계세요.' 하고 갔어."
+                "en": "Yesterday, I forgot how to say 'friend' in Spanish. My own language. Forty years in this market and the word just... wasn't there. My neighbor forgot 'bread.' Eduardo forgot 'open.' Something is happening to words in this neighborhood.",
+                "es": "Ayer olvidé cómo decir 'amigo' en español. Mi propio idioma. Cuarenta años en este mercado y la palabra simplemente... no estaba. Mi vecina olvidó 'pan.' Eduardo olvidó 'abierto.' Algo le está pasando a las palabras aquí.",
+                "ko": "어제 스페인어로 '친구'를 어떻게 말하는지 잊었어. 내 모국어인데. 40년을 이 시장에 있었는데 그 단어가 그냥... 없었어. 이웃은 '빵'을 잊었어. 에두아르도는 '열다'를 잊었어. 이 동네 단어들에 뭔가 일어나고 있어."
+              }
+            },
+            {
+              "npc": "miguel",
+              "text": {
+                "en": "A tall man in a black coat. He sat right where you're sitting, two hours ago. Ordered bread and jamon... perfect Spanish, no accent. Then he asked about Carlos. When I said I didn't know, he said 'Thank you. Goodbye.' And left.",
+                "es": "Un hombre alto con abrigo negro. Se sentó justo donde tú estás, hace dos horas. Pidió pan y jamón... español perfecto, sin acento. Luego preguntó por Carlos. Cuando dije que no sabía, dijo 'Gracias. Adiós.' Y se fue.",
+                "ko": "검은 코트를 입은 키 큰 남자. 딱 두 시간 전에 네가 앉은 자리에 앉았어. 빵이랑 하몬을 주문했어... 완벽한 스페인어, 악센트 없이. 그러고 카를로스에 대해 물었어. 모른다고 하니까 '고맙습니다. 안녕히 계세요.' 하고 갔어."
               }
             },
             {
               "npc": "rudy",
               "text": {
-                "en": "He was here two hours ago. He knew we were coming. He's not running from us — he's waiting. Don Miguel, where did he go when he left?",
-                "es": "Estuvo aquí hace dos horas. Sabía que íbamos a venir. No huye de nosotros — espera. Don Miguel, ¿adónde fue cuando se marchó?",
-                "ko": "두 시간 전에 여기 있었어. 우리가 올 걸 알고 있었던 거야. 도망치는 게 아니야 — 기다리고 있어. 돈 미겔, 떠날 때 어디로 갔어?"
+                "en": "He was here two hours ago. He knew we were coming. He's not running from us... he's waiting. Don Miguel, where did he go when he left?",
+                "es": "Estuvo aquí hace dos horas. Sabía que íbamos a venir. No huye de nosotros... espera. Don Miguel, ¿adónde fue cuando se marchó?",
+                "ko": "두 시간 전에 여기 있었어. 우리가 올 걸 알고 있었던 거야. 도망치는 게 아니야... 기다리고 있어. 돈 미겔, 떠날 때 어디로 갔어?"
               }
             }
           ],
-          "quizzes": ["ch2_quiz_pronunciation", "ch2_quiz_c", "ch2_quiz_d", "ch2_quiz_speak_a"]
+          "quizzes": [
+            "ch2_quiz_pronunciation",
+            "ch2_quiz_c",
+            "ch2_quiz_d",
+            "ch2_quiz_speak_a"
+          ]
         },
         {
           "id": "ch2_scene3_boss",
-          "title": { "ko": "카를로스를 구하라", "en": "Rescue Carlos", "es": "Rescatar a Carlos" },
+          "title": {
+            "ko": "카를로스를 구하라",
+            "en": "Rescue Carlos",
+            "es": "Rescatar a Carlos"
+          },
           "narration": {
-            "ko": "카예 델 프라도 3번지, 3층. 문이 열려 있다. 어두운 방. 오래된 기계 — 라디오처럼 생겼지만 화면에 언어들이 스크롤된다. 구석에 의자에 묶인 남자. 카를로스. 살아있다. 하지만 눈이 초점을 잃었다.",
-            "en": "Calle del Prado 3, third floor. Door open, just as Mr. Black said. A dark room. An old machine — like an antique radio, but languages scroll across its screen. In the corner, a man in a chair. Carlos. Alive. But his eyes are unfocused.",
-            "es": "Calle del Prado 3, tercer piso. Puerta abierta, tal como dijo el Sr. Black. Una sala oscura. Una máquina antigua — como una radio anticuada, pero idiomas desfilan por su pantalla. En el rincón, un hombre en una silla. Carlos. Vivo. Pero sus ojos están desenfocados."
+            "ko": "카예 델 프라도 3번지, 3층. 문이 열려 있다. 어두운 방. 오래된 기계... 라디오처럼 생겼지만 화면에 언어들이 스크롤된다. 구석에 의자에 묶인 남자. 카를로스. 살아있다. 하지만 눈이 초점을 잃었다.",
+            "en": "Calle del Prado 3, third floor. Door open, just as Mr. Black said. A dark room. An old machine... like an antique radio, but languages scroll across its screen. In the corner, a man in a chair. Carlos. Alive. But his eyes are unfocused.",
+            "es": "Calle del Prado 3, tercer piso. Puerta abierta, tal como dijo el Sr. Black. Una sala oscura. Una máquina antigua... como una radio anticuada, pero idiomas desfilan por su pantalla. En el rincón, un hombre en una silla. Carlos. Vivo. Pero sus ojos están desenfocados."
           },
           "dialogues": [
             {
@@ -378,10 +902,45 @@
                 "es": "Ventana. Recuerdo. Gracias. Gracias por venir.",
                 "ko": "Ventana. 기억해. 고마워. 와줘서 고마워."
               }
+            },
+            {
+              "npc": "isabel",
+              "text": {
+                "en": "He's shaking. Get him some water. Carlos... Carlos, look at me. Do you know who I am?",
+                "es": "Está temblando. Tráele agua. Carlos... Carlos, mírame. ¿Sabes quién soy?",
+                "ko": "떨고 있어. 물 좀 줘. 카를로스... 카를로스, 나를 봐. 내가 누군지 알아?"
+              }
+            },
+            {
+              "npc": "carlos",
+              "text": {
+                "en": "Isabel... Isabel. Yes. I know your name. I didn't lose that one.",
+                "es": "Isabel... Isabel. Sí. Sé tu nombre. Ese no lo perdí.",
+                "ko": "이사벨... 이사벨. 응. 네 이름은 알아. 그건 안 잃어버렸어."
+              }
+            },
+            {
+              "npc": "rudy",
+              "isThought": true,
+              "text": {
+                "en": "(He kept her name. Out of everything the machine took... he held onto that. Some words aren't just words.)",
+                "es": "(Guardó su nombre. De todo lo que la máquina le quitó... se aferró a eso. Algunas palabras no son solo palabras.)",
+                "ko": "(이름을 기억했어. 기계가 빼앗아간 모든 것 중에서... 그걸 붙잡고 있었구나. 어떤 단어는 그냥 단어가 아니야.)"
+              }
+            },
+            {
+              "npc": "miguel",
+              "text": {
+                "en": "Here, son. Eat first. Then remember. No hay mal que por bien no venga.",
+                "es": "Toma, hijo. Come primero. Luego recuerda. No hay mal que por bien no venga.",
+                "ko": "자, 얘야. 먼저 먹어. 그다음에 기억하는 거야. 비 온 뒤에 땅이 굳어진다."
+              }
             }
           ],
           "isBoss": true,
-          "quizzes": ["ch2_quiz_e"]
+          "quizzes": [
+            "ch2_quiz_e"
+          ]
         }
       ],
       "cliffhanger": {
@@ -392,21 +951,49 @@
     },
     {
       "id": "ch3",
-      "title": { "ko": "서울의 비밀", "en": "The Seoul Secret", "es": "El Secreto de Seúl" },
+      "title": {
+        "ko": "서울의 비밀",
+        "en": "The Seoul Secret",
+        "es": "El Secreto de Seúl"
+      },
       "city": "Seoul",
       "flag": "🇰🇷",
       "icon": "🏯",
       "isLocked": false,
       "unlockLevel": 10,
-      "theme": { "ko": "전통과 현대의 융합", "en": "Tradition Meets Modernity", "es": "Tradición y Modernidad" },
-      "npcs": ["sujin", "youngsook", "minho"],
+      "theme": {
+        "ko": "전통과 현대의 융합",
+        "en": "Tradition Meets Modernity",
+        "es": "Tradición y Modernidad"
+      },
+      "npcs": [
+        "sujin",
+        "youngsook",
+        "minho"
+      ],
       "totalXP": 1240,
-      "badge": { "id": "seoul_guardian", "name": { "ko": "서울의 수호자", "en": "Seoul Guardian", "es": "Guardián de Seúl" }, "icon": "🏯" },
+      "badge": {
+        "id": "seoul_guardian",
+        "name": {
+          "ko": "서울의 수호자",
+          "en": "Seoul Guardian",
+          "es": "Guardián de Seúl"
+        },
+        "icon": "🏯"
+      },
       "scenes": [
         {
           "id": "ch3_scene1",
-          "title": { "ko": "서울 착륙 — 전화가 죽다", "en": "Seoul Landing — Phone Dies", "es": "Aterrizaje en Seúl — El Teléfono Muere" },
-          "timelineNote": { "en": "Two weeks later...", "ko": "2주 후...", "es": "Dos semanas después..." },
+          "title": {
+            "ko": "서울 착륙: 전화가 죽다",
+            "en": "Seoul Landing: Phone Dies",
+            "es": "Aterrizaje en Seúl: El Teléfono Muere"
+          },
+          "timelineNote": {
+            "en": "Two weeks later...",
+            "ko": "2주 후...",
+            "es": "Dos semanas después..."
+          },
           "narration": {
             "ko": "인천공항. 루디가 입국장을 나서는 순간 핸드폰이 꺼진다. 배터리 완전 방전. 충전기는 마드리드 호텔에 두고 왔다. 수진이 어딘가에서 기다리고 있을 텐데, 연락할 방법이 없다. 공항 로비에 수백 명의 사람들. 한국어 간판. 한국어 안내 방송. 루디가 아는 한국어는 세 마디.",
             "en": "Incheon Airport. The moment Rudy steps through arrivals, his phone dies. Battery completely dead. Charger left at the Madrid hotel. Sujin is waiting somewhere, but there's no way to reach her. Hundreds of people in the airport lobby. Korean signs. Korean announcements. Rudy knows three phrases in Korean.",
@@ -424,9 +1011,9 @@
             {
               "npc": "rudy",
               "text": {
-                "en": "Annyeonghaseyo! I am... looking for my... chingu. Contact? My contact chingu. Sujin imnida? No wait — Sujin-eul chatgo isseoyo? I'm looking for Sujin?",
-                "ko": "안녕하세요! 저는... 찾고 있는... 친구. 연락처? 제 연락처 친구. 수진입니다? 아니 잠깐 — 수진을 찾고 있어요?",
-                "es": "Annyeonghaseyo! Yo estoy... buscando mi... chingu. Contacto? Mi contacto chingu. Sujin imnida? No espera — Sujin-eul chatgo isseoyo? Busco a Sujin?"
+                "en": "Annyeonghaseyo! I am... looking for my... chingu. Contact? My contact chingu. Sujin imnida? No wait... Sujin-eul chatgo isseoyo? I'm looking for Sujin?",
+                "ko": "안녕하세요! 저는... 찾고 있는... 친구. 연락처? 제 연락처 친구. 수진입니다? 아니 잠깐... 수진을 찾고 있어요?",
+                "es": "Annyeonghaseyo! Yo estoy... buscando mi... chingu. Contacto? Mi contacto chingu. Sujin imnida? No espera... Sujin-eul chatgo isseoyo? Busco a Sujin?"
               }
             },
             {
@@ -446,19 +1033,108 @@
               }
             },
             {
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "Ha! Fair enough. Teach me more.",
+                    "npcReaction": "That's the spirit! Okay, lesson two: never bow and shake hands at the same time. Pick one.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": 2
+                    },
+                    "gaugeBonus": 3
+                  },
+                  {
+                    "text": "Can we focus? People are losing their words.",
+                    "npcReaction": "...Right. Sorry. Sometimes I forget this isn't a game. Let's go.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": -1
+                    }
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "¡Ja! Justo. Enséñame más.",
+                    "npcReaction": "¡Ese es el espíritu! Lección dos: nunca hagas reverencia y des la mano al mismo tiempo. Elige uno.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": 2
+                    },
+                    "gaugeBonus": 3
+                  },
+                  {
+                    "text": "¿Podemos concentrarnos? La gente está perdiendo palabras.",
+                    "npcReaction": "...Cierto. Perdón. A veces olvido que esto no es un juego. Vamos.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": -1
+                    }
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "하하! 알겠어. 더 알려줘.",
+                    "npcReaction": "그 기세야! 좋아, 2단계: 절하면서 동시에 악수하지 마. 하나만 골라.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": 2
+                    },
+                    "gaugeBonus": 3
+                  },
+                  {
+                    "text": "집중하자. 사람들이 단어를 잃고 있잖아.",
+                    "npcReaction": "...맞아. 미안. 가끔 이게 게임이 아니라는 걸 잊어. 가자.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": -1
+                    }
+                  }
+                ]
+              }
+            },
+            {
               "npc": "sujin",
               "text": {
-                "en": "Rudy! I've been waiting an hour! Why didn't you call? And... did you just ask for me in Korean? Your pronunciation was terrible. But it worked. That's what matters. Now — the situation here is worse than Carlos described. People in Seoul are forgetting words too.",
-                "ko": "루디! 한 시간이나 기다렸어요! 왜 전화 안 했어요? 그리고... 방금 한국어로 저를 찾았어요? 발음은 끔찍했지만. 근데 통했잖아요. 그게 중요한 거예요. 이제 — 여기 상황은 카를로스가 말한 것보다 심각해요. 서울 사람들도 단어를 잊고 있어요.",
-                "es": "¡Rudy! ¡He estado esperando una hora! ¿Por qué no llamaste? Y... ¿acabas de preguntar por mí en coreano? Tu pronunciación fue terrible. Pero funcionó. Eso es lo que importa. Ahora — la situación aquí es peor de lo que Carlos describió. La gente en Seúl también olvida palabras."
+                "en": "Rudy! One hour! I've been standing here annotating Hangul etymology on napkins! Why didn't you... oh. Oh wait. Did you just use the object marker '-eul' with my name? That's a Level 2 particle! Your vowel placement was a disaster, but the grammar! The GRAMMAR was correct! Sorry, sorry. Linguist brain. Can't help it. Anyway... people here are forgetting words too. Whole verb conjugations, gone overnight. It's spreading.",
+                "ko": "루디! 한 시간! 냅킨에 한글 어원 정리하면서 기다렸어요! 왜 전화를... 아. 잠깐. 방금 제 이름에 목적격 조사 '-을'을 붙였어요? 그건 2단계 문법이에요! 모음 배치는 재앙이었지만, 문법이! 문법이 맞았어요! 죄송, 죄송. 언어학자 뇌. 어쩔 수 없어요. 어쨌든... 여기 사람들도 단어를 잊고 있어요. 동사 활용 전체가 하룻밤 만에 사라져요. 퍼지고 있어요.",
+                "es": "¡Rudy! ¡Una hora! ¡He estado anotando etimología del Hangul en servilletas! ¿Por qué no...? Oh. Espera. ¿Acabas de usar el marcador de objeto '-eul' con mi nombre? ¡Esa es una partícula de Nivel 2! Tu colocación de vocales fue un desastre, ¡pero la gramática! ¡La GRAMÁTICA era correcta! Perdón, perdón. Cerebro de lingüista. No puedo evitarlo. En fin... la gente aquí también olvida palabras. Conjugaciones enteras de verbos, desaparecidas de la noche a la mañana. Se está extendiendo."
               }
             }
           ],
-          "quizzes": ["ch3_quiz_a", "ch3_quiz_b", "ch3_quiz_speak_a"]
+          "quizzes": [
+            "ch3_quiz_a",
+            "ch3_quiz_b",
+            "ch3_quiz_speak_a"
+          ],
+          "clues": [
+            {
+              "id": "ch3_clue_forgetting",
+              "icon": "💭",
+              "title": {
+                "en": "Seoul Forgetting",
+                "ko": "서울의 망각",
+                "es": "El Olvido de Seúl"
+              },
+              "description": {
+                "en": "People in Seoul are also forgetting words. Verb conjugations disappearing overnight.",
+                "ko": "서울 사람들도 단어를 잊고 있음. 동사 활용이 하룻밤 만에 사라짐.",
+                "es": "La gente en Seúl también olvida palabras. Conjugaciones desaparecen de la noche a la mañana."
+              },
+              "chapter": "ch3",
+              "linkedQuiz": "ch3_quiz_a"
+            }
+          ]
         },
         {
           "id": "ch3_scene2",
-          "title": { "ko": "민호의 한옥 — 비밀번호", "en": "Minho's Hanok — The Password", "es": "El Hanok de Minho — La Contraseña" },
+          "title": {
+            "ko": "민호의 한옥: 비밀번호",
+            "en": "Minho's Hanok: The Password",
+            "es": "El Hanok de Minho: La Contraseña"
+          },
           "narration": {
             "ko": "북촌 한옥마을. 좁은 돌길을 따라 걷는다. 민호가 오래된 목조 문 앞에서 멈춘다. 여기에 렉시콘의 아지트가 있다. 문에는 자물쇠가 없다. 대신 작은 스피커가 달려 있다. 음성 인식.",
             "en": "Bukchon Hanok Village. Walking down narrow stone paths. Minho stops at an old wooden door. The Lexicon hideout is here. No lock on the door. Instead, a small speaker. Voice-activated.",
@@ -476,9 +1152,9 @@
             {
               "npc": "rudy",
               "text": {
-                "en": "Walls he wants to tear down. Except he's wrong — they're not walls. They're windows. Different views of the same world. What's the password?",
-                "ko": "그가 허물고 싶어하는 벽. 근데 틀렸어 — 그건 벽이 아니야. 창문이야. 같은 세상을 다른 시각으로 보는. 비밀번호가 뭔데?",
-                "es": "Muros que quiere derribar. Excepto que se equivoca — no son muros. Son ventanas. Diferentes vistas del mismo mundo. ¿Cuál es la contraseña?"
+                "en": "Walls he wants to tear down. Except he's wrong... they're not walls. They're windows. Different views of the same world. What's the password?",
+                "ko": "그가 허물고 싶어하는 벽. 근데 틀렸어... 그건 벽이 아니야. 창문이야. 같은 세상을 다른 시각으로 보는. 비밀번호가 뭔데?",
+                "es": "Muros que quiere derribar. Excepto que se equivoca... no son muros. Son ventanas. Diferentes vistas del mismo mundo. ¿Cuál es la contraseña?"
               }
             },
             {
@@ -490,31 +1166,120 @@
               }
             },
             {
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "Play it again. I want to catch every word.",
+                    "npcReaction": "Patient detective. Good. The clues are in the sounds, not just the meaning.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": 1
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "I got it. Let me try the password now.",
+                    "npcReaction": "Confident! Let's see if your ears are as sharp as your nose.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": 0
+                    }
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "Repítelo. Quiero captar cada palabra.",
+                    "npcReaction": "Detective paciente. Bien. Las pistas están en los sonidos, no solo en el significado.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": 1
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "Lo tengo. Déjame probar la contraseña.",
+                    "npcReaction": "¡Seguro de sí mismo! Veamos si tus oídos son tan agudos como tu nariz.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": 0
+                    }
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "다시 들려줘. 모든 단어를 잡고 싶어.",
+                    "npcReaction": "참을성 있는 탐정이네. 좋아. 단서는 의미가 아니라 소리에 있어.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": 1
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "알겠어. 비밀번호 바로 도전할게.",
+                    "npcReaction": "자신감! 귀가 코만큼 날카로운지 보자.",
+                    "npcRelation": {
+                      "npc": "minho",
+                      "points": 0
+                    }
+                  }
+                ]
+              }
+            },
+            {
               "npc": "youngsook",
               "text": {
-                "en": "아이고! You're the fox from London? Minho told me. Here — eat first. A conversation without rice is like a map without streets. Now. What do you need from Grandma?",
-                "ko": "아이고! 런던에서 온 여우예요? 민호한테 들었어요. 여기 — 밥부터 먹어요. 밥 없는 대화는 길 없는 지도야. 자. 할머니한테 뭐가 필요해요?",
-                "es": "¡Aigo! ¿Eres el zorro de Londres? Minho me contó. Aquí — come primero. Una conversación sin arroz es como un mapa sin calles. Ahora. ¿Qué necesitas de la abuela?"
+                "en": "아이고! You're the fox from London? Minho told me. Here... eat first. A conversation without rice is like a map without streets. Now. What do you need from Grandma?",
+                "ko": "아이고! 런던에서 온 여우예요? 민호한테 들었어요. 여기... 밥부터 먹어요. 밥 없는 대화는 길 없는 지도야. 자. 할머니한테 뭐가 필요해요?",
+                "es": "¡Aigo! ¿Eres el zorro de Londres? Minho me contó. Aquí... come primero. Una conversación sin arroz es como un mapa sin calles. Ahora. ¿Qué necesitas de la abuela?"
               }
             }
           ],
-          "quizzes": ["ch3_quiz_pronunciation", "ch3_quiz_c", "ch3_quiz_d"]
+          "quizzes": [
+            "ch3_quiz_pronunciation",
+            "ch3_quiz_c",
+            "ch3_quiz_d"
+          ],
+          "clues": [
+            {
+              "id": "ch3_clue_voicelock",
+              "icon": "🔊",
+              "title": {
+                "en": "Voice-Activated Lock",
+                "ko": "음성 인식 잠금",
+                "es": "Cerradura por Voz"
+              },
+              "description": {
+                "en": "The door changes its password based on the speaker's language. Built by Mr. Black.",
+                "ko": "문의 비밀번호가 사용자의 언어에 따라 바뀜. 미스터 블랙이 제작.",
+                "es": "La puerta cambia su contraseña según el idioma del hablante. Construida por Mr. Black."
+              },
+              "chapter": "ch3",
+              "linkedQuiz": "ch3_quiz_d"
+            }
+          ]
         },
         {
           "id": "ch3_scene3_boss",
-          "title": { "ko": "남산타워의 그림자", "en": "Shadow at Namsan Tower", "es": "Sombra en la Torre Namsan" },
+          "title": {
+            "ko": "남산타워의 그림자",
+            "en": "Shadow at Namsan Tower",
+            "es": "Sombra en la Torre Namsan"
+          },
           "narration": {
-            "ko": "남산타워. 서울의 야경이 보석처럼 빛난다. 루디, 수진, 민호가 서울 수호석을 가지고 전망대에 서 있다. 드디어. 한 개를 되찾았다. 루디는 처음으로 미소짓는다 — 진심으로.",
-            "en": "Namsan Tower. Seoul's night skyline glitters like jewels. Rudy, Sujin, and Minho stand on the observation deck with Seoul's Guardian Stone. Finally. They recovered one. Rudy smiles for the first time — genuinely.",
-            "es": "Torre Namsan. El horizonte nocturno de Seúl brilla como joyas. Rudy, Sujin y Minho están en la plataforma con la Piedra Guardián de Seúl. Por fin. Recuperaron una. Rudy sonríe por primera vez — genuinamente."
+            "ko": "남산타워. 서울의 야경이 보석처럼 빛난다. 루디, 수진, 민호가 서울 수호석을 가지고 전망대에 서 있다. 드디어. 한 개를 되찾았다. 루디는 처음으로 미소짓는다... 진심으로.",
+            "en": "Namsan Tower. Seoul's night skyline glitters like jewels. Rudy, Sujin, and Minho stand on the observation deck with Seoul's Guardian Stone. Finally. They recovered one. Rudy smiles for the first time... genuinely.",
+            "es": "Torre Namsan. El horizonte nocturno de Seúl brilla como joyas. Rudy, Sujin y Minho están en la plataforma con la Piedra Guardián de Seúl. Por fin. Recuperaron una. Rudy sonríe por primera vez... genuinamente."
           },
           "dialogues": [
             {
               "npc": "rudy",
               "text": {
-                "en": "We did it. We actually did it. One stone recovered. That's one more than Madrid. Progress.",
-                "ko": "해냈어. 진짜 해냈어. 수호석 하나 되찾았어. 마드리드보다 하나 많아. 진전이야.",
-                "es": "Lo logramos. Realmente lo logramos. Una piedra recuperada. Eso es una más que en Madrid. Progreso."
+                "en": "One stone. One clumsy, mispronounced word at a time. That's how you do it.",
+                "ko": "수호석 하나. 서툴고, 발음 엉망인 단어 하나씩. 이렇게 하는 거야.",
+                "es": "Una piedra. Una torpe palabra mal pronunciada a la vez. Así se hace."
               }
             },
             {
@@ -536,9 +1301,9 @@
             {
               "npc": "rudy",
               "text": {
-                "en": "He left a note. In Korean. Only Korean. A few weeks ago I couldn't have read it. But now —",
-                "ko": "메모를 남겼어. 한국어로. 한국어로만. 몇 주 전이었으면 읽을 수 없었을 거야. 하지만 지금은 —",
-                "es": "Dejó una nota. En coreano. Solo coreano. Hace unas semanas no habría podido leerla. Pero ahora —"
+                "en": "He left a note. In Korean. Only Korean. A few weeks ago I couldn't have read it. But now...",
+                "ko": "메모를 남겼어. 한국어로. 한국어로만. 몇 주 전이었으면 읽을 수 없었을 거야. 하지만 지금은...",
+                "es": "Dejó una nota. En coreano. Solo coreano. Hace unas semanas no habría podido leerla. Pero ahora..."
               }
             },
             {
@@ -551,7 +1316,9 @@
             }
           ],
           "isBoss": true,
-          "quizzes": ["ch3_quiz_e"]
+          "quizzes": [
+            "ch3_quiz_e"
+          ]
         }
       ],
       "cliffhanger": {
@@ -562,21 +1329,51 @@
     },
     {
       "id": "ch4",
-      "title": { "ko": "카이로의 유산", "en": "The Cairo Legacy", "es": "El Legado de El Cairo" },
+      "title": {
+        "ko": "카이로의 유산",
+        "en": "The Cairo Legacy",
+        "es": "El Legado de El Cairo"
+      },
       "city": "Cairo",
       "flag": "🇪🇬",
       "icon": "🏛️",
       "isLocked": false,
       "unlockLevel": 15,
-      "theme": { "ko": "고대 문명 & 수수께끼", "en": "Ancient Civilization & Enigmas", "es": "Civilización Antigua y Enigmas" },
-      "npcs": ["amira", "hassan", "penny", "mr_black", "eleanor"],
+      "theme": {
+        "ko": "고대 문명 & 수수께끼",
+        "en": "Ancient Civilization & Enigmas",
+        "es": "Civilización Antigua y Enigmas"
+      },
+      "npcs": [
+        "amira",
+        "hassan",
+        "penny",
+        "mr_black",
+        "eleanor"
+      ],
       "totalXP": 1550,
-      "badge": { "id": "pyramid_scholar", "name": { "ko": "피라미드 학자", "en": "Pyramid Scholar", "es": "Erudito de las Pirámides" }, "icon": "🏛️" },
+      "badge": {
+        "id": "pyramid_scholar",
+        "name": {
+          "ko": "피라미드 학자",
+          "en": "Pyramid Scholar",
+          "es": "Erudito de las Pirámides"
+        },
+        "icon": "🏛️"
+      },
       "scenes": [
         {
           "id": "ch4_scene1",
-          "title": { "ko": "빈 페이지", "en": "The Blank Pages", "es": "Las Páginas en Blanco" },
-          "timelineNote": { "en": "One week later...", "ko": "일주일 후...", "es": "Una semana después..." },
+          "title": {
+            "ko": "빈 페이지",
+            "en": "The Blank Pages",
+            "es": "Las Páginas en Blanco"
+          },
+          "timelineNote": {
+            "en": "One week later...",
+            "ko": "일주일 후...",
+            "es": "Una semana después..."
+          },
           "narration": {
             "ko": "카이로 공항. 루디가 가방에서 아랍어 회화집을 꺼낸다. 서울 출발 전에 산 것이다. 펼친다. 비어 있다. 모든 페이지가. 표지만 남고 내용이 전부 사라졌다. 마치 누군가 모든 글자를 지운 것처럼.",
             "en": "Cairo Airport. Rudy pulls his Arabic phrasebook from his bag. Bought it before leaving Seoul. He opens it. Empty. Every page. The cover remains but every word inside is gone. As if someone erased every letter.",
@@ -608,11 +1405,74 @@
               }
             },
             {
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "Three languages? Watch this.",
+                    "npcReaction": "Confident. I like that. But confidence without accuracy is just noise. Show me.",
+                    "npcRelation": {
+                      "npc": "amira",
+                      "points": 1
+                    }
+                  },
+                  {
+                    "text": "I'll try. My pronunciation needs work, but I won't give up.",
+                    "npcReaction": "Honest. My grandmother always said: a humble tongue learns faster than a proud one. Go ahead.",
+                    "npcRelation": {
+                      "npc": "amira",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "¿Tres idiomas? Mira esto.",
+                    "npcReaction": "Seguro de sí mismo. Me gusta. Pero la confianza sin precisión es solo ruido. Demuéstramelo.",
+                    "npcRelation": {
+                      "npc": "amira",
+                      "points": 1
+                    }
+                  },
+                  {
+                    "text": "Lo intentaré. Mi pronunciación necesita trabajo, pero no me rendiré.",
+                    "npcReaction": "Honesto. Mi abuela siempre decía: una lengua humilde aprende más rápido que una orgullosa. Adelante.",
+                    "npcRelation": {
+                      "npc": "amira",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "3개 국어? 한번 볼래?",
+                    "npcReaction": "자신감 있네. 마음에 들어. 하지만 정확도 없는 자신감은 소음일 뿐이야. 보여줘.",
+                    "npcRelation": {
+                      "npc": "amira",
+                      "points": 1
+                    }
+                  },
+                  {
+                    "text": "해볼게. 발음은 아직 부족하지만 포기는 안 해.",
+                    "npcReaction": "솔직하네. 할머니가 항상 말씀하셨어. 겸손한 혀가 교만한 혀보다 빨리 배운다고. 해봐.",
+                    "npcRelation": {
+                      "npc": "amira",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  }
+                ]
+              }
+            },
+            {
               "npc": "amira",
               "text": {
-                "en": "Professor Amira. My family has protected the Cairo stone for four generations. My grandmother hid it. My mother guarded it. I study it. And now some man in a black coat wants to take it. That's not going to happen. But before I trust you with anything — prove you can communicate. Tell me the name of this object in three languages.",
-                "ko": "아미라 교수. 우리 가족은 4대에 걸쳐 카이로 수호석을 지켜왔어. 할머니가 숨겼고. 어머니가 지켰고. 나는 연구해. 이제 검은 코트 입은 남자가 가져가려 해. 그런 일은 없을 거야. 하지만 널 믿기 전에 — 증명해. 이 물건의 이름을 세 개 언어로 말해봐.",
-                "es": "Profesora Amira. Mi familia ha protegido la piedra de El Cairo por cuatro generaciones. Mi abuela la escondió. Mi madre la guardó. Yo la estudio. Y ahora un hombre de abrigo negro quiere tomarla. Eso no va a pasar. Pero antes de confiarte cualquier cosa — demuestra que puedes comunicarte. Dime el nombre de este objeto en tres idiomas."
+                "en": "Professor Amira. My family has protected the Cairo stone for four generations. My grandmother hid it. My mother guarded it. I study it. And now some man in a black coat wants to take it. That's not going to happen. But before I trust you with anything... prove you can communicate. Tell me the name of this object in three languages.",
+                "ko": "아미라 교수. 우리 가족은 4대에 걸쳐 카이로 수호석을 지켜왔어. 할머니가 숨겼고. 어머니가 지켰고. 나는 연구해. 이제 검은 코트 입은 남자가 가져가려 해. 그런 일은 없을 거야. 하지만 널 믿기 전에... 증명해. 이 물건의 이름을 세 개 언어로 말해봐.",
+                "es": "Profesora Amira. Mi familia ha protegido la piedra de El Cairo por cuatro generaciones. Mi abuela la escondió. Mi madre la guardó. Yo la estudio. Y ahora un hombre de abrigo negro quiere tomarla. Eso no va a pasar. Pero antes de confiarte cualquier cosa... demuestra que puedes comunicarte. Dime el nombre de este objeto en tres idiomas."
               }
             },
             {
@@ -624,11 +1484,34 @@
               }
             }
           ],
-          "quizzes": ["ch4_quiz_a"]
+          "quizzes": [
+            "ch4_quiz_a"
+          ],
+          "clues": [
+            {
+              "id": "ch4_clue_blankbook",
+              "icon": "📖",
+              "title": {
+                "en": "Blank Phrasebook",
+                "ko": "빈 회화집",
+                "es": "Libro en Blanco"
+              },
+              "description": {
+                "en": "Rudy's Arabic phrasebook was emptied before he landed. Mr. Black knew he was coming.",
+                "ko": "루디의 아랍어 회화집이 착륙 전에 비워져 있었음. 미스터 블랙이 올 걸 알았다.",
+                "es": "El libro de frases de Rudy fue vaciado antes de aterrizar. Mr. Black sabía que venía."
+              },
+              "chapter": "ch4"
+            }
+          ]
         },
         {
           "id": "ch4_scene2",
-          "title": { "ko": "발굴 현장의 시험", "en": "The Dig Site Test", "es": "La Prueba del Sitio de Excavación" },
+          "title": {
+            "ko": "발굴 현장의 시험",
+            "en": "The Dig Site Test",
+            "es": "La Prueba del Sitio de Excavación"
+          },
           "narration": {
             "ko": "기자 피라미드 근처 발굴 현장. 아미라의 영역. 모래와 고대 돌벽, 작업 도구가 정리되어 있다. 아미라가 루디를 현장 한가운데로 데려간다.",
             "en": "A dig site near the Giza pyramids. Amira's domain. Sand and ancient stone walls, tools neatly arranged. Amira leads Rudy to the center of the site.",
@@ -638,41 +1521,47 @@
             {
               "npc": "amira",
               "text": {
-                "en": "The Cairo stone is here. Buried where my grandmother left it sixty years ago. But there's a problem. Someone has been digging at night. Not professionals — they leave tracks, damage the strata. And they always dig in the wrong places. Almost as if someone is sending them to the wrong spots on purpose.",
-                "ko": "카이로 수호석이 여기 있어. 할머니가 60년 전에 묻어둔 곳에. 근데 문제가 있어. 누군가 밤에 파고 있어. 전문가는 아니야 — 흔적을 남기고 지층을 손상시켜. 항상 엉뚱한 곳을 파. 마치 누가 일부러 틀린 장소로 보내는 것처럼.",
-                "es": "La piedra de El Cairo está aquí. Enterrada donde mi abuela la dejó hace sesenta años. Pero hay un problema. Alguien ha estado excavando de noche. No son profesionales — dejan huellas, dañan los estratos. Y siempre excavan en los lugares equivocados. Casi como si alguien los enviara a los sitios incorrectos a propósito."
+                "en": "The Cairo stone is here. Buried where my grandmother left it sixty years ago. But there's a problem. Someone has been digging at night. Not professionals... they leave tracks, damage the strata. And they always dig in the wrong places. Almost as if someone is sending them to the wrong spots on purpose.",
+                "ko": "카이로 수호석이 여기 있어. 할머니가 60년 전에 묻어둔 곳에. 근데 문제가 있어. 누군가 밤에 파고 있어. 전문가는 아니야... 흔적을 남기고 지층을 손상시켜. 항상 엉뚱한 곳을 파. 마치 누가 일부러 틀린 장소로 보내는 것처럼.",
+                "es": "La piedra de El Cairo está aquí. Enterrada donde mi abuela la dejó hace sesenta años. Pero hay un problema. Alguien ha estado excavando de noche. No son profesionales... dejan huellas, dañan los estratos. Y siempre excavan en los lugares equivocados. Casi como si alguien los enviara a los sitios incorrectos a propósito."
               }
             },
             {
               "npc": "rudy",
               "text": {
-                "en": "Sending them to the wrong spots. That sounds like Mr. Black. He doesn't dig himself — he lets others do the work and watches where they fail. Then he digs where they didn't.",
-                "ko": "틀린 장소로 보낸다고. 미스터 블랙 스타일이야. 직접 파지 않아 — 다른 사람들이 실패하는 걸 지켜보고. 그 사람들이 안 판 곳을 파지.",
-                "es": "Enviarlos a los sitios incorrectos. Eso suena como Mr. Black. Él no excava — deja que otros trabajen y observa donde fallan. Luego excava donde ellos no lo hicieron."
+                "en": "Sending them to the wrong spots. That sounds like Mr. Black. He doesn't dig himself... he lets others do the work and watches where they fail. Then he digs where they didn't.",
+                "ko": "틀린 장소로 보낸다고. 미스터 블랙 스타일이야. 직접 파지 않아... 다른 사람들이 실패하는 걸 지켜보고. 그 사람들이 안 판 곳을 파지.",
+                "es": "Enviarlos a los sitios incorrectos. Eso suena como Mr. Black. Él no excava... deja que otros trabajen y observa donde fallan. Luego excava donde ellos no lo hicieron."
               }
             },
             {
               "npc": "amira",
               "text": {
-                "en": "Smart fox. My grandmother left instructions to find the stone — but they're written in a mix of Arabic, English, and Korean. She was a linguist, like Sujin. She believed the stone should only be found by someone who understood that languages work together, not apart. So — read this. Tell me what it says. Prove my grandmother right.",
-                "ko": "똑똑한 여우네. 할머니가 수호석을 찾는 방법을 남겼어 — 근데 아랍어, 영어, 한국어가 섞여 있어. 수진처럼 언어학자였거든. 언어가 따로가 아니라 함께 작동한다는 걸 이해하는 사람만 수호석을 찾아야 한다고 믿었어. 자 — 이거 읽어. 뭐라고 써있는지 말해. 할머니가 옳았다는 걸 증명해.",
-                "es": "Zorro listo. Mi abuela dejó instrucciones para encontrar la piedra — pero están escritas en una mezcla de árabe, inglés y coreano. Era lingüista, como Sujin. Creía que la piedra solo debería ser encontrada por alguien que entendiera que los idiomas trabajan juntos, no separados. Así que — lee esto. Dime qué dice. Demuestra que mi abuela tenía razón."
+                "en": "Smart fox. My grandmother left instructions to find the stone... but they're written in a mix of Arabic, English, and Korean. She was a linguist, like Sujin. She believed the stone should only be found by someone who understood that languages work together, not apart. So... read this. Tell me what it says. Prove my grandmother right.",
+                "ko": "똑똑한 여우네. 할머니가 수호석을 찾는 방법을 남겼어... 근데 아랍어, 영어, 한국어가 섞여 있어. 수진처럼 언어학자였거든. 언어가 따로가 아니라 함께 작동한다는 걸 이해하는 사람만 수호석을 찾아야 한다고 믿었어. 자... 이거 읽어. 뭐라고 써있는지 말해. 할머니가 옳았다는 걸 증명해.",
+                "es": "Zorro listo. Mi abuela dejó instrucciones para encontrar la piedra... pero están escritas en una mezcla de árabe, inglés y coreano. Era lingüista, como Sujin. Creía que la piedra solo debería ser encontrada por alguien que entendiera que los idiomas trabajan juntos, no separados. Así que... lee esto. Dime qué dice. Demuestra que mi abuela tenía razón."
               }
             },
             {
               "npc": "amira",
               "text": {
-                "en": "You did it. My grandmother would have liked you. The stone is thirty meters north, two meters deep, under the stone marked with the eye of Horus. Let's go get it — before someone else does.",
+                "en": "You did it. My grandmother would have liked you. The stone is thirty meters north, two meters deep, under the stone marked with the eye of Horus. Let's go get it... before someone else does.",
                 "ko": "해냈네. 할머니가 좋아했을 거야. 수호석은 북쪽 30미터, 깊이 2미터, 호루스의 눈이 새겨진 돌 아래에 있어. 다른 사람이 찾기 전에 가자.",
-                "es": "Lo lograste. A mi abuela le habrías caído bien. La piedra está treinta metros al norte, dos metros de profundidad, bajo la piedra marcada con el ojo de Horus. Vamos a buscarla — antes de que alguien más lo haga."
+                "es": "Lo lograste. A mi abuela le habrías caído bien. La piedra está treinta metros al norte, dos metros de profundidad, bajo la piedra marcada con el ojo de Horus. Vamos a buscarla... antes de que alguien más lo haga."
               }
             }
           ],
-          "quizzes": ["ch4_quiz_b"]
+          "quizzes": [
+            "ch4_quiz_b"
+          ]
         },
         {
           "id": "ch4_scene3",
-          "title": { "ko": "하산의 수크", "en": "Hassan's Souk", "es": "El Zoco de Hassan" },
+          "title": {
+            "ko": "하산의 수크",
+            "en": "Hassan's Souk",
+            "es": "El Zoco de Hassan"
+          },
           "narration": {
             "ko": "칸 엘 칼릴리 시장. 향신료 냄새, 금속 세공품의 반짝임, 흥정하는 목소리들. 아미라가 루디를 사촌 하산의 가게로 데려간다.",
             "en": "Khan el-Khalili market. The smell of spices, gleaming metalwork, voices bargaining. Amira takes Rudy to her cousin Hassan's shop.",
@@ -698,9 +1587,9 @@
             {
               "npc": "hassan",
               "text": {
-                "en": "Yes, yes! The tall man! Very polite. Bought a lamp from me. Paid exactly. Didn't bargain — which is how I knew something was wrong. Everyone bargains at Khan el-Khalili. Everyone. He just said 'How much? Thank you. Goodbye.' Perfect Arabic. Too perfect. And then — okay, Amira is going to be angry at me — he asked where I live. And I... may have told him. And where you work. And where the dig site is. He was very friendly! The words just came out!",
-                "ko": "그래, 그래! 키 큰 남자! 아주 공손했어. 내한테 램프를 샀어. 정확하게 지불했고. 흥정을 안 했어 — 그래서 뭔가 이상하다는 걸 알았지. 칸 엘 칼릴리에서는 모두가 흥정해. 모두. 그냥 '얼마예요? 감사합니다. 안녕히 계세요.'라고 했어. 완벽한 아랍어. 너무 완벽한. 그리고 — 아미라가 화낼 건데 — 내가 어디 사는지 물었어. 그리고 나는... 말했을 수도 있어. 네가 어디서 일하는지도. 발굴 현장이 어디인지도. 아주 친절했거든! 말이 그냥 나왔어!",
-                "es": "¡Sí, sí! ¡El hombre alto! Muy educado. Me compró una lámpara. Pagó exacto. No regateó — así supe que algo estaba mal. Todos regatean en Khan el-Khalili. Todos. Solo dijo '¿Cuánto? Gracias. Adiós.' Árabe perfecto. Demasiado perfecto. Y luego — Amira se va a enojar — preguntó dónde vivo. Y yo... puede que le haya dicho. Y dónde trabajas. Y dónde está el sitio de excavación. ¡Era muy amigable! ¡Las palabras simplemente salieron!"
+                "en": "Yes, yes! The tall man! Very polite. Bought a lamp from me. Paid exactly. Didn't bargain... which is how I knew something was wrong. Everyone bargains at Khan el-Khalili. Everyone. He just said 'How much? Thank you. Goodbye.' Perfect Arabic. Too perfect. And then... okay, Amira is going to be angry at me... he asked where I live. And I... may have told him. And where you work. And where the dig site is. He was very friendly! The words just came out!",
+                "ko": "그래, 그래! 키 큰 남자! 아주 공손했어. 내한테 램프를 샀어. 정확하게 지불했고. 흥정을 안 했어... 그래서 뭔가 이상하다는 걸 알았지. 칸 엘 칼릴리에서는 모두가 흥정해. 모두. 그냥 '얼마예요? 감사합니다. 안녕히 계세요.'라고 했어. 완벽한 아랍어. 너무 완벽한. 그리고... 아미라가 화낼 건데... 내가 어디 사는지 물었어. 그리고 나는... 말했을 수도 있어. 네가 어디서 일하는지도. 발굴 현장이 어디인지도. 아주 친절했거든! 말이 그냥 나왔어!",
+                "es": "¡Sí, sí! ¡El hombre alto! Muy educado. Me compró una lámpara. Pagó exacto. No regateó... así supe que algo estaba mal. Todos regatean en Khan el-Khalili. Todos. Solo dijo '¿Cuánto? Gracias. Adiós.' Árabe perfecto. Demasiado perfecto. Y luego... Amira se va a enojar... preguntó dónde vivo. Y yo... puede que le haya dicho. Y dónde trabajas. Y dónde está el sitio de excavación. ¡Era muy amigable! ¡Las palabras simplemente salieron!"
               }
             },
             {
@@ -714,9 +1603,9 @@
             {
               "npc": "hassan",
               "text": {
-                "en": "I know, I know! But listen — I also heard where HE goes every night. See? Information goes both ways! As we say, 'el-kalaam zay el-asal' — words are like honey. And I collected some honey too! He goes to a building on Sharia el-Muizz every night at nine o'clock. Third door. Blue sign. He's there right now. Probably.",
-                "ko": "알아, 알아! 근데 들어봐 — 그 사람이 매일 밤 어디 가는지도 들었어. 봐? 정보는 양방향이야! 속담에 '말은 꿀과 같다'라고 하잖아. 나도 꿀을 좀 모았어! 매일 밤 9시에 무이즈 거리의 건물에 가. 세 번째 문. 파란 간판. 아마 지금 거기 있을 거야.",
-                "es": "¡Lo sé, lo sé! Pero escucha — también escuché adónde VA él cada noche. ¿Ves? ¡La información va en ambas direcciones! Como decimos, 'el-kalaam zay el-asal' — las palabras son como miel. ¡Y yo también recolecté algo de miel! Va a un edificio en Sharia el-Muizz cada noche a las nueve. Tercera puerta. Letrero azul. Está ahí ahora mismo. Probablemente."
+                "en": "I know, I know! But listen... I also heard where HE goes every night. See? Information goes both ways! As we say, 'el-kalaam zay el-asal'... words are like honey. And I collected some honey too! He goes to a building on Sharia el-Muizz every night at nine o'clock. Third door. Blue sign. He's there right now. Probably.",
+                "ko": "알아, 알아! 근데 들어봐... 그 사람이 매일 밤 어디 가는지도 들었어. 봐? 정보는 양방향이야! 속담에 '말은 꿀과 같다'라고 하잖아. 나도 꿀을 좀 모았어! 매일 밤 9시에 무이즈 거리의 건물에 가. 세 번째 문. 파란 간판. 아마 지금 거기 있을 거야.",
+                "es": "¡Lo sé, lo sé! Pero escucha... también escuché adónde VA él cada noche. ¿Ves? ¡La información va en ambas direcciones! Como decimos, 'el-kalaam zay el-asal'... las palabras son como miel. ¡Y yo también recolecté algo de miel! Va a un edificio en Sharia el-Muizz cada noche a las nueve. Tercera puerta. Letrero azul. Está ahí ahora mismo. Probablemente."
               }
             },
             {
@@ -730,21 +1619,45 @@
             {
               "npc": "rudy",
               "text": {
-                "en": "Muizz Street. Third door. Blue sign. Nine o'clock. Got it. Amira — we go tonight.",
-                "ko": "무이즈 거리. 세 번째 문. 파란 간판. 9시. 알겠어. 아미라 — 오늘 밤 간다.",
-                "es": "Calle Muizz. Tercera puerta. Letrero azul. Nueve en punto. Entendido. Amira — vamos esta noche."
+                "en": "Muizz Street. Third door. Blue sign. Nine o'clock. Got it. Amira... we go tonight.",
+                "ko": "무이즈 거리. 세 번째 문. 파란 간판. 9시. 알겠어. 아미라... 오늘 밤 간다.",
+                "es": "Calle Muizz. Tercera puerta. Letrero azul. Nueve en punto. Entendido. Amira... vamos esta noche."
               }
             }
           ],
-          "quizzes": ["ch4_quiz_c"]
+          "quizzes": [
+            "ch4_quiz_c"
+          ],
+          "clues": [
+            {
+              "id": "ch4_clue_hassan",
+              "icon": "🗺️",
+              "title": {
+                "en": "Hassan's Intel",
+                "ko": "하산의 정보",
+                "es": "Intel de Hassan"
+              },
+              "description": {
+                "en": "Mr. Black visits Muizz Street every night at 9. Third door, blue sign.",
+                "ko": "미스터 블랙이 매일 밤 9시에 무이즈 거리 방문. 세 번째 문, 파란 간판.",
+                "es": "Mr. Black visita la Calle Muizz cada noche a las 9. Tercera puerta, letrero azul."
+              },
+              "chapter": "ch4",
+              "linkedQuiz": "ch4_quiz_c"
+            }
+          ]
         },
         {
           "id": "ch4_scene4",
-          "title": { "ko": "미스 페니의 귀환", "en": "Miss Penny Returns", "es": "El Regreso de Miss Penny" },
+          "title": {
+            "ko": "미스 페니의 귀환",
+            "en": "Miss Penny Returns",
+            "es": "El Regreso de Miss Penny"
+          },
           "narration": {
-            "ko": "아미라의 연구실. 루디가 오늘 밤 작전을 준비하고 있다. 문을 두드리는 소리. 아미라가 열면 — 미스 페니가 서 있다. 런던의 서점 주인. 렉시콘의 내부자. 배신자. 여기 카이로에.",
-            "en": "Amira's lab. Rudy is preparing for tonight's operation. A knock at the door. Amira opens it — and Miss Penny is standing there. The London bookshop owner. Lexicon's insider. The traitor. Here in Cairo.",
-            "es": "El laboratorio de Amira. Rudy prepara la operación de esta noche. Un golpe en la puerta. Amira abre — y Miss Penny está ahí. La dueña de la librería de Londres. La infiltrada de Lexicón. La traidora. Aquí en El Cairo."
+            "ko": "아미라의 연구실. 루디가 오늘 밤 작전을 준비하고 있다. 문을 두드리는 소리. 아미라가 열면... 미스 페니가 서 있다. 런던의 서점 주인. 렉시콘의 내부자. 배신자. 여기 카이로에.",
+            "en": "Amira's lab. Rudy is preparing for tonight's operation. A knock at the door. Amira opens it... and Miss Penny is standing there. The London bookshop owner. Lexicon's insider. The traitor. Here in Cairo.",
+            "es": "El laboratorio de Amira. Rudy prepara la operación de esta noche. Un golpe en la puerta. Amira abre... y Miss Penny está ahí. La dueña de la librería de Londres. La infiltrada de Lexicón. La traidora. Aquí en El Cairo."
           },
           "dialogues": [
             {
@@ -764,11 +1677,74 @@
               }
             },
             {
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "Everyone makes mistakes. What matters is you came back.",
+                    "npcReaction": "...Thank you, Rudy. I don't deserve that, but I'll try to earn it.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "You betrayed us once. How do I know you won't do it again?",
+                    "npcReaction": "You don't. That's fair. But I'm here, and I have the codes you need. That has to count for something.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": -1
+                    }
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "Todos cometemos errores. Lo que importa es que volviste.",
+                    "npcReaction": "...Gracias, Rudy. No lo merezco, pero intentaré ganármelo.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "Nos traicionaste una vez. ¿Cómo sé que no lo harás de nuevo?",
+                    "npcReaction": "No lo sabes. Es justo. Pero estoy aquí, y tengo los códigos que necesitas. Eso debe contar algo.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": -1
+                    }
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "누구나 실수해. 중요한 건 돌아왔다는 거야.",
+                    "npcReaction": "...고마워, 루디. 자격이 없는데, 자격을 만들어볼게.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": 3
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "한 번 배신했잖아. 다시 안 그럴 거라는 보장이 어딨어?",
+                    "npcReaction": "없어. 맞아. 하지만 나 여기 있고, 네가 필요한 코드를 가지고 있어. 그 정도는 인정해줘.",
+                    "npcRelation": {
+                      "npc": "penny",
+                      "points": -1
+                    }
+                  }
+                ]
+              }
+            },
+            {
               "npc": "penny",
               "text": {
-                "en": "Mr. Black held my bookshop hostage. My collection — thirty years of manuscripts from dying languages. He funded it, then used it as leverage. 'Help me, or I burn every book.' I was weak. I chose the books over my conscience. But after Seoul... after watching you READ that Korean note on the tower... I understood what I was helping him destroy. Not words on paper. Living understanding between people. I can't be part of that anymore.",
-                "ko": "미스터 블랙이 내 서점을 볼모로 잡았어. 내 컬렉션 — 사라지는 언어의 원고 30년치. 그가 자금을 대고, 그걸 지렛대로 썼어. '도와라, 아니면 모든 책을 태운다.' 나는 약했어. 양심보다 책을 택했어. 하지만 서울 이후에... 네가 타워에서 그 한국어 쪽지를 읽는 걸 본 후에... 내가 뭘 파괴하는 걸 돕고 있었는지 이해했어. 종이 위의 글자가 아니야. 사람들 사이의 살아있는 이해. 더 이상 그 일부가 될 수 없어.",
-                "es": "Mr. Black tomó mi librería como rehén. Mi colección — treinta años de manuscritos de idiomas moribundos. Él la financió, luego la usó como palanca. 'Ayúdame, o quemo cada libro.' Fui débil. Elegí los libros sobre mi conciencia. Pero después de Seúl... después de verte LEER esa nota en coreano en la torre... entendí lo que estaba ayudando a destruir. No palabras en papel. Comprensión viva entre personas. No puedo ser parte de eso más."
+                "en": "Mr. Black held my bookshop hostage. My collection... thirty years of manuscripts from dying languages. He funded it, then used it as leverage. 'Help me, or I burn every book.' I was weak. I chose the books over my conscience. But after Seoul... after watching you READ that Korean note on the tower... I understood what I was helping him destroy. Not words on paper. Living understanding between people. I can't be part of that anymore.",
+                "ko": "미스터 블랙이 내 서점을 볼모로 잡았어. 내 컬렉션... 사라지는 언어의 원고 30년치. 그가 자금을 대고, 그걸 지렛대로 썼어. '도와라, 아니면 모든 책을 태운다.' 나는 약했어. 양심보다 책을 택했어. 하지만 서울 이후에... 네가 타워에서 그 한국어 쪽지를 읽는 걸 본 후에... 내가 뭘 파괴하는 걸 돕고 있었는지 이해했어. 종이 위의 글자가 아니야. 사람들 사이의 살아있는 이해. 더 이상 그 일부가 될 수 없어.",
+                "es": "Mr. Black tomó mi librería como rehén. Mi colección... treinta años de manuscritos de idiomas moribundos. Él la financió, luego la usó como palanca. 'Ayúdame, o quemo cada libro.' Fui débil. Elegí los libros sobre mi conciencia. Pero después de Seúl... después de verte LEER esa nota en coreano en la torre... entendí lo que estaba ayudando a destruir. No palabras en papel. Comprensión viva entre personas. No puedo ser parte de eso más."
               }
             },
             {
@@ -782,9 +1758,9 @@
             {
               "npc": "rudy",
               "text": {
-                "en": "I don't trust you. But I don't need to. I need your codes. Amira — your call. She's your dig site, your stone, your family's legacy.",
-                "ko": "널 믿지 않아. 하지만 믿을 필요도 없어. 네 코드가 필요해. 아미라 — 네가 결정해. 네 발굴 현장이고, 네 수호석이고, 네 가족의 유산이니까.",
-                "es": "No confío en ti. Pero no necesito hacerlo. Necesito tus códigos. Amira — tú decides. Es tu sitio de excavación, tu piedra, el legado de tu familia."
+                "en": "I don't trust you. But I don't need to. I need your codes. Amira... your call. She's your dig site, your stone, your family's legacy.",
+                "ko": "널 믿지 않아. 하지만 믿을 필요도 없어. 네 코드가 필요해. 아미라... 네가 결정해. 네 발굴 현장이고, 네 수호석이고, 네 가족의 유산이니까.",
+                "es": "No confío en ti. Pero no necesito hacerlo. Necesito tus códigos. Amira... tú decides. Es tu sitio de excavación, tu piedra, el legado de tu familia."
               }
             },
             {
@@ -808,12 +1784,16 @@
         },
         {
           "id": "ch4_scene5",
-          "title": { "ko": "편집자의 철학", "en": "The Editor's Philosophy", "es": "La Filosofía del Editor" },
+          "title": {
+            "ko": "편집자의 철학",
+            "en": "The Editor's Philosophy",
+            "es": "La Filosofía del Editor"
+          },
           "isBoss": true,
           "narration": {
             "ko": "무이즈 거리. 밤 9시. 미스 페니의 코드로 문이 열린다. 안에는 도서관. 모든 벽이 책으로 가득하다. 하지만 책들의 제목이 보이지 않는다. 표지만 남고 제목이 지워져 있다. 방 중앙에, 미스터 블랙이 의자에 앉아 있다. 루디를 기다리고 있었다. 차가 두 잔 놓여 있다.",
-            "en": "Muizz Street. Nine PM. Miss Penny's code opens the door. Inside — a library. Every wall covered in books. But the titles on the books are invisible. Only covers remain, titles erased. And in the center of the room, Mr. Black sits in a chair. He was waiting for Rudy. Two cups of tea are set.",
-            "es": "Calle Muizz. Nueve de la noche. El código de Miss Penny abre la puerta. Dentro — una biblioteca. Cada pared cubierta de libros. Pero los títulos de los libros son invisibles. Solo quedan las portadas, títulos borrados. Y en el centro de la habitación, Mr. Black está sentado en una silla. Esperaba a Rudy. Dos tazas de té están servidas."
+            "en": "Muizz Street. Nine PM. Miss Penny's code opens the door. Inside... a library. Every wall covered in books. But the titles on the books are invisible. Only covers remain, titles erased. And in the center of the room, Mr. Black sits in a chair. He was waiting for Rudy. Two cups of tea are set.",
+            "es": "Calle Muizz. Nueve de la noche. El código de Miss Penny abre la puerta. Dentro... una biblioteca. Cada pared cubierta de libros. Pero los títulos de los libros son invisibles. Solo quedan las portadas, títulos borrados. Y en el centro de la habitación, Mr. Black está sentado en una silla. Esperaba a Rudy. Dos tazas de té están servidas."
           },
           "dialogues": [
             {
@@ -851,9 +1831,9 @@
             {
               "npc": "rudy",
               "text": {
-                "en": "You're wrong. Not about the problem. About the solution. The answer to 'people don't understand each other' isn't to destroy every language and replace it with yours. The answer is to LEARN. The way I learned Korean in Seoul. Badly. Embarrassingly. One word at a time. And it worked. Not because the wall disappeared — because I climbed over it. That's what language learning IS. Not erasing walls. Building bridges. One clumsy, mispronounced word at a time.",
-                "ko": "틀렸어. 문제에 대해서가 아니라. 해법에 대해서. '사람들이 서로를 이해하지 못한다'에 대한 답은 모든 언어를 파괴하고 당신 것으로 대체하는 게 아니야. 답은 배우는 거야. 내가 서울에서 한국어를 배운 것처럼. 엉망으로. 창피하게. 한 단어씩. 그리고 통했어. 벽이 사라져서가 아니라 — 내가 넘었으니까. 언어 학습이 그거야. 벽을 지우는 게 아니라. 다리를 놓는 거야. 서툴고, 발음 틀린, 한 단어씩.",
-                "es": "Te equivocas. No sobre el problema. Sobre la solución. La respuesta a 'la gente no se entiende' no es destruir cada idioma y reemplazarlo con el tuyo. La respuesta es APRENDER. Como yo aprendí coreano en Seúl. Mal. Vergonzosamente. Una palabra a la vez. Y funcionó. No porque el muro desapareció — porque lo escalé. Eso ES el aprendizaje de idiomas. No borrar muros. Construir puentes. Una torpe palabra mal pronunciada a la vez."
+                "en": "You're wrong. Not about the problem. About the solution. The answer to 'people don't understand each other' isn't to destroy every language and replace it with yours. The answer is to LEARN. The way I learned Korean in Seoul. Badly. Embarrassingly. One word at a time. And it worked. Not because the wall disappeared... because I climbed over it. That's what language learning IS. Not erasing walls. Building bridges. One clumsy, mispronounced word at a time.",
+                "ko": "틀렸어. 문제에 대해서가 아니라. 해법에 대해서. '사람들이 서로를 이해하지 못한다'에 대한 답은 모든 언어를 파괴하고 당신 것으로 대체하는 게 아니야. 답은 배우는 거야. 내가 서울에서 한국어를 배운 것처럼. 엉망으로. 창피하게. 한 단어씩. 그리고 통했어. 벽이 사라져서가 아니라... 내가 넘었으니까. 언어 학습이 그거야. 벽을 지우는 게 아니라. 다리를 놓는 거야. 서툴고, 발음 틀린, 한 단어씩.",
+                "es": "Te equivocas. No sobre el problema. Sobre la solución. La respuesta a 'la gente no se entiende' no es destruir cada idioma y reemplazarlo con el tuyo. La respuesta es APRENDER. Como yo aprendí coreano en Seúl. Mal. Vergonzosamente. Una palabra a la vez. Y funcionó. No porque el muro desapareció... porque lo escalé. Eso ES el aprendizaje de idiomas. No borrar muros. Construir puentes. Una torpe palabra mal pronunciada a la vez."
               }
             },
             {
@@ -867,50 +1847,88 @@
             {
               "npc": "amira",
               "text": {
-                "en": "Rudy. There's something I haven't told you. The Cairo stone — it's one of seven. My grandmother's notes describe how the seven Guardian Stones were scattered across the world centuries ago. Mr. Black found the first one before any of us. He's not just collecting them, Rudy. He's building something. And that first stone was the key piece.",
-                "ko": "루디. 말하지 않은 게 있어. 카이로 수호석은 — 일곱 중 하나야. 할머니의 기록에 일곱 개의 수호석이 수 세기 전에 세계 곳곳에 흩어졌다고 적혀 있어. 미스터 블랙이 우리보다 먼저 첫 번째를 찾은 거야. 그는 수집만 하는 게 아니야, 루디. 뭔가를 만들고 있어. 그 첫 번째 수호석이 핵심 조각이었어.",
-                "es": "Rudy. Hay algo que no te he dicho. La piedra de El Cairo — es una de siete. Las notas de mi abuela describen cómo las siete Piedras Guardianas fueron dispersadas por el mundo hace siglos. Mr. Black encontró la primera antes que todos. No solo las recolecta, Rudy. Está construyendo algo. Y esa primera piedra fue la pieza clave."
+                "en": "Rudy. There's something I haven't told you. The Cairo stone... it's one of seven. My grandmother's notes describe how the seven Guardian Stones were scattered across the world centuries ago. Mr. Black found the first one before any of us. He's not just collecting them, Rudy. He's building something. And that first stone was the key piece.",
+                "ko": "루디. 말하지 않은 게 있어. 카이로 수호석은... 일곱 중 하나야. 할머니의 기록에 일곱 개의 수호석이 수 세기 전에 세계 곳곳에 흩어졌다고 적혀 있어. 미스터 블랙이 우리보다 먼저 첫 번째를 찾은 거야. 그는 수집만 하는 게 아니야, 루디. 뭔가를 만들고 있어. 그 첫 번째 수호석이 핵심 조각이었어.",
+                "es": "Rudy. Hay algo que no te he dicho. La piedra de El Cairo... es una de siete. Las notas de mi abuela describen cómo las siete Piedras Guardianas fueron dispersadas por el mundo hace siglos. Mr. Black encontró la primera antes que todos. No solo las recolecta, Rudy. Está construyendo algo. Y esa primera piedra fue la pieza clave."
               }
             }
           ],
-          "quizzes": ["ch4_quiz_d"]
+          "quizzes": [
+            "ch4_quiz_d"
+          ]
         }
       ],
       "cliffhanger": {
-        "ko": "아미라의 폭탄 선언: 미스터 블랙이 이미 첫 번째 수호석을 찾았다. 그는 수집하는 게 아니야 — 뭔가를 만들고 있어. 루디가 생각한 것보다 판이 훨씬 크다.",
-        "en": "Amira's bombshell: Mr. Black already found the first Guardian Stone. He's not just collecting — he's building something. The board is bigger than Rudy imagined.",
-        "es": "La revelación de Amira: Mr. Black ya encontró la primera Piedra Guardiana. No solo está coleccionando — está construyendo algo. El tablero es más grande de lo que Rudy imaginó."
+        "ko": "아미라의 폭탄 선언: 미스터 블랙이 이미 첫 번째 수호석을 찾았다. 그는 수집하는 게 아니야... 뭔가를 만들고 있어. 루디가 생각한 것보다 판이 훨씬 크다.",
+        "en": "Amira's bombshell: Mr. Black already found the first Guardian Stone. He's not just collecting... he's building something. The board is bigger than Rudy imagined.",
+        "es": "La revelación de Amira: Mr. Black ya encontró la primera Piedra Guardiana. No solo está coleccionando... está construyendo algo. El tablero es más grande de lo que Rudy imaginó."
       }
     },
     {
       "id": "ch5",
-      "title": { "ko": "최후의 언어", "en": "The Last Language", "es": "El Último Idioma" },
+      "title": {
+        "ko": "최후의 언어",
+        "en": "The Last Language",
+        "es": "El Último Idioma"
+      },
       "city": "Babel Tower",
       "flag": "🌍",
       "icon": "👑",
       "isLocked": false,
       "unlockLevel": 20,
-      "theme": { "ko": "연대, 구원, 그리고 언어의 힘", "en": "Unity, Redemption, and the Power of Language", "es": "Unidad, Redención y el Poder del Idioma" },
-      "npcs": ["penny", "mr_black", "tom", "isabel", "miguel", "sujin", "minho", "youngsook", "amira", "hassan", "eleanor"],
+      "theme": {
+        "ko": "연대, 구원, 그리고 언어의 힘",
+        "en": "Unity, Redemption, and the Power of Language",
+        "es": "Unidad, Redención y el Poder del Idioma"
+      },
+      "npcs": [
+        "penny",
+        "mr_black",
+        "tom",
+        "isabel",
+        "miguel",
+        "sujin",
+        "minho",
+        "youngsook",
+        "amira",
+        "hassan",
+        "eleanor"
+      ],
       "totalXP": 2300,
-      "badge": { "id": "language_defender", "name": { "ko": "언어의 수호자", "en": "Language Defender", "es": "Defensor del Idioma" }, "icon": "👑" },
+      "badge": {
+        "id": "language_defender",
+        "name": {
+          "ko": "언어의 수호자",
+          "en": "Language Defender",
+          "es": "Defensor del Idioma"
+        },
+        "icon": "👑"
+      },
       "scenes": [
         {
           "id": "ch5_scene1",
-          "title": { "ko": "바벨에 도착하다", "en": "Arrival at Babel", "es": "Llegada a Babel" },
-          "timelineNote": { "en": "The next morning...", "ko": "다음 날 아침...", "es": "A la mañana siguiente..." },
+          "title": {
+            "ko": "바벨에 도착하다",
+            "en": "Arrival at Babel",
+            "es": "Llegada a Babel"
+          },
+          "timelineNote": {
+            "en": "The next morning...",
+            "ko": "다음 날 아침...",
+            "es": "A la mañana siguiente..."
+          },
           "narration": {
-            "ko": "4개의 수호석이 가리킨 좌표 — 메소포타미아 평원 한가운데, 하늘을 찌를 듯한 구조물이 서 있다. 고대의 탑이 아니다. 현대적인 유리와 강철의 타워. 꼭대기에서 불빛이 맥동한다. 렉시콘 소사이어티의 본부. 미스 페니가 루디 옆에서 걸음을 멈춘다.",
-            "en": "The coordinates the four Guardian Stones pointed to — in the middle of the Mesopotamian plain, a structure pierces the sky. Not an ancient tower. A modern spire of glass and steel. Light pulses from its peak. Lexicon Society headquarters. Miss Penny stops walking beside Rudy.",
-            "es": "Las coordenadas que señalaron las cuatro Piedras Guardianas — en medio de la llanura mesopotámica, una estructura atraviesa el cielo. No es una torre antigua. Una aguja moderna de vidrio y acero. La luz pulsa desde su cima. El cuartel general de la Sociedad Lexicón. Miss Penny deja de caminar junto a Rudy."
+            "ko": "4개의 수호석이 가리킨 좌표... 메소포타미아 평원 한가운데, 하늘을 찌를 듯한 구조물이 서 있다. 고대의 탑이 아니다. 현대적인 유리와 강철의 타워. 꼭대기에서 불빛이 맥동한다. 렉시콘 소사이어티의 본부. 미스 페니가 루디 옆에서 걸음을 멈춘다.",
+            "en": "The coordinates the four Guardian Stones pointed to... in the middle of the Mesopotamian plain, a structure pierces the sky. Not an ancient tower. A modern spire of glass and steel. Light pulses from its peak. Lexicon Society headquarters. Miss Penny stops walking beside Rudy.",
+            "es": "Las coordenadas que señalaron las cuatro Piedras Guardianas... en medio de la llanura mesopotámica, una estructura atraviesa el cielo. No es una torre antigua. Una aguja moderna de vidrio y acero. La luz pulsa desde su cima. El cuartel general de la Sociedad Lexicón. Miss Penny deja de caminar junto a Rudy."
           },
           "dialogues": [
             {
               "npc": "penny",
               "text": {
-                "en": "There are five floors. Each one is a language gate — English, Spanish, Korean, and two more I never learned. The stones are kept at the top. And Rudy... Black knows we're coming. He always knows.",
-                "es": "Hay cinco pisos. Cada uno es una puerta lingüística — inglés, español, coreano, y dos más que nunca aprendí. Las piedras están en la cima. Y Rudy... Black sabe que venimos. Siempre lo sabe.",
-                "ko": "5층이야. 각 층이 언어 관문이야 — 영어, 스페인어, 한국어, 그리고 내가 모르는 두 개 더. 수호석은 꼭대기에 있어. 그리고 루디... 블랙은 우리가 오는 걸 알아. 항상 알거든."
+                "en": "There are five floors. Each one is a language gate... English, Spanish, Korean, and two more I never learned. The stones are kept at the top. And Rudy... Black knows we're coming. He always knows.",
+                "es": "Hay cinco pisos. Cada uno es una puerta lingüística... inglés, español, coreano, y dos más que nunca aprendí. Las piedras están en la cima. Y Rudy... Black sabe que venimos. Siempre lo sabe.",
+                "ko": "5층이야. 각 층이 언어 관문이야... 영어, 스페인어, 한국어, 그리고 내가 모르는 두 개 더. 수호석은 꼭대기에 있어. 그리고 루디... 블랙은 우리가 오는 걸 알아. 항상 알거든."
               }
             },
             {
@@ -924,9 +1942,9 @@
             {
               "npc": "penny",
               "text": {
-                "en": "I need to tell you something. The Universal Code — it's not just a translation machine. It's a frequency. When Black activates it with all seven stones, it overwrites how the brain processes language. Everyone on Earth would wake up speaking one artificial language. And forgetting every other one. Their mother's lullabies. Their grandfather's stories. Gone.",
-                "es": "Necesito decirte algo. El Código Universal — no es solo una máquina traductora. Es una frecuencia. Cuando Black la active con las siete piedras, sobreescribe cómo el cerebro procesa el lenguaje. Todos en la Tierra despertarían hablando un idioma artificial. Y olvidarían cada otro. Las canciones de cuna de sus madres. Las historias de sus abuelos. Desaparecidas.",
-                "ko": "말해야 할 게 있어. 유니버설 코드 — 단순한 번역기가 아니야. 주파수야. 블랙이 7개의 수호석으로 활성화하면, 뇌가 언어를 처리하는 방식을 덮어써. 지구상의 모든 사람이 하나의 인공 언어만 말하게 돼. 나머지는 전부 잊어. 엄마의 자장가. 할아버지의 이야기. 사라져."
+                "en": "I need to tell you something. The Universal Code... it's not just a translation machine. It's a frequency. When Black activates it with all seven stones, it overwrites how the brain processes language. Everyone on Earth would wake up speaking one artificial language. And forgetting every other one. Their mother's lullabies. Their grandfather's stories. Gone.",
+                "es": "Necesito decirte algo. El Código Universal... no es solo una máquina traductora. Es una frecuencia. Cuando Black la active con las siete piedras, sobreescribe cómo el cerebro procesa el lenguaje. Todos en la Tierra despertarían hablando un idioma artificial. Y olvidarían cada otro. Las canciones de cuna de sus madres. Las historias de sus abuelos. Desaparecidas.",
+                "ko": "말해야 할 게 있어. 유니버설 코드... 단순한 번역기가 아니야. 주파수야. 블랙이 7개의 수호석으로 활성화하면, 뇌가 언어를 처리하는 방식을 덮어써. 지구상의 모든 사람이 하나의 인공 언어만 말하게 돼. 나머지는 전부 잊어. 엄마의 자장가. 할아버지의 이야기. 사라져."
               }
             },
             {
@@ -947,11 +1965,34 @@
               }
             }
           ],
-          "quizzes": ["ch5_quiz_a"]
+          "quizzes": [
+            "ch5_quiz_a"
+          ],
+          "clues": [
+            {
+              "id": "ch5_clue_tower",
+              "icon": "🗼",
+              "title": {
+                "en": "Babel Tower Location",
+                "ko": "바벨탑 위치",
+                "es": "Ubicación de la Torre Babel"
+              },
+              "description": {
+                "en": "The coordinates from four Guardian Stones point to the Mesopotamian plains.",
+                "ko": "4개 수호석이 가리킨 좌표가 메소포타미아 평원.",
+                "es": "Las coordenadas de cuatro Piedras Guardianas apuntan a las llanuras mesopotámicas."
+              },
+              "chapter": "ch5"
+            }
+          ]
         },
         {
           "id": "ch5_scene2",
-          "title": { "ko": "미스터 블랙의 초대", "en": "Mr. Black's Invitation", "es": "La Invitación de Mr. Black" },
+          "title": {
+            "ko": "미스터 블랙의 초대",
+            "en": "Mr. Black's Invitation",
+            "es": "La Invitación de Mr. Black"
+          },
           "narration": {
             "ko": "타워 1층. 넓은 홀 중앙에 거대한 스크린이 켜진다. 미스터 블랙이 화면 너머에서 루디를 맞이한다. 그의 목소리는 놀라울 정도로 부드럽다. 그리고 놀라울 정도로 설득력이 있다.",
             "en": "Tower, ground floor. A massive screen lights up in the center of the hall. Mr. Black greets Rudy from the other side. His voice is surprisingly soft. And surprisingly persuasive.",
@@ -985,9 +2026,9 @@
             {
               "npc": "mr_black",
               "text": {
-                "en": "I'll make this simple. There are five language gates between you and the stones. Pass them all, and you can try to stop me. Fail even one, and I activate the Code with the four stones you so kindly delivered to my doorstep. Oh — and Penny? I know you're there. I always knew you'd come back. Everyone does.",
-                "es": "Lo haré simple. Hay cinco puertas lingüísticas entre tú y las piedras. Pásalas todas, y puedes intentar detenerme. Falla aunque sea una, y activo el Código con las cuatro piedras que tan amablemente trajiste a mi puerta. Ah — ¿y Penny? Sé que estás ahí. Siempre supe que volverías. Todos vuelven.",
-                "ko": "간단하게 하자. 너와 수호석 사이에 다섯 개의 언어 관문이 있어. 다 통과하면 나를 막아볼 수 있어. 하나라도 실패하면, 네가 친절하게 내 문 앞까지 배달해 준 4개의 수호석으로 코드를 활성화할 거야. 아 — 그리고 페니? 거기 있는 거 알아. 돌아올 줄 항상 알았어. 다들 그러거든."
+                "en": "I'll make this simple. There are five language gates between you and the stones. Pass them all, and you can try to stop me. Fail even one, and I activate the Code with the four stones you so kindly delivered to my doorstep. Oh... and Penny? I know you're there. I always knew you'd come back. Everyone does.",
+                "es": "Lo haré simple. Hay cinco puertas lingüísticas entre tú y las piedras. Pásalas todas, y puedes intentar detenerme. Falla aunque sea una, y activo el Código con las cuatro piedras que tan amablemente trajiste a mi puerta. Ah... ¿y Penny? Sé que estás ahí. Siempre supe que volverías. Todos vuelven.",
+                "ko": "간단하게 하자. 너와 수호석 사이에 다섯 개의 언어 관문이 있어. 다 통과하면 나를 막아볼 수 있어. 하나라도 실패하면, 네가 친절하게 내 문 앞까지 배달해 준 4개의 수호석으로 코드를 활성화할 거야. 아... 그리고 페니? 거기 있는 거 알아. 돌아올 줄 항상 알았어. 다들 그러거든."
               }
             },
             {
@@ -999,17 +2040,86 @@
               }
             }
           ],
-          "quizzes": ["ch5_quiz_b"]
+          "quizzes": [
+            "ch5_quiz_b"
+          ]
         },
         {
           "id": "ch5_scene3",
-          "title": { "ko": "빼앗긴 수호석", "en": "The Stolen Stone", "es": "La Piedra Robada" },
+          "title": {
+            "ko": "빼앗긴 수호석",
+            "en": "The Stolen Stone",
+            "es": "La Piedra Robada"
+          },
           "narration": {
             "ko": "3층 관문을 통과한 직후. 루디가 뒤를 돌아보니 배낭의 지퍼가 열려 있다. 카이로 수호석이 없다. 바닥에 작은 메모 하나. 미스터 블랙의 글씨체. 루디의 손이 떨린다.",
             "en": "Just after passing the third floor gate. Rudy looks back and sees his backpack zipper is open. The Cairo Guardian Stone is gone. A small note on the floor. Mr. Black's handwriting. Rudy's hands shake.",
             "es": "Justo después de pasar la puerta del tercer piso. Rudy mira atrás y ve que la cremallera de su mochila está abierta. La Piedra Guardiana de El Cairo ha desaparecido. Una pequeña nota en el suelo. La letra de Mr. Black. Las manos de Rudy tiemblan."
           },
           "dialogues": [
+            {
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "I can't do this alone. I need all of you.",
+                    "npcReaction": "You were never alone, detective. We've been with you since London.",
+                    "npcRelation": {
+                      "npc": "eleanor",
+                      "points": 2
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "Stay back. This is my fight.",
+                    "npcReaction": "Your fight? Rudy, this stopped being just yours the moment Carlos lost his words. We're coming.",
+                    "npcRelation": {
+                      "npc": "isabel",
+                      "points": 1
+                    }
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "No puedo hacer esto solo. Los necesito a todos.",
+                    "npcReaction": "Nunca estuviste solo, detective. Hemos estado contigo desde Londres.",
+                    "npcRelation": {
+                      "npc": "eleanor",
+                      "points": 2
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "Quédense atrás. Esta es mi pelea.",
+                    "npcReaction": "¿Tu pelea? Rudy, esto dejó de ser solo tuyo cuando Carlos perdió sus palabras. Vamos.",
+                    "npcRelation": {
+                      "npc": "isabel",
+                      "points": 1
+                    }
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "혼자서는 못 해. 모두가 필요해.",
+                    "npcReaction": "혼자였던 적 없어, 탐정. 런던부터 쭉 함께였잖아.",
+                    "npcRelation": {
+                      "npc": "eleanor",
+                      "points": 2
+                    },
+                    "gaugeBonus": 5
+                  },
+                  {
+                    "text": "뒤에 있어. 이건 내 싸움이야.",
+                    "npcReaction": "네 싸움? 루디, 카를로스가 단어를 잃은 순간부터 네 것만은 아니야. 우리도 간다.",
+                    "npcRelation": {
+                      "npc": "isabel",
+                      "points": 1
+                    }
+                  }
+                ]
+              }
+            },
             {
               "npc": "rudy",
               "text": {
@@ -1021,7 +2131,7 @@
             {
               "npc": "penny",
               "text": {
-                "en": "The note says 'Thank you for the delivery. Four down, three to go.' He's taunting you. That means he doesn't have the other three yet. The tower still has three stones hidden in it — the ones the original Babel guardians placed here. We can still get to them first.",
+                "en": "The note says 'Thank you for the delivery. Four down, three to go.' He's taunting you. That means he doesn't have the other three yet. The tower still has three stones hidden in it... the ones the original Babel guardians placed here. We can still get to them first.",
                 "es": "La nota dice 'Gracias por la entrega. Cuatro listas, faltan tres.' Se está burlando de ti. Eso significa que no tiene las otras tres todavía. La torre aún tiene tres piedras escondidas. Aún podemos llegar primero.",
                 "ko": "메모에 '배달 감사합니다. 4개 완료, 3개 남음'이라고 써있어. 도발하는 거야. 즉 나머지 셋은 아직 없다는 뜻이야. 탑 안에 아직 3개의 수호석이 숨겨져 있어. 아직 먼저 찾을 수 있어."
               }
@@ -1029,17 +2139,17 @@
             {
               "npc": "penny",
               "text": {
-                "en": "Then stop feeling sorry for yourself and get the other three. You taught me something in Cairo, Rudy — that mistakes don't define you. What you do after them does. So. What are you going to do?",
-                "es": "Entonces deja de sentir lástima por ti mismo y consigue las otras tres. Me enseñaste algo en El Cairo, Rudy — que los errores no te definen. Lo que haces después, sí. Entonces. ¿Qué vas a hacer?",
-                "ko": "그러면 자기 연민 그만하고 나머지 셋을 찾아. 카이로에서 네가 나한테 가르쳐준 거 있잖아, 루디 — 실수가 널 정의하는 게 아니라고. 그 후에 뭘 하느냐가 정의하는 거라고. 자. 뭘 할 거야?"
+                "en": "Then stop feeling sorry for yourself and get the other three. You taught me something in Cairo, Rudy... that mistakes don't define you. What you do after them does. So. What are you going to do?",
+                "es": "Entonces deja de sentir lástima por ti mismo y consigue las otras tres. Me enseñaste algo en El Cairo, Rudy... que los errores no te definen. Lo que haces después, sí. Entonces. ¿Qué vas a hacer?",
+                "ko": "그러면 자기 연민 그만하고 나머지 셋을 찾아. 카이로에서 네가 나한테 가르쳐준 거 있잖아, 루디... 실수가 널 정의하는 게 아니라고. 그 후에 뭘 하느냐가 정의하는 거라고. 자. 뭘 할 거야?"
               }
             },
             {
               "npc": "tom",
               "text": {
-                "en": "Oi Rudy! Heard you're in a right pickle. Listen mate — 'when the going gets tough, the tough get going.' And the slippery ones check their bags. Chin up, yeah?",
-                "es": "¡Oye Rudy! Me enteré de que estás en un buen lío. Escucha amigo — 'cuando las cosas se ponen difíciles, los duros se ponen en marcha.' Y los listos revisan sus mochilas. ¡Ánimo, vale?",
-                "ko": "이봐 루디! 곤란한 상황이라며. 들어 친구 — '힘들 때 강한 자가 움직인다'고. 그리고 영리한 놈은 가방을 확인하지. 기운 내, 알았지?"
+                "en": "Oi Rudy! Heard you're in a right pickle. Listen mate... 'when the going gets tough, the tough get going.' And the slippery ones check their bags. Chin up, yeah?",
+                "es": "¡Oye Rudy! Me enteré de que estás en un buen lío. Escucha amigo... 'cuando las cosas se ponen difíciles, los duros se ponen en marcha.' Y los listos revisan sus mochilas. ¡Ánimo, vale?",
+                "ko": "이봐 루디! 곤란한 상황이라며. 들어 친구... '힘들 때 강한 자가 움직인다'고. 그리고 영리한 놈은 가방을 확인하지. 기운 내, 알았지?"
               }
             },
             {
@@ -1061,33 +2171,33 @@
             {
               "npc": "sujin",
               "text": {
-                "en": "Rudy, it's Sujin. I've been researching the original Babel stones. Each one responds to a different language — you need to speak TO them, not just carry them. The stones aren't keys. They're listeners.",
-                "es": "Rudy, soy Sujin. He estado investigando las piedras originales de Babel. Cada una responde a un idioma diferente — necesitas hablarLES, no solo llevarlas. Las piedras no son llaves. Son oyentes.",
-                "ko": "루디 씨, 수진이에요. 원래 바벨 수호석을 연구하고 있었어요. 각 돌이 다른 언어에 반응해요 — 들고만 다니는 게 아니라 말을 걸어야 해요. 수호석은 열쇠가 아니에요. 듣는 자예요."
+                "en": "Rudy, it's Sujin. I haven't slept in three days and I've filled six notebooks. The original Babel stones have phonological resonance patterns! Each one responds to a different language's frequency. You need to speak TO them, not just carry them. They're not keys. They're listeners. This is the most beautiful thing I've ever studied and I am NOT letting Mr. Black turn it into a weapon.",
+                "es": "Rudy, soy Sujin. No he dormido en tres días y he llenado seis cuadernos. ¡Las piedras originales de Babel tienen patrones de resonancia fonológica! Cada una responde a la frecuencia de un idioma diferente. Necesitas hablarLES, no solo llevarlas. No son llaves. Son oyentes. Es lo más hermoso que he estudiado en mi vida y NO voy a dejar que Mr. Black lo convierta en un arma.",
+                "ko": "루디 씨, 수진이에요. 3일째 잠을 못 잤고 노트 여섯 권을 채웠어요. 원래 바벨 수호석에 음운적 공명 패턴이 있어요! 각 돌이 다른 언어의 주파수에 반응해요. 들고만 다니는 게 아니라 말을 걸어야 해요. 열쇠가 아니에요. 듣는 자예요. 제가 평생 연구한 것 중 가장 아름다운 거예요. 미스터 블랙이 이걸 무기로 만들게 절대 놔두지 않을 거예요."
               }
             },
             {
               "npc": "minho",
               "text": {
-                "en": "Yo Rudy. Minho. Word on the underground network — Black's Code has a flaw. It needs all seven stones SIMULTANEOUSLY. Even one missing and the frequency collapses. So guard what you have left with your life.",
-                "es": "Ey Rudy. Minho. La red subterránea dice — el Código de Black tiene un fallo. Necesita las siete piedras SIMULTÁNEAMENTE. Si falta una sola, la frecuencia colapsa. Protege lo que te queda con tu vida.",
-                "ko": "요 루디. 민호야. 지하 네트워크에서 들은 건데 — 블랙의 코드에 결함이 있대. 7개의 수호석이 동시에 필요하대. 하나라도 없으면 주파수가 붕괴해. 남은 거 목숨 걸고 지켜."
+                "en": "Yo Rudy. Minho. Word on the underground network... Black's Code has a flaw. It needs all seven stones SIMULTANEOUSLY. Even one missing and the frequency collapses. So guard what you have left with your life.",
+                "es": "Ey Rudy. Minho. La red subterránea dice... el Código de Black tiene un fallo. Necesita las siete piedras SIMULTÁNEAMENTE. Si falta una sola, la frecuencia colapsa. Protege lo que te queda con tu vida.",
+                "ko": "요 루디. 민호야. 지하 네트워크에서 들은 건데... 블랙의 코드에 결함이 있대. 7개의 수호석이 동시에 필요하대. 하나라도 없으면 주파수가 붕괴해. 남은 거 목숨 걸고 지켜."
               }
             },
             {
               "npc": "eleanor",
               "text": {
-                "en": "Rudy. It's Eleanor. I hired you twenty years ago because you never gave up on a case, even the ones that seemed impossible. This is not different. It's just bigger. Find the stones. Stop the Code. And Rudy — come home.",
-                "es": "Rudy. Soy Eleanor. Te contraté hace veinte años porque nunca abandonabas un caso, ni los que parecían imposibles. Esto no es diferente. Solo es más grande. Encuentra las piedras. Detén el Código. Y Rudy — vuelve a casa.",
-                "ko": "루디. 엘리너야. 20년 전에 너를 고용한 건 불가능해 보이는 사건도 절대 포기하지 않았기 때문이야. 이번도 다르지 않아. 그저 더 클 뿐이야. 수호석을 찾아. 코드를 멈춰. 그리고 루디 — 집으로 돌아와."
+                "en": "Rudy. It's Eleanor. I hired you twenty years ago because you never gave up on a case, even the ones that seemed impossible. This is not different. It's just bigger. Find the stones. Stop the Code. And Rudy... come home.",
+                "es": "Rudy. Soy Eleanor. Te contraté hace veinte años porque nunca abandonabas un caso, ni los que parecían imposibles. Esto no es diferente. Solo es más grande. Encuentra las piedras. Detén el Código. Y Rudy... vuelve a casa.",
+                "ko": "루디. 엘리너야. 20년 전에 너를 고용한 건 불가능해 보이는 사건도 절대 포기하지 않았기 때문이야. 이번도 다르지 않아. 그저 더 클 뿐이야. 수호석을 찾아. 코드를 멈춰. 그리고 루디... 집으로 돌아와."
               }
             },
             {
               "npc": "eleanor",
               "text": {
-                "en": "I was your teacher, and I failed you. But these students — they won't fail.",
-                "ko": "내가 너의 선생이었고, 널 실패했어. 하지만 이 학생들은 — 실패하지 않을 거야.",
-                "es": "Fui tu maestra y te fallé. Pero estos estudiantes — ellos no fallarán."
+                "en": "I was your teacher, and I failed you. But these students... they won't fail.",
+                "ko": "내가 너의 선생이었고, 널 실패했어. 하지만 이 학생들은... 실패하지 않을 거야.",
+                "es": "Fui tu maestra y te fallé. Pero estos estudiantes... ellos no fallarán."
               }
             },
             {
@@ -1099,23 +2209,29 @@
               }
             }
           ],
-          "quizzes": ["ch5_quiz_c"]
+          "quizzes": [
+            "ch5_quiz_c"
+          ]
         },
         {
           "id": "ch5_scene4",
-          "title": { "ko": "언어의 벽을 넘어", "en": "Beyond the Language Wall", "es": "Más Allá del Muro del Idioma" },
+          "title": {
+            "ko": "언어의 벽을 넘어",
+            "en": "Beyond the Language Wall",
+            "es": "Más Allá del Muro del Idioma"
+          },
           "narration": {
             "ko": "4층. 관문이 바뀌었다. 하나의 언어가 아니라 세 가지 언어가 동시에 울려퍼진다. 영어, 스페인어, 한국어가 뒤섞인 비문이 벽면을 가득 채우고 있다. 미스 페니가 비문의 패턴을 분석하기 시작한다.",
             "en": "Fourth floor. The gate has changed. Not one language but three pouring out simultaneously. English, Spanish, Korean inscriptions intertwined across every wall. Miss Penny begins analyzing the patterns.",
-            "es": "Cuarto piso. La puerta ha cambiado. No un idioma sino tres fluyendo simultáneamente. Inscripciones en inglés, español y coreano entrelazadas por todas las paredes. Miss Penny comienza a analizar los patrones."
+            "es": "Cuarto piso. La puerta ha cambiado. No un idioma sino tres fluyendo simultáneamente. Inscripciónes en inglés, español y coreano entrelazadas por todas las paredes. Miss Penny comienza a analizar los patrones."
           },
           "dialogues": [
             {
               "npc": "penny",
               "text": {
-                "en": "This is it. This is what I spent my life studying. These inscriptions — they're not separate languages. They're one message written in three voices. Like a chord in music. Each language carries a piece of meaning that the others can't express alone. Remove one, and the message breaks.",
-                "es": "Esto es. Esto es lo que pasé mi vida estudiando. Estas inscripciones — no son idiomas separados. Son un mensaje escrito en tres voces. Como un acorde musical. Cada idioma lleva un pedazo de significado que los otros no pueden expresar solos. Quita uno, y el mensaje se rompe.",
-                "ko": "이거야. 이게 내가 평생 연구한 거야. 이 비문들 — 따로 있는 언어가 아니야. 세 가지 목소리로 쓰인 하나의 메시지야. 음악의 화음 같은 거야. 각 언어가 다른 언어만으로는 표현할 수 없는 의미 조각을 품고 있어. 하나를 빼면 메시지가 깨져."
+                "en": "This is it. This is what I spent my life studying. These inscriptions... they're not separate languages. They're one message written in three voices. Like a chord in music. Each language carries a piece of meaning that the others can't express alone. Remove one, and the message breaks.",
+                "es": "Esto es. Esto es lo que pasé mi vida estudiando. Estas inscripciones... no son idiomas separados. Son un mensaje escrito en tres voces. Como un acorde musical. Cada idioma lleva un pedazo de significado que los otros no pueden expresar solos. Quita uno, y el mensaje se rompe.",
+                "ko": "이거야. 이게 내가 평생 연구한 거야. 이 비문들... 따로 있는 언어가 아니야. 세 가지 목소리로 쓰인 하나의 메시지야. 음악의 화음 같은 거야. 각 언어가 다른 언어만으로는 표현할 수 없는 의미 조각을 품고 있어. 하나를 빼면 메시지가 깨져."
               }
             },
             {
@@ -1145,17 +2261,41 @@
             {
               "npc": "penny",
               "text": {
-                "en": "The trilingual inscription is a lock. We need to read it aloud — all three languages, together. I'll take the Spanish. You take the English and Korean. Ready?",
-                "es": "La inscripción trilingüe es una cerradura. Necesitamos leerla en voz alta — los tres idiomas, juntos. Yo tomo el español. Tú toma el inglés y el coreano. ¿Lista?",
-                "ko": "세 언어 비문이 자물쇠야. 소리 내어 읽어야 해 — 세 언어 모두, 함께. 내가 스페인어를 맡을게. 너는 영어와 한국어를. 준비됐어?"
+                "en": "The trilingual inscription is a lock. We need to read it aloud... all three languages, together. I'll take the Spanish. You take the English and Korean. Ready?",
+                "es": "La inscripción trilingüe es una cerradura. Necesitamos leerla en voz alta... los tres idiomas, juntos. Yo tomo el español. Tú toma el inglés y el coreano. ¿Lista?",
+                "ko": "세 언어 비문이 자물쇠야. 소리 내어 읽어야 해... 세 언어 모두, 함께. 내가 스페인어를 맡을게. 너는 영어와 한국어를. 준비됐어?"
               }
             }
           ],
-          "quizzes": ["ch5_quiz_d"]
+          "quizzes": [
+            "ch5_quiz_d"
+          ],
+          "clues": [
+            {
+              "id": "ch5_clue_listeners",
+              "icon": "👂",
+              "title": {
+                "en": "Stones Are Listeners",
+                "ko": "수호석은 듣는 자",
+                "es": "Las Piedras Son Oyentes"
+              },
+              "description": {
+                "en": "Sujin discovered the stones respond to language frequency, not just placement.",
+                "ko": "수진이 수호석이 배치가 아니라 언어 주파수에 반응한다는 것을 발견.",
+                "es": "Sujin descubrió que las piedras responden a frecuencia lingüística, no solo ubicación."
+              },
+              "chapter": "ch5",
+              "linkedQuiz": "ch5_quiz_e"
+            }
+          ]
         },
         {
           "id": "ch5_scene5_boss",
-          "title": { "ko": "최후의 언어", "en": "The Last Language", "es": "El Último Idioma" },
+          "title": {
+            "ko": "최후의 언어",
+            "en": "The Last Language",
+            "es": "El Último Idioma"
+          },
           "isBoss": true,
           "narration": {
             "ko": "꼭대기 층. 7개의 수호석 받침대가 원형으로 배치되어 있다. 5개는 이미 놓여 있다. 루디는 3개의 수호석을 손에 쥐고 있다. 미스터 블랙이 방 반대편에 서 있다. 이번에는 스크린이 아니다. 진짜다.",
@@ -1174,9 +2314,9 @@
             {
               "npc": "rudy",
               "text": {
-                "en": "You're wrong about one thing, Black. The stones don't activate the Code when placed together. Sujin told me — they're listeners. They respond to language. YOUR Code would try to force one frequency through them. But that's not what they were made for.",
-                "es": "Te equivocas en una cosa, Black. Las piedras no activan el Código al colocarlas juntas. Sujin me lo dijo — son oyentes. Responden al idioma. TU Código intentaría forzar una frecuencia a través de ellas. Pero no fueron hechas para eso.",
-                "ko": "한 가지 틀렸어, 블랙. 수호석은 모아 놓는다고 코드가 활성화되는 게 아니야. 수진이가 알려줬어 — 듣는 자들이래. 언어에 반응한다고. 네 코드는 하나의 주파수를 강제로 통과시키려 하겠지. 하지만 그건 수호석이 만들어진 목적이 아니야."
+                "en": "You're wrong about one thing, Black. The stones don't activate the Code when placed together. Sujin told me... they're listeners. They respond to language. YOUR Code would try to force one frequency through them. But that's not what they were made for.",
+                "es": "Te equivocas en una cosa, Black. Las piedras no activan el Código al colocarlas juntas. Sujin me lo dijo... son oyentes. Responden al idioma. TU Código intentaría forzar una frecuencia a través de ellas. Pero no fueron hechas para eso.",
+                "ko": "한 가지 틀렸어, 블랙. 수호석은 모아 놓는다고 코드가 활성화되는 게 아니야. 수진이가 알려줬어... 듣는 자들이래. 언어에 반응한다고. 네 코드는 하나의 주파수를 강제로 통과시키려 하겠지. 하지만 그건 수호석이 만들어진 목적이 아니야."
               }
             },
             {
@@ -1190,9 +2330,72 @@
             {
               "npc": "penny",
               "text": {
-                "en": "Rudy. The stones are listeners. Speak to them. Everything you've learned. Every greeting, every name, every clumsy 'thank you' in every city. Let them hear what language really sounds like — messy, imperfect, and human.",
-                "es": "Rudy. Las piedras son oyentes. Háblales. Todo lo que aprendiste. Cada saludo, cada nombre, cada torpe 'gracias' en cada ciudad. Déjalas oír cómo suena realmente el idioma — desordenado, imperfecto y humano.",
-                "ko": "루디. 수호석은 듣는 자야. 말을 걸어. 배운 모든 것을. 모든 인사, 모든 이름, 모든 도시에서의 서툰 '감사합니다'. 언어가 진짜로 어떤 소리인지 들려줘 — 어지럽고, 불완전하고, 인간적인."
+                "en": "Rudy. The stones are listeners. Speak to them. Everything you've learned. Every greeting, every name, every clumsy 'thank you' in every city. Let them hear what language really sounds like... messy, imperfect, and human.",
+                "es": "Rudy. Las piedras son oyentes. Háblales. Todo lo que aprendiste. Cada saludo, cada nombre, cada torpe 'gracias' en cada ciudad. Déjalas oír cómo suena realmente el idioma... desordenado, imperfecto y humano.",
+                "ko": "루디. 수호석은 듣는 자야. 말을 걸어. 배운 모든 것을. 모든 인사, 모든 이름, 모든 도시에서의 서툰 '감사합니다'. 언어가 진짜로 어떤 소리인지 들려줘... 어지럽고, 불완전하고, 인간적인."
+              }
+            },
+            {
+              "npc": "rudy",
+              "isChoice": true,
+              "choices": {
+                "en": [
+                  {
+                    "text": "(Speak perfectly. Show Black that languages can be mastered.)",
+                    "npcReaction": "Impressive pronunciation. But the stones are barely glowing. Something's missing.",
+                    "npcRelation": {
+                      "npc": "mr_black",
+                      "points": 0
+                    }
+                  },
+                  {
+                    "text": "(Speak from the heart. Clumsy, imperfect, but sincere.)",
+                    "npcReaction": "Your grammar is a disaster. But the stones... they're RESONATING. All seven.",
+                    "npcRelation": {
+                      "npc": "sujin",
+                      "points": 3
+                    },
+                    "gaugeBonus": 10
+                  }
+                ],
+                "es": [
+                  {
+                    "text": "(Hablar perfectamente. Mostrar a Black que los idiomas se dominan.)",
+                    "npcReaction": "Pronunciación impresionante. Pero las piedras apenas brillan. Falta algo.",
+                    "npcRelation": {
+                      "npc": "mr_black",
+                      "points": 0
+                    }
+                  },
+                  {
+                    "text": "(Hablar con el corazón. Torpe, imperfecto, pero sincero.)",
+                    "npcReaction": "Tu gramática es un desastre. Pero las piedras... están RESONANDO. Las siete.",
+                    "npcRelation": {
+                      "npc": "sujin",
+                      "points": 3
+                    },
+                    "gaugeBonus": 10
+                  }
+                ],
+                "ko": [
+                  {
+                    "text": "(완벽하게 말하자. 블랙에게 언어는 정복할 수 있다는 걸 보여주자.)",
+                    "npcReaction": "인상적인 발음이야. 하지만 수호석이 거의 안 빛나. 뭔가 빠졌어.",
+                    "npcRelation": {
+                      "npc": "mr_black",
+                      "points": 0
+                    }
+                  },
+                  {
+                    "text": "(진심을 담아 말하자. 서투르고, 불완전하지만, 진심으로.)",
+                    "npcReaction": "문법이 엉망이야. 하지만 수호석이... 공명하고 있어. 일곱 개 전부.",
+                    "npcRelation": {
+                      "npc": "sujin",
+                      "points": 3
+                    },
+                    "gaugeBonus": 10
+                  }
+                ]
               }
             },
             {
@@ -1206,17 +2409,17 @@
             {
               "npc": "mr_black",
               "text": {
-                "en": "No. No, that's not — the frequency should be overriding — why are they resonating with that broken, stumbling — that's not even proper grammar!",
-                "es": "No. No, eso no — la frecuencia debería estar anulando — ¿por qué están resonando con ese entrecortado, tropezante — eso ni siquiera es gramática correcta!",
-                "ko": "아니. 아니, 그건 — 주파수가 덮어써야 하는데 — 왜 저 깨진, 더듬거리는 — 문법도 맞지 않는데!"
+                "en": "No. No, that's not... the frequency should be overriding... why are they resonating with that broken, stumbling... that's not even proper grammar!",
+                "es": "No. No, eso no... la frecuencia debería estar anulando... ¿por qué están resonando con ese entrecortado, tropezante... eso ni siquiera es gramática correcta!",
+                "ko": "아니. 아니, 그건... 주파수가 덮어써야 하는데... 왜 저 깨진, 더듬거리는... 문법도 맞지 않는데!"
               }
             },
             {
               "npc": "rudy",
               "text": {
-                "en": "That's the point, Black. Language was never about being perfect. It's about being understood. And right now, seven stones that have listened to human voices for a thousand years are hearing something your Code never could — someone trying.",
-                "es": "Ese es el punto, Black. El idioma nunca fue sobre ser perfecto. Es sobre ser entendido. Y ahora mismo, siete piedras que han escuchado voces humanas por mil años están oyendo algo que tu Código nunca pudo — alguien intentándolo.",
-                "ko": "그게 포인트야, 블랙. 언어는 완벽한 것에 관한 게 아니었어. 이해받는 것에 관한 거야. 그리고 지금, 천 년간 인간의 목소리를 들어온 7개의 수호석이 네 코드가 절대 할 수 없던 걸 듣고 있어 — 노력하는 누군가를."
+                "en": "That's the point, Black. Language was never about being perfect. It's about being understood. And right now, seven stones that have listened to human voices for a thousand years are hearing something your Code never could... someone trying.",
+                "es": "Ese es el punto, Black. El idioma nunca fue sobre ser perfecto. Es sobre ser entendido. Y ahora mismo, siete piedras que han escuchado voces humanas por mil años están oyendo algo que tu Código nunca pudo... alguien intentándolo.",
+                "ko": "그게 포인트야, 블랙. 언어는 완벽한 것에 관한 게 아니었어. 이해받는 것에 관한 거야. 그리고 지금, 천 년간 인간의 목소리를 들어온 7개의 수호석이 네 코드가 절대 할 수 없던 걸 듣고 있어... 노력하는 누군가를."
               }
             },
             {
@@ -1244,30 +2447,148 @@
               }
             }
           ],
-          "quizzes": ["ch5_quiz_e"]
+          "quizzes": [
+            "ch5_quiz_e"
+          ]
         }
       ],
       "cliffhanger": {
-        "ko": "코드 장치가 산산조각 난다. 수호석들이 탑의 벽에 하나씩 안착한다. 미스터 블랙이 무릎을 꿇는다 — 패배가 아니라, 처음으로 자신이 틀렸을 수도 있다는 생각의 무게에. 미스 페니가 루디 곁에 선다. 바벨 타워의 유리벽 너머로 새벽 빛이 들어온다. 세상의 모든 언어가 오늘도 살아 있다. 서투르고, 불완전하고, 아름답게.",
-        "en": "The Code device shatters. The Guardian Stones return to their places, settling one by one into the tower's walls as if coming home. Mr. Black falls to his knees — not from defeat, but from the weight of realizing for the first time that he might have been wrong. Miss Penny stands beside Rudy. Dawn light pours through Babel Tower's glass walls. Every language in the world is still alive today. Clumsy, imperfect, and beautiful.",
-        "es": "El dispositivo del Código se destroza. Las Piedras Guardianas regresan a sus lugares, asentándose una por una en las paredes de la torre como si volvieran a casa. Mr. Black cae de rodillas — no por la derrota, sino por el peso de darse cuenta de que podría haberse equivocado. Miss Penny está junto a Rudy. La luz del amanecer entra por las paredes de vidrio. Todos los idiomas del mundo siguen vivos hoy. Torpes, imperfectos y hermosos."
+        "ko": "코드 장치가 산산조각 난다. 수호석들이 탑의 벽에 하나씩 안착한다. 미스터 블랙이 무릎을 꿇는다... 패배가 아니라, 처음으로 자신이 틀렸을 수도 있다는 생각의 무게에. 미스 페니가 루디 곁에 선다. 바벨 타워의 유리벽 너머로 새벽 빛이 들어온다. 세상의 모든 언어가 오늘도 살아 있다. 서투르고, 불완전하고, 아름답게.",
+        "en": "The Code device shatters. The Guardian Stones return to their places, settling one by one into the tower's walls as if coming home. Mr. Black falls to his knees... not from defeat, but from the weight of realizing for the first time that he might have been wrong. Miss Penny stands beside Rudy. Dawn light pours through Babel Tower's glass walls. Every language in the world is still alive today. Clumsy, imperfect, and beautiful.",
+        "es": "El dispositivo del Código se destroza. Las Piedras Guardianas regresan a sus lugares, asentándose una por una en las paredes de la torre como si volvieran a casa. Mr. Black cae de rodillas... no por la derrota, sino por el peso de darse cuenta de que podría haberse equivocado. Miss Penny está junto a Rudy. La luz del amanecer entra por las paredes de vidrio. Todos los idiomas del mundo siguen vivos hoy. Torpes, imperfectos y hermosos."
       }
     }
   ],
-
   "badges": [
-    { "id": "london_codebreaker", "name": { "ko": "런던 암호해독가", "en": "London Codebreaker", "es": "Descifrador de Londres" }, "icon": "🔓", "condition": "ch1_all_quiz_clear" },
-    { "id": "the_fog_lifts", "name": { "ko": "안개가 걷히다", "en": "The Fog Lifts", "es": "La Niebla Se Disipa" }, "icon": "🌫️", "condition": "ch1_boss_clear" },
-    { "id": "madrid_rescuer", "name": { "ko": "마드리드의 구원자", "en": "Madrid Rescuer", "es": "Rescatador de Madrid" }, "icon": "🎭", "condition": "ch2_boss_clear" },
-    { "id": "flamenco_linguist", "name": { "ko": "플라멩코 언어학자", "en": "Flamenco Linguist", "es": "Lingüista Flamenco" }, "icon": "💃", "condition": "isabel_max_relation" },
-    { "id": "seoul_guardian", "name": { "ko": "서울의 수호자", "en": "Seoul Guardian", "es": "Guardián de Seúl" }, "icon": "🏯", "condition": "ch3_boss_clear" },
-    { "id": "pyramid_scholar", "name": { "ko": "피라미드 학자", "en": "Pyramid Scholar", "es": "Erudito de las Pirámides" }, "icon": "🏛️", "condition": "ch4_boss_clear" },
-    { "id": "polyglot_fox", "name": { "ko": "다국어 여우", "en": "Polyglot Fox", "es": "Zorro Políglota" }, "icon": "🌍", "condition": "3_boss_perfect" },
-    { "id": "language_defender", "name": { "ko": "언어의 수호자", "en": "Language Defender", "es": "Defensor del Idioma" }, "icon": "👑", "condition": "all_story_clear" },
-    { "id": "mr_blacks_rival", "name": { "ko": "미스터 블랙의 라이벌", "en": "Mr. Black's Rival", "es": "El Rival del Sr. Black" }, "icon": "🎩", "condition": "final_boss_perfect" },
-    { "id": "rudys_best_friend", "name": { "ko": "루디의 절친", "en": "Rudy's Best Friend", "es": "Mejor Amigo de Rudy" }, "icon": "🦊", "condition": "all_npc_max" },
-    { "id": "speed_demon", "name": { "ko": "스피드 데몬", "en": "Speed Demon", "es": "Demonio Veloz" }, "icon": "⚡", "condition": "all_timed_clear" },
-    { "id": "perfect_ear", "name": { "ko": "완벽한 귀", "en": "Perfect Ear", "es": "Oído Perfecto" }, "icon": "👂", "condition": "all_listening_perfect" },
-    { "id": "silver_tongue", "name": { "ko": "은의 혀", "en": "Silver Tongue", "es": "Lengua de Plata" }, "icon": "🗣️", "condition": "all_roleplay_90plus" }
+    {
+      "id": "london_codebreaker",
+      "name": {
+        "ko": "런던 암호해독가",
+        "en": "London Codebreaker",
+        "es": "Descifrador de Londres"
+      },
+      "icon": "🔓",
+      "condition": "ch1_all_quiz_clear"
+    },
+    {
+      "id": "the_fog_lifts",
+      "name": {
+        "ko": "안개가 걷히다",
+        "en": "The Fog Lifts",
+        "es": "La Niebla Se Disipa"
+      },
+      "icon": "🌫️",
+      "condition": "ch1_boss_clear"
+    },
+    {
+      "id": "madrid_rescuer",
+      "name": {
+        "ko": "마드리드의 구원자",
+        "en": "Madrid Rescuer",
+        "es": "Rescatador de Madrid"
+      },
+      "icon": "🎭",
+      "condition": "ch2_boss_clear"
+    },
+    {
+      "id": "flamenco_linguist",
+      "name": {
+        "ko": "플라멩코 언어학자",
+        "en": "Flamenco Linguist",
+        "es": "Lingüista Flamenco"
+      },
+      "icon": "💃",
+      "condition": "isabel_max_relation"
+    },
+    {
+      "id": "seoul_guardian",
+      "name": {
+        "ko": "서울의 수호자",
+        "en": "Seoul Guardian",
+        "es": "Guardián de Seúl"
+      },
+      "icon": "🏯",
+      "condition": "ch3_boss_clear"
+    },
+    {
+      "id": "pyramid_scholar",
+      "name": {
+        "ko": "피라미드 학자",
+        "en": "Pyramid Scholar",
+        "es": "Erudito de las Pirámides"
+      },
+      "icon": "🏛️",
+      "condition": "ch4_boss_clear"
+    },
+    {
+      "id": "polyglot_fox",
+      "name": {
+        "ko": "다국어 여우",
+        "en": "Polyglot Fox",
+        "es": "Zorro Políglota"
+      },
+      "icon": "🌍",
+      "condition": "3_boss_perfect"
+    },
+    {
+      "id": "language_defender",
+      "name": {
+        "ko": "언어의 수호자",
+        "en": "Language Defender",
+        "es": "Defensor del Idioma"
+      },
+      "icon": "👑",
+      "condition": "all_story_clear"
+    },
+    {
+      "id": "mr_blacks_rival",
+      "name": {
+        "ko": "미스터 블랙의 라이벌",
+        "en": "Mr. Black's Rival",
+        "es": "El Rival del Sr. Black"
+      },
+      "icon": "🎩",
+      "condition": "final_boss_perfect"
+    },
+    {
+      "id": "rudys_best_friend",
+      "name": {
+        "ko": "루디의 절친",
+        "en": "Rudy's Best Friend",
+        "es": "Mejor Amigo de Rudy"
+      },
+      "icon": "🦊",
+      "condition": "all_npc_max"
+    },
+    {
+      "id": "speed_demon",
+      "name": {
+        "ko": "스피드 데몬",
+        "en": "Speed Demon",
+        "es": "Demonio Veloz"
+      },
+      "icon": "⚡",
+      "condition": "all_timed_clear"
+    },
+    {
+      "id": "perfect_ear",
+      "name": {
+        "ko": "완벽한 귀",
+        "en": "Perfect Ear",
+        "es": "Oído Perfecto"
+      },
+      "icon": "👂",
+      "condition": "all_listening_perfect"
+    },
+    {
+      "id": "silver_tongue",
+      "name": {
+        "ko": "은의 혀",
+        "en": "Silver Tongue",
+        "es": "Lengua de Plata"
+      },
+      "icon": "🗣️",
+      "condition": "all_roleplay_90plus"
+    }
   ]
 }

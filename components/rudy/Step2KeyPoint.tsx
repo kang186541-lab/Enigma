@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View, Text, StyleSheet, Pressable, TextInput, Animated, Platform, ActivityIndicator,
 } from "react-native";
@@ -73,7 +73,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   const shakeAnim    = useRef(new Animated.Value(0)).current;
 
   const apiBase    = getApiUrl();
-  const quiz: FillBlankQuiz = data.quizzes[quizIdx];
+  const quiz: FillBlankQuiz | undefined = data.quizzes[quizIdx];
   const speechLang = SPEECH_LANG_MAP[learningLang] ?? "en-US";
 
   // Cleanup on unmount
@@ -83,6 +83,24 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       stopAllTTSSync();
     };
   }, []);
+
+  // Skip unsupported quiz types (e.g. "listening" without promptWithBlank)
+  useEffect(() => {
+    if (screenPhase !== "quiz") return;
+    if (quiz && quiz.promptWithBlank) return;
+    if (quizIdx < data.quizzes.length - 1) {
+      setQuizIdx(i => i + 1);
+      setQuizPhase("question");
+      setSelected(null);
+      setInputVal("");
+      setWrongFeedback("");
+      setInputError(false);
+      setSpeakPhase("idle");
+      setSpeakScore(null);
+    } else {
+      onComplete(correctCount);
+    }
+  }, [quizIdx, screenPhase]);
 
   function startPulse() {
     pulseLoop.current = Animated.loop(
@@ -139,8 +157,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   async function playSpeakTTS() {
     try {
       if (soundRef.current) {
-        await soundRef.current.stopAsync().catch(() => {});
-        await soundRef.current.unloadAsync().catch(() => {});
+        await soundRef.current.stopAsync().catch((e) => console.warn('[Step2] sound stop failed:', e));
+        await soundRef.current.unloadAsync().catch((e) => console.warn('[Step2] sound unload failed:', e));
         soundRef.current = null;
       }
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
@@ -156,7 +174,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
           registerGlobalWebAudio(audio);
           audio.onended = () => URL.revokeObjectURL(objUrl);
           audio.onerror = () => URL.revokeObjectURL(objUrl);
-          await audio.play().catch(() => {});
+          await audio.play().catch((e) => console.warn('[Step2] web audio play failed:', e));
         }
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
@@ -164,12 +182,12 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
           if (st.isLoaded && st.didJustFinish) {
-            sound.unloadAsync().catch(() => {});
+            sound.unloadAsync().catch((e) => console.warn('[Step2] sound unload failed:', e));
             soundRef.current = null;
           }
         });
       }
-    } catch {}
+    } catch (e) { console.warn('[Step2] TTS playback failed:', e); }
   }
 
   // ── Speak-after recording ─────────────────────────────────────────────────────
@@ -409,6 +427,10 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   }
 
   // ── Quiz screen ───────────────────────────────────────────────────────────────
+
+  if (!quiz || !quiz.promptWithBlank) {
+    return null;
+  }
 
   const promptParts = quiz.promptWithBlank.split("___");
 

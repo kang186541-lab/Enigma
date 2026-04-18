@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { checkAchievements } from "@/lib/achievementManager";
+import { addWeeklyXP } from "@/lib/leagueManager";
 
 export type NativeLanguage = "korean" | "english" | "spanish";
 
@@ -7,17 +9,25 @@ export interface Level {
   num: number;
   emoji: string;
   name: string;
+  nameEn: string;
+  nameEs: string;
   minXP: number;
   maxXP: number;
 }
 
 export const LEVELS: Level[] = [
-  { num: 1, emoji: "🌱", name: "입문자",  minXP: 0,    maxXP: 100  },
-  { num: 2, emoji: "📚", name: "초보자",  minXP: 101,  maxXP: 300  },
-  { num: 3, emoji: "⭐", name: "중급자",  minXP: 301,  maxXP: 600  },
-  { num: 4, emoji: "🔥", name: "고급자",  minXP: 601,  maxXP: 1000 },
-  { num: 5, emoji: "👑", name: "마스터",  minXP: 1001, maxXP: Infinity },
+  { num: 1, emoji: "🌱", name: "입문자",  nameEn: "Beginner",      nameEs: "Principiante",  minXP: 0,    maxXP: 100  },
+  { num: 2, emoji: "📚", name: "초보자",  nameEn: "Novice",        nameEs: "Novato",        minXP: 101,  maxXP: 300  },
+  { num: 3, emoji: "⭐", name: "중급자",  nameEn: "Intermediate",  nameEs: "Intermedio",    minXP: 301,  maxXP: 600  },
+  { num: 4, emoji: "🔥", name: "고급자",  nameEn: "Advanced",      nameEs: "Avanzado",      minXP: 601,  maxXP: 1000 },
+  { num: 5, emoji: "👑", name: "마스터",  nameEn: "Master",        nameEs: "Maestro",       minXP: 1001, maxXP: Infinity },
 ];
+
+export function getLevelName(level: Level, lang: NativeLanguage): string {
+  if (lang === "english") return level.nameEn;
+  if (lang === "spanish") return level.nameEs;
+  return level.name;
+}
 
 export function getLevel(xp: number): Level {
   for (let i = LEVELS.length - 1; i >= 0; i--) {
@@ -260,7 +270,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         if (statsStr) {
           setStats(JSON.parse(statsStr));
         }
-      } catch {}
+      } catch (e) { console.warn('[LanguageContext] Failed to load saved preferences:', e); }
     })();
   }, []);
 
@@ -290,6 +300,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
     setStats(newStats);
     await AsyncStorage.setItem("@lingua_stats", JSON.stringify(newStats));
+
+    // Fire-and-forget: check achievements after stats update
+    checkAchievements({ stats: newStats }).catch((e) => console.warn('[Achievements] check failed:', e));
+
+    // Fire-and-forget: track weekly XP if XP changed
+    if (updates.xp !== undefined && updates.xp > stats.xp) {
+      addWeeklyXP(updates.xp - stats.xp).catch((e) => console.warn('[League] weekly XP update failed:', e));
+    }
   };
 
   const clearLevelUp = () => setPendingLevelUp(null);

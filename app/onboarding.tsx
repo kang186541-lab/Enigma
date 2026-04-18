@@ -71,11 +71,11 @@ const UI: Record<NativeLanguage, {
     cta1: "Next", cta2: "Next", back: "Back",
   },
   spanish: {
-    step1Title: "¿Cual es tu idioma nativo?",
+    step1Title: "¿Cuál es tu idioma nativo?",
     step1Sub:   "Elige el idioma que hablas en casa",
-    step2Title: "¿Que idioma quieres aprender?",
+    step2Title: "¿Qué idioma quieres aprender?",
     step2Sub:   "Selecciona el idioma que quieres dominar",
-    cta1: "Siguiente", cta2: "Siguiente", back: "Atras",
+    cta1: "Siguiente", cta2: "Siguiente", back: "Atrás",
   },
 };
 

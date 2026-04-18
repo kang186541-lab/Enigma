@@ -26,10 +26,9 @@ interface Props {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const apiBase = getApiUrl();
-
 async function playWordTTS(word: string, lang: string) {
   try {
+    const apiBase = getApiUrl();
     const url = new URL("/api/pronunciation-tts", apiBase);
     url.searchParams.set("text", word);
     url.searchParams.set("lang", lang);
@@ -50,11 +49,166 @@ async function playWordTTS(word: string, lang: string) {
       );
       registerGlobalSound(sound);
     }
-  } catch { /* ignore */ }
+  } catch (e) { console.warn('[PhonemeCoaching] word TTS failed:', e); }
 }
 
 function L(nl: string, ko: string, es: string, en: string): string {
   return nl === "korean" ? ko : nl === "spanish" ? es : en;
+}
+
+// ── IPA → Readable mapping ───────────────────────────────────────────────────
+
+type ReadableEntry = { display: string; example: string };
+type ReadableMap = Record<string, ReadableEntry>;
+
+const IPA_READABLE_BY_LANG: Record<string, ReadableMap> = {
+  english: {
+    θ: { display: "th", example: "think" },
+    ð: { display: "th", example: "this" },
+    ʃ: { display: "sh", example: "ship" },
+    ʒ: { display: "zh", example: "measure" },
+    tʃ: { display: "ch", example: "church" },
+    dʒ: { display: "j", example: "judge" },
+    ŋ: { display: "ng", example: "sing" },
+    æ: { display: "a", example: "cat" },
+    ɑ: { display: "ah", example: "father" },
+    ɔ: { display: "aw", example: "law" },
+    ə: { display: "uh", example: "about" },
+    ɛ: { display: "eh", example: "bed" },
+    ɪ: { display: "ih", example: "sit" },
+    ʊ: { display: "oo", example: "book" },
+    ʌ: { display: "uh", example: "cup" },
+    r: { display: "r", example: "red" },
+    l: { display: "l", example: "let" },
+    v: { display: "v", example: "very" },
+    f: { display: "f", example: "fun" },
+    z: { display: "z", example: "zoo" },
+    w: { display: "w", example: "way" },
+    j: { display: "y", example: "yes" },
+    h: { display: "h", example: "hat" },
+    p: { display: "p", example: "pen" },
+    b: { display: "b", example: "bed" },
+    t: { display: "t", example: "top" },
+    d: { display: "d", example: "dog" },
+    k: { display: "k", example: "key" },
+    g: { display: "g", example: "go" },
+    n: { display: "n", example: "no" },
+    m: { display: "m", example: "man" },
+    s: { display: "s", example: "sun" },
+    iː: { display: "ee", example: "see" },
+    uː: { display: "oo", example: "food" },
+    ɜː: { display: "er", example: "bird" },
+    oʊ: { display: "oh", example: "go" },
+    eɪ: { display: "ay", example: "take" },
+    aɪ: { display: "ai", example: "time" },
+    aʊ: { display: "ow", example: "house" },
+    ɔɪ: { display: "oy", example: "boy" },
+  },
+  spanish: {
+    rr: { display: "rr", example: "perro" },
+    r: { display: "r", example: "pero" },
+    ɾ: { display: "r", example: "pero" },
+    β: { display: "b/v", example: "saber" },
+    ð_es: { display: "d suave", example: "nada" },
+    ð: { display: "d suave", example: "nada" },
+    ɣ: { display: "g suave", example: "lago" },
+    θ_es: { display: "z/c", example: "gracias" },
+    θ: { display: "z/c", example: "gracias" },
+    ɲ: { display: "ñ", example: "año" },
+    ʎ: { display: "ll/y", example: "calle" },
+    x: { display: "j", example: "jota" },
+    tʃ: { display: "ch", example: "chico" },
+    j: { display: "y", example: "yo" },
+    w: { display: "w", example: "bueno" },
+    ŋ: { display: "n(g)", example: "tango" },
+    p: { display: "p", example: "pan" },
+    b: { display: "b", example: "bien" },
+    t: { display: "t", example: "tu" },
+    d: { display: "d", example: "de" },
+    k: { display: "k/c", example: "casa" },
+    g: { display: "g", example: "gato" },
+    n: { display: "n", example: "no" },
+    m: { display: "m", example: "mas" },
+    s: { display: "s", example: "sol" },
+    f: { display: "f", example: "feo" },
+    l: { display: "l", example: "luna" },
+    a: { display: "a", example: "casa" },
+    e: { display: "e", example: "mesa" },
+    i: { display: "i", example: "si" },
+    o: { display: "o", example: "sol" },
+    u: { display: "u", example: "tu" },
+  },
+  korean: {
+    // IPA symbols Azure returns for Korean
+    tɕ: { display: "ㅈ", example: "자" },
+    tɕʰ: { display: "ㅊ", example: "차" },
+    dʑ: { display: "ㅈ", example: "가지" },
+    ɕ: { display: "ㅅ(i)", example: "시" },
+    "s͈": { display: "ㅆ", example: "싸" },
+    "p͈": { display: "ㅃ", example: "빠" },
+    "t͈": { display: "ㄸ", example: "따" },
+    "k͈": { display: "ㄲ", example: "까" },
+    kʰ: { display: "ㅋ", example: "카" },
+    tʰ: { display: "ㅌ", example: "타" },
+    pʰ: { display: "ㅍ", example: "파" },
+    ɾ: { display: "ㄹ", example: "라" },
+    ŋ: { display: "ㅇ받침", example: "강" },
+    j: { display: "y(ㅑ)", example: "야" },
+    w: { display: "w(ㅘ)", example: "와" },
+    // Common consonants
+    p: { display: "ㅂ", example: "바" },
+    b: { display: "ㅂ", example: "바" },
+    t: { display: "ㄷ", example: "다" },
+    d: { display: "ㄷ", example: "다" },
+    k: { display: "ㄱ", example: "가" },
+    g: { display: "ㄱ", example: "가" },
+    n: { display: "ㄴ", example: "나" },
+    m: { display: "ㅁ", example: "마" },
+    s: { display: "ㅅ", example: "사" },
+    h: { display: "ㅎ", example: "하" },
+    l: { display: "ㄹ", example: "을" },
+    r: { display: "ㄹ", example: "라" },
+    // Hangul jamo (if Azure returns them directly)
+    ㄱ: { display: "ㄱ", example: "가" },
+    ㅋ: { display: "ㅋ", example: "카" },
+    ㄲ: { display: "ㄲ", example: "까" },
+    ㄷ: { display: "ㄷ", example: "다" },
+    ㅌ: { display: "ㅌ", example: "타" },
+    ㄸ: { display: "ㄸ", example: "따" },
+    ㅂ: { display: "ㅂ", example: "바" },
+    ㅍ: { display: "ㅍ", example: "파" },
+    ㅃ: { display: "ㅃ", example: "빠" },
+    ㅈ: { display: "ㅈ", example: "자" },
+    ㅊ: { display: "ㅊ", example: "차" },
+    ㅉ: { display: "ㅉ", example: "짜" },
+    ㅅ: { display: "ㅅ", example: "사" },
+    ㅆ: { display: "ㅆ", example: "싸" },
+    ㅎ: { display: "ㅎ", example: "하" },
+    ㄴ: { display: "ㄴ", example: "나" },
+    ㅁ: { display: "ㅁ", example: "마" },
+    ㄹ: { display: "ㄹ", example: "라" },
+    ㅇ: { display: "ㅇ", example: "아" },
+    // Vowels
+    ㅓ: { display: "ㅓ", example: "어" },
+    ㅗ: { display: "ㅗ", example: "오" },
+    ㅡ: { display: "ㅡ", example: "으" },
+    ㅢ: { display: "ㅢ", example: "의" },
+    ㅐ: { display: "ㅐ", example: "개" },
+    ㅔ: { display: "ㅔ", example: "게" },
+    ㅘ: { display: "ㅘ", example: "와" },
+    ㅝ: { display: "ㅝ", example: "워" },
+    a: { display: "ㅏ", example: "아" },
+    e: { display: "ㅔ", example: "에" },
+    i: { display: "ㅣ", example: "이" },
+    o: { display: "ㅗ", example: "오" },
+    u: { display: "ㅜ", example: "우" },
+  },
+};
+
+function getReadable(targetLang: string, phoneme: string): ReadableEntry | undefined {
+  const langMap = IPA_READABLE_BY_LANG[targetLang.toLowerCase()];
+  if (!langMap) return undefined;
+  return langMap[phoneme] ?? langMap[phoneme.toLowerCase()];
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -81,9 +235,12 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
       {wordScores.map((w, i) => {
         const isWeak = w.score < 70;
         const isExpanded = expandedWord === `${w.word}-${i}`;
-        const lowestPhoneme = w.phonemes?.length
-          ? w.phonemes.reduce((a, b) => (a.score < b.score ? a : b))
-          : null;
+        // Get up to 3 weakest phonemes (below 70) sorted by score ascending
+        const weakPhonemes = (w.phonemes ?? [])
+          .filter(p => p.score < 70 && p.phoneme && p.phoneme.trim() !== "")
+          .sort((a, b) => a.score - b.score)
+          .slice(0, 3);
+        const lowestPhoneme = weakPhonemes.length > 0 ? weakPhonemes[0] : null;
 
         return (
           <View key={i}>
@@ -136,12 +293,14 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                       {L(nativeLang, "음소별 점수", "Puntuación por fonema", "Phoneme Scores")}
                     </Text>
                     <View style={s.phonemeList}>
-                      {w.phonemes.map((p, pi) => {
+                      {w.phonemes.filter(p => p.phoneme && p.phoneme.trim() !== "").map((p, pi) => {
                         const isLowest = lowestPhoneme?.phoneme === p.phoneme && p.score < 70;
                         return (
                           <View key={pi} style={[s.phonemeRow, isLowest && s.phonemeRowHighlight]}>
                             <Text style={[s.phonemeLabel, isLowest && s.phonemeLabelWeak]}>
-                              /{p.phoneme}/
+                              {getReadable(targetLang, p.phoneme)
+                                ? getReadable(targetLang, p.phoneme)!.display
+                                : `/${p.phoneme}/`}
                             </Text>
                             <View style={s.phonemeBarBg}>
                               <View
@@ -167,23 +326,27 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                   </View>
                 )}
 
-                {/* Coaching tip for lowest phoneme */}
-                {lowestPhoneme && lowestPhoneme.score < 70 && (() => {
-                  const tip = getCoachingTip(targetLang, lowestPhoneme.phoneme, nativeLang);
+                {/* Coaching tips for up to 3 weakest phonemes */}
+                {weakPhonemes.length > 0 && weakPhonemes.map((wp, wpi) => {
+                  const tip = getCoachingTip(targetLang, wp.phoneme, nativeLang);
                   if (!tip) return null;
+                  const readable = getReadable(targetLang, wp.phoneme);
                   return (
-                    <View style={s.coachingBox}>
+                    <View key={wpi} style={s.coachingBox}>
                       <View style={s.coachingHeader}>
-                        <Text style={s.coachingIcon}>💡</Text>
+                        <Text style={s.coachingIcon}>{wpi === 0 ? "💡" : "📌"}</Text>
                         <Text style={s.coachingTitle}>
                           {L(nativeLang, "발음 코칭", "Consejo", "Coaching Tip")}
                         </Text>
-                        <Text style={s.coachingPhoneme}>/{lowestPhoneme.phoneme}/</Text>
+                        <Text style={s.coachingPhoneme}>
+                          {readable ? `"${readable.display}" (${readable.example})` : `/${wp.phoneme}/`}
+                        </Text>
+                        <Text style={[s.phonemeScore, s.phonemeScoreWeak]}>{wp.score}%</Text>
                       </View>
                       <Text style={s.coachingText}>{tip}</Text>
                     </View>
                   );
-                })()}
+                })}
 
                 {/* Slow TTS button */}
                 <Pressable

@@ -8,10 +8,40 @@ import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 import * as FileSystem from "expo-file-system/legacy";
 import { C, F } from "@/constants/theme";
-import type { LoadedQuiz, LangCode } from "@/constants/storyTypes";
-import { fillGptPrompt } from "@/lib/storyUtils";
+import type { LoadedQuiz, LangCode, StoneEffect, VoicePowerContent, DebateBattleContent, NpcRescueContent } from "@/constants/storyTypes";
+import { fillGptPrompt, addToExpressionBook, trackQuizIO, markExpressionsMastered } from "@/lib/storyUtils";
 import { getApiUrl, apiRequest } from "@/lib/query-client";
 import { checkAnswer as checkSpelling } from "@/lib/answerUtils";
+
+// ─── Quiz UI i18n ────────────────────────────────────────────────────────────
+
+type QL = "ko" | "es" | "en";
+const QT: Record<string, Record<QL, string>> = {
+  checkAnswers:   { ko: "정답 확인 ✓",         es: "Comprobar ✓",             en: "Check Answers ✓" },
+  arrangeWords:   { ko: "단어를 올바른 순서로 배열하세요:", es: "Ordena las palabras en la oración correcta:", en: "Arrange the words into the correct sentence:" },
+  tapWords:       { ko: "아래 단어를 탭하여 문장을 만드세요", es: "Toca las palabras abajo para formar la oración", en: "Tap words below to build the sentence" },
+  check:          { ko: "확인 ✓",              es: "Comprobar ✓",             en: "Check ✓" },
+  playing:        { ko: "재생 중...",           es: "Reproduciendo...",        en: "Playing..." },
+  playRecording:  { ko: "녹음 재생",           es: "Reproducir grabación",    en: "Play Recording" },
+  typeAnswer:     { ko: "답을 입력하세요...",    es: "Escribe tu respuesta...", en: "Type your answer..." },
+  submit:         { ko: "제출 ✓",              es: "Enviar ✓",               en: "Submit ✓" },
+  submitted:      { ko: "제출 완료! 연습을 계속하세요.", es: "¡Enviado! Sigue practicando.", en: "Submitted! Keep practising." },
+  requiredWords:  { ko: "필수 단어:",           es: "Palabras requeridas:",    en: "Required words:" },
+  readAloud:      { ko: "다음 문장을 소리 내어 읽으세요:", es: "Lee la siguiente oración en voz alta:", en: "Read the following sentence aloud:" },
+  noSentences:    { ko: "문장을 찾을 수 없습니다.", es: "No se encontraron oraciones.", en: "No sentences found." },
+  submitReview:   { ko: "검토 제출 ✓",         es: "Enviar para revisión ✓",  en: "Submit for Review ✓" },
+  yourAnswer:     { ko: "답변...",              es: "Tu respuesta...",         en: "Your answer..." },
+  translateTo:    { ko: "번역하세요:",          es: "Traduce a:",              en: "Translate to:" },
+  submitArgument: { ko: "주장 제출",            es: "Enviar argumento",        en: "Submit Argument" },
+  typeArgument:   { ko: "반론을 입력하세요…",    es: "Escribe tu contraargumento…", en: "Type your counter-argument…" },
+  listening:      { ko: "듣는 중…",             es: "Escuchando…",             en: "Listening…" },
+  blank:          { ko: "빈칸",                 es: "Espacio",                 en: "Blank" },
+};
+function qt(key: string, lang: LangCode): string {
+  const entry = QT[key];
+  if (!entry) return key;
+  return entry[lang as QL] ?? entry.en;
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,11 +97,14 @@ async function playTTS(
   script: string,
   voice: string,
   apiBase: string,
-  onPlay?: (v: boolean) => void
+  onPlay?: (v: boolean) => void,
+  lang?: string,
 ) {
   const url = new URL("/api/pronunciation-tts", apiBase);
   url.searchParams.set("text", script);
-  url.searchParams.set("lang", "en-US");
+  // Derive lang from voice name if not explicitly given (e.g. "ko-KR-SunHiNeural" → "ko-KR")
+  const ttsLang = lang || (voice ? voice.split("-").slice(0, 2).join("-") : "en-US");
+  url.searchParams.set("lang", ttsLang);
   if (voice) url.searchParams.set("voice", voice);
   onPlay?.(true);
   try {
@@ -94,11 +127,12 @@ async function playTTS(
       sound.setOnPlaybackStatusUpdate((st) => {
         if ("didJustFinish" in st && st.didJustFinish) {
           onPlay?.(false);
-          sound.unloadAsync().catch(() => {});
+          sound.unloadAsync().catch((e) => console.warn('[StoryQuiz] TTS audio unload failed:', e));
         }
       });
     }
-  } catch {
+  } catch (e) {
+    console.warn('[Audio] TTS playback failed:', e);
     onPlay?.(false);
   }
 }
@@ -109,7 +143,8 @@ async function callGPT(systemPrompt: string, userMessage: string): Promise<strin
     const res = await apiRequest("POST", "/api/quiz-evaluate", { systemPrompt, userMessage });
     const data = await res.json() as { reply?: string };
     return data?.reply ?? "";
-  } catch {
+  } catch (e) {
+    console.warn('[API] quiz evaluation request failed:', e);
     return "";
   }
 }
@@ -268,6 +303,7 @@ function FillBlankQuizView({
   nativeLang: LangCode;
   onDone: (correct: number, total: number) => void;
 }) {
+  const nl = nativeLang;
   const passage = String(content.passage ?? "");
   const blanks: BlankQ[] = (content.blanks as BlankQ[]) ?? [];
   const [answers, setAnswers] = useState<Record<number, string | null>>({});
@@ -320,7 +356,7 @@ function FillBlankQuizView({
 
       {blank && (
         <View style={styles.blankSection}>
-          <Text style={styles.blankNum}>Blank {blank.id}</Text>
+          <Text style={styles.blankNum}>{qt("blank", nl)} {blank.id}</Text>
           {blank.hint && (
             <Text style={styles.hintText}>💡 {blank.hint[nativeLang] ?? blank.hint.en ?? ""}</Text>
           )}
@@ -357,7 +393,7 @@ function FillBlankQuizView({
 
       {allFilled && !done && (
         <Pressable style={styles.submitBtn} onPress={checkAnswers}>
-          <Text style={styles.submitBtnText}>Check Answers ✓</Text>
+          <Text style={styles.submitBtnText}>{qt("checkAnswers", nl)}</Text>
         </Pressable>
       )}
       {checking && <ActivityIndicator style={{ marginTop: 16 }} color={C.gold} />}
@@ -429,12 +465,12 @@ function WordRearrangeView({
   return (
     <View style={styles.quizBody}>
       <Text style={styles.progressLabel}>{qIdx + 1} / {questions.length}</Text>
-      <Text style={styles.instructionText}>Arrange the words into the correct sentence:</Text>
+      <Text style={styles.instructionText}>{qt("arrangeWords", nativeLang)}</Text>
 
       {/* Built sentence */}
       <View style={styles.builtBox}>
         {built.length === 0
-          ? <Text style={styles.builtPlaceholder}>Tap words below to build the sentence</Text>
+          ? <Text style={styles.builtPlaceholder}>{qt("tapWords", nativeLang)}</Text>
           : <View style={styles.wordRow}>
               {built.map((w, i) => (
                 <Pressable key={`${w}-${i}`} style={styles.wordChipBuilt} onPress={() => tapWord(w, "built", i)}>
@@ -477,7 +513,7 @@ function WordRearrangeView({
 
       {built.length > 0 && !feedback && (
         <Pressable style={styles.submitBtn} onPress={checkAnswer}>
-          <Text style={styles.submitBtnText}>Check ✓</Text>
+          <Text style={styles.submitBtnText}>{qt("check", nativeLang)}</Text>
         </Pressable>
       )}
     </View>
@@ -546,7 +582,7 @@ function ListeningQuizView({
       <Pressable style={[styles.ttsBtn, playing && styles.ttsBtnActive]} onPress={play}>
         <Ionicons name={playing ? "volume-high" : "play-circle"} size={32} color={playing ? "#fff" : C.gold} />
         <Text style={[styles.ttsBtnText, playing && { color: "#fff" }]}>
-          {playing ? "Playing..." : "Play Recording"}
+          {playing ? qt("playing", nativeLang) : qt("playRecording", nativeLang)}
         </Text>
       </Pressable>
 
@@ -556,7 +592,7 @@ function ListeningQuizView({
         style={styles.textInput}
         value={input}
         onChangeText={setInput}
-        placeholder="Type your answer..."
+        placeholder={qt("typeAnswer", nativeLang)}
         placeholderTextColor={C.textMuted}
         returnKeyType="done"
         onSubmitEditing={checkAnswer}
@@ -572,7 +608,7 @@ function ListeningQuizView({
 
       {!feedback && input.length > 0 && (
         <Pressable style={styles.submitBtn} onPress={checkAnswer}>
-          <Text style={styles.submitBtnText}>Submit ✓</Text>
+          <Text style={styles.submitBtnText}>{qt("submit", nativeLang)}</Text>
         </Pressable>
       )}
 
@@ -637,7 +673,7 @@ function RiddleQuizView({
           setFeedback(json.feedback ?? "✗ Not quite. Try again!");
         }
         return;
-      } catch { /* fall through */ }
+      } catch (e) { console.warn('[API] riddle answer parse failed:', e); /* fall through */ }
     }
 
     setFeedback(`✗ Not quite. Answer: ${riddle.answer}`);
@@ -667,7 +703,7 @@ function RiddleQuizView({
         style={styles.textInput}
         value={input}
         onChangeText={setInput}
-        placeholder="Your answer..."
+        placeholder={qt("yourAnswer", nativeLang)}
         placeholderTextColor={C.textMuted}
         returnKeyType="done"
         onSubmitEditing={checkAnswer}
@@ -682,7 +718,7 @@ function RiddleQuizView({
       )}
       {!loading && !feedback && input.length > 0 && (
         <Pressable style={styles.submitBtn} onPress={checkAnswer}>
-          <Text style={styles.submitBtnText}>Submit ✓</Text>
+          <Text style={styles.submitBtnText}>{qt("submit", nativeLang)}</Text>
         </Pressable>
       )}
     </View>
@@ -744,7 +780,8 @@ function RoleplayQuizView({
       if (res?.secretRevealed || res?.clueRevealed) {
         setTimeout(() => onDone(1, 1), 1500);
       }
-    } catch {
+    } catch (e) {
+      console.warn('[API] NPC chat request failed:', e);
       setMessages(m => [...m, { role: "npc", text: "..." }]);
     } finally {
       setLoading(false);
@@ -764,7 +801,9 @@ function RoleplayQuizView({
 
       {/* Progress */}
       {ordersComplete > 0 && (
-        <Text style={styles.progressLabel}>Orders: {ordersComplete}/3 ✓</Text>
+        <Text style={styles.progressLabel}>
+          {quiz.nativeLang === "ko" ? `주문: ${ordersComplete}/3 ✓` : quiz.nativeLang === "es" ? `Pedidos: ${ordersComplete}/3 ✓` : `Orders: ${ordersComplete}/3 ✓`}
+        </Text>
       )}
 
       {/* Chat */}
@@ -775,7 +814,9 @@ function RoleplayQuizView({
         showsVerticalScrollIndicator={false}
       >
         {messages.length === 0 && (
-          <Text style={styles.chatPlaceholder}>Start the conversation...</Text>
+          <Text style={styles.chatPlaceholder}>
+            {quiz.nativeLang === "ko" ? "대화를 시작하세요..." : quiz.nativeLang === "es" ? "Inicia la conversación..." : "Start the conversation..."}
+          </Text>
         )}
         {messages.map((m, i) => (
           <View key={i} style={[styles.chatBubble, m.role === "user" ? styles.chatUser : styles.chatNpc]}>
@@ -851,8 +892,9 @@ function WritingQuizView({
       setScore(json.score ?? 0);
       setFeedback(json.feedback ?? "Evaluated!");
       if ((json.score ?? 0) >= 60) setCorrect(c => c + 1);
-    } catch {
-      setFeedback("Submitted! Keep practising.");
+    } catch (e) {
+      console.warn('[API] writing evaluation parse failed:', e);
+      setFeedback(qt("submitted", quiz.nativeLang));
     }
   }
 
@@ -879,7 +921,7 @@ function WritingQuizView({
       <View style={styles.writePromptBox}>
         <Text style={styles.writeEmoji}>{imageEmoji[prompt.image] ?? "🖼️"}</Text>
         <Text style={styles.writeDesc}>{prompt.description}</Text>
-        <Text style={styles.writeVocabLabel}>Required words:</Text>
+        <Text style={styles.writeVocabLabel}>{qt("requiredWords", quiz.nativeLang)}</Text>
         <View style={styles.writeVocabRow}>
           {prompt.requiredVocab.map(v => (
             <View key={v} style={styles.vocabChip}><Text style={styles.vocabChipText}>{v}</Text></View>
@@ -908,14 +950,16 @@ function WritingQuizView({
           )}
           <Text style={styles.writeFeedback}>{feedback}</Text>
           <Pressable style={styles.submitBtn} onPress={advance}>
-            <Text style={styles.submitBtnText}>Next →</Text>
+            <Text style={styles.submitBtnText}>
+              {quiz.nativeLang === "ko" ? "다음 →" : quiz.nativeLang === "es" ? "Siguiente →" : "Next →"}
+            </Text>
           </Pressable>
         </View>
       )}
 
       {!loading && !feedback && input.trim().length > 10 && (
         <Pressable style={styles.submitBtn} onPress={submit}>
-          <Text style={styles.submitBtnText}>Submit for Review ✓</Text>
+          <Text style={styles.submitBtnText}>{qt("submitReview", quiz.nativeLang)}</Text>
         </Pressable>
       )}
     </ScrollView>
@@ -1034,7 +1078,7 @@ function TimedBossView({
             onPress={() => playTTS(r.ttsScript ?? "", r.ttsVoice ?? "en-GB-SoniaNeural", apiBase, setPlaying)}>
             <Ionicons name={playing ? "volume-high" : "play-circle"} size={28} color={playing ? "#fff" : C.gold} />
             <Text style={[styles.ttsBtnText, playing && { color: "#fff" }]}>
-              {playing ? "Playing..." : "Play"}
+              {playing ? qt("playing", quiz.nativeLang) : "Play"}
             </Text>
           </Pressable>
           <Text style={styles.bossQuestion}>{r.question}</Text>
@@ -1043,7 +1087,7 @@ function TimedBossView({
             returnKeyType="done" onSubmitEditing={submitText} />
           {!feedback && input.length > 0 && (
             <Pressable style={styles.submitBtn} onPress={submitText}>
-              <Text style={styles.submitBtnText}>Submit ✓</Text>
+              <Text style={styles.submitBtnText}>{qt("submit", quiz.nativeLang)}</Text>
             </Pressable>
           )}
         </>
@@ -1054,7 +1098,13 @@ function TimedBossView({
       const src = r.source?.[quiz.nativeLang] ?? r.source?.en ?? "";
       return (
         <>
-          <Text style={styles.instructionText}>Translate to {quiz.targetLang === "ko" ? "Korean" : quiz.targetLang === "es" ? "Spanish" : "English"}:</Text>
+          <Text style={styles.instructionText}>
+            {quiz.nativeLang === "ko"
+              ? `${quiz.targetLang === "ko" ? "한국어" : quiz.targetLang === "es" ? "스페인어" : "영어"}로 번역하세요:`
+              : quiz.nativeLang === "es"
+              ? `Traduce al ${quiz.targetLang === "ko" ? "coreano" : quiz.targetLang === "es" ? "español" : "inglés"}:`
+              : `Translate to ${quiz.targetLang === "ko" ? "Korean" : quiz.targetLang === "es" ? "Spanish" : "English"}:`}
+          </Text>
           <View style={styles.riddleBox}>
             <Text style={styles.riddleText}>{src}</Text>
           </View>
@@ -1063,7 +1113,7 @@ function TimedBossView({
             returnKeyType="done" onSubmitEditing={submitText} />
           {!feedback && input.length > 0 && (
             <Pressable style={styles.submitBtn} onPress={submitText}>
-              <Text style={styles.submitBtnText}>Submit ✓</Text>
+              <Text style={styles.submitBtnText}>{qt("submit", quiz.nativeLang)}</Text>
             </Pressable>
           )}
         </>
@@ -1082,7 +1132,7 @@ function TimedBossView({
             returnKeyType="done" onSubmitEditing={submitText} />
           {!feedback && input.length > 0 && (
             <Pressable style={styles.submitBtn} onPress={submitText}>
-              <Text style={styles.submitBtnText}>Submit ✓</Text>
+              <Text style={styles.submitBtnText}>{qt("submit", quiz.nativeLang)}</Text>
             </Pressable>
           )}
         </>
@@ -1100,14 +1150,16 @@ function TimedBossView({
             textAlignVertical="top" />
           {input.length > 20 && (
             <Pressable style={styles.submitBtn} onPress={() => advance(true)}>
-              <Text style={styles.submitBtnText}>Submit ✓</Text>
+              <Text style={styles.submitBtnText}>{qt("submit", quiz.nativeLang)}</Text>
             </Pressable>
           )}
         </>
       );
     }
 
-    return <Text style={styles.instructionText}>Unknown round type: {r.type}</Text>;
+    return <Text style={styles.instructionText}>
+      {quiz.nativeLang === "ko" ? `알 수 없는 라운드 유형: ${r.type}` : quiz.nativeLang === "es" ? `Tipo de ronda desconocido: ${r.type}` : `Unknown round type: ${r.type}`}
+    </Text>;
   }
 
   return (
@@ -1116,7 +1168,9 @@ function TimedBossView({
       <View style={[styles.timerRow, { borderColor: urgentColor }]}>
         <Ionicons name="timer" size={20} color={urgentColor} />
         <Text style={[styles.timerText, { color: urgentColor }]}>{timeLeft}s</Text>
-        <Text style={styles.progressLabel}> Round {round + 1}/{rounds.length}</Text>
+        <Text style={styles.progressLabel}>
+          {" "}{quiz.nativeLang === "ko" ? `라운드 ${round + 1}/${rounds.length}` : quiz.nativeLang === "es" ? `Ronda ${round + 1}/${rounds.length}` : `Round ${round + 1}/${rounds.length}`}
+        </Text>
       </View>
 
       {/* Round type badge */}
@@ -1148,8 +1202,9 @@ function PronunciationQuizView({
 }) {
   const tl = quiz.targetLang as "en" | "es" | "ko";
   const nl = quiz.nativeLang;
-  const contentMap = quiz.content as Record<string, { sentences: { text: string; minScore: number }[] }>;
-  const sentences = contentMap[tl]?.sentences ?? contentMap["en"]?.sentences ?? [];
+  // loadQuiz already resolves content to targetLang, so quiz.content is { sentences: [...] }
+  const resolved = quiz.content as { sentences?: { text: string; minScore: number }[] } | undefined;
+  const sentences = resolved?.sentences ?? [];
 
   const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : "en-US";
   const rudyMsg = nl === "ko" ? "루디가 듣고 있어요… 🦊" : nl === "es" ? "Rudy está escuchando… 🦊" : "Rudy is listening… 🦊";
@@ -1215,7 +1270,8 @@ function PronunciationQuizView({
       const s = typeof data.accuracyScore === "number" ? data.accuracyScore : typeof data.score === "number" ? data.score : 0;
       setScore(Math.round(s));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {
+    } catch (e) {
+      console.warn('[API] pronunciation assessment failed:', e);
       setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : nl === "es" ? "Error al evaluar." : "Evaluation error.");
     } finally {
       setRecordState("done");
@@ -1268,7 +1324,8 @@ function PronunciationQuizView({
           nativeRecordingRef.current = recording;
           setRecordState("recording");
           autoStopRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
-        } catch {
+        } catch (e) {
+          console.warn('[Speech] microphone start failed:', e);
           setError(nl === "ko" ? "마이크를 시작할 수 없습니다." : nl === "es" ? "No se puede iniciar el micrófono." : "Cannot start microphone.");
         }
       })();
@@ -1315,7 +1372,8 @@ function PronunciationQuizView({
           const s = typeof data.accuracyScore === "number" ? data.accuracyScore : typeof data.score === "number" ? data.score : 0;
           setScore(Math.round(s));
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        } catch {
+        } catch (e) {
+          console.warn('[API] pronunciation assessment failed:', e);
           setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : "Evaluation error.");
         } finally {
           setRecordState("done");
@@ -1324,12 +1382,13 @@ function PronunciationQuizView({
       recorder.start();
       setRecordState("recording");
       autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 8000);
-    }).catch(() => {
+    }).catch((e) => {
+      console.warn('[Speech] microphone permission denied:', e);
       setError(nl === "ko" ? "마이크 권한을 허용해주세요." : "Microphone permission required.");
     });
   }
 
-  if (!sentence) return <Text style={styles.instructionText}>No sentences found.</Text>;
+  if (!sentence) return <Text style={styles.instructionText}>{qt("noSentences", nl)}</Text>;
 
   const scoreColor = score === null ? C.gold : score >= 80 ? "#4caf50" : score >= 60 ? "#ff9800" : "#f44336";
 
@@ -1419,6 +1478,708 @@ function PronunciationQuizView({
   );
 }
 
+// ─── Voice Power Quiz ──────────────────────────────────────────────────────────
+
+const STONE_COLORS: Record<StoneEffect, string> = {
+  dim: "#555555",
+  glow: "#60A5FA",
+  bright: "#F59E0B",
+  blinding: "#E879F9",
+};
+const STONE_LABELS: Record<StoneEffect, { ko: string; en: string; es: string }> = {
+  dim: { ko: "희미함", en: "Dim", es: "Tenue" },
+  glow: { ko: "빛남", en: "Glow", es: "Brillo" },
+  bright: { ko: "밝음", en: "Bright", es: "Brillante" },
+  blinding: { ko: "눈부심", en: "Blinding", es: "Cegador" },
+};
+
+function scoreToStoneEffect(score: number): StoneEffect {
+  if (score >= 86) return "blinding";
+  if (score >= 61) return "bright";
+  if (score >= 41) return "glow";
+  return "dim";
+}
+
+function VoicePowerQuizView({
+  quiz,
+  onDone,
+}: {
+  quiz: LoadedQuiz;
+  onDone: (correct: number, total: number) => void;
+}) {
+  const tl = quiz.targetLang as "en" | "es" | "ko";
+  const nl = quiz.nativeLang;
+  // loadQuiz already resolves content to targetLang, so quiz.content is { sentences: [...] }
+  const contentRaw = quiz.content as any;
+  const sentences: VoicePowerContent[] = contentRaw?.sentences ?? [];
+
+  const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : "en-US";
+  const rudyMsg = nl === "ko" ? "수호석이 반응하고 있어… 🦊" : nl === "es" ? "La piedra reacciona… 🦊" : "The stone reacts… 🦊";
+
+  const [sIdx, setSIdx] = useState(0);
+  const [recordState, setRecordState] = useState<"idle" | "recording" | "processing" | "done">("idle");
+  const [score, setScore] = useState<number | null>(null);
+  const [stoneEffect, setStoneEffect] = useState<StoneEffect>("dim");
+  const [error, setError] = useState("");
+  const [correctCount, setCorrectCount] = useState(0);
+
+  const nativeRecordingRef = useRef<Audio.Recording | null>(null);
+  const autoStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mediaRecorderRef = useRef<any>(null);
+  const audioChunksRef = useRef<any[]>([]);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  const sentence = sentences[sIdx];
+  const isLast = sIdx >= sentences.length - 1;
+  const minScore = sentence?.minScore ?? 60;
+  const passed = score !== null && score >= minScore;
+
+  useEffect(() => {
+    if (stoneEffect === "blinding" || stoneEffect === "bright") {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1.3, duration: 600, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+        ])
+      ).start();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [stoneEffect]);
+
+  function advance() {
+    const wasCorrect = score !== null && score >= minScore;
+    const newCorrect = correctCount + (wasCorrect ? 1 : 0);
+    if (isLast) {
+      onDone(newCorrect, sentences.length);
+    } else {
+      setCorrectCount(newCorrect);
+      setSIdx((i) => i + 1);
+      setScore(null);
+      setStoneEffect("dim");
+      setError("");
+      setRecordState("idle");
+    }
+  }
+
+  async function stopNativeRecording() {
+    const rec = nativeRecordingRef.current;
+    if (!rec) return;
+    if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
+    setRecordState("processing");
+    try {
+      await rec.stopAndUnloadAsync();
+      await new Promise(resolve => setTimeout(resolve, 300));
+      const uri = rec.getURI();
+      nativeRecordingRef.current = null;
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      if (!uri) throw new Error("No URI");
+      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
+      if (!base64 || base64.length < 2000) {
+        setScore(0);
+        setStoneEffect("dim");
+        setRecordState("done");
+        return;
+      }
+      const nativeMime = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
+      const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: sentence?.sentence ?? "", lang: speechLang, audio: base64, mimeType: nativeMime }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const s = typeof data.accuracyScore === "number" ? data.accuracyScore : typeof data.score === "number" ? data.score : 0;
+      const rounded = Math.round(s);
+      setScore(rounded);
+      setStoneEffect(scoreToStoneEffect(rounded));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (e) {
+      console.warn('[API] pronunciation assessment failed:', e);
+      setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : nl === "es" ? "Error al evaluar." : "Evaluation error.");
+    } finally {
+      setRecordState("done");
+    }
+  }
+
+  function handleRecord() {
+    if (recordState === "processing") return;
+
+    if (recordState === "recording") {
+      if (Platform.OS !== "web" && nativeRecordingRef.current) {
+        stopNativeRecording();
+      } else if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+      return;
+    }
+
+    setScore(null);
+    setStoneEffect("dim");
+    setError("");
+
+    if (Platform.OS !== "web") {
+      (async () => {
+        try {
+          const { granted } = await Audio.requestPermissionsAsync();
+          if (!granted) {
+            setError(nl === "ko" ? "마이크 권한을 허용해주세요." : "Microphone permission required.");
+            return;
+          }
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+          const recording = new Audio.Recording();
+          const recOptions: Audio.RecordingOptions = Platform.OS === "ios" ? {
+            android: Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+            ios: {
+              extension: ".wav", outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+              audioQuality: Audio.IOSAudioQuality.HIGH, sampleRate: 16000,
+              numberOfChannels: 1, bitRate: 256000,
+              linearPCMBitDepth: 16, linearPCMIsBigEndian: false, linearPCMIsFloat: false,
+            },
+            web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
+          } : Audio.RecordingOptionsPresets.HIGH_QUALITY;
+          await recording.prepareToRecordAsync(recOptions);
+          await recording.startAsync();
+          nativeRecordingRef.current = recording;
+          setRecordState("recording");
+          autoStopRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
+        } catch (e) {
+          console.warn('[Speech] microphone start failed:', e);
+          setError(nl === "ko" ? "마이크를 시작할 수 없습니다." : "Cannot start microphone.");
+        }
+      })();
+      return;
+    }
+
+    // Web recording
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      setError(nl === "ko" ? "이 브라우저는 마이크를 지원하지 않습니다." : "Microphone not supported.");
+      return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      audioChunksRef.current = [];
+      const mimeType = (window as any).MediaRecorder?.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus" : "audio/webm";
+      const recorder = new (window as any).MediaRecorder(stream, { mimeType });
+      mediaRecorderRef.current = recorder;
+      recorder.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunksRef.current.push(e.data); };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t: any) => t.stop());
+        setRecordState("processing");
+        const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        const base64: string = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve((reader.result as string).split(",")[1] ?? "");
+          reader.readAsDataURL(blob);
+        });
+        if (!base64 || base64.length < 2000) { setScore(0); setStoneEffect("dim"); setRecordState("done"); return; }
+        try {
+          const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+          const res = await fetch(apiUrl, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ word: sentence?.sentence ?? "", lang: speechLang, audio: base64, mimeType: recorder.mimeType || "audio/webm" }),
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          const s = typeof data.accuracyScore === "number" ? data.accuracyScore : typeof data.score === "number" ? data.score : 0;
+          const rounded = Math.round(s);
+          setScore(rounded);
+          setStoneEffect(scoreToStoneEffect(rounded));
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch (e) {
+          console.warn('[API] pronunciation assessment failed:', e);
+          setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : "Evaluation error.");
+        } finally { setRecordState("done"); }
+      };
+      recorder.start();
+      setRecordState("recording");
+      autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 8000);
+    }).catch((e) => {
+      console.warn('[Speech] microphone permission denied:', e);
+      setError(nl === "ko" ? "마이크 권한을 허용해주세요." : "Microphone permission required.");
+    });
+  }
+
+  if (!sentence) return <Text style={styles.instructionText}>{qt("noSentences", nl)}</Text>;
+
+  const stoneColor = STONE_COLORS[stoneEffect];
+  const stoneLabel = STONE_LABELS[stoneEffect][nl] ?? STONE_LABELS[stoneEffect]["en"];
+  const stoneCount = sentence.stoneCount ?? 1;
+
+  return (
+    <View style={styles.pronContainer}>
+      <Text style={styles.pronProgress}>{sIdx + 1} / {sentences.length}</Text>
+
+      {/* Stone visual */}
+      <View style={vpStyles.stoneRow}>
+        {Array.from({ length: stoneCount }).map((_, i) => (
+          <Animated.View
+            key={i}
+            style={[vpStyles.stone, { backgroundColor: stoneColor, transform: [{ scale: pulseAnim }] }]}
+          >
+            <Text style={vpStyles.stoneIcon}>
+              {stoneEffect === "blinding" ? "💎" : stoneEffect === "bright" ? "✨" : stoneEffect === "glow" ? "🔵" : "⚫"}
+            </Text>
+          </Animated.View>
+        ))}
+      </View>
+      <Text style={[vpStyles.stoneLabel, { color: stoneColor }]}>{stoneLabel}</Text>
+
+      {/* Sentence card */}
+      <View style={styles.pronCard}>
+        <Text style={styles.pronSentenceLabel}>
+          {nl === "ko" ? "수호석에 힘을 불어넣으세요:" : nl === "es" ? "Da poder a la piedra:" : "Empower the Guardian Stone:"}
+        </Text>
+        <Text style={styles.pronSentenceText}>{sentence.sentence}</Text>
+        {sentence.translation && (
+          <Text style={vpStyles.translationText}>{sentence.translation}</Text>
+        )}
+      </View>
+
+      {/* Mic button */}
+      <Pressable
+        style={[
+          styles.pronMicBtn,
+          recordState === "recording" && styles.pronMicBtnActive,
+          recordState === "processing" && { opacity: 0.6 },
+        ]}
+        onPress={handleRecord}
+        disabled={recordState === "processing" || recordState === "done"}
+      >
+        {recordState === "processing" ? (
+          <ActivityIndicator size="large" color={C.bg1} />
+        ) : (
+          <Ionicons name={recordState === "recording" ? "stop-circle" : "mic"} size={40} color={C.bg1} />
+        )}
+      </Pressable>
+
+      <Text style={styles.pronStatusText}>
+        {recordState === "recording" ? rudyMsg
+          : recordState === "processing" ? (nl === "ko" ? "수호석 반응 확인 중…" : "Checking stone response…")
+          : recordState === "idle" ? (nl === "ko" ? "마이크를 눌러 말하세요" : "Tap mic to speak")
+          : ""}
+      </Text>
+
+      {/* Score + stone effect */}
+      {score !== null && (
+        <View style={[styles.pronScoreBox, { borderColor: stoneColor }]}>
+          <Text style={[styles.pronScoreNum, { color: stoneColor }]}>{score}</Text>
+          <Text style={styles.pronScoreLabel}>/ 100</Text>
+          <Text style={[styles.pronFeedbackLabel, { color: stoneColor }]}>
+            {passed
+              ? (nl === "ko" ? "수호석이 반응합니다!" : nl === "es" ? "La piedra reacciona!" : "The stone responds!")
+              : (nl === "ko" ? "더 강하게 말해보세요 🦊" : nl === "es" ? "Habla más fuerte 🦊" : "Speak louder! 🦊")}
+          </Text>
+        </View>
+      )}
+
+      {!!error && <Text style={styles.pronErrorText}>{error}</Text>}
+
+      {recordState === "done" && (
+        <View style={styles.pronActionRow}>
+          {!passed && (
+            <Pressable style={styles.pronRetryBtn} onPress={() => { setScore(null); setStoneEffect("dim"); setError(""); setRecordState("idle"); }}>
+              <Text style={styles.pronRetryText}>{nl === "ko" ? "다시 녹음" : nl === "es" ? "Reintentar" : "Retry"}</Text>
+            </Pressable>
+          )}
+          <Pressable style={[styles.pronNextBtn, !passed && { backgroundColor: C.bg3 }]} onPress={advance}>
+            <Text style={[styles.pronNextText, !passed && { color: C.textMuted }]}>
+              {isLast ? (nl === "ko" ? "완료" : "Complete") : (nl === "ko" ? "다음 →" : "Next →")}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+    </View>
+  );
+}
+
+// ─── Debate Battle Quiz ────────────────────────────────────────────────────────
+
+function DebateBattleQuizView({
+  quiz,
+  onDone,
+}: {
+  quiz: LoadedQuiz;
+  onDone: (correct: number, total: number) => void;
+}) {
+  const nl = quiz.nativeLang;
+  const tl = quiz.targetLang;
+  // loadQuiz already resolves content to targetLang
+  const debate: DebateBattleContent = (quiz.content as any) ?? { opponent: "NPC", rounds: 3, minExpressions: 1, roundData: [] };
+
+  const [roundIdx, setRoundIdx] = useState(0);
+  const [input, setInput] = useState("");
+  const [feedback, setFeedback] = useState<{ text: string; won: boolean } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [wonRounds, setWonRounds] = useState(0);
+
+  const round = debate.roundData?.[roundIdx];
+  const totalRounds = debate.rounds ?? debate.roundData?.length ?? 3;
+  const isLast = roundIdx >= totalRounds - 1;
+
+  async function submitArgument() {
+    if (!input.trim() || loading) return;
+    setLoading(true);
+    try {
+      const gptPrompt = `You are judging a language debate. The student argues against "${debate.opponent}".
+Topic: "${round?.topic?.[tl] ?? round?.topic?.["en"] ?? "general"}"
+NPC argument: "${round?.npcArgument?.[tl] ?? round?.npcArgument?.["en"] ?? ""}"
+Required expressions: ${JSON.stringify(round?.requiredExpressions ?? [])}
+Min expressions needed: ${debate.minExpressions}
+Student's argument: "${input}"
+
+Score 0-100. Check if student used required expressions naturally. Respond ONLY with JSON: {"score": number, "feedback": "brief feedback", "expressionsUsed": string[]}`;
+
+      const data = await apiRequest("POST", "/api/quiz-evaluate", {
+        systemPrompt: gptPrompt,
+        userMessage: input,
+      }) as any;
+      const resultText = typeof data === "string" ? data : data?.result ?? data?.text ?? "{}";
+      let parsed: { score?: number; feedback?: string } = {};
+      try { parsed = JSON.parse(resultText); } catch (e) { console.warn('[API] debate result parse failed:', e); parsed = { score: 50, feedback: resultText?.slice?.(0, 200) ?? "" }; }
+      const won = (parsed.score ?? 0) >= 60;
+      setFeedback({ text: parsed.feedback ?? (won ? "Good argument!" : "Try harder."), won });
+      if (won) setWonRounds((w) => w + 1);
+    } catch (e) {
+      console.warn('[API] debate evaluation failed:', e);
+      setFeedback({ text: nl === "ko" ? "평가 중 오류 발생" : "Evaluation error", won: false });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function nextRound() {
+    if (isLast) {
+      onDone(wonRounds + (feedback?.won ? 1 : 0), totalRounds);
+    } else {
+      setRoundIdx((i) => i + 1);
+      setInput("");
+      setFeedback(null);
+    }
+  }
+
+  return (
+    <View style={styles.quizBody}>
+      {/* Round indicator */}
+      <View style={styles.roundBadge}>
+        <Text style={styles.roundBadgeText}>
+          ROUND {roundIdx + 1} / {totalRounds}
+        </Text>
+      </View>
+
+      {/* NPC argument */}
+      {round && (
+        <View style={dbStyles.npcArgBox}>
+          <Text style={dbStyles.npcName}>{debate.opponent}</Text>
+          <Text style={dbStyles.npcArgText}>{round.npcArgument?.[tl] ?? round.npcArgument?.["en"] ?? ""}</Text>
+        </View>
+      )}
+
+      {/* Required expressions */}
+      {round?.requiredExpressions && round.requiredExpressions.length > 0 && (
+        <View style={dbStyles.exprRow}>
+          <Text style={dbStyles.exprLabel}>{nl === "ko" ? "사용해야 할 표현:" : "Use these expressions:"}</Text>
+          <View style={styles.wordBank}>
+            {round.requiredExpressions.map((e, i) => (
+              <View key={i} style={styles.wordChip}><Text style={styles.wordChipText}>{e}</Text></View>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {/* Input */}
+      {!feedback && (
+        <>
+          <TextInput
+            style={styles.chatInput}
+            value={input}
+            onChangeText={setInput}
+            placeholder={nl === "ko" ? "반론을 입력하세요…" : "Type your counter-argument…"}
+            placeholderTextColor={C.textMuted}
+            multiline
+          />
+          <Pressable
+            style={[styles.submitBtn, (!input.trim() || loading) && { opacity: 0.5 }]}
+            onPress={submitArgument}
+            disabled={!input.trim() || loading}
+          >
+            {loading ? <ActivityIndicator color={C.bg1} /> : (
+              <Text style={styles.submitBtnText}>{nl === "ko" ? "반론 제출" : "Submit Argument"}</Text>
+            )}
+          </Pressable>
+        </>
+      )}
+
+      {/* Feedback */}
+      {feedback && (
+        <>
+          <View style={[styles.feedbackBanner, { backgroundColor: feedback.won ? "#2e7d32" : "#c62828" }]}>
+            <Text style={styles.feedbackText}>
+              {feedback.won ? (nl === "ko" ? "이 라운드 승리!" : "You won this round!") : (nl === "ko" ? "이 라운드 패배" : "You lost this round")}
+            </Text>
+          </View>
+          <Text style={dbStyles.feedbackDetail}>{feedback.text}</Text>
+          <Pressable style={styles.submitBtn} onPress={nextRound}>
+            <Text style={styles.submitBtnText}>
+              {isLast ? (nl === "ko" ? "결과 보기" : "See Results") : (nl === "ko" ? "다음 라운드 →" : "Next Round →")}
+            </Text>
+          </Pressable>
+        </>
+      )}
+    </View>
+  );
+}
+
+// ─── NPC Rescue Quiz ───────────────────────────────────────────────────────────
+
+function NpcRescueQuizView({
+  quiz,
+  onDone,
+}: {
+  quiz: LoadedQuiz;
+  onDone: (correct: number, total: number) => void;
+}) {
+  const tl = quiz.targetLang as "en" | "es" | "ko";
+  const nl = quiz.nativeLang;
+  // loadQuiz already resolves content to targetLang
+  const rescue: NpcRescueContent = (quiz.content as any) ?? { npcToRescue: "NPC", stages: [], progressiveIntro: true };
+
+  const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : "en-US";
+
+  const [stageIdx, setStageIdx] = useState(0);
+  const [recordState, setRecordState] = useState<"idle" | "recording" | "processing" | "done">("idle");
+  const [score, setScore] = useState<number | null>(null);
+  const [error, setError] = useState("");
+  const [passedCount, setPassedCount] = useState(0);
+
+  const nativeRecordingRef = useRef<Audio.Recording | null>(null);
+  const autoStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mediaRecorderRef = useRef<any>(null);
+  const audioChunksRef = useRef<any[]>([]);
+
+  const stage = rescue.stages?.[stageIdx];
+  const totalStages = rescue.stages?.length ?? 0;
+  const isLast = stageIdx >= totalStages - 1;
+  const minScore = stage?.minScore ?? 60;
+  const passed = score !== null && score >= minScore;
+
+  function advance() {
+    const wasCorrect = score !== null && score >= minScore;
+    const newPassed = passedCount + (wasCorrect ? 1 : 0);
+    if (isLast) {
+      onDone(newPassed, totalStages);
+    } else {
+      setPassedCount(newPassed);
+      setStageIdx((i) => i + 1);
+      setScore(null);
+      setError("");
+      setRecordState("idle");
+    }
+  }
+
+  async function stopNativeRecording() {
+    const rec = nativeRecordingRef.current;
+    if (!rec) return;
+    if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
+    setRecordState("processing");
+    try {
+      await rec.stopAndUnloadAsync();
+      await new Promise(resolve => setTimeout(resolve, 300));
+      const uri = rec.getURI();
+      nativeRecordingRef.current = null;
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      if (!uri) throw new Error("No URI");
+      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" as any });
+      if (!base64 || base64.length < 2000) { setScore(0); setRecordState("done"); return; }
+      const nativeMime = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
+      const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+      const res = await fetch(apiUrl, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: stage?.targetPhrase ?? "", lang: speechLang, audio: base64, mimeType: nativeMime }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const s = typeof data.accuracyScore === "number" ? data.accuracyScore : typeof data.score === "number" ? data.score : 0;
+      setScore(Math.round(s));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (e) {
+      console.warn('[API] pronunciation assessment failed:', e);
+      setError(nl === "ko" ? "채점 오류" : "Evaluation error.");
+    } finally {
+      setRecordState("done");
+    }
+  }
+
+  function handleRecord() {
+    if (recordState === "processing") return;
+
+    if (recordState === "recording") {
+      if (Platform.OS !== "web" && nativeRecordingRef.current) {
+        stopNativeRecording();
+      } else if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+      return;
+    }
+
+    setScore(null);
+    setError("");
+
+    if (Platform.OS !== "web") {
+      (async () => {
+        try {
+          const { granted } = await Audio.requestPermissionsAsync();
+          if (!granted) { setError(nl === "ko" ? "마이크 권한 필요" : "Microphone permission required."); return; }
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+          const recording = new Audio.Recording();
+          const recOptions: Audio.RecordingOptions = Platform.OS === "ios" ? {
+            android: Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+            ios: {
+              extension: ".wav", outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+              audioQuality: Audio.IOSAudioQuality.HIGH, sampleRate: 16000,
+              numberOfChannels: 1, bitRate: 256000,
+              linearPCMBitDepth: 16, linearPCMIsBigEndian: false, linearPCMIsFloat: false,
+            },
+            web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
+          } : Audio.RecordingOptionsPresets.HIGH_QUALITY;
+          await recording.prepareToRecordAsync(recOptions);
+          await recording.startAsync();
+          nativeRecordingRef.current = recording;
+          setRecordState("recording");
+          autoStopRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
+        } catch (e) {
+          console.warn('[Speech] microphone start failed:', e);
+          setError(nl === "ko" ? "마이크 시작 실패" : "Cannot start microphone.");
+        }
+      })();
+      return;
+    }
+
+    // Web recording
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      setError("Microphone not supported.");
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      audioChunksRef.current = [];
+      const mimeType = (window as any).MediaRecorder?.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus" : "audio/webm";
+      const recorder = new (window as any).MediaRecorder(stream, { mimeType });
+      mediaRecorderRef.current = recorder;
+      recorder.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunksRef.current.push(e.data); };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t: any) => t.stop());
+        setRecordState("processing");
+        const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        const base64: string = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve((reader.result as string).split(",")[1] ?? "");
+          reader.readAsDataURL(blob);
+        });
+        if (!base64 || base64.length < 2000) { setScore(0); setRecordState("done"); return; }
+        try {
+          const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+          const res = await fetch(apiUrl, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ word: stage?.targetPhrase ?? "", lang: speechLang, audio: base64, mimeType: recorder.mimeType || "audio/webm" }),
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          const s = typeof data.accuracyScore === "number" ? data.accuracyScore : typeof data.score === "number" ? data.score : 0;
+          setScore(Math.round(s));
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch (e) {
+          console.warn('[API] pronunciation assessment failed:', e);
+          setError(nl === "ko" ? "채점 오류" : "Evaluation error.");
+        } finally { setRecordState("done"); }
+      };
+      recorder.start();
+      setRecordState("recording");
+      autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 8000);
+    }).catch((e) => { console.warn('[Speech] microphone permission denied:', e); setError(nl === "ko" ? "마이크 권한 필요" : "Microphone permission required."); });
+  }
+
+  if (!stage) return <Text style={styles.instructionText}>No rescue stages found.</Text>;
+
+  const progressPct = ((stageIdx + (passed ? 1 : 0)) / totalStages) * 100;
+
+  return (
+    <View style={styles.pronContainer}>
+      {/* Progress bar */}
+      <View style={nrStyles.progressBarBg}>
+        <View style={[nrStyles.progressBarFill, { width: `${progressPct}%` as any }]} />
+      </View>
+      <Text style={styles.pronProgress}>
+        {nl === "ko" ? `구출 단계 ${stageIdx + 1} / ${totalStages}` : `Rescue Stage ${stageIdx + 1} / ${totalStages}`}
+      </Text>
+
+      {/* NPC rescue banner */}
+      <View style={nrStyles.rescueBanner}>
+        <Text style={nrStyles.rescueEmoji}>🆘</Text>
+        <Text style={nrStyles.rescueText}>
+          {nl === "ko" ? `${rescue.npcToRescue}을(를) 구출하세요!` : `Rescue ${rescue.npcToRescue}!`}
+        </Text>
+      </View>
+
+      {/* Stage instruction */}
+      <View style={styles.pronCard}>
+        <Text style={styles.pronSentenceLabel}>{stage.instruction?.[nl] ?? stage.instruction?.["en"] ?? ""}</Text>
+        <Text style={styles.pronSentenceText}>{stage.targetPhrase}</Text>
+        {stage.hint && (
+          <Text style={vpStyles.translationText}>{stage.hint?.[nl] ?? stage.hint?.["en"] ?? ""}</Text>
+        )}
+      </View>
+
+      {/* Mic */}
+      <Pressable
+        style={[styles.pronMicBtn, recordState === "recording" && styles.pronMicBtnActive, recordState === "processing" && { opacity: 0.6 }]}
+        onPress={handleRecord}
+        disabled={recordState === "processing" || recordState === "done"}
+      >
+        {recordState === "processing" ? <ActivityIndicator size="large" color={C.bg1} /> : (
+          <Ionicons name={recordState === "recording" ? "stop-circle" : "mic"} size={40} color={C.bg1} />
+        )}
+      </Pressable>
+
+      <Text style={styles.pronStatusText}>
+        {recordState === "recording" ? (nl === "ko" ? "듣고 있어요…" : "Listening…")
+          : recordState === "processing" ? (nl === "ko" ? "평가 중…" : "Evaluating…")
+          : recordState === "idle" ? (nl === "ko" ? "마이크를 눌러 말하세요" : "Tap mic to speak")
+          : ""}
+      </Text>
+
+      {score !== null && (
+        <View style={[styles.pronScoreBox, { borderColor: passed ? "#4caf50" : "#f44336" }]}>
+          <Text style={[styles.pronScoreNum, { color: passed ? "#4caf50" : "#f44336" }]}>{score}</Text>
+          <Text style={styles.pronScoreLabel}>/ 100</Text>
+          <Text style={[styles.pronFeedbackLabel, { color: passed ? "#4caf50" : "#f44336" }]}>
+            {passed ? (nl === "ko" ? "구출 성공!" : "Rescue success!") : (nl === "ko" ? "다시 시도하세요" : "Try again")}
+          </Text>
+        </View>
+      )}
+
+      {!!error && <Text style={styles.pronErrorText}>{error}</Text>}
+
+      {recordState === "done" && (
+        <View style={styles.pronActionRow}>
+          {!passed && (
+            <Pressable style={styles.pronRetryBtn} onPress={() => { setScore(null); setError(""); setRecordState("idle"); }}>
+              <Text style={styles.pronRetryText}>{nl === "ko" ? "다시 녹음" : "Retry"}</Text>
+            </Pressable>
+          )}
+          <Pressable style={[styles.pronNextBtn, !passed && { backgroundColor: C.bg3 }]} onPress={advance}>
+            <Text style={[styles.pronNextText, !passed && { color: C.textMuted }]}>
+              {isLast ? (nl === "ko" ? "완료" : "Complete") : (nl === "ko" ? "다음 단계 →" : "Next Stage →")}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+    </View>
+  );
+}
+
 // ─── Main Modal ────────────────────────────────────────────────────────────────
 
 export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }: Props) {
@@ -1432,6 +2193,19 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
   function handleDone(correct: number, total: number) {
     setResultData({ correct, total });
     setPhase("result");
+
+    // Track expression book + I/O ratio
+    if (quiz) {
+      const quizAny = quiz as any;
+      const chapter = quizAny.chapter ?? "";
+      const tprsStage = quizAny.tprsStage;
+      const targetExprs: string[] = quizAny.targetExpressions ?? [];
+      if (targetExprs.length > 0) {
+        addToExpressionBook(targetExprs, chapter, tprsStage).catch((e) => console.warn('[StoryQuiz] expression book storage failed:', e));
+        if (tprsStage === 4) markExpressionsMastered(targetExprs).catch((e) => console.warn('[StoryQuiz] mark expressions mastered failed:', e));
+      }
+      trackQuizIO(chapter, quiz.type).catch((e) => console.warn('[StoryQuiz] quiz I/O tracking failed:', e));
+    }
   }
 
   if (!quiz) return null;
@@ -1448,6 +2222,9 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
     mixed: "🏆 Final Trial",
     translation: "🌐 Translate",
     pronunciation: "🎤 Pronunciation",
+    voice_power: "💎 Voice Power",
+    debate_battle: "⚔️ Debate",
+    npc_rescue: "🆘 Rescue",
   };
 
   function renderQuiz() {
@@ -1473,8 +2250,16 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
         return <TimedBossView quiz={quiz!} onDone={handleDone} />;
       case "pronunciation":
         return <PronunciationQuizView quiz={quiz!} onDone={handleDone} />;
+      case "voice_power":
+        return <VoicePowerQuizView quiz={quiz!} onDone={handleDone} />;
+      case "debate_battle":
+        return <DebateBattleQuizView quiz={quiz!} onDone={handleDone} />;
+      case "npc_rescue":
+        return <NpcRescueQuizView quiz={quiz!} onDone={handleDone} />;
       default:
-        return <Text style={styles.instructionText}>Quiz type not yet supported: {quiz!.type}</Text>;
+        return <Text style={styles.instructionText}>
+          {quiz!.nativeLang === "ko" ? `아직 지원하지 않는 퀴즈 유형: ${quiz!.type}` : quiz!.nativeLang === "es" ? `Tipo de quiz aún no admitido: ${quiz!.type}` : `Quiz type not yet supported: ${quiz!.type}`}
+        </Text>;
     }
   }
 
@@ -1799,4 +2584,65 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pronNextText: { fontSize: 14, fontFamily: F.label, color: C.bg1 },
+});
+
+// ─── Voice Power Styles ──────────────────────────────────────────────────────
+
+const vpStyles = StyleSheet.create({
+  stoneRow: {
+    flexDirection: "row", gap: 12, justifyContent: "center", marginVertical: 8,
+  },
+  stone: {
+    width: 48, height: 48, borderRadius: 24,
+    justifyContent: "center", alignItems: "center",
+    shadowOpacity: 0.6, shadowRadius: 12, elevation: 8,
+  },
+  stoneIcon: { fontSize: 22 },
+  stoneLabel: {
+    fontSize: 14, fontFamily: F.label, textAlign: "center",
+  },
+  translationText: {
+    fontSize: 13, fontFamily: F.body, color: C.textMuted,
+    textAlign: "center", fontStyle: "italic", marginTop: 4,
+  },
+});
+
+// ─── Debate Battle Styles ────────────────────────────────────────────────────
+
+const dbStyles = StyleSheet.create({
+  npcArgBox: {
+    backgroundColor: C.bg2, borderRadius: 16, padding: 16,
+    borderWidth: 1, borderColor: C.border, gap: 6,
+  },
+  npcName: {
+    fontSize: 12, fontFamily: F.label, color: C.gold, textTransform: "uppercase", letterSpacing: 1,
+  },
+  npcArgText: {
+    fontSize: 15, fontFamily: F.body, color: C.parchment, lineHeight: 22,
+  },
+  exprRow: { gap: 6 },
+  exprLabel: { fontSize: 12, fontFamily: F.body, color: C.textMuted },
+  feedbackDetail: {
+    fontSize: 14, fontFamily: F.body, color: C.parchment, textAlign: "center", lineHeight: 20,
+  },
+});
+
+// ─── NPC Rescue Styles ───────────────────────────────────────────────────────
+
+const nrStyles = StyleSheet.create({
+  progressBarBg: {
+    width: "100%", height: 6, backgroundColor: C.bg3, borderRadius: 3, overflow: "hidden",
+  },
+  progressBarFill: {
+    height: "100%", backgroundColor: "#4caf50", borderRadius: 3,
+  },
+  rescueBanner: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    backgroundColor: "#c62828" + "22", borderRadius: 12,
+    paddingHorizontal: 16, paddingVertical: 8,
+  },
+  rescueEmoji: { fontSize: 24 },
+  rescueText: {
+    fontSize: 15, fontFamily: F.label, color: "#c62828",
+  },
 });

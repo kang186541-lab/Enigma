@@ -13,7 +13,10 @@ export function getSpellingVariants(word: string): string[] {
 
   // -our / -or (colour/color, honour/honor, favour/favor, humour/humor, neighbour/neighbor)
   if (word.endsWith("our")) variants.push(word.replace(/our$/, "or"));
-  if (word.endsWith("or") && !["oor","for","nor","tor","bor","mor","cor","gor","por","sor","vor","wor","xor","yor","zor"].some(e => word.endsWith(e))) {
+  // Only generate -our variants for words that actually have British spellings
+  // (e.g., color→colour, favor→favour). Exclude words like doctor, mirror, mayor.
+  if (word.endsWith("or") && word.length > 4 &&
+      !["ctor","itor","ator","eror","iror","otor","enor","ior","yor","nor","for","oor","tor","ror","dor"].some(e => word.endsWith(e))) {
     variants.push(word.replace(/or$/, "our"));
   }
 

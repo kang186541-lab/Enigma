@@ -55,6 +55,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   const [totalSpoken, setTotalSpoken] = useState(0);
   const [playingMode, setPlayingMode] = useState<"slow" | "normal" | null>(null);
   const [textRevealed, setTextRevealed] = useState(false); // for round 3: reveal text after attempt
+  const [recordedAudio, setRecordedAudio] = useState<{ base64: string; mimeType: string } | null>(null);
+  const [playingMyRec, setPlayingMyRec] = useState(false);
 
   // ── Round 3 (audio-only recall) configuration ───────────────────────────────
   const hasRound3 = step1Config?.hasAudioOnlyRound === true;
@@ -130,13 +132,14 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
     if (phase === "playing" || phase === "recording" || phase === "assessing") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setPlayingMode(mode);
+    const wasResult = phase === "result";
     setPhase("playing");
 
     try {
       // Stop any existing sound
       if (soundRef.current) {
-        await soundRef.current.stopAsync().catch(() => {});
-        await soundRef.current.unloadAsync().catch(() => {});
+        await soundRef.current.stopAsync().catch((e) => console.warn('[Step1] TTS stop failed:', e));
+        await soundRef.current.unloadAsync().catch((e) => console.warn('[Step1] TTS unload failed:', e));
         soundRef.current = null;
       }
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
@@ -154,8 +157,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         const objUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
         registerGlobalWebAudio(audio);
-        audio.onended = () => { setPhase("idle"); setPlayingMode(null); };
-        audio.onerror = () => { setPhase("idle"); setPlayingMode(null); };
+        audio.onended = () => { setPhase(wasResult ? "result" : "idle"); setPlayingMode(null); };
+        audio.onerror = () => { setPhase(wasResult ? "result" : "idle"); setPlayingMode(null); };
         await audio.play();
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
@@ -164,13 +167,14 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded && status.didJustFinish) {
             soundRef.current = null;
-            setPhase("idle");
+            setPhase(wasResult ? "result" : "idle");
             setPlayingMode(null);
           }
         });
       }
-    } catch {
-      setPhase("idle");
+    } catch (e) {
+      console.warn('[Audio] TTS playback failed:', e);
+      setPhase(wasResult ? "result" : "idle");
       setPlayingMode(null);
     }
   }
@@ -211,7 +215,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         await rec.startAsync();
         nativeRecRef.current = rec;
         autoStopRef.current = setTimeout(() => stopNativeRecording(), 4000);
-      } catch {
+      } catch (e) {
+        console.warn('[Speech] recording start failed:', e);
         stopPulse();
         setPhase("idle");
       }
@@ -247,7 +252,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
       const mimeType = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
       await submitAssessment(base64, mimeType);
-    } catch {
+    } catch (e) {
+      console.warn('[Speech] native recording stop failed:', e);
       setPhase("idle");
     }
   }
@@ -265,7 +271,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         reader.readAsDataURL(blob);
       });
       await submitAssessment(base64, mimeType);
-    } catch {
+    } catch (e) {
+      console.warn('[Speech] web recording stop failed:', e);
       setPhase("idle");
     }
   }
@@ -276,7 +283,33 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
     return typeof t === "string" && t.trim().length > 0;
   }
 
+  async function playMyRecording() {
+    if (!recordedAudio || playingMyRec) return;
+    setPlayingMyRec(true);
+    try {
+      const dataUri = `data:${recordedAudio.mimeType};base64,${recordedAudio.base64}`;
+      if (Platform.OS === "web") {
+        const audio = new (window as any).Audio(dataUri) as HTMLAudioElement;
+        registerGlobalWebAudio(audio);
+        audio.onended = () => setPlayingMyRec(false);
+        audio.onerror = () => setPlayingMyRec(false);
+        await audio.play();
+      } else {
+        const { sound } = await Audio.Sound.createAsync({ uri: dataUri }, { shouldPlay: true });
+        registerGlobalSound(sound);
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) setPlayingMyRec(false);
+        });
+      }
+    } catch (e) {
+      console.warn('[Audio] playback of recording failed:', e);
+      setPlayingMyRec(false);
+    }
+  }
+
   async function submitAssessment(base64: string, mimeType: string) {
+    // Save recording for playback
+    setRecordedAudio({ base64, mimeType });
     // Empty audio guard
     if (!isValidAudio(base64)) {
       console.warn('[STEP1] Audio too short — user probably said nothing');
@@ -311,7 +344,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         : s >= 70 ? getRandomFeedback("good", nativeLang)
         : getRandomFeedback("needsWork", nativeLang));
       Haptics.notificationAsync(s >= 70 ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning);
-    } catch {
+    } catch (e) {
+      console.warn('[API] pronunciation assessment failed:', e);
       setScore(0);
       setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
     } finally {
@@ -345,6 +379,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       setFeedback("");
       setWordScores([]);
       setTextRevealed(false);
+      setRecordedAudio(null);
     } else if (sentIdx < sentences.length - 1) {
       setSentIdx(sentIdx + 1);
       setRound(0);
@@ -353,6 +388,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       setFeedback("");
       setWordScores([]);
       setTextRevealed(false);
+      setRecordedAudio(null);
     } else {
       // All done
       onComplete(newSpoken);
@@ -480,6 +516,38 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
             speechLang={sentence.speechLang}
           />
 
+          {/* Playback comparison: my recording vs native TTS */}
+          <View style={s.playbackRow}>
+            {recordedAudio && (
+              <Pressable
+                style={({ pressed }) => [s.playbackBtn, pressed && { opacity: 0.8 }]}
+                onPress={playMyRecording}
+                disabled={playingMyRec}
+              >
+                {playingMyRec
+                  ? <ActivityIndicator size="small" color="#e5a940" />
+                  : <Ionicons name="ear-outline" size={15} color="#e5a940" />
+                }
+                <Text style={s.playbackBtnText}>
+                  {nativeLang === "korean" ? "내 발음" : nativeLang === "spanish" ? "Mi voz" : "My voice"}
+                </Text>
+              </Pressable>
+            )}
+            <Pressable
+              style={({ pressed }) => [s.playbackBtn, s.playbackBtnNative, pressed && { opacity: 0.8 }]}
+              onPress={() => playTTS("normal")}
+              disabled={phase === "playing"}
+            >
+              {playingMode === "normal" && phase === "playing"
+                ? <ActivityIndicator size="small" color={C.gold} />
+                : <Ionicons name="volume-medium-outline" size={15} color={C.gold} />
+              }
+              <Text style={[s.playbackBtnText, { color: C.gold }]}>
+                {nativeLang === "korean" ? "원어민 발음" : nativeLang === "spanish" ? "Nativo" : "Native"}
+              </Text>
+            </Pressable>
+          </View>
+
           <View style={s.resultBtns}>
             {score < 70 && (
               <Pressable
@@ -573,6 +641,19 @@ const s = StyleSheet.create({
   scoreNum:  { fontSize: 14, fontFamily: F.header, color: C.parchment, marginLeft: 8 },
   feedbackText: { fontSize: 14, fontFamily: F.body, color: C.parchment, textAlign: "center", fontStyle: "italic" },
 
+
+  playbackRow: { flexDirection: "row", gap: 10, width: "100%" },
+  playbackBtn: {
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    paddingVertical: 10, borderRadius: 10,
+    borderWidth: 1, borderColor: "rgba(229,169,64,0.3)",
+    backgroundColor: "rgba(229,169,64,0.08)",
+  },
+  playbackBtnNative: {
+    borderColor: "rgba(201,162,39,0.3)",
+    backgroundColor: "rgba(201,162,39,0.08)",
+  },
+  playbackBtnText: { fontSize: 12, fontFamily: F.bodySemi, color: "#e5a940" },
 
   resultBtns: { flexDirection: "row", gap: 10, marginTop: 4 },
   retryBtn: {

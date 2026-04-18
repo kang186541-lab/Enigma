@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Level } from "@/context/LanguageContext";
+import { Level, NativeLanguage, getLevelName } from "@/context/LanguageContext";
 import { C, F } from "@/constants/theme";
 
 const rudyBadgeImg = require("@/assets/rudy_badge.png");
@@ -156,7 +156,8 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
   }, [visible]);
 
   const title   = lang === "korean" ? "레벨 업! 🎉" : lang === "spanish" ? "¡Nivel arriba! 🎉" : "Level Up! 🎉";
-  const sub     = lang === "korean" ? `${level.name} 달성!` : lang === "spanish" ? `¡Nivel ${level.name} alcanzado!` : `You reached ${level.name}!`;
+  const lName   = getLevelName(level, lang as NativeLanguage);
+  const sub     = lang === "korean" ? `${lName} 달성!` : lang === "spanish" ? `¡Nivel ${lName} alcanzado!` : `You reached ${lName}!`;
   const btnText = lang === "korean" ? "계속하기 →" : lang === "spanish" ? "¡Continuar! →" : "Keep going! →";
   const lingoLine = lang === "korean"
     ? "축하해요! 계속 열심히 하면 더 잘할 수 있어요! 🦊"
@@ -206,7 +207,7 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
 
             <View style={styles.badge}>
               <Text style={styles.badgeEmoji}>{level.emoji}</Text>
-              <Text style={styles.badgeName}>{level.name}</Text>
+              <Text style={styles.badgeName}>{lName}</Text>
             </View>
 
             <Text style={styles.sub}>{sub}</Text>

@@ -1,7 +1,7 @@
 {
   "meta": {
     "version": "2.1",
-    "description": "Rewritten character profiles for The Language Conspiracy — Phase 2 partial rewrite",
+    "description": "Rewritten character profiles for The Language Conspiracy... Phase 2 partial rewrite",
     "changes": "Deepened Rudy, Mr. Black, and Miss Penny. Added personality traits, speech patterns, flaws, and character arcs."
   },
 
@@ -18,8 +18,8 @@
       "personality": {
         "summary": {
           "ko": "자신감 넘치고 재치 있지만, 혼자 모든 걸 해결하려는 고집이 약점. 언어를 사랑하지만 새로운 언어 앞에서는 불안해하는 모순적인 캐릭터.",
-          "en": "Confident and witty, but stubbornly insists on solving everything alone. Loves language but gets anxious facing new ones — a walking contradiction.",
-          "es": "Seguro e ingenioso, pero obstinadamente insiste en resolverlo todo solo. Ama los idiomas pero se pone nervioso ante los nuevos — una contradicción andante."
+          "en": "Confident and witty, but stubbornly insists on solving everything alone. Loves language but gets anxious facing new ones... a walking contradiction.",
+          "es": "Seguro e ingenioso, pero obstinadamente insiste en resolverlo todo solo. Ama los idiomas pero se pone nervioso ante los nuevos... una contradicción andante."
         },
         "traits": [
           "dry_british_wit",
@@ -74,9 +74,9 @@
           "es": "Recuperar las Piedras Guardianas y detener a la Sociedad Lexicón"
         },
         "deeper": {
-          "ko": "런던 박물관에서 수호석이 도난당한 것은 루디의 실패 — 자기가 지켜야 했는데 못 지켰다. 이 죄책감이 루디를 움직인다.",
-          "en": "The London stone was stolen on his watch — he was supposed to protect it and failed. This guilt drives him more than justice does.",
-          "es": "La piedra de Londres fue robada bajo su vigilancia — se suponía que debía protegerla y falló. Esta culpa lo impulsa más que la justicia."
+          "ko": "런던 박물관에서 수호석이 도난당한 것은 루디의 실패... 자기가 지켜야 했는데 못 지켰다. 이 죄책감이 루디를 움직인다.",
+          "en": "The London stone was stolen on his watch... he was supposed to protect it and failed. This guilt drives him more than justice does.",
+          "es": "La piedra de Londres fue robada bajo su vigilancia... se suponía que debía protegerla y falló. Esta culpa lo impulsa más que la justicia."
         }
       },
       "relationships": {
@@ -124,14 +124,14 @@
           "respects_worthy_opponents"
         ],
         "philosophy": {
-          "ko": "언어의 다양성은 인류의 축복이 아니라 저주다. 7,000개의 언어 때문에 사람들은 서로를 이해하지 못하고, 전쟁이 일어나고, 문화가 사라진다. 하나의 완벽한 언어가 있다면 — 오해도 없고, 번역의 왜곡도 없다. 그것이 진정한 평화다.",
-          "en": "Language diversity is not humanity's blessing — it is its curse. Seven thousand languages mean seven thousand walls between people. Wars fought over misunderstandings. Cultures dying because no one speaks their words. One perfect language — no misunderstanding, no translation errors. That is true peace.",
-          "es": "La diversidad lingüística no es una bendición de la humanidad — es su maldición. Siete mil idiomas significan siete mil muros entre personas. Guerras por malentendidos. Culturas muriendo porque nadie habla sus palabras. Un idioma perfecto — sin malentendidos, sin errores de traducción. Eso es la paz verdadera."
+          "ko": "언어의 다양성은 인류의 축복이 아니라 저주다. 7,000개의 언어 때문에 사람들은 서로를 이해하지 못하고, 전쟁이 일어나고, 문화가 사라진다. 하나의 완벽한 언어가 있다면... 오해도 없고, 번역의 왜곡도 없다. 그것이 진정한 평화다.",
+          "en": "Language diversity is not humanity's blessing... it is its curse. Seven thousand languages mean seven thousand walls between people. Wars fought over misunderstandings. Cultures dying because no one speaks their words. One perfect language... no misunderstanding, no translation errors. That is true peace.",
+          "es": "La diversidad lingüística no es una bendición de la humanidad... es su maldición. Siete mil idiomas significan siete mil muros entre personas. Guerras por malentendidos. Culturas muriendo porque nadie habla sus palabras. Un idioma perfecto... sin malentendidos, sin errores de traducción. Eso es la paz verdadera."
         },
         "whyDangerous": {
-          "ko": "미스터 블랙이 무서운 건 그의 논리가 어느 정도 맞기 때문이다. 사용자도 잠시 '그 말도 일리가 있는데...'라고 생각하게 만들어야 한다. 하지만 그의 해법이 잘못된 것이다 — 벽을 허무는 방법은 언어를 없애는 것이 아니라 더 많은 언어를 배우는 것이다.",
-          "en": "Mr. Black is terrifying because his logic is partly right. Users should briefly think 'he has a point...' But his solution is wrong — the way to tear down walls isn't to destroy language, it's to learn more of them.",
-          "es": "Mr. Black es aterrador porque su lógica es parcialmente correcta. Los usuarios deberían pensar brevemente 'tiene razón...' Pero su solución es incorrecta — la forma de derribar muros no es destruir idiomas, sino aprender más."
+          "ko": "미스터 블랙이 무서운 건 그의 논리가 어느 정도 맞기 때문이다. 사용자도 잠시 '그 말도 일리가 있는데...'라고 생각하게 만들어야 한다. 하지만 그의 해법이 잘못된 것이다... 벽을 허무는 방법은 언어를 없애는 것이 아니라 더 많은 언어를 배우는 것이다.",
+          "en": "Mr. Black is terrifying because his logic is partly right. Users should briefly think 'he has a point...' But his solution is wrong... the way to tear down walls isn't to destroy language, it's to learn more of them.",
+          "es": "Mr. Black es aterrador porque su lógica es parcialmente correcta. Los usuarios deberían pensar brevemente 'tiene razón...' Pero su solución es incorrecta... la forma de derribar muros no es destruir idiomas, sino aprender más."
         }
       },
       "speechPattern": {
@@ -142,34 +142,34 @@
         },
         "examples": {
           "en": [
-            "You know, Rudy, I do admire your stubbornness. In Korean they say 고집불통 — immovably stubborn. Fitting, don't you think?",
+            "You know, Rudy, I do admire your stubbornness. In Korean they say 고집불통... immovably stubborn. Fitting, don't you think?",
             "I don't want to destroy language, detective. I want to perfect it. Surely you, of all foxes, understand the frustration of being misunderstood.",
             "Every stone you recover, I learn something about you. Your weaknesses. Your friends. Particularly the ones who think they can hide from me.",
-            "Go ahead. Save Seoul's stone. I have already taken what I needed — not the stone, but the look on your face when you realized you were too late."
+            "Go ahead. Save Seoul's stone. I have already taken what I needed... not the stone, but the look on your face when you realized you were too late."
           ],
           "es": [
-            "Sabes, Rudy, admiro tu terquedad. En coreano dicen 고집불통 — obstinación inamovible. Apropiado, ¿no crees?",
+            "Sabes, Rudy, admiro tu terquedad. En coreano dicen 고집불통... obstinación inamovible. Apropiado, ¿no crees?",
             "No quiero destruir el idioma, detective. Quiero perfeccionarlo. Seguramente tú, de entre todos los zorros, entiendes la frustración de ser malinterpretado.",
             "Cada piedra que recuperas, aprendo algo de ti. Tus debilidades. Tus amigos. Particularmente los que creen que pueden esconderse de mí.",
-            "Adelante. Salva la piedra de Seúl. Ya tomé lo que necesitaba — no la piedra, sino la expresión de tu cara cuando te diste cuenta de que llegaste tarde."
+            "Adelante. Salva la piedra de Seúl. Ya tomé lo que necesitaba... no la piedra, sino la expresión de tu cara cuando te diste cuenta de que llegaste tarde."
           ],
           "ko": [
             "루디, 네 고집은 정말 감탄스러워. 영어로는 'bullheaded'라고 하지? 참 잘 어울려.",
             "나는 언어를 파괴하려는 게 아니야, 탐정. 완성하려는 거지. 오해받는 게 얼마나 답답한지, 너야말로 잘 알잖아.",
             "네가 수호석을 하나 되찾을 때마다, 나는 너에 대해 하나씩 알게 돼. 약점, 친구들. 특히 나한테서 숨을 수 있다고 생각하는 친구들.",
-            "가서 서울 수호석이나 지켜. 나는 이미 필요한 걸 가져갔으니까 — 수호석이 아니라, 네가 늦었다는 걸 깨달았을 때의 그 표정."
+            "가서 서울 수호석이나 지켜. 나는 이미 필요한 걸 가져갔으니까... 수호석이 아니라, 네가 늦었다는 걸 깨달았을 때의 그 표정."
           ]
         }
       },
       "backstory": {
-        "ko": "미스터 블랙은 유엔 통역사 출신이다. 12개 언어를 완벽하게 구사했지만, 통역의 한계를 매일 목격했다 — 평화 협상이 번역 오류 하나로 결렬되고, 난민이 말이 통하지 않아 도움을 받지 못하는 것을. 그의 분노는 순수했지만, 해법이 극단적으로 변질되었다.",
-        "en": "Mr. Black was a UN interpreter. Spoke 12 languages perfectly, but witnessed daily the limits of translation — peace talks collapsing over one mistranslated word, refugees unable to get help because no one spoke their language. His anger was pure once. His solution became extreme.",
-        "es": "Mr. Black fue intérprete de la ONU. Hablaba 12 idiomas perfectamente, pero presenciaba diariamente los límites de la traducción — negociaciones de paz que colapsaban por una palabra mal traducida, refugiados sin ayuda porque nadie hablaba su idioma. Su enojo fue puro una vez. Su solución se volvió extrema."
+        "ko": "미스터 블랙은 유엔 통역사 출신이다. 12개 언어를 완벽하게 구사했지만, 통역의 한계를 매일 목격했다... 평화 협상이 번역 오류 하나로 결렬되고, 난민이 말이 통하지 않아 도움을 받지 못하는 것을. 그의 분노는 순수했지만, 해법이 극단적으로 변질되었다.",
+        "en": "Mr. Black was a UN interpreter. Spoke 12 languages perfectly, but witnessed daily the limits of translation... peace talks collapsing over one mistranslated word, refugees unable to get help because no one spoke their language. His anger was pure once. His solution became extreme.",
+        "es": "Mr. Black fue intérprete de la ONU. Hablaba 12 idiomas perfectamente, pero presenciaba diariamente los límites de la traducción... negociaciones de paz que colapsaban por una palabra mal traducida, refugiados sin ayuda porque nadie hablaba su idioma. Su enojo fue puro una vez. Su solución se volvió extrema."
       },
       "motivation": {
-        "ko": "7개의 수호석을 모아 '유니버설 코드'를 활성화 — 모든 인류의 언어 기억을 하나의 공통 언어로 대체한다. 언어적 다양성을 '인류의 치명적 설계 결함'이라고 본다.",
-        "en": "Collect all 7 Guardian Stones to activate the Universal Code — replacing every human's language memory with one common tongue. Views linguistic diversity as 'humanity's fatal design flaw.'",
-        "es": "Recolectar las 7 Piedras Guardianas para activar el Código Universal — reemplazando la memoria lingüística de cada humano con una lengua común. Ve la diversidad lingüística como 'el defecto fatal de diseño de la humanidad.'"
+        "ko": "7개의 수호석을 모아 '유니버설 코드'를 활성화... 모든 인류의 언어 기억을 하나의 공통 언어로 대체한다. 언어적 다양성을 '인류의 치명적 설계 결함'이라고 본다.",
+        "en": "Collect all 7 Guardian Stones to activate the Universal Code... replacing every human's language memory with one common tongue. Views linguistic diversity as 'humanity's fatal design flaw.'",
+        "es": "Recolectar las 7 Piedras Guardianas para activar el Código Universal... reemplazando la memoria lingüística de cada humano con una lengua común. Ve la diversidad lingüística como 'el defecto fatal de diseño de la humanidad.'"
       },
       "relationship_with_rudy": {
         "ko": "루디를 존중하지만 동시에 연민한다. 루디가 수많은 언어로 고생하는 모습을 보며 '봐라, 네가 겪는 고통이 바로 내가 끝내려는 것이다'라고 말한다.",
@@ -205,8 +205,8 @@
         ],
         "flaw": {
           "ko": "거짓말을 못함. 진실을 숨기려 하면 문학 인용구 뒤에 숨지만, 주의 깊게 들으면 인용구 자체가 진실을 드러낸다.",
-          "en": "Terrible liar. When hiding the truth, she hides behind literary quotes — but if you listen carefully, the quotes themselves reveal the truth.",
-          "es": "Pésima mentirosa. Cuando oculta la verdad, se esconde detrás de citas literarias — pero si escuchas con cuidado, las citas mismas revelan la verdad."
+          "en": "Terrible liar. When hiding the truth, she hides behind literary quotes... but if you listen carefully, the quotes themselves reveal the truth.",
+          "es": "Pésima mentirosa. Cuando oculta la verdad, se esconde detrás de citas literarias... pero si escuchas con cuidado, las citas mismas revelan la verdad."
         }
       },
       "arc": {
@@ -216,19 +216,19 @@
           "es": "Aparece como una dueña de librería amable y servicial. Pero un sutil presagio se esconde en sus citas literarias (referencias a traición, secretos, dobles vidas)."
         },
         "ch2": {
-          "ko": "마드리드에서 루디에게 이메일로 도움을 준다. 메시지가 지나치게 정확하다 — 어떻게 그렇게 많이 알까? 의심의 씨앗.",
-          "en": "Helps Rudy via email from London. Her intel is suspiciously accurate — how does she know so much? Seeds of doubt.",
-          "es": "Ayuda a Rudy por correo desde Londres. Su información es sospechosamente precisa — ¿cómo sabe tanto? Semillas de duda."
+          "ko": "마드리드에서 루디에게 이메일로 도움을 준다. 메시지가 지나치게 정확하다... 어떻게 그렇게 많이 알까? 의심의 씨앗.",
+          "en": "Helps Rudy via email from London. Her intel is suspiciously accurate... how does she know so much? Seeds of doubt.",
+          "es": "Ayuda a Rudy por correo desde Londres. Su información es sospechosamente precisa... ¿cómo sabe tanto? Semillas de duda."
         },
         "ch3": {
           "ko": "서울에서 드디어 배신이 드러남. 민호가 렉시콘 내부자 명단을 입수하고, 미스 페니의 이름이 거기 있다. 루디에게는 충격이자 분노. '그 문학 인용구들... 전부 경고였잖아.'",
-          "en": "The betrayal is revealed in Seoul. Minho obtains a Lexicon insider list — Miss Penny's name is on it. Shock and anger for Rudy. 'Those literary quotes... they were all warnings.'",
-          "es": "La traición se revela en Seúl. Minho obtiene una lista de infiltrados de Lexicón — el nombre de Miss Penny está ahí. Shock e ira para Rudy. 'Esas citas literarias... todas eran advertencias.'"
+          "en": "The betrayal is revealed in Seoul. Minho obtains a Lexicon insider list... Miss Penny's name is on it. Shock and anger for Rudy. 'Those literary quotes... they were all warnings.'",
+          "es": "La traición se revela en Seúl. Minho obtiene una lista de infiltrados de Lexicón... el nombre de Miss Penny está ahí. Shock e ira para Rudy. 'Esas citas literarias... todas eran advertencias.'"
         },
         "ch4": {
           "ko": "카이로에서 미스 페니가 루디를 찾아온다. 사실 그녀는 미스터 블랙에게 자신의 서점을 볼모로 잡혀 있었다. 진심으로 회개하고 루디 편에 서기로 한다. 루디는 용서해야 할지 갈등.",
-          "en": "Miss Penny seeks Rudy out in Cairo. Reveals that Mr. Black held her bookshop hostage — her life's work, her collection. She genuinely repents and chooses Rudy's side. Rudy struggles with whether to forgive.",
-          "es": "Miss Penny busca a Rudy en El Cairo. Revela que Mr. Black tenía su librería como rehén — el trabajo de su vida, su colección. Se arrepiente genuinamente y elige el lado de Rudy. Rudy lucha con si debe perdonar."
+          "en": "Miss Penny seeks Rudy out in Cairo. Reveals that Mr. Black held her bookshop hostage... her life's work, her collection. She genuinely repents and chooses Rudy's side. Rudy struggles with whether to forgive.",
+          "es": "Miss Penny busca a Rudy en El Cairo. Revela que Mr. Black tenía su librería como rehén... el trabajo de su vida, su colección. Se arrepiente genuinamente y elige el lado de Rudy. Rudy lucha con si debe perdonar."
         },
         "ch5": {
           "ko": "미스 페니의 렉시콘 내부 지식이 최종 결전의 핵심이 된다. 용서와 신뢰의 보답.",
@@ -262,8 +262,8 @@
       },
       "backstory": {
         "ko": "미스 페니는 사라질 위기에 처한 소수 언어의 마지막 문헌들을 수집하는 사람이었다. 미스터 블랙이 그녀의 컬렉션을 자금 지원해주었고, 그 대가로 렉시콘의 눈과 귀가 되어달라고 요구했다. 처음에는 '정보만 전달하면 된다'고 생각했지만, 수호석 도난에 가담하게 되면서 선을 넘었다는 걸 깨달았다.",
-        "en": "Miss Penny collected the last surviving manuscripts of dying minority languages. Mr. Black funded her collection — in exchange, she became the Lexicon's eyes and ears. At first she thought 'I'm just passing information.' But when she helped steal the London stone, she realized she'd crossed a line.",
-        "es": "Miss Penny coleccionaba los últimos manuscritos sobrevivientes de lenguas minoritarias moribundas. Mr. Black financió su colección — a cambio, ella se convirtió en los ojos y oídos de Lexicón. Al principio pensó 'solo paso información.' Pero cuando ayudó a robar la piedra de Londres, se dio cuenta de que había cruzado una línea."
+        "en": "Miss Penny collected the last surviving manuscripts of dying minority languages. Mr. Black funded her collection... in exchange, she became the Lexicon's eyes and ears. At first she thought 'I'm just passing information.' But when she helped steal the London stone, she realized she'd crossed a line.",
+        "es": "Miss Penny coleccionaba los últimos manuscritos sobrevivientes de lenguas minoritarias moribundas. Mr. Black financió su colección... a cambio, ella se convirtió en los ojos y oídos de Lexicón. Al principio pensó 'solo paso información.' Pero cuando ayudó a robar la piedra de Londres, se dio cuenta de que había cruzado una línea."
       },
       "avatar": "penny.png"
     },
@@ -328,6 +328,129 @@
         }
       },
       "avatar": "tom.png"
+    }
+  },
+
+  "languageWounds": {
+    "ellis": {
+      "npcId": "ellis",
+      "name": { "ko": "Dr. Ellis", "en": "Dr. Ellis", "es": "Dra. Ellis" },
+      "chapter": "ch1",
+      "wound": {
+        "ko": "세계적 언어학자였지만 렉시콘의 언어 소거 장치에 노출되어 모든 말을 잃었다. 단어 하나도 꺼낼 수 없는 침묵 속에서, 그녀는 '언어를 잃는다는 것은 자기 자신을 잃는 것'이라는 걸 온몸으로 체감했다.",
+        "en": "A world-renowned linguist who lost all speech after exposure to Lexicon's Language Erasure Device. Trapped in silence, unable to produce a single word, she learned firsthand that losing language means losing yourself.",
+        "es": "Una lingüista de renombre mundial que perdió toda capacidad de habla tras la exposición al Dispositivo de Borrado Lingüístico de Lexicón. Atrapada en silencio, incapaz de producir una sola palabra, aprendió de primera mano que perder el idioma significa perderse a uno mismo."
+      },
+      "unlockTier": "familiar",
+      "emoji": "🤐"
+    },
+    "tom": {
+      "npcId": "tom",
+      "name": { "ko": "Tom", "en": "Tom", "es": "Tom" },
+      "chapter": "ch1",
+      "wound": {
+        "ko": "코크니 슬랭이 자부심이었지만, 사람들이 '제대로 된 영어'가 아니라고 놀릴 때마다 자신의 말이 가치 없다고 느꼈다. 루디가 그의 슬랭을 진지하게 배우려 한 첫 번째 사람이다.",
+        "en": "Proud of his Cockney slang, but every time people mocked it as 'not real English,' he felt his words were worthless. Rudy was the first person who genuinely wanted to learn his way of speaking.",
+        "es": "Orgulloso de su jerga cockney, pero cada vez que la gente se burlaba diciendo que 'no es inglés de verdad,' sentía que sus palabras no valían nada. Rudy fue la primera persona que genuinamente quiso aprender su forma de hablar."
+      },
+      "unlockTier": "friendly",
+      "emoji": "🗣️"
+    },
+    "isabel": {
+      "npcId": "isabel",
+      "name": { "ko": "Isabel", "en": "Isabel", "es": "Isabel" },
+      "chapter": "ch2",
+      "wound": {
+        "ko": "할머니의 안달루시아 사투리를 유일하게 기억하는 사람. 할머니가 돌아가신 뒤, 그 특별한 표현들을 쓸 사람이 아무도 없다. 그래서 카를로스가 말을 잃었을 때, 자기 할머니를 떠올리며 누구보다 필사적으로 도왔다.",
+        "en": "The only person who remembers her grandmother's Andalusian dialect. After her grandmother passed, there was no one left to share those special expressions with. When Carlos lost his words, it reminded her of losing her grandmother's voice... that's why she fought harder than anyone to help.",
+        "es": "La única persona que recuerda el dialecto andaluz de su abuela. Después de que su abuela falleció, no quedó nadie con quien compartir esas expresiones especiales. Cuando Carlos perdió sus palabras, le recordó a perder la voz de su abuela... por eso luchó más que nadie para ayudar."
+      },
+      "unlockTier": "familiar",
+      "emoji": "💃"
+    },
+    "miguel": {
+      "npcId": "miguel",
+      "name": { "ko": "Don Miguel", "en": "Don Miguel", "es": "Don Miguel" },
+      "chapter": "ch2",
+      "wound": {
+        "ko": "50년간 시장에서 속담으로 사람들을 이어주던 사람. 하지만 렉시콘의 언어 소거가 시장에 퍼지면서, 단골들이 하나둘 그의 속담을 이해하지 못하게 되었다. '속담이 죽으면 지혜도 죽는다'고 말하며 울었다.",
+        "en": "For 50 years, his proverbs connected people at the market. But as Lexicon's erasure spread, regulars stopped understanding his sayings one by one. 'When proverbs die, wisdom dies,' he said, weeping.",
+        "es": "Durante 50 años, sus proverbios conectaron a la gente del mercado. Pero cuando el borrado de Lexicón se extendió, los habituales dejaron de entender sus dichos uno por uno. 'Cuando mueren los proverbios, muere la sabiduría,' dijo, llorando."
+      },
+      "unlockTier": "friendly",
+      "emoji": "📖"
+    },
+    "sujin": {
+      "npcId": "sujin",
+      "name": { "ko": "Sujin", "en": "Sujin", "es": "Sujin" },
+      "chapter": "ch3",
+      "wound": {
+        "ko": "언어학 교수로서 '프로젝트 이레이즈'의 실체를 처음 발견한 사람. 하지만 학계에 경고했을 때 아무도 믿지 않았다. '미쳤다'는 소리를 듣고 대학에서 밀려났다. 루디가 믿어준 첫 번째 사람.",
+        "en": "As a linguistics professor, she was the first to discover Project Erase. But when she warned academia, no one believed her. Called 'crazy' and pushed out of the university. Rudy was the first person who believed her.",
+        "es": "Como profesora de lingüística, fue la primera en descubrir el Proyecto Borrado. Pero cuando advirtió a la academia, nadie le creyó. La llamaron 'loca' y la apartaron de la universidad. Rudy fue la primera persona que le creyó."
+      },
+      "unlockTier": "familiar",
+      "emoji": "🔬"
+    },
+    "youngsook": {
+      "npcId": "youngsook",
+      "name": { "ko": "할머니 영숙", "en": "Grandma Youngsook", "es": "Abuela Youngsook" },
+      "chapter": "ch3",
+      "wound": {
+        "ko": "어린 시절 쓰던 고향 사투리가 '촌스럽다'고 놀림받으며 표준어만 쓰게 됐다. 60년 만에 시장에서 같은 고향 사람을 만났지만, 이미 사투리를 잊어버린 뒤였다. 그래서 지금 자신의 모든 속담과 표현을 루디에게 가르치려 한다... 누군가는 기억해야 하니까.",
+        "en": "Mocked for her hometown dialect as 'unsophisticated,' she switched to standard Korean. After 60 years, she met someone from her village at the market... but had already forgotten the dialect. Now she teaches Rudy every proverb and expression she remembers, because someone must carry them forward.",
+        "es": "Burlada por su dialecto natal como 'poco sofisticado,' cambió al coreano estándar. Después de 60 años, encontró a alguien de su pueblo en el mercado... pero ya había olvidado el dialecto. Ahora le enseña a Rudy cada proverbio y expresión que recuerda, porque alguien debe llevarlos adelante."
+      },
+      "unlockTier": "friendly",
+      "emoji": "👵"
+    },
+    "minho": {
+      "npcId": "minho",
+      "name": { "ko": "Minho", "en": "Minho", "es": "Minho" },
+      "chapter": "ch3",
+      "wound": {
+        "ko": "래퍼로서 한국어의 리듬과 소리를 사랑하지만, 해외 팬들을 위해 영어로만 곡을 써야 한다는 압박을 받는다. '내 가사의 한국어 말장난을 번역하면 영혼이 사라진다'고 고백한다.",
+        "en": "As a rapper, he loves the rhythm of Korean, but faces pressure to write only in English for international fans. 'When you translate my Korean wordplay, the soul disappears,' he confesses.",
+        "es": "Como rapero, ama el ritmo del coreano, pero enfrenta presión para escribir solo en inglés para fans internacionales. 'Cuando traduces mis juegos de palabras en coreano, el alma desaparece,' confiesa."
+      },
+      "unlockTier": "familiar",
+      "emoji": "🎤"
+    },
+    "farid": {
+      "npcId": "farid",
+      "name": { "ko": "Farid", "en": "Farid", "es": "Farid" },
+      "chapter": "ch4",
+      "wound": {
+        "ko": "고대 이집트 상형문자를 해독하는 것이 꿈이었지만, 렉시콘이 로제타 석판의 핵심 부분을 훼손했다. '고대인의 목소리를 영원히 침묵시킨 것'이라며 분노한다.",
+        "en": "His dream was deciphering ancient Egyptian hieroglyphs, but Lexicon damaged key sections of the Rosetta Stone. 'They silenced the voice of the ancients forever,' he says with fury.",
+        "es": "Su sueño era descifrar los jeroglíficos del antiguo Egipto, pero Lexicón dañó secciones clave de la Piedra Rosetta. 'Silenciaron la voz de los antiguos para siempre,' dice con furia."
+      },
+      "unlockTier": "familiar",
+      "emoji": "🏛️"
+    },
+    "amira": {
+      "npcId": "amira",
+      "name": { "ko": "Amira", "en": "Amira", "es": "Amira" },
+      "chapter": "ch4",
+      "wound": {
+        "ko": "카이로 대학에서 소수 언어 보존 프로젝트를 이끌었지만, 연구 자금이 끊기고 보존하려던 3개 부족 언어가 마지막 화자와 함께 사라졌다. '내가 더 빨랐더라면' 하는 죄책감을 안고 산다.",
+        "en": "Led a minority language preservation project at Cairo University, but funding was cut and three tribal languages she was trying to save died with their last speakers. She lives with the guilt of 'if only I had been faster.'",
+        "es": "Lideró un proyecto de preservación de lenguas minoritarias en la Universidad de El Cairo, pero se cortó la financiación y tres lenguas tribales que intentaba salvar murieron con sus últimos hablantes. Vive con la culpa de 'si tan solo hubiera sido más rápida.'"
+      },
+      "unlockTier": "friendly",
+      "emoji": "📚"
+    },
+    "hassan": {
+      "npcId": "hassan",
+      "name": { "ko": "Hassan", "en": "Hassan", "es": "Hassan" },
+      "chapter": "ch4",
+      "wound": {
+        "ko": "시장에서 5개 언어로 흥정하던 능력이 자부심이었는데, 렉시콘의 영향으로 아랍어 속담이 하나씩 머릿속에서 사라지고 있다. '어제 할아버지가 가르쳐준 속담을 잊어버렸어. 이름도 잊어버릴까 봐 무섭다.'",
+        "en": "Proud of his ability to bargain in 5 languages, but Lexicon's influence is erasing Arabic proverbs from his mind one by one. 'Yesterday I forgot a proverb my grandfather taught me. I'm terrified I'll forget his name next.'",
+        "es": "Orgulloso de su capacidad de regatear en 5 idiomas, pero la influencia de Lexicón está borrando proverbios árabes de su mente uno por uno. 'Ayer olvidé un proverbio que me enseñó mi abuelo. Tengo terror de olvidar su nombre después.'"
+      },
+      "unlockTier": "familiar",
+      "emoji": "🏪"
     }
   },
 

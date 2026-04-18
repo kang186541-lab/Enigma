@@ -943,8 +943,8 @@ async function speakWord(word: string, lang: string) {
     } else {
       // Stop any previous sound
       if (_cardNativeSound) {
-        await _cardNativeSound.stopAsync().catch(() => {});
-        await _cardNativeSound.unloadAsync().catch(() => {});
+        await _cardNativeSound.stopAsync().catch((e) => console.warn('[Cards] stop failed:', e));
+        await _cardNativeSound.unloadAsync().catch((e) => console.warn('[Cards] unload failed:', e));
         _cardNativeSound = null;
       }
       // Use Audio.Sound (expo-av) instead of expo-speech so iOS audio session
@@ -965,7 +965,7 @@ async function speakWord(word: string, lang: string) {
       _cardNativeSound = sound;
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync().catch(() => {});
+          sound.unloadAsync().catch((e) => console.warn('[Cards] sound unload failed:', e));
           _cardNativeSound = null;
         }
       });
@@ -1042,7 +1042,7 @@ export default function CardsScreen() {
       setAgain(0);
       flipAnim.setValue(0);
       slideAnim.setValue(0);
-    } catch {}
+    } catch (e) { console.warn('[Cards] session load failed:', e); }
   }, [deckType, lang]);
 
   useFocusEffect(useCallback(() => {
@@ -1071,7 +1071,7 @@ export default function CardsScreen() {
     setAgain(0);
     setDailyCount(0);
     setDailyComplete(false);
-    AsyncStorage.removeItem(getTodayKey()).catch(() => {});
+    AsyncStorage.removeItem(getTodayKey()).catch((e) => console.warn('[Cards] daily reset failed:', e));
     Animated.parallel([
       Animated.timing(flipAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
@@ -1115,10 +1115,10 @@ export default function CardsScreen() {
     const newCount = dailyCount + 1;
     setDailyCount(newCount);
     const todayKey = getTodayKey();
-    AsyncStorage.setItem(todayKey, JSON.stringify({ count: newCount })).catch(() => {});
+    AsyncStorage.setItem(todayKey, JSON.stringify({ count: newCount })).catch((e) => console.warn('[Cards] daily count save failed:', e));
 
     const currentWords = sessionCards.map((c) => c.word);
-    AsyncStorage.setItem("cards_last_seen_words", JSON.stringify(currentWords)).catch(() => {});
+    AsyncStorage.setItem("cards_last_seen_words", JSON.stringify(currentWords)).catch((e) => console.warn('[Cards] last seen save failed:', e));
 
     Animated.timing(slideAnim, { toValue: knew ? -width : width, duration: 230, useNativeDriver: true }).start(() => {
       slideAnim.setValue(knew ? width : -width);
@@ -1181,26 +1181,53 @@ export default function CardsScreen() {
         )}
       </View>
 
-      {dailyComplete ? (
+      {!dailyComplete && sessionCards.length === 0 ? (
+        <ScrollView
+          contentContainerStyle={styles.completedContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.completedEmoji}>📭</Text>
+          <Text style={styles.completedTitle}>
+            {nativeLang === "korean" ? "복습할 카드가 없어요" : nativeLang === "spanish" ? "Sin tarjetas para revisar" : "No cards to review"}
+          </Text>
+          <Text style={styles.completedSub}>
+            {nativeLang === "korean"
+              ? "레슨이나 스토리를 진행하면\n카드가 자동으로 추가됩니다!"
+              : nativeLang === "spanish"
+              ? "Completa lecciones o historias\npara añadir tarjetas automáticamente!"
+              : "Complete lessons or stories\nto add cards automatically!"}
+          </Text>
+        </ScrollView>
+      ) : dailyComplete ? (
         <ScrollView
           contentContainerStyle={styles.completedContainer}
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.completedEmoji}>🏆</Text>
-          <Text style={styles.completedTitle}>Daily Goal Complete!</Text>
+          <Text style={styles.completedTitle}>
+            {nativeLang === "korean" ? "오늘 목표 달성!" : nativeLang === "spanish" ? "¡Meta diaria completada!" : "Daily Goal Complete!"}
+          </Text>
           <Text style={styles.completedSub}>
-            You've reviewed {DAILY_GOAL} cards today.{"\n"}Come back tomorrow for new words!
+            {nativeLang === "korean"
+              ? `오늘 ${DAILY_GOAL}장의 카드를 복습했어요.\n내일 다시 와서 새 단어를 만나요!`
+              : nativeLang === "spanish"
+              ? `Repasaste ${DAILY_GOAL} tarjetas hoy.\n¡Vuelve mañana para nuevas palabras!`
+              : `You've reviewed ${DAILY_GOAL} cards today.\nCome back tomorrow for new words!`}
           </Text>
           <View style={styles.scoreRow}>
             <View style={[styles.scoreCard, { backgroundColor: "rgba(90,153,90,0.15)" }]}>
               <Text style={styles.scoreEmoji}>✅</Text>
               <Text style={[styles.scoreNum, { color: "#5a9" }]}>{gotIt}</Text>
-              <Text style={styles.scoreLabel}>Got it!</Text>
+              <Text style={styles.scoreLabel}>
+                {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : "Got it!"}
+              </Text>
             </View>
             <View style={styles.scoreCard}>
               <Text style={styles.scoreEmoji}>😅</Text>
               <Text style={styles.scoreNum}>{again}</Text>
-              <Text style={styles.scoreLabel}>Again</Text>
+              <Text style={styles.scoreLabel}>
+                {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : "Again"}
+              </Text>
             </View>
           </View>
           <Pressable
@@ -1208,14 +1235,20 @@ export default function CardsScreen() {
             onPress={resetState}
           >
             <Ionicons name="refresh" size={18} color={C.bg1} />
-            <Text style={styles.resetBtnText}>Practice More</Text>
+            <Text style={styles.resetBtnText}>
+              {nativeLang === "korean" ? "더 연습하기" : nativeLang === "spanish" ? "Practicar más" : "Practice More"}
+            </Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [styles.switchBtn, pressed && { opacity: 0.85 }]}
             onPress={() => switchDeck(deckType === "beginner" ? "advanced" : "beginner")}
           >
             <Text style={styles.switchBtnText}>
-              Try {deckType === "beginner" ? "Advanced" : "Beginner"} deck →
+              {nativeLang === "korean"
+                ? `${deckType === "beginner" ? "고급" : "초급"} 덱 도전 →`
+                : nativeLang === "spanish"
+                ? `Prueba el mazo ${deckType === "beginner" ? "avanzado" : "principiante"} →`
+                : `Try ${deckType === "beginner" ? "Advanced" : "Beginner"} deck →`}
             </Text>
           </Pressable>
         </ScrollView>
@@ -1318,7 +1351,9 @@ export default function CardsScreen() {
                 size={16}
                 color={C.parchment}
               />
-              <Text style={styles.speakerBtnBackText}>Listen</Text>
+              <Text style={styles.speakerBtnBackText}>
+                {nativeLang === "korean" ? "듣기" : nativeLang === "spanish" ? "Escuchar" : "Listen"}
+              </Text>
             </Pressable>
           )}
 
@@ -1331,7 +1366,9 @@ export default function CardsScreen() {
               >
                 <View style={styles.actionBtnInner}>
                   <Text style={styles.againBtnEmoji}>😅</Text>
-                  <Text style={[styles.actionLabel, { color: C.gold }]}>Again</Text>
+                  <Text style={[styles.actionLabel, { color: C.gold }]}>
+                    {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : "Again"}
+                  </Text>
                 </View>
               </RippleButton>
               <RippleButton
@@ -1341,7 +1378,9 @@ export default function CardsScreen() {
               >
                 <View style={styles.actionBtnInner}>
                   <Text style={styles.gotItBtnEmoji}>✅</Text>
-                  <Text style={[styles.actionLabel, { color: "#5a9" }]}>Got it!</Text>
+                  <Text style={[styles.actionLabel, { color: "#5a9" }]}>
+                    {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : "Got it!"}
+                  </Text>
                 </View>
               </RippleButton>
             </View>
@@ -1353,13 +1392,15 @@ export default function CardsScreen() {
               >
                 <LinearGradient colors={[C.gold, C.goldDark]} style={styles.flipPromptGradient}>
                   <Ionicons name="sync" size={18} color={C.bg1} />
-                  <Text style={styles.flipPromptText}>Tap to reveal meaning</Text>
+                  <Text style={styles.flipPromptText}>
+                    {nativeLang === "korean" ? "탭해서 뜻 보기" : nativeLang === "spanish" ? "Toca para ver el significado" : "Tap to reveal meaning"}
+                  </Text>
                 </LinearGradient>
               </Pressable>
             </View>
           )}
 
-          <View style={[styles.miniStats, { paddingBottom: Math.max(insets.bottom + 16, 34) }]}>
+          <View style={[styles.miniStats, { paddingBottom: Platform.OS === "web" ? 100 : Math.max(insets.bottom + 16, 34) }]}>
             <View style={styles.miniStat}>
               <Text style={styles.miniStatEmoji}>✅</Text>
               <Text style={[styles.miniStatText, { color: "#5a9" }]}>{gotIt}</Text>

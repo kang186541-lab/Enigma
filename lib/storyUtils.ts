@@ -3,7 +3,9 @@ import type {
   LangCode, LocalizedText, LoadedQuiz, StoryChapter, StoryScene,
   StoryDialogue, UiTextSet, NpcRelationLevel, TtsVoiceMap,
   ChapterProgress, StoryProgress, NpcRelationState,
+  ChapterGauge, GaugeGrade, StoryClue,
 } from "@/constants/storyTypes";
+import { getGaugeGrade } from "@/constants/storyTypes";
 import storyData from "@/data/storyData.json";
 import quizData from "@/data/quizData.json";
 
@@ -215,7 +217,7 @@ export function applyQuizRewards(
   const newCompleted = [...progress.completedQuizzes, quizId];
   const isComplete = chapterQuizIds.every((id: string) => newCompleted.includes(id));
 
-  return {
+  const result: ChapterProgress & { justCompleted?: boolean; nextChapterId?: string } = {
     ...progress,
     completedQuizzes: newCompleted,
     earnedBadges: newBadges,
@@ -223,6 +225,18 @@ export function applyQuizRewards(
     totalXpEarned: progress.totalXpEarned + (quiz.rewards?.xp ?? 0),
     isComplete,
   };
+
+  // Flag for UI: chapter just became complete this call
+  if (isComplete && !progress.isComplete) {
+    result.justCompleted = true;
+    const chapters = getChapters();
+    const idx = chapters.findIndex(c => c.id === progress.chapterId);
+    if (idx >= 0 && idx < chapters.length - 1) {
+      result.nextChapterId = chapters[idx + 1].id;
+    }
+  }
+
+  return result;
 }
 
 /** Substitute template variables in a GPT prompt */
@@ -231,6 +245,226 @@ export function fillGptPrompt(
   vars: { targetLang?: string; nativeLang?: string; [key: string]: string | undefined }
 ): string {
   return template.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
+}
+
+// ─── Expression Book ─────────────────────────────────────────────────────────
+
+const EXPRESSION_BOOK_KEY = "expressionBook";
+
+interface BookExpression {
+  phrase: string;
+  meaning: string;
+  collection?: string;
+  chapter: string;
+  tprsStage?: number;
+  mastered: boolean;
+  learnedAt: string;
+}
+
+interface ExpressionBookData {
+  expressions: BookExpression[];
+}
+
+/**
+ * Add expressions to the Expression Book after quiz completion.
+ * Deduplicates by phrase. Called from quiz completion handlers.
+ */
+export async function addToExpressionBook(
+  expressions: string[],
+  chapter: string,
+  tprsStage?: number,
+  collection?: string,
+): Promise<void> {
+  try {
+    const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+    const raw = await AsyncStorage.getItem(EXPRESSION_BOOK_KEY);
+    const book: ExpressionBookData = raw ? JSON.parse(raw) : { expressions: [] };
+    const existing = new Set(book.expressions.map((e) => e.phrase.toLowerCase()));
+    const now = new Date().toISOString();
+
+    for (const expr of expressions) {
+      if (!expr || existing.has(expr.toLowerCase())) continue;
+      book.expressions.push({
+        phrase: expr,
+        meaning: "",
+        collection,
+        chapter,
+        tprsStage,
+        mastered: false,
+        learnedAt: now,
+      });
+      existing.add(expr.toLowerCase());
+    }
+
+    await AsyncStorage.setItem(EXPRESSION_BOOK_KEY, JSON.stringify(book));
+  } catch (err) {
+    console.warn("[ExpressionBook] save error:", err);
+  }
+}
+
+/**
+ * Mark expressions as mastered (used when reaching TPRS stage 4).
+ */
+export async function markExpressionsMastered(phrases: string[]): Promise<void> {
+  try {
+    const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+    const raw = await AsyncStorage.getItem(EXPRESSION_BOOK_KEY);
+    if (!raw) return;
+    const book: ExpressionBookData = JSON.parse(raw);
+    const toMaster = new Set(phrases.map((p) => p.toLowerCase()));
+    for (const expr of book.expressions) {
+      if (toMaster.has(expr.phrase.toLowerCase())) expr.mastered = true;
+    }
+    await AsyncStorage.setItem(EXPRESSION_BOOK_KEY, JSON.stringify(book));
+  } catch (err) {
+    console.warn("[ExpressionBook] mastered error:", err);
+  }
+}
+
+// ─── I/O Ratio Tracking ──────────────────────────────────────────────────────
+
+const IO_RATIO_KEY = "ioRatioTracking";
+
+type QuizCategory = "input" | "output";
+
+const QUIZ_CATEGORY_MAP: Record<string, QuizCategory> = {
+  word_rearrange: "input",
+  matching: "input",
+  fill_blank: "input",
+  listening: "input",
+  riddle: "input",
+  translation: "input",
+  pronunciation: "output",
+  voice_power: "output",
+  debate_battle: "output",
+  npc_rescue: "output",
+  roleplay: "output",
+  writing: "output",
+  timed: "input",
+  mixed: "input",
+};
+
+export interface IOChapterStats {
+  inputCount: number;
+  outputCount: number;
+}
+
+export interface IORatioData {
+  chapters: Record<string, IOChapterStats>;
+}
+
+/**
+ * Record a quiz completion for I/O ratio tracking.
+ */
+export async function trackQuizIO(
+  chapter: string,
+  quizType: string,
+): Promise<void> {
+  try {
+    const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+    const raw = await AsyncStorage.getItem(IO_RATIO_KEY);
+    const data: IORatioData = raw ? JSON.parse(raw) : { chapters: {} };
+    if (!data.chapters[chapter]) data.chapters[chapter] = { inputCount: 0, outputCount: 0 };
+    const category = QUIZ_CATEGORY_MAP[quizType] ?? "input";
+    if (category === "input") data.chapters[chapter].inputCount++;
+    else data.chapters[chapter].outputCount++;
+    await AsyncStorage.setItem(IO_RATIO_KEY, JSON.stringify(data));
+  } catch (err) {
+    console.warn("[IOTracker] save error:", err);
+  }
+}
+
+/**
+ * Get I/O ratio data for display.
+ */
+export async function getIORatioData(): Promise<IORatioData> {
+  try {
+    const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+    const raw = await AsyncStorage.getItem(IO_RATIO_KEY);
+    return raw ? JSON.parse(raw) : { chapters: {} };
+  } catch {
+    return { chapters: {} };
+  }
+}
+
+// ─── Chapter Gauge (P1) ─────────────────────────────────────────────────────
+
+/** Create a fresh gauge for a chapter start */
+export function makeNewGauge(): ChapterGauge {
+  return { current: 100, hintsUsed: 0, wrongAnswers: 0 };
+}
+
+/** Apply a wrong answer penalty to the gauge */
+export function gaugeOnWrong(gauge: ChapterGauge, isBoss: boolean): ChapterGauge {
+  const penalty = isBoss ? 15 : 10;
+  return {
+    ...gauge,
+    current: Math.max(0, gauge.current - penalty),
+    wrongAnswers: gauge.wrongAnswers + 1,
+  };
+}
+
+/** Apply a hint usage penalty to the gauge */
+export function gaugeOnHint(gauge: ChapterGauge): ChapterGauge {
+  return {
+    ...gauge,
+    current: Math.max(0, gauge.current - 5),
+    hintsUsed: gauge.hintsUsed + 1,
+  };
+}
+
+/** Apply a bonus (e.g. from a good choice) to the gauge */
+export function gaugeOnBonus(gauge: ChapterGauge, bonus: number): ChapterGauge {
+  return {
+    ...gauge,
+    current: Math.min(100, gauge.current + bonus),
+  };
+}
+
+/** Get the grade for a final gauge value */
+export function getGaugeGradeFromValue(value: number): GaugeGrade {
+  return getGaugeGrade(value);
+}
+
+// ─── Clue Collection (P2) ───────────────────────────────────────────────────
+
+const CLUE_STORAGE_KEY = "storyCluesCollected";
+
+/** Save a collected clue to storage */
+export async function collectClue(clueId: string, chapter: string): Promise<void> {
+  try {
+    const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+    const raw = await AsyncStorage.getItem(CLUE_STORAGE_KEY);
+    const data: Record<string, string[]> = raw ? JSON.parse(raw) : {};
+    if (!data[chapter]) data[chapter] = [];
+    if (!data[chapter].includes(clueId)) {
+      data[chapter].push(clueId);
+    }
+    await AsyncStorage.setItem(CLUE_STORAGE_KEY, JSON.stringify(data));
+  } catch (err) {
+    console.warn("[Clue] save error:", err);
+  }
+}
+
+/** Get collected clue IDs for a chapter */
+export async function getCollectedClues(chapter: string): Promise<string[]> {
+  try {
+    const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+    const raw = await AsyncStorage.getItem(CLUE_STORAGE_KEY);
+    const data: Record<string, string[]> = raw ? JSON.parse(raw) : {};
+    return data[chapter] ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Get bonus hints count based on clues collected vs total in chapter */
+export function getClueBonus(collectedCount: number, totalCount: number): number {
+  if (totalCount === 0) return 0;
+  const ratio = collectedCount / totalCount;
+  if (ratio >= 1.0) return 2;  // all clues → 2 extra hints on boss
+  if (ratio >= 0.5) return 1;  // half+ → 1 extra hint
+  return 0;
 }
 
 /** Get gradient colors for a chapter based on its city */
@@ -257,9 +491,26 @@ export function getChapterAccent(chapterId: string): string {
   }
 }
 
-/** Check if a chapter is unlocked given the user's current level */
-export function isChapterUnlocked(chapter: StoryChapter, userLevel: number): boolean {
-  return !chapter.isLocked && userLevel >= chapter.unlockLevel;
+/** Check if a chapter is unlocked given the user's level and story progress */
+export function isChapterUnlocked(
+  chapter: StoryChapter,
+  userLevel: number,
+  storyProgress?: StoryProgress,
+): boolean {
+  // Ch1 is always unlocked
+  if (chapter.id === "ch1") return true;
+
+  // Must meet level requirement
+  if (userLevel < chapter.unlockLevel) return false;
+
+  // Previous chapter must be completed
+  const chapters = getChapters();
+  const chapterIndex = chapters.findIndex(c => c.id === chapter.id);
+  if (chapterIndex <= 0) return true;
+
+  const prevChapterId = chapters[chapterIndex - 1].id;
+  const prevProgress = storyProgress?.chapters[prevChapterId];
+  return prevProgress?.isComplete === true;
 }
 
 /** Get the full StoryProgress object (for use with AsyncStorage) */

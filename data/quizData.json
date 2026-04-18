@@ -993,41 +993,33 @@
         "en": "Mr. Black's Message",
         "es": "El Mensaje de Mr. Black"
       },
+      "difficulty": 1,
+      "isBoss": false,
       "storyContext": {
         "ko": "Mr. Black이 남긴 메시지를 소리내어 읽어보세요. 탐정은 증거를 목소리로 기록합니다.",
         "en": "Read Mr. Black's message aloud. A detective records evidence with their voice.",
         "es": "Lee el mensaje de Mr. Black en voz alta. Un detective registra la evidencia con su voz."
       },
-      "questions": [
-        {
-          "id": "cspa_1",
-          "text": {
-            "en": "Hello. My name is Mr. Black.",
-            "es": "Hola. Me llamo Mr. Black.",
-            "ko": "안녕하세요. 제 이름은 Mr. Black이에요."
-          },
-          "hint": {
-            "ko": "Mr. Black의 자기소개예요",
-            "en": "Mr. Black's self-introduction",
-            "es": "La autopresentación de Mr. Black"
-          },
-          "targetScore": 70
+      "content": {
+        "en": {
+          "sentences": [
+            { "text": "Hello. My name is Mr. Black.", "minScore": 60 },
+            { "text": "Thank you. Goodbye, London.", "minScore": 60 }
+          ]
         },
-        {
-          "id": "cspa_2",
-          "text": {
-            "en": "Thank you. Goodbye, London.",
-            "es": "Gracias. Adiós, Londres.",
-            "ko": "감사합니다. 안녕, 런던."
-          },
-          "hint": {
-            "ko": "Mr. Black이 돌아서며 한 마지막 말",
-            "en": "Mr. Black's last words as he leaves",
-            "es": "Las últimas palabras de Mr. Black al irse"
-          },
-          "targetScore": 70
+        "es": {
+          "sentences": [
+            { "text": "Hola. Me llamo Mr. Black.", "minScore": 60 },
+            { "text": "Gracias. Adiós, Londres.", "minScore": 60 }
+          ]
+        },
+        "ko": {
+          "sentences": [
+            { "text": "안녕하세요. 제 이름은 Mr. Black이에요.", "minScore": 60 },
+            { "text": "감사합니다. 안녕, 런던.", "minScore": 60 }
+          ]
         }
-      ],
+      },
       "rewards": {
         "xp": 50,
         "badge": null
@@ -1977,55 +1969,36 @@
         "en": "Don Miguel's Order",
         "es": "El Pedido de Don Miguel"
       },
+      "difficulty": 2,
+      "isBoss": false,
       "storyContext": {
         "ko": "Don Miguel은 주문을 받기 전에 절대 이야기하지 않아요. 직접 말로 주문해보세요!",
         "en": "Don Miguel won't talk until you order properly. Speak your order aloud!",
         "es": "Don Miguel no habla hasta que pidas correctamente. ¡Pide en voz alta!"
       },
-      "questions": [
-        {
-          "id": "cspa2_1",
-          "text": {
-            "en": "Excuse me. I would like bread, please.",
-            "es": "Perdón. Quisiera pan, por favor.",
-            "ko": "저기요. 빵 주세요."
-          },
-          "hint": {
-            "ko": "Don Miguel에게 정중하게 주문하세요",
-            "en": "Order politely from Don Miguel",
-            "es": "Pide amablemente a Don Miguel"
-          },
-          "targetScore": 65
+      "content": {
+        "en": {
+          "sentences": [
+            { "text": "Excuse me. I would like bread, please.", "minScore": 60 },
+            { "text": "How much is this?", "minScore": 60 },
+            { "text": "Thank you very much!", "minScore": 60 }
+          ]
         },
-        {
-          "id": "cspa2_2",
-          "text": {
-            "en": "How much is this?",
-            "es": "¿Cuánto cuesta esto?",
-            "ko": "이거 얼마예요?"
-          },
-          "hint": {
-            "ko": "가격을 물어보세요",
-            "en": "Ask the price",
-            "es": "Pregunta el precio"
-          },
-          "targetScore": 65
+        "es": {
+          "sentences": [
+            { "text": "Perdón. Quisiera pan, por favor.", "minScore": 60 },
+            { "text": "¿Cuánto cuesta esto?", "minScore": 60 },
+            { "text": "¡Muchas gracias!", "minScore": 60 }
+          ]
         },
-        {
-          "id": "cspa2_3",
-          "text": {
-            "en": "Thank you very much!",
-            "es": "¡Muchas gracias!",
-            "ko": "정말 감사합니다!"
-          },
-          "hint": {
-            "ko": "감사 인사",
-            "en": "Express gratitude",
-            "es": "Expresar gratitud"
-          },
-          "targetScore": 65
+        "ko": {
+          "sentences": [
+            { "text": "저기요. 빵 주세요.", "minScore": 60 },
+            { "text": "이거 얼마예요?", "minScore": 60 },
+            { "text": "정말 감사합니다!", "minScore": 60 }
+          ]
         }
-      ],
+      },
       "rewards": {
         "xp": 75,
         "badge": null
@@ -2607,16 +2580,16 @@
           "pairs": [
             {
               "left": "Forewarned is forearmed",
-              "right": "Rudy always carries his detective tools — which proverb?",
+              "right": "Rudy always carries his detective tools... which proverb?",
               "meaning": {
-                "ko": "유비무환 — 준비가 있으면 걱정 없다",
+                "ko": "유비무환... 준비가 있으면 걱정 없다",
                 "es": "Hombre prevenido vale por dos",
                 "en": "Being prepared prevents problems"
               }
             },
             {
               "left": "Seeing is believing",
-              "right": "Better to see the Guardian Stone yourself than hear Carlos describe it — which proverb?",
+              "right": "Better to see the Guardian Stone yourself than hear Carlos describe it... which proverb?",
               "meaning": {
                 "ko": "백문이 불여일견",
                 "es": "Ver para creer",
@@ -2625,7 +2598,7 @@
             },
             {
               "left": "A friend in need is a friend indeed",
-              "right": "Rudy and his friends share hardship and joy together — which proverb?",
+              "right": "Rudy and his friends share hardship and joy together... which proverb?",
               "meaning": {
                 "ko": "동고동락",
                 "es": "En la necesidad se conoce la amistad",
@@ -2634,7 +2607,7 @@
             },
             {
               "left": "Knowledge is power",
-              "right": "Learning languages gives Rudy the ability to solve cases — which proverb?",
+              "right": "Learning languages gives Rudy the ability to solve cases... which proverb?",
               "meaning": {
                 "ko": "아는 것이 힘이다",
                 "es": "El saber es poder",
@@ -2647,7 +2620,7 @@
           "pairs": [
             {
               "left": "Hombre prevenido vale por dos",
-              "right": "Rudy siempre lleva sus herramientas de detective — ¿qué refrán?",
+              "right": "Rudy siempre lleva sus herramientas de detective... ¿qué refrán?",
               "meaning": {
                 "ko": "유비무환",
                 "en": "Forewarned is forearmed",
@@ -2656,7 +2629,7 @@
             },
             {
               "left": "Ver para creer",
-              "right": "Mejor ver la Piedra Guardiana que escuchar a Carlos — ¿qué refrán?",
+              "right": "Mejor ver la Piedra Guardiana que escuchar a Carlos... ¿qué refrán?",
               "meaning": {
                 "ko": "백문이 불여일견",
                 "en": "Seeing is believing",
@@ -2665,7 +2638,7 @@
             },
             {
               "left": "En la necesidad se conoce la amistad",
-              "right": "Rudy y sus amigos comparten penas y alegrías — ¿qué refrán?",
+              "right": "Rudy y sus amigos comparten penas y alegrías... ¿qué refrán?",
               "meaning": {
                 "ko": "동고동락",
                 "en": "A friend in need is a friend indeed",
@@ -2674,7 +2647,7 @@
             },
             {
               "left": "El saber es poder",
-              "right": "Aprender idiomas le da a Rudy la habilidad de resolver casos — ¿qué refrán?",
+              "right": "Aprender idiomas le da a Rudy la habilidad de resolver casos... ¿qué refrán?",
               "meaning": {
                 "ko": "아는 것이 힘이다",
                 "en": "Knowledge is power",
@@ -2687,7 +2660,7 @@
           "pairs": [
             {
               "left": "유비무환",
-              "right": "루디는 항상 탐정 도구를 가지고 다닌다 — 어떤 사자성어?",
+              "right": "루디는 항상 탐정 도구를 가지고 다닌다... 어떤 사자성어?",
               "meaning": {
                 "en": "Forewarned is forearmed",
                 "es": "Hombre prevenido vale por dos",
@@ -2696,7 +2669,7 @@
             },
             {
               "left": "백문이 불여일견",
-              "right": "카를로스의 설명보다 직접 수호석을 보는 게 낫다 — 어떤 사자성어?",
+              "right": "카를로스의 설명보다 직접 수호석을 보는 게 낫다... 어떤 사자성어?",
               "meaning": {
                 "en": "Seeing is believing",
                 "es": "Ver para creer",
@@ -2705,7 +2678,7 @@
             },
             {
               "left": "동고동락",
-              "right": "루디와 친구들은 고생과 즐거움을 함께 한다 — 어떤 사자성어?",
+              "right": "루디와 친구들은 고생과 즐거움을 함께 한다... 어떤 사자성어?",
               "meaning": {
                 "en": "A friend in need is a friend indeed",
                 "es": "En la necesidad se conoce la amistad",
@@ -2714,7 +2687,7 @@
             },
             {
               "left": "아는 것이 힘이다",
-              "right": "언어를 배우면 루디가 사건을 해결할 수 있다 — 어떤 격언?",
+              "right": "언어를 배우면 루디가 사건을 해결할 수 있다... 어떤 격언?",
               "meaning": {
                 "en": "Knowledge is power",
                 "es": "El saber es poder",
@@ -2753,7 +2726,7 @@
       },
       "content": {
         "en": {
-          "ttsScript": "Listen carefully, friend. On the mountain of the south, a tower shines bright. Below it hides a secret door. The password has four letters. First letter: the beginning of 'light'. Second letter: the middle of 'time'. Third letter: the end of 'goal'. Fourth letter: the start of 'hope'.",
+          "ttsScript": "Listen carefully, friend. On the mountain of the south, a tower shines bright. Below it hides a secret door. The password has four letters. First letter: the beginning of 'light'. Second letter: the middle of 'time'. Third letter: the end of 'leaf'. Fourth letter: the end of 'hope'.",
           "ttsVoice": "en-GB-RyanNeural",
           "ttsSpeed": "0.9",
           "questions": [
@@ -2787,10 +2760,22 @@
                 "en": "Third letter?",
                 "es": "¿Tercera letra?"
               },
-              "answer": "L",
+              "answer": "F",
               "acceptableAnswers": [
-                "l",
-                "L"
+                "f",
+                "F"
+              ]
+            },
+            {
+              "question": {
+                "ko": "비밀번호의 네 번째 글자는?",
+                "en": "Fourth letter?",
+                "es": "¿Cuarta letra?"
+              },
+              "answer": "E",
+              "acceptableAnswers": [
+                "e",
+                "E"
               ]
             },
             {
@@ -2799,22 +2784,23 @@
                 "en": "Complete password?",
                 "es": "¿Contraseña completa?"
               },
-              "answer": "LILH",
+              "answer": "LIFE",
               "acceptableAnswers": [
-                "LILH",
-                "lilh"
+                "LIFE",
+                "life",
+                "Life"
               ]
             }
           ],
           "finalAnswer": "LIFE",
           "explanation": {
-            "ko": "L(light) + I(time) + F(life) + E(hope의 끝)",
-            "en": "L(light) + I(time) + F(of) + E(hope ending) = LIFE",
-            "es": "L(light) + I(time) + F(of) + E(hope final) = LIFE"
+            "ko": "L(light의 첫 글자) + I(time의 가운데) + F(leaf의 끝) + E(hope의 끝) = LIFE",
+            "en": "L(light start) + I(time middle) + F(leaf end) + E(hope end) = LIFE",
+            "es": "L(light inicio) + I(time centro) + F(leaf final) + E(hope final) = LIFE"
           }
         },
         "es": {
-          "ttsScript": "Escucha bien, amigo. En la montaña del sur, brilla una torre. Debajo se esconde una puerta secreta. La contraseña tiene cuatro letras. Primera: el inicio de 'luz'. Segunda: el centro de 'vida'. Tercera: el final de 'sol'. Cuarta: el inicio de 'alma'.",
+          "ttsScript": "Escucha bien, amigo. En la montaña del sur, brilla una torre. Debajo se esconde una puerta secreta. La contraseña tiene cuatro letras. Primera: el inicio de 'luz'. Segunda: la segunda letra de 'muro'. Tercera: el final de 'pan'. Cuarta: el inicio de 'alma'.",
           "ttsVoice": "es-ES-AlvaroNeural",
           "ttsSpeed": "0.9",
           "questions": [
@@ -2836,10 +2822,10 @@
                 "en": "Second letter?",
                 "es": "¿Segunda letra?"
               },
-              "answer": "D",
+              "answer": "U",
               "acceptableAnswers": [
-                "d",
-                "D"
+                "u",
+                "U"
               ]
             },
             {
@@ -2848,10 +2834,22 @@
                 "en": "Third letter?",
                 "es": "¿Tercera letra?"
               },
-              "answer": "L",
+              "answer": "N",
               "acceptableAnswers": [
-                "l",
-                "L"
+                "n",
+                "N"
+              ]
+            },
+            {
+              "question": {
+                "ko": "네 번째 글자는?",
+                "en": "Fourth letter?",
+                "es": "¿Cuarta letra?"
+              },
+              "answer": "A",
+              "acceptableAnswers": [
+                "a",
+                "A"
               ]
             },
             {
@@ -2863,53 +2861,54 @@
               "answer": "LUNA",
               "acceptableAnswers": [
                 "luna",
-                "LUNA"
+                "LUNA",
+                "Luna"
               ]
             }
           ],
           "finalAnswer": "LUNA",
           "explanation": {
-            "ko": "L(luz) + U(중심) + N(조정) + A(alma) = LUNA (달)",
-            "en": "L(luz) + U(vida center) + N(sol end) + A(alma) = LUNA (moon)",
-            "es": "L(luz) + U(vida centro) + N(sol final) + A(alma) = LUNA"
+            "ko": "L(luz 시작) + U(muro 둘째) + N(pan 끝) + A(alma 시작) = LUNA (달)",
+            "en": "L(luz start) + U(muro 2nd) + N(pan end) + A(alma start) = LUNA (moon)",
+            "es": "L(luz inicio) + U(muro segunda) + N(pan final) + A(alma inicio) = LUNA"
           }
         },
         "ko": {
-          "ttsScript": "잘 들어, 형. 남산 위에 빛나는 탑이 있어. 그 아래 비밀 문이 숨겨져 있지. 비밀번호는 네 글자야. 첫 글자는 '빛'의 시작. 둘째는 '나라'의 가운데. 셋째는 '달'의 끝. 넷째는 '별'의 처음.",
+          "ttsScript": "잘 들어, 형. 남산 위에 빛나는 탑이 있어. 그 아래 비밀 문이 숨겨져 있지. 비밀번호는 세 글자야. 첫째는 어두울 때 필요한 것. 둘째는 '나라'의 첫 글자. 셋째는 '라면'의 첫 글자.",
           "ttsVoice": "ko-KR-InJoonNeural",
           "ttsSpeed": "0.9",
           "questions": [
             {
               "question": {
-                "en": "First character hint?",
-                "es": "¿Pista del primer carácter?",
-                "ko": "첫 글자는?"
+                "en": "First syllable? (What do you need in the dark?)",
+                "es": "¿Primera sílaba? (¿Qué necesitas en la oscuridad?)",
+                "ko": "첫 글자는? (어두울 때 필요한 것)"
               },
-              "answer": "ㅂ",
+              "answer": "빛",
               "acceptableAnswers": [
-                "ㅂ"
+                "빛"
               ]
             },
             {
               "question": {
-                "en": "Second character hint?",
-                "es": "¿Segundo carácter?",
-                "ko": "둘째 글자는?"
+                "en": "Second syllable? (First syllable of '나라')",
+                "es": "¿Segunda sílaba? (Primera sílaba de '나라')",
+                "ko": "둘째 글자는? ('나라'의 첫 글자)"
               },
-              "answer": "ㄹ",
+              "answer": "나",
               "acceptableAnswers": [
-                "ㄹ"
+                "나"
               ]
             },
             {
               "question": {
-                "en": "Third character?",
-                "es": "¿Tercer carácter?",
-                "ko": "셋째 글자는?"
+                "en": "Third syllable? (First syllable of '라면')",
+                "es": "¿Tercera sílaba? (Primera sílaba de '라면')",
+                "ko": "셋째 글자는? ('라면'의 첫 글자)"
               },
-              "answer": "ㄹ",
+              "answer": "라",
               "acceptableAnswers": [
-                "ㄹ"
+                "라"
               ]
             },
             {
@@ -2926,9 +2925,9 @@
           ],
           "finalAnswer": "빛나라",
           "explanation": {
-            "en": "ㅂ(빛) + ㄴ(나라 center) + ㄹ(달 end) + ㅂ(별) → 빛나라",
-            "es": "ㅂ(빛) + ㄴ(나라 centro) + ㄹ(달 final) + ㅂ(별) → 빛나라",
-            "ko": "ㅂ(빛) + 나(나라 가운데) + 라(달의 끝 소리) → 빛나라!"
+            "en": "빛(light) + 나(first of 나라/country) + 라(first of 라면/ramen) → 빛나라 (Shine!)",
+            "es": "빛(luz) + 나(primera de 나라/país) + 라(primera de 라면/ramen) → 빛나라 (¡Brilla!)",
+            "ko": "빛(어둠의 반대) + 나(나라의 첫 글자) + 라(라면의 첫 글자) → 빛나라!"
           }
         }
       },
@@ -3133,55 +3132,36 @@
         "en": "At Incheon Airport",
         "es": "En el Aeropuerto de Incheon"
       },
+      "difficulty": 2,
+      "isBoss": false,
       "storyContext": {
         "ko": "루디의 전화가 죽었어요. 번역 앱도 없어요. 직접 한국어로 말해야 해요!",
         "en": "Rudy's phone is dead. No translator app. You have to speak Korean yourself!",
         "es": "El teléfono de Rudy está muerto. Sin traductor. ¡Hay que hablar coreano!"
       },
-      "questions": [
-        {
-          "id": "cspa3_1",
-          "text": {
-            "en": "Excuse me. Do you speak English?",
-            "es": "Disculpe. ¿Habla inglés?",
-            "ko": "실례합니다. 영어 할 줄 아세요?"
-          },
-          "hint": {
-            "ko": "공항 직원에게 영어 가능 여부를 물어보세요",
-            "en": "Ask the airport staff if they speak English",
-            "es": "Pregunta al personal del aeropuerto"
-          },
-          "targetScore": 60
+      "content": {
+        "en": {
+          "sentences": [
+            { "text": "Excuse me. Do you speak English?", "minScore": 55 },
+            { "text": "I don't understand. Can you say that again slowly?", "minScore": 55 },
+            { "text": "Where is the subway?", "minScore": 55 }
+          ]
         },
-        {
-          "id": "cspa3_2",
-          "text": {
-            "en": "I don't understand. Can you say that again slowly?",
-            "es": "No entiendo. ¿Puede repetirlo más despacio?",
-            "ko": "이해 못 했어요. 천천히 다시 말해 주세요."
-          },
-          "hint": {
-            "ko": "모를 때 쓰는 생존 표현이에요",
-            "en": "Survival phrase for when you're lost",
-            "es": "Frase de supervivencia cuando no entiendes"
-          },
-          "targetScore": 60
+        "es": {
+          "sentences": [
+            { "text": "Disculpe. ¿Habla inglés?", "minScore": 55 },
+            { "text": "No entiendo. ¿Puede repetirlo más despacio?", "minScore": 55 },
+            { "text": "¿Dónde está el metro?", "minScore": 55 }
+          ]
         },
-        {
-          "id": "cspa3_3",
-          "text": {
-            "en": "Where is the subway?",
-            "es": "¿Dónde está el metro?",
-            "ko": "지하철이 어디예요?"
-          },
-          "hint": {
-            "ko": "지하철을 찾아야 해요",
-            "en": "You need to find the subway",
-            "es": "Necesitas encontrar el metro"
-          },
-          "targetScore": 60
+        "ko": {
+          "sentences": [
+            { "text": "실례합니다. 영어 할 줄 아세요?", "minScore": 55 },
+            { "text": "이해 못 했어요. 천천히 다시 말해 주세요.", "minScore": 55 },
+            { "text": "지하철이 어디예요?", "minScore": 55 }
+          ]
         }
-      ],
+      },
       "rewards": {
         "xp": 80,
         "badge": null
@@ -3461,7 +3441,7 @@
       "title": {
         "ko": "하산의 혼란스러운 길 안내",
         "en": "Hassan's Chaotic Directions",
-        "es": "Las Direcciones Caoticas de Hassan"
+        "es": "Las Direcciones Caóticas de Hassan"
       },
       "difficulty": 2,
       "timeLimit": null,
@@ -3477,9 +3457,8 @@
             {
               "instruction": "Unscramble the street name:",
               "scrambled": [
-                "Muizz",
+                "el-Muizz",
                 "Sharia",
-                "el-",
                 "Street"
               ],
               "answer": "Sharia el-Muizz Street"
@@ -3511,10 +3490,8 @@
             {
               "instruction": "Descifra el nombre de la calle:",
               "scrambled": [
-                "Muizz",
-                "Calle",
-                "el-",
-                "Sharia"
+                "el-Muizz",
+                "Calle"
               ],
               "answer": "Calle el-Muizz"
             },
@@ -3534,7 +3511,8 @@
                 "noche",
                 "nueve",
                 "cada",
-                "en punto"
+                "en",
+                "punto"
               ],
               "answer": "cada noche nueve en punto"
             }
@@ -3545,9 +3523,8 @@
             {
               "instruction": "거리 이름을 해독하세요:",
               "scrambled": [
-                "무이즈",
-                "거리",
-                "엘-"
+                "엘-무이즈",
+                "거리"
               ],
               "answer": "엘-무이즈 거리"
             },
@@ -3556,7 +3533,8 @@
               "scrambled": [
                 "문",
                 "파란",
-                "세 번째",
+                "세",
+                "번째",
                 "간판"
               ],
               "answer": "세 번째 문 파란 간판"
@@ -3817,7 +3795,7 @@
               "label": "Tell Amira: 'Go to the back door'",
               "correct": "뒷문으로 가세요 / Ve a la puerta de atras",
               "wrong": [
-                "Go to the back door (English — Mr. Black understands!)",
+                "Go to the back door (English... Mr. Black understands!)",
                 "앞문으로 가세요 / Ve a la puerta de enfrente (Wrong door!)"
               ]
             },
@@ -3825,7 +3803,7 @@
               "label": "Tell Amira: 'I have the stone. Run now.'",
               "correct": "수호석 있어요. 지금 뛰세요! / Tengo la piedra. Corre ahora!",
               "wrong": [
-                "I have the stone, run! (English — intercepted!)",
+                "I have the stone, run! (English... intercepted!)",
                 "수호석 없어요. 기다리세요. / No tengo la piedra. Espera. (Wrong info!)"
               ]
             },
@@ -3845,7 +3823,7 @@
               "label": "Dile a Amira: 'Ve a la puerta trasera'",
               "correct": "뒷문으로 가세요 / Ve a la puerta de atras",
               "wrong": [
-                "Go to the back door (ingles — Mr. Black entiende!)",
+                "Go to the back door (ingles... Mr. Black entiende!)",
                 "앞문으로 가세요 / Ve a la puerta de enfrente (Puerta equivocada!)"
               ]
             },
@@ -3853,7 +3831,7 @@
               "label": "Dile a Amira: 'Tengo la piedra. Corre ahora.'",
               "correct": "수호석 있어요. 지금 뛰세요! / Tengo la piedra. Corre ahora!",
               "wrong": [
-                "I have the stone, run! (ingles — interceptado!)",
+                "I have the stone, run! (ingles... interceptado!)",
                 "수호석 없어요. 기다리세요. / No tengo la piedra. Espera. (Informacion incorrecta!)"
               ]
             },
@@ -3873,7 +3851,7 @@
               "label": "아미라에게: '뒷문으로 가'",
               "correct": "뒷문으로 가세요 / Ve a la puerta de atras",
               "wrong": [
-                "Go to the back door (영어 — 미스터 블랙이 알아듣는다!)",
+                "Go to the back door (영어... 미스터 블랙이 알아듣는다!)",
                 "앞문으로 가세요 / Ve a la puerta de enfrente (틀린 문!)"
               ]
             },
@@ -3881,7 +3859,7 @@
               "label": "아미라에게: '수호석이 있어. 지금 뛰어'",
               "correct": "수호석 있어요. 지금 뛰세요! / Tengo la piedra. Corre ahora!",
               "wrong": [
-                "I have the stone, run! (영어 — 차단당한다!)",
+                "I have the stone, run! (영어... 차단당한다!)",
                 "수호석 없어요. 기다리세요. / No tengo la piedra. Espera. (잘못된 정보!)"
               ]
             },
@@ -4255,7 +4233,7 @@
       "title": {
         "ko": "블랙의 암호 해독",
         "en": "Decoding Black's Cipher",
-        "es": "Descifrando el Codigo de Black"
+        "es": "Descifrando el Código de Black"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -4567,7 +4545,7 @@
               "hint": {
                 "ko": "민호가 알려준 코드의 약점",
                 "en": "The Code weakness Minho revealed",
-                "es": "La debilidad del Codigo que revelo Minho"
+                "es": "La debilidad del Código que revelo Minho"
               }
             },
             {
@@ -4583,7 +4561,7 @@
               "hint": {
                 "ko": "수호석을 활성화하는 방법",
                 "en": "How to activate the Guardian Stones",
-                "es": "Como activar las Piedras Guardianas"
+                "es": "Cómo activar las Piedras Guardianas"
               }
             },
             {
@@ -4599,7 +4577,7 @@
               "hint": {
                 "ko": "Day 1에서 배운 자기소개",
                 "en": "Self-introduction from Day 1",
-                "es": "Autopresentacion del Dia 1"
+                "es": "Autopresentación del Día 1"
               }
             }
           ]
@@ -4638,7 +4616,7 @@
               "hint": {
                 "ko": "코드의 약점",
                 "en": "The Code's weakness",
-                "es": "La debilidad del Codigo"
+                "es": "La debilidad del Código"
               }
             },
             {
@@ -4652,7 +4630,7 @@
               "hint": {
                 "ko": "수호석 활성화 방법",
                 "en": "How to activate the stones",
-                "es": "Como activar las piedras"
+                "es": "Cómo activar las piedras"
               }
             },
             {
@@ -4667,7 +4645,7 @@
               "hint": {
                 "ko": "Day 1 자기소개",
                 "en": "Day 1 self-introduction",
-                "es": "Autopresentacion del Dia 1"
+                "es": "Autopresentación del Día 1"
               }
             }
           ]
@@ -4700,7 +4678,7 @@
               "answer": "7개의 수호석이 모두 동시에 필요합니다",
               "hint": {
                 "en": "The Code's weakness",
-                "es": "La debilidad del Codigo",
+                "es": "La debilidad del Código",
                 "ko": "민호가 알려준 약점"
               }
             },
@@ -4715,7 +4693,7 @@
               "answer": "수호석에 당신의 언어로 말을 걸어주세요",
               "hint": {
                 "en": "How to activate the stones",
-                "es": "Como activar las piedras",
+                "es": "Cómo activar las piedras",
                 "ko": "활성화 방법"
               }
             },
@@ -4729,7 +4707,7 @@
               "answer": "안녕하세요 제 이름은 루디입니다",
               "hint": {
                 "en": "Day 1 self-introduction",
-                "es": "Autopresentacion del Dia 1",
+                "es": "Autopresentación del Día 1",
                 "ko": "Day 1 자기소개"
               }
             }
@@ -4750,7 +4728,7 @@
       "title": {
         "ko": "3개 국어 비문 읽기",
         "en": "Reading the Trilingual Inscription",
-        "es": "Leyendo la Inscripcion Trilingue"
+        "es": "Leyendo la Inscripción Trilingüe"
       },
       "difficulty": 4,
       "timeLimit": null,
@@ -4828,9 +4806,9 @@
       "scene": "ch5_scene5_boss",
       "type": "mixed",
       "title": {
-        "ko": "최후의 시험 — 모든 언어의 화음",
-        "en": "The Final Trial — Harmony of All Languages",
-        "es": "La Prueba Final — Armonia de Todos los Idiomas"
+        "ko": "최후의 시험... 모든 언어의 화음",
+        "en": "The Final Trial... Harmony of All Languages",
+        "es": "La Prueba Final... Armonía de Todos los Idiomas"
       },
       "difficulty": 5,
       "timeLimit": 120,
@@ -4838,16 +4816,16 @@
       "useGPT": true,
       "useAzureTTS": true,
       "storyContext": {
-        "ko": "수호석에 말을 걸어야 한다. 배운 모든 것을 세 가지 언어로. 인사, 자기소개, 감사, 주문하기, 감정 표현. 완벽할 필요 없다 — 진심이면 된다. 이것이 최후의 시험이다.",
-        "en": "You must speak to the Guardian Stones. Everything you've learned, in all three languages. Greetings, introductions, gratitude, ordering, expressing feelings. It doesn't need to be perfect — it needs to be sincere. This is the final trial.",
-        "es": "Debes hablar con las Piedras Guardianas. Todo lo que aprendiste, en los tres idiomas. Saludos, presentaciones, gratitud, pedir comida, expresar sentimientos. No necesita ser perfecto — necesita ser sincero. Esta es la prueba final."
+        "ko": "수호석에 말을 걸어야 한다. 배운 모든 것을 세 가지 언어로. 인사, 자기소개, 감사, 주문하기, 감정 표현. 완벽할 필요 없다... 진심이면 된다. 이것이 최후의 시험이다.",
+        "en": "You must speak to the Guardian Stones. Everything you've learned, in all three languages. Greetings, introductions, gratitude, ordering, expressing feelings. It doesn't need to be perfect... it needs to be sincere. This is the final trial.",
+        "es": "Debes hablar con las Piedras Guardianas. Todo lo que aprendiste, en los tres idiomas. Saludos, presentaciones, gratitud, pedir comida, expresar sentimientos. No necesita ser perfecto... necesita ser sincero. Esta es la prueba final."
       },
       "content": {
         "en": {
           "rounds": [
             {
               "type": "listening",
-              "ttsScript": "Seven stones, seven voices. To wake them, speak what you know. Not what is perfect — what is true. Begin with the first words you ever learned. How do you greet someone you have never met?",
+              "ttsScript": "Seven stones, seven voices. To wake them, speak what you know. Not what is perfect... what is true. Begin with the first words you ever learned. How do you greet someone you have never met?",
               "ttsVoice": "en-GB-SoniaNeural",
               "question": "What does the voice ask you to begin with?",
               "answer": "greetings",
@@ -4919,7 +4897,7 @@
             },
             {
               "type": "translation_chain",
-              "instruction": "Translate this message through all three languages — English to Spanish to Korean.",
+              "instruction": "Translate this message through all three languages... English to Spanish to Korean.",
               "chain": [
                 {
                   "from": "en",
@@ -4946,7 +4924,7 @@
             },
             {
               "type": "matching",
-              "description": "Match each NPC's signature expression to its meaning — prove you listened to everyone who helped you.",
+              "description": "Match each NPC's signature expression to its meaning... prove you listened to everyone who helped you.",
               "pairs": [
                 {
                   "left": "When the going gets tough, the tough get going (Tom)",
@@ -4979,8 +4957,8 @@
             },
             {
               "type": "roleplay",
-              "prompt": "This is the final moment. Speak to the Guardian Stones in your target language. Tell them: who you are, where you have been, who helped you, and why languages matter. Use at least 5 sentences. Include at least one expression or proverb you learned during your journey. The stones are listening — be sincere, not perfect.",
-              "reviewNote": "Thematic climax — user articulates the story's core message using vocabulary from all chapters"
+              "prompt": "This is the final moment. Speak to the Guardian Stones in your target language. Tell them: who you are, where you have been, who helped you, and why languages matter. Use at least 5 sentences. Include at least one expression or proverb you learned during your journey. The stones are listening... be sincere, not perfect.",
+              "reviewNote": "Thematic climax... user articulates the story's core message using vocabulary from all chapters"
             }
           ]
         },
@@ -4988,7 +4966,7 @@
           "rounds": [
             {
               "type": "listening",
-              "ttsScript": "Siete piedras, siete voces. Para despertarlas, habla lo que sabes. No lo que es perfecto — lo que es verdadero. Comienza con las primeras palabras que aprendiste. Como saludas a alguien que nunca has conocido?",
+              "ttsScript": "Siete piedras, siete voces. Para despertarlas, habla lo que sabes. No lo que es perfecto... lo que es verdadero. Comienza con las primeras palabras que aprendiste. Como saludas a alguien que nunca has conocido?",
               "ttsVoice": "es-ES-ElviraNeural",
               "question": "Con que te pide la voz que comiences?",
               "answer": "saludos",
@@ -5059,7 +5037,7 @@
             },
             {
               "type": "translation_chain",
-              "instruction": "Traduce este mensaje a traves de los tres idiomas — espanol a ingles a coreano.",
+              "instruction": "Traduce este mensaje a traves de los tres idiomas... espanol a ingles a coreano.",
               "chain": [
                 {
                   "from": "es",
@@ -5118,7 +5096,7 @@
             },
             {
               "type": "roleplay",
-              "prompt": "Este es el momento final. Habla con las Piedras Guardianas en tu idioma objetivo. Diles: quién eres, dónde has estado, quién te ayudó, y por qué los idiomas importan. Usa al menos 5 oraciones. Incluye al menos una expresión o refrán que aprendiste durante tu viaje. Las piedras están escuchando — sé sincero, no perfecto."
+              "prompt": "Este es el momento final. Habla con las Piedras Guardianas en tu idioma objetivo. Diles: quién eres, dónde has estado, quién te ayudó, y por qué los idiomas importan. Usa al menos 5 oraciones. Incluye al menos una expresión o refrán que aprendiste durante tu viaje. Las piedras están escuchando... sé sincero, no perfecto."
             }
           ]
         },
@@ -5195,7 +5173,7 @@
             },
             {
               "type": "translation_chain",
-              "instruction": "이 메시지를 세 가지 언어로 번역하세요 — 한국어에서 영어로, 영어에서 스페인어로.",
+              "instruction": "이 메시지를 세 가지 언어로 번역하세요... 한국어에서 영어로, 영어에서 스페인어로.",
               "chain": [
                 {
                   "from": "ko",
@@ -5222,7 +5200,7 @@
             },
             {
               "type": "matching",
-              "description": "각 NPC의 대표 표현과 의미를 연결하세요 — 도와준 모든 사람의 말을 기억하고 있는지 증명하세요.",
+              "description": "각 NPC의 대표 표현과 의미를 연결하세요... 도와준 모든 사람의 말을 기억하고 있는지 증명하세요.",
               "pairs": [
                 {
                   "left": "힘들 때 강한 자가 움직인다 (Tom)",
@@ -5255,12 +5233,12 @@
             },
             {
               "type": "roleplay",
-              "prompt": "마지막 순간입니다. 학습 언어로 수호석에게 말하세요. 당신이 누구인지, 어디를 다녀왔는지, 누가 도와줬는지, 그리고 왜 언어가 중요한지 말해주세요. 최소 5문장을 사용하세요. 여행 중 배운 표현이나 속담을 최소 1개 포함하세요. 수호석이 듣고 있습니다 — 완벽하지 않아도 됩니다, 진심이면 됩니다."
+              "prompt": "마지막 순간입니다. 학습 언어로 수호석에게 말하세요. 당신이 누구인지, 어디를 다녀왔는지, 누가 도와줬는지, 그리고 왜 언어가 중요한지 말해주세요. 최소 5문장을 사용하세요. 여행 중 배운 표현이나 속담을 최소 1개 포함하세요. 수호석이 듣고 있습니다... 완벽하지 않아도 됩니다, 진심이면 됩니다."
             }
           ]
         }
       },
-      "gptPrompt": "You are the final boss quiz evaluator for Chapter 5 (Babel Tower) of a language learning game. The player must speak to the Guardian Stones, demonstrating everything they've learned across 5 chapters. They should: introduce themselves, describe their journey (London, Madrid, Seoul, Cairo, Babel), mention NPCs who helped them, and explain why language diversity matters. Evaluate: grammar and vocabulary range (0-20), use of expressions from previous chapters like proverbs/idioms (0-20), multilingual awareness showing knowledge of multiple languages (0-20), emotional sincerity and personal voice (0-20), length and completeness minimum 5 sentences (0-20). A perfect answer weaves together greetings, expressions, and cultural references from all chapters into a heartfelt statement. Be generous with partial credit — this is about trying, not perfection. Return JSON: {\"score\": 0-100, \"feedback\": \"...\", \"expressionsRecognized\": [], \"languagesUsed\": [], \"emotionalImpact\": \"cold/warm/moving/extraordinary\"}",
+      "gptPrompt": "You are the final boss quiz evaluator for Chapter 5 (Babel Tower) of a language learning game. The player must speak to the Guardian Stones, demonstrating everything they've learned across 5 chapters. They should: introduce themselves, describe their journey (London, Madrid, Seoul, Cairo, Babel), mention NPCs who helped them, and explain why language diversity matters. Evaluate: grammar and vocabulary range (0-20), use of expressions from previous chapters like proverbs/idioms (0-20), multilingual awareness showing knowledge of multiple languages (0-20), emotional sincerity and personal voice (0-20), length and completeness minimum 5 sentences (0-20). A perfect answer weaves together greetings, expressions, and cultural references from all chapters into a heartfelt statement. Be generous with partial credit... this is about trying, not perfection. Return JSON: {\"score\": 0-100, \"feedback\": \"...\", \"expressionsRecognized\": [], \"languagesUsed\": [], \"emotionalImpact\": \"cold/warm/moving/extraordinary\"}",
       "rewards": {
         "xp": 500,
         "items": [
@@ -5268,6 +5246,252 @@
         ],
         "npcRelation": null,
         "badge": "language_defender"
+      }
+    },
+
+    {
+      "id": "ch3_quiz_voice_power",
+      "chapter": "ch3",
+      "scene": "ch3_scene3",
+      "type": "voice_power",
+      "title": {
+        "ko": "수호석의 공명",
+        "en": "The Stone's Resonance",
+        "es": "La Resonancia de la Piedra"
+      },
+      "difficulty": 3,
+      "timeLimit": null,
+      "isBoss": false,
+      "tprsStage": 3,
+      "targetExpressions": ["How are you?", "I'm fine, thank you", "Nice to meet you"],
+      "previouslyLearned": ["Hello", "My name is", "Goodbye"],
+      "speakAfter": true,
+      "storyReason": "수호석이 반응하려면 올바른 발음으로 주문을 외워야 한다",
+      "storyConsequence": "수호석이 빛나며 서울의 단서를 드러낸다",
+      "onFail": { "addToWeakExpressions": ["How are you?", "Nice to meet you"], "reviewInDailyCourse": true, "reviewDays": 3 },
+      "storyContext": {
+        "ko": "수호석을 깨우려면 올바른 발음으로 영어를 말해야 한다. 루디가 말한다: '이건 마법이 아니야... 진심이 담긴 말이 돌을 깨우는 거야.'",
+        "en": "To awaken the Guardian Stone, you must speak English with true pronunciation. Rudy says: 'This isn't magic... it's heartfelt words that wake the stone.'",
+        "es": "Para despertar la Piedra Guardiana, debes hablar inglés con pronunciación verdadera. Rudy dice: 'Esto no es magia... son palabras sinceras las que despiertan la piedra.'"
+      },
+      "content": {
+        "en": {
+          "sentences": [
+            { "sentence": "How are you?", "translation": "어떻게 지내세요?", "stoneEffect": "glow", "stoneCount": 1, "visualEffect": "Blue pulse", "minScore": 60 },
+            { "sentence": "I'm fine, thank you.", "translation": "잘 지내요, 감사합니다.", "stoneEffect": "bright", "stoneCount": 2, "visualEffect": "Gold shimmer", "minScore": 65 },
+            { "sentence": "Nice to meet you.", "translation": "만나서 반갑습니다.", "stoneEffect": "blinding", "stoneCount": 3, "visualEffect": "Diamond burst", "minScore": 70 }
+          ]
+        },
+        "es": {
+          "sentences": [
+            { "sentence": "How are you?", "translation": "¿Cómo estás?", "stoneEffect": "glow", "stoneCount": 1, "visualEffect": "Blue pulse", "minScore": 60 },
+            { "sentence": "I'm fine, thank you.", "translation": "Estoy bien, gracias.", "stoneEffect": "bright", "stoneCount": 2, "visualEffect": "Gold shimmer", "minScore": 65 },
+            { "sentence": "Nice to meet you.", "translation": "Mucho gusto.", "stoneEffect": "blinding", "stoneCount": 3, "visualEffect": "Diamond burst", "minScore": 70 }
+          ]
+        },
+        "ko": {
+          "sentences": [
+            { "sentence": "How are you?", "translation": "어떻게 지내세요?", "stoneEffect": "glow", "stoneCount": 1, "visualEffect": "Blue pulse", "minScore": 60 },
+            { "sentence": "I'm fine, thank you.", "translation": "잘 지내요, 감사합니다.", "stoneEffect": "bright", "stoneCount": 2, "visualEffect": "Gold shimmer", "minScore": 65 },
+            { "sentence": "Nice to meet you.", "translation": "만나서 반갑습니다.", "stoneEffect": "blinding", "stoneCount": 3, "visualEffect": "Diamond burst", "minScore": 70 }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 80,
+        "items": ["guardian_stone_shard"],
+        "npcRelation": { "npc": "sujin", "points": 10 },
+        "badge": null
+      }
+    },
+
+    {
+      "id": "ch4_quiz_debate",
+      "chapter": "ch4",
+      "scene": "ch4_scene4",
+      "type": "debate_battle",
+      "title": {
+        "ko": "하산과의 흥정 대결",
+        "en": "Bargaining Battle with Hassan",
+        "es": "Batalla de Regateo con Hassan"
+      },
+      "difficulty": 4,
+      "timeLimit": null,
+      "isBoss": false,
+      "tprsStage": 4,
+      "targetExpressions": ["How much is this?", "That's too expensive", "Can you lower the price?"],
+      "previouslyLearned": ["Thank you", "Please", "Yes", "No", "Excuse me"],
+      "speakAfter": true,
+      "storyReason": "하산이 수호석의 위치를 알려주는 대가로 흥정 실력을 증명하라고 요구한다",
+      "storyConsequence": "하산이 감동하여 피라미드 비밀 통로의 지도를 준다",
+      "onFail": { "addToWeakExpressions": ["How much is this?", "Can you lower the price?"], "reviewInDailyCourse": true, "reviewDays": 3 },
+      "storyContext": {
+        "ko": "하산이 말한다: '네가 진정한 협상가인지 증명해봐. 내 주장을 논리적으로 반박해야 해. 아랍어로 하면 가산점이야.'",
+        "en": "Hassan says: 'Prove you're a real negotiator. Counter my arguments logically. Arabic earns bonus points.'",
+        "es": "Hassan dice: 'Demuestra que eres un verdadero negociador. Rebate mis argumentos con lógica. El árabe da puntos extra.'"
+      },
+      "content": {
+        "en": {
+          "opponent": "Hassan",
+          "rounds": 3,
+          "minExpressions": 1,
+          "roundData": [
+            {
+              "topic": { "ko": "이 램프의 가격", "en": "Price of this lamp", "es": "Precio de esta lámpara" },
+              "npcArgument": { "ko": "이 램프는 300년 된 골동품이야. 500달러도 싸.", "en": "This lamp is a 300-year-old antique. $500 is a steal.", "es": "Esta lámpara es una antigüedad de 300 años. $500 es una ganga." },
+              "requiredExpressions": ["How much is this?"]
+            },
+            {
+              "topic": { "ko": "유사한 램프 가격", "en": "Comparable lamp prices", "es": "Precios de lámparas comparables" },
+              "npcArgument": { "ko": "다른 가게에서 이런 품질 못 찾아. 내 것만이 진품이야.", "en": "You won't find this quality anywhere else. Mine is the only authentic one.", "es": "No encontrarás esta calidad en otro lugar. El mío es el único auténtico." },
+              "requiredExpressions": ["That's too expensive"]
+            },
+            {
+              "topic": { "ko": "최종 가격 협상", "en": "Final price negotiation", "es": "Negociación de precio final" },
+              "npcArgument": { "ko": "좋아, 네 진심이 보여. 하지만 400달러 이하는 절대 안 돼.", "en": "OK, I see your sincerity. But below $400 is absolutely impossible.", "es": "OK, veo tu sinceridad. Pero menos de $400 es absolutamente imposible." },
+              "requiredExpressions": ["Can you lower the price?"]
+            }
+          ]
+        },
+        "es": {
+          "opponent": "Hassan",
+          "rounds": 3,
+          "minExpressions": 1,
+          "roundData": [
+            {
+              "topic": { "ko": "이 램프의 가격", "en": "Price of this lamp", "es": "Precio de esta lámpara" },
+              "npcArgument": { "ko": "이 램프는 300년 된 골동품이야.", "en": "This lamp is a 300-year-old antique.", "es": "Esta lámpara es una antigüedad de 300 años. $500 es una ganga." },
+              "requiredExpressions": ["How much is this?"]
+            },
+            {
+              "topic": { "ko": "유사한 램프 가격", "en": "Comparable prices", "es": "Precios comparables" },
+              "npcArgument": { "ko": "다른 가게에선 못 찾아.", "en": "You won't find this elsewhere.", "es": "No encontrarás esta calidad en otro lugar." },
+              "requiredExpressions": ["That's too expensive"]
+            },
+            {
+              "topic": { "ko": "최종 협상", "en": "Final negotiation", "es": "Negociación final" },
+              "npcArgument": { "ko": "400달러 이하는 안 돼.", "en": "Below $400 is impossible.", "es": "Menos de $400 es imposible." },
+              "requiredExpressions": ["Can you lower the price?"]
+            }
+          ]
+        },
+        "ko": {
+          "opponent": "Hassan",
+          "rounds": 3,
+          "minExpressions": 1,
+          "roundData": [
+            {
+              "topic": { "ko": "이 램프의 가격", "en": "Price of this lamp", "es": "Precio de esta lámpara" },
+              "npcArgument": { "ko": "이 램프는 300년 된 골동품이야. 500달러도 싸다고.", "en": "This lamp is a 300-year-old antique. $500 is a steal.", "es": "Esta lámpara es una antigüedad de 300 años." },
+              "requiredExpressions": ["How much is this?"]
+            },
+            {
+              "topic": { "ko": "유사한 램프 가격", "en": "Comparable prices", "es": "Precios comparables" },
+              "npcArgument": { "ko": "다른 가게에서 이런 품질 절대 못 찾아. 내 것만이 진품이야.", "en": "You won't find this quality elsewhere.", "es": "No encontrarás esta calidad." },
+              "requiredExpressions": ["That's too expensive"]
+            },
+            {
+              "topic": { "ko": "최종 가격 협상", "en": "Final negotiation", "es": "Negociación final" },
+              "npcArgument": { "ko": "좋아, 네 진심이 보여. 하지만 400달러 이하는 절대 안 된다.", "en": "Below $400 is impossible.", "es": "Menos de $400 es imposible." },
+              "requiredExpressions": ["Can you lower the price?"]
+            }
+          ]
+        }
+      },
+      "rewards": {
+        "xp": 120,
+        "items": ["hassan_map"],
+        "npcRelation": { "npc": "hassan", "points": 15 },
+        "badge": null
+      }
+    },
+
+    {
+      "id": "ch2_quiz_npc_rescue",
+      "chapter": "ch2",
+      "scene": "ch2_scene3",
+      "type": "npc_rescue",
+      "title": {
+        "ko": "카를로스 구출 작전",
+        "en": "Operation: Rescue Carlos",
+        "es": "Operación: Rescatar a Carlos"
+      },
+      "difficulty": 2,
+      "timeLimit": null,
+      "isBoss": false,
+      "tprsStage": 2,
+      "targetExpressions": ["Help me please", "Where are you?", "Don't worry"],
+      "previouslyLearned": ["Hello", "Thank you", "Sorry"],
+      "speakAfter": true,
+      "storyReason": "카를로스가 렉시콘에 납치되어 영어로 구조 신호를 보내야 한다",
+      "storyConsequence": "카를로스가 구출되어 렉시콘의 언어 소거 장치 정보를 알려준다",
+      "onFail": { "addToWeakExpressions": ["Help me please", "Where are you?"], "reviewInDailyCourse": true, "reviewDays": 3 },
+      "storyContext": {
+        "ko": "카를로스가 어딘가에 갇혀 있다. 이사벨이 위치 단서를 찾았지만, 구조 신호를 영어로 정확하게 말해야 카를로스가 반응할 수 있다.",
+        "en": "Carlos is trapped somewhere. Isabel found location clues, but you must speak the rescue phrases in clear English for Carlos to respond.",
+        "es": "Carlos está atrapado. Isabel encontró pistas, pero debes decir las frases de rescate en inglés claro para que Carlos responda."
+      },
+      "content": {
+        "en": {
+          "npcToRescue": "Carlos",
+          "stages": [
+            {
+              "instruction": { "ko": "카를로스에게 도움을 요청하세요", "en": "Call for help to Carlos", "es": "Pide ayuda a Carlos" },
+              "targetPhrase": "Help me please",
+              "hint": { "ko": "'Help'으로 시작하세요", "en": "Start with 'Help'", "es": "Empieza con 'Help'" },
+              "minScore": 55
+            },
+            {
+              "instruction": { "ko": "카를로스의 위치를 물어보세요", "en": "Ask Carlos where he is", "es": "Pregunta a Carlos dónde está" },
+              "targetPhrase": "Where are you?",
+              "hint": { "ko": "의문사 'Where'를 사용하세요", "en": "Use the question word 'Where'", "es": "Usa la palabra interrogativa 'Where'" },
+              "minScore": 55
+            }
+          ],
+          "progressiveIntro": true
+        },
+        "es": {
+          "npcToRescue": "Carlos",
+          "stages": [
+            {
+              "instruction": { "ko": "카를로스에게 도움을 요청하세요", "en": "Call for help", "es": "Pide ayuda a Carlos" },
+              "targetPhrase": "Help me please",
+              "hint": { "ko": "'Help'으로 시작", "en": "Start with 'Help'", "es": "Empieza con 'Help'" },
+              "minScore": 55
+            },
+            {
+              "instruction": { "ko": "카를로스의 위치를 물어보세요", "en": "Ask where he is", "es": "Pregunta dónde está" },
+              "targetPhrase": "Where are you?",
+              "hint": { "ko": "'Where' 사용", "en": "Use 'Where'", "es": "Usa 'Where'" },
+              "minScore": 55
+            }
+          ],
+          "progressiveIntro": true
+        },
+        "ko": {
+          "npcToRescue": "Carlos",
+          "stages": [
+            {
+              "instruction": { "ko": "카를로스에게 도움을 요청하세요", "en": "Call for help", "es": "Pide ayuda" },
+              "targetPhrase": "Help me please",
+              "hint": { "ko": "'Help'으로 시작하세요", "en": "Start with 'Help'", "es": "Empieza con 'Help'" },
+              "minScore": 55
+            },
+            {
+              "instruction": { "ko": "카를로스의 위치를 물어보세요", "en": "Ask where he is", "es": "Pregunta dónde está" },
+              "targetPhrase": "Where are you?",
+              "hint": { "ko": "의문사 'Where'를 사용하세요", "en": "Use 'Where'", "es": "Usa 'Where'" },
+              "minScore": 55
+            }
+          ],
+          "progressiveIntro": true
+        }
+      },
+      "rewards": {
+        "xp": 80,
+        "items": [],
+        "npcRelation": { "npc": "isabel", "points": 10 },
+        "badge": null
       }
     }
   ],

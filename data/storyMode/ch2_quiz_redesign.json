@@ -1,7 +1,7 @@
 {
   "meta": {
     "version": "2.0",
-    "description": "Chapter 2 Madrid quiz redesign — uses only Day 1-12 vocabulary",
+    "description": "Chapter 2 Madrid quiz redesign... uses only Day 1-12 vocabulary",
     "replaces": ["ch2_quiz_a", "ch2_quiz_b", "ch2_quiz_c", "ch2_quiz_d", "ch2_quiz_e"],
     "vocabularyScope": "Day 1-12 (Unit 1: First Encounters + Unit 2: Everyday Expressions)"
   },
@@ -494,9 +494,9 @@
       "scene": "ch2_scene3_boss",
       "type": "timed",
       "title": {
-        "ko": "렉시콘의 함정 — 카를로스 구출",
-        "en": "The Lexicon Trap — Rescuing Carlos",
-        "es": "La Trampa de Lexicón — Rescatando a Carlos"
+        "ko": "렉시콘의 함정... 카를로스 구출",
+        "en": "The Lexicon Trap... Rescuing Carlos",
+        "es": "La Trampa de Lexicón... Rescatando a Carlos"
       },
       "difficulty": 4,
       "timeLimit": 60,

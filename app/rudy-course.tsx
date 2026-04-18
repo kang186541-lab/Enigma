@@ -11,7 +11,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { C, F } from "@/constants/theme";
 import {
@@ -40,7 +40,7 @@ export default function RudyCourseScreen() {
     setSelectedUnitIdx(p.currentUnitIndex);
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useFocusEffect(useCallback(() => { loadData(); }, [loadData]));
 
   if (!progress) {
     return (

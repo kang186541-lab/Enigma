@@ -1,6 +1,6 @@
 {
   "meta": {
-    "description": "Fix for ch3_quiz_d password puzzle — letters now correctly produce the final answer in all 3 languages",
+    "description": "Fix for ch3_quiz_d password puzzle... letters now correctly produce the final answer in all 3 languages",
     "bug": "EN: clues produced LILH but finalAnswer was LIFE. ES: clues were inconsistent with LUNA. KO: clues were inconsistent with 빛나라.",
     "fix": "Rewrote clue sentences and letter extraction to match the intended final answers: EN=LIFE, ES=LUNA, KO=빛나라"
   },

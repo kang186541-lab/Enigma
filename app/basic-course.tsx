@@ -21,6 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { C, F } from "@/constants/theme";
+import { addDayPhrases } from "@/lib/srsManager";
 
 const { width: SW } = Dimensions.get("window");
 const CARD_W = Math.min(SW - 48, 360);
@@ -198,8 +199,8 @@ async function stopBcSound() {
   if (_bcNativeSound) {
     const s = _bcNativeSound;
     _bcNativeSound = null;
-    await s.stopAsync().catch(() => {});
-    await s.unloadAsync().catch(() => {});
+    await s.stopAsync().catch((e) => console.warn('[BasicCourse] stop failed:', e));
+    await s.unloadAsync().catch((e) => console.warn('[BasicCourse] unload failed:', e));
   }
 }
 
@@ -208,7 +209,7 @@ let _bcWebAudio: HTMLAudioElement | null = null;
 
 function stopBcWebAudio() {
   if (_bcWebAudio) {
-    try { _bcWebAudio.pause(); _bcWebAudio.src = ""; } catch {}
+    try { _bcWebAudio.pause(); _bcWebAudio.src = ""; } catch (e) { console.warn('[BasicCourse] Failed to stop web audio:', e); }
     _bcWebAudio = null;
   }
 }
@@ -219,15 +220,15 @@ function stopBcTTS() {
   if (_bcNativeSound) {
     const s = _bcNativeSound;
     _bcNativeSound = null;
-    s.stopAsync().catch(() => {});
-    s.unloadAsync().catch(() => {});
+    s.stopAsync().catch((e) => console.warn('[BasicCourse] stop failed:', e));
+    s.unloadAsync().catch((e) => console.warn('[BasicCourse] unload failed:', e));
   }
 }
 
 /** Play TTS via Azure /api/pronunciation-tts endpoint.
  *  For single letters, uses phonetic name + letter mode for best results. */
 async function speak(text: string, courseLang: string) {
-  try { await stopBcSound(); } catch {}
+  try { await stopBcSound(); } catch (e) { console.warn('[BasicCourse] Failed to stop previous sound:', e); }
   stopBcWebAudio();
 
   const isSingleChar = text.length === 1;
@@ -235,11 +236,13 @@ async function speak(text: string, courseLang: string) {
   const ttsText = isSingleChar ? getPhoneticName(text, courseLang) : text;
   const voice = BC_VOICES[courseLang];
 
-  const url = new URL("/api/pronunciation-tts", getApiUrl());
+  let url: URL;
+  try {
+    url = new URL("/api/pronunciation-tts", getApiUrl());
+  } catch (e) { console.warn('[BasicCourse] Failed to construct TTS URL:', e); return; }
   url.searchParams.set("text", ttsText);
   url.searchParams.set("lang", courseLang);
   if (voice) url.searchParams.set("voice", voice);
-  // Don't set mode=letter — phonetic name is already expanded (e.g. "A" → "ay")
 
   try {
     if (Platform.OS === "web") {
@@ -253,18 +256,18 @@ async function speak(text: string, courseLang: string) {
       audio.onerror = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
       await audio.play();
     } else {
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch(() => {});
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch((e) => console.warn('[BasicCourse] setAudioMode failed:', e));
       const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true, volume: 1.0 });
       _bcNativeSound = sound;
       sound.setOnPlaybackStatusUpdate((st: any) => {
         if (st.isLoaded && st.didJustFinish) {
-          sound.unloadAsync().catch(() => {});
+          sound.unloadAsync().catch((e) => console.warn('[BasicCourse] sound unload failed:', e));
           _bcNativeSound = null;
         }
       });
     }
-  } catch {
-    // Azure TTS failed — silently ignore since expo-speech is removed
+  } catch (e) {
+    console.warn('[BasicCourse] Azure TTS playback failed:', e);
   }
 }
 
@@ -635,7 +638,8 @@ export default function BasicCourseScreen() {
   };
 
   const handleSkip = async () => {
-    try { await AsyncStorage.setItem(DONE_KEY(lang), "true"); } catch {}
+    stopBcTTS();
+    try { await AsyncStorage.setItem(DONE_KEY(lang), "true"); } catch (e) { console.warn('[BasicCourse] Failed to save skip state:', e); }
     router.replace("/(tabs)");
   };
 
@@ -647,11 +651,11 @@ export default function BasicCourseScreen() {
         setStep(p.step ?? 0);
         setSubIdx(p.subIdx ?? 0);
       }
-    } catch {}
+    } catch (e) { console.warn('[BasicCourse] Failed to load progress:', e); }
   };
 
   const saveProgress = async (s: number, idx: number) => {
-    try { await AsyncStorage.setItem(PROGRESS_KEY(lang), JSON.stringify({ step: s, subIdx: idx })); } catch {}
+    try { await AsyncStorage.setItem(PROGRESS_KEY(lang), JSON.stringify({ step: s, subIdx: idx })); } catch (e) { console.warn('[BasicCourse] Failed to save progress:', e); }
   };
 
   const markDone = async () => {
@@ -659,13 +663,13 @@ export default function BasicCourseScreen() {
       await AsyncStorage.setItem(DONE_KEY(lang), "true");
       await AsyncStorage.removeItem(PROGRESS_KEY(lang));
       await updateStats({ xp: stats.xp + 100 });
-    } catch {}
+    } catch (e) { console.warn('[BasicCourse] Failed to mark course done:', e); }
   };
 
   // Set audio mode once when screen mounts (avoids per-press delay)
   useEffect(() => {
     if (Platform.OS !== "web") {
-      Audio.setAudioModeAsync({ playsInSilentModeIOS: true, allowsRecordingIOS: false }).catch(() => {});
+      Audio.setAudioModeAsync({ playsInSilentModeIOS: true, allowsRecordingIOS: false }).catch((e) => console.warn('[BasicCourse] setAudioMode (mount) failed:', e));
     }
   }, []);
 
@@ -707,18 +711,18 @@ export default function BasicCourseScreen() {
         audio.onerror = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
         await audio.play();
       } else {
-        await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch(() => {});
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch((e) => console.warn('[BasicCourse] setAudioMode failed:', e));
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true, volume: 1.0 });
         _bcNativeSound = sound;
         sound.setOnPlaybackStatusUpdate((st: any) => {
           if (st.isLoaded && st.didJustFinish) {
-            sound.unloadAsync().catch(() => {});
+            sound.unloadAsync().catch((e) => console.warn('[BasicCourse] sound unload failed:', e));
             _bcNativeSound = null;
           }
         });
       }
-    } catch {
-      // Azure TTS failed — silently ignore since expo-speech is removed
+    } catch (e) {
+      console.warn('[BasicCourse] Auto-play TTS failed:', e);
     }
   }, [course.lang]);
 
@@ -764,6 +768,7 @@ export default function BasicCourseScreen() {
   };
 
   const finishCourse = async () => {
+    stopBcTTS();
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     await markDone();
     Animated.timing(xpAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start(() => {
@@ -803,18 +808,18 @@ export default function BasicCourseScreen() {
         audio.onerror = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
         await audio.play();
       } else {
-        await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch(() => {});
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch((e) => console.warn('[BasicCourse] setAudioMode failed:', e));
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true, volume: 1.0 });
         _bcNativeSound = sound;
         sound.setOnPlaybackStatusUpdate((s: any) => {
           if (s.isLoaded && s.didJustFinish) {
-            sound.unloadAsync().catch(() => {});
+            sound.unloadAsync().catch((e) => console.warn('[BasicCourse] sound unload failed:', e));
             _bcNativeSound = null;
           }
         });
       }
-    } catch {
-      // Azure TTS failed — silently ignore since expo-speech is removed
+    } catch (e) {
+      console.warn('[BasicCourse] Greeting TTS playback failed:', e);
     }
     setGreetPhase("speak");
   };
@@ -877,7 +882,8 @@ export default function BasicCourseScreen() {
         } else {
           setGreetPhase("fail");
         }
-      } catch {
+      } catch (e) {
+        console.warn('[BasicCourse] Pronunciation assessment failed:', e);
         setGreetScore(60);
         setGreetPhase("fail");
       }
@@ -1184,7 +1190,7 @@ export default function BasicCourseScreen() {
                 </Text>
               </Pressable>
             )}
-            <Pressable onPress={() => setShowSkipConfirm(true)} hitSlop={10}>
+            <Pressable onPress={() => { stopBcTTS(); setShowSkipConfirm(true); }} hitSlop={10}>
               <Ionicons name="home-outline" size={18} color={C.goldDim} />
             </Pressable>
           </View>
@@ -1711,6 +1717,70 @@ const s = StyleSheet.create({
     backgroundColor: "rgba(201,162,39,0.10)",
   },
   skipPillTxt: { fontSize: 12, fontFamily: F.bodySemi, color: C.goldDark },
+
+  /* ── Modal ── */
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.65)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
+  modalBox: {
+    backgroundColor: C.bg2,
+    borderRadius: 16,
+    padding: 24,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontFamily: F.title,
+    color: C.gold,
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  modalDesc: {
+    fontSize: 13,
+    fontFamily: F.body,
+    color: C.goldDim,
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  modalBtns: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  modalCancel: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: C.border,
+    alignItems: "center",
+  },
+  modalCancelTxt: {
+    fontSize: 14,
+    fontFamily: F.body,
+    color: C.goldDim,
+  },
+  modalConfirm: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: "rgba(201,162,39,0.15)",
+    borderWidth: 1,
+    borderColor: C.gold,
+    alignItems: "center",
+  },
+  modalConfirmTxt: {
+    fontSize: 14,
+    fontFamily: F.body,
+    color: C.gold,
+    fontWeight: "600",
+  },
 });
 
 /* ── Intro screen styles ── */
@@ -1889,4 +1959,27 @@ const rv = StyleSheet.create({
   cardRight: { alignItems: "flex-end", gap: 2 },
   cardSub:   { fontSize: 12, fontFamily: F.bodySemi, color: C.goldDim },
   cardTs:    { fontSize: 11, fontFamily: F.body, color: "rgba(201,162,39,0.5)" },
+
+  /* ── Skip confirmation modal ── */
+  modalOverlay: {
+    flex: 1, backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center", alignItems: "center", padding: 24,
+  },
+  modalBox: {
+    backgroundColor: C.bg2, borderRadius: 20, padding: 24, width: "100%", maxWidth: 340,
+    borderWidth: 1, borderColor: C.border, gap: 14,
+  },
+  modalTitle: { fontSize: 18, fontFamily: F.header, color: C.gold, textAlign: "center" },
+  modalDesc:  { fontSize: 13, fontFamily: F.body, color: C.parchment, textAlign: "center", lineHeight: 20 },
+  modalBtns:  { flexDirection: "row", gap: 10, marginTop: 6 },
+  modalCancel: {
+    flex: 1, paddingVertical: 12, borderRadius: 12,
+    borderWidth: 1, borderColor: C.border, alignItems: "center",
+  },
+  modalCancelTxt:  { fontSize: 14, fontFamily: F.bodySemi, color: C.goldDim },
+  modalConfirm: {
+    flex: 1, paddingVertical: 12, borderRadius: 12,
+    backgroundColor: "rgba(201,162,39,0.18)", borderWidth: 1, borderColor: C.gold, alignItems: "center",
+  },
+  modalConfirmTxt: { fontSize: 14, fontFamily: F.bodySemi, color: C.gold },
 });

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   View, Text, StyleSheet, Pressable, ScrollView,
-  TextInput, Animated, Platform, ActivityIndicator, KeyboardAvoidingView,
+  TextInput, Animated, Platform, ActivityIndicator, KeyboardAvoidingView, Modal,
 } from "react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system/legacy";
@@ -20,8 +20,17 @@ type Phase = "loading" | "idle" | "recording" | "processing" | "done";
 interface ChatMsg {
   role: "rudy" | "user";
   text: string;
+  translation?: string;
   isVoice?: boolean;
   sttError?: boolean;
+}
+
+interface WordLookupData {
+  word: string;
+  meaning: string;
+  partOfSpeech?: string;
+  example?: string;
+  sentenceTranslation?: string;
 }
 
 interface Props {
@@ -104,9 +113,14 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const [grammarNotes, setGrammarNotes]    = useState<string[]>([]);
   const [usedKeyboard, setUsedKeyboard]    = useState(false);
   const [step3Done, setStep3Done] = useState(false);
+  const [wordPopup, setWordPopup]          = useState<WordLookupData | null>(null);
+  const [wordLoading, setWordLoading]      = useState(false);
+  const [showTranslation, setShowTranslation] = useState<Record<number, boolean>>({});
 
   const nativeRecRef   = useRef<Audio.Recording | null>(null);
   const autoStopRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const doneTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef     = useRef(true);
   const audioChunksRef = useRef<Blob[]>([]);
   const mediaRecRef    = useRef<any>(null);
   const soundRef       = useRef<Audio.Sound | null>(null);
@@ -135,17 +149,25 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       if (rudyText) {
         const opening: ChatMsg = { role: "rudy", text: rudyText };
         setMessages([opening]);
-        await playTTS(rudyText);
+        playTTS(rudyText);
+        // Fetch translation in background
+        fetchTranslation(rudyText).then((tr) => {
+          if (tr && mountedRef.current) {
+            setMessages((prev) => prev.map((m, i) => i === 0 ? { ...m, translation: tr } : m));
+          }
+        });
       }
       setPhase("idle");
     })();
     return () => {
+      mountedRef.current = false;
       stopAllTTSSync();
       if (nativeRecRef.current) {
-        nativeRecRef.current.stopAndUnloadAsync().catch(() => {});
+        nativeRecRef.current.stopAndUnloadAsync().catch((e) => console.warn('[Step3] Recording cleanup failed:', e));
         nativeRecRef.current = null;
       }
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
+      if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
     };
   }, []);
 
@@ -180,18 +202,68 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         grammarNote: string; shouldEnd: boolean;
       };
 
+      if (!mountedRef.current) return json.reply;
       if (json.sentenceCount > 0) setTotalSentences(json.sentenceCount);
       if (json.grammarNote) setGrammarNotes((prev) => [...prev, json.grammarNote]);
       if (json.shouldEnd) {
-        setTimeout(() => triggerDone(), 2500);
+        if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
+        doneTimerRef.current = setTimeout(() => {
+          if (mountedRef.current) triggerDone();
+        }, 2500);
       }
 
       return json.reply;
-    } catch {
+    } catch (e) {
+      console.warn('[API] mission chat request failed:', e);
       return nativeLang === "korean"
         ? "잠깐 연결에 문제가 생겼어. 다시 해볼까?"
         : "There was a connection issue. Let's try again!";
     }
+  }
+
+  // ── Translate Rudy's message ──────────────────────────────────────────────────
+
+  const NATIVE_LANG_LABEL: Record<string, string> = { korean: "Korean", english: "English", spanish: "Spanish" };
+
+  async function fetchTranslation(text: string): Promise<string> {
+    try {
+      const url = new URL("/api/translate", apiBase).toString();
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: sanitizeForTTS(text), targetLanguage: NATIVE_LANG_LABEL[nativeLang] ?? "Korean" }),
+      });
+      if (!res.ok) return "";
+      const json = await res.json();
+      return json.translation ?? "";
+    } catch (e) { console.warn('[API] translation request failed:', e); return ""; }
+  }
+
+  // ── Word lookup ─────────────────────────────────────────────────────────────
+
+  async function lookupWord(word: string, sentence: string) {
+    setWordLoading(true);
+    setWordPopup(null);
+    try {
+      const url = new URL("/api/word-lookup", apiBase).toString();
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          word,
+          targetLanguage: learningLang,
+          nativeLanguage: nativeLang,
+          sentence,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      setWordPopup(json);
+    } catch (e) {
+      console.warn('[API] word lookup failed:', e);
+      setWordPopup({ word, meaning: "...", partOfSpeech: "", example: "" });
+    }
+    setWordLoading(false);
   }
 
   // ── TTS (sanitized + male Rudy voice) ────────────────────────────────────────
@@ -199,8 +271,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   async function playTTS(text: string) {
     try {
       if (soundRef.current) {
-        await soundRef.current.stopAsync().catch(() => {});
-        await soundRef.current.unloadAsync().catch(() => {});
+        await soundRef.current.stopAsync().catch((e) => console.warn('[Step3] TTS stop failed:', e));
+        await soundRef.current.unloadAsync().catch((e) => console.warn('[Step3] TTS unload failed:', e));
         soundRef.current = null;
       }
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
@@ -223,20 +295,20 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         registerGlobalWebAudio(audio);
         audio.onended = () => { URL.revokeObjectURL(objUrl); setTtsPlaying(false); };
         audio.onerror = () => { URL.revokeObjectURL(objUrl); setTtsPlaying(false); };
-        audio.play().catch(() => setTtsPlaying(false));
+        audio.play().catch((e) => { console.warn('[Step3] Audio playback failed:', e); setTtsPlaying(false); });
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
         registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
           if (st.isLoaded && st.didJustFinish) {
-            sound.unloadAsync().catch(() => {});
+            sound.unloadAsync().catch((e) => console.warn('[Step3] Audio unload failed:', e));
             soundRef.current = null;
             setTtsPlaying(false);
           }
         });
       }
-    } catch { setTtsPlaying(false); }
+    } catch (e) { console.warn('[Audio] TTS playback failed:', e); setTtsPlaying(false); }
   }
 
   // ── Pulse anim ───────────────────────────────────────────────────────────────
@@ -270,8 +342,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       try {
         // Stop any TTS that's still playing — audio session must be clean before switching to record mode
         if (soundRef.current) {
-          await soundRef.current.stopAsync().catch(() => {});
-          await soundRef.current.unloadAsync().catch(() => {});
+          await soundRef.current.stopAsync().catch((e) => console.warn('[Step3] TTS stop failed:', e));
+          await soundRef.current.unloadAsync().catch((e) => console.warn('[Step3] TTS unload failed:', e));
           soundRef.current = null;
           setTtsPlaying(false);
         }
@@ -438,7 +510,20 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     const rudyText = await fetchRudyLine(history);
     const rudyMsg: ChatMsg = { role: "rudy", text: rudyText };
     setMessages((prev) => [...prev, rudyMsg]);
-    await playTTS(rudyText);
+    playTTS(rudyText);
+    // Fetch translation in background
+    fetchTranslation(rudyText).then((tr) => {
+      if (tr && mountedRef.current) {
+        setMessages((prev) => {
+          const copy = [...prev];
+          const lastRudyIdx = copy.length - 1 - [...copy].reverse().findIndex((m) => m.role === "rudy");
+          if (lastRudyIdx >= 0 && lastRudyIdx < copy.length) {
+            copy[lastRudyIdx] = { ...copy[lastRudyIdx], translation: tr };
+          }
+          return copy;
+        });
+      }
+    });
     setPhase((cur) => cur === "done" ? "done" : "idle");
   }
 
@@ -468,6 +553,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   }
 
   function triggerDone() {
+    if (!mountedRef.current) return;
     setStep3Done(true);
     setPhase("done");
   }
@@ -521,7 +607,42 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
               </Text>
             )}
             {msg.role === "rudy" ? (
-              <RudyText text={msg.text} style={s.bubbleText} />
+              <View>
+                {/* Tappable words */}
+                <Text style={s.bubbleText}>
+                  {msg.text.split(/(\s+)/g).map((token, ti) => {
+                    const cleaned = token.replace(/[*_]/g, "").replace(/[.,!?;:"""''()]/g, "");
+                    if (!cleaned.trim()) return <Text key={ti}>{token}</Text>;
+                    const isBold = token.startsWith("**") && token.endsWith("**");
+                    return (
+                      <Text
+                        key={ti}
+                        style={isBold ? { color: C.gold, fontFamily: F.bodySemi } : undefined}
+                        onPress={() => lookupWord(cleaned, msg.text)}
+                      >
+                        {isBold ? token.slice(2, -2) : token}
+                      </Text>
+                    );
+                  })}
+                </Text>
+                {/* Translation toggle + text */}
+                <Pressable
+                  style={s.transToggle}
+                  onPress={() => setShowTranslation((prev) => ({ ...prev, [i]: !prev[i] }))}
+                >
+                  <Ionicons name={showTranslation[i] ? "eye-off-outline" : "eye-outline"} size={12} color={C.goldDim} />
+                  <Text style={s.transToggleText}>
+                    {showTranslation[i]
+                      ? (nativeLang === "korean" ? "번역 숨기기" : "Hide")
+                      : (nativeLang === "korean" ? "번역 보기" : "Translate")}
+                  </Text>
+                </Pressable>
+                {showTranslation[i] && msg.translation ? (
+                  <Text style={s.transText}>{msg.translation}</Text>
+                ) : showTranslation[i] && !msg.translation ? (
+                  <ActivityIndicator size="small" color={C.goldDim} style={{ marginTop: 4 }} />
+                ) : null}
+              </View>
             ) : (
               <Text style={[s.bubbleText, s.userBubbleText]}>{msg.text}</Text>
             )}
@@ -659,6 +780,38 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
           {totalSentences} {nativeLang === "korean" ? "문장 말함" : nativeLang === "spanish" ? "oraciones" : "sentences"}
         </Text>
       </View>
+
+      {/* Word lookup popup */}
+      <Modal visible={wordLoading || !!wordPopup} transparent animationType="fade" onRequestClose={() => setWordPopup(null)}>
+        <Pressable style={s.popupOverlay} onPress={() => setWordPopup(null)}>
+          <Pressable style={s.popupBox} onPress={() => {}}>
+            {wordLoading ? (
+              <ActivityIndicator size="large" color={C.gold} />
+            ) : wordPopup ? (
+              <>
+                <Text style={s.popupWord}>{wordPopup.word}</Text>
+                {wordPopup.partOfSpeech ? <Text style={s.popupPos}>{wordPopup.partOfSpeech}</Text> : null}
+                <Text style={s.popupMeaning}>{wordPopup.meaning}</Text>
+                {wordPopup.example ? (
+                  <View style={s.popupExWrap}>
+                    <Text style={s.popupExLabel}>{nativeLang === "korean" ? "예문" : "Example"}</Text>
+                    <Text style={s.popupEx}>{wordPopup.example}</Text>
+                  </View>
+                ) : null}
+                {wordPopup.sentenceTranslation ? (
+                  <View style={s.popupExWrap}>
+                    <Text style={s.popupExLabel}>{nativeLang === "korean" ? "문장 번역" : "Sentence"}</Text>
+                    <Text style={s.popupEx}>{wordPopup.sentenceTranslation}</Text>
+                  </View>
+                ) : null}
+                <Pressable style={({ pressed }) => [s.popupClose, pressed && { opacity: 0.8 }]} onPress={() => setWordPopup(null)}>
+                  <Text style={s.popupCloseTxt}>{nativeLang === "korean" ? "닫기" : "Close"}</Text>
+                </Pressable>
+              </>
+            ) : null}
+          </Pressable>
+        </Pressable>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -743,4 +896,30 @@ const s = StyleSheet.create({
 
   counterRow: { flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" },
   counterText: { fontSize: 12, fontFamily: F.label, color: C.goldDim },
+
+  /* ── Translation toggle ── */
+  transToggle: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 6 },
+  transToggleText: { fontSize: 11, fontFamily: F.label, color: C.goldDim },
+  transText: { fontSize: 13, fontFamily: F.body, color: C.goldDim, marginTop: 4, lineHeight: 19, fontStyle: "italic" },
+
+  /* ── Word popup ── */
+  popupOverlay: {
+    flex: 1, backgroundColor: "rgba(0,0,0,0.55)",
+    justifyContent: "center", alignItems: "center", paddingHorizontal: 32,
+  },
+  popupBox: {
+    backgroundColor: C.bg2, borderRadius: 18, padding: 24, width: "100%",
+    borderWidth: 1.5, borderColor: C.border, gap: 8, alignItems: "center",
+  },
+  popupWord: { fontSize: 22, fontFamily: F.header, color: C.gold, letterSpacing: 0.5 },
+  popupPos: { fontSize: 12, fontFamily: F.label, color: C.goldDim, textTransform: "uppercase" },
+  popupMeaning: { fontSize: 16, fontFamily: F.bodySemi, color: C.parchment, textAlign: "center", lineHeight: 24 },
+  popupExWrap: { width: "100%", backgroundColor: "rgba(201,162,39,0.08)", borderRadius: 10, padding: 12, gap: 4, marginTop: 4 },
+  popupExLabel: { fontSize: 11, fontFamily: F.label, color: C.goldDim },
+  popupEx: { fontSize: 13, fontFamily: F.body, color: C.parchment, lineHeight: 19 },
+  popupClose: {
+    marginTop: 8, paddingVertical: 10, paddingHorizontal: 28, borderRadius: 12,
+    backgroundColor: "rgba(201,162,39,0.15)", borderWidth: 1, borderColor: C.gold,
+  },
+  popupCloseTxt: { fontSize: 14, fontFamily: F.bodySemi, color: C.gold },
 });

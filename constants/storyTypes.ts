@@ -42,6 +42,8 @@ export interface StoryChapter {
   isLocked: boolean;
   unlockLevel: number;
   theme: LocalizedText;
+  emotionalArc?: LocalizedText;
+  npcLangRatio?: number;
   npcs: string[];
   totalXP: number;
   badge: ChapterBadge;
@@ -97,7 +99,67 @@ export type QuizType =
   | "writing"
   | "timed"
   | "mixed"
-  | "pronunciation";
+  | "pronunciation"
+  | "voice_power"
+  | "debate_battle"
+  | "npc_rescue";
+
+// ─── New Quiz Content Types ──────────────────────────────────────────────────
+
+export type StoneEffect = "dim" | "glow" | "bright" | "blinding";
+
+export interface VoicePowerContent {
+  sentence: string;
+  translation: string;
+  stoneEffect: StoneEffect;
+  stoneCount: number;
+  visualEffect: string;
+  minScore?: number;
+}
+
+export interface DebateBattleRound {
+  topic: LocalizedText;
+  npcArgument: LocalizedText;
+  requiredExpressions: string[];
+}
+
+export interface DebateBattleContent {
+  opponent: string;
+  rounds: number;
+  minExpressions: number;
+  roundData: DebateBattleRound[];
+}
+
+export interface NpcRescueStage {
+  instruction: LocalizedText;
+  targetPhrase: string;
+  hint?: LocalizedText;
+  minScore?: number;
+}
+
+export interface NpcRescueContent {
+  npcToRescue: string;
+  stages: NpcRescueStage[];
+  progressiveIntro: boolean;
+}
+
+// ─── TPRS Quiz Fields ────────────────────────────────────────────────────────
+
+export interface QuizOnFail {
+  addToWeakExpressions: string[];
+  reviewInDailyCourse: boolean;
+  reviewDays: number;
+}
+
+export interface TprsQuizMeta {
+  tprsStage?: number;
+  targetExpressions?: string[];
+  previouslyLearned?: string[];
+  speakAfter?: boolean;
+  storyReason?: string;
+  storyConsequence?: string;
+  onFail?: QuizOnFail;
+}
 
 export interface QuizRewards {
   xp: number;
@@ -106,7 +168,7 @@ export interface QuizRewards {
   npcRelation?: { npc: string; points: number } | null;
 }
 
-export interface BaseQuiz {
+export interface BaseQuiz extends TprsQuizMeta {
   id: string;
   chapter: string;
   scene: string;
@@ -165,4 +227,67 @@ export interface ChapterProgress {
 
 export interface StoryProgress {
   chapters: Record<string, ChapterProgress>;
+}
+
+// ─── Gameplay Systems (P0~P4) ───────────────────────────────────────────────
+
+/** P1: Chapter gauge for tension/grading system */
+export interface ChapterGauge {
+  current: number;       // 0-100
+  hintsUsed: number;
+  wrongAnswers: number;
+}
+
+export type GaugeGrade = "platinum" | "gold" | "silver" | "bronze";
+
+export function getGaugeGrade(gauge: number): GaugeGrade {
+  if (gauge >= 80) return "platinum";
+  if (gauge >= 50) return "gold";
+  if (gauge >= 20) return "silver";
+  return "bronze";
+}
+
+export const GAUGE_GRADE_META: Record<GaugeGrade, { icon: string; color: string; label: LocalizedText }> = {
+  platinum: { icon: "💎", color: "#E5E4E2", label: { ko: "플래티넘", en: "Platinum", es: "Platino" } },
+  gold:     { icon: "🥇", color: "#C9A227", label: { ko: "골드", en: "Gold", es: "Oro" } },
+  silver:   { icon: "🥈", color: "#A0A0A0", label: { ko: "실버", en: "Silver", es: "Plata" } },
+  bronze:   { icon: "🥉", color: "#CD7F32", label: { ko: "브론즈", en: "Bronze", es: "Bronce" } },
+};
+
+/** P0: Player choice in dialogue */
+export interface StoryChoiceOption {
+  text: string;
+  npcReaction: string;
+  npcRelation?: { npc: string; points: number };
+  gaugeBonus?: number;
+}
+
+export interface StoryChoiceDialogue {
+  npc: string;
+  isChoice: true;
+  choices: Record<LangCode, StoryChoiceOption[]>;
+}
+
+/** P2: Clue collected during story scenes */
+export interface StoryClue {
+  id: string;
+  icon: string;
+  title: LocalizedText;
+  description: LocalizedText;
+  chapter: string;
+  linkedQuiz?: string;
+}
+
+/** P4: Chapter result summary */
+export interface ChapterResult {
+  chapterId: string;
+  gaugeGrade: GaugeGrade;
+  gaugeFinal: number;
+  correctRate: number;
+  cluesFound: number;
+  cluesTotal: number;
+  npcRelationChanges: Record<string, number>;
+  newExpressions: string[];
+  badgeEarned?: string;
+  xpEarned: number;
 }

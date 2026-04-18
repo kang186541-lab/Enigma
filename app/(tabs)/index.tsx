@@ -13,13 +13,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLanguage, getLevel, getLevelProgress, NativeLanguage } from "@/context/LanguageContext";
+import { useLanguage, getLevel, getLevelProgress, getLevelName, NativeLanguage } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
 import { LanguageChangeModal } from "@/components/LanguageChangeModal";
 import { RudyGuideModal, getNextGuideIndex } from "@/components/RudyGuideModal";
+import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
 import {
   loadProgress,
@@ -28,6 +29,8 @@ import {
   langToCode,
   type DailyCourseProgress,
 } from "@/lib/dailyCourseData";
+import { getDueCount } from "@/lib/srsManager";
+import { getTodayNote } from "@/data/culturalNotes";
 
 const { width } = Dimensions.get("window");
 const rudyBadgeImg = require("@/assets/rudy_badge.png");
@@ -168,6 +171,7 @@ export default function HomeScreen() {
   const [dailyProgress, setDailyProgress] = React.useState<DailyCourseProgress | null>(null);
   const [showLangModal, setShowLangModal] = React.useState(false);
   const [showGuide, setShowGuide] = React.useState(false);
+  const [srsDueCount, setSrsDueCount] = React.useState(0);
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
@@ -184,9 +188,10 @@ export default function HomeScreen() {
     AsyncStorage.getItem(key).then(v => setCourseCompleted(v === "true"));
   }, [learningLanguage]);
 
-  useEffect(() => {
+  useFocusEffect(React.useCallback(() => {
     loadProgress().then(setDailyProgress);
-  }, []);
+    getDueCount().then(setSrsDueCount);
+  }, []));
 
   useEffect(() => {
     getNextGuideIndex().then((idx) => {
@@ -246,15 +251,21 @@ export default function HomeScreen() {
   const storyLabel = nativeLang === "korean" ? "스토리 모드" : nativeLang === "spanish" ? "Modo Historia" : "Story Mode";
   const storyDesc  = nativeLang === "korean" ? "이야기로 자연스럽게 배우기" : nativeLang === "spanish" ? "Aprende con historias inmersivas" : "Learn through immersive stories";
 
+  const writingLabel = nativeLang === "korean" ? "쓰기 연습" : nativeLang === "spanish" ? "Escritura" : "Writing";
+  const writingDesc  = nativeLang === "korean" ? "번역, 작문, 문장 완성" : nativeLang === "spanish" ? "Traduce, escribe, completa" : "Translate, compose, complete";
+  const grammarLabel = nativeLang === "korean" ? "문법 팁" : nativeLang === "spanish" ? "Gramática" : "Grammar";
+  const grammarDesc  = nativeLang === "korean" ? "핵심 문법 규칙 카드" : nativeLang === "spanish" ? "Tarjetas de reglas gramaticales" : "Key grammar rule cards";
+
   const quickItems = [
     { icon: "albums",      color: C.gold,    label: t("flashcards"),    desc: t("flashcards_desc"),    route: "/(tabs)/cards"  },
     { icon: "chatbubbles", color: "#7eb8c9", label: t("conversation"),  desc: t("conversation_desc"),  route: "/(tabs)/chat"   },
     { icon: "mic",         color: "#9b8bb4", label: t("pronunciation"), desc: t("pronunciation_desc"), route: "/(tabs)/speak"  },
     { icon: "book",        color: "#c97b27", label: storyLabel,         desc: storyDesc,               route: "/story"         },
+    { icon: "pencil",      color: "#e8a87c", label: writingLabel,       desc: writingDesc,             route: "/writing-practice" },
   ];
 
   const statItems = [
-    { label: nativeLang === "korean" ? "연속학습일" : nativeLang === "spanish" ? "Racha" : "Streak",   value: `${stats.streak}🔥`,    },
+    { label: nativeLang === "korean" ? "연속학습일" : nativeLang === "spanish" ? "Racha" : "Streak",   value: `${stats.streak}🔥` },
     { label: nativeLang === "korean" ? "단어"       : nativeLang === "spanish" ? "Palabras" : "Words", value: `${stats.wordsLearned}` },
     { label: nativeLang === "korean" ? "정확도"     : nativeLang === "spanish" ? "Exactitud" : "Acc.", value: `${stats.accuracy}%`    },
     { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
@@ -279,20 +290,28 @@ export default function HomeScreen() {
         <View style={styles.headerTop}>
           <View style={{ flex: 1 }}>
             <Text style={styles.greeting} numberOfLines={1}>{lingoGreeting}</Text>
-            <Text style={styles.headerTitle} numberOfLines={1}>Enigma ✨</Text>
+            <EmojiText style={styles.headerTitle} numberOfLines={1}>Enigma ✨</EmojiText>
           </View>
-          <RudyImageWithPlaceholder
-            source={rudyBadgeImg}
-            style={styles.lingoHeader}
-            resizeMode="cover"
-          />
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <Pressable
+              onPress={() => router.push("/settings")}
+              style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+            >
+              <Ionicons name="settings-outline" size={22} color={C.goldDim} />
+            </Pressable>
+            <RudyImageWithPlaceholder
+              source={rudyBadgeImg}
+              style={styles.lingoHeader}
+              resizeMode="cover"
+            />
+          </View>
         </View>
 
         {/* Level badge + Language change row */}
         <View style={styles.levelRow}>
           <View style={styles.levelBadge}>
             <Text style={styles.levelEmoji}>{level.emoji}</Text>
-            <Text style={styles.levelName}>{level.name}</Text>
+            <Text style={styles.levelName}>{getLevelName(level, nativeLang)}</Text>
             <View style={styles.levelDot} />
             <Text style={styles.levelNum}>{t("level")} {level.num}</Text>
           </View>
@@ -321,7 +340,7 @@ export default function HomeScreen() {
           <Text style={styles.xpLabel}>
             {level.num < 5
               ? `${xpInLvl} / ${xpForLvl} XP`
-              : `${stats.xp} XP · ${level.name} ${level.emoji}`}
+              : `${stats.xp} XP · ${getLevelName(level, nativeLang)} ${level.emoji}`}
           </Text>
         </View>
 
@@ -333,7 +352,7 @@ export default function HomeScreen() {
       <View style={styles.statsRow}>
         {statItems.map((s, i) => (
           <View key={i} style={styles.statCard}>
-            <Text style={styles.statValue}>{s.value}</Text>
+            <EmojiText style={styles.statValue}>{s.value}</EmojiText>
             <Text style={styles.statLabel}>{s.label}</Text>
           </View>
         ))}
@@ -386,7 +405,7 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.streakMotivation}>
-            <Text style={styles.streakMotivationText}>{streakText}</Text>
+            <EmojiText style={styles.streakMotivationText}>{streakText}</EmojiText>
           </View>
         </View>
       </View>
@@ -413,6 +432,38 @@ export default function HomeScreen() {
               </Text>
             </Pressable>
           </Animated.View>
+        </View>
+      )}
+
+      {/* ── SRS REVIEW BANNER ─────────────────────────── */}
+      {srsDueCount > 0 && (
+        <View style={styles.pad}>
+          <Pressable
+            style={({ pressed }) => [styles.srsBanner, pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] }]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              router.push("/(tabs)/cards" as any);
+            }}
+          >
+            <Text style={styles.srsBannerEmoji}>🦊</Text>
+            <View style={styles.srsBannerText}>
+              <Text style={styles.srsBannerTitle}>
+                {nativeLang === "korean"
+                  ? "루디가 복습 카드를 준비했어요!"
+                  : nativeLang === "spanish"
+                  ? "¡Rudy preparó tarjetas de repaso!"
+                  : "Rudy prepared review cards for you!"}
+              </Text>
+              <Text style={styles.srsBannerSub}>
+                {nativeLang === "korean"
+                  ? `${srsDueCount}장의 카드가 복습을 기다리고 있어요`
+                  : nativeLang === "spanish"
+                  ? `${srsDueCount} tarjetas esperan tu repaso`
+                  : `${srsDueCount} cards are waiting for review`}
+              </Text>
+            </View>
+            <Ionicons name="arrow-forward-circle" size={24} color={C.gold} />
+          </Pressable>
         </View>
       )}
 
@@ -443,12 +494,12 @@ export default function HomeScreen() {
             <View style={styles.npcMissionTop}>
               <View style={styles.npcMissionEmojis}>
                 <Text style={styles.npcEmoji}>☕</Text>
-                <Text style={styles.npcEmoji}>✈️</Text>
                 <Text style={styles.npcEmoji}>🏨</Text>
-                <Text style={styles.npcEmoji}>🚕</Text>
+                <Text style={styles.npcEmoji}>🏥</Text>
+                <Text style={styles.npcEmoji}>💼</Text>
               </View>
               <View style={styles.xpPill}>
-                <Text style={styles.xpPillText}>10 NPCs</Text>
+                <Text style={styles.xpPillText}>23 NPCs</Text>
               </View>
             </View>
             <Text style={styles.npcMissionTitle}>{npcMissionDesc}</Text>
@@ -462,6 +513,43 @@ export default function HomeScreen() {
           <Text style={styles.npcMissionBg}>🕵️</Text>
         </Pressable>
       </View>
+
+      {/* ── FEATURE SHORTCUTS (Stats, Achievements, Leaderboard) ── */}
+      <GoldDivider label={nativeLang === "korean" ? "나의 성장" : nativeLang === "spanish" ? "MI PROGRESO" : "MY PROGRESS"} />
+      <View style={styles.pad}>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <Pressable
+            style={({ pressed }) => [styles.featureCard, pressed && { opacity: 0.85 }]}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/stats-dashboard" as any); }}
+          >
+            <Text style={{ fontSize: 24 }}>📊</Text>
+            <Text style={styles.featureLabel}>
+              {nativeLang === "korean" ? "학습 통계" : nativeLang === "spanish" ? "Estadísticas" : "Stats"}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.featureCard, pressed && { opacity: 0.85 }]}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/achievements" as any); }}
+          >
+            <Text style={{ fontSize: 24 }}>🏆</Text>
+            <Text style={styles.featureLabel}>
+              {nativeLang === "korean" ? "업적" : nativeLang === "spanish" ? "Logros" : "Achievements"}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.featureCard, pressed && { opacity: 0.85 }]}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/leaderboard" as any); }}
+          >
+            <Text style={{ fontSize: 24 }}>🥇</Text>
+            <Text style={styles.featureLabel}>
+              {nativeLang === "korean" ? "리더보드" : nativeLang === "spanish" ? "Ranking" : "Leaderboard"}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* ── TODAY'S CULTURAL NOTE ── */}
+      <CulturalNoteSection nativeLang={nativeLang} learningLang={learningLanguage ?? "english"} />
 
       {/* ── QUICK PRACTICE ────────────────────────────── */}
       <GoldDivider label={nativeLang === "korean" ? "빠른 학습" : nativeLang === "spanish" ? "PRÁCTICA RÁPIDA" : "QUICK PRACTICE"} />
@@ -494,12 +582,37 @@ export default function HomeScreen() {
 
     <LevelUpModal
       visible={!!pendingLevelUp}
-      level={pendingLevelUp ?? { num: 2, emoji: "📚", name: "초보자", minXP: 101, maxXP: 300 }}
+      level={pendingLevelUp ?? { num: 2, emoji: "📚", name: "초보자", nameEn: "Novice", nameEs: "Novato", minXP: 101, maxXP: 300 }}
       lang={nativeLang}
       onClose={clearLevelUp}
     />
     <LanguageChangeModal visible={showLangModal} onClose={() => setShowLangModal(false)} />
     <RudyGuideModal visible={showGuide} lang={nativeLang} onClose={() => setShowGuide(false)} />
+    </>
+  );
+}
+
+// ── CulturalNoteSection ──────────────────────────────────────────────────────
+function CulturalNoteSection({ nativeLang, learningLang }: { nativeLang: string; learningLang: string }) {
+  const learningCode = learningLang === "korean" ? "ko" : learningLang === "spanish" ? "es" : "en";
+  const note = getTodayNote(learningCode);
+  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
+  const sectionLabel = nativeLang === "korean" ? "오늘의 문화 노트" : nativeLang === "spanish" ? "NOTA CULTURAL" : "CULTURAL NOTE";
+
+  return (
+    <>
+      <GoldDivider label={sectionLabel} />
+      <View style={styles.pad}>
+        <View style={styles.cultureCard}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            <Text style={{ fontSize: 22 }}>{note.icon}</Text>
+            <Text style={styles.cultureTitle}>{note.title[lc] || note.title.en}</Text>
+          </View>
+          <Text style={styles.cultureContent} numberOfLines={4}>
+            {note.content[lc] || note.content.en}
+          </Text>
+        </View>
+      </View>
     </>
   );
 }
@@ -543,10 +656,11 @@ function RudyTrainingCard({
     );
   }
 
-  const todayDone = dailyProgress.todayCompleted;
-  const currentUnit = UNITS[dailyProgress.currentUnitIndex] ?? UNITS[0];
-  const currentDay = currentUnit.days[dailyProgress.currentDayIndex] ?? currentUnit.days[0];
-  const stepsCompleted = Object.values(dailyProgress.todayStepsCompleted).filter(Boolean).length;
+  const todayDone = dailyProgress.todayCompleted ?? false;
+  const currentUnit = UNITS[dailyProgress.currentUnitIndex ?? 0] ?? UNITS[0];
+  const currentDay = currentUnit.days[dailyProgress.currentDayIndex ?? 0] ?? currentUnit.days[0];
+  const steps = dailyProgress.todayStepsCompleted ?? { listenRepeat: false, keyPoint: false, missionTalk: false, review: false };
+  const stepsCompleted = Object.values(steps).filter(Boolean).length;
   const totalSteps = 4;
 
   const levelLabel = nativeLang === "korean" ? `${currentUnit.level} · ${getTri(currentUnit.title, lc)}`
@@ -572,12 +686,12 @@ function RudyTrainingCard({
             <Text style={styles.dailyPillLabel}>{trainingLabel}</Text>
           </View>
           <View style={styles.xpPill}>
-            <Text style={styles.xpPillText}>{todayDone ? "✅ +100 XP" : "+100 XP"}</Text>
+            <EmojiText style={styles.xpPillText}>{todayDone ? "✅ +100 XP" : "+100 XP"}</EmojiText>
           </View>
         </View>
 
         {todayDone ? (
-          <Text style={[styles.dailyTitle, { color: "#5a9", fontSize: 14 }]}>{doneMsg}</Text>
+          <EmojiText style={[styles.dailyTitle, { color: "#5a9", fontSize: 14 }]}>{doneMsg}</EmojiText>
         ) : (
           <>
             <Text style={styles.dailyTitle}>{dayLabel}</Text>
@@ -586,7 +700,7 @@ function RudyTrainingCard({
               {blocks.map((filled, i) => (
                 <View key={i} style={[styles.rudyStepBlock, filled && styles.rudyStepBlockFilled]} />
               ))}
-              <Text style={styles.rudyStepLabel}>STEP {stepsCompleted}/{totalSteps}</Text>
+              <Text style={styles.rudyStepLabel}>{nativeLang === "korean" ? "단계" : nativeLang === "spanish" ? "PASO" : "STEP"} {stepsCompleted}/{totalSteps}</Text>
             </View>
           </>
         )}
@@ -675,6 +789,19 @@ const styles = StyleSheet.create({
 
   /* ─ SHARED ─ */
   pad: { paddingHorizontal: 16, marginTop: 4 },
+
+  /* ─ SRS BANNER ─ */
+  srsBanner: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "rgba(201,162,39,0.1)",
+    borderWidth: 1.5, borderColor: "rgba(201,162,39,0.3)",
+    borderRadius: 16, padding: 14,
+    shadowColor: C.gold, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 8, elevation: 3,
+  },
+  srsBannerEmoji: { fontSize: 28 },
+  srsBannerText: { flex: 1 },
+  srsBannerTitle: { fontSize: 14, fontFamily: F.header, color: C.gold, lineHeight: 20 },
+  srsBannerSub: { fontSize: 12, fontFamily: F.body, color: C.goldDim, marginTop: 2 },
 
   /* ─ STREAK CARD ─ */
   streakCard: {
@@ -830,5 +957,40 @@ const styles = StyleSheet.create({
     fontFamily: F.bodySemi,
     color: C.gold,
     letterSpacing: 0.2,
+  },
+  featureCard: {
+    flex: 1,
+    backgroundColor: C.bg3,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.border,
+    padding: 14,
+    alignItems: "center",
+    gap: 6,
+  },
+  featureLabel: {
+    fontFamily: F.bodySemi,
+    fontSize: 11,
+    color: C.goldDim,
+    textAlign: "center",
+  },
+  cultureCard: {
+    backgroundColor: C.bg3,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.border,
+    padding: 16,
+  },
+  cultureTitle: {
+    flex: 1,
+    fontFamily: F.bodySemi,
+    fontSize: 15,
+    color: C.parchment,
+  },
+  cultureContent: {
+    fontFamily: F.body,
+    fontSize: 13,
+    color: C.parchmentDark,
+    lineHeight: 19,
   },
 });

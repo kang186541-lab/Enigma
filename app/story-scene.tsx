@@ -27,6 +27,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
 import { C, F } from "@/constants/theme";
 import { getApiUrl, apiRequest } from "@/lib/query-client";
+import { addToExpressionBook, trackQuizIO, markExpressionsMastered } from "@/lib/storyUtils";
 import { checkAnswer, AnswerResult } from "@/lib/answerUtils";
 import { Svg, Path } from "react-native-svg";
 
@@ -51,7 +52,7 @@ async function ttsPreload(text: string, lang: string, apiBase: string) {
       audio.volume = 1.0;
       audio.load();
       _ttsCacheWeb.set(key, audio);
-    } catch {}
+    } catch (e) { console.warn('[Audio] TTS web cache prefetch failed:', e); }
   } else {
     if (_ttsCacheNative.has(key)) return;
     try {
@@ -61,7 +62,7 @@ async function ttsPreload(text: string, lang: string, apiBase: string) {
         { shouldPlay: false, volume: 1.0 }
       );
       _ttsCacheNative.set(key, sound);
-    } catch {}
+    } catch (e) { console.warn('[Audio] TTS native cache prefetch failed:', e); }
   }
 }
 
@@ -83,14 +84,14 @@ function ttsPlayCached(
       cached.currentTime = 0;
       cached.volume = 1.0;
       setPlaying(true);
-      cached.play().catch(() => {});
+      cached.play().catch((e: unknown) => console.warn('[Audio] cached web TTS play failed:', e));
       cached.onended = () => setPlaying(false);
       cached.onerror = () => setPlaying(false);
     } else {
       const audio = new (window as any).Audio(urlStr);
       audio.volume = 1.0;
       setPlaying(true);
-      audio.play().catch(() => {});
+      audio.play().catch((e: unknown) => console.warn('[Audio] web TTS play failed:', e));
       audio.onended = () => setPlaying(false);
       audio.onerror = () => setPlaying(false);
       _ttsCacheWeb.set(key, audio);
@@ -108,7 +109,7 @@ function ttsPlayCached(
           cached.setOnPlaybackStatusUpdate((s) => {
             if (s.isLoaded && s.didJustFinish) setPlaying(false);
           });
-        } catch { setPlaying(false); }
+        } catch (e) { console.warn('[Audio] cached TTS playback failed:', e); setPlaying(false); }
       })();
     } else {
       setPlaying(true);
@@ -125,7 +126,7 @@ function ttsPlayCached(
           sound.setOnPlaybackStatusUpdate((s) => {
             if (s.isLoaded && s.didJustFinish) setPlaying(false);
           });
-        } catch { setPlaying(false); }
+        } catch (e) { console.warn('[Audio] TTS playback failed:', e); setPlaying(false); }
       })();
     }
   }
@@ -203,6 +204,40 @@ interface WordPuzzleQ {
   scrambled: Tri;
 }
 
+interface VoicePowerQ {
+  sentence: Tri;
+  translation?: Tri;
+  stoneEffect?: "dim" | "glow" | "bright" | "blinding";
+  stoneCount?: number;
+  minScore?: number;
+}
+
+interface DebateBattleRoundQ {
+  topic: Tri;
+  npcArgument: Tri;
+  requiredExpressions: string[];
+}
+
+interface DebateBattleQ {
+  opponent: string;
+  rounds: number;
+  minExpressions: number;
+  roundData: DebateBattleRoundQ[];
+}
+
+interface NpcRescueStageQ {
+  instruction: Tri;
+  targetPhrase: Tri;
+  hint?: Tri;
+  minScore?: number;
+}
+
+interface NpcRescueQ {
+  npcToRescue: string;
+  stages: NpcRescueStageQ[];
+  progressiveIntro: boolean;
+}
+
 type PuzzleType =
   | { pType: "word-match"; questions: WordMatchQ[] }
   | { pType: "fill-blank"; questions: FillBlankQ[] }
@@ -213,7 +248,10 @@ type PuzzleType =
   | { pType: "pronunciation"; questions: PronunciationQ[] }
   | { pType: "writing-mission"; questions: WritingMissionQ[] }
   | { pType: "cipher"; questions: CipherQ[] }
-  | { pType: "word-puzzle"; questions: WordPuzzleQ[] };
+  | { pType: "word-puzzle"; questions: WordPuzzleQ[] }
+  | { pType: "voice-power"; questions: VoicePowerQ[] }
+  | { pType: "debate-battle"; questions: [DebateBattleQ] }
+  | { pType: "npc-rescue"; questions: [NpcRescueQ] };
 
 /* Puzzle hints
  * Each tier is a Tri (ui-language display) with an optional `byLearning` map
@@ -4106,7 +4144,8 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
         setFeedback("retry");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
-    } catch {
+    } catch (e) {
+      console.warn('[Audio] puzzle pronunciation recognition failed:', e);
       setFeedback("retry");
     } finally {
       setRecognizing(false);
@@ -4583,21 +4622,21 @@ export default function StoryScene() {
 
     const sub = AppState.addEventListener("change", (state) => {
       if (!bgmRef.current) return;
-      if (state === "active") { bgmRef.current.playAsync().catch(() => {}); }
-      else { bgmRef.current.pauseAsync().catch(() => {}); }
+      if (state === "active") { bgmRef.current.playAsync().catch((e: unknown) => console.warn('[Audio] BGM resume failed:', e)); }
+      else { bgmRef.current.pauseAsync().catch((e: unknown) => console.warn('[Audio] BGM pause failed:', e)); }
     });
 
     return () => {
       mounted = false;
       sub.remove();
       // Stop all cached TTS sounds on unmount
-      _ttsCacheNative.forEach((sound) => { sound.stopAsync().catch(() => {}); sound.unloadAsync().catch(() => {}); });
+      _ttsCacheNative.forEach((sound) => { sound.stopAsync().catch((e: unknown) => console.warn('[Audio] TTS stop cleanup failed:', e)); sound.unloadAsync().catch((e: unknown) => console.warn('[Audio] TTS unload cleanup failed:', e)); });
       _ttsCacheNative.clear();
-      _ttsCacheWeb.forEach((audio) => { try { audio.pause(); audio.src = ""; } catch {} });
+      _ttsCacheWeb.forEach((audio) => { try { audio.pause(); audio.src = ""; } catch (e) { console.warn('[Audio] web audio cleanup failed:', e); } });
       _ttsCacheWeb.clear();
       if (bgmRef.current) {
-        bgmRef.current.stopAsync().catch(() => {});
-        bgmRef.current.unloadAsync().catch(() => {});
+        bgmRef.current.stopAsync().catch((e: unknown) => console.warn('[Audio] BGM stop cleanup failed:', e));
+        bgmRef.current.unloadAsync().catch((e: unknown) => console.warn('[Audio] BGM unload cleanup failed:', e));
         bgmRef.current = null;
       }
     };
@@ -4613,8 +4652,8 @@ export default function StoryScene() {
     const currentItem = seq[seqIdx];
     const isSpeakingQuiz =
       currentItem?.kind === "puzzle" &&
-      (currentItem.pType === "pronunciation");
-    bgmRef.current?.setVolumeAsync(isSpeakingQuiz ? BGM_DIM : BGM_FULL).catch(() => {});
+      (currentItem.pType === "pronunciation" || currentItem.pType === "voice-power" || currentItem.pType === "npc-rescue");
+    bgmRef.current?.setVolumeAsync(isSpeakingQuiz ? BGM_DIM : BGM_FULL).catch((e: unknown) => console.warn('[Audio] BGM volume change failed:', e));
   }, [seqIdx]);
   const sceneCount = seq.slice(0, seqIdx).filter((s) => s.kind === "scene").length;
 
@@ -4628,6 +4667,27 @@ export default function StoryScene() {
   function advance() {
     setSharedHintVisible(false);
     setSharedHintLevel(0);
+
+    // Track idioms from dialogue scenes into Expression Book
+    const currentItem = seq[seqIdx];
+    if (currentItem?.kind === "scene" && currentItem.idiomRef) {
+      const idiomEntry = IDIOM_COLLECTION[currentItem.idiomRef];
+      if (idiomEntry) {
+        const tl = learningLang === "korean" ? "ko" : learningLang === "spanish" ? "es" : "en";
+        const idiomData = idiomEntry.idiom[tl] ?? idiomEntry.idiom["en"];
+        if (idiomData?.expression) {
+          const chapter = story.id === "london" ? "ch1" : story.id === "madrid" ? "ch2" : story.id === "seoul" ? "ch3" : story.id === "cairo" ? "ch4" : "ch5";
+          const meaning = Object.values(idiomData.meaning ?? {})[0] ?? "";
+          addToExpressionBook(
+            [idiomData.expression],
+            chapter,
+            undefined,
+            idiomEntry.npc,
+          ).catch((e: unknown) => console.warn('[Story] addToExpressionBook failed:', e));
+        }
+      }
+    }
+
     fadeTransition(() => {
       if (seqIdx < seq.length - 1) {
         setSeqIdx((i) => i + 1);
@@ -4652,7 +4712,20 @@ export default function StoryScene() {
   }
 
   async function handlePuzzleSolved() {
-    try { await updateStats({ xp: 20 }); } catch {}
+    try { await updateStats({ xp: 20 }); } catch (e) { console.warn('[Story] handlePuzzleSolved XP update failed:', e); }
+
+    // Track expressions and I/O ratio for inline puzzles
+    const currentItem = seq[seqIdx];
+    if (currentItem?.kind === "puzzle") {
+      const puzzleItem = currentItem as SeqPuzzle;
+      const chapter = story.id === "london" ? "ch1" : story.id === "madrid" ? "ch2" : story.id === "seoul" ? "ch3" : story.id === "cairo" ? "ch4" : "ch5";
+      if (puzzleItem.targetExpressions?.length) {
+        addToExpressionBook(puzzleItem.targetExpressions, chapter, puzzleItem.tprsStage).catch((e: unknown) => console.warn('[Story] addToExpressionBook failed:', e));
+        if (puzzleItem.tprsStage === 4) markExpressionsMastered(puzzleItem.targetExpressions).catch((e: unknown) => console.warn('[Story] markExpressionsMastered failed:', e));
+      }
+      trackQuizIO(chapter, puzzleItem.pType).catch((e: unknown) => console.warn('[Story] trackQuizIO failed:', e));
+    }
+
     advance();
   }
 
@@ -4701,13 +4774,13 @@ export default function StoryScene() {
       <View style={styles.header}>
         <Pressable style={styles.backBtn} onPress={() => {
           // Stop all cached TTS sounds before navigating away
-          _ttsCacheNative.forEach((sound) => { sound.stopAsync().catch(() => {}); sound.unloadAsync().catch(() => {}); });
+          _ttsCacheNative.forEach((sound) => { sound.stopAsync().catch((e: unknown) => console.warn('[Audio] TTS stop cleanup failed:', e)); sound.unloadAsync().catch((e: unknown) => console.warn('[Audio] TTS unload cleanup failed:', e)); });
           _ttsCacheNative.clear();
-          _ttsCacheWeb.forEach((audio) => { try { audio.pause(); audio.src = ""; } catch {} });
+          _ttsCacheWeb.forEach((audio) => { try { audio.pause(); audio.src = ""; } catch (e) { console.warn('[Audio] web audio cleanup failed:', e); } });
           _ttsCacheWeb.clear();
           if (bgmRef.current) {
-            bgmRef.current.stopAsync().catch(() => {});
-            bgmRef.current.unloadAsync().catch(() => {});
+            bgmRef.current.stopAsync().catch((e: unknown) => console.warn('[Audio] BGM stop cleanup failed:', e));
+            bgmRef.current.unloadAsync().catch((e: unknown) => console.warn('[Audio] BGM unload cleanup failed:', e));
             bgmRef.current = null;
           }
           router.back();
@@ -4838,7 +4911,7 @@ export default function StoryScene() {
                 {item.pType === "word-puzzle" && (
                   <WordPuzzlePuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
-                {!["word-match","fill-blank","dialogue-choice","sentence-builder","investigation","cipher","listen-choose","pronunciation","writing-mission","word-puzzle"].includes(item.pType) && (
+                {!["word-match","fill-blank","dialogue-choice","sentence-builder","investigation","cipher","listen-choose","pronunciation","writing-mission","word-puzzle","voice-power","debate-battle","npc-rescue"].includes(item.pType) && (
                   <FallbackPuzzle lang={lang} onSolved={handlePuzzleSolved} />
                 )}
                 {hasSharedHints && (

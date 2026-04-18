@@ -1,7 +1,7 @@
 {
   "meta": {
     "version": "2.0",
-    "description": "Chapter 3 Seoul quiz redesign — uses only Day 1-12 vocabulary",
+    "description": "Chapter 3 Seoul quiz redesign... uses only Day 1-12 vocabulary",
     "replaces": ["ch3_quiz_a", "ch3_quiz_b", "ch3_quiz_c", "ch3_quiz_d", "ch3_quiz_e"],
     "vocabularyScope": "Day 1-12 (Unit 1: First Encounters + Unit 2: Everyday Expressions)",
     "note": "ch3_quiz_d_fix.json is superseded by this redesign"
@@ -13,9 +13,9 @@
       "scene": "ch3_scene1",
       "type": "dialogue_choice",
       "title": {
-        "ko": "서울 도착 — 수진과의 첫 만남",
-        "en": "Arriving in Seoul — Meeting Sujin",
-        "es": "Llegando a Seúl — Conociendo a Sujin"
+        "ko": "서울 도착... 수진과의 첫 만남",
+        "en": "Arriving in Seoul... Meeting Sujin",
+        "es": "Llegando a Seúl... Conociendo a Sujin"
       },
       "difficulty": 1,
       "timeLimit": null,
@@ -137,7 +137,7 @@
       },
       "content": {
         "en": {
-          "passage": "Grandma Youngsook's market stall is warm and colorful. She asks: 'How are you today?' You reply: 'I'm ___(1)___, thank you.' The food looks delicious. 'How ___(2)___ is the kimbap?' you ask. She smiles: 'It's ___(3)___ won.' You look at the clock — it's ___(4)___ o'clock. She whispers: 'Come back at ___(5)___ in the evening. I'll tell you about the suspicious people.'",
+          "passage": "Grandma Youngsook's market stall is warm and colorful. She asks: 'How are you today?' You reply: 'I'm ___(1)___, thank you.' The food looks delicious. 'How ___(2)___ is the kimbap?' you ask. She smiles: 'It's ___(3)___ won.' You look at the clock... it's ___(4)___ o'clock. She whispers: 'Come back at ___(5)___ in the evening. I'll tell you about the suspicious people.'",
           "blanks": [
             {
               "id": 1,
@@ -172,7 +172,7 @@
           ]
         },
         "es": {
-          "passage": "El puesto de la Abuela Youngsook es cálido y colorido. Ella pregunta: '¿Cómo estás hoy?' Respondes: 'Estoy ___(1)___, gracias.' La comida se ve deliciosa. '¿___(2)___ cuesta el kimbap?' preguntas. Ella sonríe: 'Son ___(3)___ won.' Miras el reloj — son las ___(4)___. Ella susurra: 'Vuelve a las ___(5)___ de la noche. Te contaré sobre las personas sospechosas.'",
+          "passage": "El puesto de la Abuela Youngsook es cálido y colorido. Ella pregunta: '¿Cómo estás hoy?' Respondes: 'Estoy ___(1)___, gracias.' La comida se ve deliciosa. '¿___(2)___ cuesta el kimbap?' preguntas. Ella sonríe: 'Son ___(3)___ won.' Miras el reloj... son las ___(4)___. Ella susurra: 'Vuelve a las ___(5)___ de la noche. Te contaré sobre las personas sospechosas.'",
           "blanks": [
             {
               "id": 1,
@@ -207,7 +207,7 @@
           ]
         },
         "ko": {
-          "passage": "영숙 할머니의 시장 가게는 따뜻하고 다채로워요. 할머니가 물어요: '오늘 어떻게 지내요?' 대답해요: '___(1)___, 감사합니다.' 음식이 맛있어 보여요. '김밥 ___(2)___?' 물어봐요. 할머니가 웃어요: '___(3)___ 원이에요.' 시계를 봐요 — ___(4)___시예요. 할머니가 속삭여요: '저녁 ___(5)___시에 다시 와. 수상한 사람들 얘기해줄게.'",
+          "passage": "영숙 할머니의 시장 가게는 따뜻하고 다채로워요. 할머니가 물어요: '오늘 어떻게 지내요?' 대답해요: '___(1)___, 감사합니다.' 음식이 맛있어 보여요. '김밥 ___(2)___?' 물어봐요. 할머니가 웃어요: '___(3)___ 원이에요.' 시계를 봐요... ___(4)___시예요. 할머니가 속삭여요: '저녁 ___(5)___시에 다시 와. 수상한 사람들 얘기해줄게.'",
           "blanks": [
             {
               "id": 1,
@@ -397,7 +397,7 @@
       },
       "content": {
         "en": {
-          "ttsScript": "Listen carefully, friend. The Lexicon people meet every Wednesday at nine o'clock. The meeting place? It's near Namsan Tower. The weather is cold there, so bring a jacket. And remember — if you need help, just say 'help' loudly.",
+          "ttsScript": "Listen carefully, friend. The Lexicon people meet every Wednesday at nine o'clock. The meeting place? It's near Namsan Tower. The weather is cold there, so bring a jacket. And remember... if you need help, just say 'help' loudly.",
           "ttsVoice": "en-GB-RyanNeural",
           "ttsSpeed": "0.9",
           "questions": [
@@ -439,7 +439,7 @@
           ]
         },
         "es": {
-          "ttsScript": "Escucha bien, amigo. La gente de Lexicón se reúne cada miércoles a las nueve. ¿El lugar? Está cerca de la Torre Namsan. Hace frío allí, así que trae una chaqueta. Y recuerda — si necesitas ayuda, solo di 'ayuda' fuerte.",
+          "ttsScript": "Escucha bien, amigo. La gente de Lexicón se reúne cada miércoles a las nueve. ¿El lugar? Está cerca de la Torre Namsan. Hace frío allí, así que trae una chaqueta. Y recuerda... si necesitas ayuda, solo di 'ayuda' fuerte.",
           "ttsVoice": "es-ES-AlvaroNeural",
           "ttsSpeed": "0.9",
           "questions": [
@@ -481,7 +481,7 @@
           ]
         },
         "ko": {
-          "ttsScript": "잘 들어, 형. 렉시콘 사람들은 매주 수요일 아홉 시에 만나. 장소? 남산타워 근처야. 거기 추우니까 재킷 가져가. 그리고 기억해 — 도움이 필요하면 '도와주세요'라고 크게 말해.",
+          "ttsScript": "잘 들어, 형. 렉시콘 사람들은 매주 수요일 아홉 시에 만나. 장소? 남산타워 근처야. 거기 추우니까 재킷 가져가. 그리고 기억해... 도움이 필요하면 '도와주세요'라고 크게 말해.",
           "ttsVoice": "ko-KR-InJoonNeural",
           "ttsSpeed": "0.9",
           "questions": [
@@ -535,9 +535,9 @@
       "scene": "ch3_scene3_boss",
       "type": "timed",
       "title": {
-        "ko": "남산타워 결전 — 수호석 시험",
-        "en": "Namsan Tower Showdown — The Guardian Stone Trial",
-        "es": "Batalla en Namsan — La Prueba de la Piedra Guardiana"
+        "ko": "남산타워 결전... 수호석 시험",
+        "en": "Namsan Tower Showdown... The Guardian Stone Trial",
+        "es": "Batalla en Namsan... La Prueba de la Piedra Guardiana"
       },
       "difficulty": 4,
       "timeLimit": 90,

@@ -523,7 +523,7 @@ async function preloadPronunciationTTS(text: string, lang: string, apiBase: stri
       if (!res.ok) return;
       const blob = await res.blob();
       _pronWebCache.set(key, URL.createObjectURL(blob));
-    } catch {}
+    } catch (e) { console.warn('[Audio] pronunciation web cache prefetch failed:', e); }
   } else {
     if (_pronNativeCache.has(key)) return;
     try {
@@ -532,7 +532,7 @@ async function preloadPronunciationTTS(text: string, lang: string, apiBase: stri
         { shouldPlay: false, volume: 1.0 }
       );
       _pronNativeCache.set(key, sound);
-    } catch {}
+    } catch (e) { console.warn('[Audio] pronunciation native cache prefetch failed:', e); }
   }
 }
 
@@ -573,8 +573,8 @@ async function playPronunciationTTS(text: string, lang: string, apiBase: string)
       }
     } else {
       if (_nativePronSound) {
-        await _nativePronSound.stopAsync().catch(() => {});
-        await _nativePronSound.unloadAsync().catch(() => {});
+        await _nativePronSound.stopAsync().catch((e: unknown) => console.warn('[Audio] stopAsync cleanup failed:', e));
+        await _nativePronSound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
         _nativePronSound = null;
       }
       // Ensure audio mode is set for playback (recording may have left allowsRecordingIOS: true)
@@ -738,7 +738,7 @@ export default function SpeakScreen() {
     if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
     if (mediaRecorderRef.current?.state === "recording") { mediaRecorderRef.current.stop(); }
     if (nativeRecordingRef.current) {
-      nativeRecordingRef.current.stopAndUnloadAsync().catch(() => {});
+      nativeRecordingRef.current.stopAndUnloadAsync().catch((e: unknown) => console.warn('[Audio] recording stopAndUnload cleanup failed:', e));
       nativeRecordingRef.current = null;
     }
     setRecordState("idle");
@@ -780,7 +780,7 @@ export default function SpeakScreen() {
       setSessionIdx(0);
       setSessionComplete(false);
       resetPracticeState();
-    } catch {}
+    } catch (e) { console.warn('[Speak] loadSession failed:', e); }
   }, [resetPracticeState]);
 
   useFocusEffect(useCallback(() => {
@@ -820,7 +820,7 @@ export default function SpeakScreen() {
         await AsyncStorage.setItem(weakKey, JSON.stringify(list));
         setWeakWords(list);
       }
-    } catch {}
+    } catch (e) { console.warn('[Speak] addWeakWord failed:', e); }
   };
 
   const removeWeakWord = async (word: string) => {
@@ -830,7 +830,7 @@ export default function SpeakScreen() {
       const updated = list.filter((w) => w !== word);
       await AsyncStorage.setItem(weakKey, JSON.stringify(updated));
       setWeakWords(updated);
-    } catch {}
+    } catch (e) { console.warn('[Speak] removeWeakWord failed:', e); }
   };
 
   const handleListen = () => {
@@ -923,8 +923,8 @@ export default function SpeakScreen() {
       const newCount = pronCountRef.current + 1;
       pronCountRef.current = newCount;
       setPronCount(newCount);
-      await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch(() => {});
-      await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase?.word ?? "").catch(() => {});
+      await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch((e: unknown) => console.warn('[Speak] pron count save failed:', e));
+      await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase?.word ?? "").catch((e: unknown) => console.warn('[Speak] pron last word save failed:', e));
       const newLevel = countToPronLevel(newCount);
       if (newLevel !== pronLevelRef.current) {
         pronLevelRef.current = newLevel;
@@ -932,9 +932,10 @@ export default function SpeakScreen() {
         setLevelUpNewLevel(newLevel);
         setLevelUpShow(true);
       }
-    } catch {
+    } catch (e) {
+      console.warn('[Audio] native recording scoring failed:', e);
       // Always restore audio mode so NPC/tutor sounds work after a failed recording
-      Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch(() => {});
+      Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch((e2: unknown) => console.warn('[Audio] audio mode restore failed:', e2));
       setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
     } finally {
       setRecordState("done");
@@ -1002,9 +1003,10 @@ export default function SpeakScreen() {
           setSttError("");
           startPulse();
           autoStopTimerRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
-        } catch {
+        } catch (e) {
+          console.warn('[Audio] microphone start failed:', e);
           // Restore audio mode so other sounds (NPC, tutor) can play again
-          Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch(() => {});
+          Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch((e2: unknown) => console.warn('[Audio] audio mode restore failed:', e2));
           setSttError(nativeLang === "korean" ? "마이크를 시작할 수 없습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se pudo iniciar el micrófono." : "Could not start microphone. Please try again.");
           setRecordState("done");
           recordStateRef.current = "done";
@@ -1087,8 +1089,8 @@ export default function SpeakScreen() {
           const newCount = pronCountRef.current + 1;
           pronCountRef.current = newCount;
           setPronCount(newCount);
-          await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch(() => {});
-          await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase.word).catch(() => {});
+          await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch((e: unknown) => console.warn('[Speak] pron count save failed:', e));
+          await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase.word).catch((e: unknown) => console.warn('[Speak] pron last word save failed:', e));
           const newLevel = countToPronLevel(newCount);
           if (newLevel !== pronLevelRef.current) {
             pronLevelRef.current = newLevel;
@@ -1096,7 +1098,8 @@ export default function SpeakScreen() {
             setLevelUpNewLevel(newLevel);
             setLevelUpShow(true);
           }
-        } catch {
+        } catch (e) {
+          console.warn('[Audio] web recording scoring failed:', e);
           setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
         } finally {
           setRecordState("done");
@@ -1124,7 +1127,8 @@ export default function SpeakScreen() {
           mediaRecorderRef.current.stop();
         }
       }, 8000);
-    }).catch(() => {
+    }).catch((e) => {
+      console.warn('[Speak] microphone access failed:', e);
       setSttError(nativeLang === "korean" ? "마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)" : nativeLang === "spanish" ? "Permite el acceso al micrófono.\n(Configuración del navegador → Micrófono)" : "Please allow microphone access.\n(Browser settings → Microphone)");
       setRecordState("done");
       recordStateRef.current = "done";
@@ -1138,7 +1142,7 @@ export default function SpeakScreen() {
       const prev: string[] = raw ? JSON.parse(raw) : [];
       const updated = [...prev.filter((w) => w !== word), word].slice(-(SESSION_SIZE * 3));
       await AsyncStorage.setItem(lastSeenKey, JSON.stringify(updated));
-    } catch {}
+    } catch (e) { console.warn('[Speak] markWordSeen failed:', e); }
   }, [lastSeenKey]);
 
   const goNextWord = async () => {
@@ -1176,8 +1180,12 @@ export default function SpeakScreen() {
         <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
         <View style={[styles.completeWrap, { paddingBottom: TAB_BAR_HEIGHT + bottomPad }]}>
           <Text style={styles.completeTrophy}>🏆</Text>
-          <Text style={styles.completeTitle}>Pronunciation Practice{"\n"}Complete!</Text>
-          <Text style={styles.completeSub}>You practiced {sessionWords.length} words this session.</Text>
+          <Text style={styles.completeTitle}>
+            {nativeLang === "korean" ? "발음 연습\n완료!" : nativeLang === "spanish" ? "¡Práctica de pronunciación\ncompleta!" : "Pronunciation Practice\nComplete!"}
+          </Text>
+          <Text style={styles.completeSub}>
+            {nativeLang === "korean" ? `이번 세션에서 ${sessionWords.length}개 단어를 연습했어요.` : nativeLang === "spanish" ? `Practicaste ${sessionWords.length} palabras en esta sesión.` : `You practiced ${sessionWords.length} words this session.`}
+          </Text>
           {(() => {
             const prog = pronLevelProgress(pronCount);
             return (
@@ -1186,9 +1194,13 @@ export default function SpeakScreen() {
                   <Text style={styles.pronLevelBadgeText}>{prog.current}</Text>
                 </View>
                 {prog.next ? (
-                  <Text style={styles.pronLevelHint}>{prog.done}/{prog.total} practices to {prog.next}</Text>
+                  <Text style={styles.pronLevelHint}>
+                    {nativeLang === "korean" ? `${prog.next}까지 ${prog.done}/${prog.total} 연습` : nativeLang === "spanish" ? `${prog.done}/${prog.total} prácticas hasta ${prog.next}` : `${prog.done}/${prog.total} practices to ${prog.next}`}
+                  </Text>
                 ) : (
-                  <Text style={styles.pronLevelHint}>Max Level Reached 🏆</Text>
+                  <Text style={styles.pronLevelHint}>
+                    {nativeLang === "korean" ? "최고 레벨 달성 🏆" : nativeLang === "spanish" ? "¡Nivel máximo alcanzado! 🏆" : "Max Level Reached 🏆"}
+                  </Text>
                 )}
               </View>
             );
@@ -1197,7 +1209,9 @@ export default function SpeakScreen() {
             <View style={styles.weakBox}>
               <View style={styles.weakBoxHeader}>
                 <Ionicons name="warning-outline" size={14} color="#EF4444" />
-                <Text style={styles.weakBoxTitle}>Weak Words for Review</Text>
+                <Text style={styles.weakBoxTitle}>
+                  {nativeLang === "korean" ? "복습이 필요한 단어" : nativeLang === "spanish" ? "Palabras débiles para repasar" : "Weak Words for Review"}
+                </Text>
               </View>
               {weakWords.slice(0, 5).map((w) => (
                 <Text key={w} style={styles.weakWord}>• {w}</Text>
@@ -1210,7 +1224,9 @@ export default function SpeakScreen() {
           >
             <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} />
             <Ionicons name="refresh" size={18} color={C.bg1} />
-            <Text style={styles.newSessionBtnText}>New Session</Text>
+            <Text style={styles.newSessionBtnText}>
+              {nativeLang === "korean" ? "새 세션" : nativeLang === "spanish" ? "Nueva sesión" : "New Session"}
+            </Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -1243,13 +1259,21 @@ export default function SpeakScreen() {
           >
             <View style={styles.levelUpCard}>
               <Text style={styles.levelUpEmoji}>🎉</Text>
-              <Text style={styles.levelUpTitle}>Level Up!</Text>
-              <Text style={styles.levelUpSub}>You've reached</Text>
+              <Text style={styles.levelUpTitle}>
+                {nativeLang === "korean" ? "레벨 업!" : nativeLang === "spanish" ? "¡Subiste de nivel!" : "Level Up!"}
+              </Text>
+              <Text style={styles.levelUpSub}>
+                {nativeLang === "korean" ? "도달" : nativeLang === "spanish" ? "Has alcanzado" : "You've reached"}
+              </Text>
               <View style={styles.levelUpBadge}>
                 <Text style={styles.levelUpBadgeText}>{levelUpNewLevel}</Text>
               </View>
-              <Text style={styles.levelUpHint}>Harder words unlocked!</Text>
-              <Text style={styles.levelUpDismiss}>Tap to continue</Text>
+              <Text style={styles.levelUpHint}>
+                {nativeLang === "korean" ? "더 어려운 단어가 열렸어요!" : nativeLang === "spanish" ? "¡Palabras más difíciles desbloqueadas!" : "Harder words unlocked!"}
+              </Text>
+              <Text style={styles.levelUpDismiss}>
+                {nativeLang === "korean" ? "탭해서 계속하기" : nativeLang === "spanish" ? "Toca para continuar" : "Tap to continue"}
+              </Text>
             </View>
           </Pressable>
         )}
@@ -1502,7 +1526,9 @@ export default function SpeakScreen() {
             testID="prev-button"
           >
             <Ionicons name="arrow-back" size={16} color={sessionIdx === 0 ? C.goldDark : C.gold} />
-            <Text style={[styles.navBtnText, { color: sessionIdx === 0 ? C.goldDark : C.gold }]}>Prev</Text>
+            <Text style={[styles.navBtnText, { color: sessionIdx === 0 ? C.goldDark : C.gold }]}>
+              {nativeLang === "korean" ? "이전" : nativeLang === "spanish" ? "Anterior" : "Prev"}
+            </Text>
           </Pressable>
 
           <View style={styles.navProgress}>
@@ -1516,7 +1542,9 @@ export default function SpeakScreen() {
               testID="next-word-button"
             >
               <Text style={styles.nextBtnText}>
-                {sessionIdx + 1 >= sessionWords.length ? "완료" : "다음"}
+                {sessionIdx + 1 >= sessionWords.length
+                  ? (nativeLang === "korean" ? "완료" : nativeLang === "spanish" ? "Completar" : "Done")
+                  : (nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : "Next")}
               </Text>
               <Ionicons name={sessionIdx + 1 >= sessionWords.length ? "checkmark" : "arrow-forward"} size={16} color="#fff" />
             </Pressable>
@@ -1526,7 +1554,9 @@ export default function SpeakScreen() {
               onPress={goNextWord}
               testID="next-button"
             >
-              <Text style={[styles.navBtnText, { color: C.goldDim }]}>다음</Text>
+              <Text style={[styles.navBtnText, { color: C.goldDim }]}>
+                {nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : "Next"}
+              </Text>
               <Ionicons name="arrow-forward" size={16} color={C.goldDim} />
             </Pressable>
           )}

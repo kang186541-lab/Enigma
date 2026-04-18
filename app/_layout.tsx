@@ -21,8 +21,10 @@ import { View, Text, Image, Animated, StyleSheet, Dimensions } from "react-nativ
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { queryClient } from "@/lib/query-client";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { C } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
@@ -116,8 +118,16 @@ function RootLayoutNav() {
       <Stack.Screen name="npc-list"     options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="npc-mission"  options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="basic-course" options={{ headerShown: false, gestureEnabled: false }} />
-      <Stack.Screen name="rudy-course"  options={{ headerShown: false, presentation: "card" }} />
-      <Stack.Screen name="rudy-lesson"  options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="rudy-course"       options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="rudy-lesson"       options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="expression-book"   options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="daily-lesson"      options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="story-scene"       options={{ headerShown: false, gestureEnabled: false }} />
+      <Stack.Screen name="settings"          options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="stats-dashboard"   options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="writing-practice"  options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="achievements"      options={{ headerShown: false, presentation: "card" }} />
+      <Stack.Screen name="leaderboard"       options={{ headerShown: false, presentation: "card" }} />
     </Stack>
   );
 }
@@ -137,7 +147,7 @@ export default function RootLayout() {
   const fontError   = cinzelError   || crimsonError  || iconsError;
 
   useEffect(() => {
-    Asset.loadAsync(PRELOAD_IMAGES).catch(() => {});
+    Asset.loadAsync(PRELOAD_IMAGES).catch((e) => console.warn('[Layout] preload images failed:', e));
   }, []);
 
   useEffect(() => {
@@ -151,9 +161,12 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <KeyboardProvider>
-            <LanguageProvider>
-              <RootLayoutNav />
-            </LanguageProvider>
+            <ThemeProvider>
+              <LanguageProvider>
+                <OfflineBanner />
+                <RootLayoutNav />
+              </LanguageProvider>
+            </ThemeProvider>
           </KeyboardProvider>
         </GestureHandlerRootView>
       </QueryClientProvider>

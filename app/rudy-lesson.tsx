@@ -29,6 +29,7 @@ import {
   LESSON_CONTENT, MISSION_CONTENT, REVIEW_CONTENT, DAY_REWARDS,
   getCompletionMessage, type LearningLangKey,
 } from "@/lib/lessonContent";
+import { addDayPhrases } from "@/lib/srsManager";
 import { Step1ListenRepeat } from "@/components/rudy/Step1ListenRepeat";
 import { Step2KeyPoint } from "@/components/rudy/Step2KeyPoint";
 import { Step3MissionTalk } from "@/components/rudy/Step3MissionTalk";
@@ -99,34 +100,56 @@ export default function RudyLessonScreen() {
   async function completeMission() {
     if (!progress || !day) { setPhase("complete"); return; }
 
-    const now = { ...progress };
-    if (!now.completedDays.includes(day.id)) {
-      now.completedDays = [...now.completedDays, day.id];
-    }
-    now.todayCompleted = true;
-    now.todayStepsCompleted = { listenRepeat: true, keyPoint: true, missionTalk: true, review: true };
-    const totalSpoken = sentenceCount + missionSentCount;
-    now.stats = {
-      ...now.stats,
-      totalSentencesSpoken: now.stats.totalSentencesSpoken + totalSpoken,
-      totalDaysCompleted: now.stats.totalDaysCompleted + 1,
-    };
-
-    // Advance to next day if this was the current day
-    const allDays = UNITS.flatMap((u) => u.days);
-    const currentDayGlobal = allDays.findIndex((d) => d.id === day.id);
-    if (currentDayGlobal !== -1 && currentDayGlobal >= 0) {
-      const nextDay = allDays[currentDayGlobal + 1];
-      if (nextDay) {
-        const nextUnit = UNITS.findIndex((u) => u.days.some((d) => d.id === nextDay.id));
-        const nextDayIdx = UNITS[nextUnit]?.days.findIndex((d) => d.id === nextDay.id) ?? 0;
-        now.currentUnitIndex = nextUnit >= 0 ? nextUnit : now.currentUnitIndex;
-        now.currentDayIndex = nextDayIdx;
+    try {
+      const now = { ...progress };
+      const isFirstClear = !now.completedDays.includes(day.id);
+      if (isFirstClear) {
+        now.completedDays = [...now.completedDays, day.id];
       }
-    }
+      now.todayCompleted = true;
+      now.todayStepsCompleted = { listenRepeat: true, keyPoint: true, missionTalk: true, review: true };
+      const totalSpoken = sentenceCount + missionSentCount;
+      const prevStats = now.stats ?? { totalSentencesSpoken: 0, totalDaysCompleted: 0, averagePronunciationScore: 0, currentStreak: 0 };
+      now.stats = {
+        ...prevStats,
+        totalSentencesSpoken: prevStats.totalSentencesSpoken + totalSpoken,
+        totalDaysCompleted: prevStats.totalDaysCompleted + (isFirstClear ? 1 : 0),
+      };
 
-    await saveProgress(now);
-    setProgress(now);
+      // Advance to next day only if this was the current active day
+      const activeDayId = UNITS[now.currentUnitIndex]?.days[now.currentDayIndex]?.id;
+      if (isFirstClear && day.id === activeDayId) {
+        const allDays = UNITS.flatMap((u) => u.days);
+        const currentDayGlobal = allDays.findIndex((d) => d.id === day.id);
+        if (currentDayGlobal >= 0) {
+          const nextDay = allDays[currentDayGlobal + 1];
+          if (nextDay) {
+            const nextUnit = UNITS.findIndex((u) => u.days.some((d) => d.id === nextDay.id));
+            const nextDayIdx = UNITS[nextUnit]?.days.findIndex((d) => d.id === nextDay.id) ?? 0;
+            now.currentUnitIndex = nextUnit >= 0 ? nextUnit : now.currentUnitIndex;
+            now.currentDayIndex = nextDayIdx;
+          }
+        }
+      }
+
+      await saveProgress(now);
+      setProgress(now);
+
+      // Register today's phrases into the SRS system for spaced repetition
+      if (isFirstClear) {
+        const llKey = learnLang as LearningLangKey;
+        const lessonData = LESSON_CONTENT[day.id]?.[llKey];
+        if (lessonData?.step1Sentences) {
+          const phrases = lessonData.step1Sentences.map(s => ({
+            text: s.text,
+            meaning: getTri(s.meaning, lc),
+          }));
+          addDayPhrases(day.id, phrases).catch((e) => console.warn('[RudyLesson] addDayPhrases failed:', e));
+        }
+      }
+    } catch (e) {
+      console.error("completeMission error:", e);
+    }
     setPhase("complete");
   }
 
@@ -353,9 +376,13 @@ function LessonScreen({
           <Ionicons name="arrow-back" size={20} color={C.goldDim} />
         </Pressable>
         <View style={styles.lessonHeaderCenter}>
-          <Text style={styles.lessonDayLabel}>Day {day.dayNumber} · {getTri(day.topic, lc)}</Text>
+          <Text style={styles.lessonDayLabel}>
+            {nativeLang === "korean" ? `${day.dayNumber}일차` : nativeLang === "spanish" ? `Día ${day.dayNumber}` : `Day ${day.dayNumber}`} · {getTri(day.topic, lc)}
+          </Text>
           <View style={styles.stepRow}>
-            <Text style={styles.stepCounter}>STEP {currentStep + 1}/{totalSteps}</Text>
+            <Text style={styles.stepCounter}>
+              {nativeLang === "korean" ? "단계" : nativeLang === "spanish" ? "PASO" : "STEP"} {currentStep + 1}/{totalSteps}
+            </Text>
             <Text style={styles.stepName}>{stepLabels[currentStep]}</Text>
           </View>
         </View>
@@ -488,7 +515,9 @@ function StepContent({
           <View style={stepContentStyles.iconWrap}>
             <Ionicons name="headset" size={26} color={C.gold} />
           </View>
-          <Text style={stepContentStyles.stepTitle}>STEP 1: {stepLabels[0]}</Text>
+          <Text style={stepContentStyles.stepTitle}>
+            {nativeLang === "korean" ? "단계 1: " : nativeLang === "spanish" ? "PASO 1: " : "STEP 1: "}{stepLabels[0]}
+          </Text>
           <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
         </View>
         <Step1ListenRepeat
@@ -516,7 +545,9 @@ function StepContent({
           <View style={stepContentStyles.iconWrap}>
             <Ionicons name="bulb" size={26} color={C.gold} />
           </View>
-          <Text style={stepContentStyles.stepTitle}>STEP 2: {stepLabels[1]}</Text>
+          <Text style={stepContentStyles.stepTitle}>
+            {nativeLang === "korean" ? "단계 2: " : nativeLang === "spanish" ? "PASO 2: " : "STEP 2: "}{stepLabels[1]}
+          </Text>
           <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
         </View>
         <Step2KeyPoint
@@ -545,7 +576,9 @@ function StepContent({
           <View style={stepContentStyles.iconWrap}>
             <Ionicons name="mic" size={26} color={C.gold} />
           </View>
-          <Text style={stepContentStyles.stepTitle}>STEP 3: {stepLabels[2]}</Text>
+          <Text style={stepContentStyles.stepTitle}>
+            {nativeLang === "korean" ? "단계 3: " : nativeLang === "spanish" ? "PASO 3: " : "STEP 3: "}{stepLabels[2]}
+          </Text>
           <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
         </View>
         <Step3MissionTalk
@@ -575,7 +608,9 @@ function StepContent({
           <View style={stepContentStyles.iconWrap}>
             <Ionicons name="refresh-circle" size={26} color={C.gold} />
           </View>
-          <Text style={stepContentStyles.stepTitle}>STEP 4: {stepLabels[3]}</Text>
+          <Text style={stepContentStyles.stepTitle}>
+            {nativeLang === "korean" ? "단계 4: " : nativeLang === "spanish" ? "PASO 4: " : "STEP 4: "}{stepLabels[3]}
+          </Text>
           <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
         </View>
         <Step4QuickReview

@@ -1,0 +1,23 @@
+/** Light theme colors — warm parchment/gold maintaining the fantasy-book aesthetic */
+export const CLight = {
+  bg1:           "#f5f0e1",
+  bg2:           "#ebe3d0",
+  bg3:           "#dfd6c0",
+  tabBar:        "#f5f0e1",
+  gold:          "#8b6914",
+  goldDim:       "#a07d1a",
+  goldDark:      "#c9a227",
+  goldFaint:     "#8b691422",
+  parchment:     "#2c1810",
+  parchmentDark: "#3d2418",
+  parchmentDeep: "#5a4030",
+  textDark:      "#8b6914",
+  textParchment: "#f4e8c1",
+  textMuted:     "#a07d1a",
+  border:        "#8b691455",
+  borderSolid:   "#8b6914",
+  shadow:        "#8b6914",
+  white:         "#FFFFFF",
+  error:         "#c44",
+  success:       "#4a8",
+};

@@ -2,7 +2,7 @@
   "meta": {
     "version": "2.1",
     "chapter": "ch4",
-    "description": "Chapter 4: The Cairo Legacy — Miss Penny's return, Rudy confronts betrayal, new NPCs Farid/Amira/Hassan, pyramid puzzles, Mr. Black appears in person for the first time."
+    "description": "Chapter 4: The Cairo Legacy... Miss Penny's return, Rudy confronts betrayal, new NPCs Farid/Amira/Hassan, pyramid puzzles, Mr. Black appears in person for the first time."
   },
 
   "chapter": {
@@ -19,6 +19,7 @@
       "en": "Anger → Conflict → Understanding → The Choice to Forgive",
       "es": "Ira → Conflicto → Comprensión → La Elección de Perdonar"
     },
+    "npcLangRatio": 0.85,
     "npcs": ["farid", "amira", "hassan", "penny"],
     "totalXP": 1550,
     "badge": { "id": "pyramid_scholar", "name": { "ko": "피라미드 학자", "en": "Pyramid Scholar", "es": "Erudito de las Pirámides" }, "icon": "🏛️" },
@@ -28,33 +29,33 @@
         "id": "ch4_scene1",
         "title": { "ko": "나일의 도시", "en": "The City on the Nile", "es": "La Ciudad del Nilo" },
         "narration": {
-          "ko": "카이로 공항에 도착한 루디. 서울에서의 배신 — 미스 페니가 렉시콘의 내부자였다는 사실이 아직도 가슴에 남아있다. 하지만 멈출 수 없다. 수호석 4개째. 공항 출구에서 젊은 고고학자가 루디의 이름이 적힌 팻말을 들고 서 있다.",
-          "en": "Rudy arrives at Cairo Airport. The betrayal from Seoul still burns — Miss Penny was Lexicon's insider. But he can't stop now. Guardian Stone number four. At the airport exit, a young archaeologist holds a sign with Rudy's name.",
-          "es": "Rudy llega al Aeropuerto de El Cairo. La traición de Seúl aún quema — Miss Penny era la infiltrada de Lexicón. Pero no puede detenerse. Piedra Guardiana número cuatro. En la salida del aeropuerto, un joven arqueólogo sostiene un cartel con el nombre de Rudy."
+          "ko": "카이로 공항에 도착한 루디. 서울에서의 배신... 미스 페니가 렉시콘의 내부자였다는 사실이 아직도 가슴에 남아있다. 하지만 멈출 수 없다. 수호석 4개째. 공항 출구에서 젊은 고고학자가 루디의 이름이 적힌 팻말을 들고 서 있다.",
+          "en": "Rudy arrives at Cairo Airport. The betrayal from Seoul still burns... Miss Penny was Lexicon's insider. But he can't stop now. Guardian Stone number four. At the airport exit, a young archaeologist holds a sign with Rudy's name.",
+          "es": "Rudy llega al Aeropuerto de El Cairo. La traición de Seúl aún quema... Miss Penny era la infiltrada de Lexicón. Pero no puede detenerse. Piedra Guardiana número cuatro. En la salida del aeropuerto, un joven arqueólogo sostiene un cartel con el nombre de Rudy."
         },
         "dialogues": [
           {
             "npc": "farid",
             "text": {
-              "en": "Rudy! The fox detective! Amira told me you were coming. I'm Farid — archaeologist, amateur historian, professional enthusiast. Welcome to Cairo, where every stone has a story and every story has a thousand years behind it!",
-              "es": "Rudy! El detective zorro! Amira me dijo que venías. Soy Farid — arqueólogo, historiador amateur, entusiasta profesional. Bienvenido a El Cairo, donde cada piedra tiene una historia y cada historia tiene mil años detrás!",
-              "ko": "루디! 여우 탐정! 아미라가 온다고 했어요. 저는 파리드 — 고고학자, 아마추어 역사가, 프로 열정맨이에요. 카이로에 온 걸 환영해요, 여기선 모든 돌에 이야기가 있고 모든 이야기에 천 년의 역사가 있거든요!"
+              "en": "Rudy! The fox detective! Amira told me you were coming. I'm Farid... archaeologist, amateur historian, professional enthusiast. Welcome to Cairo, where every stone has a story and every story has a thousand years behind it!",
+              "es": "Rudy! El detective zorro! Amira me dijo que venías. Soy Farid... arqueólogo, historiador amateur, entusiasta profesional. Bienvenido a El Cairo, donde cada piedra tiene una historia y cada historia tiene mil años detrás!",
+              "ko": "루디! 여우 탐정! 아미라가 온다고 했어요. 저는 파리드... 고고학자, 아마추어 역사가, 프로 열정맨이에요. 카이로에 온 걸 환영해요, 여기선 모든 돌에 이야기가 있고 모든 이야기에 천 년의 역사가 있거든요!"
             }
           },
           {
             "npc": "rudy",
             "text": {
-              "en": "Professional enthusiast. That's a new job title. Amira — she's Sujin's contact?",
-              "es": "Entusiasta profesional. Ese es un nuevo título laboral. Amira — ¿es el contacto de Sujin?",
-              "ko": "프로 열정맨. 처음 듣는 직함이네요. 아미라 — 수진의 연락처요?"
+              "en": "Professional enthusiast. That's a new job title. Amira... she's Sujin's contact?",
+              "es": "Entusiasta profesional. Ese es un nuevo título laboral. Amira... ¿es el contacto de Sujin?",
+              "ko": "프로 열정맨. 처음 듣는 직함이네요. 아미라... 수진의 연락처요?"
             }
           },
           {
             "npc": "farid",
             "text": {
-              "en": "Professor Amira, Cairo University. Rosetta Stone specialist. She's been tracking strange activity near the pyramids — people digging in places they shouldn't be. As we say in Arabic, 'el-sabr moftah el-farag' — patience is the key to relief. But honestly? Patience is running out.",
-              "es": "La Profesora Amira, Universidad de El Cairo. Especialista en la Piedra Rosetta. Ha estado rastreando actividad extraña cerca de las pirámides — gente excavando donde no debería. Como decimos en árabe, 'el-sabr moftah el-farag' — la paciencia es la clave del alivio. Pero honestamente? La paciencia se agota.",
-              "ko": "아미라 교수님, 카이로 대학교. 로제타석 전문가예요. 피라미드 근처에서 이상한 활동을 추적하고 있었대요 — 있으면 안 되는 곳에서 땅을 파는 사람들. 아랍 속담에 '인내는 구원의 열쇠'라고 하지만, 솔직히? 인내심이 바닥나고 있어요."
+              "en": "Professor Amira, Cairo University. Rosetta Stone specialist. She's been tracking strange activity near the pyramids... people digging in places they shouldn't be. As we say in Arabic, 'el-sabr moftah el-farag'... patience is the key to relief. But honestly? Patience is running out.",
+              "es": "La Profesora Amira, Universidad de El Cairo. Especialista en la Piedra Rosetta. Ha estado rastreando actividad extraña cerca de las pirámides... gente excavando donde no debería. Como decimos en árabe, 'el-sabr moftah el-farag'... la paciencia es la clave del alivio. Pero honestamente? La paciencia se agota.",
+              "ko": "아미라 교수님, 카이로 대학교. 로제타석 전문가예요. 피라미드 근처에서 이상한 활동을 추적하고 있었대요... 있으면 안 되는 곳에서 땅을 파는 사람들. 아랍 속담에 '인내는 구원의 열쇠'라고 하지만, 솔직히? 인내심이 바닥나고 있어요."
             }
           },
           {
@@ -97,17 +98,17 @@
           {
             "npc": "hassan",
             "text": {
-              "en": "Ha! I like you already. A fox who thinks. As we say, 'el-kalaam zay el-asal' — words are like honey. The sweeter you speak, the better the deal. Now, what are you looking for? Spices? Souvenirs? Or perhaps... information about certain people digging near the pyramids at night?",
-              "es": "Ja! Ya me caes bien. Un zorro que piensa. Como decimos, 'el-kalaam zay el-asal' — las palabras son como la miel. Cuanto más dulce hables, mejor el trato. Ahora, ¿qué buscas? ¿Especias? ¿Recuerdos? ¿O quizás... información sobre cierta gente excavando cerca de las pirámides de noche?",
+              "en": "Ha! I like you already. A fox who thinks. As we say, 'el-kalaam zay el-asal'... words are like honey. The sweeter you speak, the better the deal. Now, what are you looking for? Spices? Souvenirs? Or perhaps... information about certain people digging near the pyramids at night?",
+              "es": "Ja! Ya me caes bien. Un zorro que piensa. Como decimos, 'el-kalaam zay el-asal'... las palabras son como la miel. Cuanto más dulce hables, mejor el trato. Ahora, ¿qué buscas? ¿Especias? ¿Recuerdos? ¿O quizás... información sobre cierta gente excavando cerca de las pirámides de noche?",
               "ko": "하! 벌써 마음에 들어. 생각하는 여우라니. 우리가 하는 말이 있어, '말은 꿀과 같다.' 달콤하게 말할수록 거래가 좋아진다고. 자, 뭘 찾아? 향신료? 기념품? 아니면... 밤에 피라미드 근처에서 땅 파는 사람들에 대한 정보?"
             }
           },
           {
             "npc": "rudy",
             "text": {
-              "en": "Information. And I'll pay in your language — I hear that's the best currency in a market.",
-              "es": "Información. Y pagaré en tu idioma — dicen que esa es la mejor moneda en un mercado.",
-              "ko": "정보요. 그리고 당신 언어로 지불할게요 — 시장에서는 그게 최고의 화폐라던데."
+              "en": "Information. And I'll pay in your language... I hear that's the best currency in a market.",
+              "es": "Información. Y pagaré en tu idioma... dicen que esa es la mejor moneda en un mercado.",
+              "ko": "정보요. 그리고 당신 언어로 지불할게요... 시장에서는 그게 최고의 화폐라던데."
             }
           },
           {
@@ -133,9 +134,9 @@
           {
             "npc": "penny",
             "text": {
-              "en": "Before you say anything — I know I don't deserve to be here. I know what I did. I'm not going to quote Shakespeare or hide behind metaphors this time. I owe you the truth. The plain, ugly truth.",
-              "es": "Antes de que digas algo — sé que no merezco estar aquí. Sé lo que hice. No voy a citar a Shakespeare ni esconderme detrás de metáforas esta vez. Te debo la verdad. La verdad simple y fea.",
-              "ko": "뭐라 하기 전에 — 내가 여기 있을 자격이 없다는 거 알아. 내가 뭘 했는지도 알고. 이번엔 셰익스피어를 인용하거나 은유 뒤에 숨지 않을게. 진실을 말할 의무가 있어. 있는 그대로의, 못생긴 진실을."
+              "en": "Before you say anything... I know I don't deserve to be here. I know what I did. I'm not going to quote Shakespeare or hide behind metaphors this time. I owe you the truth. The plain, ugly truth.",
+              "es": "Antes de que digas algo... sé que no merezco estar aquí. Sé lo que hice. No voy a citar a Shakespeare ni esconderme detrás de metáforas esta vez. Te debo la verdad. La verdad simple y fea.",
+              "ko": "뭐라 하기 전에... 내가 여기 있을 자격이 없다는 거 알아. 내가 뭘 했는지도 알고. 이번엔 셰익스피어를 인용하거나 은유 뒤에 숨지 않을게. 진실을 말할 의무가 있어. 있는 그대로의, 못생긴 진실을."
             }
           },
           {
@@ -149,9 +150,9 @@
           {
             "npc": "penny",
             "text": {
-              "en": "Yes. That truth. Mr. Black funded my collection for fifteen years. The last manuscripts of dying languages — Livonian, Silesian, Ainu. Without his money, those texts would have been lost forever. When he asked me to be his eyes and ears... I told myself I was just passing information. That nobody would get hurt. I was wrong.",
-              "es": "Sí. Esa verdad. Mr. Black financió mi colección durante quince años. Los últimos manuscritos de idiomas moribundos — livonio, silesio, ainu. Sin su dinero, esos textos se habrían perdido para siempre. Cuando me pidió que fuera sus ojos y oídos... me dije que solo pasaba información. Que nadie saldría herido. Estaba equivocada.",
-              "ko": "응. 그 진실. 미스터 블랙이 15년 동안 내 컬렉션을 후원했어. 사라져가는 언어들의 마지막 원고 — 리보니아어, 실레시아어, 아이누어. 그의 돈 없이는 그 문서들이 영원히 사라졌을 거야. 그가 자기 눈과 귀가 되어달라고 했을 때... 나는 정보만 전달하는 거라고 자기 합리화했어. 아무도 다치지 않을 거라고. 틀렸어."
+              "en": "Yes. That truth. Mr. Black funded my collection for fifteen years. The last manuscripts of dying languages... Livonian, Silesian, Ainu. Without his money, those texts would have been lost forever. When he asked me to be his eyes and ears... I told myself I was just passing information. That nobody would get hurt. I was wrong.",
+              "es": "Sí. Esa verdad. Mr. Black financió mi colección durante quince años. Los últimos manuscritos de idiomas moribundos... livonio, silesio, ainu. Sin su dinero, esos textos se habrían perdido para siempre. Cuando me pidió que fuera sus ojos y oídos... me dije que solo pasaba información. Que nadie saldría herido. Estaba equivocada.",
+              "ko": "응. 그 진실. 미스터 블랙이 15년 동안 내 컬렉션을 후원했어. 사라져가는 언어들의 마지막 원고... 리보니아어, 실레시아어, 아이누어. 그의 돈 없이는 그 문서들이 영원히 사라졌을 거야. 그가 자기 눈과 귀가 되어달라고 했을 때... 나는 정보만 전달하는 거라고 자기 합리화했어. 아무도 다치지 않을 거라고. 틀렸어."
             }
           },
           {
@@ -165,8 +166,8 @@
           {
             "npc": "penny",
             "text": {
-              "en": "Yes. And the ticket was my first act of disobedience. Black wanted you lost. I wanted you to have a chance. It wasn't enough — I know that. But it was all I could do then.",
-              "es": "Sí. Y el boleto fue mi primer acto de desobediencia. Black quería que te perdieras. Yo quería que tuvieras una oportunidad. No fue suficiente — lo sé. Pero era todo lo que podía hacer entonces.",
+              "en": "Yes. And the ticket was my first act of disobedience. Black wanted you lost. I wanted you to have a chance. It wasn't enough... I know that. But it was all I could do then.",
+              "es": "Sí. Y el boleto fue mi primer acto de desobediencia. Black quería que te perdieras. Yo quería que tuvieras una oportunidad. No fue suficiente... lo sé. Pero era todo lo que podía hacer entonces.",
               "ko": "응. 그리고 그 표가 나의 첫 번째 불복종이었어. 블랙은 네가 길을 잃길 원했어. 나는 네가 기회를 갖길 원했어. 충분하지 않았다는 거 알아. 하지만 그때 내가 할 수 있는 전부였어."
             }
           },
@@ -182,9 +183,9 @@
           {
             "npc": "amira",
             "text": {
-              "en": "Rudy, I understand your anger. But Miss Penny contacted me two weeks ago with inside information about the Cairo stone's location. Without her, we'd be searching blind. The question isn't whether you trust her past — it's whether you can use her knowledge to save the future.",
-              "es": "Rudy, entiendo tu enojo. Pero Miss Penny me contactó hace dos semanas con información interna sobre la ubicación de la piedra de El Cairo. Sin ella, estaríamos buscando a ciegas. La pregunta no es si confías en su pasado — es si puedes usar su conocimiento para salvar el futuro.",
-              "ko": "루디, 분노하는 거 이해해. 하지만 미스 페니가 2주 전에 카이로 수호석의 위치에 대한 내부 정보를 가지고 연락했어. 그녀 없이는 눈 먼 채로 찾았을 거야. 문제는 그녀의 과거를 신뢰하느냐가 아니라 — 미래를 구하기 위해 그녀의 지식을 쓸 수 있느냐야."
+              "en": "Rudy, I understand your anger. But Miss Penny contacted me two weeks ago with inside information about the Cairo stone's location. Without her, we'd be searching blind. The question isn't whether you trust her past... it's whether you can use her knowledge to save the future.",
+              "es": "Rudy, entiendo tu enojo. Pero Miss Penny me contactó hace dos semanas con información interna sobre la ubicación de la piedra de El Cairo. Sin ella, estaríamos buscando a ciegas. La pregunta no es si confías en su pasado... es si puedes usar su conocimiento para salvar el futuro.",
+              "ko": "루디, 분노하는 거 이해해. 하지만 미스 페니가 2주 전에 카이로 수호석의 위치에 대한 내부 정보를 가지고 연락했어. 그녀 없이는 눈 먼 채로 찾았을 거야. 문제는 그녀의 과거를 신뢰하느냐가 아니라... 미래를 구하기 위해 그녀의 지식을 쓸 수 있느냐야."
             }
           },
           {
@@ -202,17 +203,17 @@
         "id": "ch4_scene4_boss",
         "title": { "ko": "피라미드 지하의 시험", "en": "The Trial Beneath the Pyramid", "es": "La Prueba Bajo la Pirámide" },
         "narration": {
-          "ko": "피라미드 지하의 비밀 통로. 미스 페니의 정보 덕에 수호석 방까지 도달했다. 하지만 방 입구에 미스터 블랙이 서 있다 — 이번엔 전화가 아니라 직접.",
-          "en": "The secret passage beneath the pyramid. Thanks to Miss Penny's intel, they've reached the Guardian Stone chamber. But at the entrance stands Mr. Black — in person this time, not on a phone.",
-          "es": "El pasaje secreto bajo la pirámide. Gracias a la información de Miss Penny, llegaron a la cámara de la Piedra Guardiana. Pero en la entrada está Mr. Black — en persona esta vez, no por teléfono."
+          "ko": "피라미드 지하의 비밀 통로. 미스 페니의 정보 덕에 수호석 방까지 도달했다. 하지만 방 입구에 미스터 블랙이 서 있다... 이번엔 전화가 아니라 직접.",
+          "en": "The secret passage beneath the pyramid. Thanks to Miss Penny's intel, they've reached the Guardian Stone chamber. But at the entrance stands Mr. Black... in person this time, not on a phone.",
+          "es": "El pasaje secreto bajo la pirámide. Gracias a la información de Miss Penny, llegaron a la cámara de la Piedra Guardiana. Pero en la entrada está Mr. Black... en persona esta vez, no por teléfono."
         },
         "dialogues": [
           {
             "npc": "mr_black",
             "text": {
-              "en": "Rudy. At last, face to face. You know, I've been watching you stumble through three cities, struggling with languages, relying on strangers. And I thought — this is exactly the problem I'm trying to solve.",
-              "es": "Rudy. Por fin, cara a cara. Sabes, te he estado viendo tropezar por tres ciudades, luchando con idiomas, dependiendo de extraños. Y pensé — este es exactamente el problema que intento resolver.",
-              "ko": "루디. 드디어, 대면이군. 있잖아, 세 도시를 헤매며 언어에 고생하고 낯선 사람들에게 의존하는 너를 지켜보고 있었어. 그리고 생각했지 — 이게 바로 내가 해결하려는 문제라고."
+              "en": "Rudy. At last, face to face. You know, I've been watching you stumble through three cities, struggling with languages, relying on strangers. And I thought... this is exactly the problem I'm trying to solve.",
+              "es": "Rudy. Por fin, cara a cara. Sabes, te he estado viendo tropezar por tres ciudades, luchando con idiomas, dependiendo de extraños. Y pensé... este es exactamente el problema que intento resolver.",
+              "ko": "루디. 드디어, 대면이군. 있잖아, 세 도시를 헤매며 언어에 고생하고 낯선 사람들에게 의존하는 너를 지켜보고 있었어. 그리고 생각했지... 이게 바로 내가 해결하려는 문제라고."
             }
           },
           {
@@ -235,17 +236,17 @@
             "npc": "rudy",
             "isThought": true,
             "text": {
-              "en": "(He's right about the facts. Wrong about what they mean. Every misunderstanding taught me something. Every stumble brought me closer to someone. That's not failure — that's how language works. But right now, I need to prove it, not argue it.)",
-              "es": "(Tiene razón sobre los hechos. Se equivoca sobre lo que significan. Cada malentendido me enseñó algo. Cada tropiezo me acercó a alguien. Eso no es fracaso — así funciona el idioma. Pero ahora, necesito probarlo, no argumentarlo.)",
-              "ko": "(사실관계는 맞아. 하지만 그 의미에 대해서는 틀렸어. 모든 오해가 나에게 뭔가를 가르쳤고. 모든 실수가 누군가와 더 가까워지게 했어. 그건 실패가 아니야 — 언어가 작동하는 방식이야. 하지만 지금은 증명해야지, 논쟁할 때가 아니야.)"
+              "en": "(He's right about the facts. Wrong about what they mean. Every misunderstanding taught me something. Every stumble brought me closer to someone. That's not failure... that's how language works. But right now, I need to prove it, not argue it.)",
+              "es": "(Tiene razón sobre los hechos. Se equivoca sobre lo que significan. Cada malentendido me enseñó algo. Cada tropiezo me acercó a alguien. Eso no es fracaso... así funciona el idioma. Pero ahora, necesito probarlo, no argumentarlo.)",
+              "ko": "(사실관계는 맞아. 하지만 그 의미에 대해서는 틀렸어. 모든 오해가 나에게 뭔가를 가르쳤고. 모든 실수가 누군가와 더 가까워지게 했어. 그건 실패가 아니야... 언어가 작동하는 방식이야. 하지만 지금은 증명해야지, 논쟁할 때가 아니야.)"
             }
           },
           {
             "npc": "mr_black",
             "text": {
-              "en": "I'll make you a deal, detective. The stone chamber has a final trial — five challenges in multiple languages. If you pass, take the stone. I won't stop you. I want to see if your 'beautiful struggle' can actually deliver results. Because if it can't... well, that proves my point, doesn't it?",
-              "es": "Te propongo un trato, detective. La cámara de la piedra tiene una prueba final — cinco desafíos en múltiples idiomas. Si pasas, llévate la piedra. No te detendré. Quiero ver si tu 'hermosa lucha' realmente da resultados. Porque si no... bueno, eso prueba mi punto, ¿no?",
-              "ko": "거래를 하자, 탐정. 수호석 방에 최종 시험이 있어 — 여러 언어로 된 다섯 가지 도전. 통과하면 수호석을 가져가. 막지 않을게. 네 '아름다운 고생'이 정말 결과를 낼 수 있는지 보고 싶어. 만약 안 되면... 글쎄, 그게 내 말이 맞다는 증거가 되겠지?"
+              "en": "I'll make you a deal, detective. The stone chamber has a final trial... five challenges in multiple languages. If you pass, take the stone. I won't stop you. I want to see if your 'beautiful struggle' can actually deliver results. Because if it can't... well, that proves my point, doesn't it?",
+              "es": "Te propongo un trato, detective. La cámara de la piedra tiene una prueba final... cinco desafíos en múltiples idiomas. Si pasas, llévate la piedra. No te detendré. Quiero ver si tu 'hermosa lucha' realmente da resultados. Porque si no... bueno, eso prueba mi punto, ¿no?",
+              "ko": "거래를 하자, 탐정. 수호석 방에 최종 시험이 있어... 여러 언어로 된 다섯 가지 도전. 통과하면 수호석을 가져가. 막지 않을게. 네 '아름다운 고생'이 정말 결과를 낼 수 있는지 보고 싶어. 만약 안 되면... 글쎄, 그게 내 말이 맞다는 증거가 되겠지?"
             }
           },
           {
@@ -272,25 +273,25 @@
         {
           "npc": "mr_black",
           "text": {
-            "en": "Impressive. Truly. But Rudy — you needed Miss Penny's betrayal to get here. You needed Hassan's help to navigate. You needed Farid's knowledge to find the entrance. You needed Amira's research to decode the map. Four people. Four languages. All that effort, all that time, all that struggle... for something my Universal Code would have solved in seconds. Think about that on your way to Babel.",
-            "es": "Impresionante. De verdad. Pero Rudy — necesitaste la traición de Miss Penny para llegar aquí. Necesitaste la ayuda de Hassan para navegar. Necesitaste el conocimiento de Farid para encontrar la entrada. Necesitaste la investigación de Amira para decodificar el mapa. Cuatro personas. Cuatro idiomas. Todo ese esfuerzo, todo ese tiempo, toda esa lucha... por algo que mi Código Universal habría resuelto en segundos. Piénsalo de camino a Babel.",
-            "ko": "인상적이야. 진심으로. 하지만 루디 — 여기 오려면 미스 페니의 배신이 필요했잖아. 하산의 도움 없이는 길을 못 찾았고. 파리드의 지식 없이는 입구를 못 찾았고. 아미라의 연구 없이는 지도를 해독할 수 없었어. 네 명. 네 가지 언어. 그 모든 노력, 모든 시간, 모든 고생이... 내 유니버설 코드라면 몇 초면 해결할 일이었어. 바벨로 가는 길에 그 점을 생각해봐."
+            "en": "Impressive. Truly. But Rudy... you needed Miss Penny's betrayal to get here. You needed Hassan's help to navigate. You needed Farid's knowledge to find the entrance. You needed Amira's research to decode the map. Four people. Four languages. All that effort, all that time, all that struggle... for something my Universal Code would have solved in seconds. Think about that on your way to Babel.",
+            "es": "Impresionante. De verdad. Pero Rudy... necesitaste la traición de Miss Penny para llegar aquí. Necesitaste la ayuda de Hassan para navegar. Necesitaste el conocimiento de Farid para encontrar la entrada. Necesitaste la investigación de Amira para decodificar el mapa. Cuatro personas. Cuatro idiomas. Todo ese esfuerzo, todo ese tiempo, toda esa lucha... por algo que mi Código Universal habría resuelto en segundos. Piénsalo de camino a Babel.",
+            "ko": "인상적이야. 진심으로. 하지만 루디... 여기 오려면 미스 페니의 배신이 필요했잖아. 하산의 도움 없이는 길을 못 찾았고. 파리드의 지식 없이는 입구를 못 찾았고. 아미라의 연구 없이는 지도를 해독할 수 없었어. 네 명. 네 가지 언어. 그 모든 노력, 모든 시간, 모든 고생이... 내 유니버설 코드라면 몇 초면 해결할 일이었어. 바벨로 가는 길에 그 점을 생각해봐."
           }
         },
         {
           "npc": "rudy",
           "isThought": true,
           "text": {
-            "en": "(Four people. Four languages. He thinks that's a weakness. But Don Miguel's proverbs, Tom's slang, Grandma Youngsook's warmth, Hassan's wit — those aren't inefficiencies. Those are people. And you can't code people, Black. Babel Tower. The final stone. And this time, I'm not going alone.)",
-            "es": "(Cuatro personas. Cuatro idiomas. Piensa que es una debilidad. Pero los refranes de Don Miguel, la jerga de Tom, la calidez de la Abuela Youngsook, el ingenio de Hassan — esos no son ineficiencias. Son personas. Y no puedes codificar personas, Black. Torre de Babel. La piedra final. Y esta vez, no voy solo.)",
-            "ko": "(네 명. 네 가지 언어. 그는 그게 약점이라고 생각해. 하지만 돈 미겔의 속담, 톰의 슬랭, 영숙 할머니의 따뜻함, 하산의 재치 — 그건 비효율이 아니야. 그건 사람들이야. 사람을 코드로 바꿀 순 없어, 블랙. 바벨 타워. 마지막 수호석. 이번엔 혼자 가지 않아.)"
+            "en": "(Four people. Four languages. He thinks that's a weakness. But Don Miguel's proverbs, Tom's slang, Grandma Youngsook's warmth, Hassan's wit... those aren't inefficiencies. Those are people. And you can't code people, Black. Babel Tower. The final stone. And this time, I'm not going alone.)",
+            "es": "(Cuatro personas. Cuatro idiomas. Piensa que es una debilidad. Pero los refranes de Don Miguel, la jerga de Tom, la calidez de la Abuela Youngsook, el ingenio de Hassan... esos no son ineficiencias. Son personas. Y no puedes codificar personas, Black. Torre de Babel. La piedra final. Y esta vez, no voy solo.)",
+            "ko": "(네 명. 네 가지 언어. 그는 그게 약점이라고 생각해. 하지만 돈 미겔의 속담, 톰의 슬랭, 영숙 할머니의 따뜻함, 하산의 재치... 그건 비효율이 아니야. 그건 사람들이야. 사람을 코드로 바꿀 순 없어, 블랙. 바벨 타워. 마지막 수호석. 이번엔 혼자 가지 않아.)"
           }
         }
       ],
       "finalNarration": {
-        "ko": "4개의 수호석이 진동하며 하나의 방향을 가리킨다 — 바벨 타워. 미스 페니가 루디 옆에 선다. '내가 알고 있는 렉시콘의 모든 것을 알려줄게. 이번엔 진짜로.' 루디는 대답하지 않는다. 하지만 걸음을 멈추지도 않는다.",
-        "en": "The four Guardian Stones vibrate and point in one direction — Babel Tower. Miss Penny stands beside Rudy. 'I'll tell you everything I know about Lexicon. For real this time.' Rudy doesn't answer. But he doesn't stop walking either.",
-        "es": "Las cuatro Piedras Guardianas vibran y apuntan en una dirección — la Torre de Babel. Miss Penny está junto a Rudy. 'Te diré todo lo que sé sobre Lexicón. De verdad esta vez.' Rudy no responde. Pero tampoco deja de caminar."
+        "ko": "4개의 수호석이 진동하며 하나의 방향을 가리킨다... 바벨 타워. 미스 페니가 루디 옆에 선다. '내가 알고 있는 렉시콘의 모든 것을 알려줄게. 이번엔 진짜로.' 루디는 대답하지 않는다. 하지만 걸음을 멈추지도 않는다.",
+        "en": "The four Guardian Stones vibrate and point in one direction... Babel Tower. Miss Penny stands beside Rudy. 'I'll tell you everything I know about Lexicon. For real this time.' Rudy doesn't answer. But he doesn't stop walking either.",
+        "es": "Las cuatro Piedras Guardianas vibran y apuntan en una dirección... la Torre de Babel. Miss Penny está junto a Rudy. 'Te diré todo lo que sé sobre Lexicón. De verdad esta vez.' Rudy no responde. Pero tampoco deja de caminar."
       }
     }
   },
@@ -474,7 +475,7 @@
           "rounds": [
             {
               "type": "listening",
-              "ttsScript": "The stone chamber lies beneath the Sphinx, accessible only when the moon reaches its peak. Three guardians protect it — one speaks in riddles, one speaks in proverbs, and one speaks only the truth.",
+              "ttsScript": "The stone chamber lies beneath the Sphinx, accessible only when the moon reaches its peak. Three guardians protect it... one speaks in riddles, one speaks in proverbs, and one speaks only the truth.",
               "ttsVoice": "en-GB-SoniaNeural",
               "question": "How many guardians protect the chamber?",
               "answer": "three",
@@ -485,7 +486,7 @@
               "question": "If Rudy ___ (study) harder, he would understand Mr. Black's languages.",
               "answer": "had studied",
               "options": ["studies", "studied", "had studied", "will study"],
-              "reviewNote": "Past unreal conditional — advanced grammar from Ch3"
+              "reviewNote": "Past unreal conditional... advanced grammar from Ch3"
             },
             {
               "type": "translation",
@@ -509,7 +510,7 @@
             {
               "type": "roleplay",
               "prompt": "Mr. Black says languages are inefficient and should be replaced. Argue against him in your target language. Explain why language diversity matters. Use at least 4 sentences. Reference at least one proverb you learned in earlier chapters.",
-              "reviewNote": "This is the thematic climax — user must articulate the story's core message in their target language"
+              "reviewNote": "This is the thematic climax... user must articulate the story's core message in their target language"
             }
           ]
         },
@@ -517,7 +518,7 @@
           "rounds": [
             {
               "type": "listening",
-              "ttsScript": "La camara de la piedra se encuentra bajo la Esfinge, accesible solo cuando la luna alcanza su punto mas alto. Tres guardianes la protegen — uno habla en acertijos, uno habla en refranes, y uno solo dice la verdad.",
+              "ttsScript": "La camara de la piedra se encuentra bajo la Esfinge, accesible solo cuando la luna alcanza su punto mas alto. Tres guardianes la protegen... uno habla en acertijos, uno habla en refranes, y uno solo dice la verdad.",
               "ttsVoice": "es-ES-ElviraNeural",
               "question": "Cuantos guardianes protegen la camara?",
               "answer": "tres",
@@ -556,7 +557,7 @@
           "rounds": [
             {
               "type": "listening",
-              "ttsScript": "수호석 방은 스핑크스 아래에 있으며 달이 가장 높이 떠 있을 때만 들어갈 수 있습니다. 세 명의 수호자가 지키고 있습니다 — 한 명은 수수께끼로, 한 명은 속담으로, 한 명은 오직 진실만 말합니다.",
+              "ttsScript": "수호석 방은 스핑크스 아래에 있으며 달이 가장 높이 떠 있을 때만 들어갈 수 있습니다. 세 명의 수호자가 지키고 있습니다... 한 명은 수수께끼로, 한 명은 속담으로, 한 명은 오직 진실만 말합니다.",
               "ttsVoice": "ko-KR-SunHiNeural",
               "question": "수호석 방을 지키는 수호자는 몇 명인가요?",
               "answer": "세 명",

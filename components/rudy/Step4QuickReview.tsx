@@ -110,7 +110,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
       if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
       if (nativeRecRef.current) {
-        nativeRecRef.current.stopAndUnloadAsync().catch(() => {});
+        nativeRecRef.current.stopAndUnloadAsync().catch((e) => console.warn('[Step4] Recording cleanup failed:', e));
         nativeRecRef.current = null;
       }
       stopAllTTSSync();
@@ -191,8 +191,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   async function playTTS(text: string, speechLang: string) {
     try {
       if (soundRef.current) {
-        await soundRef.current.stopAsync().catch(() => {});
-        await soundRef.current.unloadAsync().catch(() => {});
+        await soundRef.current.stopAsync().catch((e) => console.warn('[Step4] TTS stop failed:', e));
+        await soundRef.current.unloadAsync().catch((e) => console.warn('[Step4] TTS unload failed:', e));
         soundRef.current = null;
       }
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
@@ -209,19 +209,19 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         registerGlobalWebAudio(audio);
         audio.onended = () => URL.revokeObjectURL(objUrl);
         audio.onerror = () => URL.revokeObjectURL(objUrl);
-        await audio.play().catch(() => {});
+        await audio.play().catch((e) => console.warn('[Step4] Audio playback failed:', e));
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
         registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
           if (st.isLoaded && st.didJustFinish) {
-            sound.unloadAsync().catch(() => {});
+            sound.unloadAsync().catch((e) => console.warn('[Step4] Audio unload failed:', e));
             soundRef.current = null;
           }
         });
       }
-    } catch {}
+    } catch (e) { console.warn('[Audio] TTS playback failed:', e); }
   }
 
   // ── Recording ─────────────────────────────────────────────────────────────
@@ -239,8 +239,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       try {
         // Stop any playing TTS before switching to record mode
         if (soundRef.current) {
-          await soundRef.current.stopAsync().catch(() => {});
-          await soundRef.current.unloadAsync().catch(() => {});
+          await soundRef.current.stopAsync().catch((e) => console.warn('[Step4] TTS stop failed:', e));
+          await soundRef.current.unloadAsync().catch((e) => console.warn('[Step4] TTS unload failed:', e));
           soundRef.current = null;
         }
         await Audio.setAudioModeAsync({
@@ -267,7 +267,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         await rec.startAsync();
         nativeRecRef.current = rec;
         autoStopRef.current = setTimeout(() => stopRecordAndAssess(q), 7000);
-      } catch { stopPulse(); setQPhase("ready"); }
+      } catch (e) { console.warn('[Speech] recording start failed:', e); stopPulse(); setQPhase("ready"); }
     } else {
       if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); setQPhase("ready"); return; }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
@@ -315,7 +315,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
         const nativeMime = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
         await assessPronunciation(base64, nativeMime, currentQ);
-      } catch {
+      } catch (e) {
+        console.warn('[Speech] native recording stop failed:', e);
         fallbackReveal();
       }
     } else {
@@ -337,7 +338,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         r.readAsDataURL(blob);
       });
       await assessPronunciation(base64, mime, currentQ);
-    } catch { fallbackReveal(); }
+    } catch (e) { console.warn('[Speech] web recording stop failed:', e); fallbackReveal(); }
   }
 
   function isValidAudio(b64: string) { return !!b64 && b64.length >= 2000; }
@@ -378,6 +379,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         clearTimeout(timeoutId);
         if (res.ok) data = await res.json();
       } catch (e) {
+        console.warn('[API] pronunciation assessment request failed:', e);
         clearTimeout(timeoutId);
       }
 
@@ -394,7 +396,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       setWordScores(data.words ?? []);
       setAllScores((prev) => [...prev, score]);
       setStars(score >= 90 ? 3 : score >= 75 ? 2 : score > 0 ? 1 : 0);
-    } catch {
+    } catch (e) {
+      console.warn('[API] pronunciation assessment failed:', e);
       setPronScore(0);
       setAllScores((prev) => [...prev, 0]);
       setStars(0);
@@ -403,7 +406,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     setCanSkipScoring(false);
     setQPhase("revealed");
     // Play TTS after revealing so the spinner doesn't hang waiting for audio load
-    playTTS(word, lang).catch(() => {});
+    playTTS(word, lang).catch((e) => console.warn('[Step4] TTS playback failed:', e));
   }
 
   function skipScoring() {
@@ -487,7 +490,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     blank: nativeLang === "korean" ? "빈칸을 채우세요:" : nativeLang === "spanish" ? "Rellena el espacio:" : "Fill in the blank:",
   };
 
-  if (showComplete) {
+  if (showComplete || !q) {
     const avg = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
     return (
       <View style={s.completeCard}>

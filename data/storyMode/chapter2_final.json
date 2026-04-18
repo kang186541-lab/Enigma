@@ -6,6 +6,12 @@
     "es": "La Desaparicion de Madrid"
   },
   "setting": "Madrid",
+  "emotionalArc": {
+    "ko": "공포 → 연민 → 분노 → 추격",
+    "en": "Fear → Compassion → Anger → Pursuit",
+    "es": "Miedo → Compasión → Ira → Persecución"
+  },
+  "npcLangRatio": 0.5,
   "vocabularyPool": "Day 1-18: Greetings, self-intro, goodbye, thank you, sorry, where is, how much, yes/no, help, numbers 1-100, age, days of the week, time, weather, colours, sizes, food names, ordering, prices, food feelings, recommendations",
   "meta": {
     "version": "4.0",
@@ -13,7 +19,7 @@
     "date": "2026-03-23",
     "pacingTemplate": "Visceral Hook -> Tension -> Quiz Moment -> Reveal -> Cliffhanger",
     "plotHook": "Carlos found Mr. Black's Language Erasure Device prototype. He was kidnapped because he saw it working. Don Miguel's market is ground zero for the word-vanishing plague.",
-    "designPhilosophy": "Quizzes ARE the story. Every quiz has life-or-death stakes. Isabel's testimony, Don Miguel's food gate, Mr. Black's notebook cipher, the Language Erasure Device locks — each quiz failure has narrative consequences. Don Miguel idioms woven into dialogue as characterization, not decoration."
+    "designPhilosophy": "Quizzes ARE the story. Every quiz has life-or-death stakes. Isabel's testimony, Don Miguel's food gate, Mr. Black's notebook cipher, the Language Erasure Device locks... each quiz failure has narrative consequences. Don Miguel idioms woven into dialogue as characterization, not decoration."
   },
 
   "npcs": [
@@ -21,7 +27,7 @@
       "id": "isabel",
       "name": "Isabel",
       "role": { "ko": "플라멩코 댄서 / 카를로스의 동료", "en": "Flamenco Dancer / Carlos's Colleague", "es": "Bailaora de Flamenco / Colega de Carlos" },
-      "idiomStyle": "Bold and direct, Spanish fire — speaks in short bursts, never wastes words",
+      "idiomStyle": "Bold and direct, Spanish fire... speaks in short bursts, never wastes words",
       "collection": "Isabel_Madrid_Fire"
     },
     {
@@ -35,7 +41,7 @@
       "id": "carlos",
       "name": "Carlos",
       "role": { "ko": "박물관 복원가 / 피해자", "en": "Museum Restorer / Victim", "es": "Restaurador del Museo / Victima" },
-      "idiomStyle": "Fragmented, terrified — speaks only in Day 1 vocabulary. Every word is a victory."
+      "idiomStyle": "Fragmented, terrified... speaks only in Day 1 vocabulary. Every word is a victory."
     },
     {
       "id": "mr_black",
@@ -58,9 +64,9 @@
           "id": "ch2_s1_hook",
           "beat": "HOOK",
           "narration": {
-            "en": "The plane hasn't stopped taxiing when your phone buzzes. A photo. Carlos's workshop at the Prado, shot from above. Every surface covered in the same word, scrawled in red marker: AYUDA. AYUDA. AYUDA. Help. Help. Help. Hundreds of times. The handwriting gets worse toward the edges — larger, shakier, more desperate. Like watching someone forget how to hold a pen.",
-            "ko": "비행기가 완전히 멈추기도 전에 핸드폰이 울린다. 사진 한 장. 프라도에 있는 카를로스의 작업실을 위에서 찍은 것. 모든 표면에 같은 단어가 빨간 마커로 휘갈겨져 있다: AYUDA. AYUDA. AYUDA. 도와주세요. 도와주세요. 도와주세요. 수백 번. 가장자리로 갈수록 글씨가 나빠진다 — 더 크고, 더 떨리고, 더 절박해진다. 마치 펜을 잡는 법을 잊어가는 걸 보는 것 같다.",
-            "es": "El avion aun no ha terminado de rodar cuando tu telefono vibra. Una foto. El taller de Carlos en el Prado, tomada desde arriba. Cada superficie cubierta con la misma palabra, garabateada con marcador rojo: AYUDA. AYUDA. AYUDA. Cientos de veces. La letra empeora hacia los bordes — mas grande, mas temblorosa, mas desesperada. Como ver a alguien olvidar como sostener un boligrafo."
+            "en": "The plane hasn't stopped taxiing when your phone buzzes. A photo. Carlos's workshop at the Prado, shot from above. Every surface covered in the same word, scrawled in red marker: AYUDA. AYUDA. AYUDA. Help. Help. Help. Hundreds of times. The handwriting gets worse toward the edges... larger, shakier, more desperate. Like watching someone forget how to hold a pen.",
+            "ko": "비행기가 완전히 멈추기도 전에 핸드폰이 울린다. 사진 한 장. 프라도에 있는 카를로스의 작업실을 위에서 찍은 것. 모든 표면에 같은 단어가 빨간 마커로 휘갈겨져 있다: AYUDA. AYUDA. AYUDA. 도와주세요. 도와주세요. 도와주세요. 수백 번. 가장자리로 갈수록 글씨가 나빠진다... 더 크고, 더 떨리고, 더 절박해진다. 마치 펜을 잡는 법을 잊어가는 걸 보는 것 같다.",
+            "es": "El avion aun no ha terminado de rodar cuando tu telefono vibra. Una foto. El taller de Carlos en el Prado, tomada desde arriba. Cada superficie cubierta con la misma palabra, garabateada con marcador rojo: AYUDA. AYUDA. AYUDA. Cientos de veces. La letra empeora hacia los bordes... mas grande, mas temblorosa, mas desesperada. Como ver a alguien olvidar como sostener un boligrafo."
           }
         },
         {
@@ -69,9 +75,9 @@
           "charId": "lingo",
           "isThought": true,
           "text": {
-            "en": "(AYUDA. That's Spanish for 'help.' It's Day One vocabulary. The most basic word in any language. Carlos — a man who speaks four languages fluently — was reduced to writing 'help' over and over like a child learning their first word. Whatever happened to him, it didn't just take his languages. It took them backwards. Word by word. Until all he had left was... Day One.)",
-            "ko": "(AYUDA. 스페인어로 '도와주세요'야. 첫날 배우는 단어. 어떤 언어에서든 가장 기초적인 단어. 카를로스 — 4개 국어를 유창하게 하는 사람이 — 첫 단어를 배우는 아이처럼 '도와주세요'를 반복해서 쓰는 신세가 된 거야. 무슨 일이 있었든, 언어를 빼앗긴 거야. 거꾸로. 단어 하나씩. 남은 건... 첫날뿐.)",
-            "es": "(AYUDA. Es la palabra del Dia Uno. El vocabulario mas basico de cualquier idioma. Carlos — un hombre que habla cuatro idiomas con fluidez — reducido a escribir 'ayuda' una y otra vez como un nino aprendiendo su primera palabra. Lo que le paso no solo le quito los idiomas. Se los quito al reves. Palabra por palabra. Hasta que lo unico que le quedo fue... el Dia Uno.)"
+            "en": "(AYUDA. That's Spanish for 'help.' It's Day One vocabulary. The most basic word in any language. Carlos... a man who speaks four languages fluently... was reduced to writing 'help' over and over like a child learning their first word. Whatever happened to him, it didn't just take his languages. It took them backwards. Word by word. Until all he had left was... Day One.)",
+            "ko": "(AYUDA. 스페인어로 '도와주세요'야. 첫날 배우는 단어. 어떤 언어에서든 가장 기초적인 단어. 카를로스... 4개 국어를 유창하게 하는 사람이... 첫 단어를 배우는 아이처럼 '도와주세요'를 반복해서 쓰는 신세가 된 거야. 무슨 일이 있었든, 언어를 빼앗긴 거야. 거꾸로. 단어 하나씩. 남은 건... 첫날뿐.)",
+            "es": "(AYUDA. Es la palabra del Dia Uno. El vocabulario mas basico de cualquier idioma. Carlos... un hombre que habla cuatro idiomas con fluidez... reducido a escribir 'ayuda' una y otra vez como un nino aprendiendo su primera palabra. Lo que le paso no solo le quito los idiomas. Se los quito al reves. Palabra por palabra. Hasta que lo unico que le quedo fue... el Dia Uno.)"
           }
         },
         {
@@ -98,9 +104,9 @@
           "beat": "TENSION",
           "charId": "lingo",
           "text": {
-            "en": "I'm average height, thank you very much. And yes, I'm here to help. You must be Isabel. Eleanor told me about you — Carlos's colleague from the Prado.",
-            "ko": "평균 신장이거든, 정말 감사해. 그리고 맞아, 도와주러 왔어. 이사벨이지? 엘리너한테 들었어 — 프라도에서 카를로스랑 같이 일한 동료.",
-            "es": "Soy de estatura promedio, muchas gracias. Y si, vine a ayudar. Debes ser Isabel. Eleanor me hablo de ti — la colega de Carlos del Prado."
+            "en": "I'm average height, thank you very much. And yes, I'm here to help. You must be Isabel. Eleanor told me about you... Carlos's colleague from the Prado.",
+            "ko": "평균 신장이거든, 정말 감사해. 그리고 맞아, 도와주러 왔어. 이사벨이지? 엘리너한테 들었어... 프라도에서 카를로스랑 같이 일한 동료.",
+            "es": "Soy de estatura promedio, muchas gracias. Y si, vine a ayudar. Debes ser Isabel. Eleanor me hablo de ti... la colega de Carlos del Prado."
           }
         },
         {
@@ -108,9 +114,9 @@
           "beat": "TENSION",
           "charId": "isabel",
           "text": {
-            "en": "Eleanor said you were funny. She was wrong. Listen — Carlos called me three nights ago. Ten o'clock. He was working late at the Prado, restoring a medieval fresco. When I picked up, he was screaming.",
-            "ko": "엘리너가 재밌는 사람이라고 했는데. 틀렸네. 들어 — 카를로스가 3일 전 밤에 전화했어. 밤 10시. 프라도에서 중세 프레스코화 복원하며 야근하고 있었어. 전화를 받으니까 소리를 지르고 있었어.",
-            "es": "Eleanor dijo que eras gracioso. Se equivoco. Escucha — Carlos me llamo hace tres noches. A las diez. Estaba trabajando tarde en el Prado, restaurando un fresco medieval. Cuando conteste, estaba gritando."
+            "en": "Eleanor said you were funny. She was wrong. Listen... Carlos called me three nights ago. Ten o'clock. He was working late at the Prado, restoring a medieval fresco. When I picked up, he was screaming.",
+            "ko": "엘리너가 재밌는 사람이라고 했는데. 틀렸네. 들어... 카를로스가 3일 전 밤에 전화했어. 밤 10시. 프라도에서 중세 프레스코화 복원하며 야근하고 있었어. 전화를 받으니까 소리를 지르고 있었어.",
+            "es": "Eleanor dijo que eras gracioso. Se equivoco. Escucha... Carlos me llamo hace tres noches. A las diez. Estaba trabajando tarde en el Prado, restaurando un fresco medieval. Cuando conteste, estaba gritando."
           }
         },
         {
@@ -128,13 +134,13 @@
           "beat": "CURIOSITY",
           "charId": "isabel",
           "text": {
-            "en": "That's the thing. He was screaming words. Simple words. But not in Spanish. Not in English either. 'Hello! Help! Where is the door? Please! Sorry!' — basic phrases, like a textbook. In a language I didn't recognize. Over and over. Then the line went dead.",
-            "ko": "그게 문제야. 단어를 소리치고 있었어. 간단한 단어들. 근데 스페인어가 아니었어. 영어도 아니고. '안녕하세요! 도와주세요! 문이 어디예요? 제발! 죄송합니다!' — 교과서 같은 기초 표현을. 내가 모르는 언어로. 계속 반복하다가, 전화가 끊겼어.",
-            "es": "Eso es lo raro. Gritaba palabras. Palabras simples. Pero no en espanol. Tampoco en ingles. 'Hola! Ayuda! Donde esta la puerta? Por favor! Perdon!' — frases basicas, como de libro. En un idioma que no reconoci. Una y otra vez. Luego se corto la linea."
+            "en": "That's the thing. He was screaming words. Simple words. But not in Spanish. Not in English either. 'Hello! Help! Where is the door? Please! Sorry!'... basic phrases, like a textbook. In a language I didn't recognize. Over and over. Then the line went dead.",
+            "ko": "그게 문제야. 단어를 소리치고 있었어. 간단한 단어들. 근데 스페인어가 아니었어. 영어도 아니고. '안녕하세요! 도와주세요! 문이 어디예요? 제발! 죄송합니다!'... 교과서 같은 기초 표현을. 내가 모르는 언어로. 계속 반복하다가, 전화가 끊겼어.",
+            "es": "Eso es lo raro. Gritaba palabras. Palabras simples. Pero no en espanol. Tampoco en ingles. 'Hola! Ayuda! Donde esta la puerta? Por favor! Perdon!'... frases basicas, como de libro. En un idioma que no reconoci. Una y otra vez. Luego se corto la linea."
           },
           "idiom": {
             "phrase": { "en": "Then the line went dead", "ko": "전화가 끊겼어", "es": "Se corto la linea" },
-            "meaning": { "en": "The phone call abruptly disconnected — silence where a voice should be.", "ko": "전화가 갑자기 끊겼다 — 목소리가 있어야 할 곳에 침묵.", "es": "La llamada se corto abruptamente — silencio donde deberia haber una voz." },
+            "meaning": { "en": "The phone call abruptly disconnected... silence where a voice should be.", "ko": "전화가 갑자기 끊겼다... 목소리가 있어야 할 곳에 침묵.", "es": "La llamada se corto abruptamente... silencio donde deberia haber una voz." },
             "collection": "Isabel_Madrid_Fire",
             "addToExpressionBook": true
           }
@@ -144,13 +150,13 @@
           "beat": "TENSION",
           "charId": "isabel",
           "text": {
-            "en": "I wrote down every word he said. I'm a dancer, not a detective — but I'm not stupid. Here. Some words are missing because the line was... breaking up. Or he was breaking down. I'm not sure which.",
-            "ko": "그가 한 말 전부 적어뒀어. 나는 댄서지 탐정이 아니야 — 하지만 바보도 아니거든. 여기. 몇 단어가 빠져있어, 전화가... 끊기고 있었거든. 아니면 그가 무너지고 있었거나. 뭔지 모르겠어.",
-            "es": "Anote cada palabra que dijo. Soy bailaora, no detective — pero no soy tonta. Aqui. Faltan algunas palabras porque la linea se estaba... cortando. O el se estaba derrumbando. No se cual de las dos."
+            "en": "I wrote down every word he said. I'm a dancer, not a detective... but I'm not stupid. Here. Some words are missing because the line was... breaking up. Or he was breaking down. I'm not sure which.",
+            "ko": "그가 한 말 전부 적어뒀어. 나는 댄서지 탐정이 아니야... 하지만 바보도 아니거든. 여기. 몇 단어가 빠져있어, 전화가... 끊기고 있었거든. 아니면 그가 무너지고 있었거나. 뭔지 모르겠어.",
+            "es": "Anote cada palabra que dijo. Soy bailaora, no detective... pero no soy tonta. Aqui. Faltan algunas palabras porque la linea se estaba... cortando. O el se estaba derrumbando. No se cual de las dos."
           },
           "idiom": {
             "phrase": { "en": "I'm a dancer, not a detective", "ko": "나는 댄서지 탐정이 아니야", "es": "Soy bailaora, no detective" },
-            "meaning": { "en": "Isabel's defiant humility — 'I did the best I could with what I know.'", "ko": "이사벨의 당당한 겸손 — '내가 아는 한 최선을 다했어.'", "es": "La humildad desafiante de Isabel — 'hice lo mejor que pude con lo que se.'" },
+            "meaning": { "en": "Isabel's defiant humility... 'I did the best I could with what I know.'", "ko": "이사벨의 당당한 겸손... '내가 아는 한 최선을 다했어.'", "es": "La humildad desafiante de Isabel... 'hice lo mejor que pude con lo que se.'" },
             "collection": "Isabel_Madrid_Fire",
             "addToExpressionBook": true
           }
@@ -159,9 +165,9 @@
           "id": "ch2_s1_quiz_intro",
           "beat": "QUIZ_MOMENT",
           "narration": {
-            "en": "Isabel hands you a crumpled napkin. On it, Carlos's last words — written in her sharp, dancer's handwriting. But gaps remain where the signal cut out. Fill in the missing words to reconstruct what Carlos was desperately trying to say before his language was stripped away.",
+            "en": "Isabel hands you a crumpled napkin. On it, Carlos's last words... written in her sharp, dancer's handwriting. But gaps remain where the signal cut out. Fill in the missing words to reconstruct what Carlos was desperately trying to say before his language was stripped away.",
             "ko": "이사벨이 구겨진 냅킨을 건넨다. 카를로스의 마지막 말이 그녀의 날카로운 댄서 필체로 적혀 있다. 하지만 신호가 끊긴 곳에 빈칸이 남아있다. 빠진 단어를 채워서 카를로스가 언어를 빼앗기기 전에 필사적으로 말하려 했던 것을 복원하라.",
-            "es": "Isabel te entrega una servilleta arrugada. Las ultimas palabras de Carlos — escritas en su letra aguda de bailaora. Pero quedan huecos donde la senal se corto. Completa las palabras que faltan para reconstruir lo que Carlos desesperadamente intentaba decir antes de que le arrancaran el lenguaje."
+            "es": "Isabel te entrega una servilleta arrugada. Las ultimas palabras de Carlos... escritas en su letra aguda de bailaora. Pero quedan huecos donde la senal se corto. Completa las palabras que faltan para reconstruir lo que Carlos desesperadamente intentaba decir antes de que le arrancaran el lenguaje."
           }
         },
         {
@@ -169,9 +175,9 @@
           "beat": "REVEAL",
           "charId": "lingo",
           "text": {
-            "en": "'Hello! Help! Where is the door? I'm sorry! My name is Carlos. Goodbye!' Isabel — he wasn't speaking a foreign language. He was speaking the ONLY language he had left. Something stripped his Spanish, his English, his French, everything — and left him with nothing but Day One vocabulary. Basic greetings. Basic survival. Someone did this to him. And I know who.",
-            "ko": "'안녕하세요! 도와주세요! 문이 어디예요? 죄송합니다! 제 이름은 카를로스입니다. 안녕히 계세요!' 이사벨 — 그가 외국어를 한 게 아니야. 남은 유일한 언어를 말한 거야. 무언가가 스페인어, 영어, 프랑스어, 전부를 벗겨갔어 — 그리고 첫날 단어만 남겨놓은 거야. 기초 인사. 기초 생존 표현. 누군가가 이걸 한 거야. 그리고 누군지 알아.",
-            "es": "'Hola! Ayuda! Donde esta la puerta? Lo siento! Mi nombre es Carlos. Adios!' Isabel — no estaba hablando un idioma extranjero. Estaba hablando el UNICO idioma que le quedaba. Algo le quito su espanol, su ingles, su frances, todo — y le dejo solo con vocabulario del Dia Uno. Saludos basicos. Supervivencia basica. Alguien le hizo esto. Y se quien."
+            "en": "'Hello! Help! Where is the door? I'm sorry! My name is Carlos. Goodbye!' Isabel... he wasn't speaking a foreign language. He was speaking the ONLY language he had left. Something stripped his Spanish, his English, his French, everything... and left him with nothing but Day One vocabulary. Basic greetings. Basic survival. Someone did this to him. And I know who.",
+            "ko": "'안녕하세요! 도와주세요! 문이 어디예요? 죄송합니다! 제 이름은 카를로스입니다. 안녕히 계세요!' 이사벨... 그가 외국어를 한 게 아니야. 남은 유일한 언어를 말한 거야. 무언가가 스페인어, 영어, 프랑스어, 전부를 벗겨갔어... 그리고 첫날 단어만 남겨놓은 거야. 기초 인사. 기초 생존 표현. 누군가가 이걸 한 거야. 그리고 누군지 알아.",
+            "es": "'Hola! Ayuda! Donde esta la puerta? Lo siento! Mi nombre es Carlos. Adios!' Isabel... no estaba hablando un idioma extranjero. Estaba hablando el UNICO idioma que le quedaba. Algo le quito su espanol, su ingles, su frances, todo... y le dejo solo con vocabulario del Dia Uno. Saludos basicos. Supervivencia basica. Alguien le hizo esto. Y se quien."
           }
         },
         {
@@ -189,9 +195,9 @@
           "beat": "CLIFFHANGER",
           "charId": "lingo",
           "text": {
-            "en": "A week ago I would have said the same thing. Then I watched a woman with twenty years of research forget how to say 'hello.' Take me to where Carlos was working. The Prado. Now. And Isabel — who sent you that photo of his workshop? The one with 'AYUDA' written everywhere?",
-            "ko": "일주일 전이었으면 나도 같은 말을 했을 거야. 그런데 20년 연구 경력의 여성이 '안녕하세요'를 잊어버리는 걸 봤거든. 카를로스가 일하던 곳으로 데려다줘. 프라도. 지금. 그리고 이사벨 — 'AYUDA'가 가득 쓰인 작업실 사진, 누가 보낸 거야?",
-            "es": "Hace una semana hubiera dicho lo mismo. Luego vi a una mujer con veinte anos de investigacion olvidar como decir 'hola.' Llevame a donde trabajaba Carlos. El Prado. Ahora. Y Isabel — quien te mando esa foto del taller? La que tiene 'AYUDA' escrito por todas partes?"
+            "en": "A week ago I would have said the same thing. Then I watched a woman with twenty years of research forget how to say 'hello.' Take me to where Carlos was working. The Prado. Now. And Isabel... who sent you that photo of his workshop? The one with 'AYUDA' written everywhere?",
+            "ko": "일주일 전이었으면 나도 같은 말을 했을 거야. 그런데 20년 연구 경력의 여성이 '안녕하세요'를 잊어버리는 걸 봤거든. 카를로스가 일하던 곳으로 데려다줘. 프라도. 지금. 그리고 이사벨... 'AYUDA'가 가득 쓰인 작업실 사진, 누가 보낸 거야?",
+            "es": "Hace una semana hubiera dicho lo mismo. Luego vi a una mujer con veinte anos de investigacion olvidar como decir 'hola.' Llevame a donde trabajaba Carlos. El Prado. Ahora. Y Isabel... quien te mando esa foto del taller? La que tiene 'AYUDA' escrito por todas partes?"
           }
         },
         {
@@ -210,9 +216,9 @@
           "charId": "lingo",
           "isThought": true,
           "text": {
-            "en": "('Good morning. Thank you for waiting.' Day One vocabulary. Again. He's signing everything in beginner phrases. It's his calling card. Mr. Black doesn't just speak every language — he mocks the people still learning them.)",
-            "ko": "('좋은 아침이에요. 기다려줘서 감사합니다.' 첫날 단어. 또. 모든 걸 초급 표현으로 서명하고 있어. 그의 서명이야. 미스터 블랙은 모든 언어를 말하는 것뿐만 아니라 — 아직 배우는 사람들을 조롱하고 있어.)",
-            "es": "('Buenos dias. Gracias por esperar.' Vocabulario del Dia Uno. De nuevo. Firma todo en frases de principiante. Es su tarjeta de visita. Mr. Black no solo habla todos los idiomas — se burla de los que aun los estan aprendiendo.)"
+            "en": "('Good morning. Thank you for waiting.' Day One vocabulary. Again. He's signing everything in beginner phrases. It's his calling card. Mr. Black doesn't just speak every language... he mocks the people still learning them.)",
+            "ko": "('좋은 아침이에요. 기다려줘서 감사합니다.' 첫날 단어. 또. 모든 걸 초급 표현으로 서명하고 있어. 그의 서명이야. 미스터 블랙은 모든 언어를 말하는 것뿐만 아니라... 아직 배우는 사람들을 조롱하고 있어.)",
+            "es": "('Buenos dias. Gracias por esperar.' Vocabulario del Dia Uno. De nuevo. Firma todo en frases de principiante. Es su tarjeta de visita. Mr. Black no solo habla todos los idiomas... se burla de los que aun los estan aprendiendo.)"
           }
         }
       ]
@@ -221,18 +227,18 @@
     {
       "id": "ch2_scene2",
       "title": {
-        "ko": "돈 미겔의 시장 — 단어가 사라지는 곳",
-        "en": "Don Miguel's Market — Where Words Go to Die",
-        "es": "El Mercado de Don Miguel — Donde las Palabras Mueren"
+        "ko": "돈 미겔의 시장... 단어가 사라지는 곳",
+        "en": "Don Miguel's Market... Where Words Go to Die",
+        "es": "El Mercado de Don Miguel... Donde las Palabras Mueren"
       },
       "beats": [
         {
           "id": "ch2_s2_opening",
           "beat": "CALM",
           "narration": {
-            "en": "On the way to the Prado, Isabel detours through San Miguel Market. 'There's someone you need to meet first. Don Miguel. Forty years in this market. He sees everything, knows everyone.' The smell of spices, mountains of fruit, voices overlapping in rapid Spanish. An old man arranges tomatoes behind a small stall. His smile is warm — but his hands are shaking.",
-            "ko": "프라도로 가는 길에 이사벨이 산 미겔 시장으로 우회한다. '먼저 만나야 할 사람이 있어. 돈 미겔. 이 시장에서 40년. 모든 것을 보고, 모든 사람을 알아.' 향신료 냄새, 과일 산더미, 빠른 스페인어가 겹치는 목소리. 한 노인이 작은 가판대 뒤에서 토마토를 정리한다. 미소는 따뜻하지만 — 손이 떨리고 있다.",
-            "es": "De camino al Prado, Isabel desvía por el Mercado de San Miguel. 'Hay alguien que necesitas conocer primero. Don Miguel. Cuarenta anos en este mercado. Lo ve todo, conoce a todos.' El olor de especias, montanas de fruta, voces superpuestas en rapido espanol. Un anciano ordena tomates detras de un pequeno puesto. Su sonrisa es calida — pero sus manos tiemblan."
+            "en": "On the way to the Prado, Isabel detours through San Miguel Market. 'There's someone you need to meet first. Don Miguel. Forty years in this market. He sees everything, knows everyone.' The smell of spices, mountains of fruit, voices overlapping in rapid Spanish. An old man arranges tomatoes behind a small stall. His smile is warm... but his hands are shaking.",
+            "ko": "프라도로 가는 길에 이사벨이 산 미겔 시장으로 우회한다. '먼저 만나야 할 사람이 있어. 돈 미겔. 이 시장에서 40년. 모든 것을 보고, 모든 사람을 알아.' 향신료 냄새, 과일 산더미, 빠른 스페인어가 겹치는 목소리. 한 노인이 작은 가판대 뒤에서 토마토를 정리한다. 미소는 따뜻하지만... 손이 떨리고 있다.",
+            "es": "De camino al Prado, Isabel desvía por el Mercado de San Miguel. 'Hay alguien que necesitas conocer primero. Don Miguel. Cuarenta anos en este mercado. Lo ve todo, conoce a todos.' El olor de especias, montanas de fruta, voces superpuestas en rapido espanol. Un anciano ordena tomates detras de un pequeno puesto. Su sonrisa es calida... pero sus manos tiemblan."
           }
         },
         {
@@ -240,13 +246,13 @@
           "beat": "CALM",
           "charId": "miguel",
           "text": {
-            "en": "Isabel! And this must be the famous detective. Welcome, welcome! Please, sit. Are you hungry? Of course you're hungry — you're in Madrid! Nobody leaves my stall hungry. That's my one rule.",
-            "ko": "이사벨! 이분이 유명한 탐정이로구나. 환영해, 환영해! 자, 앉아. 배고프지? 당연히 배고프겠지 — 마드리드에 왔으니까! 아무도 내 가판대에서 배고프게 안 가. 그게 내 유일한 규칙이야.",
-            "es": "Isabel! Y este debe ser el famoso detective. Bienvenido, bienvenido! Por favor, sientate. Tienes hambre? Claro que tienes hambre — estas en Madrid! Nadie se va de mi puesto con hambre. Esa es mi unica regla."
+            "en": "Isabel! And this must be the famous detective. Welcome, welcome! Please, sit. Are you hungry? Of course you're hungry... you're in Madrid! Nobody leaves my stall hungry. That's my one rule.",
+            "ko": "이사벨! 이분이 유명한 탐정이로구나. 환영해, 환영해! 자, 앉아. 배고프지? 당연히 배고프겠지... 마드리드에 왔으니까! 아무도 내 가판대에서 배고프게 안 가. 그게 내 유일한 규칙이야.",
+            "es": "Isabel! Y este debe ser el famoso detective. Bienvenido, bienvenido! Por favor, sientate. Tienes hambre? Claro que tienes hambre... estas en Madrid! Nadie se va de mi puesto con hambre. Esa es mi unica regla."
           },
           "idiom": {
             "phrase": { "en": "Nobody leaves my stall hungry", "ko": "아무도 내 가판대에서 배고프게 안 가", "es": "Nadie se va de mi puesto con hambre" },
-            "meaning": { "en": "Don Miguel's personal code — hospitality before business, food before questions. In Spain, sharing food is sharing trust.", "ko": "돈 미겔의 개인 신조 — 사업보다 환대가 먼저, 질문보다 음식이 먼저. 스페인에서 음식을 나누는 건 신뢰를 나누는 것.", "es": "El codigo personal de Don Miguel — hospitalidad antes que negocio, comida antes que preguntas. En Espana, compartir comida es compartir confianza." },
+            "meaning": { "en": "Don Miguel's personal code... hospitality before business, food before questions. In Spain, sharing food is sharing trust.", "ko": "돈 미겔의 개인 신조... 사업보다 환대가 먼저, 질문보다 음식이 먼저. 스페인에서 음식을 나누는 건 신뢰를 나누는 것.", "es": "El codigo personal de Don Miguel... hospitalidad antes que negocio, comida antes que preguntas. En Espana, compartir comida es compartir confianza." },
             "collection": "Miguel_Spanish_Proverbs",
             "addToExpressionBook": true
           }
@@ -256,9 +262,9 @@
           "beat": "CALM",
           "charId": "lingo",
           "text": {
-            "en": "I appreciate the hospitality, Don Miguel, but I'm actually here about Carlos —",
-            "ko": "환대에 감사합니다, 돈 미겔, 하지만 사실 카를로스 때문에 왔는데 —",
-            "es": "Agradezco la hospitalidad, Don Miguel, pero en realidad estoy aqui por Carlos —"
+            "en": "I appreciate the hospitality, Don Miguel, but I'm actually here about Carlos...",
+            "ko": "환대에 감사합니다, 돈 미겔, 하지만 사실 카를로스 때문에 왔는데...",
+            "es": "Agradezco la hospitalidad, Don Miguel, pero en realidad estoy aqui por Carlos..."
           }
         },
         {
@@ -266,9 +272,9 @@
           "beat": "CURIOSITY",
           "charId": "miguel",
           "text": {
-            "en": "First, you eat. Then, we talk. In Spain, a conversation without food is like a song without music. As we say: 'Barriga llena, corazon contento' — a full belly, a happy heart. Now — what would you like? I have the best bread in Madrid. Fresh ham. Tomatoes so red they should be illegal. Coffee that will wake up your grandchildren. Tell me what you want, detective. In my market, you must ask properly.",
-            "ko": "먼저 먹어. 그다음 얘기해. 스페인에서 음식 없는 대화는 음악 없는 노래야. 우리 말로 'Barriga llena, corazon contento' — 배가 부르면 마음이 행복하다. 자 — 뭐 먹을래? 마드리드 최고의 빵이 있어. 신선한 하몽. 불법이어야 할 만큼 빨간 토마토. 손자까지 깨울 커피. 뭘 원하는지 말해, 탐정. 내 시장에서는 제대로 주문해야 해.",
-            "es": "Primero, comes. Luego, hablamos. En Espana, una conversacion sin comida es como una cancion sin musica. Como decimos: 'Barriga llena, corazon contento.' Ahora — que te gustaria? Tengo el mejor pan de Madrid. Jamon fresco. Tomates tan rojos que deberian ser ilegales. Cafe que despertara a tus nietos. Dime que quieres, detective. En mi mercado, hay que pedir como es debido."
+            "en": "First, you eat. Then, we talk. In Spain, a conversation without food is like a song without music. As we say: 'Barriga llena, corazon contento'... a full belly, a happy heart. Now... what would you like? I have the best bread in Madrid. Fresh ham. Tomatoes so red they should be illegal. Coffee that will wake up your grandchildren. Tell me what you want, detective. In my market, you must ask properly.",
+            "ko": "먼저 먹어. 그다음 얘기해. 스페인에서 음식 없는 대화는 음악 없는 노래야. 우리 말로 'Barriga llena, corazon contento'... 배가 부르면 마음이 행복하다. 자... 뭐 먹을래? 마드리드 최고의 빵이 있어. 신선한 하몽. 불법이어야 할 만큼 빨간 토마토. 손자까지 깨울 커피. 뭘 원하는지 말해, 탐정. 내 시장에서는 제대로 주문해야 해.",
+            "es": "Primero, comes. Luego, hablamos. En Espana, una conversacion sin comida es como una cancion sin musica. Como decimos: 'Barriga llena, corazon contento.' Ahora... que te gustaria? Tengo el mejor pan de Madrid. Jamon fresco. Tomates tan rojos que deberian ser ilegales. Cafe que despertara a tus nietos. Dime que quieres, detective. En mi mercado, hay que pedir como es debido."
           },
           "idiom": {
             "phrase": { "en": "Barriga llena, corazon contento", "ko": "배가 부르면 마음이 행복하다", "es": "Barriga llena, corazon contento" },
@@ -292,9 +298,9 @@
           "id": "ch2_s2_quiz_intro",
           "beat": "QUIZ_MOMENT",
           "narration": {
-            "en": "Don Miguel crosses his arms and waits. The market bustles around you — vendors shouting prices, the sizzle of cooking, the clink of coins. Order food and he'll talk. Fail to impress him and Carlos stays missing one minute longer. The menu board behind him shows food and prices in three languages.",
-            "ko": "돈 미겔이 팔짱을 끼고 기다린다. 시장이 주변에서 북적인다 — 상인들이 가격을 외치고, 요리 소리, 동전 소리. 음식을 주문하면 그가 입을 열 것이다. 감동을 주지 못하면 카를로스는 1분 더 실종 상태로 남는다. 뒤의 메뉴판에 음식과 가격이 세 개 언어로 적혀 있다.",
-            "es": "Don Miguel cruza los brazos y espera. El mercado bulle a tu alrededor — vendedores gritando precios, el chisporroteo de la cocina, el tintineo de monedas. Pide comida y hablara. Si no lo impresionas, Carlos sigue desaparecido un minuto mas. El menu detras muestra comida y precios en tres idiomas."
+            "en": "Don Miguel crosses his arms and waits. The market bustles around you... vendors shouting prices, the sizzle of cooking, the clink of coins. Order food and he'll talk. Fail to impress him and Carlos stays missing one minute longer. The menu board behind him shows food and prices in three languages.",
+            "ko": "돈 미겔이 팔짱을 끼고 기다린다. 시장이 주변에서 북적인다... 상인들이 가격을 외치고, 요리 소리, 동전 소리. 음식을 주문하면 그가 입을 열 것이다. 감동을 주지 못하면 카를로스는 1분 더 실종 상태로 남는다. 뒤의 메뉴판에 음식과 가격이 세 개 언어로 적혀 있다.",
+            "es": "Don Miguel cruza los brazos y espera. El mercado bulle a tu alrededor... vendedores gritando precios, el chisporroteo de la cocina, el tintineo de monedas. Pide comida y hablara. Si no lo impresionas, Carlos sigue desaparecido un minuto mas. El menu detras muestra comida y precios en tres idiomas."
           }
         },
         {
@@ -312,9 +318,9 @@
           "beat": "TENSION",
           "charId": "miguel",
           "text": {
-            "en": "Yesterday, I forgot how to say 'friend' in Spanish. My own language. Forty years I ran this market. I stood here, looking at my neighbor Eduardo, and the word 'amigo' — gone. Like someone reached into my head and pulled it out. For three seconds, nothing. The word came back. But those three seconds? I have never been so frightened in my life.",
-            "ko": "어제, '친구'라는 단어를 스페인어로 잊어버렸어. 내 모국어를. 40년간 이 시장을 운영했어. 여기 서서 이웃 에두아르도를 보는데, 'amigo'라는 단어가 — 사라졌어. 누가 머릿속에 손을 넣어서 뽑아간 것처럼. 3초 동안, 아무것도. 단어는 돌아왔어. 근데 그 3초? 내 인생에서 그렇게 무서웠던 적이 없어.",
-            "es": "Ayer, olvide como decir 'amigo' en espanol. Mi propio idioma. Cuarenta anos llevo en este mercado. Me quede aqui, mirando a mi vecino Eduardo, y la palabra 'amigo' — desaparecio. Como si alguien metiera la mano en mi cabeza y la sacara. Por tres segundos, nada. La palabra volvio. Pero esos tres segundos? Nunca en mi vida he tenido tanto miedo."
+            "en": "Yesterday, I forgot how to say 'friend' in Spanish. My own language. Forty years I ran this market. I stood here, looking at my neighbor Eduardo, and the word 'amigo'... gone. Like someone reached into my head and pulled it out. For three seconds, nothing. The word came back. But those three seconds? I have never been so frightened in my life.",
+            "ko": "어제, '친구'라는 단어를 스페인어로 잊어버렸어. 내 모국어를. 40년간 이 시장을 운영했어. 여기 서서 이웃 에두아르도를 보는데, 'amigo'라는 단어가... 사라졌어. 누가 머릿속에 손을 넣어서 뽑아간 것처럼. 3초 동안, 아무것도. 단어는 돌아왔어. 근데 그 3초? 내 인생에서 그렇게 무서웠던 적이 없어.",
+            "es": "Ayer, olvide como decir 'amigo' en espanol. Mi propio idioma. Cuarenta anos llevo en este mercado. Me quede aqui, mirando a mi vecino Eduardo, y la palabra 'amigo'... desaparecio. Como si alguien metiera la mano en mi cabeza y la sacara. Por tres segundos, nada. La palabra volvio. Pero esos tres segundos? Nunca en mi vida he tenido tanto miedo."
           }
         },
         {
@@ -322,13 +328,13 @@
           "beat": "TENSION",
           "charId": "miguel",
           "text": {
-            "en": "And I'm not the only one. Maria the baker forgot 'bread' — her own product. Eduardo forgot 'open' and couldn't open his shop. The word wouldn't come. As we say, 'No hay mal que por bien no venga' — every cloud has a silver lining. But I'm struggling to find the silver in this, detective.",
-            "ko": "그리고 나만 그런 게 아니야. 빵집 마리아가 '빵'을 잊어버렸어 — 자기가 파는 것을. 에두아르도는 '열다'를 잊어서 자기 가게를 못 열었어. 단어가 안 떠올라서. 우리 말로 'No hay mal que por bien no venga' — 비 온 뒤에 땅이 굳는다지만. 이번엔 좋은 점을 찾기 힘들어, 탐정.",
-            "es": "Y no soy el unico. Maria la panadera olvido 'pan' — su propio producto. Eduardo olvido 'abrir' y no pudo abrir su tienda. La palabra no venia. Como decimos, 'No hay mal que por bien no venga.' Pero me cuesta encontrar el bien en esto, detective."
+            "en": "And I'm not the only one. Maria the baker forgot 'bread'... her own product. Eduardo forgot 'open' and couldn't open his shop. The word wouldn't come. As we say, 'No hay mal que por bien no venga'... every cloud has a silver lining. But I'm struggling to find the silver in this, detective.",
+            "ko": "그리고 나만 그런 게 아니야. 빵집 마리아가 '빵'을 잊어버렸어... 자기가 파는 것을. 에두아르도는 '열다'를 잊어서 자기 가게를 못 열었어. 단어가 안 떠올라서. 우리 말로 'No hay mal que por bien no venga'... 비 온 뒤에 땅이 굳는다지만. 이번엔 좋은 점을 찾기 힘들어, 탐정.",
+            "es": "Y no soy el unico. Maria la panadera olvido 'pan'... su propio producto. Eduardo olvido 'abrir' y no pudo abrir su tienda. La palabra no venia. Como decimos, 'No hay mal que por bien no venga.' Pero me cuesta encontrar el bien en esto, detective."
           },
           "idiom": {
             "phrase": { "en": "No hay mal que por bien no venga", "ko": "비 온 뒤에 땅이 굳는다", "es": "No hay mal que por bien no venga" },
-            "meaning": { "en": "Spanish proverb: Every cloud has a silver lining — but Don Miguel uses it ironically here, struggling to find hope.", "ko": "스페인 속담: 나쁜 일 뒤에 좋은 일이 온다 — 하지만 돈 미겔은 여기서 아이러니하게 사용, 희망을 찾기 힘들어하며.", "es": "Proverbio espanol: de todo lo malo sale algo bueno — pero Don Miguel lo usa ironicamente, luchando por encontrar esperanza." },
+            "meaning": { "en": "Spanish proverb: Every cloud has a silver lining... but Don Miguel uses it ironically here, struggling to find hope.", "ko": "스페인 속담: 나쁜 일 뒤에 좋은 일이 온다... 하지만 돈 미겔은 여기서 아이러니하게 사용, 희망을 찾기 힘들어하며.", "es": "Proverbio espanol: de todo lo malo sale algo bueno... pero Don Miguel lo usa ironicamente, luchando por encontrar esperanza." },
             "collection": "Miguel_Spanish_Proverbs",
             "addToExpressionBook": true
           }
@@ -339,9 +345,9 @@
           "charId": "lingo",
           "isThought": true,
           "text": {
-            "en": "(He's forgetting words. Don Miguel — seventy years of daily Spanish — is losing simple words. The baker forgot 'bread.' The shopkeeper forgot 'open.' And Carlos screamed nothing but Day One phrases before disappearing. The device isn't just a prototype. It's already leaking. Here. In this market. The words aren't just being stolen from Carlos — they're being stolen from everyone nearby.)",
-            "ko": "(단어를 잊고 있어. 돈 미겔 — 70년 넘게 매일 스페인어를 해온 사람이 — 간단한 단어를 잃고 있어. 빵집이 '빵'을 잊었어. 가게 주인이 '열다'를 잊었어. 그리고 카를로스는 사라지기 전에 첫날 표현만 외치고 있었고. 장치는 시제품만이 아니야. 이미 새고 있어. 여기. 이 시장에서. 단어가 카를로스한테서만 빼앗기는 게 아니야 — 주변 모든 사람한테서 빼앗기고 있어.)",
-            "es": "(Olvida palabras. Don Miguel — setenta anos de espanol diario — pierde palabras simples. La panadera olvido 'pan.' El tendero olvido 'abrir.' Y Carlos gritaba solo frases del Dia Uno antes de desaparecer. El dispositivo no es solo un prototipo. Ya esta filtrando. Aqui. En este mercado. Las palabras no solo se las roban a Carlos — se las roban a todos los que estan cerca.)"
+            "en": "(He's forgetting words. Don Miguel... seventy years of daily Spanish... is losing simple words. The baker forgot 'bread.' The shopkeeper forgot 'open.' And Carlos screamed nothing but Day One phrases before disappearing. The device isn't just a prototype. It's already leaking. Here. In this market. The words aren't just being stolen from Carlos... they're being stolen from everyone nearby.)",
+            "ko": "(단어를 잊고 있어. 돈 미겔... 70년 넘게 매일 스페인어를 해온 사람이... 간단한 단어를 잃고 있어. 빵집이 '빵'을 잊었어. 가게 주인이 '열다'를 잊었어. 그리고 카를로스는 사라지기 전에 첫날 표현만 외치고 있었고. 장치는 시제품만이 아니야. 이미 새고 있어. 여기. 이 시장에서. 단어가 카를로스한테서만 빼앗기는 게 아니야... 주변 모든 사람한테서 빼앗기고 있어.)",
+            "es": "(Olvida palabras. Don Miguel... setenta anos de espanol diario... pierde palabras simples. La panadera olvido 'pan.' El tendero olvido 'abrir.' Y Carlos gritaba solo frases del Dia Uno antes de desaparecer. El dispositivo no es solo un prototipo. Ya esta filtrando. Aqui. En este mercado. Las palabras no solo se las roban a Carlos... se las roban a todos los que estan cerca.)"
           }
         },
         {
@@ -349,9 +355,9 @@
           "beat": "CLIFFHANGER",
           "charId": "lingo",
           "text": {
-            "en": "Don Miguel. The man who took Carlos — tall, black coat, speaks perfect everything. Does he come here?",
-            "ko": "돈 미겔. 카를로스를 데려간 남자 — 키 크고, 검은 코트, 모든 언어를 완벽하게 하는 사람. 여기 와요?",
-            "es": "Don Miguel. El hombre que se llevo a Carlos — alto, abrigo negro, habla todo perfectamente. Viene aqui?"
+            "en": "Don Miguel. The man who took Carlos... tall, black coat, speaks perfect everything. Does he come here?",
+            "ko": "돈 미겔. 카를로스를 데려간 남자... 키 크고, 검은 코트, 모든 언어를 완벽하게 하는 사람. 여기 와요?",
+            "es": "Don Miguel. El hombre que se llevo a Carlos... alto, abrigo negro, habla todo perfectamente. Viene aqui?"
           }
         },
         {
@@ -369,8 +375,8 @@
           "beat": "CLIFFHANGER",
           "charId": "miguel",
           "text": {
-            "en": "And detective? He asked about you. He said: 'When the fox arrives, tell him the door is open.' Then he smiled, left three euros for one coffee, and walked toward Retiro Park. 'Dime con quien andas y te dire quien eres' — tell me who you walk with, and I'll tell you who you are. Be careful who you follow, detective.",
-            "ko": "그리고 탐정? 그가 너에 대해 물어봤어. 이렇게 말했어: '여우가 도착하면, 문이 열려 있다고 전해줘.' 그러고는 미소짓고, 커피 한 잔에 3유로를 남기고, 레티로 공원 쪽으로 걸어갔어. 'Dime con quien andas y te dire quien eres' — 누구와 다니는지 말해봐, 네가 누군지 알려줄게. 누구를 따라가는지 조심해, 탐정.",
+            "en": "And detective? He asked about you. He said: 'When the fox arrives, tell him the door is open.' Then he smiled, left three euros for one coffee, and walked toward Retiro Park. 'Dime con quien andas y te dire quien eres'... tell me who you walk with, and I'll tell you who you are. Be careful who you follow, detective.",
+            "ko": "그리고 탐정? 그가 너에 대해 물어봤어. 이렇게 말했어: '여우가 도착하면, 문이 열려 있다고 전해줘.' 그러고는 미소짓고, 커피 한 잔에 3유로를 남기고, 레티로 공원 쪽으로 걸어갔어. 'Dime con quien andas y te dire quien eres'... 누구와 다니는지 말해봐, 네가 누군지 알려줄게. 누구를 따라가는지 조심해, 탐정.",
             "es": "Y detective? Pregunto por ti. Dijo: 'Cuando llegue el zorro, dile que la puerta esta abierta.' Luego sonrio, dejo tres euros por un cafe, y camino hacia el Retiro. 'Dime con quien andas y te dire quien eres.' Ten cuidado a quien sigues, detective."
           },
           "idiom": {
@@ -395,9 +401,9 @@
           "id": "ch2_s3_opening",
           "beat": "CALM",
           "narration": {
-            "en": "Retiro Park. Afternoon sun filters through ancient trees. The last place Carlos was seen. You sit on a bench, scanning every face. Then — across the path — a man. Tall. Silver hair. Impeccably dressed. Writing in a small leather notebook with the calm of someone who has all the time in the world.",
-            "ko": "레티로 공원. 오후 햇살이 오래된 나무 사이로 쏟아진다. 카를로스가 마지막으로 목격된 곳. 벤치에 앉아 모든 얼굴을 훑는다. 그때 — 길 건너편에 — 한 남자. 키가 크다. 은발. 흠잡을 데 없이 차려입었다. 시간이 무한한 사람의 여유로 작은 가죽 노트에 무언가를 적고 있다.",
-            "es": "Parque del Retiro. El sol de la tarde se filtra entre arboles antiguos. El ultimo lugar donde vieron a Carlos. Te sientas en un banco, escaneando cada cara. Entonces — al otro lado del camino — un hombre. Alto. Pelo plateado. Impecablemente vestido. Escribiendo en una libreta de cuero con la calma de alguien que tiene todo el tiempo del mundo."
+            "en": "Retiro Park. Afternoon sun filters through ancient trees. The last place Carlos was seen. You sit on a bench, scanning every face. Then... across the path... a man. Tall. Silver hair. Impeccably dressed. Writing in a small leather notebook with the calm of someone who has all the time in the world.",
+            "ko": "레티로 공원. 오후 햇살이 오래된 나무 사이로 쏟아진다. 카를로스가 마지막으로 목격된 곳. 벤치에 앉아 모든 얼굴을 훑는다. 그때... 길 건너편에... 한 남자. 키가 크다. 은발. 흠잡을 데 없이 차려입었다. 시간이 무한한 사람의 여유로 작은 가죽 노트에 무언가를 적고 있다.",
+            "es": "Parque del Retiro. El sol de la tarde se filtra entre arboles antiguos. El ultimo lugar donde vieron a Carlos. Te sientas en un banco, escaneando cada cara. Entonces... al otro lado del camino... un hombre. Alto. Pelo plateado. Impecablemente vestido. Escribiendo en una libreta de cuero con la calma de alguien que tiene todo el tiempo del mundo."
           }
         },
         {
@@ -406,9 +412,9 @@
           "charId": "lingo",
           "isThought": true,
           "text": {
-            "en": "(That's him. Twenty meters away. Writing like he's composing poetry instead of destroying civilizations. My heart is trying to escape through my throat. Stay calm. He doesn't know I've —)",
-            "ko": "(저 사람이야. 20미터 앞에서. 문명을 파괴하는 대신 시를 쓰는 것처럼 적고 있어. 심장이 목구멍으로 도망치려 하고 있어. 침착해. 그는 내가 봤다는 걸 몰라 —)",
-            "es": "(Es el. A veinte metros. Escribiendo como si compusiera poesia en vez de destruir civilizaciones. Mi corazon intenta escapar por mi garganta. Calma. No sabe que lo he —)"
+            "en": "(That's him. Twenty meters away. Writing like he's composing poetry instead of destroying civilizations. My heart is trying to escape through my throat. Stay calm. He doesn't know I've ...)",
+            "ko": "(저 사람이야. 20미터 앞에서. 문명을 파괴하는 대신 시를 쓰는 것처럼 적고 있어. 심장이 목구멍으로 도망치려 하고 있어. 침착해. 그는 내가 봤다는 걸 몰라 ...)",
+            "es": "(Es el. A veinte metros. Escribiendo como si compusiera poesia en vez de destruir civilizaciones. Mi corazon intenta escapar por mi garganta. Calma. No sabe que lo he ...)"
           }
         },
         {
@@ -450,7 +456,7 @@
             "ko": "칼레 델 프라도 3번지. 3층. 문은 열려 있어요. 저는 문을 잠그지 않아요, 탐정. 이미 아시잖아요.",
             "es": "Numero tres, Calle del Prado. Tercer piso. La puerta esta abierta. Yo no cierro puertas, detective. Eso ya lo sabe de mi."
           },
-          "designNote": "Numbers (Day 7) + Where is/door (Day 1-6). Mr. Black gives information freely — that's what's terrifying."
+          "designNote": "Numbers (Day 7) + Where is/door (Day 1-6). Mr. Black gives information freely... that's what's terrifying."
         },
         {
           "id": "ch2_s3_d6",
@@ -496,9 +502,9 @@
           "id": "ch2_s3_notebook",
           "beat": "CLIFFHANGER",
           "narration": {
-            "en": "You check the bench where Mr. Black was sitting. A torn page from his notebook lies underneath. Numbers and words scrambled together — an address, a floor number, a cryptic warning. All in beginner vocabulary. He left it on purpose. Everything he does is on purpose.",
-            "ko": "미스터 블랙이 앉았던 벤치를 확인한다. 노트에서 찢어진 페이지가 밑에 있다. 숫자와 단어가 뒤섞여 있다 — 주소, 층수, 암호 같은 경고. 전부 초급 단어로. 일부러 남긴 거야. 그가 하는 모든 것은 의도적이다.",
-            "es": "Revisas el banco donde estaba Mr. Black. Una pagina arrancada de su libreta esta debajo. Numeros y palabras mezclados — una direccion, un piso, una advertencia criptica. Todo en vocabulario de principiante. Lo dejo a proposito. Todo lo que hace es a proposito."
+            "en": "You check the bench where Mr. Black was sitting. A torn page from his notebook lies underneath. Numbers and words scrambled together... an address, a floor number, a cryptic warning. All in beginner vocabulary. He left it on purpose. Everything he does is on purpose.",
+            "ko": "미스터 블랙이 앉았던 벤치를 확인한다. 노트에서 찢어진 페이지가 밑에 있다. 숫자와 단어가 뒤섞여 있다... 주소, 층수, 암호 같은 경고. 전부 초급 단어로. 일부러 남긴 거야. 그가 하는 모든 것은 의도적이다.",
+            "es": "Revisas el banco donde estaba Mr. Black. Una pagina arrancada de su libreta esta debajo. Numeros y palabras mezclados... una direccion, un piso, una advertencia criptica. Todo en vocabulario de principiante. Lo dejo a proposito. Todo lo que hace es a proposito."
           }
         }
       ]
@@ -516,9 +522,9 @@
           "id": "ch2_s4_opening",
           "beat": "TENSION",
           "narration": {
-            "en": "Number three, Calle del Prado. Third floor. The door is open — of course it is. Inside: a dark room that smells of burnt electronics and old stone. A machine sits in the center, humming. It looks like someone crossed an antique radio with a medieval torture device. Languages scroll across its cracked screen — Spanish, English, Korean, Arabic, Hindi — flickering and dying, one word at a time. And in the corner, tied to a chair with nothing but rope and silence: Carlos. Alive. But staring at the wall like the wall is the only thing left that makes sense.",
-            "ko": "칼레 델 프라도 3번지. 3층. 문이 열려 있다 — 당연히. 안에는: 탄 전자기기와 오래된 돌 냄새가 나는 어두운 방. 가운데에 기계가 윙윙거리며 앉아 있다. 앤티크 라디오와 중세 고문 장치를 합쳐놓은 것 같다. 갈라진 화면에 언어가 스크롤된다 — 스페인어, 영어, 한국어, 아랍어, 힌디어 — 깜빡이며 죽어간다, 한 단어씩. 그리고 구석에, 밧줄과 침묵만으로 의자에 묶인 채: 카를로스. 살아 있다. 하지만 벽을 응시한다, 마치 벽만이 아직 이해되는 유일한 것처럼.",
-            "es": "Numero tres, Calle del Prado. Tercer piso. La puerta esta abierta — por supuesto. Dentro: una habitacion oscura que huele a electronica quemada y piedra vieja. Una maquina esta en el centro, zumbando. Parece como si alguien cruzara una radio antigua con un dispositivo de tortura medieval. Idiomas se desplazan por su pantalla agrietada — espanol, ingles, coreano, arabe, hindi — parpadeando y muriendo, una palabra a la vez. Y en la esquina, atado a una silla con nada mas que cuerda y silencio: Carlos. Vivo. Pero mirando la pared como si la pared fuera lo unico que aun tiene sentido."
+            "en": "Number three, Calle del Prado. Third floor. The door is open... of course it is. Inside: a dark room that smells of burnt electronics and old stone. A machine sits in the center, humming. It looks like someone crossed an antique radio with a medieval torture device. Languages scroll across its cracked screen... Spanish, English, Korean, Arabic, Hindi... flickering and dying, one word at a time. And in the corner, tied to a chair with nothing but rope and silence: Carlos. Alive. But staring at the wall like the wall is the only thing left that makes sense.",
+            "ko": "칼레 델 프라도 3번지. 3층. 문이 열려 있다... 당연히. 안에는: 탄 전자기기와 오래된 돌 냄새가 나는 어두운 방. 가운데에 기계가 윙윙거리며 앉아 있다. 앤티크 라디오와 중세 고문 장치를 합쳐놓은 것 같다. 갈라진 화면에 언어가 스크롤된다... 스페인어, 영어, 한국어, 아랍어, 힌디어... 깜빡이며 죽어간다, 한 단어씩. 그리고 구석에, 밧줄과 침묵만으로 의자에 묶인 채: 카를로스. 살아 있다. 하지만 벽을 응시한다, 마치 벽만이 아직 이해되는 유일한 것처럼.",
+            "es": "Numero tres, Calle del Prado. Tercer piso. La puerta esta abierta... por supuesto. Dentro: una habitacion oscura que huele a electronica quemada y piedra vieja. Una maquina esta en el centro, zumbando. Parece como si alguien cruzara una radio antigua con un dispositivo de tortura medieval. Idiomas se desplazan por su pantalla agrietada... espanol, ingles, coreano, arabe, hindi... parpadeando y muriendo, una palabra a la vez. Y en la esquina, atado a una silla con nada mas que cuerda y silencio: Carlos. Vivo. Pero mirando la pared como si la pared fuera lo unico que aun tiene sentido."
           }
         },
         {
@@ -546,9 +552,9 @@
           "beat": "TENSION",
           "charId": "lingo",
           "text": {
-            "en": "Carlos, listen. You're going to be okay. But this machine — I need to shut it down. It's still running. What does it do?",
-            "ko": "카를로스, 들어. 괜찮을 거야. 하지만 이 기계 — 꺼야 해. 아직 작동 중이야. 뭐 하는 건데?",
-            "es": "Carlos, escucha. Vas a estar bien. Pero esta maquina — necesito apagarla. Todavia funciona. Que hace?"
+            "en": "Carlos, listen. You're going to be okay. But this machine... I need to shut it down. It's still running. What does it do?",
+            "ko": "카를로스, 들어. 괜찮을 거야. 하지만 이 기계... 꺼야 해. 아직 작동 중이야. 뭐 하는 건데?",
+            "es": "Carlos, escucha. Vas a estar bien. Pero esta maquina... necesito apagarla. Todavia funciona. Que hace?"
           }
         },
         {
@@ -567,27 +573,27 @@
           "charId": "lingo",
           "isThought": true,
           "text": {
-            "en": "(A Language Erasure Device. Carlos found the prototype. Mr. Black is building the real one — and it needs all seven Guardian Stones to work at full power. This prototype only erases locally, one person at a time. The final version? Seven stones, seven thousand languages, eight billion people. He's not a thief. He's not even a villain. He's an extinction event wearing a nice coat.)",
-            "ko": "(언어 삭제 장치. 카를로스가 시제품을 발견한 거야. 미스터 블랙은 진짜를 만들고 있어 — 완전한 힘으로 작동하려면 7개의 수호석 전부가 필요해. 이 시제품은 근거리에서만, 한 명씩만 지울 수 있어. 최종 버전은? 7개의 수호석, 7천 개의 언어, 80억 인구. 그는 도둑이 아니야. 악당도 아니야. 멋진 코트를 입은 멸종 사건이야.)",
-            "es": "(Un Dispositivo de Borrado de Idiomas. Carlos encontro el prototipo. Mr. Black esta construyendo el real — y necesita las siete Piedras Guardianas para funcionar a plena potencia. Este prototipo solo borra localmente, una persona a la vez. La version final? Siete piedras, siete mil idiomas, ocho mil millones de personas. No es un ladron. Ni siquiera es un villano. Es un evento de extincion con un abrigo bonito.)"
+            "en": "(A Language Erasure Device. Carlos found the prototype. Mr. Black is building the real one... and it needs all seven Guardian Stones to work at full power. This prototype only erases locally, one person at a time. The final version? Seven stones, seven thousand languages, eight billion people. He's not a thief. He's not even a villain. He's an extinction event wearing a nice coat.)",
+            "ko": "(언어 삭제 장치. 카를로스가 시제품을 발견한 거야. 미스터 블랙은 진짜를 만들고 있어... 완전한 힘으로 작동하려면 7개의 수호석 전부가 필요해. 이 시제품은 근거리에서만, 한 명씩만 지울 수 있어. 최종 버전은? 7개의 수호석, 7천 개의 언어, 80억 인구. 그는 도둑이 아니야. 악당도 아니야. 멋진 코트를 입은 멸종 사건이야.)",
+            "es": "(Un Dispositivo de Borrado de Idiomas. Carlos encontro el prototipo. Mr. Black esta construyendo el real... y necesita las siete Piedras Guardianas para funcionar a plena potencia. Este prototipo solo borra localmente, una persona a la vez. La version final? Siete piedras, siete mil idiomas, ocho mil millones de personas. No es un ladron. Ni siquiera es un villano. Es un evento de extincion con un abrigo bonito.)"
           }
         },
         {
           "id": "ch2_s4_boss_intro",
           "beat": "QUIZ_MOMENT",
           "narration": {
-            "en": "The machine's screen flashes red. An alarm. It's detected your presence and is accelerating — erasing faster now, pulling words from Carlos's mind like teeth from a jaw. To free him, you must crack three security locks in 60 seconds. Each lock is a language puzzle. Fail, and the machine erases another layer of Carlos's vocabulary. He's already down to Day One. After that? Silence. Permanent silence.",
-            "ko": "기계 화면이 빨갛게 깜빡인다. 경보. 네 존재를 감지하고 가속하고 있다 — 더 빠르게 지우고 있어, 턱에서 이빨을 뽑듯 카를로스의 마음에서 단어를 끌어내고 있다. 그를 해방시키려면 60초 안에 세 개의 보안 잠금을 풀어야 한다. 각 잠금은 언어 퍼즐이다. 실패하면 기계가 카를로스의 어휘를 한 층 더 지운다. 이미 첫날까지 내려왔다. 그 다음은? 침묵. 영구적인 침묵.",
-            "es": "La pantalla de la maquina parpadea en rojo. Una alarma. Ha detectado tu presencia y esta acelerando — borrando mas rapido ahora, arrancando palabras de la mente de Carlos como dientes de una mandibula. Para liberarlo, debes descifrar tres cerraduras de seguridad en 60 segundos. Cada cerradura es un rompecabezas linguistico. Si fallas, la maquina borra otra capa del vocabulario de Carlos. Ya esta en el Dia Uno. Despues de eso? Silencio. Silencio permanente."
+            "en": "The machine's screen flashes red. An alarm. It's detected your presence and is accelerating... erasing faster now, pulling words from Carlos's mind like teeth from a jaw. To free him, you must crack three security locks in 60 seconds. Each lock is a language puzzle. Fail, and the machine erases another layer of Carlos's vocabulary. He's already down to Day One. After that? Silence. Permanent silence.",
+            "ko": "기계 화면이 빨갛게 깜빡인다. 경보. 네 존재를 감지하고 가속하고 있다... 더 빠르게 지우고 있어, 턱에서 이빨을 뽑듯 카를로스의 마음에서 단어를 끌어내고 있다. 그를 해방시키려면 60초 안에 세 개의 보안 잠금을 풀어야 한다. 각 잠금은 언어 퍼즐이다. 실패하면 기계가 카를로스의 어휘를 한 층 더 지운다. 이미 첫날까지 내려왔다. 그 다음은? 침묵. 영구적인 침묵.",
+            "es": "La pantalla de la maquina parpadea en rojo. Una alarma. Ha detectado tu presencia y esta acelerando... borrando mas rapido ahora, arrancando palabras de la mente de Carlos como dientes de una mandibula. Para liberarlo, debes descifrar tres cerraduras de seguridad en 60 segundos. Cada cerradura es un rompecabezas linguistico. Si fallas, la maquina borra otra capa del vocabulario de Carlos. Ya esta en el Dia Uno. Despues de eso? Silencio. Silencio permanente."
           }
         },
         {
           "id": "ch2_s4_post_boss",
           "beat": "REVEAL",
           "narration": {
-            "en": "The last lock disengages. The machine shudders, sparks, and goes dark. The hum dies. In the sudden silence, you can hear Carlos breathing. Then — a word.",
-            "ko": "마지막 잠금이 풀린다. 기계가 떨리고, 불꽃이 튀고, 어두워진다. 윙윙 소리가 죽는다. 갑작스러운 침묵 속에서, 카를로스가 숨 쉬는 소리가 들린다. 그리고 — 한마디.",
-            "es": "La ultima cerradura se desactiva. La maquina se estremece, echa chispas, y se apaga. El zumbido muere. En el subito silencio, puedes oir a Carlos respirar. Entonces — una palabra."
+            "en": "The last lock disengages. The machine shudders, sparks, and goes dark. The hum dies. In the sudden silence, you can hear Carlos breathing. Then... a word.",
+            "ko": "마지막 잠금이 풀린다. 기계가 떨리고, 불꽃이 튀고, 어두워진다. 윙윙 소리가 죽는다. 갑작스러운 침묵 속에서, 카를로스가 숨 쉬는 소리가 들린다. 그리고... 한마디.",
+            "es": "La ultima cerradura se desactiva. La maquina se estremece, echa chispas, y se apaga. El zumbido muere. En el subito silencio, puedes oir a Carlos respirar. Entonces... una palabra."
           }
         },
         {
@@ -605,9 +611,9 @@
           "beat": "REVEAL",
           "charId": "lingo",
           "text": {
-            "en": "Welcome back, Carlos. We need to move. The Madrid stone — do you know where it is?",
-            "ko": "돌아와서 다행이야, 카를로스. 움직여야 해. 마드리드 수호석 — 어디 있는지 알아?",
-            "es": "Bienvenido de vuelta, Carlos. Tenemos que movernos. La piedra de Madrid — sabes donde esta?"
+            "en": "Welcome back, Carlos. We need to move. The Madrid stone... do you know where it is?",
+            "ko": "돌아와서 다행이야, 카를로스. 움직여야 해. 마드리드 수호석... 어디 있는지 알아?",
+            "es": "Bienvenido de vuelta, Carlos. Tenemos que movernos. La piedra de Madrid... sabes donde esta?"
           }
         },
         {
@@ -615,18 +621,18 @@
           "beat": "REVEAL",
           "charId": "carlos",
           "text": {
-            "en": "Under the machine. There's a compartment. The stone was powering it — he used the Madrid stone to run the prototype. Please, get it. Before he comes back.",
-            "ko": "기계 아래에. 칸이 있어. 수호석이 동력원이었어 — 시제품을 돌리는 데 마드리드 수호석을 사용했어. 제발, 꺼내줘. 그가 돌아오기 전에.",
-            "es": "Debajo de la maquina. Hay un compartimento. La piedra la alimentaba — uso la piedra de Madrid para hacer funcionar el prototipo. Por favor, sacala. Antes de que vuelva."
+            "en": "Under the machine. There's a compartment. The stone was powering it... he used the Madrid stone to run the prototype. Please, get it. Before he comes back.",
+            "ko": "기계 아래에. 칸이 있어. 수호석이 동력원이었어... 시제품을 돌리는 데 마드리드 수호석을 사용했어. 제발, 꺼내줘. 그가 돌아오기 전에.",
+            "es": "Debajo de la maquina. Hay un compartimento. La piedra la alimentaba... uso la piedra de Madrid para hacer funcionar el prototipo. Por favor, sacala. Antes de que vuelva."
           }
         },
         {
           "id": "ch2_s4_cliffhanger_setup",
           "beat": "CLIFFHANGER",
           "narration": {
-            "en": "You reach under the machine. There's a compartment — warm, humming faintly. You pull it open. Inside: empty. Where the Guardian Stone should be, a single playing card. The Ace of Spades. And on the back, in red ink, Mr. Black's careful handwriting.",
-            "ko": "기계 아래로 손을 넣는다. 칸이 있다 — 따뜻하고, 희미하게 윙윙거린다. 열린다. 안에는: 비어 있다. 수호석이 있어야 할 곳에, 카드 한 장. 스페이드 에이스. 그리고 뒷면에, 빨간 잉크로, 미스터 블랙의 정성스러운 필체.",
-            "es": "Metes la mano bajo la maquina. Hay un compartimento — calido, zumbando debilmente. Lo abres. Dentro: vacio. Donde deberia estar la Piedra Guardian, una sola carta. El As de Espadas. Y en el reverso, en tinta roja, la cuidadosa letra de Mr. Black."
+            "en": "You reach under the machine. There's a compartment... warm, humming faintly. You pull it open. Inside: empty. Where the Guardian Stone should be, a single playing card. The Ace of Spades. And on the back, in red ink, Mr. Black's careful handwriting.",
+            "ko": "기계 아래로 손을 넣는다. 칸이 있다... 따뜻하고, 희미하게 윙윙거린다. 열린다. 안에는: 비어 있다. 수호석이 있어야 할 곳에, 카드 한 장. 스페이드 에이스. 그리고 뒷면에, 빨간 잉크로, 미스터 블랙의 정성스러운 필체.",
+            "es": "Metes la mano bajo la maquina. Hay un compartimento... calido, zumbando debilmente. Lo abres. Dentro: vacio. Donde deberia estar la Piedra Guardian, una sola carta. El As de Espadas. Y en el reverso, en tinta roja, la cuidadosa letra de Mr. Black."
           }
         },
         {
@@ -635,9 +641,9 @@
           "charId": "mr_black",
           "isNote": true,
           "text": {
-            "en": "Thank you for helping Carlos. I'm sorry about the machine. You found one stone in London. I have six. The numbers are not in your favor, detective. See you in Seoul. Goodbye, Madrid. — B",
-            "ko": "카를로스를 도와줘서 감사합니다. 기계에 대해서는 죄송합니다. 런던에서 수호석 하나를 찾았죠. 저는 여섯 개 있어요. 숫자가 유리하지 않아요, 탐정. 서울에서 봐요. 안녕히 계세요, 마드리드. — B",
-            "es": "Gracias por ayudar a Carlos. Perdon por la maquina. Encontraste una piedra en Londres. Yo tengo seis. Los numeros no estan a tu favor, detective. Nos vemos en Seul. Adios, Madrid. — B"
+            "en": "Thank you for helping Carlos. I'm sorry about the machine. You found one stone in London. I have six. The numbers are not in your favor, detective. See you in Seoul. Goodbye, Madrid.... B",
+            "ko": "카를로스를 도와줘서 감사합니다. 기계에 대해서는 죄송합니다. 런던에서 수호석 하나를 찾았죠. 저는 여섯 개 있어요. 숫자가 유리하지 않아요, 탐정. 서울에서 봐요. 안녕히 계세요, 마드리드.... B",
+            "es": "Gracias por ayudar a Carlos. Perdon por la maquina. Encontraste una piedra en Londres. Yo tengo seis. Los numeros no estan a tu favor, detective. Nos vemos en Seul. Adios, Madrid.... B"
           },
           "designNote": "Day 1-6 + Day 7 numbers: Thank you, sorry, goodbye, numbers. His calling card. Rudy saved Carlos but lost the stone. First real defeat."
         },
@@ -667,18 +673,18 @@
           "charId": "lingo",
           "isThought": true,
           "text": {
-            "en": "(Does it? One stone recovered in London. Zero in Madrid. He has six. He told me the math: 'The numbers are not in your favor.' And the worst part? His speech about seven thousand walls — about refugees who can't say 'help' in the right language — it wasn't wrong. He's wrong about the solution. Burning every language down to build one perfect one is not peace. It's silence. But the problem he described? The problem is real. Seoul. He said Seoul. It's time to stop being one step behind.)",
-            "ko": "(그래? 런던에서 수호석 하나 회수. 마드리드에서 제로. 그는 여섯 개를 가지고 있어. 직접 수학을 말해줬지: '숫자가 유리하지 않아요.' 그리고 최악인 건? 7천 개의 벽에 대한 그의 말 — '도와주세요'를 적절한 언어로 못하는 난민들에 대한 — 틀리지 않았어. 해법이 틀린 거야. 모든 언어를 태워서 하나의 완벽한 언어를 만드는 건 평화가 아니야. 침묵이야. 하지만 그가 설명한 문제? 문제는 진짜야. 서울. 서울이라고 했어. 한 발 뒤처지는 건 그만할 때야.)",
-            "es": "(De verdad? Una piedra recuperada en Londres. Cero en Madrid. El tiene seis. Me dijo las matematicas: 'Los numeros no estan a tu favor.' Y lo peor? Su discurso sobre siete mil muros — sobre refugiados que no pueden decir 'ayuda' en el idioma correcto — no estaba equivocado. Se equivoca en la solucion. Quemar todos los idiomas para construir uno perfecto no es paz. Es silencio. Pero el problema que describio? El problema es real. Seul. Dijo Seul. Es hora de dejar de ir un paso atras.)"
+            "en": "(Does it? One stone recovered in London. Zero in Madrid. He has six. He told me the math: 'The numbers are not in your favor.' And the worst part? His speech about seven thousand walls... about refugees who can't say 'help' in the right language... it wasn't wrong. He's wrong about the solution. Burning every language down to build one perfect one is not peace. It's silence. But the problem he described? The problem is real. Seoul. He said Seoul. It's time to stop being one step behind.)",
+            "ko": "(그래? 런던에서 수호석 하나 회수. 마드리드에서 제로. 그는 여섯 개를 가지고 있어. 직접 수학을 말해줬지: '숫자가 유리하지 않아요.' 그리고 최악인 건? 7천 개의 벽에 대한 그의 말... '도와주세요'를 적절한 언어로 못하는 난민들에 대한... 틀리지 않았어. 해법이 틀린 거야. 모든 언어를 태워서 하나의 완벽한 언어를 만드는 건 평화가 아니야. 침묵이야. 하지만 그가 설명한 문제? 문제는 진짜야. 서울. 서울이라고 했어. 한 발 뒤처지는 건 그만할 때야.)",
+            "es": "(De verdad? Una piedra recuperada en Londres. Cero en Madrid. El tiene seis. Me dijo las matematicas: 'Los numeros no estan a tu favor.' Y lo peor? Su discurso sobre siete mil muros... sobre refugiados que no pueden decir 'ayuda' en el idioma correcto... no estaba equivocado. Se equivoca en la solucion. Quemar todos los idiomas para construir uno perfecto no es paz. Es silencio. Pero el problema que describio? El problema es real. Seul. Dijo Seul. Es hora de dejar de ir un paso atras.)"
           }
         },
         {
           "id": "ch2_s4_end",
           "beat": "CLIFFHANGER",
           "narration": {
-            "en": "[Next Chapter: The Seoul Secret — Sujin is in danger]",
-            "ko": "[다음 챕터: 서울의 비밀 — 수진이 위험에 처했다]",
-            "es": "[Siguiente Capitulo: El Secreto de Seul — Sujin esta en peligro]"
+            "en": "[Next Chapter: The Seoul Secret... Sujin is in danger]",
+            "ko": "[다음 챕터: 서울의 비밀... 수진이 위험에 처했다]",
+            "es": "[Siguiente Capitulo: El Secreto de Seul... Sujin esta en peligro]"
           }
         }
       ]
@@ -699,7 +705,7 @@
       "consequence": {
         "ko": "카를로스가 모든 언어를 잃고 Day 1 표현만 남았다는 것이 밝혀진다. 언어 삭제 장치의 존재가 확인된다.",
         "en": "Reveals that Carlos lost all languages except Day 1 phrases. Confirms the Language Erasure Device exists.",
-        "es": "Revela que Carlos perdio todos los idiomas excepto frases del Dia 1. Confirma que el Dispositivo de Borrado existe."
+        "es": "Revela que Carlos perdio todos los idiomas excepto frases del Día 1. Confirma que el Dispositivo de Borrado existe."
       },
       "vocabularyUsed": "Day 1-6: Hello, Help, Where is, Please, Sorry, My name is, Goodbye",
       "questions": [
@@ -734,9 +740,9 @@
       "type": "dialogue_choice",
       "title": { "ko": "돈 미겔의 시장에서 주문하기", "en": "Ordering at Don Miguel's Stall", "es": "Pidiendo en el Puesto de Don Miguel" },
       "storyContext": {
-        "ko": "돈 미겔이 음식을 제대로 주문해야 카를로스에 대해 이야기해주겠다고 한다. 시장 예절을 보여줘라 — 카를로스의 생명이 달려있다.",
-        "en": "Don Miguel won't share what he knows until you order food properly. Show your market manners — Carlos's life depends on it.",
-        "es": "Don Miguel no compartira lo que sabe hasta que pidas comida correctamente. Demuestra tus modales — la vida de Carlos depende de ello."
+        "ko": "돈 미겔이 음식을 제대로 주문해야 카를로스에 대해 이야기해주겠다고 한다. 시장 예절을 보여줘라... 카를로스의 생명이 달려있다.",
+        "en": "Don Miguel won't share what he knows until you order food properly. Show your market manners... Carlos's life depends on it.",
+        "es": "Don Miguel no compartira lo que sabe hasta que pidas comida correctamente. Demuestra tus modales... la vida de Carlos depende de ello."
       },
       "consequence": {
         "ko": "돈 미겔이 감동해서 카를로스, 미스터 블랙, 그리고 시장에서 단어가 사라지고 있다는 충격적인 사실을 알려준다.",
@@ -785,9 +791,9 @@
       "type": "word_rearrange",
       "title": { "ko": "미스터 블랙의 노트", "en": "Mr. Black's Notebook", "es": "La Libreta de Mr. Black" },
       "storyContext": {
-        "ko": "미스터 블랙이 벤치에 일부러 떨어뜨린 노트 페이지. 뒤섞인 단어와 숫자를 정리하면 카를로스의 정확한 위치가 드러난다 — 하지만 이것이 함정인가, 초대인가?",
-        "en": "A torn notebook page Mr. Black deliberately left on the bench. Unscramble the words and numbers to reveal Carlos's exact location — but is this a trap or an invitation?",
-        "es": "Una pagina arrancada que Mr. Black dejo deliberadamente en el banco. Descifra las palabras y numeros para revelar la ubicacion exacta de Carlos — pero esto es una trampa o una invitacion?"
+        "ko": "미스터 블랙이 벤치에 일부러 떨어뜨린 노트 페이지. 뒤섞인 단어와 숫자를 정리하면 카를로스의 정확한 위치가 드러난다... 하지만 이것이 함정인가, 초대인가?",
+        "en": "A torn notebook page Mr. Black deliberately left on the bench. Unscramble the words and numbers to reveal Carlos's exact location... but is this a trap or an invitation?",
+        "es": "Una pagina arrancada que Mr. Black dejo deliberadamente en el banco. Descifra las palabras y numeros para revelar la ubicacion exacta de Carlos... pero esto es una trampa o una invitacion?"
       },
       "consequence": {
         "ko": "카를로스의 위치가 밝혀지지만, 동시에 미스터 블랙이 루디를 유인하고 있다는 것도 깨닫는다.",
@@ -820,7 +826,7 @@
       "scene": "ch2_scene4",
       "type": "timed_mixed",
       "isBoss": true,
-      "title": { "ko": "언어 함정 해제 — 카를로스 구출", "en": "Disabling the Language Trap — Rescue Carlos", "es": "Desactivando la Trampa — Rescatar a Carlos" },
+      "title": { "ko": "언어 함정 해제... 카를로스 구출", "en": "Disabling the Language Trap... Rescue Carlos", "es": "Desactivando la Trampa... Rescatar a Carlos" },
       "storyContext": {
         "ko": "언어 삭제 장치가 가속하고 있다! 카를로스의 마지막 단어들이 사라지기 전에 세 개의 보안 잠금을 60초 안에 풀어라. 실패하면 카를로스는 영원히 침묵한다.",
         "en": "The Language Erasure Device is accelerating! Crack three security locks in 60 seconds before Carlos loses his last words. Fail and Carlos falls into permanent silence.",
@@ -836,12 +842,12 @@
         {
           "stageNum": 1,
           "stageType": "word_rearrange",
-          "label": { "en": "LOCK 1: Deactivation Code", "ko": "잠금 1: 비활성화 코드", "es": "CERRADURA 1: Codigo de Desactivacion" },
+          "label": { "en": "LOCK 1: Deactivation Code", "ko": "잠금 1: 비활성화 코드", "es": "CERRADURA 1: Código de Desactivacion" },
           "instruction": { "en": "Unscramble the shutdown phrase:", "ko": "종료 문구를 해독하세요:", "es": "Descifra la frase de apagado:" },
           "scrambled": { "en": ["please", "stop", "goodbye", "thank you"], "ko": ["제발", "멈춰", "안녕히 계세요", "감사합니다"], "es": ["por favor", "para", "adios", "gracias"] },
           "answer": { "en": "Goodbye thank you please stop", "ko": "안녕히 계세요 감사합니다 제발 멈춰", "es": "Adios gracias por favor para" },
           "vocabularyUsed": "Day 1-6: goodbye, thank you, please",
-          "designNote": "The shutdown phrase is polite — because Mr. Black is always polite."
+          "designNote": "The shutdown phrase is polite... because Mr. Black is always polite."
         },
         {
           "stageNum": 2,
@@ -854,12 +860,12 @@
             { "answer": { "en": "five", "ko": "5", "es": "cinco" }, "opts": [{ "en": "hundred", "ko": "100", "es": "cien" }, { "en": "zero", "ko": "0", "es": "cero" }] }
           ],
           "vocabularyUsed": "Day 13-15: food ordering + Day 7: numbers",
-          "designNote": "The system override is a food order — Mr. Black used everyday phrases as passwords. Who would guess the code to a doomsday device is a coffee order?"
+          "designNote": "The system override is a food order... Mr. Black used everyday phrases as passwords. Who would guess the code to a doomsday device is a coffee order?"
         },
         {
           "stageNum": 3,
           "stageType": "listening",
-          "label": { "en": "LOCK 3: Carlos's Code", "ko": "잠금 3: 카를로스의 코드", "es": "CERRADURA 3: Codigo de Carlos" },
+          "label": { "en": "LOCK 3: Carlos's Code", "ko": "잠금 3: 카를로스의 코드", "es": "CERRADURA 3: Código de Carlos" },
           "instruction": { "en": "Carlos whispers the final number through cracked lips. What did he say?", "ko": "카를로스가 갈라진 입술로 마지막 숫자를 속삭인다. 뭐라고 했어?", "es": "Carlos susurra el numero final con labios agrietados. Que dijo?" },
           "audioText": { "en": "seven", "ko": "칠", "es": "siete" },
           "opts": [
@@ -870,16 +876,16 @@
           ],
           "answerIdx": 1,
           "vocabularyUsed": "Day 7: numbers",
-          "designNote": "Seven — the number of Guardian Stones. The only number burned into Carlos's mind because it's the number Mr. Black kept repeating."
+          "designNote": "Seven... the number of Guardian Stones. The only number burned into Carlos's mind because it's the number Mr. Black kept repeating."
         }
       ],
       "difficulty": 3,
       "rewards": { "xp": 300, "badge": "madrid_rescuer", "unlockChapter": "ch3" },
       "resultVariants": {
         "perfect": {
-          "en": "The device shatters. Carlos gasps — words flood back like water through a broken dam. 'Ventana! Recuerdo! Amigo!' He grabs your arm. 'Thank you. Gracias. I can hear myself again.'",
-          "ko": "장치가 산산조각 난다. 카를로스가 숨을 헐떡인다 — 무너진 댐으로 물이 쏟아지듯 단어가 돌아온다. 'Ventana! Recuerdo! Amigo!' 네 팔을 잡는다. '감사합니다. Gracias. 다시 내 말이 들려요.'",
-          "es": "El dispositivo se destroza. Carlos jadea — las palabras regresan como agua por una presa rota. 'Ventana! Recuerdo! Amigo!' Agarra tu brazo. 'Gracias. Thank you. Puedo escucharme de nuevo.'"
+          "en": "The device shatters. Carlos gasps... words flood back like water through a broken dam. 'Ventana! Recuerdo! Amigo!' He grabs your arm. 'Thank you. Gracias. I can hear myself again.'",
+          "ko": "장치가 산산조각 난다. 카를로스가 숨을 헐떡인다... 무너진 댐으로 물이 쏟아지듯 단어가 돌아온다. 'Ventana! Recuerdo! Amigo!' 네 팔을 잡는다. '감사합니다. Gracias. 다시 내 말이 들려요.'",
+          "es": "El dispositivo se destroza. Carlos jadea... las palabras regresan como agua por una presa rota. 'Ventana! Recuerdo! Amigo!' Agarra tu brazo. 'Gracias. Thank you. Puedo escucharme de nuevo.'"
         },
         "good": {
           "en": "The device powers down with a dying whine. Carlos blinks. Words return, one at a time, like shy animals emerging from hiding. 'Some words... they're coming back. Not all. But enough. Enough to remember who I am.'",

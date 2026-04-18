@@ -34,16 +34,31 @@ const REL_KEY = "npcRelationships";
 const EMO_KEY  = "npcEmotions";
 
 const NPC_OPENING: Record<string, Record<string, string>> = {
-  emma:         { english: "Welcome! ☕ What can I get for you today?", korean: "어서오세요! ☕ 오늘 무엇을 드릴까요?", spanish: "¡Bienvenido! ☕ ¿Qué le pongo hoy?" },
-  james:        { english: "Good day! ✈️ How can I assist you with your travel?", korean: "안녕하세요! ✈️ 오늘 여행 도움이 필요하신가요?", spanish: "¡Buen día! ✈️ ¿En qué le puedo ayudar con su viaje?" },
-  officer_park: { english: "Halt. I need to ask you a few questions.", korean: "멈춰요. 몇 가지 질문이 있습니다.", spanish: "Alto. Necesito hacerle unas preguntas." },
-  bar_alex:     { english: "Hey! 🍺 What'll it be tonight?", korean: "어이! 🍺 오늘 밤 뭐 마실 거예요?", spanish: "¡Oye! 🍺 ¿Qué va a ser esta noche?" },
-  sofia:        { english: "Good evening! 🏨 Welcome. Do you have a reservation?", korean: "안녕하세요! 🏨 오신 것을 환영합니다. 예약하셨나요?", spanish: "¡Buenas noches! 🏨 Bienvenido. ¿Tiene reserva?" },
-  mia:          { english: "Hi there! 🛍️ Looking for something special today?", korean: "안녕하세요! 🛍️ 오늘 특별한 것을 찾고 계신가요?", spanish: "¡Hola! 🛍️ ¿Busca algo especial hoy?" },
-  dr_kim:       { english: "Good morning. Please have a seat. What brings you in today?", korean: "좋은 아침입니다. 앉으세요. 오늘 어떻게 오셨나요?", spanish: "Buenos días. Por favor, siéntese. ¿Qué le trae por aquí?" },
-  lisa:         { english: "Thank you for calling! 📞 How may I assist you today?", korean: "전화해 주셔서 감사합니다! 📞 오늘 어떻게 도와드릴까요?", spanish: "¡Gracias por llamar! 📞 ¿En qué puedo ayudarle hoy?" },
-  marco:        { english: "Buongiorno! 🍽️ Welcome! Are you dining alone today?", korean: "어서오세요! 🍽️ 오늘 혼자 오셨나요?", spanish: "¡Buongiorno! 🍽️ ¡Bienvenido! ¿Cena solo hoy?" },
-  tom:          { english: "Hey! 🚕 Where are we headed today?", korean: "안녕하세요! 🚕 오늘 어디로 가세요?", spanish: "¡Hola! 🚕 ¿Adónde vamos hoy?" },
+  // ── Story NPCs (real-world scenarios) ──────────────────────────────────
+  penny:     { english: "Hi there! ☕ Welcome to the cafe. What can I get you today?", korean: "안녕하세요! ☕ 카페에 오신 걸 환영해요. 오늘 뭘 드릴까요?", spanish: "¡Hola! ☕ Bienvenido al café. ¿Qué te pongo hoy?" },
+  miguel:    { english: "Welcome, friend! 🍽️ Take a seat. Our special today is amazing!", korean: "어서오세요, 친구! 🍽️ 앉으세요. 오늘의 특선이 끝내줘요!", spanish: "¡Bienvenido, amigo! 🍽️ Siéntate. ¡El especial de hoy está increíble!" },
+  tom:       { english: "Hey! 🚕 Where to? I know every shortcut in this city.", korean: "안녕하세요! 🚕 어디로 갈까요? 이 도시 지름길은 다 알아요.", spanish: "¡Hola! 🚕 ¿Adónde vamos? Conozco todos los atajos de la ciudad." },
+  hassan:    { english: "Welcome! ✈️ First time flying? Don't worry, I'll help you out!", korean: "어서오세요! ✈️ 비행기 처음이에요? 걱정 마세요, 도와드릴게요!", spanish: "¡Bienvenido! ✈️ ¿Primera vez volando? ¡No te preocupes, te ayudo!" },
+  eleanor:   { english: "Good evening. 🏨 Welcome to our hotel. May I see your reservation?", korean: "안녕하세요. 🏨 저희 호텔에 오신 것을 환영합니다. 예약 확인 부탁드릴게요.", spanish: "Buenas noches. 🏨 Bienvenido a nuestro hotel. ¿Puedo ver su reserva?" },
+  sujin:     { english: "Hello, please come in. 🏥 What seems to be the problem today?", korean: "안녕하세요, 들어오세요. 🏥 오늘 어디가 불편하세요?", spanish: "Hola, pase por favor. 🏥 ¿Qué le ocurre hoy?" },
+  minho:     { english: "Yo! 📱 Looking for a new plan? I got the best deals right here.", korean: "안녕하세요! 📱 요금제 바꾸려고요? 여기 좋은 거 있어요.", spanish: "¡Ey! 📱 ¿Buscas un plan nuevo? Tengo las mejores ofertas aquí." },
+  youngsook: { english: "Oh, come in dear! 🛒 Looking for something? I know where everything is!", korean: "어서 와, 얘야! 🛒 뭐 찾아? 할머니가 다 알려줄게!", spanish: "¡Pasa, cariño! 🛒 ¿Buscas algo? ¡Sé dónde está todo!" },
+  isabel:    { english: "Hi! 🛍️ Oh, that would look amazing on you! Let me help.", korean: "안녕! 🛍️ 어머, 그거 완전 잘 어울릴 것 같아! 내가 도와줄게.", spanish: "¡Hola! 🛍️ ¡Eso te quedaría genial! Déjame ayudarte." },
+  carlos:    { english: "Hey. 🍺 Grab a seat. What are you drinking tonight?", korean: "안녕. 🍺 앉아. 오늘 밤 뭐 마실 거야?", spanish: "Oye. 🍺 Siéntate. ¿Qué tomas esta noche?" },
+  amira:     { english: "Good morning. 🏦 How can I help you today? Please have your ID ready.", korean: "안녕하세요. 🏦 오늘 어떤 업무로 오셨나요? 신분증 준비해 주세요.", spanish: "Buenos días. 🏦 ¿En qué puedo ayudarle? Tenga su identificación lista." },
+  // ── Real-world NPCs ───────────────────────────────────────────────────
+  ryan:      { english: "Hi, welcome! 🍔 What can I get for you? We've got a combo deal today.", korean: "어서오세요! 🍔 뭘로 드릴까요? 오늘 콤보 할인 중이에요.", spanish: "¡Hola, bienvenido! 🍔 ¿Qué le sirvo? Hoy tenemos oferta de combo." },
+  nari:      { english: "Excuse me... 🚇 Oh, you need help? Which station are you looking for?", korean: "저기요... 🚇 아, 도움 필요해요? 어디 역 찾으세요?", spanish: "Disculpa... 🚇 Ah, ¿necesitas ayuda? ¿Qué estación buscas?" },
+  derek:     { english: "*sigh* 🔧 Yeah? What's broken now?", korean: "*한숨* 🔧 네? 이번엔 뭐가 고장났어요?", spanish: "*suspiro* 🔧 ¿Sí? ¿Qué se ha roto ahora?" },
+  mei:       { english: "Hello! 💊 What can I help you with today? Any allergies I should know about?", korean: "안녕하세요! 💊 오늘 어떤 약을 찾으세요? 알레르기 있으신 거 있나요?", spanish: "¡Hola! 💊 ¿En qué puedo ayudarle? ¿Tiene alguna alergia que deba saber?" },
+  juno:      { english: "Hey! 🛵 I'm at the building. Which floor? Hurry, I've got more deliveries!", korean: "저기요! 🛵 건물 앞인데요. 몇 층이에요? 빨리요, 배달 더 있어서!", spanish: "¡Oye! 🛵 Estoy en el edificio. ¿Qué piso? ¡Rápido, tengo más entregas!" },
+  gloria:    { english: "Hello. 🔄 Do you have your receipt? What seems to be the issue?", korean: "안녕하세요. 🔄 영수증 가져오셨나요? 어떤 문제가 있으신가요?", spanish: "Hola. 🔄 ¿Tiene el recibo? ¿Cuál es el problema?" },
+  stan:      { english: "Next, please. 📦 Sending or picking up?", korean: "다음 분요. 📦 보내실 건가요, 찾으실 건가요?", spanish: "Siguiente, por favor. 📦 ¿Envía o recoge?" },
+  hana:      { english: "Oh hi! 💬 I don't think we've met! Where are you from?", korean: "어머 안녕! 💬 처음 뵙는 것 같은데! 어디서 오셨어요?", spanish: "¡Oh, hola! 💬 ¡Creo que no nos conocemos! ¿De dónde eres?" },
+  vincent:   { english: "Welcome! 🏠 I've got the perfect place for you. Let me show you around.", korean: "어서오세요! 🏠 딱 맞는 곳이 있어요. 한번 둘러보시죠.", spanish: "¡Bienvenido! 🏠 Tengo el lugar perfecto para usted. Permítame mostrárselo." },
+  claire:    { english: "Good morning. 💼 Please, have a seat. Tell me about yourself.", korean: "안녕하세요. 💼 앉으세요. 자기소개 부탁드릴게요.", spanish: "Buenos días. 💼 Por favor, siéntese. Hábleme de usted." },
+  officer_kwon: { english: "Number 47. 🏛️ Come forward. Documents, please.", korean: "47번님. 🏛️ 이쪽으로 오세요. 서류 주세요.", spanish: "Número 47. 🏛️ Acérquese. Documentos, por favor." },
+  luca:      { english: "Hey, come on in! 💇 So what are we doing today? Something bold?", korean: "어서 와요! 💇 오늘 어떻게 해드릴까요? 과감하게 가볼까요?", spanish: "¡Pasa, pasa! 💇 ¿Qué hacemos hoy? ¿Algo atrevido?" },
 };
 
 interface NpcMessage {
@@ -63,8 +78,8 @@ function stopAudio() {
     if (_nativeSound) {
       const prev = _nativeSound;
       _nativeSound = null;
-      prev.stopAsync().catch(() => {});
-      prev.unloadAsync().catch(() => {});
+      prev.stopAsync().catch((e: unknown) => console.warn('[Audio] stopAsync cleanup failed:', e));
+      prev.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
     }
   }
 }
@@ -93,6 +108,7 @@ export default function NpcMissionScreen() {
   const [relationship, setRelationship] = useState(0);
   const [emotion, setEmotion]       = useState("neutral");
   const [choices, setChoices]       = useState<{ text: string; translation: string }[]>([]);
+  const [choicesError, setChoicesError] = useState<string | null>(null);
   const [choiceTranslVisible, setChoiceTranslVisible] = useState<boolean[]>([]);
   const [msgTranslVisible, setMsgTranslVisible] = useState<Set<string>>(new Set());
   const [onDemandTranslMap, setOnDemandTranslMap] = useState<Record<string, string>>({});
@@ -142,7 +158,8 @@ export default function NpcMissionScreen() {
       setMessages([{ id: openingId, text: openingText, isUser: false }]);
       setTimeout(() => playNpcTts(openingText, openingId), 400);
       fetchNpcReply([], true, savedScore);
-    }).catch(() => {
+    }).catch((e) => {
+      console.warn('[NPC] Storage load failed:', e);
       setMessages([{ id: openingId, text: openingText, isUser: false }]);
       setTimeout(() => playNpcTts(openingText, openingId), 400);
       fetchNpcReply([], true, 0);
@@ -163,7 +180,7 @@ export default function NpcMissionScreen() {
         AsyncStorage.setItem(REL_KEY, JSON.stringify(rels)),
         AsyncStorage.setItem(EMO_KEY, JSON.stringify(emos)),
       ]);
-    } catch {}
+    } catch (e) { console.warn('[NpcMission] saveRelationship failed:', e); }
   }, []);
 
   const showScoreChange = useCallback((amount: number) => {
@@ -201,15 +218,15 @@ export default function NpcMissionScreen() {
           _webAudioEl = audio;
           audio.onended = () => { URL.revokeObjectURL(objUrl); _webAudioEl = null; setSpeakingId(null); };
           audio.onerror = () => { URL.revokeObjectURL(objUrl); _webAudioEl = null; setSpeakingId(null); };
-          audio.play().catch(() => setSpeakingId(null));
+          audio.play().catch((e) => { console.warn('[NPC] TTS audio play failed:', e); setSpeakingId(null); });
         })
-        .catch(() => setSpeakingId(null));
+        .catch((e) => { console.warn('[NPC] TTS playback failed:', e); setSpeakingId(null); });
     } else {
       (async () => {
         try {
           if (_nativeSound) {
-            await _nativeSound.stopAsync().catch(() => {});
-            await _nativeSound.unloadAsync().catch(() => {});
+            await _nativeSound.stopAsync().catch((e: unknown) => console.warn('[Audio] stopAsync cleanup failed:', e));
+            await _nativeSound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
             _nativeSound = null;
           }
           const url = new URL("/api/npc-tts", getApiUrl());
@@ -225,12 +242,13 @@ export default function NpcMissionScreen() {
           _nativeSound = sound;
           sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
             if (status.isLoaded && status.didJustFinish) {
-              sound.unloadAsync().catch(() => {});
+              sound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
               _nativeSound = null;
               setSpeakingId(null);
             }
           });
-        } catch {
+        } catch (e) {
+          console.warn('[Audio] NPC TTS playback failed:', e);
           _nativeSound = null;
           setSpeakingId(null);
         }
@@ -245,6 +263,7 @@ export default function NpcMissionScreen() {
   ) => {
     if (!npc) return;
     if (!isStart) setIsTyping(true);
+    if (isStart) setChoicesError(null);
     try {
       const res = await fetch(new URL("/api/npc-chat", getApiUrl()).toString(), {
         method: "POST",
@@ -276,6 +295,9 @@ export default function NpcMissionScreen() {
         setChoices(safeChoices);
         setChoiceTranslVisible(Array(safeChoices.length).fill(false));
         setEmotion(newEmotion ?? "neutral");
+        if (safeChoices.length === 0) {
+          setChoicesError("empty");
+        }
         return;
       }
 
@@ -300,15 +322,18 @@ export default function NpcMissionScreen() {
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       playNpcTts(reply, msgId);
-    } catch {
+    } catch (e) {
+      console.warn('[API] fetchNpcReply failed:', e);
       if (!isStart) {
         const fallbackId = Date.now().toString() + "err";
         setMessages(prev => [{ id: fallbackId, text: "...", isUser: false }, ...prev]);
+      } else {
+        setChoicesError(e instanceof Error ? e.message : "network");
       }
     } finally {
       if (!isStart) setIsTyping(false);
     }
-  }, [npc, language, playNpcTts, saveRelationship, showScoreChange, updateStats]);
+  }, [npc, language, native, playNpcTts, saveRelationship, showScoreChange, updateStats]);
 
   const sendMessage = useCallback(async (text: string) => {
     const trimmed = text.trim();
@@ -347,15 +372,15 @@ export default function NpcMissionScreen() {
             const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
             audio.onended = () => { URL.revokeObjectURL(objUrl); setPopupPlaying(false); };
             audio.onerror = () => { URL.revokeObjectURL(objUrl); setPopupPlaying(false); };
-            audio.play().catch(() => setPopupPlaying(false));
+            audio.play().catch((e) => { console.warn('[NPC] TTS choice audio play failed:', e); setPopupPlaying(false); });
           })
-          .catch(() => setPopupPlaying(false));
+          .catch((e) => { console.warn('[NPC] TTS choice playback failed:', e); setPopupPlaying(false); });
       } else {
         (async () => {
           try {
             if (_nativeSound) {
-              await _nativeSound.stopAsync().catch(() => {});
-              await _nativeSound.unloadAsync().catch(() => {});
+              await _nativeSound.stopAsync().catch((e: unknown) => console.warn('[Audio] stopAsync cleanup failed:', e));
+              await _nativeSound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
               _nativeSound = null;
             }
             const url = new URL("/api/npc-tts", getApiUrl());
@@ -371,12 +396,13 @@ export default function NpcMissionScreen() {
             _nativeSound = sound;
             sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
               if (status.isLoaded && status.didJustFinish) {
-                sound.unloadAsync().catch(() => {});
+                sound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
                 _nativeSound = null;
                 setPopupPlaying(false);
               }
             });
-          } catch {
+          } catch (e) {
+            console.warn('[Audio] choice TTS playback failed:', e);
             _nativeSound = null;
             setPopupPlaying(false);
           }
@@ -403,15 +429,15 @@ export default function NpcMissionScreen() {
           const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
           audio.onended = () => { URL.revokeObjectURL(objUrl); setPopupPlaying(false); };
           audio.onerror = () => { URL.revokeObjectURL(objUrl); setPopupPlaying(false); };
-          audio.play().catch(() => setPopupPlaying(false));
+          audio.play().catch((e) => { console.warn('[NPC] TTS replay audio play failed:', e); setPopupPlaying(false); });
         })
-        .catch(() => setPopupPlaying(false));
+        .catch((e) => { console.warn('[NPC] TTS replay playback failed:', e); setPopupPlaying(false); });
     } else {
       (async () => {
         try {
           if (_nativeSound) {
-            await _nativeSound.stopAsync().catch(() => {});
-            await _nativeSound.unloadAsync().catch(() => {});
+            await _nativeSound.stopAsync().catch((e: unknown) => console.warn('[Audio] stopAsync cleanup failed:', e));
+            await _nativeSound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
             _nativeSound = null;
           }
           const url = new URL("/api/npc-tts", getApiUrl());
@@ -427,12 +453,13 @@ export default function NpcMissionScreen() {
           _nativeSound = sound;
           sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
             if (status.isLoaded && status.didJustFinish) {
-              sound.unloadAsync().catch(() => {});
+              sound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
               _nativeSound = null;
               setPopupPlaying(false);
             }
           });
-        } catch {
+        } catch (e) {
+          console.warn('[Audio] popup replay TTS failed:', e);
           _nativeSound = null;
           setPopupPlaying(false);
         }
@@ -485,7 +512,8 @@ export default function NpcMissionScreen() {
       };
       wordCache.current[cacheKey] = entry;
       setWordPopup({ word: clean, ...entry });
-    } catch {
+    } catch (e) {
+      console.warn('[API] word lookup failed:', e);
       setWordPopup({ word: clean, meaning: clean, partOfSpeech: "", example: "" });
     } finally {
       setWordLoading(false);
@@ -509,15 +537,15 @@ export default function NpcMissionScreen() {
           const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
           audio.onended = () => { URL.revokeObjectURL(objUrl); setWordPronPlaying(false); };
           audio.onerror = () => { URL.revokeObjectURL(objUrl); setWordPronPlaying(false); };
-          audio.play().catch(() => setWordPronPlaying(false));
+          audio.play().catch((e) => { console.warn('[NPC] TTS word pronunciation play failed:', e); setWordPronPlaying(false); });
         })
-        .catch(() => setWordPronPlaying(false));
+        .catch((e) => { console.warn('[NPC] TTS word pronunciation failed:', e); setWordPronPlaying(false); });
     } else {
       (async () => {
         try {
           if (_nativeSound) {
-            await _nativeSound.stopAsync().catch(() => {});
-            await _nativeSound.unloadAsync().catch(() => {});
+            await _nativeSound.stopAsync().catch((e: unknown) => console.warn('[Audio] stopAsync cleanup failed:', e));
+            await _nativeSound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
             _nativeSound = null;
           }
           const url = new URL("/api/npc-tts", getApiUrl());
@@ -533,12 +561,13 @@ export default function NpcMissionScreen() {
           _nativeSound = sound;
           sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
             if (status.isLoaded && status.didJustFinish) {
-              sound.unloadAsync().catch(() => {});
+              sound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
               _nativeSound = null;
               setWordPronPlaying(false);
             }
           });
-        } catch {
+        } catch (e) {
+          console.warn('[Audio] word pronunciation TTS failed:', e);
           _nativeSound = null;
           setWordPronPlaying(false);
         }
@@ -564,15 +593,15 @@ export default function NpcMissionScreen() {
           const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
           audio.onended = () => { URL.revokeObjectURL(objUrl); setWordExPlaying(false); };
           audio.onerror = () => { URL.revokeObjectURL(objUrl); setWordExPlaying(false); };
-          audio.play().catch(() => setWordExPlaying(false));
+          audio.play().catch((e) => { console.warn('[NPC] TTS word example play failed:', e); setWordExPlaying(false); });
         })
-        .catch(() => setWordExPlaying(false));
+        .catch((e) => { console.warn('[NPC] TTS word example failed:', e); setWordExPlaying(false); });
     } else {
       (async () => {
         try {
           if (_nativeSound) {
-            await _nativeSound.stopAsync().catch(() => {});
-            await _nativeSound.unloadAsync().catch(() => {});
+            await _nativeSound.stopAsync().catch((e: unknown) => console.warn('[Audio] stopAsync cleanup failed:', e));
+            await _nativeSound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
             _nativeSound = null;
           }
           const url = new URL("/api/npc-tts", getApiUrl());
@@ -588,12 +617,13 @@ export default function NpcMissionScreen() {
           _nativeSound = sound;
           sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
             if (status.isLoaded && status.didJustFinish) {
-              sound.unloadAsync().catch(() => {});
+              sound.unloadAsync().catch((e: unknown) => console.warn('[Audio] unloadAsync cleanup failed:', e));
               _nativeSound = null;
               setWordExPlaying(false);
             }
           });
-        } catch {
+        } catch (e) {
+          console.warn('[Audio] word example TTS failed:', e);
           _nativeSound = null;
           setWordExPlaying(false);
         }
@@ -656,7 +686,8 @@ export default function NpcMissionScreen() {
       } else {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }
-    } catch {
+    } catch (e) {
+      console.warn('[Audio] voice recording/STT failed:', e);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsRecording(false);
@@ -699,7 +730,8 @@ export default function NpcMissionScreen() {
       const tr = (data.translation ?? "").trim();
       LayoutAnimation.configureNext(LayoutAnimation.create(250, "easeInEaseOut", "opacity"));
       setOnDemandTranslMap(prev => ({ ...prev, [id]: tr || text }));
-    } catch {
+    } catch (e) {
+      console.warn('[API] translation request failed:', e);
       setOnDemandTranslMap(prev => ({ ...prev, [id]: "" }));
     } finally {
       setFetchingTranslSet(prev => { const n = new Set(prev); n.delete(id); return n; });
@@ -995,9 +1027,34 @@ export default function NpcMissionScreen() {
           )}
 
           {/* Loading state — no choices yet */}
-          {showStranger && choices.length === 0 && !isTyping && (
+          {showStranger && choices.length === 0 && !isTyping && !choicesError && (
             <View style={styles.loadingChoices}>
               <ActivityIndicator size="small" color={C.goldDim} />
+            </View>
+          )}
+
+          {/* Error state — retry initial choices */}
+          {showStranger && choices.length === 0 && !isTyping && choicesError && (
+            <View style={styles.errorChoices}>
+              <Text style={styles.errorText}>
+                {native === "korean"
+                  ? "답변을 불러올 수 없어요. 네트워크를 확인해주세요."
+                  : native === "spanish"
+                  ? "No se pudieron cargar las respuestas. Verifica tu conexión."
+                  : "Could not load replies. Please check your connection."}
+              </Text>
+              <Pressable
+                style={({ pressed }) => [styles.errorRetryBtn, pressed && { opacity: 0.8 }]}
+                onPress={() => {
+                  setChoicesError(null);
+                  fetchNpcReply(conversationRef.current, true, relationship);
+                }}
+              >
+                <Ionicons name="refresh" size={14} color={C.bg1} />
+                <Text style={styles.errorRetryText}>
+                  {native === "korean" ? "다시 시도" : native === "spanish" ? "Reintentar" : "Retry"}
+                </Text>
+              </Pressable>
             </View>
           )}
         </View>
@@ -1363,6 +1420,29 @@ const styles = StyleSheet.create({
   sendBtnDisabled: { opacity: 0.45 },
 
   loadingChoices: { alignItems: "center", paddingVertical: 16 },
+  errorChoices: { alignItems: "center", paddingVertical: 14, gap: 10 },
+  errorText: {
+    fontFamily: F.body,
+    fontSize: 13,
+    color: C.goldDim,
+    textAlign: "center",
+    lineHeight: 18,
+    paddingHorizontal: 16,
+  },
+  errorRetryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: C.gold,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 18,
+  },
+  errorRetryText: {
+    fontFamily: F.bodySemi,
+    fontSize: 13,
+    color: C.bg1,
+  },
 
   scoreToast: {
     position: "absolute",

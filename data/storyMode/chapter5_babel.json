@@ -2,7 +2,7 @@
   "meta": {
     "version": "2.1",
     "chapter": "ch5",
-    "description": "Chapter 5: Babel Tower — The Last Language. Mr. Black's final stand, Miss Penny's redemption, all NPCs reunite, Rudy fails and recovers, every language converges into one moment of unity."
+    "description": "Chapter 5: Babel Tower... The Last Language. Mr. Black's final stand, Miss Penny's redemption, all NPCs reunite, Rudy fails and recovers, every language converges into one moment of unity."
   },
 
   "chapter": {
@@ -19,6 +19,7 @@
       "en": "Resolve → Crisis → Loss → Unity → Triumph",
       "es": "Resolucion → Crisis → Perdida → Unidad → Triunfo"
     },
+    "npcLangRatio": 0.95,
     "npcs": ["penny", "mr_black", "tom", "isabel", "miguel", "sujin", "minho", "youngsook", "farid", "amira", "hassan", "eleanor"],
     "totalXP": 2300,
     "badge": { "id": "language_defender", "name": { "ko": "언어의 수호자", "en": "Language Defender", "es": "Defensor del Idioma" }, "icon": "👑" },
@@ -28,17 +29,17 @@
         "id": "ch5_scene1",
         "title": { "ko": "바벨에 도착하다", "en": "Arrival at Babel", "es": "Llegada a Babel" },
         "narration": {
-          "ko": "4개의 수호석이 가리킨 좌표 — 메소포타미아 평원 한가운데, 하늘을 찌를 듯한 구조물이 서 있다. 고대의 탑이 아니다. 현대적인 유리와 강철의 타워. 꼭대기에서 불빛이 맥동한다. 렉시콘 소사이어티의 본부. 미스 페니가 루디 옆에서 걸음을 멈춘다.",
-          "en": "The coordinates the four Guardian Stones pointed to — in the middle of the Mesopotamian plain, a structure pierces the sky. Not an ancient tower. A modern spire of glass and steel. Light pulses from its peak. Lexicon Society headquarters. Miss Penny stops walking beside Rudy.",
-          "es": "Las coordenadas que senalaron las cuatro Piedras Guardianas — en medio de la llanura mesopotamica, una estructura atraviesa el cielo. No es una torre antigua. Una aguja moderna de vidrio y acero. La luz pulsa desde su cima. El cuartel general de la Sociedad Lexicon. Miss Penny deja de caminar junto a Rudy."
+          "ko": "4개의 수호석이 가리킨 좌표... 메소포타미아 평원 한가운데, 하늘을 찌를 듯한 구조물이 서 있다. 고대의 탑이 아니다. 현대적인 유리와 강철의 타워. 꼭대기에서 불빛이 맥동한다. 렉시콘 소사이어티의 본부. 미스 페니가 루디 옆에서 걸음을 멈춘다.",
+          "en": "The coordinates the four Guardian Stones pointed to... in the middle of the Mesopotamian plain, a structure pierces the sky. Not an ancient tower. A modern spire of glass and steel. Light pulses from its peak. Lexicon Society headquarters. Miss Penny stops walking beside Rudy.",
+          "es": "Las coordenadas que senalaron las cuatro Piedras Guardianas... en medio de la llanura mesopotamica, una estructura atraviesa el cielo. No es una torre antigua. Una aguja moderna de vidrio y acero. La luz pulsa desde su cima. El cuartel general de la Sociedad Lexicon. Miss Penny deja de caminar junto a Rudy."
         },
         "dialogues": [
           {
             "npc": "penny",
             "text": {
-              "en": "There are five floors. Each one is a language gate — English, Spanish, Korean, and two more I never learned. The stones are kept at the top. And Rudy... Black knows we're coming. He always knows.",
-              "es": "Hay cinco pisos. Cada uno es una puerta linguistica — ingles, espanol, coreano, y dos mas que nunca aprendi. Las piedras estan en la cima. Y Rudy... Black sabe que venimos. Siempre lo sabe.",
-              "ko": "5층이야. 각 층이 언어 관문이야 — 영어, 스페인어, 한국어, 그리고 내가 모르는 두 개 더. 수호석은 꼭대기에 있어. 그리고 루디... 블랙은 우리가 오는 걸 알아. 항상 알거든."
+              "en": "There are five floors. Each one is a language gate... English, Spanish, Korean, and two more I never learned. The stones are kept at the top. And Rudy... Black knows we're coming. He always knows.",
+              "es": "Hay cinco pisos. Cada uno es una puerta linguistica... ingles, espanol, coreano, y dos mas que nunca aprendi. Las piedras estan en la cima. Y Rudy... Black sabe que venimos. Siempre lo sabe.",
+              "ko": "5층이야. 각 층이 언어 관문이야... 영어, 스페인어, 한국어, 그리고 내가 모르는 두 개 더. 수호석은 꼭대기에 있어. 그리고 루디... 블랙은 우리가 오는 걸 알아. 항상 알거든."
             }
           },
           {
@@ -52,9 +53,9 @@
           {
             "npc": "penny",
             "text": {
-              "en": "I need to tell you something. The Universal Code — it's not just a translation machine. It's a frequency. When Black activates it with all seven stones, it overwrites how the brain processes language. Everyone on Earth would wake up speaking one artificial language. And forgetting every other one. Their mother's lullabies. Their grandfather's stories. Gone.",
-              "es": "Necesito decirte algo. El Codigo Universal — no es solo una maquina traductora. Es una frecuencia. Cuando Black la active con las siete piedras, sobreescribe como el cerebro procesa el lenguaje. Todos en la Tierra despertarian hablando un idioma artificial. Y olvidarian cada otro. Las canciones de cuna de sus madres. Las historias de sus abuelos. Desaparecidas.",
-              "ko": "말해야 할 게 있어. 유니버설 코드 — 단순한 번역기가 아니야. 주파수야. 블랙이 7개의 수호석으로 활성화하면, 뇌가 언어를 처리하는 방식을 덮어써. 지구상의 모든 사람이 하나의 인공 언어만 말하게 돼. 나머지는 전부 잊어. 엄마의 자장가. 할아버지의 이야기. 사라져."
+              "en": "I need to tell you something. The Universal Code... it's not just a translation machine. It's a frequency. When Black activates it with all seven stones, it overwrites how the brain processes language. Everyone on Earth would wake up speaking one artificial language. And forgetting every other one. Their mother's lullabies. Their grandfather's stories. Gone.",
+              "es": "Necesito decirte algo. El Código Universal... no es solo una maquina traductora. Es una frecuencia. Cuando Black la active con las siete piedras, sobreescribe como el cerebro procesa el lenguaje. Todos en la Tierra despertarian hablando un idioma artificial. Y olvidarian cada otro. Las canciones de cuna de sus madres. Las historias de sus abuelos. Desaparecidas.",
+              "ko": "말해야 할 게 있어. 유니버설 코드... 단순한 번역기가 아니야. 주파수야. 블랙이 7개의 수호석으로 활성화하면, 뇌가 언어를 처리하는 방식을 덮어써. 지구상의 모든 사람이 하나의 인공 언어만 말하게 돼. 나머지는 전부 잊어. 엄마의 자장가. 할아버지의 이야기. 사라져."
             }
           },
           {
@@ -107,7 +108,7 @@
             "npc": "mr_black",
             "text": {
               "en": "Silence? I'm offering clarity. Right now, a doctor in Seoul can't read a research paper from Madrid because of language. A child in London can't call for help in Cairo because of language. People die because of this 'beautiful diversity' you worship. My Code fixes that. Every human, perfectly understood, everywhere, always. Tell me that isn't worth the cost.",
-              "es": "Silencio? Ofrezco claridad. Ahora mismo, un doctor en Seul no puede leer un articulo de Madrid por el idioma. Un nino en Londres no puede pedir ayuda en El Cairo por el idioma. La gente muere por esta 'hermosa diversidad' que adoras. Mi Codigo arregla eso. Cada humano, perfectamente comprendido, en todas partes, siempre. Dime que no vale el costo.",
+              "es": "Silencio? Ofrezco claridad. Ahora mismo, un doctor en Seul no puede leer un articulo de Madrid por el idioma. Un nino en Londres no puede pedir ayuda en El Cairo por el idioma. La gente muere por esta 'hermosa diversidad' que adoras. Mi Código arregla eso. Cada humano, perfectamente comprendido, en todas partes, siempre. Dime que no vale el costo.",
               "ko": "침묵? 나는 명료함을 제안하는 거야. 지금 서울의 의사가 마드리드의 연구 논문을 언어 때문에 못 읽어. 런던의 아이가 카이로에서 언어 때문에 도움을 청하지 못해. 사람들이 네가 숭배하는 이 '아름다운 다양성' 때문에 죽어. 내 코드는 그걸 고쳐. 모든 인간이 어디서나 항상 완벽하게 이해받는 거야. 그 대가가 아깝다고 말해봐."
             }
           },
@@ -115,17 +116,17 @@
             "npc": "rudy",
             "isThought": true,
             "text": {
-              "en": "(He's... not entirely wrong. The part about the doctor, the child. That's real. But his solution isn't a bridge — it's a bulldozer. You don't fix a house by burning it down and building a box. Focus, Rudy. He's good at this. That's what makes him dangerous.)",
-              "es": "(No esta... del todo equivocado. Lo del doctor, lo del nino. Eso es real. Pero su solucion no es un puente — es una excavadora. No arreglas una casa quemandola y construyendo una caja. Concentrate, Rudy. El es bueno en esto. Eso es lo que lo hace peligroso.)",
-              "ko": "(그가... 완전히 틀린 건 아니야. 의사 이야기, 아이 이야기. 그건 사실이야. 하지만 그의 해결책은 다리가 아니야 — 불도저야. 집을 태우고 상자를 지어서 집을 고치는 건 아니잖아. 집중해, 루디. 이 사람은 이게 특기야. 그래서 위험한 거지.)"
+              "en": "(He's... not entirely wrong. The part about the doctor, the child. That's real. But his solution isn't a bridge... it's a bulldozer. You don't fix a house by burning it down and building a box. Focus, Rudy. He's good at this. That's what makes him dangerous.)",
+              "es": "(No esta... del todo equivocado. Lo del doctor, lo del nino. Eso es real. Pero su solucion no es un puente... es una excavadora. No arreglas una casa quemandola y construyendo una caja. Concentrate, Rudy. El es bueno en esto. Eso es lo que lo hace peligroso.)",
+              "ko": "(그가... 완전히 틀린 건 아니야. 의사 이야기, 아이 이야기. 그건 사실이야. 하지만 그의 해결책은 다리가 아니야... 불도저야. 집을 태우고 상자를 지어서 집을 고치는 건 아니잖아. 집중해, 루디. 이 사람은 이게 특기야. 그래서 위험한 거지.)"
             }
           },
           {
             "npc": "mr_black",
             "text": {
-              "en": "I'll make this simple. There are five language gates between you and the stones. Pass them all, and you can try to stop me. Fail even one, and I activate the Code with the four stones you so kindly delivered to my doorstep. Oh — and Penny? I know you're there. I always knew you'd come back. Everyone does.",
-              "es": "Lo hare simple. Hay cinco puertas linguisticas entre tu y las piedras. Pasalas todas, y puedes intentar detenerme. Falla aunque sea una, y activo el Codigo con las cuatro piedras que tan amablemente trajiste a mi puerta. Ah — y Penny? Se que estas ahi. Siempre supe que volverias. Todos vuelven.",
-              "ko": "간단하게 하자. 너와 수호석 사이에 다섯 개의 언어 관문이 있어. 다 통과하면 나를 막아볼 수 있어. 하나라도 실패하면, 네가 친절하게 내 문 앞까지 배달해 준 4개의 수호석으로 코드를 활성화할 거야. 아 — 그리고 페니? 거기 있는 거 알아. 돌아올 줄 항상 알았어. 다들 그러거든."
+              "en": "I'll make this simple. There are five language gates between you and the stones. Pass them all, and you can try to stop me. Fail even one, and I activate the Code with the four stones you so kindly delivered to my doorstep. Oh... and Penny? I know you're there. I always knew you'd come back. Everyone does.",
+              "es": "Lo hare simple. Hay cinco puertas linguisticas entre tu y las piedras. Pasalas todas, y puedes intentar detenerme. Falla aunque sea una, y activo el Código con las cuatro piedras que tan amablemente trajiste a mi puerta. Ah... y Penny? Se que estas ahi. Siempre supe que volverias. Todos vuelven.",
+              "ko": "간단하게 하자. 너와 수호석 사이에 다섯 개의 언어 관문이 있어. 다 통과하면 나를 막아볼 수 있어. 하나라도 실패하면, 네가 친절하게 내 문 앞까지 배달해 준 4개의 수호석으로 코드를 활성화할 거야. 아... 그리고 페니? 거기 있는 거 알아. 돌아올 줄 항상 알았어. 다들 그러거든."
             }
           },
           {
@@ -144,9 +145,9 @@
         "id": "ch5_scene3",
         "title": { "ko": "빼앗긴 수호석", "en": "The Stolen Stone", "es": "La Piedra Robada" },
         "narration": {
-          "ko": "3층 관문을 통과한 직후. 루디가 뒤를 돌아보니 배낭의 지퍼가 열려 있다. 카이로 수호석이 없다. 바닥에 작은 메모 하나. 미스터 블랙의 글씨체. 루디의 손이 떨린다 — 분노인지 공포인지 모른다.",
-          "en": "Just after passing the third floor gate. Rudy looks back and sees his backpack zipper is open. The Cairo Guardian Stone is gone. A small note on the floor. Mr. Black's handwriting. Rudy's hands shake — he can't tell if it's anger or fear.",
-          "es": "Justo despues de pasar la puerta del tercer piso. Rudy mira atras y ve que la cremallera de su mochila esta abierta. La Piedra Guardiana de El Cairo ha desaparecido. Una pequena nota en el suelo. La letra de Mr. Black. Las manos de Rudy tiemblan — no sabe si es ira o miedo."
+          "ko": "3층 관문을 통과한 직후. 루디가 뒤를 돌아보니 배낭의 지퍼가 열려 있다. 카이로 수호석이 없다. 바닥에 작은 메모 하나. 미스터 블랙의 글씨체. 루디의 손이 떨린다... 분노인지 공포인지 모른다.",
+          "en": "Just after passing the third floor gate. Rudy looks back and sees his backpack zipper is open. The Cairo Guardian Stone is gone. A small note on the floor. Mr. Black's handwriting. Rudy's hands shake... he can't tell if it's anger or fear.",
+          "es": "Justo despues de pasar la puerta del tercer piso. Rudy mira atras y ve que la cremallera de su mochila esta abierta. La Piedra Guardiana de El Cairo ha desaparecido. Una pequena nota en el suelo. La letra de Mr. Black. Las manos de Rudy tiemblan... no sabe si es ira o miedo."
         },
         "dialogues": [
           {
@@ -160,9 +161,9 @@
           {
             "npc": "penny",
             "text": {
-              "en": "The note says 'Thank you for the delivery. Four down, three to go.' He's taunting you. That means he doesn't have the other three yet. The tower still has three stones hidden in it — the ones the original Babel guardians placed here. We can still get to them first.",
-              "es": "La nota dice 'Gracias por la entrega. Cuatro listas, faltan tres.' Se esta burlando de ti. Eso significa que no tiene las otras tres todavia. La torre aun tiene tres piedras escondidas — las que los guardianes originales de Babel colocaron aqui. Aun podemos llegar primero.",
-              "ko": "메모에 '배달 감사합니다. 4개 완료, 3개 남음'이라고 써있어. 도발하는 거야. 즉 나머지 셋은 아직 없다는 뜻이야. 탑 안에 아직 3개의 수호석이 숨겨져 있어 — 원래 바벨의 수호자들이 여기 놓은 것들. 아직 먼저 찾을 수 있어."
+              "en": "The note says 'Thank you for the delivery. Four down, three to go.' He's taunting you. That means he doesn't have the other three yet. The tower still has three stones hidden in it... the ones the original Babel guardians placed here. We can still get to them first.",
+              "es": "La nota dice 'Gracias por la entrega. Cuatro listas, faltan tres.' Se esta burlando de ti. Eso significa que no tiene las otras tres todavia. La torre aun tiene tres piedras escondidas... las que los guardianes originales de Babel colocaron aqui. Aun podemos llegar primero.",
+              "ko": "메모에 '배달 감사합니다. 4개 완료, 3개 남음'이라고 써있어. 도발하는 거야. 즉 나머지 셋은 아직 없다는 뜻이야. 탑 안에 아직 3개의 수호석이 숨겨져 있어... 원래 바벨의 수호자들이 여기 놓은 것들. 아직 먼저 찾을 수 있어."
           }
           },
           {
@@ -176,9 +177,9 @@
           {
             "npc": "penny",
             "text": {
-              "en": "Then stop feeling sorry for yourself and get the other three. You taught me something in Cairo, Rudy — that mistakes don't define you. What you do after them does. So. What are you going to do?",
-              "es": "Entonces deja de sentir lastima por ti mismo y consigue las otras tres. Me ensenaste algo en El Cairo, Rudy — que los errores no te definen. Lo que haces despues, si. Entonces. Que vas a hacer?",
-              "ko": "그러면 자기 연민 그만하고 나머지 셋을 찾아. 카이로에서 네가 나한테 가르쳐준 거 있잖아, 루디 — 실수가 널 정의하는 게 아니라고. 그 후에 뭘 하느냐가 정의하는 거라고. 자. 뭘 할 거야?"
+              "en": "Then stop feeling sorry for yourself and get the other three. You taught me something in Cairo, Rudy... that mistakes don't define you. What you do after them does. So. What are you going to do?",
+              "es": "Entonces deja de sentir lastima por ti mismo y consigue las otras tres. Me ensenaste algo en El Cairo, Rudy... que los errores no te definen. Lo que haces despues, si. Entonces. Que vas a hacer?",
+              "ko": "그러면 자기 연민 그만하고 나머지 셋을 찾아. 카이로에서 네가 나한테 가르쳐준 거 있잖아, 루디... 실수가 널 정의하는 게 아니라고. 그 후에 뭘 하느냐가 정의하는 거라고. 자. 뭘 할 거야?"
             }
           },
           {
@@ -194,9 +195,9 @@
           {
             "npc": "tom",
             "text": {
-              "en": "Oi Rudy! Heard you're in a right pickle. Listen mate — 'when the going gets tough, the tough get going.' And the slippery ones check their bags. Chin up, yeah?",
-              "es": "Oye Rudy! Me entere de que estas en un buen lio. Escucha amigo — 'cuando las cosas se ponen dificiles, los duros se ponen en marcha.' Y los listos revisan sus mochilas. Animo, vale?",
-              "ko": "이봐 루디! 곤란한 상황이라며. 들어 친구 — '힘들 때 강한 자가 움직인다'고. 그리고 영리한 놈은 가방을 확인하지. 기운 내, 알았지?"
+              "en": "Oi Rudy! Heard you're in a right pickle. Listen mate... 'when the going gets tough, the tough get going.' And the slippery ones check their bags. Chin up, yeah?",
+              "es": "Oye Rudy! Me entere de que estas en un buen lio. Escucha amigo... 'cuando las cosas se ponen dificiles, los duros se ponen en marcha.' Y los listos revisan sus mochilas. Animo, vale?",
+              "ko": "이봐 루디! 곤란한 상황이라며. 들어 친구... '힘들 때 강한 자가 움직인다'고. 그리고 영리한 놈은 가방을 확인하지. 기운 내, 알았지?"
             }
           },
           {
@@ -218,25 +219,25 @@
           {
             "npc": "sujin",
             "text": {
-              "en": "Rudy, it's Sujin. I've been researching the original Babel stones. Each one responds to a different language — you need to speak TO them, not just carry them. The stones aren't keys. They're listeners.",
-              "es": "Rudy, soy Sujin. He estado investigando las piedras originales de Babel. Cada una responde a un idioma diferente — necesitas hablarLES, no solo llevarlas. Las piedras no son llaves. Son oyentes.",
-              "ko": "루디 씨, 수진이에요. 원래 바벨 수호석을 연구하고 있었어요. 각 돌이 다른 언어에 반응해요 — 들고만 다니는 게 아니라 말을 걸어야 해요. 수호석은 열쇠가 아니에요. 듣는 자예요."
+              "en": "Rudy, it's Sujin. I've been researching the original Babel stones. Each one responds to a different language... you need to speak TO them, not just carry them. The stones aren't keys. They're listeners.",
+              "es": "Rudy, soy Sujin. He estado investigando las piedras originales de Babel. Cada una responde a un idioma diferente... necesitas hablarLES, no solo llevarlas. Las piedras no son llaves. Son oyentes.",
+              "ko": "루디 씨, 수진이에요. 원래 바벨 수호석을 연구하고 있었어요. 각 돌이 다른 언어에 반응해요... 들고만 다니는 게 아니라 말을 걸어야 해요. 수호석은 열쇠가 아니에요. 듣는 자예요."
             }
           },
           {
             "npc": "minho",
             "text": {
-              "en": "Yo Rudy. Minho. Word on the underground network — Black's Code has a flaw. It needs all seven stones SIMULTANEOUSLY. Even one missing and the frequency collapses. So guard what you have left with your life. And if you need a beat to keep your spirits up, just hum. Works for me.",
-              "es": "Ey Rudy. Minho. La red subterranea dice — el Codigo de Black tiene un fallo. Necesita las siete piedras SIMULTANEAMENTE. Si falta una sola, la frecuencia colapsa. Asi que protege lo que te queda con tu vida. Y si necesitas un ritmo para animarte, solo tararea. A mi me funciona.",
-              "ko": "요 루디. 민호야. 지하 네트워크에서 들은 건데 — 블랙의 코드에 결함이 있대. 7개의 수호석이 동시에 필요하대. 하나라도 없으면 주파수가 붕괴해. 남은 거 목숨 걸고 지켜. 그리고 기운 낼 비트가 필요하면, 그냥 흥얼거려. 나한테는 효과 있어."
+              "en": "Yo Rudy. Minho. Word on the underground network... Black's Code has a flaw. It needs all seven stones SIMULTANEOUSLY. Even one missing and the frequency collapses. So guard what you have left with your life. And if you need a beat to keep your spirits up, just hum. Works for me.",
+              "es": "Ey Rudy. Minho. La red subterranea dice... el Código de Black tiene un fallo. Necesita las siete piedras SIMULTANEAMENTE. Si falta una sola, la frecuencia colapsa. Asi que protege lo que te queda con tu vida. Y si necesitas un ritmo para animarte, solo tararea. A mi me funciona.",
+              "ko": "요 루디. 민호야. 지하 네트워크에서 들은 건데... 블랙의 코드에 결함이 있대. 7개의 수호석이 동시에 필요하대. 하나라도 없으면 주파수가 붕괴해. 남은 거 목숨 걸고 지켜. 그리고 기운 낼 비트가 필요하면, 그냥 흥얼거려. 나한테는 효과 있어."
             }
           },
           {
             "npc": "eleanor",
             "text": {
-              "en": "Rudy. It's Eleanor. I hired you twenty years ago because you never gave up on a case, even the ones that seemed impossible. This is not different. It's just bigger. Find the stones. Stop the Code. And Rudy — come home.",
-              "es": "Rudy. Soy Eleanor. Te contrate hace veinte anos porque nunca abandonabas un caso, ni los que parecian imposibles. Esto no es diferente. Solo es mas grande. Encuentra las piedras. Detiene el Codigo. Y Rudy — vuelve a casa.",
-              "ko": "루디. 엘리너야. 20년 전에 너를 고용한 건 불가능해 보이는 사건도 절대 포기하지 않았기 때문이야. 이번도 다르지 않아. 그저 더 클 뿐이야. 수호석을 찾아. 코드를 멈춰. 그리고 루디 — 집으로 돌아와."
+              "en": "Rudy. It's Eleanor. I hired you twenty years ago because you never gave up on a case, even the ones that seemed impossible. This is not different. It's just bigger. Find the stones. Stop the Code. And Rudy... come home.",
+              "es": "Rudy. Soy Eleanor. Te contrate hace veinte anos porque nunca abandonabas un caso, ni los que parecian imposibles. Esto no es diferente. Solo es mas grande. Encuentra las piedras. Detiene el Código. Y Rudy... vuelve a casa.",
+              "ko": "루디. 엘리너야. 20년 전에 너를 고용한 건 불가능해 보이는 사건도 절대 포기하지 않았기 때문이야. 이번도 다르지 않아. 그저 더 클 뿐이야. 수호석을 찾아. 코드를 멈춰. 그리고 루디... 집으로 돌아와."
             }
           }
         ],
@@ -247,17 +248,17 @@
         "id": "ch5_scene4",
         "title": { "ko": "언어의 벽을 넘어", "en": "Beyond the Language Wall", "es": "Mas Alla del Muro del Idioma" },
         "narration": {
-          "ko": "4층. 관문이 바뀌었다. 하나의 언어가 아니라 세 가지 언어가 동시에 울려퍼진다. 영어, 스페인어, 한국어가 뒤섞인 비문이 벽면을 가득 채우고 있다. 미스 페니가 비문의 패턴을 분석하기 시작한다. 그녀의 눈이 빛난다 — 15년간 사라지는 언어를 연구한 학자의 눈.",
-          "en": "Fourth floor. The gate has changed. Not one language but three pouring out simultaneously. English, Spanish, Korean inscriptions intertwined across every wall. Miss Penny begins analyzing the patterns. Her eyes light up — the eyes of a scholar who spent fifteen years studying dying languages.",
-          "es": "Cuarto piso. La puerta ha cambiado. No un idioma sino tres fluyendo simultaneamente. Inscripciones en ingles, espanol y coreano entrelazadas por todas las paredes. Miss Penny comienza a analizar los patrones. Sus ojos se iluminan — los ojos de una erudita que paso quince anos estudiando idiomas moribundos."
+          "ko": "4층. 관문이 바뀌었다. 하나의 언어가 아니라 세 가지 언어가 동시에 울려퍼진다. 영어, 스페인어, 한국어가 뒤섞인 비문이 벽면을 가득 채우고 있다. 미스 페니가 비문의 패턴을 분석하기 시작한다. 그녀의 눈이 빛난다... 15년간 사라지는 언어를 연구한 학자의 눈.",
+          "en": "Fourth floor. The gate has changed. Not one language but three pouring out simultaneously. English, Spanish, Korean inscriptions intertwined across every wall. Miss Penny begins analyzing the patterns. Her eyes light up... the eyes of a scholar who spent fifteen years studying dying languages.",
+          "es": "Cuarto piso. La puerta ha cambiado. No un idioma sino tres fluyendo simultaneamente. Inscripciónes en ingles, espanol y coreano entrelazadas por todas las paredes. Miss Penny comienza a analizar los patrones. Sus ojos se iluminan... los ojos de una erudita que paso quince anos estudiando idiomas moribundos."
         },
         "dialogues": [
           {
             "npc": "penny",
             "text": {
-              "en": "This is it. This is what I spent my life studying. These inscriptions — they're not separate languages. They're one message written in three voices. Like a chord in music. Each language carries a piece of meaning that the others can't express alone. Remove one, and the message breaks.",
-              "es": "Esto es. Esto es lo que pase mi vida estudiando. Estas inscripciones — no son idiomas separados. Son un mensaje escrito en tres voces. Como un acorde musical. Cada idioma lleva un pedazo de significado que los otros no pueden expresar solos. Quita uno, y el mensaje se rompe.",
-              "ko": "이거야. 이게 내가 평생 연구한 거야. 이 비문들 — 따로 있는 언어가 아니야. 세 가지 목소리로 쓰인 하나의 메시지야. 음악의 화음 같은 거야. 각 언어가 다른 언어만으로는 표현할 수 없는 의미 조각을 품고 있어. 하나를 빼면 메시지가 깨져."
+              "en": "This is it. This is what I spent my life studying. These inscriptions... they're not separate languages. They're one message written in three voices. Like a chord in music. Each language carries a piece of meaning that the others can't express alone. Remove one, and the message breaks.",
+              "es": "Esto es. Esto es lo que pase mi vida estudiando. Estas inscripciones... no son idiomas separados. Son un mensaje escrito en tres voces. Como un acorde musical. Cada idioma lleva un pedazo de significado que los otros no pueden expresar solos. Quita uno, y el mensaje se rompe.",
+              "ko": "이거야. 이게 내가 평생 연구한 거야. 이 비문들... 따로 있는 언어가 아니야. 세 가지 목소리로 쓰인 하나의 메시지야. 음악의 화음 같은 거야. 각 언어가 다른 언어만으로는 표현할 수 없는 의미 조각을 품고 있어. 하나를 빼면 메시지가 깨져."
             }
           },
           {
@@ -287,9 +288,9 @@
           {
             "npc": "penny",
             "text": {
-              "en": "The trilingual inscription is a lock. We need to read it aloud — all three languages, together. I'll take the Spanish. You take the English and Korean. Ready?",
-              "es": "La inscripcion trilingue es una cerradura. Necesitamos leerla en voz alta — los tres idiomas, juntos. Yo tomo el espanol. Tu toma el ingles y el coreano. Lista?",
-              "ko": "세 언어 비문이 자물쇠야. 소리 내어 읽어야 해 — 세 언어 모두, 함께. 내가 스페인어를 맡을게. 너는 영어와 한국어를. 준비됐어?"
+              "en": "The trilingual inscription is a lock. We need to read it aloud... all three languages, together. I'll take the Spanish. You take the English and Korean. Ready?",
+              "es": "La inscripcion trilingue es una cerradura. Necesitamos leerla en voz alta... los tres idiomas, juntos. Yo tomo el espanol. Tu toma el ingles y el coreano. Lista?",
+              "ko": "세 언어 비문이 자물쇠야. 소리 내어 읽어야 해... 세 언어 모두, 함께. 내가 스페인어를 맡을게. 너는 영어와 한국어를. 준비됐어?"
             }
           }
         ],
@@ -300,41 +301,41 @@
         "id": "ch5_scene5_boss",
         "title": { "ko": "최후의 언어", "en": "The Last Language", "es": "El Ultimo Idioma" },
         "narration": {
-          "ko": "꼭대기 층. 7개의 수호석 받침대가 원형으로 배치되어 있다. 5개는 이미 놓여 있다 — 블랙이 빼앗은 카이로 석을 포함해. 루디는 3개의 수호석을 손에 쥐고 있다. 미스터 블랙이 방 반대편에 서 있다. 이번에는 스크린이 아니다. 진짜다. 코트 주머니에 손을 넣고, 루디를 조용히 바라본다.",
-          "en": "Top floor. Seven Guardian Stone pedestals arranged in a circle. Five are already placed — including the Cairo stone Black stole. Rudy holds three in his hands. Mr. Black stands on the far side of the room. No screen this time. Real. Hands in his coat pockets, watching Rudy quietly.",
-          "es": "Ultimo piso. Siete pedestales de Piedras Guardianas dispuestos en circulo. Cinco ya estan colocadas — incluyendo la de El Cairo que Black robo. Rudy sostiene tres en sus manos. Mr. Black esta al otro lado de la sala. Sin pantalla esta vez. Real. Con las manos en los bolsillos de su abrigo, observando a Rudy en silencio."
+          "ko": "꼭대기 층. 7개의 수호석 받침대가 원형으로 배치되어 있다. 5개는 이미 놓여 있다... 블랙이 빼앗은 카이로 석을 포함해. 루디는 3개의 수호석을 손에 쥐고 있다. 미스터 블랙이 방 반대편에 서 있다. 이번에는 스크린이 아니다. 진짜다. 코트 주머니에 손을 넣고, 루디를 조용히 바라본다.",
+          "en": "Top floor. Seven Guardian Stone pedestals arranged in a circle. Five are already placed... including the Cairo stone Black stole. Rudy holds three in his hands. Mr. Black stands on the far side of the room. No screen this time. Real. Hands in his coat pockets, watching Rudy quietly.",
+          "es": "Ultimo piso. Siete pedestales de Piedras Guardianas dispuestos en circulo. Cinco ya estan colocadas... incluyendo la de El Cairo que Black robo. Rudy sostiene tres en sus manos. Mr. Black esta al otro lado de la sala. Sin pantalla esta vez. Real. Con las manos en los bolsillos de su abrigo, observando a Rudy en silencio."
         },
         "dialogues": [
           {
             "npc": "mr_black",
             "text": {
-              "en": "You made it. I'll admit, I didn't think you'd get past the fourth floor. That trilingual lock was designed by the original guardians — not me. Even I couldn't crack it alone. But here's where it ends, Rudy. Place those three stones on the pedestals, and the Code activates. Keep them, and I'll wait. I'm a patient man. But the world keeps misunderstanding itself while you decide.",
-              "es": "Lo lograste. Admito que no crei que pasarias el cuarto piso. Esa cerradura trilingue fue disenada por los guardianes originales — no por mi. Ni yo pude descifrarla solo. Pero aqui es donde termina, Rudy. Coloca esas tres piedras en los pedestales, y el Codigo se activa. Quedate con ellas, y yo espero. Soy un hombre paciente. Pero el mundo sigue malinterpretandose mientras tu decides.",
-              "ko": "해냈군. 솔직히, 4층을 통과할 줄은 몰랐어. 그 3개 국어 자물쇠는 원래 수호자들이 만든 거야 — 내가 아니라. 나도 혼자서는 못 풀었어. 하지만 여기서 끝이야, 루디. 그 세 개의 돌을 받침대에 놓으면 코드가 활성화돼. 안 놓으면, 기다릴게. 나는 인내심 있는 사람이야. 하지만 네가 결정하는 동안 세상은 계속 서로를 오해하겠지."
+              "en": "You made it. I'll admit, I didn't think you'd get past the fourth floor. That trilingual lock was designed by the original guardians... not me. Even I couldn't crack it alone. But here's where it ends, Rudy. Place those three stones on the pedestals, and the Code activates. Keep them, and I'll wait. I'm a patient man. But the world keeps misunderstanding itself while you decide.",
+              "es": "Lo lograste. Admito que no crei que pasarias el cuarto piso. Esa cerradura trilingue fue disenada por los guardianes originales... no por mi. Ni yo pude descifrarla solo. Pero aqui es donde termina, Rudy. Coloca esas tres piedras en los pedestales, y el Código se activa. Quedate con ellas, y yo espero. Soy un hombre paciente. Pero el mundo sigue malinterpretandose mientras tu decides.",
+              "ko": "해냈군. 솔직히, 4층을 통과할 줄은 몰랐어. 그 3개 국어 자물쇠는 원래 수호자들이 만든 거야... 내가 아니라. 나도 혼자서는 못 풀었어. 하지만 여기서 끝이야, 루디. 그 세 개의 돌을 받침대에 놓으면 코드가 활성화돼. 안 놓으면, 기다릴게. 나는 인내심 있는 사람이야. 하지만 네가 결정하는 동안 세상은 계속 서로를 오해하겠지."
             }
           },
           {
             "npc": "rudy",
             "text": {
-              "en": "You're wrong about one thing, Black. The stones don't activate the Code when placed together. Sujin told me — they're listeners. They respond to language. YOUR Code would try to force one frequency through them. But that's not what they were made for.",
-              "es": "Te equivocas en una cosa, Black. Las piedras no activan el Codigo al colocarlas juntas. Sujin me lo dijo — son oyentes. Responden al idioma. TU Codigo intentaria forzar una frecuencia a traves de ellas. Pero no fueron hechas para eso.",
-              "ko": "한 가지 틀렸어, 블랙. 수호석은 모아 놓는다고 코드가 활성화되는 게 아니야. 수진이가 알려줬어 — 듣는 자들이래. 언어에 반응한다고. 네 코드는 하나의 주파수를 강제로 통과시키려 하겠지. 하지만 그건 수호석이 만들어진 목적이 아니야."
+              "en": "You're wrong about one thing, Black. The stones don't activate the Code when placed together. Sujin told me... they're listeners. They respond to language. YOUR Code would try to force one frequency through them. But that's not what they were made for.",
+              "es": "Te equivocas en una cosa, Black. Las piedras no activan el Código al colocarlas juntas. Sujin me lo dijo... son oyentes. Responden al idioma. TU Código intentaria forzar una frecuencia a traves de ellas. Pero no fueron hechas para eso.",
+              "ko": "한 가지 틀렸어, 블랙. 수호석은 모아 놓는다고 코드가 활성화되는 게 아니야. 수진이가 알려줬어... 듣는 자들이래. 언어에 반응한다고. 네 코드는 하나의 주파수를 강제로 통과시키려 하겠지. 하지만 그건 수호석이 만들어진 목적이 아니야."
             }
           },
           {
             "npc": "mr_black",
             "text": {
               "en": "Then show me. Show me what a few half-learned phrases in three languages can do against a Code that took me twenty years to build. I genuinely want to see it, Rudy. Prove me wrong. Or prove me right. Either way, one of us walks out of here knowing the truth.",
-              "es": "Entonces demuestramelo. Muestrame lo que unas frases a medio aprender en tres idiomas pueden hacer contra un Codigo que me tomo veinte anos construir. Genuinamente quiero verlo, Rudy. Prueba que estoy equivocado. O prueba que tengo razon. De cualquier forma, uno de nosotros saldra de aqui conociendo la verdad.",
+              "es": "Entonces demuestramelo. Muestrame lo que unas frases a medio aprender en tres idiomas pueden hacer contra un Código que me tomo veinte anos construir. Genuinamente quiero verlo, Rudy. Prueba que estoy equivocado. O prueba que tengo razon. De cualquier forma, uno de nosotros saldra de aqui conociendo la verdad.",
               "ko": "그러면 보여줘. 세 언어로 반쯤 배운 몇 마디가 내가 20년 걸려 만든 코드에 대항해서 뭘 할 수 있는지 보여줘. 진심으로 보고 싶어, 루디. 내가 틀렸다는 걸 증명해. 아니면 맞다는 걸 증명해. 어느 쪽이든, 우리 둘 중 하나는 진실을 알고 여기를 나가겠지."
             }
           },
           {
             "npc": "penny",
             "text": {
-              "en": "Rudy. The stones are listeners. Speak to them. Everything you've learned. Every greeting, every name, every clumsy 'thank you' in every city. Let them hear what language really sounds like — messy, imperfect, and human.",
-              "es": "Rudy. Las piedras son oyentes. Hablales. Todo lo que aprendiste. Cada saludo, cada nombre, cada torpe 'gracias' en cada ciudad. Dejalas oir como suena realmente el idioma — desordenado, imperfecto y humano.",
-              "ko": "루디. 수호석은 듣는 자야. 말을 걸어. 배운 모든 것을. 모든 인사, 모든 이름, 모든 도시에서의 서툰 '감사합니다'. 언어가 진짜로 어떤 소리인지 들려줘 — 어지럽고, 불완전하고, 인간적인."
+              "en": "Rudy. The stones are listeners. Speak to them. Everything you've learned. Every greeting, every name, every clumsy 'thank you' in every city. Let them hear what language really sounds like... messy, imperfect, and human.",
+              "es": "Rudy. Las piedras son oyentes. Hablales. Todo lo que aprendiste. Cada saludo, cada nombre, cada torpe 'gracias' en cada ciudad. Dejalas oir como suena realmente el idioma... desordenado, imperfecto y humano.",
+              "ko": "루디. 수호석은 듣는 자야. 말을 걸어. 배운 모든 것을. 모든 인사, 모든 이름, 모든 도시에서의 서툰 '감사합니다'. 언어가 진짜로 어떤 소리인지 들려줘... 어지럽고, 불완전하고, 인간적인."
             }
           },
           {
@@ -353,32 +354,32 @@
 
     "cliffhanger": {
       "narration": {
-        "ko": "루디가 세 가지 언어로 말한다. 서툴고, 문법이 틀리고, 발음이 엉망인 곳도 있다. 하지만 진심이다. 수호석 7개가 빛나기 시작한다. 블랙의 코드 장치에서 불꽃이 튄다 — 하나의 주파수로 돌을 지배하려던 기계가, 세 가지 언어의 화음에 과부하된다.",
-        "en": "Rudy speaks in three languages. Clumsy, grammatically imperfect, mispronounced in places. But sincere. All seven Guardian Stones begin to glow. Sparks fly from Black's Code device — the machine that tried to dominate the stones with one frequency overloads under the harmony of three languages.",
-        "es": "Rudy habla en tres idiomas. Torpe, gramaticalmente imperfecto, mal pronunciado en partes. Pero sincero. Las siete Piedras Guardianas comienzan a brillar. Saltan chispas del dispositivo del Codigo de Black — la maquina que intento dominar las piedras con una frecuencia se sobrecarga bajo la armonia de tres idiomas."
+        "ko": "루디가 세 가지 언어로 말한다. 서툴고, 문법이 틀리고, 발음이 엉망인 곳도 있다. 하지만 진심이다. 수호석 7개가 빛나기 시작한다. 블랙의 코드 장치에서 불꽃이 튄다... 하나의 주파수로 돌을 지배하려던 기계가, 세 가지 언어의 화음에 과부하된다.",
+        "en": "Rudy speaks in three languages. Clumsy, grammatically imperfect, mispronounced in places. But sincere. All seven Guardian Stones begin to glow. Sparks fly from Black's Code device... the machine that tried to dominate the stones with one frequency overloads under the harmony of three languages.",
+        "es": "Rudy habla en tres idiomas. Torpe, gramaticalmente imperfecto, mal pronunciado en partes. Pero sincero. Las siete Piedras Guardianas comienzan a brillar. Saltan chispas del dispositivo del Código de Black... la maquina que intento dominar las piedras con una frecuencia se sobrecarga bajo la armonia de tres idiomas."
       },
       "dialogues": [
         {
           "npc": "mr_black",
           "text": {
-            "en": "No. No, that's not — the frequency should be overriding — why are they resonating with that broken, stumbling — that's not even proper grammar!",
-            "es": "No. No, eso no — la frecuencia deberia estar anulando — por que estan resonando con ese entrecortado, tropezante — eso ni siquiera es gramatica correcta!",
-            "ko": "아니. 아니, 그건 — 주파수가 덮어써야 하는데 — 왜 저 깨진, 더듬거리는 — 문법도 맞지 않는데!"
+            "en": "No. No, that's not... the frequency should be overriding... why are they resonating with that broken, stumbling... that's not even proper grammar!",
+            "es": "No. No, eso no... la frecuencia deberia estar anulando... por que estan resonando con ese entrecortado, tropezante... eso ni siquiera es gramatica correcta!",
+            "ko": "아니. 아니, 그건... 주파수가 덮어써야 하는데... 왜 저 깨진, 더듬거리는... 문법도 맞지 않는데!"
           }
         },
         {
           "npc": "rudy",
           "text": {
-            "en": "That's the point, Black. Language was never about being perfect. It's about being understood. And right now, seven stones that have listened to human voices for a thousand years are hearing something your Code never could — someone trying.",
-            "es": "Ese es el punto, Black. El idioma nunca fue sobre ser perfecto. Es sobre ser entendido. Y ahora mismo, siete piedras que han escuchado voces humanas por mil anos estan oyendo algo que tu Codigo nunca pudo — alguien intentandolo.",
-            "ko": "그게 포인트야, 블랙. 언어는 완벽한 것에 관한 게 아니었어. 이해받는 것에 관한 거야. 그리고 지금, 천 년간 인간의 목소리를 들어온 7개의 수호석이 네 코드가 절대 할 수 없던 걸 듣고 있어 — 노력하는 누군가를."
+            "en": "That's the point, Black. Language was never about being perfect. It's about being understood. And right now, seven stones that have listened to human voices for a thousand years are hearing something your Code never could... someone trying.",
+            "es": "Ese es el punto, Black. El idioma nunca fue sobre ser perfecto. Es sobre ser entendido. Y ahora mismo, siete piedras que han escuchado voces humanas por mil anos estan oyendo algo que tu Código nunca pudo... alguien intentandolo.",
+            "ko": "그게 포인트야, 블랙. 언어는 완벽한 것에 관한 게 아니었어. 이해받는 것에 관한 거야. 그리고 지금, 천 년간 인간의 목소리를 들어온 7개의 수호석이 네 코드가 절대 할 수 없던 걸 듣고 있어... 노력하는 누군가를."
           }
         },
         {
           "npc": "penny",
           "text": {
             "en": "The Code device is collapsing. The stones are... singing? Each one in a different frequency, but together they're making a harmony I've never heard before. It's not one language. It's all of them.",
-            "es": "El dispositivo del Codigo esta colapsando. Las piedras estan... cantando? Cada una en una frecuencia diferente, pero juntas estan creando una armonia que nunca antes habia escuchado. No es un idioma. Son todos.",
+            "es": "El dispositivo del Código esta colapsando. Las piedras estan... cantando? Cada una en una frecuencia diferente, pero juntas estan creando una armonia que nunca antes habia escuchado. No es un idioma. Son todos.",
             "ko": "코드 장치가 무너지고 있어. 수호석들이... 노래하고 있어? 각각 다른 주파수인데, 함께 이전에 들어본 적 없는 화음을 만들고 있어. 하나의 언어가 아니야. 전부야."
           }
         },
@@ -400,9 +401,9 @@
         }
       ],
       "finalNarration": {
-        "ko": "코드 장치가 산산조각 난다. 수호석들이 원래 자리로 돌아가듯 탑의 벽에 하나씩 안착한다. 미스터 블랙이 무릎을 꿇는다 — 패배가 아니라, 처음으로 자신이 틀렸을 수도 있다는 생각의 무게에. 미스 페니가 루디 곁에 선다. 바벨 타워의 유리벽 너머로 새벽 빛이 들어온다. 세상의 모든 언어가 오늘도 살아 있다. 서투르고, 불완전하고, 아름답게.",
-        "en": "The Code device shatters. The Guardian Stones return to their places, settling one by one into the tower's walls as if coming home. Mr. Black falls to his knees — not from defeat, but from the weight of realizing for the first time that he might have been wrong. Miss Penny stands beside Rudy. Dawn light pours through Babel Tower's glass walls. Every language in the world is still alive today. Clumsy, imperfect, and beautiful.",
-        "es": "El dispositivo del Codigo se destroza. Las Piedras Guardianas regresan a sus lugares, asentandose una por una en las paredes de la torre como si volvieran a casa. Mr. Black cae de rodillas — no por la derrota, sino por el peso de darse cuenta por primera vez de que podria haberse equivocado. Miss Penny esta junto a Rudy. La luz del amanecer entra por las paredes de vidrio de la Torre de Babel. Todos los idiomas del mundo siguen vivos hoy. Torpes, imperfectos y hermosos."
+        "ko": "코드 장치가 산산조각 난다. 수호석들이 원래 자리로 돌아가듯 탑의 벽에 하나씩 안착한다. 미스터 블랙이 무릎을 꿇는다... 패배가 아니라, 처음으로 자신이 틀렸을 수도 있다는 생각의 무게에. 미스 페니가 루디 곁에 선다. 바벨 타워의 유리벽 너머로 새벽 빛이 들어온다. 세상의 모든 언어가 오늘도 살아 있다. 서투르고, 불완전하고, 아름답게.",
+        "en": "The Code device shatters. The Guardian Stones return to their places, settling one by one into the tower's walls as if coming home. Mr. Black falls to his knees... not from defeat, but from the weight of realizing for the first time that he might have been wrong. Miss Penny stands beside Rudy. Dawn light pours through Babel Tower's glass walls. Every language in the world is still alive today. Clumsy, imperfect, and beautiful.",
+        "es": "El dispositivo del Código se destroza. Las Piedras Guardianas regresan a sus lugares, asentandose una por una en las paredes de la torre como si volvieran a casa. Mr. Black cae de rodillas... no por la derrota, sino por el peso de darse cuenta por primera vez de que podria haberse equivocado. Miss Penny esta junto a Rudy. La luz del amanecer entra por las paredes de vidrio de la Torre de Babel. Todos los idiomas del mundo siguen vivos hoy. Torpes, imperfectos y hermosos."
       }
     }
   },
@@ -457,7 +458,7 @@
       "chapter": "ch5",
       "scene": "ch5_scene2",
       "type": "fill_blank",
-      "title": { "ko": "블랙의 암호 해독", "en": "Decoding Black's Cipher", "es": "Descifrando el Codigo de Black" },
+      "title": { "ko": "블랙의 암호 해독", "en": "Decoding Black's Cipher", "es": "Descifrando el Código de Black" },
       "difficulty": 3,
       "isBoss": false,
       "storyContext": {
@@ -523,17 +524,17 @@
             {
               "scrambled": ["needs", "he", "seven", "all", "stones", "at", "once"],
               "answer": "he needs all seven stones at once",
-              "hint": { "ko": "민호가 알려준 코드의 약점", "en": "The Code weakness Minho revealed", "es": "La debilidad del Codigo que revelo Minho" }
+              "hint": { "ko": "민호가 알려준 코드의 약점", "en": "The Code weakness Minho revealed", "es": "La debilidad del Código que revelo Minho" }
             },
             {
               "scrambled": ["speak", "to", "them", "in", "your", "language"],
               "answer": "speak to them in your language",
-              "hint": { "ko": "수호석을 활성화하는 방법", "en": "How to activate the Guardian Stones", "es": "Como activar las Piedras Guardianas" }
+              "hint": { "ko": "수호석을 활성화하는 방법", "en": "How to activate the Guardian Stones", "es": "Cómo activar las Piedras Guardianas" }
             },
             {
               "scrambled": ["good", "morning", "my", "name", "is", "Rudy"],
               "answer": "good morning my name is Rudy",
-              "hint": { "ko": "자기소개 — Day 1에서 배운 표현", "en": "Self-introduction from Day 1", "es": "Autopresentacion del Dia 1" }
+              "hint": { "ko": "자기소개... Day 1에서 배운 표현", "en": "Self-introduction from Day 1", "es": "Autopresentación del Día 1" }
             }
           ]
         },
@@ -547,17 +548,17 @@
             {
               "scrambled": ["necesita", "el", "siete", "todas", "piedras", "las", "a", "vez", "la"],
               "answer": "el necesita todas las siete piedras a la vez",
-              "hint": { "ko": "코드의 약점", "en": "The Code's weakness", "es": "La debilidad del Codigo" }
+              "hint": { "ko": "코드의 약점", "en": "The Code's weakness", "es": "La debilidad del Código" }
             },
             {
               "scrambled": ["hablales", "en", "tu", "idioma"],
               "answer": "hablales en tu idioma",
-              "hint": { "ko": "수호석 활성화 방법", "en": "How to activate the stones", "es": "Como activar las piedras" }
+              "hint": { "ko": "수호석 활성화 방법", "en": "How to activate the stones", "es": "Cómo activar las piedras" }
             },
             {
               "scrambled": ["buenos", "dias", "me", "llamo", "Rudy"],
               "answer": "buenos dias me llamo Rudy",
-              "hint": { "ko": "Day 1 자기소개", "en": "Day 1 self-introduction", "es": "Autopresentacion del Dia 1" }
+              "hint": { "ko": "Day 1 자기소개", "en": "Day 1 self-introduction", "es": "Autopresentación del Día 1" }
             }
           ]
         },
@@ -571,17 +572,17 @@
             {
               "scrambled": ["7개의", "수호석이", "동시에", "모두", "필요합니다"],
               "answer": "7개의 수호석이 모두 동시에 필요합니다",
-              "hint": { "en": "The Code's weakness", "es": "La debilidad del Codigo", "ko": "민호가 알려준 약점" }
+              "hint": { "en": "The Code's weakness", "es": "La debilidad del Código", "ko": "민호가 알려준 약점" }
             },
             {
               "scrambled": ["언어로", "당신의", "말을", "걸어주세요", "수호석에"],
               "answer": "수호석에 당신의 언어로 말을 걸어주세요",
-              "hint": { "en": "How to activate the stones", "es": "Como activar las piedras", "ko": "활성화 방법" }
+              "hint": { "en": "How to activate the stones", "es": "Cómo activar las piedras", "ko": "활성화 방법" }
             },
             {
               "scrambled": ["안녕하세요", "이름은", "제", "루디입니다"],
               "answer": "안녕하세요 제 이름은 루디입니다",
-              "hint": { "en": "Day 1 self-introduction", "es": "Autopresentacion del Dia 1", "ko": "Day 1 자기소개" }
+              "hint": { "en": "Day 1 self-introduction", "es": "Autopresentación del Día 1", "ko": "Day 1 자기소개" }
             }
           ]
         }
@@ -593,7 +594,7 @@
       "chapter": "ch5",
       "scene": "ch5_scene4",
       "type": "pronunciation",
-      "title": { "ko": "3개 국어 비문 읽기", "en": "Reading the Trilingual Inscription", "es": "Leyendo la Inscripcion Trilingue" },
+      "title": { "ko": "3개 국어 비문 읽기", "en": "Reading the Trilingual Inscription", "es": "Leyendo la Inscripción Trilingüe" },
       "difficulty": 4,
       "isBoss": false,
       "storyContext": {
@@ -631,23 +632,23 @@
       "chapter": "ch5",
       "scene": "ch5_scene5_boss",
       "type": "mixed",
-      "title": { "ko": "최후의 시험 — 모든 언어의 화음", "en": "The Final Trial — Harmony of All Languages", "es": "La Prueba Final — Armonia de Todos los Idiomas" },
+      "title": { "ko": "최후의 시험... 모든 언어의 화음", "en": "The Final Trial... Harmony of All Languages", "es": "La Prueba Final... Armonía de Todos los Idiomas" },
       "difficulty": 5,
       "timeLimit": 120,
       "isBoss": true,
       "useGPT": true,
       "useAzureTTS": true,
       "storyContext": {
-        "ko": "수호석에 말을 걸어야 한다. 배운 모든 것을 세 가지 언어로. 인사, 자기소개, 감사, 주문하기, 감정 표현. 완벽할 필요 없다 — 진심이면 된다. 이것이 최후의 시험이다.",
-        "en": "You must speak to the Guardian Stones. Everything you've learned, in all three languages. Greetings, introductions, gratitude, ordering, expressing feelings. It doesn't need to be perfect — it needs to be sincere. This is the final trial.",
-        "es": "Debes hablar con las Piedras Guardianas. Todo lo que aprendiste, en los tres idiomas. Saludos, presentaciones, gratitud, pedir comida, expresar sentimientos. No necesita ser perfecto — necesita ser sincero. Esta es la prueba final."
+        "ko": "수호석에 말을 걸어야 한다. 배운 모든 것을 세 가지 언어로. 인사, 자기소개, 감사, 주문하기, 감정 표현. 완벽할 필요 없다... 진심이면 된다. 이것이 최후의 시험이다.",
+        "en": "You must speak to the Guardian Stones. Everything you've learned, in all three languages. Greetings, introductions, gratitude, ordering, expressing feelings. It doesn't need to be perfect... it needs to be sincere. This is the final trial.",
+        "es": "Debes hablar con las Piedras Guardianas. Todo lo que aprendiste, en los tres idiomas. Saludos, presentaciones, gratitud, pedir comida, expresar sentimientos. No necesita ser perfecto... necesita ser sincero. Esta es la prueba final."
       },
       "content": {
         "en": {
           "rounds": [
             {
               "type": "listening",
-              "ttsScript": "Seven stones, seven voices. To wake them, speak what you know. Not what is perfect — what is true. Begin with the first words you ever learned. How do you greet someone you have never met?",
+              "ttsScript": "Seven stones, seven voices. To wake them, speak what you know. Not what is perfect... what is true. Begin with the first words you ever learned. How do you greet someone you have never met?",
               "ttsVoice": "en-GB-SoniaNeural",
               "question": "What does the voice ask you to begin with?",
               "answer": "greetings",
@@ -664,7 +665,7 @@
             },
             {
               "type": "translation_chain",
-              "instruction": "Translate this message through all three languages — English to Spanish to Korean.",
+              "instruction": "Translate this message through all three languages... English to Spanish to Korean.",
               "chain": [
                 { "from": "en", "text": "Thank you for helping me.", "to": "es", "answer": "Gracias por ayudarme", "acceptableAnswers": ["Gracias por ayudarme", "Gracias por tu ayuda"] },
                 { "from": "es", "text": "Gracias por ayudarme", "to": "ko", "answer": "도와주셔서 감사합니다", "acceptableAnswers": ["도와주셔서 감사합니다", "도와줘서 고마워요", "도와줘서 감사해요"] }
@@ -672,7 +673,7 @@
             },
             {
               "type": "matching",
-              "description": "Match each NPC's signature expression to its meaning — prove you listened to everyone who helped you.",
+              "description": "Match each NPC's signature expression to its meaning... prove you listened to everyone who helped you.",
               "pairs": [
                 { "left": "When the going gets tough, the tough get going (Tom)", "right": "Strong people act in difficult times", "wrongOptions": ["Good things take time", "Knowledge is power", "Silence is golden"] },
                 { "left": "No hay mal que por bien no venga (Don Miguel)", "right": "Bad things can lead to good outcomes", "wrongOptions": ["The early bird catches the worm", "Actions speak louder than words", "Better late than never"] },
@@ -681,8 +682,8 @@
             },
             {
               "type": "roleplay",
-              "prompt": "This is the final moment. Speak to the Guardian Stones in your target language. Tell them: who you are, where you have been, who helped you, and why languages matter. Use at least 5 sentences. Include at least one expression or proverb you learned during your journey. The stones are listening — be sincere, not perfect.",
-              "reviewNote": "Thematic climax — user articulates the story's core message using vocabulary from all chapters"
+              "prompt": "This is the final moment. Speak to the Guardian Stones in your target language. Tell them: who you are, where you have been, who helped you, and why languages matter. Use at least 5 sentences. Include at least one expression or proverb you learned during your journey. The stones are listening... be sincere, not perfect.",
+              "reviewNote": "Thematic climax... user articulates the story's core message using vocabulary from all chapters"
             }
           ]
         },
@@ -690,7 +691,7 @@
           "rounds": [
             {
               "type": "listening",
-              "ttsScript": "Siete piedras, siete voces. Para despertarlas, habla lo que sabes. No lo que es perfecto — lo que es verdadero. Comienza con las primeras palabras que aprendiste. Como saludas a alguien que nunca has conocido?",
+              "ttsScript": "Siete piedras, siete voces. Para despertarlas, habla lo que sabes. No lo que es perfecto... lo que es verdadero. Comienza con las primeras palabras que aprendiste. Como saludas a alguien que nunca has conocido?",
               "ttsVoice": "es-ES-ElviraNeural",
               "question": "Con que te pide la voz que comiences?",
               "answer": "saludos",
@@ -707,7 +708,7 @@
             },
             {
               "type": "translation_chain",
-              "instruction": "Traduce este mensaje a traves de los tres idiomas — espanol a ingles a coreano.",
+              "instruction": "Traduce este mensaje a traves de los tres idiomas... espanol a ingles a coreano.",
               "chain": [
                 { "from": "es", "text": "Gracias por ayudarme.", "to": "en", "answer": "Thank you for helping me", "acceptableAnswers": ["Thank you for helping me", "Thanks for your help"] },
                 { "from": "en", "text": "Thank you for helping me", "to": "ko", "answer": "도와주셔서 감사합니다", "acceptableAnswers": ["도와주셔서 감사합니다", "도와줘서 고마워요"] }
@@ -724,7 +725,7 @@
             },
             {
               "type": "roleplay",
-              "prompt": "Este es el momento final. Habla con las Piedras Guardianas en tu idioma objetivo. Diles: quien eres, donde has estado, quien te ayudo, y por que los idiomas importan. Usa al menos 5 oraciones. Incluye al menos una expresion o refran que aprendiste durante tu viaje. Las piedras estan escuchando — se sincero, no perfecto."
+              "prompt": "Este es el momento final. Habla con las Piedras Guardianas en tu idioma objetivo. Diles: quien eres, donde has estado, quien te ayudo, y por que los idiomas importan. Usa al menos 5 oraciones. Incluye al menos una expresion o refran que aprendiste durante tu viaje. Las piedras estan escuchando... se sincero, no perfecto."
             }
           ]
         },
@@ -749,7 +750,7 @@
             },
             {
               "type": "translation_chain",
-              "instruction": "이 메시지를 세 가지 언어로 번역하세요 — 한국어에서 영어로, 영어에서 스페인어로.",
+              "instruction": "이 메시지를 세 가지 언어로 번역하세요... 한국어에서 영어로, 영어에서 스페인어로.",
               "chain": [
                 { "from": "ko", "text": "도와주셔서 감사합니다.", "to": "en", "answer": "Thank you for helping me", "acceptableAnswers": ["Thank you for helping me", "Thanks for your help", "Thank you for your help"] },
                 { "from": "en", "text": "Thank you for helping me", "to": "es", "answer": "Gracias por ayudarme", "acceptableAnswers": ["Gracias por ayudarme", "Gracias por tu ayuda"] }
@@ -757,7 +758,7 @@
             },
             {
               "type": "matching",
-              "description": "각 NPC의 대표 표현과 의미를 연결하세요 — 도와준 모든 사람의 말을 기억하고 있는지 증명하세요.",
+              "description": "각 NPC의 대표 표현과 의미를 연결하세요... 도와준 모든 사람의 말을 기억하고 있는지 증명하세요.",
               "pairs": [
                 { "left": "힘들 때 강한 자가 움직인다 (Tom)", "right": "어려울 때 강한 사람이 행동한다", "wrongOptions": ["좋은 것은 시간이 걸린다", "아는 것이 힘이다", "침묵이 금이다"] },
                 { "left": "비 온 뒤에 땅이 굳어진다 (돈 미겔)", "right": "나쁜 일 뒤에 좋은 결과가 온다", "wrongOptions": ["일찍 일어나는 새가 벌레를 잡는다", "행동이 말보다 크다", "늦더라도 안 하는 것보다 낫다"] },
@@ -766,12 +767,12 @@
             },
             {
               "type": "roleplay",
-              "prompt": "마지막 순간입니다. 학습 언어로 수호석에게 말하세요. 당신이 누구인지, 어디를 다녀왔는지, 누가 도와줬는지, 그리고 왜 언어가 중요한지 말해주세요. 최소 5문장을 사용하세요. 여행 중 배운 표현이나 속담을 최소 1개 포함하세요. 수호석이 듣고 있습니다 — 완벽하지 않아도 됩니다, 진심이면 됩니다."
+              "prompt": "마지막 순간입니다. 학습 언어로 수호석에게 말하세요. 당신이 누구인지, 어디를 다녀왔는지, 누가 도와줬는지, 그리고 왜 언어가 중요한지 말해주세요. 최소 5문장을 사용하세요. 여행 중 배운 표현이나 속담을 최소 1개 포함하세요. 수호석이 듣고 있습니다... 완벽하지 않아도 됩니다, 진심이면 됩니다."
             }
           ]
         }
       },
-      "gptPrompt": "You are the final boss quiz evaluator for Chapter 5 (Babel Tower) of a language learning game. The player must speak to the Guardian Stones, demonstrating everything they've learned across 5 chapters. They should: introduce themselves, describe their journey (London, Madrid, Seoul, Cairo, Babel), mention NPCs who helped them, and explain why language diversity matters. Evaluate: grammar and vocabulary range (0-20), use of expressions from previous chapters like proverbs/idioms (0-20), multilingual awareness showing knowledge of multiple languages (0-20), emotional sincerity and personal voice (0-20), length and completeness minimum 5 sentences (0-20). A perfect answer weaves together greetings, expressions, and cultural references from all chapters into a heartfelt statement. Be generous with partial credit — this is about trying, not perfection. Return JSON: {\"score\": 0-100, \"feedback\": \"...\", \"expressionsRecognized\": [], \"languagesUsed\": [], \"emotionalImpact\": \"cold/warm/moving/extraordinary\"}",
+      "gptPrompt": "You are the final boss quiz evaluator for Chapter 5 (Babel Tower) of a language learning game. The player must speak to the Guardian Stones, demonstrating everything they've learned across 5 chapters. They should: introduce themselves, describe their journey (London, Madrid, Seoul, Cairo, Babel), mention NPCs who helped them, and explain why language diversity matters. Evaluate: grammar and vocabulary range (0-20), use of expressions from previous chapters like proverbs/idioms (0-20), multilingual awareness showing knowledge of multiple languages (0-20), emotional sincerity and personal voice (0-20), length and completeness minimum 5 sentences (0-20). A perfect answer weaves together greetings, expressions, and cultural references from all chapters into a heartfelt statement. Be generous with partial credit... this is about trying, not perfection. Return JSON: {\"score\": 0-100, \"feedback\": \"...\", \"expressionsRecognized\": [], \"languagesUsed\": [], \"emotionalImpact\": \"cold/warm/moving/extraordinary\"}",
       "rewards": {
         "xp": 500,
         "items": ["babel_harmony_crystal"],

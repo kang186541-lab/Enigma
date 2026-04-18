@@ -17,6 +17,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
 import { C, F } from "@/constants/theme";
+import { getIORatioData, type IORatioData } from "@/lib/storyUtils";
 
 const { width } = Dimensions.get("window");
 export const STORY_PROGRESS_KEY = "lingo_story_progress";
@@ -44,6 +45,10 @@ const CHAPTERS = [
     missionEn: "4 puzzles + 2 clues",
     missionKo: "퍼즐 4개 + 단서 2개",
     missionEs: "4 puzzles + 2 pistas",
+    arcEn: "Curiosity → Tension → Shock → Resolve",
+    arcKo: "호기심 → 긴장 → 충격 → 결의",
+    arcEs: "Curiosidad → Tensión → Conmoción → Determinación",
+    npcLangRatio: 0.3,
   },
   {
     id: "madrid",
@@ -62,6 +67,10 @@ const CHAPTERS = [
     missionEn: "4 puzzles + 1 clue",
     missionKo: "퍼즐 4개 + 단서 1개",
     missionEs: "4 puzzles + 1 pista",
+    arcEn: "Fear → Compassion → Anger → Pursuit",
+    arcKo: "공포 → 연민 → 분노 → 추격",
+    arcEs: "Miedo → Compasión → Ira → Persecución",
+    npcLangRatio: 0.5,
   },
   {
     id: "seoul",
@@ -80,6 +89,10 @@ const CHAPTERS = [
     missionEn: "4 puzzles + 1 clue",
     missionKo: "퍼즐 4개 + 단서 1개",
     missionEs: "4 puzzles + 1 pista",
+    arcEn: "Confusion → Bonding → Betrayal → Awakening",
+    arcKo: "혼란 → 유대 → 배신 → 각성",
+    arcEs: "Confusión → Vínculo → Traición → Despertar",
+    npcLangRatio: 0.7,
   },
   {
     id: "cairo",
@@ -98,6 +111,10 @@ const CHAPTERS = [
     missionEn: "4 puzzles + 2 clues",
     missionKo: "퍼즐 4개 + 단서 2개",
     missionEs: "4 puzzles + 2 pistas",
+    arcEn: "Anger → Conflict → Understanding → Forgiveness",
+    arcKo: "분노 → 갈등 → 이해 → 용서의 선택",
+    arcEs: "Ira → Conflicto → Comprensión → Perdón",
+    npcLangRatio: 0.85,
   },
   {
     id: "babel",
@@ -116,6 +133,10 @@ const CHAPTERS = [
     missionEn: "4 puzzles + 2 clues",
     missionKo: "퍼즐 4개 + 단서 2개",
     missionEs: "4 puzzles + 2 pistas",
+    arcEn: "Resolve → Crisis → Loss → Unity → Triumph",
+    arcKo: "결의 → 위기 → 상실 → 연대 → 승리",
+    arcEs: "Resolución → Crisis → Pérdida → Unidad → Triunfo",
+    npcLangRatio: 0.95,
   },
 ];
 
@@ -130,12 +151,17 @@ export default function StoryTab() {
     completed: [],
     unlocked: ["london"],
   });
+  const [ioData, setIoData] = useState<IORatioData>({ chapters: {} });
 
   const loadProgress = useCallback(async () => {
     try {
-      const raw = await AsyncStorage.getItem(STORY_PROGRESS_KEY);
+      const [raw, io] = await Promise.all([
+        AsyncStorage.getItem(STORY_PROGRESS_KEY),
+        getIORatioData(),
+      ]);
       if (raw) setProgress(JSON.parse(raw));
-    } catch {}
+      setIoData(io);
+    } catch (e) { console.warn('[Story] progress load failed:', e); }
   }, []);
 
   useFocusEffect(
@@ -160,6 +186,12 @@ export default function StoryTab() {
     if (lang === "korean") return ch.missionKo;
     if (lang === "spanish") return ch.missionEs;
     return ch.missionEn;
+  }
+
+  function getArc(ch: (typeof CHAPTERS)[0]) {
+    if (lang === "korean") return ch.arcKo;
+    if (lang === "spanish") return ch.arcEs;
+    return ch.arcEn;
   }
 
   function getStatus(
@@ -223,6 +255,28 @@ export default function StoryTab() {
         <View style={styles.lingoSpeech}>
           <Text style={styles.lingoSpeechText}>{lingoMsg}</Text>
         </View>
+      </View>
+
+      {/* Quick actions */}
+      <View style={styles.quickActions}>
+        <Pressable
+          style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.7 }]}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/expression-book" as any); }}
+        >
+          <Ionicons name="book-outline" size={16} color={C.gold} />
+          <Text style={styles.quickBtnText}>
+            {lang === "korean" ? "표현 도감" : lang === "spanish" ? "Expresiones" : "Expression Book"}
+          </Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.7 }]}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/npc-list" as any); }}
+        >
+          <Ionicons name="people-outline" size={16} color={C.gold} />
+          <Text style={styles.quickBtnText}>
+            {lang === "korean" ? "NPC 미션" : lang === "spanish" ? "Misiones NPC" : "NPC Missions"}
+          </Text>
+        </Pressable>
       </View>
 
       <ScrollView
@@ -362,6 +416,18 @@ export default function StoryTab() {
                   {getDesc(ch)}
                 </Text>
 
+                {/* Emotional Arc + Language Ratio */}
+                {!isLocked && (
+                  <View style={styles.arcRow}>
+                    <Text style={styles.arcText}>🎭 {getArc(ch)}</Text>
+                    <View style={styles.langRatioPill}>
+                      <Text style={styles.langRatioText}>
+                        {lang === "korean" ? "목표어" : "Target"} {Math.round(ch.npcLangRatio * 100)}%
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
                 <View style={styles.cardFooter}>
                   <View style={styles.footerLeft}>
                     <View style={styles.metaPill}>
@@ -431,6 +497,28 @@ export default function StoryTab() {
                       ? " de recompensa"
                       : " reward"}
                   </Text>
+                  {(() => {
+                    const chKey = `ch${ch.num}`;
+                    const io = ioData.chapters[chKey];
+                    if (!io || (io.inputCount + io.outputCount === 0)) return null;
+                    const total = io.inputCount + io.outputCount;
+                    const outputPct = Math.round((io.outputCount / total) * 100);
+                    return (
+                      <View style={styles.ioRow}>
+                        <Text style={styles.ioLabel}>
+                          {lang === "korean" ? "입력" : "In"}
+                        </Text>
+                        <View style={styles.ioBar}>
+                          <View style={[styles.ioBarInput, { flex: io.inputCount }]} />
+                          <View style={[styles.ioBarOutput, { flex: io.outputCount }]} />
+                        </View>
+                        <Text style={styles.ioLabel}>
+                          {lang === "korean" ? "출력" : "Out"}
+                        </Text>
+                        <Text style={styles.ioPct}>{outputPct}%</Text>
+                      </View>
+                    );
+                  })()}
                 </View>
               </LinearGradient>
             </Pressable>
@@ -474,6 +562,30 @@ const styles = StyleSheet.create({
     backgroundColor: C.bg2,
     borderBottomWidth: 1,
     borderBottomColor: C.border,
+  },
+  quickActions: {
+    flexDirection: "row",
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
+  },
+  quickBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: C.bg2,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  quickBtnText: {
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.gold,
   },
   lingoSpeech: {
     flex: 1,
@@ -593,5 +705,65 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: F.bodySemi,
     color: "rgba(201,162,39,0.6)",
+  },
+  ioRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+  },
+  ioBar: {
+    flex: 1,
+    flexDirection: "row",
+    height: 6,
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  ioBarInput: {
+    backgroundColor: "#60A5FA",
+    height: "100%",
+  },
+  ioBarOutput: {
+    backgroundColor: "#34D399",
+    height: "100%",
+  },
+  ioLabel: {
+    fontSize: 9,
+    fontFamily: F.bodySemi,
+    color: "rgba(255,255,255,0.5)",
+    letterSpacing: 0.5,
+  },
+  ioPct: {
+    fontSize: 10,
+    fontFamily: F.bodySemi,
+    color: "#34D399",
+    minWidth: 28,
+    textAlign: "right",
+  },
+  arcRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  arcText: {
+    fontSize: 12,
+    fontFamily: F.body,
+    color: "rgba(244,232,193,0.75)",
+    flexShrink: 1,
+  },
+  langRatioPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    backgroundColor: "rgba(201,162,39,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.3)",
+    marginLeft: 8,
+  },
+  langRatioText: {
+    fontSize: 10,
+    fontFamily: F.bodySemi,
+    color: C.gold,
   },
 });

@@ -170,8 +170,8 @@ async function playWordTTS(text: string, lang: string, apiBase: string) {
       await audio.play();
     } else {
       if (_nativeLessonSound) {
-        await _nativeLessonSound.stopAsync().catch(() => {});
-        await _nativeLessonSound.unloadAsync().catch(() => {});
+        await _nativeLessonSound.stopAsync().catch((e) => console.warn('[DailyLesson] stop failed:', e));
+        await _nativeLessonSound.unloadAsync().catch((e) => console.warn('[DailyLesson] unload failed:', e));
         _nativeLessonSound = null;
       }
       await Audio.setAudioModeAsync({ playsInSilentModeIOS: true, allowsRecordingIOS: false });
@@ -179,7 +179,7 @@ async function playWordTTS(text: string, lang: string, apiBase: string) {
       _nativeLessonSound = sound;
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync().catch(() => {});
+          sound.unloadAsync().catch((e) => console.warn('[DailyLesson] sound unload failed:', e));
           _nativeLessonSound = null;
         }
       });
@@ -217,7 +217,7 @@ async function buildDailySession(lang: LearningLang): Promise<LessonWord[]> {
   const newSeen = [...seenSet, ...session.map((w) => w.word)];
   try {
     await AsyncStorage.setItem(storageKey, JSON.stringify(newSeen));
-  } catch {}
+  } catch (e) { console.warn('[DailyLesson] seen words save failed:', e); }
 
   return session;
 }

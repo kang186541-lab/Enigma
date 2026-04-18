@@ -26,6 +26,7 @@ import { XPToast } from "@/components/XPToast";
 import { getApiUrl } from "@/lib/query-client";
 import { recordAudio } from "@/lib/audio";
 import { C, F } from "@/constants/theme";
+import { startSession, endSession } from "@/lib/sessionTracker";
 
 interface Message {
   id: string;
@@ -83,8 +84,8 @@ async function azureNativePlay(
   if (_nativeSound) {
     const prev = _nativeSound;
     _nativeSound = null;
-    try { await prev.stopAsync(); } catch {}
-    try { await prev.unloadAsync(); } catch {}
+    try { await prev.stopAsync(); } catch (e) { console.warn('[ChatRoom] Failed to stop previous sound:', e); }
+    try { await prev.unloadAsync(); } catch (e) { console.warn('[ChatRoom] Failed to unload previous sound:', e); }
   }
 
   const url = new URL("/api/tts", apiBase);
@@ -102,13 +103,13 @@ async function azureNativePlay(
     _nativeSound = sound;
     sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
       if (status.isLoaded && status.didJustFinish) {
-        sound.unloadAsync().catch(() => {});
+        sound.unloadAsync().catch((e) => console.warn('[ChatRoom] sound unload failed:', e));
         _nativeSound = null;
         onEnd?.();
       }
     });
-  } catch {
-    // Server unreachable — fail silently
+  } catch (e) {
+    console.warn('[ChatRoom] TTS playback failed (server unreachable):', e);
     _nativeSound = null;
     onEnd?.();
   }
@@ -151,7 +152,7 @@ function stopSpeech() {
     if (_nativeSound) {
       const s = _nativeSound;
       _nativeSound = null;
-      s.stopAsync().catch(() => {}).finally(() => s.unloadAsync().catch(() => {}));
+      s.stopAsync().catch((e) => console.warn('[ChatRoom] stop failed:', e)).finally(() => s.unloadAsync().catch((e) => console.warn('[ChatRoom] unload failed:', e)));
     }
   } else {
     if (_webAudioEl) {
@@ -162,7 +163,7 @@ function stopSpeech() {
   }
 }
 
-async function azureWebPlay(
+function azureWebPlay(
   text: string,
   tutorId: string,
   apiBase: string,
@@ -179,41 +180,50 @@ async function azureWebPlay(
     url.searchParams.set("text", text.slice(0, 5000));
     url.searchParams.set("tutorId", tutorId);
     url.searchParams.set("speed", speed.toString());
-    // mode deliberately excluded — see comment above
     console.log("TTS called with speed:", speed);
-
-    onStart?.();
-    const res = await fetch(url.toString());
-    if (!res.ok) throw new Error(`TTS ${res.status}`);
-
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
 
     // Stop previous playback
     if (_webAudioEl) {
       _webAudioEl.pause();
       _webAudioEl.src = "";
+      _webAudioEl = null;
     }
-    const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
+
+    // iOS Safari: create Audio element + call play() synchronously inside the
+    // user-gesture handler. Using a direct URL (not fetched blob) keeps the
+    // gesture chain intact, so autoplay restrictions don't block playback.
+    const audio = new (window as any).Audio() as HTMLAudioElement;
+    audio.preload = "auto";
+    audio.src = url.toString();
     _webAudioEl = audio;
 
-    // Fire once the audio actually begins playing — duration is now reliable
-    audio.onplay = () => {
+    onStart?.();
+
+    audio.onloadedmetadata = () => {
       const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : null;
       if (dur !== null) onPlaybackStart?.(dur);
     };
     audio.onended = () => {
-      URL.revokeObjectURL(objectUrl);
       _webAudioEl = null;
       onEnd?.();
     };
     audio.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
+      console.warn('[ChatRoom] Azure web TTS audio error');
       _webAudioEl = null;
       onEnd?.();
     };
-    await audio.play();
-  } catch {
+
+    // Must be called synchronously inside the user-gesture handler for iOS.
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch((e) => {
+        console.warn('[ChatRoom] Azure web TTS playback failed:', e);
+        _webAudioEl = null;
+        onEnd?.();
+      });
+    }
+  } catch (e) {
+    console.warn('[ChatRoom] Azure web TTS setup failed:', e);
     onEnd?.();
   }
 }
@@ -291,7 +301,14 @@ export default function ChatRoomScreen() {
   const { t, nativeLanguage, stats, updateStats } = useLanguage();
   const [xpGain, setXpGain] = useState(0);
   const statsRef = useRef(stats);
+  const sessionXpRef = useRef(0);
   useEffect(() => { statsRef.current = stats; }, [stats]);
+
+  // Session tracking: start on mount, end on unmount
+  useEffect(() => {
+    startSession('chat');
+    return () => { endSession(sessionXpRef.current); };
+  }, []);
 
   const tutor = getTutor(tutorId ?? "") as Tutor | undefined;
 
@@ -602,6 +619,7 @@ export default function ChatRoomScreen() {
     if (!trimmed || !tutor || isTyping) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setXpGain(5);
+    sessionXpRef.current += 5;
     updateStats({ xp: statsRef.current.xp + 5 });
 
     const userMsg: Message = {
@@ -644,7 +662,8 @@ export default function ChatRoomScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       speakMsg(responseText, aiId, muted);
       inputRef.current?.focus();
-    } catch {
+    } catch (e) {
+      console.warn('[ChatRoom] Chat API request failed:', e);
       const fallback = tutor.responses[Math.floor(Math.random() * tutor.responses.length)];
       const aiId = Date.now().toString() + "a";
       setMessages((prev) => [{ id: aiId, text: fallback, isUser: false }, ...prev]);
@@ -758,7 +777,9 @@ export default function ChatRoomScreen() {
   if (!tutor) {
     return (
       <View style={[styles.screen, { paddingTop: topPad, justifyContent: "center", alignItems: "center" }]}>
-        <Text style={{ fontFamily: F.body, color: C.goldDim }}>Tutor not found</Text>
+        <Text style={{ fontFamily: F.body, color: C.goldDim }}>
+          {userNativeLang === "korean" ? "튜터를 찾을 수 없어요" : userNativeLang === "spanish" ? "Tutor no encontrado" : "Tutor not found"}
+        </Text>
       </View>
     );
   }

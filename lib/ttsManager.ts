@@ -20,15 +20,15 @@ export function registerGlobalWebAudio(audio: HTMLAudioElement) {
 export async function stopAllTTS() {
   if (Platform.OS === "web") {
     if (_webAudio) {
-      try { _webAudio.pause(); _webAudio.src = ""; } catch {}
+      try { _webAudio.pause(); _webAudio.src = ""; } catch (e) { console.warn('[TTS] web audio stop failed:', e); }
       _webAudio = null;
     }
   } else {
     if (_sound) {
       const s = _sound;
       _sound = null;
-      try { await s.stopAsync(); } catch {}
-      try { await s.unloadAsync(); } catch {}
+      try { await s.stopAsync(); } catch (e) { console.warn('[TTS] sound stop failed:', e); }
+      try { await s.unloadAsync(); } catch (e) { console.warn('[TTS] sound unload failed:', e); }
     }
   }
 }
@@ -36,15 +36,15 @@ export async function stopAllTTS() {
 export function stopAllTTSSync() {
   if (Platform.OS === "web") {
     if (_webAudio) {
-      try { _webAudio.pause(); _webAudio.src = ""; } catch {}
+      try { _webAudio.pause(); _webAudio.src = ""; } catch (e) { console.warn('[TTS] web audio stop failed:', e); }
       _webAudio = null;
     }
   } else {
     if (_sound) {
       const s = _sound;
       _sound = null;
-      s.stopAsync().catch(() => {});
-      s.unloadAsync().catch(() => {});
+      s.stopAsync().catch((e) => console.warn('[TTS] sound stop failed:', e));
+      s.unloadAsync().catch((e) => console.warn('[TTS] sound unload failed:', e));
     }
   }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,12 +12,16 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, getLevel } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
 import {
   getChapters, pick, toLangCode, getChapterGradient, getChapterAccent,
-  isChapterUnlocked, getChapterTotalXP, getUiText,
+  isChapterUnlocked, getChapterTotalXP, getUiText, getEmptyStoryProgress,
 } from "@/lib/storyUtils";
+import type { StoryProgress } from "@/constants/storyTypes";
+
+const STORY_PROGRESS_KEY = "@lingua_story_progress";
 
 export default function StoryScreen() {
   const insets = useSafeAreaInsets();
@@ -27,6 +31,16 @@ export default function StoryScreen() {
   const ui = getUiText(nativeLang);
   const chapters = getChapters();
   const userLevel = getLevel(stats.xp).num;
+
+  const [storyProgress, setStoryProgress] = useState<StoryProgress>(getEmptyStoryProgress());
+
+  useEffect(() => {
+    AsyncStorage.getItem(STORY_PROGRESS_KEY).then((raw) => {
+      if (raw) {
+        try { setStoryProgress(JSON.parse(raw)); } catch (e) { console.warn('[Story] progress parse failed:', e); }
+      }
+    });
+  }, []);
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
@@ -66,7 +80,7 @@ export default function StoryScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {chapters.map((chapter) => {
-          const unlocked = isChapterUnlocked(chapter, userLevel);
+          const unlocked = isChapterUnlocked(chapter, userLevel, storyProgress);
           const totalXP = getChapterTotalXP(chapter.id);
           const gradient = getChapterGradient(chapter.id);
           const accent = getChapterAccent(chapter.id);

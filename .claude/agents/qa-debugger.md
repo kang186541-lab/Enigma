@@ -101,6 +101,29 @@ Common bugs to check:
   - Stage 1 quiz with roleplay type → too hard for first encounter
 ```
 
+### 신규 퀴즈 3종 JSON 필수 필드 체크 (voice_power / debate_battle / npc_rescue):
+```
+voice_power 퀴즈 필수 필드:
+  ✅ stoneEffect: string ("dim" | "glow" | "bright" | "blinding")
+  ✅ stoneCount: number (이번 퀴즈에서 반응하는 Stone 수)
+  ✅ visualEffect: string (UI 이펙트 설명)
+  ❌ stoneEffect 없음 → 발음=파워 시스템 미반영 → High bug
+  ❌ 발음 점수 90%+인데 stoneEffect가 "dim" → 데이터 불일치
+
+debate_battle 퀴즈 필수 필드:
+  ✅ rounds: number (Ch4: 3, Ch5: 5)
+  ✅ minExpressions: number (라운드당 필수 표현 사용 수)
+  ❌ rounds 없음 → 라운드 진행 불가 → Critical bug
+  ❌ Ch5인데 rounds가 3 → 레벨 부적합 → Medium bug
+
+npc_rescue 퀴즈 필수 필드:
+  ✅ stages: array (각 단계별 미션 정의)
+  ✅ progressiveIntro: boolean (true여야 함 — 점진적 도입)
+  ❌ stages 없음 → 구출 단계 미정의 → Critical bug
+  ❌ Ch2인데 stages.length > 2 → 난이도 부적합 → Medium bug
+  ❌ progressiveIntro: false → 점진적 도입 원칙 위반 → High bug
+```
+
 ### Quiz-Story consistency checks:
 - targetExpressions in quiz must match expressions introduced in preceding NPC dialogue
 - If choices lead to different scenes, both routes must teach the same targetExpressions

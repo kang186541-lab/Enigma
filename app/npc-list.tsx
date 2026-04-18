@@ -13,11 +13,33 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
-import { NPCS, NPC, NPC_REL_LEVELS, NPC_EMOTIONS, getRelTier, getRelLabel, RelationshipTier } from "@/constants/npcs";
+import { NPCS, NPC, NPC_REL_LEVELS, NPC_EMOTIONS, getRelTier, getRelLabel, RelationshipTier, NPC_UNLOCK_CHAPTER, CHAPTER_ID_MAP } from "@/constants/npcs";
 import { C, F } from "@/constants/theme";
 
 const REL_KEY = "npcRelationships";
 const EMO_KEY = "npcEmotions";
+const STORY_PROGRESS_KEY = "lingo_story_progress";
+
+// ─── Language Wound Data ──────────────────────────────────────────────────────
+import languageWoundsRaw from "@/data/storyMode/characters.json";
+
+interface LanguageWound {
+  npcId: string;
+  name: { ko: string; en: string; es: string };
+  chapter: string;
+  wound: { ko: string; en: string; es: string };
+  unlockTier: string;
+  emoji: string;
+}
+
+const LANGUAGE_WOUNDS: LanguageWound[] = Object.values(
+  (languageWoundsRaw as any).languageWounds ?? {}
+);
+
+const TIER_ORDER = ["stranger", "familiar", "friendly", "close"];
+function isTierUnlocked(currentTier: string, requiredTier: string): boolean {
+  return TIER_ORDER.indexOf(currentTier) >= TIER_ORDER.indexOf(requiredTier);
+}
 
 export default function NpcListScreen() {
   const insets = useSafeAreaInsets();
@@ -27,16 +49,20 @@ export default function NpcListScreen() {
 
   const [relationships, setRelationships] = useState<Record<string, number>>({});
   const [emotions, setEmotions] = useState<Record<string, string>>({});
+  const [storyProgress, setStoryProgress] = useState<{ completed: string[]; unlocked: string[] }>({ completed: [], unlocked: [] });
+  const [expandedWound, setExpandedWound] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
-      const [relRaw, emoRaw] = await Promise.all([
+      const [relRaw, emoRaw, spRaw] = await Promise.all([
         AsyncStorage.getItem(REL_KEY),
         AsyncStorage.getItem(EMO_KEY),
+        AsyncStorage.getItem(STORY_PROGRESS_KEY),
       ]);
       if (relRaw) setRelationships(JSON.parse(relRaw));
       if (emoRaw) setEmotions(JSON.parse(emoRaw));
-    } catch {}
+      if (spRaw) setStoryProgress(JSON.parse(spRaw));
+    } catch (e) { console.warn('[NpcList] data load failed:', e); }
   }, []);
 
   useEffect(() => {
@@ -53,6 +79,32 @@ export default function NpcListScreen() {
     const learnName  = lang === "korean" ? npc.scenarioKo : lang === "spanish" ? npc.scenarioEs : npc.scenario;
     if (native === lang) return nativeName;
     return `${nativeName} (${learnName})`;
+  };
+
+  // Check if NPC is unlocked based on story progress
+  const isNpcUnlocked = (npcId: string): boolean => {
+    const requiredChapter = NPC_UNLOCK_CHAPTER[npcId];
+    if (!requiredChapter) return true; // null = always unlocked
+    const storyChapterId = CHAPTER_ID_MAP[requiredChapter];
+    return storyProgress.completed.includes(storyChapterId);
+  };
+
+  const getUnlockLabel = (npcId: string): string => {
+    const ch = NPC_UNLOCK_CHAPTER[npcId];
+    if (!ch) return "";
+    const chNum = ch.replace("ch", "");
+    const chNames: Record<string, Record<string, string>> = {
+      "1": { korean: "Ch1 런던", spanish: "Ch1 Londres", english: "Ch1 London" },
+      "2": { korean: "Ch2 마드리드", spanish: "Ch2 Madrid", english: "Ch2 Madrid" },
+      "3": { korean: "Ch3 서울", spanish: "Ch3 Seúl", english: "Ch3 Seoul" },
+      "4": { korean: "Ch4 카이로", spanish: "Ch4 El Cairo", english: "Ch4 Cairo" },
+    };
+    const chName = chNames[chNum]?.[native] ?? `Ch${chNum}`;
+    return native === "korean"
+      ? `${chName} 완료 시 해금`
+      : native === "spanish"
+      ? `Se desbloquea al completar ${chName}`
+      : `Unlocks after completing ${chName}`;
   };
 
   const headerTitle = native === "korean" ? "실전 미션" : native === "spanish" ? "Misión Real" : "Real Missions";
@@ -83,6 +135,7 @@ export default function NpcListScreen() {
         contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad + 24 }]}
       >
         {NPCS.map((npc) => {
+          const unlocked = isNpcUnlocked(npc.id);
           const score = relationships[npc.id] ?? 0;
           const tier: RelationshipTier = getRelTier(score);
           const level = NPC_REL_LEVELS[tier];
@@ -94,48 +147,131 @@ export default function NpcListScreen() {
               key={npc.id}
               style={({ pressed }) => [
                 styles.npcCard,
-                pressed && { transform: [{ scale: 0.97 }], opacity: 0.9 },
+                !unlocked && styles.npcCardLocked,
+                pressed && unlocked && { transform: [{ scale: 0.97 }], opacity: 0.9 },
               ]}
               onPress={() => {
+                if (!unlocked) return;
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 router.push({ pathname: "/npc-mission", params: { npcId: npc.id } });
               }}
             >
               <View style={[styles.emojiCircle, { backgroundColor: npc.color + "33", borderColor: npc.color + "88" }]}>
-                <Text style={styles.emojiText}>{npc.emoji}</Text>
-                <Text style={styles.emotionBadge}>{emojiIcon}</Text>
+                <Text style={styles.emojiText}>{unlocked ? npc.emoji : "🔒"}</Text>
+                {unlocked && <Text style={styles.emotionBadge}>{emojiIcon}</Text>}
               </View>
 
               <View style={styles.npcInfo}>
                 <View style={styles.nameRow}>
-                  <Text style={styles.npcName}>{npc.name}</Text>
-                  <View style={[styles.tierPill, { backgroundColor: level.color + "33", borderColor: level.color + "66" }]}>
-                    <Text style={styles.tierHeart}>{level.heart}</Text>
-                    <Text style={[styles.tierLabel, { color: level.color }]}>
-                      {getRelLabel(tier, native)}
-                    </Text>
-                  </View>
+                  <Text style={[styles.npcName, !unlocked && { color: C.goldDim }]}>{npc.name}</Text>
+                  {unlocked ? (
+                    <View style={[styles.tierPill, { backgroundColor: level.color + "33", borderColor: level.color + "66" }]}>
+                      <Text style={styles.tierHeart}>{level.heart}</Text>
+                      <Text style={[styles.tierLabel, { color: level.color }]}>
+                        {getRelLabel(tier, native)}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={[styles.tierPill, { backgroundColor: "rgba(150,150,150,0.15)", borderColor: "rgba(150,150,150,0.3)" }]}>
+                      <Text style={[styles.tierLabel, { color: "#999" }]}>
+                        {getUnlockLabel(npc.id)}
+                      </Text>
+                    </View>
+                  )}
                 </View>
 
                 <Text style={styles.scenarioLabel}>{getScenarioLabel(npc)}</Text>
 
-                <View style={styles.barRow}>
-                  <View style={styles.barTrack}>
-                    <View
-                      style={[
-                        styles.barFill,
-                        { width: `${Math.min(100, score)}%` as any, backgroundColor: level.color },
-                      ]}
-                    />
+                {unlocked && (
+                  <View style={styles.barRow}>
+                    <View style={styles.barTrack}>
+                      <View
+                        style={[
+                          styles.barFill,
+                          { width: `${Math.min(100, score)}%` as any, backgroundColor: level.color },
+                        ]}
+                      />
+                    </View>
+                    <Text style={[styles.barScore, { color: level.color }]}>{Math.round(score)}/100</Text>
                   </View>
-                  <Text style={[styles.barScore, { color: level.color }]}>{Math.round(score)}/100</Text>
-                </View>
+                )}
               </View>
 
-              <Ionicons name="chevron-forward" size={16} color={C.goldDark} />
+              {unlocked && <Ionicons name="chevron-forward" size={16} color={C.goldDark} />}
             </Pressable>
           );
         })}
+
+        {/* ── Story NPC Language Wounds ─────────────────────────── */}
+        {LANGUAGE_WOUNDS.length > 0 && (
+          <>
+            <View style={styles.sectionDivider} />
+            <Text style={styles.sectionTitle}>
+              {native === "korean" ? "🩹 NPC 언어의 상처" : native === "spanish" ? "🩹 Heridas Lingüísticas" : "🩹 Language Wounds"}
+            </Text>
+            <Text style={styles.sectionSub}>
+              {native === "korean"
+                ? "스토리를 진행하며 NPC의 숨겨진 아픔을 발견하세요"
+                : native === "spanish"
+                ? "Descubre el dolor oculto de cada NPC mientras avanzas"
+                : "Discover each NPC's hidden pain as you progress"}
+            </Text>
+
+            {LANGUAGE_WOUNDS.map((w) => {
+              const chapterCompleted = storyProgress.completed.includes(
+                w.chapter === "ch1" ? "london" : w.chapter === "ch2" ? "madrid" : w.chapter === "ch3" ? "seoul" : w.chapter === "ch4" ? "cairo" : "babel"
+              ) || storyProgress.unlocked.includes(
+                w.chapter === "ch1" ? "madrid" : w.chapter === "ch2" ? "seoul" : w.chapter === "ch3" ? "cairo" : w.chapter === "ch4" ? "babel" : "done"
+              );
+              // For story NPCs, use story progress as proxy for relationship
+              const storyRelScore = relationships[w.npcId] ?? (chapterCompleted ? 50 : 0);
+              const currentTier = storyRelScore >= 80 ? "close" : storyRelScore >= 60 ? "friendly" : storyRelScore >= 30 ? "familiar" : "stranger";
+              const unlocked = isTierUnlocked(currentTier, w.unlockTier);
+              const isExpanded = expandedWound === w.npcId;
+
+              const npcName = native === "korean" ? w.name.ko : native === "spanish" ? w.name.es : w.name.en;
+              const chapterLabel = w.chapter.replace("ch", "Ch.");
+
+              return (
+                <Pressable
+                  key={w.npcId}
+                  style={[styles.woundCard, !unlocked && styles.woundCardLocked]}
+                  onPress={() => {
+                    if (unlocked) {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setExpandedWound(isExpanded ? null : w.npcId);
+                    }
+                  }}
+                >
+                  <View style={styles.woundHeader}>
+                    <Text style={styles.woundEmoji}>{unlocked ? w.emoji : "🔒"}</Text>
+                    <View style={styles.woundInfo}>
+                      <Text style={styles.woundName}>{npcName}</Text>
+                      <Text style={styles.woundChapter}>{chapterLabel}</Text>
+                    </View>
+                    {unlocked && (
+                      <Ionicons name={isExpanded ? "chevron-up" : "chevron-down"} size={16} color={C.goldDim} />
+                    )}
+                  </View>
+                  {unlocked && isExpanded && (
+                    <Text style={styles.woundText}>
+                      {native === "korean" ? w.wound.ko : native === "spanish" ? w.wound.es : w.wound.en}
+                    </Text>
+                  )}
+                  {!unlocked && (
+                    <Text style={styles.woundLockedText}>
+                      {native === "korean"
+                        ? `${npcName}과(와) 더 친해지면 열립니다`
+                        : native === "spanish"
+                        ? `Aumenta tu relación con ${npcName}`
+                        : `Increase your bond with ${npcName}`}
+                    </Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -191,6 +327,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  npcCardLocked: {
+    opacity: 0.5,
+  },
 
   emojiCircle: {
     width: 54,
@@ -243,4 +382,61 @@ const styles = StyleSheet.create({
   },
   barFill: { height: 5, borderRadius: 3 },
   barScore: { fontSize: 11, fontFamily: F.bodySemi, minWidth: 40, textAlign: "right" },
+
+  // Language Wounds section
+  sectionDivider: {
+    height: 1,
+    backgroundColor: C.border,
+    marginVertical: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: F.title,
+    color: C.gold,
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+  sectionSub: {
+    fontSize: 12,
+    fontFamily: F.body,
+    color: C.goldDim,
+    fontStyle: "italic",
+    marginBottom: 12,
+  },
+  woundCard: {
+    backgroundColor: C.bg2,
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  woundCardLocked: {
+    opacity: 0.5,
+  },
+  woundHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  woundEmoji: { fontSize: 24 },
+  woundInfo: { flex: 1 },
+  woundName: { fontSize: 15, fontFamily: F.header, color: C.parchment },
+  woundChapter: { fontSize: 11, fontFamily: F.body, color: C.goldDim },
+  woundText: {
+    fontSize: 13,
+    fontFamily: F.body,
+    color: C.parchment,
+    lineHeight: 20,
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: C.border,
+  },
+  woundLockedText: {
+    fontSize: 11,
+    fontFamily: F.body,
+    color: C.textMuted,
+    fontStyle: "italic",
+    marginTop: 4,
+  },
 });
