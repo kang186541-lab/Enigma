@@ -140,6 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const {
         tutorId, messages, mode, lessonTopic, nativeLang, isOpening,
         learnerSummary, needsDiagnosis,
+        lessonPhase, turnsInPhase,
       } = req.body as {
         tutorId: string;
         messages: { role: "user" | "assistant"; content: string }[];
@@ -148,8 +149,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         nativeLang?: "ko" | "en" | "es";
         isOpening?: boolean;
         // Phase 1: Learner Model
-        learnerSummary?: string;       // compact profile block (CEFR, goals, errors…)
-        needsDiagnosis?: boolean;      // true on very first session — run diagnostic dialogue
+        learnerSummary?: string;
+        needsDiagnosis?: boolean;
+        // Phase 3: Lesson Arc
+        lessonPhase?: "connect" | "model" | "guided" | "free" | "reflect" | "done";
+        turnsInPhase?: number;         // how many AI turns the learner has seen in this phase
       };
 
       if (!tutorId || !Array.isArray(messages)) {
@@ -218,6 +222,30 @@ Greet the student warmly in character (1–2 sentences), then propose practicing
 Keep the whole opening to 2–3 short sentences. Do NOT append any [CORRECTION] block on this turn.`
         : "";
 
+      // ── Phase 3: Lesson Arc — current-phase instruction + advance protocol ──
+      const phaseInstruction = (() => {
+        if (!lessonPhase || needsDiagnosis === true) return "";
+        const topic = lessonTopic ? `"${lessonTopic}"` : "today's topic";
+        const turnsNote = typeof turnsInPhase === "number" ? `You are on turn ${turnsInPhase} of this phase.` : "";
+        const body = (() => {
+          switch (lessonPhase) {
+            case "connect":
+              return `You are in the CONNECT phase. Warmly acknowledge the learner and briefly connect to their interests. Introduce today's topic (${topic}) in 1 short sentence. Ask ONE hook question. Keep the whole turn to 2-3 sentences.`;
+            case "model":
+              return `You are in the MODEL phase. Demonstrate 1-2 target expressions for ${topic}. Say the expression in character, note when to use it, invite the learner to try. 3-4 sentences.`;
+            case "guided":
+              return `You are in the GUIDED PRACTICE phase. Give a small scaffolded task — fill-in-the-blank, partial sentence, or prompt with hint. Evaluate next turn, give concrete feedback, ask for another attempt. Keep scaffolding high.`;
+            case "free":
+              return `You are in the FREE PRODUCTION phase. Set up a realistic scenario around ${topic} and let the learner speak freely. Respond naturally in character, weave in target expressions only if natural. Do NOT prompt or scaffold unless they stall.`;
+            case "reflect":
+              return `You are in the REFLECT phase — the last pedagogical turn. In ONE short reply: (1) give ONE specific positive observation about what they did today, (2) ask ONE metacognition question ("what felt easy/hard?", "which expression will you remember?"). Be warm.`;
+            case "done":
+              return `The lesson is done. Say a warm goodbye in character (1 sentence) and look forward to next session. Do NOT start a new teaching cycle.`;
+          }
+        })();
+        return `\n\n[LESSON ARC — PHASE INSTRUCTION]\n${body}\n${turnsNote}\nIf you believe this phase is complete and the learner is ready to move on, append on a new line exactly: [PHASE_ADVANCE]{"reason":"<one short sentence>"}[/PHASE_ADVANCE]\nDo NOT advance during CONNECT or MODEL turn 1. Do NOT advance more than once per reply.`;
+      })();
+
       const correctionBlock = (isOpening !== true && needsDiagnosis !== true)
         ? `\n\n[CORRECTION PROTOCOL — WORLD-CLASS TUTOR STRATEGY]
 After your natural conversational reply, evaluate the USER's last message for grammar or vocabulary mistakes.
@@ -268,7 +296,7 @@ other
 
       const systemPrompt = (modePrompt
         ? `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}\n\n[PERSONALITY MODE OVERRIDE — apply this interaction style]\n${modePrompt}`
-        : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`) + learnerBlock + diagnosticBlock + openingBlock + correctionBlock;
+        : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`) + learnerBlock + diagnosticBlock + openingBlock + phaseInstruction + correctionBlock;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
@@ -405,16 +433,33 @@ other
         }
       }
 
+      // ── Phase 3: [PHASE_ADVANCE] detection ─────────────────────────────────
+      let phaseAdvance: { reason?: string } | null = null;
+      const pmatch = raw.match(/\[PHASE_ADVANCE\]([\s\S]*?)\[\/PHASE_ADVANCE\]/);
+      if (pmatch) {
+        try {
+          const obj = JSON.parse(pmatch[1]);
+          phaseAdvance = {
+            reason: typeof obj?.reason === "string" ? obj.reason.slice(0, 200) : undefined,
+          };
+        } catch {
+          // Treat as advance without reason if JSON is malformed.
+          phaseAdvance = { reason: undefined };
+        }
+      }
+
       // Always strip metadata blocks from the spoken reply.
-      // Fallback for unclosed tags: everything from [CORRECTION]/[DIAGNOSIS]
-      // to end-of-string also gets stripped so TTS never reads metadata aloud.
+      // Fallback for unclosed tags: everything from a metadata opener to EOS
+      // also gets stripped so TTS never reads metadata aloud.
       const reply = raw
         .replace(/\s*\[CORRECTION\][\s\S]*?\[\/CORRECTION\]/g, "")
         .replace(/\s*\[DIAGNOSIS\][\s\S]*?\[\/DIAGNOSIS\]/g, "")
-        .replace(/\s*\[CORRECTION\][\s\S]*$/g, "")   // unclosed CORRECTION
-        .replace(/\s*\[DIAGNOSIS\][\s\S]*$/g, "")    // unclosed DIAGNOSIS
+        .replace(/\s*\[PHASE_ADVANCE\][\s\S]*?\[\/PHASE_ADVANCE\]/g, "")
+        .replace(/\s*\[CORRECTION\][\s\S]*$/g, "")
+        .replace(/\s*\[DIAGNOSIS\][\s\S]*$/g, "")
+        .replace(/\s*\[PHASE_ADVANCE\][\s\S]*$/g, "")
         .trim() || "...";
-      res.json({ reply, correction, diagnosis });
+      res.json({ reply, correction, diagnosis, phaseAdvance });
     } catch (err) {
       console.error("OpenAI error:", err);
       res.status(500).json({ error: "Failed to get AI response" });

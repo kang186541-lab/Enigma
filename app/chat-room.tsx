@@ -34,6 +34,10 @@ import {
   seedDiagnosedIfExistingUser, isValidCefrLevel,
   type LearnerProfile, type CefrLevel, type LearningGoal,
 } from "@/lib/learnerProfile";
+import {
+  LESSON_PHASE_ORDER, nextPhase, phaseLabel, shouldAutoAdvance,
+  type LessonPhase,
+} from "@/lib/lessonArc";
 
 type CorrectionStrategy = "recast" | "elicit" | "mini_lesson";
 type CorrectionPriority = "high" | "pattern" | "low";
@@ -442,6 +446,22 @@ export default function ChatRoomScreen() {
   // of jumping straight to the lesson topic. Flips to false after [DIAGNOSIS].
   const needsDiagnosisRef = useRef<boolean>(false);
 
+  // ── Phase 3: Lesson Arc ────────────────────────────────────────────────────
+  // Skipped entirely during diagnosis (phase = null until diagnosed+opened).
+  const [lessonPhase, setLessonPhase] = useState<LessonPhase | null>(null);
+  // Count of AI turns that have landed while we were in the *current* phase.
+  // Used both for auto-advance heuristic and to tell the server.
+  const turnsInPhaseRef = useRef<number>(0);
+  // Set once when the user sees the [done] goodbye so we can show the report.
+  const [showLessonReport, setShowLessonReport] = useState(false);
+  // Lesson-end metrics — accumulated during the session.
+  const lessonMetricsRef = useRef<{
+    startedAt: number;
+    correctionCount: number;
+    userTurnCount: number;
+    corrections: { errorKey?: string; original: string; corrected: string }[];
+  }>({ startedAt: Date.now(), correctionCount: 0, userTurnCount: 0, corrections: [] });
+
   const userNativeLang = nativeLanguage ?? "english";
   const userLangName = LANG_NAMES[userNativeLang] ?? "English";
   const tutorLangName = tutor ? (LANG_NAMES[tutor.language.toLowerCase()] ?? tutor.language) : "English";
@@ -491,6 +511,20 @@ export default function ChatRoomScreen() {
         learnerSummary = buildLearnerSummary(profile, learnLangRaw);
       } catch (e) {
         console.warn('[ChatRoom] loadLearnerProfile failed:', e);
+      }
+
+      // ── Phase 3: start the lesson arc as soon as we know it's NOT diagnosis.
+      // Doing this BEFORE the API fetch means the stepper shows + sendMessage
+      // sends lessonPhase even if the API-driven opening fails.
+      if (!needsDiagnosis && !cancelled) {
+        setLessonPhase("connect");
+        turnsInPhaseRef.current = 0;  // greeting itself does NOT count as a learner turn
+        lessonMetricsRef.current = {
+          startedAt: Date.now(),
+          correctionCount: 0,
+          userTurnCount: 0,
+          corrections: [],
+        };
       }
 
       let lessonTopicLearn: string | null = null;
@@ -544,6 +578,8 @@ export default function ChatRoomScreen() {
           lessonTopicLabel: needsDiagnosis ? undefined : (lessonTopicNative ?? undefined),
         }]);
         conversationHistoryRef.current = [{ role: "assistant", content: reply }];
+        // Phase 3 lessonPhase already set above (before fetch) so the arc
+        // works even on API failure/fallback paths. Nothing else to do here.
         if (cancelled) return;
         speakMsg(reply, id, false);
       } catch (e) {
@@ -834,6 +870,12 @@ export default function ChatRoomScreen() {
           // Phase 1
           learnerSummary: learnerSummary || undefined,
           needsDiagnosis: needsDiagnosisRef.current || undefined,
+          // Phase 3 — after "done" stop injecting the goodbye instruction so
+          // the user can keep chatting freely with the tutor.
+          lessonPhase: lessonPhase && lessonPhase !== "done" ? lessonPhase : undefined,
+          turnsInPhase: typeof turnsInPhaseRef.current === "number" && turnsInPhaseRef.current > 0
+            ? turnsInPhaseRef.current
+            : undefined,
         }),
       });
 
@@ -897,6 +939,38 @@ export default function ChatRoomScreen() {
         { role: "assistant", content: responseText },
       ];
       setMessages((prev) => [aiMsg, ...prev]);
+
+      // ── Phase 3: advance lesson-arc bookkeeping ─────────────────────────
+      lessonMetricsRef.current.userTurnCount += 1;
+      // Only count elicit + mini_lesson in the "corrections" stat shown to the
+      // user — recast is designed to be invisible/gentle, so including it
+      // contradicts the pedagogy and would inflate the perceived mistake count.
+      if (correction && correction.strategy !== "recast") {
+        lessonMetricsRef.current.correctionCount += 1;
+        lessonMetricsRef.current.corrections.push({
+          errorKey: correction.errorKey,
+          original: correction.original,
+          corrected: correction.corrected,
+        });
+      }
+      if (lessonPhase && lessonPhase !== "done") {
+        turnsInPhaseRef.current = (turnsInPhaseRef.current ?? 0) + 1;
+        const serverWantsAdvance = !!(data?.phaseAdvance && typeof data.phaseAdvance === "object");
+        const autoAdvance = shouldAutoAdvance(lessonPhase, turnsInPhaseRef.current);
+        if (serverWantsAdvance || autoAdvance) {
+          const np = nextPhase(lessonPhase);
+          setLessonPhase(np);
+          turnsInPhaseRef.current = 0;
+          if (np === "done") {
+            // Wait for TTS of the farewell to finish before showing the report.
+            // Estimate ~80ms/char reading speed as a conservative upper bound;
+            // capped at 10s so a slow server can't stall the modal forever.
+            const estimatedMs = Math.min(10000, Math.max(2500, responseText.length * 80));
+            setTimeout(() => setShowLessonReport(true), estimatedMs);
+          }
+        }
+      }
+
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       speakMsg(responseText, aiId, muted);
       inputRef.current?.focus();
@@ -1199,6 +1273,47 @@ export default function ChatRoomScreen() {
         </Pressable>
       </View>
 
+      {/* Phase 3: Lesson Arc stepper — hidden during diagnosis */}
+      {lessonPhase && !needsDiagnosisRef.current && (
+        <View style={styles.phaseStepperRow}>
+          {LESSON_PHASE_ORDER.map((p, i) => {
+            const currentIdx = LESSON_PHASE_ORDER.indexOf(lessonPhase);
+            const doneState =
+              lessonPhase === "done" ? "done" :
+              i < currentIdx ? "done" :
+              i === currentIdx ? "current" :
+              "upcoming";
+            return (
+              <View key={p} style={styles.phaseStep}>
+                <View
+                  style={[
+                    styles.phaseDot,
+                    doneState === "done" && styles.phaseDotDone,
+                    doneState === "current" && styles.phaseDotCurrent,
+                  ]}
+                />
+                <Text
+                  style={[
+                    styles.phaseStepText,
+                    doneState === "current" && { color: C.gold, fontFamily: F.bodySemi },
+                  ]}
+                >
+                  {phaseLabel(p, userNativeLang)}
+                </Text>
+                {i < LESSON_PHASE_ORDER.length - 1 && (
+                  <View
+                    style={[
+                      styles.phaseConnector,
+                      doneState === "done" && styles.phaseConnectorDone,
+                    ]}
+                  />
+                )}
+              </View>
+            );
+          })}
+        </View>
+      )}
+
       {/* Style badge */}
       <View style={styles.styleBadgeRow}>
         <View style={styles.styleBadge}>
@@ -1251,6 +1366,84 @@ export default function ChatRoomScreen() {
         </Animated.View>
       )}
 
+
+      {/* Phase 3: Lesson completion report modal */}
+      <Modal
+        visible={showLessonReport}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLessonReport(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.lessonReportCard}>
+            <Text style={styles.lessonReportEmoji}>🎓</Text>
+            <Text style={styles.lessonReportTitle}>
+              {userNativeLang === "korean"
+                ? "오늘의 수업 완료!"
+                : userNativeLang === "spanish"
+                ? "¡Lección completada!"
+                : "Lesson complete!"}
+            </Text>
+            {lessonTopicNativeRef.current && (
+              <Text style={styles.lessonReportTopic}>
+                {userNativeLang === "korean" ? "주제: " : userNativeLang === "spanish" ? "Tema: " : "Topic: "}
+                {lessonTopicNativeRef.current}
+              </Text>
+            )}
+            <View style={styles.lessonReportStatsRow}>
+              <View style={styles.lessonReportStat}>
+                <Text style={styles.lessonReportStatNum}>{lessonMetricsRef.current.userTurnCount}</Text>
+                <Text style={styles.lessonReportStatLabel}>
+                  {userNativeLang === "korean" ? "주고받은 대화"
+                    : userNativeLang === "spanish" ? "Intercambios"
+                    : "Exchanges"}
+                </Text>
+              </View>
+              <View style={styles.lessonReportStat}>
+                <Text style={styles.lessonReportStatNum}>{lessonMetricsRef.current.correctionCount}</Text>
+                <Text style={styles.lessonReportStatLabel}>
+                  {userNativeLang === "korean" ? "교정 받음"
+                    : userNativeLang === "spanish" ? "Correcciones"
+                    : "Corrections"}
+                </Text>
+              </View>
+              <View style={styles.lessonReportStat}>
+                <Text style={styles.lessonReportStatNum}>
+                  {Math.max(1, Math.round((Date.now() - lessonMetricsRef.current.startedAt) / 60000))}
+                </Text>
+                <Text style={styles.lessonReportStatLabel}>
+                  {userNativeLang === "korean" ? "분" : userNativeLang === "spanish" ? "min" : "min"}
+                </Text>
+              </View>
+            </View>
+            {lessonMetricsRef.current.corrections.length > 0 && (
+              <View style={styles.lessonReportSection}>
+                <Text style={styles.lessonReportSectionTitle}>
+                  {userNativeLang === "korean" ? "🎯 다음에 주목할 점"
+                    : userNativeLang === "spanish" ? "🎯 A trabajar la próxima vez"
+                    : "🎯 Focus for next time"}
+                </Text>
+                {lessonMetricsRef.current.corrections.slice(0, 3).map((c, i) => (
+                  <Text key={i} style={styles.lessonReportItem}>
+                    • {c.original} → <Text style={{ color: "#7AC488" }}>{c.corrected}</Text>
+                  </Text>
+                ))}
+              </View>
+            )}
+            <Pressable
+              style={({ pressed }) => [styles.lessonReportBtn, pressed && { opacity: 0.85 }]}
+              onPress={() => { stopSpeech(); setShowLessonReport(false); router.back(); }}
+            >
+              <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} />
+              <Text style={styles.lessonReportBtnText}>
+                {userNativeLang === "korean" ? "돌아가기"
+                  : userNativeLang === "spanish" ? "Volver"
+                  : "Back home"}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
 
       {/* Voice Settings Modal */}
       <Modal
@@ -2068,5 +2261,143 @@ const styles = StyleSheet.create({
     fontFamily: F.bodySemi,
     color: C.gold,
     textAlign: "center",
+  },
+
+  // ── Phase 3: Lesson Arc stepper ───────────────────────────────────────────
+  phaseStepperRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
+  },
+  phaseStep: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  phaseDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: C.goldDark,
+    marginRight: 5,
+  },
+  phaseDotDone: { backgroundColor: C.gold },
+  phaseDotCurrent: {
+    backgroundColor: C.gold,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    shadowColor: C.gold,
+    shadowOpacity: 0.6,
+    shadowRadius: 4,
+  },
+  phaseStepText: {
+    fontSize: 10,
+    fontFamily: F.body,
+    color: C.goldDim,
+    letterSpacing: 0.3,
+  },
+  phaseConnector: {
+    flex: 1,
+    height: 1,
+    backgroundColor: C.goldDark,
+    marginHorizontal: 5,
+    opacity: 0.5,
+  },
+  phaseConnectorDone: { backgroundColor: C.gold, opacity: 1 },
+
+  // ── Phase 3: Lesson report modal ─────────────────────────────────────────
+  lessonReportCard: {
+    width: "88%",
+    maxWidth: 420,
+    backgroundColor: C.bg2,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: C.border,
+    padding: 22,
+    alignItems: "center",
+  },
+  lessonReportEmoji: { fontSize: 44, marginBottom: 6 },
+  lessonReportTitle: {
+    fontSize: 20,
+    fontFamily: F.header,
+    color: C.gold,
+    letterSpacing: 0.5,
+    textAlign: "center",
+  },
+  lessonReportTopic: {
+    fontSize: 13,
+    fontFamily: F.body,
+    color: C.goldDim,
+    fontStyle: "italic",
+    marginTop: 4,
+    textAlign: "center",
+  },
+  lessonReportStatsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    marginVertical: 18,
+    gap: 8,
+  },
+  lessonReportStat: {
+    flex: 1,
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "rgba(201,162,39,0.1)",
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  lessonReportStatNum: {
+    fontSize: 22,
+    fontFamily: F.bodyBold,
+    color: C.gold,
+  },
+  lessonReportStatLabel: {
+    fontSize: 10,
+    fontFamily: F.body,
+    color: C.goldDim,
+    marginTop: 2,
+    textAlign: "center",
+  },
+  lessonReportSection: {
+    width: "100%",
+    marginBottom: 14,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: "rgba(196,122,122,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(196,122,122,0.25)",
+    gap: 4,
+  },
+  lessonReportSectionTitle: {
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+    marginBottom: 4,
+  },
+  lessonReportItem: {
+    fontSize: 12,
+    fontFamily: F.body,
+    color: C.goldDim,
+    lineHeight: 18,
+  },
+  lessonReportBtn: {
+    width: "100%",
+    paddingVertical: 12,
+    borderRadius: 12,
+    overflow: "hidden",
+    alignItems: "center",
+  },
+  lessonReportBtnText: {
+    fontSize: 14,
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 1,
   },
 });
