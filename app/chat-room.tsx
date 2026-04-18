@@ -83,6 +83,12 @@ let _nativeSound: Audio.Sound | null = null;
  * Sarah → en-GB-SoniaNeural (female), Jake → en-US-GuyNeural (male), etc.
  * Fails silently if the server is unreachable.
  */
+// Monotonic token — used to invalidate in-flight native play requests whenever
+// stopSpeech() or a newer play call supersedes them. Without this, a createAsync
+// that lands AFTER cleanup would re-install a stale _nativeSound that keeps
+// playing across screen navigations or fast re-entry.
+let _nativePlayToken = 0;
+
 async function azureNativePlay(
   text: string,
   tutorId: string,
@@ -91,6 +97,8 @@ async function azureNativePlay(
   onStart?: () => void,
   onEnd?: () => void,
 ) {
+  const myToken = ++_nativePlayToken;
+
   // Stop any currently playing native sound
   if (_nativeSound) {
     const prev = _nativeSound;
@@ -98,6 +106,9 @@ async function azureNativePlay(
     try { await prev.stopAsync(); } catch (e) { console.warn('[ChatRoom] Failed to stop previous sound:', e); }
     try { await prev.unloadAsync(); } catch (e) { console.warn('[ChatRoom] Failed to unload previous sound:', e); }
   }
+
+  // If another play/stop raced in while we were stopping, bail out.
+  if (myToken !== _nativePlayToken) { onEnd?.(); return; }
 
   const url = new URL("/api/tts", apiBase);
   url.searchParams.set("text", text.slice(0, 5000));
@@ -107,21 +118,28 @@ async function azureNativePlay(
   try {
     onStart?.();
     await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+    if (myToken !== _nativePlayToken) { onEnd?.(); return; }
     const { sound } = await Audio.Sound.createAsync(
       { uri: url.toString() },
       { shouldPlay: true },
     );
+    // If we were superseded while loading, immediately unload and bail.
+    if (myToken !== _nativePlayToken) {
+      sound.unloadAsync().catch((e) => console.warn('[ChatRoom] superseded unload failed:', e));
+      onEnd?.();
+      return;
+    }
     _nativeSound = sound;
     sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
       if (status.isLoaded && status.didJustFinish) {
         sound.unloadAsync().catch((e) => console.warn('[ChatRoom] sound unload failed:', e));
-        _nativeSound = null;
+        if (_nativeSound === sound) _nativeSound = null;
         onEnd?.();
       }
     });
   } catch (e) {
     console.warn('[ChatRoom] TTS playback failed (server unreachable):', e);
-    _nativeSound = null;
+    if (myToken === _nativePlayToken) _nativeSound = null;
     onEnd?.();
   }
 }
@@ -160,6 +178,8 @@ function stripForTTS(text: string): string {
 
 function stopSpeech() {
   if (Platform.OS !== "web") {
+    // Bump the native play token so any in-flight createAsync bails on resume.
+    _nativePlayToken++;
     if (_nativeSound) {
       const s = _nativeSound;
       _nativeSound = null;
@@ -167,8 +187,14 @@ function stopSpeech() {
     }
   } else {
     if (_webAudioEl) {
-      _webAudioEl.pause();
-      _webAudioEl.src = "";
+      const prev = _webAudioEl;
+      // Detach callbacks so a late onended from the killed audio doesn't fire
+      // onEnd (which would clobber state for a newly-playing audio element).
+      prev.onended = null;
+      prev.onerror = null;
+      prev.onloadedmetadata = null;
+      try { prev.pause(); } catch (e) { console.warn('[ChatRoom] pause failed:', e); }
+      try { prev.src = ""; prev.load?.(); } catch (e) { console.warn('[ChatRoom] src clear failed:', e); }
       _webAudioEl = null;
     }
   }
@@ -193,10 +219,16 @@ function azureWebPlay(
     url.searchParams.set("speed", speed.toString());
     console.log("TTS called with speed:", speed);
 
-    // Stop previous playback
+    // Stop previous playback — and detach its callbacks so a late onended/
+    // onerror from the killed audio can't fire onEnd for the NEW message
+    // (which would clear speakingId/subtitle for a bubble that's still speaking).
     if (_webAudioEl) {
-      _webAudioEl.pause();
-      _webAudioEl.src = "";
+      const prev = _webAudioEl;
+      prev.onended = null;
+      prev.onerror = null;
+      prev.onloadedmetadata = null;
+      try { prev.pause(); } catch (e) { console.warn('[ChatRoom] pause prev failed:', e); }
+      try { prev.src = ""; prev.load?.(); } catch (e) { console.warn('[ChatRoom] src clear failed:', e); }
       _webAudioEl = null;
     }
 
@@ -471,14 +503,22 @@ export default function ChatRoomScreen() {
           lessonTopicLabel: lessonTopicNative ?? undefined,
         }]);
         conversationHistoryRef.current = [{ role: "assistant", content: reply }];
-        // Replace TTS with the new reply
+        // Re-check cancelled once more before triggering TTS — the await above
+        // may have landed while the user was already leaving the screen.
+        if (cancelled) return;
         speakMsg(reply, id, false);
       } catch (e) {
         console.warn('[ChatRoom] API-driven opening failed, keeping static greeting:', e);
       }
     })();
 
-    return () => { cancelled = true; clearTimeout(timer); };
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      // Belt-and-suspenders: explicitly stop any in-flight TTS the moment the
+      // screen leaves, even if the other unmount cleanup runs later.
+      stopSpeech();
+    };
   }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Subtitle helpers ──────────────────────────────────────────────────────
