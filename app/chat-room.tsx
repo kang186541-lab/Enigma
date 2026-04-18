@@ -27,11 +27,22 @@ import { getApiUrl } from "@/lib/query-client";
 import { recordAudio } from "@/lib/audio";
 import { C, F } from "@/constants/theme";
 import { startSession, endSession } from "@/lib/sessionTracker";
+import { UNITS, loadProgress } from "@/lib/dailyCourseData";
+
+interface Correction {
+  original: string;
+  corrected: string;
+  explanation: string;
+}
 
 interface Message {
   id: string;
   text: string;
   isUser: boolean;
+  correction?: Correction;     // attached to user message that contained the mistake
+  isLessonOpening?: boolean;   // first AI bubble flag (for optional Day badge)
+  lessonDayNumber?: number;    // shown only when isLessonOpening
+  lessonTopicLabel?: string;   // topic in user's native language for the badge
 }
 
 type PersonalityMode = "친절" | "독설";
@@ -372,6 +383,11 @@ export default function ChatRoomScreen() {
   const inputRef = useRef<TextInput>(null);
   const conversationHistoryRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
 
+  // ── Daily lesson topic — picked once on mount, reused across sends ──────────
+  const lessonTopicRef = useRef<string | null>(null);
+  const lessonTopicNativeRef = useRef<string | null>(null);
+  const lessonDayNumberRef = useRef<number | null>(null);
+
   const userNativeLang = nativeLanguage ?? "english";
   const userLangName = LANG_NAMES[userNativeLang] ?? "English";
   const tutorLangName = tutor ? (LANG_NAMES[tutor.language.toLowerCase()] ?? tutor.language) : "English";
@@ -384,15 +400,97 @@ export default function ChatRoomScreen() {
 
   useEffect(() => {
     if (!tutor) return;
-    const timer = setTimeout(() => {
+
+    let cancelled = false;
+
+    (async () => {
+      // ── Resolve today's lesson topic from daily course progress ─────────────
+      // Use learningLanguage as source of truth (tutor.language as fallback).
+      // Both should match in normal flow (tutor select screen filters by learningLanguage).
+      const learnLangRaw = (learningLanguage ?? tutor.language ?? "english").toLowerCase();
+      const learnKey: "ko" | "en" | "es" =
+        learnLangRaw === "korean" ? "ko" :
+        learnLangRaw === "spanish" ? "es" : "en";
+      const nativeKey: "ko" | "en" | "es" =
+        userNativeLang === "korean" ? "ko" :
+        userNativeLang === "spanish" ? "es" : "en";
+
+      let lessonTopicLearn: string | null = null;
+      let lessonTopicNative: string | null = null;
+      let dayNumber: number | null = null;
+      try {
+        const progress = await loadProgress();
+        const unit = UNITS[progress.currentUnitIndex] ?? UNITS[0];
+        const day = unit?.days[progress.currentDayIndex] ?? unit?.days[0] ?? UNITS[0]?.days[0];
+        if (day?.topic) {
+          lessonTopicLearn = day.topic[learnKey] ?? day.topic.en ?? null;
+          lessonTopicNative = day.topic[nativeKey] ?? day.topic.en ?? lessonTopicLearn;
+          dayNumber = day.dayNumber ?? null;
+        }
+      } catch (e) {
+        console.warn('[ChatRoom] loadProgress for lesson topic failed:', e);
+      }
+
+      lessonTopicRef.current = lessonTopicLearn;
+      lessonTopicNativeRef.current = lessonTopicNative;
+      lessonDayNumberRef.current = dayNumber;
+
+      if (cancelled) return;
+
+      // Small delay so the screen mounts before showing the greeting (matches old UX).
+      await new Promise((r) => setTimeout(r, 400));
+      if (cancelled) return;
+
       const id = "greeting";
-      setMessages([{ id, text: tutor.greeting, isUser: false }]);
+
+      // ── Try API-driven opening (proposes today's lesson topic) ──────────────
+      try {
+        const apiUrl = new URL("/api/chat", getApiUrl()).toString();
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tutorId: tutor.id,
+            messages: [],
+            mode,
+            lessonTopic: lessonTopicLearn ?? undefined,
+            nativeLang: nativeKey,
+            isOpening: true,
+          }),
+        });
+        if (cancelled) return;
+        if (res.ok) {
+          const data = await res.json();
+          const reply: string = (typeof data?.reply === "string" && data.reply.trim()) ? data.reply : tutor.greeting;
+          setMessages([{
+            id, text: reply, isUser: false,
+            isLessonOpening: true,
+            lessonDayNumber: dayNumber ?? undefined,
+            lessonTopicLabel: lessonTopicNative ?? undefined,
+          }]);
+          conversationHistoryRef.current = [{ role: "assistant", content: reply }];
+          speakMsg(reply, id, false);
+          return;
+        }
+        throw new Error(`opening API HTTP ${res.status}`);
+      } catch (e) {
+        console.warn('[ChatRoom] API-driven opening failed, falling back to static greeting:', e);
+      }
+
+      if (cancelled) return;
+
+      // ── Fallback: static tutor.greeting (existing behavior) ─────────────────
+      setMessages([{
+        id, text: tutor.greeting, isUser: false,
+        isLessonOpening: true,
+        lessonDayNumber: dayNumber ?? undefined,
+        lessonTopicLabel: lessonTopicNative ?? undefined,
+      }]);
       conversationHistoryRef.current = [{ role: "assistant", content: tutor.greeting }];
-      // Always attempt to speak — on web the browser may silently block autoplay
-      // before any user interaction, but it will succeed once the user taps/types.
       speakMsg(tutor.greeting, id, false);
-    }, 400);
-    return () => clearTimeout(timer);
+    })();
+
+    return () => { cancelled = true; };
   }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Subtitle helpers ──────────────────────────────────────────────────────
@@ -636,6 +734,9 @@ export default function ChatRoomScreen() {
     setIsTyping(true);
 
     try {
+      const nativeKey: "ko" | "en" | "es" =
+        userNativeLang === "korean" ? "ko" :
+        userNativeLang === "spanish" ? "es" : "en";
       const apiUrl = new URL("/api/chat", getApiUrl()).toString();
       const res = await fetch(apiUrl, {
         method: "POST",
@@ -644,6 +745,9 @@ export default function ChatRoomScreen() {
           tutorId: tutor.id,
           messages: conversationHistoryRef.current,
           mode,
+          lessonTopic: lessonTopicRef.current ?? undefined,
+          nativeLang: nativeKey,
+          isOpening: false,
         }),
       });
 
@@ -651,6 +755,16 @@ export default function ChatRoomScreen() {
       const responseText: string = res.ok
         ? (data.reply ?? "...")
         : (tutor.responses[Math.floor(Math.random() * tutor.responses.length)]);
+
+      // ── Attach correction (if any) to the user message that contained the mistake ──
+      const correction = (res.ok && data?.correction && typeof data.correction === "object")
+        ? data.correction as Correction
+        : null;
+      if (correction && correction.original && correction.corrected && correction.explanation) {
+        setMessages((prev) =>
+          prev.map((m) => m.id === userMsg.id ? { ...m, correction } : m)
+        );
+      }
 
       const aiId = Date.now().toString() + "a";
       const aiMsg: Message = { id: aiId, text: responseText, isUser: false };
@@ -710,6 +824,20 @@ export default function ChatRoomScreen() {
       );
     };
 
+    // ── Trilingual labels for lesson badge + correction sub-bubble ────────────
+    const TODAY_LABEL = userNativeLang === "korean" ? "오늘의 레슨"
+                       : userNativeLang === "spanish" ? "Lección de hoy"
+                       : "Today's Lesson";
+    const DAY_LABEL = (n: number) => userNativeLang === "korean" ? `Day ${n}`
+                                    : userNativeLang === "spanish" ? `Día ${n}`
+                                    : `Day ${n}`;
+    const FIX_LABEL = userNativeLang === "korean" ? "교정"
+                     : userNativeLang === "spanish" ? "Corrección"
+                     : "Correction";
+    const EXPLAIN_LABEL = userNativeLang === "korean" ? "설명"
+                         : userNativeLang === "spanish" ? "Explicación"
+                         : "Why";
+
     return (
       <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowAI]}>
         {!item.isUser && tutor && (
@@ -719,6 +847,16 @@ export default function ChatRoomScreen() {
         )}
 
         <View style={styles.bubbleColumn}>
+          {/* Lesson opening badge — first AI bubble only */}
+          {!item.isUser && item.isLessonOpening && item.lessonDayNumber && item.lessonTopicLabel && (
+            <View style={styles.lessonBadge}>
+              <Ionicons name="bookmark" size={11} color={C.gold} />
+              <Text style={styles.lessonBadgeText}>
+                {TODAY_LABEL} · {DAY_LABEL(item.lessonDayNumber)} · {item.lessonTopicLabel}
+              </Text>
+            </View>
+          )}
+
           <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleAI]}>
             {renderBubbleText()}
 
@@ -738,6 +876,31 @@ export default function ChatRoomScreen() {
               </View>
             )}
           </View>
+
+          {/* Correction sub-bubble — only on user messages that had a mistake */}
+          {item.isUser && item.correction && (
+            <View style={styles.correctionBubble}>
+              <View style={styles.correctionHeader}>
+                <Text style={styles.correctionHeaderIcon}>📝</Text>
+                <Text style={styles.correctionHeaderText}>{FIX_LABEL}</Text>
+              </View>
+              <View style={styles.correctionRow}>
+                <Text style={styles.correctionMark}>❌</Text>
+                <Text style={styles.correctionOriginal}>{item.correction.original}</Text>
+              </View>
+              <View style={styles.correctionRow}>
+                <Text style={styles.correctionMark}>✅</Text>
+                <Text style={styles.correctionFixed}>{item.correction.corrected}</Text>
+              </View>
+              <View style={styles.correctionExplainRow}>
+                <Text style={styles.correctionMark}>💡</Text>
+                <Text style={styles.correctionExplain}>
+                  <Text style={styles.correctionExplainLabel}>{EXPLAIN_LABEL}: </Text>
+                  {item.correction.explanation}
+                </Text>
+              </View>
+            </View>
+          )}
 
           {/* Translation bubble — separate from main bubble, tap to toggle */}
           {!item.isUser && canTranslate && (
@@ -1323,6 +1486,97 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 7,
     alignSelf: "flex-start",
+  },
+
+  // ── Lesson opening badge (above first AI bubble) ──────────────────────────
+  lessonBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(201,162,39,0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.3)",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginBottom: 4,
+  },
+  lessonBadgeText: {
+    fontSize: 11,
+    fontFamily: F.bodySemi,
+    color: C.gold,
+    letterSpacing: 0.3,
+  },
+
+  // ── Correction sub-bubble (below user message that had a mistake) ─────────
+  correctionBubble: {
+    alignSelf: "flex-end",
+    maxWidth: "92%",
+    marginTop: 4,
+    backgroundColor: "rgba(196,122,122,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(196,122,122,0.25)",
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 4,
+  },
+  correctionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingBottom: 4,
+    marginBottom: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(196,122,122,0.18)",
+  },
+  correctionHeaderIcon: { fontSize: 12 },
+  correctionHeaderText: {
+    fontSize: 11,
+    fontFamily: F.bodySemi,
+    color: "#C47A7A",
+    letterSpacing: 0.4,
+  },
+  correctionRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 6,
+  },
+  correctionExplainRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 6,
+    marginTop: 2,
+  },
+  correctionMark: { fontSize: 12, marginTop: 1 },
+  correctionOriginal: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: F.body,
+    color: "#C47A7A",
+    textDecorationLine: "line-through",
+    lineHeight: 18,
+  },
+  correctionFixed: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: "#7AC488",
+    lineHeight: 18,
+  },
+  correctionExplain: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: F.body,
+    color: C.goldDim,
+    lineHeight: 17,
+    fontStyle: "italic",
+  },
+  correctionExplainLabel: {
+    fontFamily: F.bodySemi,
+    color: C.gold,
+    fontStyle: "normal",
   },
   translGlobe: {
     fontSize: 13,

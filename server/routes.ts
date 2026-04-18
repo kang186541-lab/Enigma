@@ -76,10 +76,13 @@ const TUTOR_DOKSEOL_PROMPTS: Record<string, string> = {
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req: Request, res: Response) => {
     try {
-      const { tutorId, messages, mode } = req.body as {
+      const { tutorId, messages, mode, lessonTopic, nativeLang, isOpening } = req.body as {
         tutorId: string;
         messages: { role: "user" | "assistant"; content: string }[];
         mode?: string;
+        lessonTopic?: string;
+        nativeLang?: "ko" | "en" | "es";
+        isOpening?: boolean;
       };
 
       if (!tutorId || !Array.isArray(messages)) {
@@ -101,21 +104,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const modePrompt = mode === "독설"
         ? (TUTOR_DOKSEOL_PROMPTS[tutorId] ?? PERSONALITY_MODE_PROMPTS["독설"])
         : (mode && PERSONALITY_MODE_PROMPTS[mode]);
-      const systemPrompt = modePrompt
+
+      // ── Daily lesson opening + structured correction protocol ──────────────
+      const NATIVE_LANG_NAME: Record<string, string> = {
+        ko: "Korean", en: "English", es: "Spanish",
+      };
+      const nativeLangName = NATIVE_LANG_NAME[nativeLang ?? "en"] ?? "English";
+
+      const openingBlock = (isOpening === true && lessonTopic)
+        ? `\n\n[TODAY'S LESSON OPENING]
+This is the FIRST message of the session. The student has not typed anything yet.
+Today's lesson topic is: "${lessonTopic}".
+Greet the student warmly in character (1–2 sentences), then propose practicing this exact topic with one concrete invitation (e.g. "try introducing yourself", "tell me where you're from", etc.).
+Keep the whole opening to 2–3 short sentences. Do NOT append any [CORRECTION] block on this turn.`
+        : "";
+
+      const correctionBlock = (isOpening !== true)
+        ? `\n\n[CORRECTION PROTOCOL — STRICT FORMAT]
+After your natural conversational reply, evaluate the USER's last message for grammar or vocabulary mistakes.
+- If a meaningful mistake exists, append on a NEW LINE exactly:
+  [CORRECTION]{"original":"<user's exact wrong sentence>","corrected":"<fully corrected version>","explanation":"<1–2 sentences written in ${nativeLangName}>"}[/CORRECTION]
+- If the message is perfect, do NOT include the block at all.
+- ONE correction per turn, focused on the single most important issue.
+- The block is silent metadata — never read by TTS. Your conversational reply above stays natural and stays focused on today's topic${lessonTopic ? `: "${lessonTopic}"` : ""}.
+- The "explanation" field MUST be written in ${nativeLangName} — even if the rest of your reply is in another language.
+- Even in 독설 mode, the explanation inside the [CORRECTION] block stays neutral and educational (the comedic roast belongs only in the conversational reply above).
+- The [CORRECTION] block is JSON — escape any double quotes inside the strings.`
+        : "";
+
+      const systemPrompt = (modePrompt
         ? `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}\n\n[PERSONALITY MODE OVERRIDE — apply this interaction style]\n${modePrompt}`
-        : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`;
+        : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`) + openingBlock + correctionBlock;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
-        max_completion_tokens: 200,
+        max_completion_tokens: 350,
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
         ],
       });
 
-      const reply = completion.choices[0]?.message?.content ?? "...";
-      res.json({ reply });
+      const raw = completion.choices[0]?.message?.content ?? "...";
+
+      // ── Parse [CORRECTION]{...}[/CORRECTION] block (if present + not opening) ──
+      let correction: { original: string; corrected: string; explanation: string } | null = null;
+      if (isOpening !== true) {
+        const match = raw.match(/\[CORRECTION\]([\s\S]*?)\[\/CORRECTION\]/);
+        if (match) {
+          try {
+            const obj = JSON.parse(match[1]);
+            if (
+              obj &&
+              typeof obj.original === "string" && obj.original.trim() &&
+              typeof obj.corrected === "string" && obj.corrected.trim() &&
+              typeof obj.explanation === "string" && obj.explanation.trim()
+            ) {
+              correction = {
+                original: obj.original,
+                corrected: obj.corrected,
+                explanation: obj.explanation,
+              };
+            }
+          } catch (e) {
+            console.warn("[/api/chat] Failed to parse [CORRECTION] block:", e);
+          }
+        }
+      }
+
+      // Always strip the [CORRECTION] block from the spoken reply.
+      const reply = raw.replace(/\s*\[CORRECTION\][\s\S]*?\[\/CORRECTION\]/g, "").trim() || "...";
+      res.json({ reply, correction });
     } catch (err) {
       console.error("OpenAI error:", err);
       res.status(500).json({ error: "Failed to get AI response" });
