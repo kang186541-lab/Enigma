@@ -73,16 +73,83 @@ const TUTOR_DOKSEOL_PROMPTS: Record<string, string> = {
   minho_tutor: `당신은 독설+개그 모드의 민호입니다 — MZ 스트리머 meets 로스트 코미디언. "이게 뭐야?! ㅋㅋㅋ 구독자들이 보면 완전 밈 만들겠는데!" MZ 슬랭과 스트리밍 문화로 놀려주세요. 항상 정답을 코미디로 포장. 3–4문장.`,
 };
 
+// Map tutor id → full name of the language they teach (used in diagnostic prompts).
+function tutorLanguageFullName(tutorId: string): string {
+  const id = (tutorId ?? "").toLowerCase();
+  if (["sarah", "jake", "eleanor", "tom_tutor"].includes(id)) return "English";
+  if (["jane", "alex", "isabel", "miguel"].includes(id)) return "Spanish";
+  if (["jisu", "minjun", "sujin", "minho_tutor"].includes(id)) return "Korean";
+  return "the target language";
+}
+
+// Canonical error-key enum — mirrors the client's learnerProfile types so
+// counts aggregate predictably across sessions no matter what GPT echoes back.
+const CANONICAL_ERROR_KEYS: ReadonlySet<string> = new Set([
+  "past_tense_irregular", "past_tense_regular", "present_tense", "future_tense",
+  "perfect_tense", "progressive_tense",
+  "subject_verb_agreement", "verb_conjugation", "modal_verb", "auxiliary_verb",
+  "article_a_the", "article_missing", "plural_form", "countable_uncountable",
+  "preposition_choice", "preposition_missing", "word_order", "negation",
+  "pronoun_choice", "possessive", "comparative_superlative",
+  "relative_clause", "conditional", "passive_voice", "reported_speech",
+  "vocabulary_choice", "collocation", "false_friend", "register_formality",
+  "spelling", "capitalization", "punctuation",
+  "particle_korean", "honorific_korean", "ser_vs_estar", "gender_agreement_spanish",
+  "other",
+]);
+
+function normalizeErrorKey(raw: unknown): string | undefined {
+  if (typeof raw !== "string") return undefined;
+  const k = raw.trim().toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 64);
+  if (!k) return undefined;
+  if (CANONICAL_ERROR_KEYS.has(k)) return k;
+  // Best-effort mapping for minor variants (past_tense_irregular vs irregular_past_tense)
+  const alias: Record<string, string> = {
+    irregular_past_tense: "past_tense_irregular",
+    regular_past_tense: "past_tense_regular",
+    past_tense: "past_tense_regular",
+    verb_tense: "verb_conjugation",
+    agreement: "subject_verb_agreement",
+    article: "article_a_the",
+    articles: "article_a_the",
+    preposition: "preposition_choice",
+    prepositions: "preposition_choice",
+    word_choice: "vocabulary_choice",
+    vocab: "vocabulary_choice",
+    formality: "register_formality",
+    particle: "particle_korean",
+    honorific: "honorific_korean",
+    ser_estar: "ser_vs_estar",
+    gender: "gender_agreement_spanish",
+  };
+  if (alias[k]) return alias[k];
+  return "other";
+}
+
+const CANONICAL_CEFR_LEVELS: ReadonlySet<string> = new Set([
+  "A1-low", "A1-mid", "A1-high",
+  "A2-low", "A2-mid", "A2-high",
+  "B1-low", "B1-mid", "B1-high",
+  "B2-low", "B2-mid", "B2-high",
+  "C1", "C2",
+]);
+
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req: Request, res: Response) => {
     try {
-      const { tutorId, messages, mode, lessonTopic, nativeLang, isOpening } = req.body as {
+      const {
+        tutorId, messages, mode, lessonTopic, nativeLang, isOpening,
+        learnerSummary, needsDiagnosis,
+      } = req.body as {
         tutorId: string;
         messages: { role: "user" | "assistant"; content: string }[];
         mode?: string;
         lessonTopic?: string;
         nativeLang?: "ko" | "en" | "es";
         isOpening?: boolean;
+        // Phase 1: Learner Model
+        learnerSummary?: string;       // compact profile block (CEFR, goals, errors…)
+        needsDiagnosis?: boolean;      // true on very first session — run diagnostic dialogue
       };
 
       if (!tutorId || !Array.isArray(messages)) {
@@ -111,7 +178,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       const nativeLangName = NATIVE_LANG_NAME[nativeLang ?? "en"] ?? "English";
 
-      const openingBlock = (isOpening === true && lessonTopic)
+      // ── Phase 1: Learner Model injection ──────────────────────────────────
+      const learnerBlock = (learnerSummary && learnerSummary.trim())
+        ? `\n\n[LEARNER PROFILE — calibrate difficulty, examples, and correction focus]
+${learnerSummary.trim()}
+Use this profile to:
+- Adjust sentence length/complexity to the stated CEFR level (aim for i+1 — slightly above).
+- Pull example topics from the learner's interests & occupation when natural.
+- Weave the recurring mistakes into the conversation so they get another chance — do not lecture about them unless the learner repeats one in this turn.
+- If the profile is thin, ask one gentle question that fills it (e.g. interests, occupation).`
+        : "";
+
+      const diagnosticBlock = (needsDiagnosis === true)
+        ? (isOpening === true
+          ? `\n\n[FIRST-TIME DIAGNOSTIC DIALOGUE — use only on this opening turn]
+The learner has never met you before. Instead of a normal lesson opening, conduct a warm 4-move intake conversation over the next few turns. Each of your replies asks EXACTLY ONE of these, woven naturally in character:
+  1. WHY they are learning (travel / work / study / hobby / other)
+  2. A GREETING OR SHORT SENTENCE in ${tutorLanguageFullName(tutorId)} to gauge current level
+  3. A TOPIC/SITUATION they want to master most
+  4. An INTEREST or HOBBY (used later for personalized examples)
+This turn is #1 of the intake — greet briefly in character and ask ONLY the "why are you learning" question. Do NOT propose today's lesson topic yet. Do NOT append a [CORRECTION] block on this turn. Do NOT emit [DIAGNOSIS] on turn #1.`
+          : `\n\n[DIAGNOSTIC DIALOGUE — CONTINUATION]
+You are in the middle of a first-time intake conversation. Continue asking ONE question per turn from this 4-move list (skip any you already covered from the conversation history above):
+  1. WHY they are learning
+  2. A SHORT SENTENCE in ${tutorLanguageFullName(tutorId)} to gauge level
+  3. A TOPIC/SITUATION they want to master
+  4. An INTEREST or HOBBY
+On the LAST intake turn (when you have enough info for all 4), reply with a warm transition sentence AND append on a new line:
+  [DIAGNOSIS]{"level":"one of: A1-low, A1-mid, A1-high, A2-low, A2-mid, A2-high, B1-low, B1-mid, B1-high, B2-low, B2-mid, B2-high, C1, C2","goals":["subset of: travel, work, study, hobby, relationship, exam"],"interests":["…up to 3 short strings…"],"occupation":"…or empty…","country":"…or empty…","motivationText":"…short quote in ${nativeLangName}…"}[/DIAGNOSIS]
+Do NOT append a [CORRECTION] block during intake.
+Do NOT emit [DIAGNOSIS] until you actually have all 4 answers.`)
+        : "";
+
+      const openingBlock = (isOpening === true && lessonTopic && needsDiagnosis !== true)
         ? `\n\n[TODAY'S LESSON OPENING]
 This is the FIRST message of the session. The student has not typed anything yet.
 Today's lesson topic is: "${lessonTopic}".
@@ -119,22 +218,33 @@ Greet the student warmly in character (1–2 sentences), then propose practicing
 Keep the whole opening to 2–3 short sentences. Do NOT append any [CORRECTION] block on this turn.`
         : "";
 
-      const correctionBlock = (isOpening !== true)
+      const correctionBlock = (isOpening !== true && needsDiagnosis !== true)
         ? `\n\n[CORRECTION PROTOCOL — STRICT FORMAT]
 After your natural conversational reply, evaluate the USER's last message for grammar or vocabulary mistakes.
 - If a meaningful mistake exists, append on a NEW LINE exactly:
-  [CORRECTION]{"original":"<user's exact wrong sentence>","corrected":"<fully corrected version>","explanation":"<1–2 sentences written in ${nativeLangName}>"}[/CORRECTION]
+  [CORRECTION]{"original":"<user's exact wrong sentence>","corrected":"<fully corrected version>","explanation":"<1–2 sentences written in ${nativeLangName}>","errorKey":"<one of the canonical keys below>"}[/CORRECTION]
 - If the message is perfect, do NOT include the block at all.
 - ONE correction per turn, focused on the single most important issue.
-- The block is silent metadata — never read by TTS. Your conversational reply above stays natural and stays focused on today's topic${lessonTopic ? `: "${lessonTopic}"` : ""}.
-- The "explanation" field MUST be written in ${nativeLangName} — even if the rest of your reply is in another language.
-- Even in 독설 mode, the explanation inside the [CORRECTION] block stays neutral and educational (the comedic roast belongs only in the conversational reply above).
-- The [CORRECTION] block is JSON — escape any double quotes inside the strings.`
+- "errorKey" MUST be exactly ONE of these canonical snake_case values (pick the closest category):
+  past_tense_irregular, past_tense_regular, present_tense, future_tense, perfect_tense, progressive_tense,
+  subject_verb_agreement, verb_conjugation, modal_verb, auxiliary_verb,
+  article_a_the, article_missing, plural_form, countable_uncountable,
+  preposition_choice, preposition_missing, word_order, negation,
+  pronoun_choice, possessive, comparative_superlative,
+  relative_clause, conditional, passive_voice, reported_speech,
+  vocabulary_choice, collocation, false_friend, register_formality,
+  spelling, capitalization, punctuation,
+  particle_korean, honorific_korean, ser_vs_estar, gender_agreement_spanish,
+  other
+- The block is silent metadata — never read by TTS. Your conversational reply stays focused on today's topic${lessonTopic ? `: "${lessonTopic}"` : ""}.
+- "explanation" MUST be written in ${nativeLangName}.
+- Even in 독설 mode, the [CORRECTION] block stays neutral and educational.
+- The block is JSON — escape any double quotes inside the strings.`
         : "";
 
       const systemPrompt = (modePrompt
         ? `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}\n\n[PERSONALITY MODE OVERRIDE — apply this interaction style]\n${modePrompt}`
-        : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`) + openingBlock + correctionBlock;
+        : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`) + learnerBlock + diagnosticBlock + openingBlock + correctionBlock;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
@@ -148,7 +258,7 @@ After your natural conversational reply, evaluate the USER's last message for gr
       const raw = completion.choices[0]?.message?.content ?? "...";
 
       // ── Parse [CORRECTION]{...}[/CORRECTION] block (if present + not opening) ──
-      let correction: { original: string; corrected: string; explanation: string } | null = null;
+      let correction: { original: string; corrected: string; explanation: string; errorKey?: string } | null = null;
       if (isOpening !== true) {
         const match = raw.match(/\[CORRECTION\]([\s\S]*?)\[\/CORRECTION\]/);
         if (match) {
@@ -164,6 +274,7 @@ After your natural conversational reply, evaluate the USER's last message for gr
                 original: obj.original,
                 corrected: obj.corrected,
                 explanation: obj.explanation,
+                errorKey: normalizeErrorKey(obj.errorKey),
               };
             }
           } catch (e) {
@@ -172,9 +283,58 @@ After your natural conversational reply, evaluate the USER's last message for gr
         }
       }
 
-      // Always strip the [CORRECTION] block from the spoken reply.
-      const reply = raw.replace(/\s*\[CORRECTION\][\s\S]*?\[\/CORRECTION\]/g, "").trim() || "...";
-      res.json({ reply, correction });
+      // ── Parse [DIAGNOSIS]{...}[/DIAGNOSIS] block (first-session intake) ──
+      let diagnosis: {
+        level?: string;
+        goals?: string[];
+        interests?: string[];
+        occupation?: string;
+        country?: string;
+        motivationText?: string;
+      } | null = null;
+      const dmatch = raw.match(/\[DIAGNOSIS\]([\s\S]*?)\[\/DIAGNOSIS\]/);
+      if (dmatch) {
+        try {
+          const obj = JSON.parse(dmatch[1]);
+          if (obj && typeof obj === "object") {
+            const CANONICAL_GOALS: ReadonlySet<string> = new Set([
+              "travel", "work", "study", "hobby", "relationship", "exam",
+            ]);
+            const level = typeof obj.level === "string" && CANONICAL_CEFR_LEVELS.has(obj.level)
+              ? obj.level : undefined;
+            const goals = Array.isArray(obj.goals)
+              ? obj.goals.filter((g: unknown): g is string => typeof g === "string" && CANONICAL_GOALS.has(g)).slice(0, 6)
+              : undefined;
+            const interests = Array.isArray(obj.interests)
+              ? obj.interests
+                  .filter((g: unknown): g is string => typeof g === "string" && !!g.trim())
+                  .map((s: string) => s.trim().slice(0, 40))
+                  .slice(0, 5)
+              : undefined;
+            diagnosis = {
+              level,
+              goals,
+              interests,
+              occupation: typeof obj.occupation === "string" && obj.occupation.trim() ? obj.occupation.trim().slice(0, 80) : undefined,
+              country: typeof obj.country === "string" && obj.country.trim() ? obj.country.trim().slice(0, 60) : undefined,
+              motivationText: typeof obj.motivationText === "string" && obj.motivationText.trim() ? obj.motivationText.trim().slice(0, 200) : undefined,
+            };
+          }
+        } catch (e) {
+          console.warn("[/api/chat] Failed to parse [DIAGNOSIS] block:", e);
+        }
+      }
+
+      // Always strip metadata blocks from the spoken reply.
+      // Fallback for unclosed tags: everything from [CORRECTION]/[DIAGNOSIS]
+      // to end-of-string also gets stripped so TTS never reads metadata aloud.
+      const reply = raw
+        .replace(/\s*\[CORRECTION\][\s\S]*?\[\/CORRECTION\]/g, "")
+        .replace(/\s*\[DIAGNOSIS\][\s\S]*?\[\/DIAGNOSIS\]/g, "")
+        .replace(/\s*\[CORRECTION\][\s\S]*$/g, "")   // unclosed CORRECTION
+        .replace(/\s*\[DIAGNOSIS\][\s\S]*$/g, "")    // unclosed DIAGNOSIS
+        .trim() || "...";
+      res.json({ reply, correction, diagnosis });
     } catch (err) {
       console.error("OpenAI error:", err);
       res.status(500).json({ error: "Failed to get AI response" });

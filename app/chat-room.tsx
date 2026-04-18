@@ -28,6 +28,12 @@ import { recordAudio } from "@/lib/audio";
 import { C, F } from "@/constants/theme";
 import { startSession, endSession } from "@/lib/sessionTracker";
 import { UNITS, loadProgress } from "@/lib/dailyCourseData";
+import {
+  loadLearnerProfile, saveLearnerProfile, markDiagnosed,
+  recordErrorPattern, buildLearnerSummary, bumpSession,
+  seedDiagnosedIfExistingUser, isValidCefrLevel,
+  type LearnerProfile, type CefrLevel, type LearningGoal,
+} from "@/lib/learnerProfile";
 
 interface Correction {
   original: string;
@@ -350,6 +356,7 @@ export default function ChatRoomScreen() {
   // Session tracking: start on mount, end on unmount
   useEffect(() => {
     startSession('chat');
+    bumpSession().catch((e) => console.warn('[ChatRoom] bumpSession failed:', e));
     return () => { endSession(sessionXpRef.current); };
   }, []);
 
@@ -420,6 +427,12 @@ export default function ChatRoomScreen() {
   const lessonTopicNativeRef = useRef<string | null>(null);
   const lessonDayNumberRef = useRef<number | null>(null);
 
+  // ── Phase 1: Learner model — loaded once, refreshed after diagnosis ─────────
+  const learnerProfileRef = useRef<LearnerProfile | null>(null);
+  // True during the first-ever session so the AI runs diagnostic intake instead
+  // of jumping straight to the lesson topic. Flips to false after [DIAGNOSIS].
+  const needsDiagnosisRef = useRef<boolean>(false);
+
   const userNativeLang = nativeLanguage ?? "english";
   const userLangName = LANG_NAMES[userNativeLang] ?? "English";
   const tutorLangName = tutor ? (LANG_NAMES[tutor.language.toLowerCase()] ?? tutor.language) : "English";
@@ -455,6 +468,22 @@ export default function ChatRoomScreen() {
         userNativeLang === "korean" ? "ko" :
         userNativeLang === "spanish" ? "es" : "en";
 
+      // ── Load learner profile (for summary injection + diagnosis trigger) ──
+      let profile: LearnerProfile | null = null;
+      let needsDiagnosis = false;
+      let learnerSummary = "";
+      try {
+        // Back-compat: if the user already has XP/stats, skip intake.
+        await seedDiagnosedIfExistingUser();
+        profile = await loadLearnerProfile();
+        learnerProfileRef.current = profile;
+        needsDiagnosis = !profile.diagnosed;
+        needsDiagnosisRef.current = needsDiagnosis;
+        learnerSummary = buildLearnerSummary(profile, learnLangRaw);
+      } catch (e) {
+        console.warn('[ChatRoom] loadLearnerProfile failed:', e);
+      }
+
       let lessonTopicLearn: string | null = null;
       let lessonTopicNative: string | null = null;
       let dayNumber: number | null = null;
@@ -488,6 +517,9 @@ export default function ChatRoomScreen() {
             lessonTopic: lessonTopicLearn ?? undefined,
             nativeLang: nativeKey,
             isOpening: true,
+            // Phase 1
+            learnerSummary: learnerSummary || undefined,
+            needsDiagnosis: needsDiagnosis || undefined,
           }),
         });
         if (cancelled) return;
@@ -498,13 +530,11 @@ export default function ChatRoomScreen() {
         // Upgrade the existing static greeting with the API-generated one.
         setMessages([{
           id, text: reply, isUser: false,
-          isLessonOpening: true,
-          lessonDayNumber: dayNumber ?? undefined,
-          lessonTopicLabel: lessonTopicNative ?? undefined,
+          isLessonOpening: !needsDiagnosis,   // diagnosis opening is not a "lesson start"
+          lessonDayNumber: needsDiagnosis ? undefined : (dayNumber ?? undefined),
+          lessonTopicLabel: needsDiagnosis ? undefined : (lessonTopicNative ?? undefined),
         }]);
         conversationHistoryRef.current = [{ role: "assistant", content: reply }];
-        // Re-check cancelled once more before triggering TTS — the await above
-        // may have landed while the user was already leaving the screen.
         if (cancelled) return;
         speakMsg(reply, id, false);
       } catch (e) {
@@ -765,6 +795,22 @@ export default function ChatRoomScreen() {
       const nativeKey: "ko" | "en" | "es" =
         userNativeLang === "korean" ? "ko" :
         userNativeLang === "spanish" ? "es" : "en";
+      const learnLangRaw = (learningLanguage ?? tutor.language ?? "english").toLowerCase();
+      // Always load the freshest profile so burst-sends use up-to-date error
+      // patterns / level / interests rather than a stale ref from last turn.
+      let freshProfile: LearnerProfile | null = learnerProfileRef.current;
+      try {
+        freshProfile = await loadLearnerProfile();
+        learnerProfileRef.current = freshProfile;
+        // Keep diagnosis ref in sync with the stored profile in case another
+        // surface flipped it (e.g., settings screen in a future phase).
+        needsDiagnosisRef.current = !freshProfile.diagnosed;
+      } catch (e) {
+        console.warn('[ChatRoom] loadLearnerProfile (sendMessage) failed:', e);
+      }
+      const learnerSummary = freshProfile
+        ? buildLearnerSummary(freshProfile, learnLangRaw)
+        : "";
       const apiUrl = new URL("/api/chat", getApiUrl()).toString();
       const res = await fetch(apiUrl, {
         method: "POST",
@@ -776,6 +822,9 @@ export default function ChatRoomScreen() {
           lessonTopic: lessonTopicRef.current ?? undefined,
           nativeLang: nativeKey,
           isOpening: false,
+          // Phase 1
+          learnerSummary: learnerSummary || undefined,
+          needsDiagnosis: needsDiagnosisRef.current || undefined,
         }),
       });
 
@@ -786,12 +835,50 @@ export default function ChatRoomScreen() {
 
       // ── Attach correction (if any) to the user message that contained the mistake ──
       const correction = (res.ok && data?.correction && typeof data.correction === "object")
-        ? data.correction as Correction
+        ? data.correction as Correction & { errorKey?: string }
         : null;
       if (correction && correction.original && correction.corrected && correction.explanation) {
         setMessages((prev) =>
           prev.map((m) => m.id === userMsg.id ? { ...m, correction } : m)
         );
+        // Phase 1b: persist the error pattern so future turns can reference it.
+        if (correction.errorKey) {
+          recordErrorPattern({
+            learningLang: learnLangRaw,
+            key: correction.errorKey,
+            original: correction.original,
+            corrected: correction.corrected,
+          }).then(() => loadLearnerProfile()).then((p) => {
+            learnerProfileRef.current = p;
+          }).catch((e) => console.warn('[ChatRoom] recordErrorPattern failed:', e));
+        }
+      }
+
+      // ── Handle [DIAGNOSIS] metadata from first-session intake ──
+      if (res.ok && data?.diagnosis && typeof data.diagnosis === "object") {
+        // Flip the ref SYNCHRONOUSLY so any follow-up send within this session
+        // doesn't re-trigger the intake prompt before the async persist lands.
+        needsDiagnosisRef.current = false;
+        const d = data.diagnosis;
+        const levelUpdate: Record<string, CefrLevel> = {};
+        if (isValidCefrLevel(d.level)) {
+          levelUpdate[learnLangRaw] = d.level;
+        }
+        const validGoals: LearningGoal[] | undefined = Array.isArray(d.goals)
+          ? d.goals.filter((g: unknown): g is LearningGoal =>
+              typeof g === "string" &&
+              ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"].includes(g))
+          : undefined;
+        markDiagnosed({
+          level: levelUpdate,
+          goals: validGoals,
+          interests: Array.isArray(d.interests) ? d.interests.filter((g: unknown): g is string => typeof g === "string") : undefined,
+          occupation: typeof d.occupation === "string" ? d.occupation : undefined,
+          country: typeof d.country === "string" ? d.country : undefined,
+          motivationText: typeof d.motivationText === "string" ? d.motivationText : undefined,
+        }).then(() => loadLearnerProfile()).then((p) => {
+          learnerProfileRef.current = p;
+        }).catch((e) => console.warn('[ChatRoom] markDiagnosed failed:', e));
       }
 
       const aiId = Date.now().toString() + "a";
