@@ -219,24 +219,48 @@ Keep the whole opening to 2–3 short sentences. Do NOT append any [CORRECTION] 
         : "";
 
       const correctionBlock = (isOpening !== true && needsDiagnosis !== true)
-        ? `\n\n[CORRECTION PROTOCOL — STRICT FORMAT]
+        ? `\n\n[CORRECTION PROTOCOL — WORLD-CLASS TUTOR STRATEGY]
 After your natural conversational reply, evaluate the USER's last message for grammar or vocabulary mistakes.
-- If a meaningful mistake exists, append on a NEW LINE exactly:
-  [CORRECTION]{"original":"<user's exact wrong sentence>","corrected":"<fully corrected version>","explanation":"<1–2 sentences written in ${nativeLangName}>","errorKey":"<one of the canonical keys below>"}[/CORRECTION]
-- If the message is perfect, do NOT include the block at all.
-- ONE correction per turn, focused on the single most important issue.
-- "errorKey" MUST be exactly ONE of these canonical snake_case values (pick the closest category):
-  past_tense_irregular, past_tense_regular, present_tense, future_tense, perfect_tense, progressive_tense,
-  subject_verb_agreement, verb_conjugation, modal_verb, auxiliary_verb,
-  article_a_the, article_missing, plural_form, countable_uncountable,
-  preposition_choice, preposition_missing, word_order, negation,
-  pronoun_choice, possessive, comparative_superlative,
-  relative_clause, conditional, passive_voice, reported_speech,
-  vocabulary_choice, collocation, false_friend, register_formality,
-  spelling, capitalization, punctuation,
-  particle_korean, honorific_korean, ser_vs_estar, gender_agreement_spanish,
-  other
-- The block is silent metadata — never read by TTS. Your conversational reply stays focused on today's topic${lessonTopic ? `: "${lessonTopic}"` : ""}.
+
+If a meaningful mistake exists, append on a NEW LINE exactly:
+  [CORRECTION]{"original":"<user's exact wrong sentence>","corrected":"<fully corrected version>","explanation":"<written in ${nativeLangName}, length depends on strategy>","errorKey":"<canonical key>","strategy":"<one of: recast, elicit, mini_lesson>","priority":"<one of: high, pattern, low>"}[/CORRECTION]
+If the message is perfect, do NOT include the block at all.
+
+[HOW TO CHOOSE STRATEGY — pedagogical reasoning]
+Use the [LEARNER PROFILE] block above (if present) to see how many times this learner has already made this errorKey. Then apply:
+
+1. "recast" — FIRST occurrence of this error AND the meaning is clear.
+   • In your conversational reply, naturally echo back the CORRECTED form (e.g. user says "I goed" → you reply "Oh, you *went* there? Cool, tell me more.")
+   • "explanation" field: ONE SHORT sentence (15 words max) in ${nativeLangName}, gentle, framed as a reminder not a lecture. Can end with "." or "!".
+   • priority: "low" — the UI can hide this bubble to avoid discouraging beginners.
+
+2. "elicit" — 2nd or 3rd occurrence of this error (getting repetitive but not fossilized).
+   • In your conversational reply, ask a leading question pointing to the error ("Hmm, one small thing — what's the past tense of 'go'?")
+   • "explanation" field: MUST end with a "?" and be phrased as a leading question in ${nativeLangName} that prompts the learner to self-correct. Do NOT reveal the corrected form in this field. 1–2 sentences max.
+   • priority: "pattern" — always show; this pattern is sticking.
+
+3. "mini_lesson" — 4th+ occurrence of SAME error OR the error destroys meaning (e.g. wrong word that changes sentence meaning).
+   • In your conversational reply, briefly address it in-character.
+   • "explanation" field: 2–4 sentences in ${nativeLangName} with the rule + 1 extra mini-example so the learner truly internalizes it.
+   • priority: "high" — always show prominently.
+
+When in doubt: lower-count errors get softer strategies; higher-count errors get more explicit teaching.
+
+[ERRORKEY — canonical snake_case values, choose the closest]
+past_tense_irregular, past_tense_regular, present_tense, future_tense, perfect_tense, progressive_tense,
+subject_verb_agreement, verb_conjugation, modal_verb, auxiliary_verb,
+article_a_the, article_missing, plural_form, countable_uncountable,
+preposition_choice, preposition_missing, word_order, negation,
+pronoun_choice, possessive, comparative_superlative,
+relative_clause, conditional, passive_voice, reported_speech,
+vocabulary_choice, collocation, false_friend, register_formality,
+spelling, capitalization, punctuation,
+particle_korean, honorific_korean, ser_vs_estar, gender_agreement_spanish,
+other
+
+[ABSOLUTE RULES]
+- ONE correction per turn, the single most pedagogically valuable one.
+- Block is silent metadata — never read by TTS. Your conversational reply stays focused on today's topic${lessonTopic ? `: "${lessonTopic}"` : ""}.
 - "explanation" MUST be written in ${nativeLangName}.
 - Even in 독설 mode, the [CORRECTION] block stays neutral and educational.
 - The block is JSON — escape any double quotes inside the strings.`
@@ -258,7 +282,19 @@ After your natural conversational reply, evaluate the USER's last message for gr
       const raw = completion.choices[0]?.message?.content ?? "...";
 
       // ── Parse [CORRECTION]{...}[/CORRECTION] block (if present + not opening) ──
-      let correction: { original: string; corrected: string; explanation: string; errorKey?: string } | null = null;
+      type CorrectionStrategy = "recast" | "elicit" | "mini_lesson";
+      type CorrectionPriority = "high" | "pattern" | "low";
+      const VALID_STRATEGIES: ReadonlySet<CorrectionStrategy> = new Set(["recast", "elicit", "mini_lesson"]);
+      const VALID_PRIORITIES: ReadonlySet<CorrectionPriority> = new Set(["high", "pattern", "low"]);
+
+      let correction: {
+        original: string;
+        corrected: string;
+        explanation: string;
+        errorKey?: string;
+        strategy?: CorrectionStrategy;
+        priority?: CorrectionPriority;
+      } | null = null;
       if (isOpening !== true) {
         const match = raw.match(/\[CORRECTION\]([\s\S]*?)\[\/CORRECTION\]/);
         if (match) {
@@ -270,11 +306,55 @@ After your natural conversational reply, evaluate the USER's last message for gr
               typeof obj.corrected === "string" && obj.corrected.trim() &&
               typeof obj.explanation === "string" && obj.explanation.trim()
             ) {
+              let strategy = typeof obj.strategy === "string" && VALID_STRATEGIES.has(obj.strategy as CorrectionStrategy)
+                ? (obj.strategy as CorrectionStrategy)
+                : undefined;
+              let priority = typeof obj.priority === "string" && VALID_PRIORITIES.has(obj.priority as CorrectionPriority)
+                ? (obj.priority as CorrectionPriority)
+                : undefined;
+              const normalizedKey = normalizeErrorKey(obj.errorKey);
+
+              // ── Server-side enforcement of count→strategy pedagogy ────────
+              // If the learner summary exposes "<key> (Nx)" for this errorKey,
+              // promote the strategy to match the count. Prevents GPT from
+              // underreacting to fossilized errors.
+              if (normalizedKey && typeof learnerSummary === "string" && learnerSummary) {
+                const countMatch = new RegExp(
+                  `\\b${normalizedKey}\\s*\\((\\d+)x\\)`,
+                  "i",
+                ).exec(learnerSummary);
+                if (countMatch) {
+                  const n = parseInt(countMatch[1], 10);
+                  if (!Number.isNaN(n)) {
+                    // Note: the current correction INCREMENTS the count on the
+                    // client, so server sees pre-increment count. A "3x" here
+                    // means this is the 4th occurrence → mini_lesson.
+                    if (n >= 3 && strategy !== "mini_lesson") {
+                      console.log(`[/api/chat] override strategy → mini_lesson (key=${normalizedKey}, prev count=${n})`);
+                      strategy = "mini_lesson";
+                      priority = "high";
+                    } else if (n >= 1 && n < 3 && strategy === "recast") {
+                      console.log(`[/api/chat] override strategy → elicit (key=${normalizedKey}, prev count=${n})`);
+                      strategy = "elicit";
+                      priority = priority ?? "pattern";
+                    }
+                  }
+                }
+              }
+
+              // Client-side safety: if elicit explanation doesn't end with "?",
+              // downgrade to mini_lesson so the hint UI doesn't show a non-question.
+              if (strategy === "elicit" && typeof obj.explanation === "string" && !obj.explanation.trim().endsWith("?")) {
+                strategy = "mini_lesson";
+              }
+
               correction = {
                 original: obj.original,
                 corrected: obj.corrected,
                 explanation: obj.explanation,
-                errorKey: normalizeErrorKey(obj.errorKey),
+                errorKey: normalizedKey,
+                strategy,
+                priority,
               };
             }
           } catch (e) {

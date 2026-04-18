@@ -35,10 +35,16 @@ import {
   type LearnerProfile, type CefrLevel, type LearningGoal,
 } from "@/lib/learnerProfile";
 
+type CorrectionStrategy = "recast" | "elicit" | "mini_lesson";
+type CorrectionPriority = "high" | "pattern" | "low";
+
 interface Correction {
   original: string;
   corrected: string;
   explanation: string;
+  errorKey?: string;
+  strategy?: CorrectionStrategy;
+  priority?: CorrectionPriority;
 }
 
 interface Message {
@@ -373,6 +379,9 @@ export default function ChatRoomScreen() {
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set());
   const [hiddenTranslationIds, setHiddenTranslationIds] = useState<Set<string>>(new Set());
+  // Phase 2: tracks which user messages have their correction sub-bubble
+  // expanded (for recast/elicit strategies that start collapsed).
+  const [expandedCorrectionIds, setExpandedCorrectionIds] = useState<Set<string>>(new Set());
   const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
 
   // Voice settings — speed (persisted)
@@ -952,6 +961,16 @@ export default function ChatRoomScreen() {
     const EXPLAIN_LABEL = userNativeLang === "korean" ? "설명"
                          : userNativeLang === "spanish" ? "Explicación"
                          : "Why";
+    // Phase 2: strategy-specific labels
+    const RECAST_LABEL = userNativeLang === "korean" ? "자연스러운 교정"
+                         : userNativeLang === "spanish" ? "Corrección natural"
+                         : "Gentle reminder";
+    const ELICIT_LABEL = userNativeLang === "korean" ? "스스로 고쳐보기"
+                         : userNativeLang === "spanish" ? "Intenta corregirlo"
+                         : "Try it yourself";
+    const MINI_LESSON_LABEL = userNativeLang === "korean" ? "자세한 설명"
+                         : userNativeLang === "spanish" ? "Explicación detallada"
+                         : "Mini-lesson";
 
     return (
       <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowAI]}>
@@ -992,30 +1011,107 @@ export default function ChatRoomScreen() {
             )}
           </View>
 
-          {/* Correction sub-bubble — only on user messages that had a mistake */}
-          {item.isUser && item.correction && (
-            <View style={styles.correctionBubble}>
-              <View style={styles.correctionHeader}>
-                <Text style={styles.correctionHeaderIcon}>📝</Text>
-                <Text style={styles.correctionHeaderText}>{FIX_LABEL}</Text>
+          {/* Correction sub-bubble — rendering strategy depends on correction.strategy */}
+          {item.isUser && item.correction && (() => {
+            const c = item.correction!;
+            const strat: CorrectionStrategy = c.strategy ?? "mini_lesson";  // default = explicit
+
+            // RECAST: soft collapsible. Collapsed state shows ONLY a gentle
+            // reminder label — preserving recast pedagogy (the AI's reply already
+            // modelled the correct form). Expanding reveals corrected + why.
+            if (strat === "recast") {
+              const expanded = expandedCorrectionIds.has(item.id);
+              return (
+                <Pressable
+                  style={({ pressed }) => [styles.correctionRecast, pressed && { opacity: 0.85 }]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setExpandedCorrectionIds((prev) => {
+                      const n = new Set(prev);
+                      if (n.has(item.id)) n.delete(item.id);
+                      else n.add(item.id);
+                      return n;
+                    });
+                  }}
+                >
+                  <View style={styles.correctionRecastHeader}>
+                    <Text style={styles.correctionRecastIcon}>💬</Text>
+                    <Text style={styles.correctionRecastLabel}>{RECAST_LABEL}</Text>
+                    <View style={{ flex: 1 }} />
+                    <Ionicons name={expanded ? "chevron-up" : "chevron-down"} size={14} color={C.goldDim} />
+                  </View>
+                  {expanded && (
+                    <>
+                      <Text style={styles.correctionRecastFixedExpanded}>✅ {c.corrected}</Text>
+                      <Text style={styles.correctionRecastExplain}>{c.explanation}</Text>
+                    </>
+                  )}
+                </Pressable>
+              );
+            }
+
+            // ELICIT: prominent hint chip; learner taps to reveal the corrected
+            // form, can toggle it hidden again to retry mentally.
+            if (strat === "elicit") {
+              const revealed = expandedCorrectionIds.has(item.id);
+              const REVEAL_SHOW = userNativeLang === "korean" ? "정답 보기" : userNativeLang === "spanish" ? "Ver respuesta" : "Reveal answer";
+              const REVEAL_HIDE = userNativeLang === "korean" ? "정답 숨기기" : userNativeLang === "spanish" ? "Ocultar respuesta" : "Hide answer";
+              return (
+                <View style={styles.correctionElicit}>
+                  <View style={styles.correctionHeader}>
+                    <Text style={styles.correctionHeaderIcon}>🤔</Text>
+                    <Text style={[styles.correctionHeaderText, { color: "#E5A940" }]}>{ELICIT_LABEL}</Text>
+                  </View>
+                  <Text style={styles.correctionElicitHint}>{c.explanation}</Text>
+                  {revealed && (
+                    <Text style={styles.correctionElicitReveal}>✅ {c.corrected}</Text>
+                  )}
+                  <Pressable
+                    style={({ pressed }) => [styles.correctionRevealBtn, pressed && { opacity: 0.8 }]}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setExpandedCorrectionIds((prev) => {
+                        const n = new Set(prev);
+                        if (n.has(item.id)) n.delete(item.id);
+                        else n.add(item.id);
+                        return n;
+                      });
+                    }}
+                  >
+                    <Ionicons name={revealed ? "eye-off-outline" : "eye-outline"} size={12} color={C.goldDim} />
+                    <Text style={styles.correctionRevealText}>
+                      {revealed ? REVEAL_HIDE : REVEAL_SHOW}
+                    </Text>
+                  </Pressable>
+                </View>
+              );
+            }
+
+            // MINI_LESSON: full expanded card — the original 3-line layout with emphasized header.
+            return (
+              <View style={styles.correctionMiniLesson}>
+                <View style={styles.correctionHeader}>
+                  <Text style={styles.correctionHeaderIcon}>📚</Text>
+                  <Text style={[styles.correctionHeaderText, { color: "#C47A7A" }]}>{MINI_LESSON_LABEL}</Text>
+                </View>
+                <View style={styles.correctionRow}>
+                  <Text style={styles.correctionMark}>❌</Text>
+                  <Text style={styles.correctionOriginal}>{c.original}</Text>
+                </View>
+                <View style={styles.correctionRow}>
+                  <Text style={styles.correctionMark}>✅</Text>
+                  <Text style={styles.correctionFixed}>{c.corrected}</Text>
+                </View>
+                <View style={styles.correctionExplainRow}>
+                  <Text style={styles.correctionMark}>💡</Text>
+                  <Text style={styles.correctionExplain}>
+                    <Text style={styles.correctionExplainLabel}>{EXPLAIN_LABEL}: </Text>
+                    {c.explanation}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.correctionRow}>
-                <Text style={styles.correctionMark}>❌</Text>
-                <Text style={styles.correctionOriginal}>{item.correction.original}</Text>
-              </View>
-              <View style={styles.correctionRow}>
-                <Text style={styles.correctionMark}>✅</Text>
-                <Text style={styles.correctionFixed}>{item.correction.corrected}</Text>
-              </View>
-              <View style={styles.correctionExplainRow}>
-                <Text style={styles.correctionMark}>💡</Text>
-                <Text style={styles.correctionExplain}>
-                  <Text style={styles.correctionExplainLabel}>{EXPLAIN_LABEL}: </Text>
-                  {item.correction.explanation}
-                </Text>
-              </View>
-            </View>
-          )}
+            );
+          })()}
 
           {/* Translation bubble — separate from main bubble, tap to toggle */}
           {!item.isUser && canTranslate && (
@@ -1692,6 +1788,113 @@ const styles = StyleSheet.create({
     fontFamily: F.bodySemi,
     color: C.gold,
     fontStyle: "normal",
+  },
+
+  // ── Phase 2: Strategy-specific correction UIs ─────────────────────────────
+  // RECAST: soft, collapsible, minimal visual weight (1st-time error).
+  correctionRecast: {
+    alignSelf: "flex-end",
+    maxWidth: "92%",
+    marginTop: 3,
+    backgroundColor: "rgba(201,162,39,0.06)",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.2)",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  correctionRecastHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  correctionRecastIcon: { fontSize: 11, opacity: 0.8 },
+  correctionRecastLabel: {
+    fontSize: 10,
+    fontFamily: F.bodySemi,
+    color: C.goldDim,
+    letterSpacing: 0.3,
+  },
+  correctionRecastFixed: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: F.body,
+    color: "#7AC488",
+    marginLeft: 2,
+  },
+  // Shown ONLY when the recast chip is expanded (keeps collapsed state hint-like).
+  correctionRecastFixedExpanded: {
+    marginTop: 6,
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: "#7AC488",
+    lineHeight: 18,
+  },
+  correctionRecastExplain: {
+    marginTop: 6,
+    fontSize: 11,
+    fontFamily: F.body,
+    color: C.goldDim,
+    fontStyle: "italic",
+    lineHeight: 16,
+  },
+
+  // ELICIT: amber/warning accent; learner must reveal answer.
+  correctionElicit: {
+    alignSelf: "flex-end",
+    maxWidth: "92%",
+    marginTop: 4,
+    backgroundColor: "rgba(229,169,64,0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(229,169,64,0.35)",
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 6,
+  },
+  correctionElicitHint: {
+    fontSize: 13,
+    fontFamily: F.body,
+    color: "#E5A940",
+    lineHeight: 18,
+  },
+  correctionElicitReveal: {
+    fontSize: 14,
+    fontFamily: F.bodySemi,
+    color: "#7AC488",
+    lineHeight: 20,
+  },
+  correctionRevealBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(201,162,39,0.12)",
+    borderWidth: 1,
+    borderColor: C.border,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginTop: 2,
+  },
+  correctionRevealText: {
+    fontSize: 11,
+    fontFamily: F.bodySemi,
+    color: C.goldDim,
+  },
+
+  // MINI_LESSON: prominent card, extra lesson-like framing (4+ occurrences).
+  correctionMiniLesson: {
+    alignSelf: "flex-end",
+    maxWidth: "92%",
+    marginTop: 4,
+    backgroundColor: "rgba(196,122,122,0.1)",
+    borderWidth: 1.5,
+    borderColor: "rgba(196,122,122,0.35)",
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 5,
   },
   translGlobe: {
     fontSize: 13,

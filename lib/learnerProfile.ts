@@ -223,6 +223,16 @@ export function getTopErrorPatterns(
   return [...list].sort((a, b) => b.count - a.count).slice(0, n);
 }
 
+/** Returns the current count for a specific error key (0 if never seen). */
+export function getErrorCount(
+  profile: LearnerProfile,
+  learningLang: string,
+  key: string,
+): number {
+  const list = profile.errorPatterns[learningLang] ?? [];
+  return list.find((e) => e.key === key)?.count ?? 0;
+}
+
 /** Add/dedupe interests the tutor learns mid-conversation. */
 export async function addInterests(items: string[]): Promise<void> {
   if (!items.length) return;
