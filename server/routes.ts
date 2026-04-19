@@ -545,7 +545,17 @@ IMPORTANT — BE LENIENT AND FAIR:
 - Missing punctuation, missing accents, minor spacing — deduct only 5-15 points, never 50+.
 - Score 0 is reserved for answers that are literally empty, in the wrong script entirely, or total gibberish.
 - If the student's answer conveys the same meaning with different wording, score 85+.
-- If you're unsure whether the answer is valid ${learnName}, ASSUME IT IS and evaluate charitably.`;
+- SELF-CONSISTENCY RULE: if "corrections" is empty OR is the same text as the student's answer (ignoring minor punctuation differences), the score MUST be 85 or higher. Never say "unintelligible" about text you just repeated back as the correct answer.
+
+FEW-SHOT EXAMPLES:
+Example A (Korean target, prompt "Buenos días", answer "좋은 아침"):
+  {"score":90,"feedback":"Great natural greeting. '좋은 아침이에요' is slightly more polite.","corrections":"좋은 아침이에요"}
+Example B (Korean target, prompt "Where is the restroom?", answer "화장실 어디에요"):
+  {"score":85,"feedback":"Correct meaning. Add the '에' particle for slightly more formal register.","corrections":"화장실이 어디에 있어요?"}
+Example C (Spanish target, prompt "Where is the bathroom?", answer "Donde esta el bano"):
+  {"score":80,"feedback":"Meaning is clear. Add accents (dónde, está) and question marks (¿?).","corrections":"¿Dónde está el baño?"}
+Example D (English target, prompt "오늘 날씨가 좋아요.", answer "weather good today"):
+  {"score":50,"feedback":"Meaning is partially there but grammatically broken — missing subject and verb.","corrections":"The weather is nice today."}`;
 
       const systemPrompt = exerciseType === "translate"
         ? `You are a patient ${learnName} language tutor evaluating a student's translation.
@@ -587,11 +597,26 @@ Return STRICTLY a JSON object with NO other text:
         console.warn("[/api/writing-eval] JSON parse failed, returning fallback:", e);
       }
 
-      const score = typeof parsed.score === "number" && parsed.score >= 0 && parsed.score <= 100
+      let score = typeof parsed.score === "number" && parsed.score >= 0 && parsed.score <= 100
         ? Math.round(parsed.score)
         : 50;
       const feedback = typeof parsed.feedback === "string" ? parsed.feedback.slice(0, 400) : "";
       const corrections = typeof parsed.corrections === "string" ? parsed.corrections.slice(0, 400) : "";
+
+      // ── Self-contradiction guard ────────────────────────────────────────────
+      // GPT-4o sometimes rates a perfectly correct non-Roman-script answer as
+      // "unintelligible" (score 0) while returning the SAME text as the
+      // "correction". Detect that pattern and raise the floor to 85.
+      const normalize = (s: string) => s.trim().replace(/[?!.,¿¡\s]/g, "").toLowerCase();
+      const answerNorm = normalize(userAnswer);
+      const corrNorm = normalize(corrections);
+      const isSelfContradictory =
+        score < 70 &&
+        (corrNorm === "" || corrNorm === answerNorm || corrNorm.includes(answerNorm) || answerNorm.includes(corrNorm));
+      if (isSelfContradictory) {
+        console.warn(`[/api/writing-eval] self-contradictory score override: was ${score}, setting to 85`);
+        score = 85;
+      }
 
       res.json({ score, feedback, corrections });
     } catch (err) {
