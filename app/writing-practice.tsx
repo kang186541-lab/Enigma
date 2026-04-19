@@ -105,37 +105,34 @@ export default function WritingPractice() {
       return;
     }
 
-    // AI evaluation for translate and free writing
+    // ── AI evaluation via dedicated /api/writing-eval endpoint ──────────────
+    // Bug history: the old code called getApiUrl("/api/chat") (wrong — that
+    // function takes no path), so it fetched the root URL, got HTML back,
+    // and always fell through to the "offline" error message. Also /api/chat
+    // requires tutorId which this screen doesn't have. The dedicated
+    // /api/writing-eval endpoint returns {score, feedback, corrections}.
     try {
-      const url = getApiUrl("/api/chat");
-      const systemPrompt = exercise.type === "translate"
-        ? `You are a language teacher. The student translated: "${t(exercise.prompt, lc)}". Evaluate their translation. Return JSON: {"score": 0-100, "feedback": "brief feedback", "corrections": "corrected version if needed"}`
-        : `You are a language teacher. The student wrote about: "${t(exercise.prompt, lc)}". Evaluate grammar, vocabulary, naturalness. Return JSON: {"score": 0-100, "feedback": "brief feedback", "corrections": "suggestions"}`;
-
+      const url = new URL("/api/writing-eval", getApiUrl()).toString();
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: input },
-          ],
+          exerciseType: exercise.type,
+          promptText: t(exercise.prompt, lc),
+          userAnswer: input,
+          learningLang: learningLanguage ?? "english",
+          nativeLang: lc,
         }),
       });
 
       if (res.ok) {
-        const data = await res.json();
-        const reply = data.reply || data.message || "";
-        try {
-          const parsed = JSON.parse(reply);
-          setScore(parsed.score || 50);
-          setFeedback(`${parsed.feedback || ""}\n${parsed.corrections ? `→ ${parsed.corrections}` : ""}`);
-          setIsCorrect((parsed.score || 0) >= 70);
-        } catch {
-          setScore(50);
-          setFeedback(reply);
-          setIsCorrect(false);
-        }
+        const data = await res.json() as { score?: number; feedback?: string; corrections?: string };
+        const s = typeof data.score === "number" ? data.score : 50;
+        const fb = data.feedback ?? "";
+        const cor = data.corrections ?? "";
+        setScore(s);
+        setFeedback(cor ? `${fb}\n→ ${cor}` : fb);
+        setIsCorrect(s >= 70);
       } else {
         setScore(50);
         setFeedback(t(T.evalError, lc));

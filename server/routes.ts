@@ -512,6 +512,82 @@ Never emit any block inside your conversational reply. Never emit a block that w
     }
   });
 
+  // ── Writing practice evaluator ───────────────────────────────────────────
+  // Dedicated endpoint for the writing-practice screen. Returns structured
+  // JSON {score, feedback, corrections} so the client UI can show a score +
+  // short feedback + the corrected sentence inline.
+  app.post("/api/writing-eval", async (req: Request, res: Response) => {
+    try {
+      const { exerciseType, promptText, userAnswer, learningLang, nativeLang } = req.body as {
+        exerciseType: "translate" | "complete" | "free";
+        promptText: string;            // what was shown to the student
+        userAnswer: string;            // what they wrote
+        learningLang: "ko" | "en" | "es" | "korean" | "english" | "spanish";
+        nativeLang?: "ko" | "en" | "es";
+      };
+
+      if (!promptText || !userAnswer) {
+        return res.status(400).json({ error: "promptText and userAnswer are required" });
+      }
+
+      const nativeName = ({ ko: "Korean", en: "English", es: "Spanish" } as const)[(nativeLang ?? "ko") as "ko" | "en" | "es"] ?? "English";
+      const learnName = (() => {
+        const ll = String(learningLang ?? "").toLowerCase();
+        if (ll.startsWith("ko")) return "Korean";
+        if (ll.startsWith("es") || ll.startsWith("sp")) return "Spanish";
+        return "English";
+      })();
+
+      const systemPrompt = exerciseType === "translate"
+        ? `You are a patient ${learnName} language tutor evaluating a student's translation.
+The student was asked to translate: "${promptText}"
+The student's answer: "${userAnswer}"
+Return STRICTLY a JSON object with NO other text, NO markdown, NO code fences:
+{"score": <0-100 integer>,"feedback": "<1-2 sentences in ${nativeName} — what worked, what didn't>","corrections": "<the best corrected ${learnName} translation, or empty string if the student's answer is already correct>"}
+Scoring guide: 90+ natural & correct, 70-89 grammatically OK with minor issues, 50-69 understandable but wrong, <50 unintelligible.`
+        : exerciseType === "complete"
+        ? `You are a patient ${learnName} language tutor evaluating a fill-in-the-blank answer.
+Prompt: "${promptText}"
+Student's answer for the blank(s): "${userAnswer}"
+Return STRICTLY a JSON object with NO other text:
+{"score": <0-100 integer>,"feedback": "<1-2 sentences in ${nativeName}>","corrections": "<the best correct ${learnName} answer, or empty if correct>"}`
+        : `You are a patient ${learnName} language tutor evaluating free writing.
+Topic/prompt: "${promptText}"
+Student's writing: "${userAnswer}"
+Return STRICTLY a JSON object with NO other text:
+{"score": <0-100 integer>,"feedback": "<2-3 sentences in ${nativeName} — grammar, vocabulary, naturalness>","corrections": "<specific fixes or rewrite, in ${learnName}; empty if already excellent>"}`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        max_completion_tokens: 400,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Exercise type: ${exerciseType}\nPrompt: ${promptText}\nMy answer: ${userAnswer}` },
+        ],
+      });
+
+      const raw = completion.choices[0]?.message?.content ?? "{}";
+      let parsed: { score?: number; feedback?: string; corrections?: string } = {};
+      try {
+        parsed = JSON.parse(raw);
+      } catch (e) {
+        console.warn("[/api/writing-eval] JSON parse failed, returning fallback:", e);
+      }
+
+      const score = typeof parsed.score === "number" && parsed.score >= 0 && parsed.score <= 100
+        ? Math.round(parsed.score)
+        : 50;
+      const feedback = typeof parsed.feedback === "string" ? parsed.feedback.slice(0, 400) : "";
+      const corrections = typeof parsed.corrections === "string" ? parsed.corrections.slice(0, 400) : "";
+
+      res.json({ score, feedback, corrections });
+    } catch (err) {
+      console.error("[/api/writing-eval] error:", err);
+      res.status(500).json({ error: "Failed to evaluate writing" });
+    }
+  });
+
   app.post("/api/translate", async (req: Request, res: Response) => {
     try {
       const { text, targetLanguage } = req.body as {
