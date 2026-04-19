@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "node:http";
 import { openai } from "./openai";
+import { anthropic, hasAnthropic } from "./anthropic";
 
 /**
  * Map browser-reported MIME types to what Azure STT actually accepts.
@@ -513,15 +514,19 @@ Never emit any block inside your conversational reply. Never emit a block that w
   });
 
   // ── Writing practice evaluator ───────────────────────────────────────────
-  // Dedicated endpoint for the writing-practice screen. Returns structured
-  // JSON {score, feedback, corrections} so the client UI can show a score +
-  // short feedback + the corrected sentence inline.
+  // Primary: Claude Sonnet 4.5 — chosen because GPT-4o has a documented bias
+  // where it flags valid non-Roman-script answers (Korean especially) as
+  // "unintelligible" and gives score 0 while simultaneously echoing the same
+  // text back as the "correct" answer. Claude does not exhibit this bias and
+  // produces more consistent multilingual judgments without needing guards.
+  //
+  // Fallback: GPT-4o when ANTHROPIC_API_KEY is not set in the environment.
   app.post("/api/writing-eval", async (req: Request, res: Response) => {
     try {
       const { exerciseType, promptText, userAnswer, learningLang, nativeLang } = req.body as {
         exerciseType: "translate" | "complete" | "free";
-        promptText: string;            // what was shown to the student
-        userAnswer: string;            // what they wrote
+        promptText: string;
+        userAnswer: string;
         learningLang: "ko" | "en" | "es" | "korean" | "english" | "spanish";
         nativeLang?: "ko" | "en" | "es";
       };
@@ -538,119 +543,85 @@ Never emit any block inside your conversational reply. Never emit a block that w
         return "English";
       })();
 
-      const commonGuidance = `
-IMPORTANT — BE LENIENT AND FAIR:
-- The student IS writing in ${learnName}. Evaluate their attempt as ${learnName} text.
-- Natural colloquial/informal forms are FINE (e.g. Korean "어디에요" instead of "어디에 있어요", Spanish "Donde esta?" without accents).
-- Missing punctuation, missing accents, minor spacing — deduct only 5-15 points, never 50+.
-- Score 0 is reserved for answers that are literally empty, in the wrong script entirely, or total gibberish.
-- If the student's answer conveys the same meaning with different wording, score 85+.
-- SELF-CONSISTENCY RULE: if "corrections" is empty OR is the same text as the student's answer (ignoring minor punctuation differences), the score MUST be 85 or higher. Never say "unintelligible" about text you just repeated back as the correct answer.
+      const systemPrompt = (() => {
+        const base = `You are a patient ${learnName} language tutor evaluating a student whose native language is ${nativeName}.
 
-FEW-SHOT EXAMPLES:
-Example A (Korean target, prompt "Buenos días", answer "좋은 아침"):
-  {"score":90,"feedback":"Great natural greeting. '좋은 아침이에요' is slightly more polite.","corrections":"좋은 아침이에요"}
-Example B (Korean target, prompt "Where is the restroom?", answer "화장실 어디에요"):
-  {"score":85,"feedback":"Correct meaning. Add the '에' particle for slightly more formal register.","corrections":"화장실이 어디에 있어요?"}
-Example C (Spanish target, prompt "Where is the bathroom?", answer "Donde esta el bano"):
-  {"score":80,"feedback":"Meaning is clear. Add accents (dónde, está) and question marks (¿?).","corrections":"¿Dónde está el baño?"}
-Example D (English target, prompt "오늘 날씨가 좋아요.", answer "weather good today"):
-  {"score":50,"feedback":"Meaning is partially there but grammatically broken — missing subject and verb.","corrections":"The weather is nice today."}`;
+The student's answer IS their attempt at writing in ${learnName}. Evaluate it charitably:
+- Natural colloquial forms are fine (e.g. Korean omitted particles, Spanish missing accents).
+- Minor issues (punctuation, accents, spacing) deduct 5–15 points, not more.
+- Score 0 is ONLY for empty strings, wrong-script entirely, or total gibberish.
+- If meaning is conveyed correctly with minor tweaks needed, score 80+.
 
-      const systemPrompt = exerciseType === "translate"
-        ? `You are a patient ${learnName} language tutor evaluating a student's translation.
-The student was asked to translate this prompt: "${promptText}"
-The student's ${learnName} translation: "${userAnswer}"
-${commonGuidance}
-Return STRICTLY a JSON object with NO other text, NO markdown, NO code fences:
-{"score": <0-100 integer>,"feedback": "<1-2 sentences in ${nativeName} explaining what worked and what didn't>","corrections": "<the best corrected ${learnName} translation; empty string if the student's answer is already acceptable>"}
-Scoring guide (apply generously): 90-100 natural & correct, 75-89 minor issues (missing punctuation/accents/particles), 60-74 understandable but grammatically off, 40-59 partial meaning, <40 only for truly unintelligible text.`
-        : exerciseType === "complete"
-        ? `You are a patient ${learnName} language tutor evaluating a fill-in-the-blank answer.
-Prompt: "${promptText}"
-Student's ${learnName} answer for the blank(s): "${userAnswer}"
-${commonGuidance}
-Return STRICTLY a JSON object with NO other text:
-{"score": <0-100 integer>,"feedback": "<1-2 sentences in ${nativeName}>","corrections": "<the best correct ${learnName} answer; empty if correct>"}`
-        : `You are a patient ${learnName} language tutor evaluating free writing.
-Topic/prompt: "${promptText}"
-Student's ${learnName} writing: "${userAnswer}"
-${commonGuidance}
-Return STRICTLY a JSON object with NO other text:
-{"score": <0-100 integer>,"feedback": "<2-3 sentences in ${nativeName} on grammar, vocabulary, naturalness>","corrections": "<specific fixes or gentle rewrite in ${learnName}; empty if already excellent>"}`;
+Respond with ONLY a JSON object (no markdown, no code fences, no prose):
+{"score": <0-100 integer>, "feedback": "<in ${nativeName}>", "corrections": "<best ${learnName} version; empty string if already good>"}
 
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
-        max_completion_tokens: 400,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: `Exercise type: ${exerciseType}\nPrompt: ${promptText}\nMy answer: ${userAnswer}` },
-        ],
-      });
+Length guides:
+- Translation exercise: feedback 1–2 sentences.
+- Fill-in-the-blank: feedback 1 sentence.
+- Free writing: feedback 2–3 sentences on grammar/vocab/naturalness.`;
+        return base;
+      })();
 
-      const raw = completion.choices[0]?.message?.content ?? "{}";
-      let parsed: { score?: number; feedback?: string; corrections?: string } = {};
-      try {
-        parsed = JSON.parse(raw);
-      } catch (e) {
-        console.warn("[/api/writing-eval] JSON parse failed, returning fallback:", e);
+      const userMsg = `Exercise type: ${exerciseType}
+Prompt: ${promptText}
+Student's ${learnName} answer: ${userAnswer}`;
+
+      // ── Try Claude first ──────────────────────────────────────────────────
+      let parsed: { score?: number; feedback?: string; corrections?: string } | null = null;
+      let source = "none";
+
+      if (hasAnthropic() && anthropic) {
+        try {
+          const msg = await anthropic.messages.create({
+            model: "claude-sonnet-4-5",
+            max_tokens: 500,
+            system: systemPrompt,
+            messages: [{ role: "user", content: userMsg }],
+          });
+          // Claude content is an array of blocks; concatenate text blocks.
+          const text = msg.content
+            .filter((b) => b.type === "text")
+            .map((b) => (b.type === "text" ? b.text : ""))
+            .join("")
+            .trim();
+          // Strip possible markdown code fences just in case.
+          const jsonStr = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
+          parsed = JSON.parse(jsonStr);
+          source = "claude-sonnet-4-5";
+        } catch (e) {
+          console.warn("[/api/writing-eval] Claude call failed, falling back to GPT-4o:", e);
+          parsed = null;
+        }
       }
 
-      let score = typeof parsed.score === "number" && parsed.score >= 0 && parsed.score <= 100
+      // ── Fall back to GPT-4o ───────────────────────────────────────────────
+      if (!parsed) {
+        try {
+          const completion = await openai.chat.completions.create({
+            model: "gpt-4o",
+            max_completion_tokens: 500,
+            response_format: { type: "json_object" },
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userMsg },
+            ],
+          });
+          const raw = completion.choices[0]?.message?.content ?? "{}";
+          parsed = JSON.parse(raw);
+          source = source === "claude-sonnet-4-5" ? "claude-failed-gpt-fallback" : "gpt-4o";
+        } catch (e) {
+          console.error("[/api/writing-eval] Both Claude and GPT failed:", e);
+          return res.status(500).json({ error: "Failed to evaluate writing" });
+        }
+      }
+
+      const score = typeof parsed.score === "number" && parsed.score >= 0 && parsed.score <= 100
         ? Math.round(parsed.score)
         : 50;
-      const feedback = typeof parsed.feedback === "string" ? parsed.feedback.slice(0, 400) : "";
-      const corrections = typeof parsed.corrections === "string" ? parsed.corrections.slice(0, 400) : "";
+      const feedback = typeof parsed.feedback === "string" ? parsed.feedback.slice(0, 500) : "";
+      const corrections = typeof parsed.corrections === "string" ? parsed.corrections.slice(0, 500) : "";
 
-      // ── Self-contradiction / low-score guards ──────────────────────────────
-      // GPT-4o sometimes gives score 0 to perfectly valid Korean answers
-      // while returning text that matches or barely differs from the student's
-      // answer. We detect several contradiction patterns.
-      const normalize = (s: string) =>
-        s.trim().replace(/[?!.,¿¡\s~]/g, "").toLowerCase();
-      const answerNorm = normalize(userAnswer);
-      const corrNorm = normalize(corrections);
-
-      // Simple Levenshtein-like similarity: fraction of shared characters /
-      // longer length. Fine for short answers; avoids pulling a library.
-      function similarity(a: string, b: string): number {
-        if (!a && !b) return 1;
-        if (!a || !b) return 0;
-        const longer = a.length >= b.length ? a : b;
-        const shorter = a.length >= b.length ? b : a;
-        let matches = 0;
-        for (const ch of shorter) if (longer.includes(ch)) matches++;
-        return matches / longer.length;
-      }
-      const sim = similarity(answerNorm, corrNorm);
-
-      const isSelfContradictory =
-        score < 70 && (
-          corrNorm === "" ||
-          corrNorm === answerNorm ||
-          corrNorm.includes(answerNorm) ||
-          answerNorm.includes(corrNorm) ||
-          sim >= 0.80  // correction is ≥ 80% the same chars as answer
-        );
-
-      // Floor: a non-empty answer should never score below 20 unless the
-      // model can articulate a specific disqualifying issue (empty string,
-      // wrong script, etc.). GPT keeps saying "gibberish/unintelligible" for
-      // perfectly valid Korean — we override those.
-      const looksLikeFalseUnintelligibleFlag =
-        score < 30 &&
-        userAnswer.trim().length >= 2 &&
-        corrections.trim().length > 0;
-
-      if (isSelfContradictory) {
-        console.warn(`[/api/writing-eval] self-contradictory override: score ${score} → 85 (sim=${sim.toFixed(2)}, answer="${answerNorm}", corr="${corrNorm}")`);
-        score = 85;
-      } else if (looksLikeFalseUnintelligibleFlag) {
-        console.warn(`[/api/writing-eval] false-unintelligible override: score ${score} → 60`);
-        score = 60;
-      }
-
+      console.log(`[/api/writing-eval] ${source} · ${nativeName}→${learnName} · score=${score}`);
       res.json({ score, feedback, corrections });
     } catch (err) {
       console.error("[/api/writing-eval] error:", err);
