@@ -615,11 +615,53 @@ Student's ${learnName} answer: ${userAnswer}`;
         }
       }
 
-      const score = typeof parsed.score === "number" && parsed.score >= 0 && parsed.score <= 100
+      let score = typeof parsed.score === "number" && parsed.score >= 0 && parsed.score <= 100
         ? Math.round(parsed.score)
         : 50;
       const feedback = typeof parsed.feedback === "string" ? parsed.feedback.slice(0, 500) : "";
       const corrections = typeof parsed.corrections === "string" ? parsed.corrections.slice(0, 500) : "";
+
+      // ── Safety net: apply self-contradiction guards ONLY when the source
+      // is GPT (not Claude). GPT-4o has a documented bias where it scores
+      // valid non-Roman-script answers as 0 while echoing the same text as
+      // the "correction". Claude doesn't exhibit this, so skipping guards
+      // for Claude keeps its accurate low scores intact.
+      if (source.startsWith("gpt") || source === "claude-failed-gpt-fallback") {
+        const normalize = (s: string) =>
+          s.trim().normalize("NFC").replace(/[?!.,¿¡\s~]/g, "").toLowerCase();
+        const answerNorm = normalize(userAnswer);
+        const corrNorm = normalize(corrections);
+        const similarity = (a: string, b: string): number => {
+          if (!a && !b) return 1;
+          if (!a || !b) return 0;
+          const longer = a.length >= b.length ? a : b;
+          const shorter = a.length >= b.length ? b : a;
+          let matches = 0;
+          for (const ch of shorter) if (longer.includes(ch)) matches++;
+          return matches / longer.length;
+        };
+        const sim = similarity(answerNorm, corrNorm);
+        const isSelfContradictory =
+          score < 70 && (
+            corrNorm === "" ||
+            corrNorm === answerNorm ||
+            corrNorm.includes(answerNorm) ||
+            answerNorm.includes(corrNorm) ||
+            sim >= 0.80
+          );
+        const looksFalseUnintelligible =
+          score < 30 &&
+          userAnswer.trim().length >= 2 &&
+          corrections.trim().length > 0;
+
+        if (isSelfContradictory) {
+          console.warn(`[/api/writing-eval] GPT self-contradictory: score ${score} → 85 (sim=${sim.toFixed(2)})`);
+          score = 85;
+        } else if (looksFalseUnintelligible) {
+          console.warn(`[/api/writing-eval] GPT false-unintelligible: score ${score} → 60`);
+          score = 60;
+        }
+      }
 
       console.log(`[/api/writing-eval] ${source} · ${nativeName}→${learnName} · score=${score}`);
       res.json({ score, feedback, corrections });
