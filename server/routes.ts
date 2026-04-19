@@ -538,24 +538,36 @@ Never emit any block inside your conversational reply. Never emit a block that w
         return "English";
       })();
 
+      const commonGuidance = `
+IMPORTANT — BE LENIENT AND FAIR:
+- The student IS writing in ${learnName}. Evaluate their attempt as ${learnName} text.
+- Natural colloquial/informal forms are FINE (e.g. Korean "어디에요" instead of "어디에 있어요", Spanish "Donde esta?" without accents).
+- Missing punctuation, missing accents, minor spacing — deduct only 5-15 points, never 50+.
+- Score 0 is reserved for answers that are literally empty, in the wrong script entirely, or total gibberish.
+- If the student's answer conveys the same meaning with different wording, score 85+.
+- If you're unsure whether the answer is valid ${learnName}, ASSUME IT IS and evaluate charitably.`;
+
       const systemPrompt = exerciseType === "translate"
         ? `You are a patient ${learnName} language tutor evaluating a student's translation.
-The student was asked to translate: "${promptText}"
-The student's answer: "${userAnswer}"
+The student was asked to translate this prompt: "${promptText}"
+The student's ${learnName} translation: "${userAnswer}"
+${commonGuidance}
 Return STRICTLY a JSON object with NO other text, NO markdown, NO code fences:
-{"score": <0-100 integer>,"feedback": "<1-2 sentences in ${nativeName} — what worked, what didn't>","corrections": "<the best corrected ${learnName} translation, or empty string if the student's answer is already correct>"}
-Scoring guide: 90+ natural & correct, 70-89 grammatically OK with minor issues, 50-69 understandable but wrong, <50 unintelligible.`
+{"score": <0-100 integer>,"feedback": "<1-2 sentences in ${nativeName} explaining what worked and what didn't>","corrections": "<the best corrected ${learnName} translation; empty string if the student's answer is already acceptable>"}
+Scoring guide (apply generously): 90-100 natural & correct, 75-89 minor issues (missing punctuation/accents/particles), 60-74 understandable but grammatically off, 40-59 partial meaning, <40 only for truly unintelligible text.`
         : exerciseType === "complete"
         ? `You are a patient ${learnName} language tutor evaluating a fill-in-the-blank answer.
 Prompt: "${promptText}"
-Student's answer for the blank(s): "${userAnswer}"
+Student's ${learnName} answer for the blank(s): "${userAnswer}"
+${commonGuidance}
 Return STRICTLY a JSON object with NO other text:
-{"score": <0-100 integer>,"feedback": "<1-2 sentences in ${nativeName}>","corrections": "<the best correct ${learnName} answer, or empty if correct>"}`
+{"score": <0-100 integer>,"feedback": "<1-2 sentences in ${nativeName}>","corrections": "<the best correct ${learnName} answer; empty if correct>"}`
         : `You are a patient ${learnName} language tutor evaluating free writing.
 Topic/prompt: "${promptText}"
-Student's writing: "${userAnswer}"
+Student's ${learnName} writing: "${userAnswer}"
+${commonGuidance}
 Return STRICTLY a JSON object with NO other text:
-{"score": <0-100 integer>,"feedback": "<2-3 sentences in ${nativeName} — grammar, vocabulary, naturalness>","corrections": "<specific fixes or rewrite, in ${learnName}; empty if already excellent>"}`;
+{"score": <0-100 integer>,"feedback": "<2-3 sentences in ${nativeName} on grammar, vocabulary, naturalness>","corrections": "<specific fixes or gentle rewrite in ${learnName}; empty if already excellent>"}`;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
