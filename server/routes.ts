@@ -603,19 +603,52 @@ Return STRICTLY a JSON object with NO other text:
       const feedback = typeof parsed.feedback === "string" ? parsed.feedback.slice(0, 400) : "";
       const corrections = typeof parsed.corrections === "string" ? parsed.corrections.slice(0, 400) : "";
 
-      // ── Self-contradiction guard ────────────────────────────────────────────
-      // GPT-4o sometimes rates a perfectly correct non-Roman-script answer as
-      // "unintelligible" (score 0) while returning the SAME text as the
-      // "correction". Detect that pattern and raise the floor to 85.
-      const normalize = (s: string) => s.trim().replace(/[?!.,¿¡\s]/g, "").toLowerCase();
+      // ── Self-contradiction / low-score guards ──────────────────────────────
+      // GPT-4o sometimes gives score 0 to perfectly valid Korean answers
+      // while returning text that matches or barely differs from the student's
+      // answer. We detect several contradiction patterns.
+      const normalize = (s: string) =>
+        s.trim().replace(/[?!.,¿¡\s~]/g, "").toLowerCase();
       const answerNorm = normalize(userAnswer);
       const corrNorm = normalize(corrections);
+
+      // Simple Levenshtein-like similarity: fraction of shared characters /
+      // longer length. Fine for short answers; avoids pulling a library.
+      function similarity(a: string, b: string): number {
+        if (!a && !b) return 1;
+        if (!a || !b) return 0;
+        const longer = a.length >= b.length ? a : b;
+        const shorter = a.length >= b.length ? b : a;
+        let matches = 0;
+        for (const ch of shorter) if (longer.includes(ch)) matches++;
+        return matches / longer.length;
+      }
+      const sim = similarity(answerNorm, corrNorm);
+
       const isSelfContradictory =
-        score < 70 &&
-        (corrNorm === "" || corrNorm === answerNorm || corrNorm.includes(answerNorm) || answerNorm.includes(corrNorm));
+        score < 70 && (
+          corrNorm === "" ||
+          corrNorm === answerNorm ||
+          corrNorm.includes(answerNorm) ||
+          answerNorm.includes(corrNorm) ||
+          sim >= 0.80  // correction is ≥ 80% the same chars as answer
+        );
+
+      // Floor: a non-empty answer should never score below 20 unless the
+      // model can articulate a specific disqualifying issue (empty string,
+      // wrong script, etc.). GPT keeps saying "gibberish/unintelligible" for
+      // perfectly valid Korean — we override those.
+      const looksLikeFalseUnintelligibleFlag =
+        score < 30 &&
+        userAnswer.trim().length >= 2 &&
+        corrections.trim().length > 0;
+
       if (isSelfContradictory) {
-        console.warn(`[/api/writing-eval] self-contradictory score override: was ${score}, setting to 85`);
+        console.warn(`[/api/writing-eval] self-contradictory override: score ${score} → 85 (sim=${sim.toFixed(2)}, answer="${answerNorm}", corr="${corrNorm}")`);
         score = 85;
+      } else if (looksLikeFalseUnintelligibleFlag) {
+        console.warn(`[/api/writing-eval] false-unintelligible override: score ${score} → 60`);
+        score = 60;
       }
 
       res.json({ score, feedback, corrections });
