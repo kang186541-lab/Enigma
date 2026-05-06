@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { checkAchievements } from "@/lib/achievementManager";
 import { addWeeklyXP } from "@/lib/leagueManager";
@@ -255,6 +255,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     accuracy: 0,
     xp: 0,
   });
+  const statsRef = useRef(stats);
+
+  useEffect(() => {
+    statsRef.current = stats;
+  }, [stats]);
 
   useEffect(() => {
     (async () => {
@@ -272,7 +277,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           }
         }
         if (statsStr) {
-          setStats(JSON.parse(statsStr));
+          const savedStats = JSON.parse(statsStr);
+          statsRef.current = savedStats;
+          setStats(savedStats);
         }
       } catch (e) {
         console.warn('[LanguageContext] Failed to load saved preferences:', e);
@@ -300,12 +307,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const updateStats = async (updates: Partial<UserStats>) => {
-    const oldLevel = getLevel(stats.xp);
-    const newStats = { ...stats, ...updates };
+    const currentStats = statsRef.current;
+    const oldLevel = getLevel(currentStats.xp);
+    const newStats = { ...currentStats, ...updates };
     const newLevel = getLevel(newStats.xp);
     if (newLevel.num > oldLevel.num) {
       setPendingLevelUp(newLevel);
     }
+    statsRef.current = newStats;
     setStats(newStats);
     await AsyncStorage.setItem("@lingua_stats", JSON.stringify(newStats));
 
@@ -313,8 +322,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     checkAchievements({ stats: newStats }).catch((e) => console.warn('[Achievements] check failed:', e));
 
     // Fire-and-forget: track weekly XP if XP changed
-    if (updates.xp !== undefined && updates.xp > stats.xp) {
-      addWeeklyXP(updates.xp - stats.xp).catch((e) => console.warn('[League] weekly XP update failed:', e));
+    if (updates.xp !== undefined && updates.xp > currentStats.xp) {
+      addWeeklyXP(updates.xp - currentStats.xp).catch((e) => console.warn('[League] weekly XP update failed:', e));
     }
   };
 

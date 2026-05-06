@@ -6285,6 +6285,7 @@ export default function StoryScene() {
   const { nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
   const lang = nativeLanguage ?? "english";
   const learningLang = learningLanguage ?? "english";
+  const statsRef = useRef(stats);
 
   const story = STORIES[id ?? "london"] ?? STORIES.london;
   const [seqIdx, setSeqIdx] = useState(0);
@@ -6304,6 +6305,20 @@ export default function StoryScene() {
   const introNativeLang = lang === "korean" || lang === "spanish" ? lang : "english";
   const forceIntro = intro === "1" || intro === "true";
   const audioMuted = mute === "1" || mute === "true";
+
+  useEffect(() => {
+    statsRef.current = stats;
+  }, [stats]);
+
+  async function awardXp(amount: number, source: string) {
+    const nextStats = { ...statsRef.current, xp: statsRef.current.xp + amount };
+    statsRef.current = nextStats;
+    try {
+      await updateStats({ xp: nextStats.xp });
+    } catch (e) {
+      console.warn(`[Story] ${source} XP update failed:`, e);
+    }
+  }
 
   const completeIntro = useCallback(async () => {
     try {
@@ -6464,7 +6479,7 @@ export default function StoryScene() {
     setXpEarned(earned);
     setCompleted(true);
     await markChapterComplete(story.id, story.nextChapterId);
-    try { await updateStats({ xp: stats.xp + earned }); } catch (e) { console.warn("[Story] finishChapter XP update failed:", e); }
+    await awardXp(earned, "finishChapter");
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }
 
@@ -6474,7 +6489,7 @@ export default function StoryScene() {
   }
 
   async function handlePuzzleSolved() {
-    try { await updateStats({ xp: stats.xp + 20 }); } catch (e) { console.warn('[Story] handlePuzzleSolved XP update failed:', e); }
+    await awardXp(20, "handlePuzzleSolved");
 
     // Track expressions and I/O ratio for inline puzzles
     const currentItem = seq[seqIdx];
