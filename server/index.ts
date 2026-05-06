@@ -28,21 +28,26 @@ function setupCors(app: express.Application) {
       });
     }
 
+    if (process.env.CORS_ALLOWED_ORIGINS) {
+      process.env.CORS_ALLOWED_ORIGINS.split(",").forEach((allowedOrigin) => {
+        const trimmedOrigin = allowedOrigin.trim();
+        if (trimmedOrigin) origins.add(trimmedOrigin);
+      });
+    }
+
     const origin = req.header("origin");
+    const isDev = process.env.NODE_ENV !== "production";
 
-    // Allow localhost origins for Expo web development (any port)
+    // Allow localhost origins for Expo web development only.
     const isLocalhost =
-      origin?.startsWith("http://localhost:") ||
-      origin?.startsWith("http://127.0.0.1:");
-
-    // Allow Railway/production domains and Vercel
-    const isRailway = origin?.endsWith(".railway.app");
-    const isVercel = origin?.endsWith(".vercel.app");
+      isDev &&
+      (origin?.startsWith("http://localhost:") ||
+        origin?.startsWith("http://127.0.0.1:"));
 
     // Allow requests with no origin (mobile apps, Expo Go, curl)
     const noOrigin = !origin;
 
-    if (noOrigin || origins.has(origin!) || isLocalhost || isRailway || isVercel) {
+    if (noOrigin || origins.has(origin!) || isLocalhost) {
       if (origin) {
         res.header("Access-Control-Allow-Origin", origin);
       } else {
@@ -52,7 +57,10 @@ function setupCors(app: express.Application) {
         "Access-Control-Allow-Methods",
         "GET, POST, PUT, DELETE, OPTIONS",
       );
-      res.header("Access-Control-Allow-Headers", "Content-Type");
+      res.header(
+        "Access-Control-Allow-Headers",
+        req.header("Access-Control-Request-Headers") || "Content-Type, Authorization",
+      );
       res.header("Access-Control-Allow-Credentials", "true");
     }
 
@@ -81,23 +89,12 @@ function setupRequestLogging(app: express.Application) {
   app.use((req, res, next) => {
     const start = Date.now();
     const path = req.path;
-    let capturedJsonResponse: Record<string, unknown> | undefined = undefined;
-
-    const originalResJson = res.json;
-    res.json = function (bodyJson, ...args) {
-      capturedJsonResponse = bodyJson;
-      return originalResJson.apply(res, [bodyJson, ...args]);
-    };
 
     res.on("finish", () => {
       if (!path.startsWith("/api")) return;
 
       const duration = Date.now() - start;
-
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
 
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";

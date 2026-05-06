@@ -14,6 +14,7 @@ import {
   Modal,
   AppState,
   ActivityIndicator,
+  ImageSourcePropType,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as FileSystem from "expo-file-system/legacy";
@@ -30,8 +31,21 @@ import { getApiUrl, apiRequest } from "@/lib/query-client";
 import { addToExpressionBook, trackQuizIO, markExpressionsMastered } from "@/lib/storyUtils";
 import { checkAnswer, AnswerResult } from "@/lib/answerUtils";
 import { Svg, Path } from "react-native-svg";
+import Typewriter, { TypewriterHandle } from "@/components/story/Typewriter";
+import StoryIntroMotionComic from "@/components/story/StoryIntroMotionComic";
+import { hasIntroTimeline } from "@/components/story/intro/timelines";
+import type { ChapterId } from "@/components/story/intro/timelines/types";
+import BossSpellPuzzle, { BossSpellQuestion } from "@/components/story/puzzles/BossSpellPuzzle";
 
 const rudyStoryImg = require("@/assets/rudy_story.png");
+const ch1BossDoorImg = require("@/assets/story/chapter1_motion_comic/ch1_boss_door.png");
+const ch1TomPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_tom.png");
+const ch1EleanorPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_eleanor.png");
+const ch2BossStageImg = require("@/assets/story/chapter2_motion_comic/ch2_boss_stage.png");
+const ch3BossPalaceImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace.png");
+const ch4BossArchiveImg = require("@/assets/story/chapter4_motion_comic/ch4_boss_archive.png");
+const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
+const ch5BlackFaceImg = require("@/assets/story/chapter5_motion_comic/ch5_intro_black_face.png");
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
 // Keyed by "text::lang". Sounds are loaded in advance; on press we just replay.
@@ -143,6 +157,7 @@ interface Character {
   side: "left" | "right";
   avatarBg: string;
   isLingo?: boolean;
+  portrait?: ImageSourcePropType;
 }
 
 interface Tri {
@@ -247,6 +262,7 @@ type PuzzleType =
   | { pType: "listen-choose"; questions: ListenChooseQ[] }
   | { pType: "pronunciation"; questions: PronunciationQ[] }
   | { pType: "writing-mission"; questions: WritingMissionQ[] }
+  | { pType: "boss-spell"; questions: [BossSpellQuestion] }
   | { pType: "cipher"; questions: CipherQ[] }
   | { pType: "word-puzzle"; questions: WordPuzzleQ[] }
   | { pType: "voice-power"; questions: VoicePowerQ[] }
@@ -337,7 +353,7 @@ type TPRSMeta = {
   };
 };
 
-type SeqPuzzle = { kind: "puzzle"; puzzleNum?: number; hints?: PuzzleHints } & PuzzleType & TPRSMeta;
+type SeqPuzzle = { kind: "puzzle"; puzzleNum?: number; title?: Tri; context?: Tri; hints?: PuzzleHints } & PuzzleType & TPRSMeta;
 type SeqItem = SeqScene | SeqClue | SeqPuzzle;
 
 interface Story {
@@ -606,6 +622,16 @@ const STORIES: Record<string, Story> = {
         nameKo: "톰",
         side: "right",
         avatarBg: "#1E2A3A",
+        portrait: ch1TomPortraitImg,
+      },
+      {
+        id: "eleanor",
+        emoji: "👩‍🏫",
+        name: "Eleanor",
+        nameKo: "엘리너",
+        side: "right",
+        avatarBg: "#2F2A3A",
+        portrait: ch1EleanorPortraitImg,
       },
       {
         id: "ellis",
@@ -625,37 +651,14 @@ const STORIES: Record<string, Story> = {
       },
     ],
     sequence: [
-      // ── Scene 1: The Hook ──────────────────────────────────────────────────
+      // ── Scene 1: After the Prologue ───────────────────────────────────────
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "3:47 AM. Your phone screams. Not a ring — a scream. The kind of sound that means someone already tried calling three times before this. The caller ID says: Eleanor — the curator of the British Museum's Ancient Languages wing.",
-        textKo: "새벽 3시 47분. 핸드폰이 비명을 질러. 벨소리가 아니야 — 비명. 이미 세 번이나 전화한 뒤에야 들리는 종류의 소리. 발신자 표시: 엘리너 — 대영박물관 고대 언어관 큐레이터.",
-        textEs: "3:47 AM. Tu teléfono grita. No suena — grita. Esa clase de sonido que significa que alguien ya intentó llamar tres veces antes. El identificador dice: Eleanor — la curadora del ala de Lenguas Antiguas del Museo Británico.",
-      },
-      {
-        kind: "scene",
-        charId: "lingo",
-        text: "Partner! Wake up. Now. Eleanor just called — something happened at the British Museum. Something bad. A linguist named Dr. Ellis was found twenty minutes ago. She's alive, but... she can't speak. Not a single word. Not in English, not in any language. Just silence. Like someone reached into her brain and pulled the plug on language itself.",
-        textKo: "파트너! 일어나. 지금 당장. 엘리너한테서 전화가 왔어 — 대영박물관에서 무슨 일이 생겼대. 안 좋은 일. 엘리스 박사라는 언어학자가 20분 전에 발견됐어. 살아 있긴 한데... 말을 못 해. 단어 하나도. 영어로도, 어떤 언어로도 안 돼. 그냥 침묵. 마치 누군가 뇌에 손을 넣어서 언어의 플러그를 뽑아버린 것처럼.",
-        textKoMix: "파트너! 일어나. 지금 당장. 엘리너한테서 전화가 왔어 — 대영박물관에서 무슨 일이 생겼대. 안 좋은 일. 엘리스 박사라는 언어학자가 20분 전에 발견됐어. 살아 있긴 한데... 말을 못 해. No — 단어 하나도 안 돼. 그냥 침묵. Help도 못 해. 마치 누군가 언어의 플러그를 뽑아버린 것처럼.",
-        textEs: "¡Compañero! Despierta. Ahora. Eleanor acaba de llamar — algo pasó en el Museo Británico. Algo malo. Una lingüista llamada Dra. Ellis fue encontrada hace veinte minutos. Está viva, pero... no puede hablar. Ni una palabra. Ni en inglés, ni en ningún idioma. Solo silencio. Como si alguien entrara en su cerebro y desconectara el lenguaje.",
-        textEsMix: "¡Compañero! Despierta. Ahora. Eleanor acaba de llamar — algo pasó en el Museo Británico. Algo malo. Una lingüista llamada Dra. Ellis fue encontrada hace veinte minutos. Está viva, pero... no puede hablar. No — ni una palabra. Solo silencio. Help tampoco puede decir. Como si alguien desconectara el lenguaje.",
-      },
-      {
-        kind: "scene",
-        charId: "lingo",
-        text: "And partner — the Guardian Stone is gone. You know, the relic Eleanor protects in the Ancient Languages wing? The one they say holds the power to erase languages from human memory? Yeah. That one. Gone. Witnesses saw a man in a black coat leaving the building. No rush. No running. Just... walking out like he owned the place.",
-        textKo: "그리고 파트너 — 수호석이 사라졌어. 알지, 엘리너가 고대 언어관에서 보호하던 유물? 인간의 기억에서 언어를 지울 수 있는 힘을 가졌다는 그것 말이야. 응. 그거. 사라졌어. 목격자들이 검은 코트를 입은 남자가 건물을 나가는 걸 봤대. 서두르지도 않고. 뛰지도 않고. 그냥... 자기 집인 것처럼 걸어 나갔대.",
-        textEs: "Y compañero — la Piedra Guardiana desapareció. Ya sabes, la reliquia que Eleanor protege en el ala de Lenguas Antiguas. La que dicen que tiene el poder de borrar idiomas de la memoria humana. Sí. Esa. Desapareció. Testigos vieron a un hombre con abrigo negro saliendo del edificio. Sin prisa. Sin correr. Solo... caminando como si fuera el dueño del lugar.",
-      },
-      {
-        kind: "scene",
-        charId: "lingo",
-        text: "Get dressed. We're going to the museum. I know it's the middle of the night and I know you just started learning. But that's exactly why I need you. Whoever did this is playing a game with language — and I need someone with fresh eyes. Someone who's still learning the basics. Trust me, that's going to matter. I'll explain on the way.",
-        textKo: "옷 입어. 박물관으로 가자. 한밤중인 거 알고, 방금 공부 시작한 것도 알아. 하지만 그래서 네가 필요한 거야. 이걸 한 놈은 언어를 가지고 게임을 하고 있어 — 나한테는 신선한 눈이 필요해. 아직 기초를 배우고 있는 사람. 날 믿어, 그게 중요해질 거야. 가면서 설명할게.",
-        textEs: "Vístete. Vamos al museo. Sé que es de madrugada y sé que recién empezaste a aprender. Pero por eso te necesito. Quien hizo esto está jugando con el lenguaje — y necesito a alguien con ojos frescos. Alguien que todavía esté aprendiendo lo básico. Créeme, eso va a importar. Te explico en el camino.",
+        text: "(The last frame of the CCTV still burns in your mind: the black coat, the stolen light, the word Detective written for you. Rudy hovers beside your phone, newly named and still shedding tiny sparks. The museum in the footage is close. Too close.)",
+        textKo: "(CCTV의 마지막 장면이 아직 머릿속에 남아 있다. 검은 코트, 훔쳐간 빛, 그리고 너를 향한 Detective라는 단어. 방금 이름을 되찾은 루디가 핸드폰 옆에 떠 있고, 아직 작은 불꽃들이 흩어진다. 영상 속 박물관은 가깝다. 너무 가깝다.)",
+        textEs: "(El último fotograma del CCTV sigue ardiendo en tu mente: el abrigo negro, la luz robada, la palabra Detective escrita para ti. Rudy flota junto a tu teléfono, recién nombrado, todavía soltando pequeñas chispas. El museo del video está cerca. Demasiado cerca.)",
       },
       // ── Scene 2: The Museum Entrance ──────────────────────────────────────
       {
@@ -669,31 +672,31 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "tom",
-        text: "Oi. Museum's closed, yeah? Crime scene. No visitors, no press, no exceptions. I don't care if you're the Queen's cousin — nobody gets past me tonight. So who are you, then?",
-        textKo: "야. 박물관 닫았어, 알겠지? 범죄 현장이야. 방문객도 안 돼, 기자도 안 돼, 예외 없어. 여왕 사촌이래도 상관없어 — 오늘 밤엔 아무도 나를 지나갈 수 없어. 그래서 누구야, 넌?",
-        textKoMix: "야. 박물관 닫았어, 알겠지? No visitors, no exceptions. 여왕 사촌이래도 상관없어 — 오늘 밤엔 아무도 못 지나가. My name is Tom. 그래서 넌 누구야?",
-        textEs: "Oye. El museo está cerrado, ¿vale? Escena del crimen. No visitantes, no prensa, sin excepciones. Me da igual si eres primo de la Reina — nadie pasa esta noche. ¿Así que quién eres?",
-        textEsMix: "Oye. El museo está cerrado, ¿vale? No visitors, no exceptions. Me da igual si eres primo de la Reina — nadie pasa esta noche. My name is Tom. ¿Así que quién eres?",
+        text: "Oi. Museum's closed, yeah? Crime scene. No visitors, no press, no exceptions. I don't care if you're the Queen's cousin, nobody gets past me tonight. So who are you, then?",
+        textKo: "야. 박물관 닫았어, 알겠지? 범죄 현장이야. 방문객도 안 돼, 기자도 안 돼, 예외 없어. 여왕 사촌이래도 상관없어. 오늘 밤엔 아무도 나를 지나갈 수 없어. 그래서 누구야, 넌?",
+        textKoMix: "야. 박물관 닫았어, 알겠지? No visitors, no exceptions. 여왕 사촌이래도 상관없어. 오늘 밤엔 아무도 못 지나가. My name is Tom. 그래서 넌 누구야?",
+        textEs: "Oye. El museo está cerrado, ¿vale? Escena del crimen. No visitantes, no prensa, sin excepciones. Me da igual si eres primo de la Reina, nadie pasa esta noche. ¿Así que quién eres?",
+        textEsMix: "Oye. El museo está cerrado, ¿vale? No visitors, no exceptions. Me da igual si eres primo de la Reina, nadie pasa esta noche. My name is Tom. ¿Así que quién eres?",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Psst. Partner — before we talk to Tom, let's review some key words first. Greetings, introductions, basic phrases. If we know the vocabulary, the conversation will go smoothly.)",
-        textKo: "(쉿. 파트너 — 톰에게 말하기 전에 먼저 핵심 단어들을 복습하자. 인사, 자기소개, 기초 표현들. 어휘를 알면 대화가 수월할 거야.)",
-        textEs: "(Psst. Compañero — antes de hablar con Tom, repasemos algunas palabras clave primero. Saludos, presentaciones, frases básicas. Si conocemos el vocabulario, la conversación será más fácil.)",
+        text: "(Psst. Partner, before we talk to Tom, let's review some key words first. Greetings, introductions, basic phrases. If we know the vocabulary, the conversation will go smoothly.)",
+        textKo: "(쉿. 파트너, 톰에게 말하기 전에 먼저 핵심 단어들을 복습하자. 인사, 자기소개, 기초 표현들. 어휘를 알면 대화가 수월할 거야.)",
+        textEs: "(Psst. Compañero, antes de hablar con Tom, repasemos algunas palabras clave primero. Saludos, presentaciones, frases básicas. Si conocemos el vocabulario, la conversación será más fácil.)",
       },
       {
         kind: "puzzle",
         puzzleNum: 1,
         pType: "word-match",
         tprsStage: 1,
-        targetExpressions: ["Hello", "Goodbye", "Where is ___?", "I am a ___"],
+        targetExpressions: ["Hello", "Help me", "Where is ___?", "My name is ___", "Thank you", "Goodbye"],
         previouslyLearned: [],
         speakAfter: true,
         storyReason: "Tom is testing whether you understand basic phrases before letting you into the crime scene.",
         storyConsequence: "Tom lets you through. The investigation begins.",
-        onFail: { addToWeakExpressions: ["Hello", "Goodbye"], reviewInDailyCourse: true, reviewDays: 3 },
+        onFail: { addToWeakExpressions: ["Hello", "Help me", "Thank you", "Goodbye"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
             word: { en: "Hello", ko: "안녕하세요", es: "Hola" },
@@ -705,10 +708,10 @@ const STORIES: Record<string, Story> = {
             ],
           },
           {
-            word: { en: "Goodbye", ko: "안녕히 계세요", es: "Adiós" },
-            meaning: { en: "a farewell, said when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida, dicha al irse" },
+            word: { en: "Help me", ko: "도와주세요", es: "Ayúdame" },
+            meaning: { en: "asking someone to help you", ko: "누군가에게 도움을 요청하는 표현", es: "pedirle ayuda a alguien" },
             wrong: [
-              { en: "a greeting when arriving", ko: "도착할 때 하는 인사", es: "un saludo al llegar" },
+              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse" },
               { en: "an expression of thanks", ko: "감사 표현", es: "una expresión de agradecimiento" },
               { en: "asking for directions", ko: "길을 묻는 것", es: "pedir direcciones" },
             ],
@@ -723,63 +726,81 @@ const STORIES: Record<string, Story> = {
             ],
           },
           {
-            word: { en: "I am a...", ko: "저는...입니다", es: "Soy un/una..." },
-            meaning: { en: "stating your job or role", ko: "직업이나 역할을 말하는 것", es: "decir tu trabajo o rol" },
+            word: { en: "My name is...", ko: "제 이름은...입니다", es: "Mi nombre es..." },
+            meaning: { en: "telling someone your name", ko: "자기 이름을 말하는 표현", es: "decirle tu nombre a alguien" },
             wrong: [
               { en: "saying where you live", ko: "사는 곳을 말하는 것", es: "decir dónde vives" },
               { en: "asking how someone is feeling", ko: "누군가의 기분을 묻는 것", es: "preguntar cómo se siente alguien" },
               { en: "saying thank you", ko: "감사하다고 말하는 것", es: "dar las gracias" },
             ],
           },
+          {
+            word: { en: "Thank you", ko: "감사합니다", es: "Gracias" },
+            meaning: { en: "thanking someone for help", ko: "도움을 준 사람에게 감사하는 표현", es: "dar las gracias por la ayuda" },
+            wrong: [
+              { en: "asking where something is", ko: "어디 있는지 묻는 것", es: "preguntar dónde está algo" },
+              { en: "telling someone your name", ko: "자기 이름을 말하는 것", es: "decir tu nombre" },
+              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse" },
+            ],
+          },
+          {
+            word: { en: "Goodbye", ko: "안녕히 계세요", es: "Adiós" },
+            meaning: { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse" },
+            wrong: [
+              { en: "a greeting when arriving", ko: "도착할 때 하는 인사", es: "un saludo al llegar" },
+              { en: "asking for help", ko: "도움을 요청하는 것", es: "pedir ayuda" },
+              { en: "an expression of thanks", ko: "감사 표현", es: "una expresión de agradecimiento" },
+            ],
+          },
         ],
         hints: {
-          h1: { ko: "런던에서 배운 단어들이야 — 인사, 작별, 위치, 직업", en: "These are words you learned in London — greeting, farewell, location, job", es: "Estas son palabras que aprendiste en Londres — saludo, despedida, lugar, trabajo" },
-          h2: { ko: "톰에게 했던 자기소개와 범죄 현장에서 들은 단어들이야", en: "Words from your self-introduction to Tom and clues from the crime scene", es: "Palabras de tu presentación a Tom y pistas de la escena del crimen" },
-          h3: { ko: "Hello=인사 / Goodbye=작별 / Where is=장소 질문 / I am a=직업 말하기", en: "Hello=greeting / Goodbye=farewell / Where is=location question / I am a=stating job", es: "Hola=saludo / Adiós=despedida / Dónde está=pregunta de lugar / Soy un=decir trabajo" },
+          h1: { ko: "프롤로그와 입구에서 이미 본 말들이야 — 인사, 도움 요청, 위치, 이름, 감사, 작별", en: "These are words from the prologue and the museum gate — greeting, help, location, name, thanks, farewell", es: "Son palabras del prólogo y la entrada del museo — saludo, ayuda, lugar, nombre, gracias, despedida" },
+          h2: { ko: "Tom에게 말하려면 먼저 자신을 밝히고, 왜 왔는지 말해야 해", en: "To talk to Tom, first show who you are and why you came", es: "Para hablar con Tom, primero muestra quién eres y por qué viniste" },
+          h3: { ko: "Hello=인사 / Help me=도움 요청 / Where is=장소 질문 / My name is=이름 / Thank you=감사 / Goodbye=작별", en: "Hello=greeting / Help me=requesting help / Where is=location question / My name is=name / Thank you=thanks / Goodbye=farewell", es: "Hola=saludo / Ayúdame=pedir ayuda / Dónde está=lugar / Mi nombre es=nombre / Gracias=gracias / Adiós=despedida" },
         },
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Good — now you know the key words. Time to use them with Tom. He's not going to let us in unless we answer his questions. Pick the right responses — show him we belong here.)",
-        textKo: "(좋아 — 이제 핵심 단어들을 알았지. 톰에게 써먹을 차례야. 질문에 대답하지 않으면 안 들여보내줄 거야. 올바른 대답을 골라 — 우리가 여기 있을 이유가 있다는 걸 보여줘.)",
-        textEs: "(Bien — ahora conoces las palabras clave. Es hora de usarlas con Tom. No nos dejará pasar a menos que respondamos sus preguntas. Elige las respuestas correctas — demuestra que pertenecemos aquí.)",
+        text: "(Good. Now you know the key words. Time to use them with Tom. He's not going to let us in unless we answer his questions. Pick the right responses, show him we belong here.)",
+        textKo: "(좋아. 이제 핵심 단어들을 알았지. 톰에게 써먹을 차례야. 질문에 대답하지 않으면 안 들여보내줄 거야. 올바른 대답을 골라. 우리가 여기 있을 이유가 있다는 걸 보여줘.)",
+        textEs: "(Bien. Ahora conoces las palabras clave. Es hora de usarlas con Tom. No nos dejará pasar a menos que respondamos sus preguntas. Elige las respuestas correctas, demuestra que pertenecemos aquí.)",
       },
       {
         kind: "puzzle",
         puzzleNum: 2,
         pType: "dialogue-choice",
         tprsStage: 2,
-        targetExpressions: ["Nice to meet you", "I don't understand", "Can you say that again?"],
-        previouslyLearned: ["Hello", "Goodbye", "Where is ___?", "I am a ___"],
+        targetExpressions: ["Hello", "My name is ___", "Help me", "Where is ___?", "Thank you", "Goodbye"],
+        previouslyLearned: ["Hello", "Help me", "Where is ___?", "My name is ___", "Thank you", "Goodbye"],
         speakAfter: true,
-        storyReason: "Eleanor is speaking quickly about the stolen stone. Choose the right response to get more information.",
-        storyConsequence: "Eleanor reveals the cipher found at the crime scene.",
-        onFail: { addToWeakExpressions: ["Nice to meet you", "I don't understand"], reviewInDailyCourse: true, reviewDays: 3 },
+        storyReason: "Tom will only open the museum if you can answer like a real beginner detective.",
+        storyConsequence: "Tom lets you through and points you toward Eleanor.",
+        onFail: { addToWeakExpressions: ["Hello", "My name is ___", "Help me", "Thank you", "Goodbye"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
             prompt: { en: "Tom asks: 'Who are you?' How do you greet him?", ko: "톰이 묻는다: '넌 누구야?' 어떻게 인사할까?", es: "Tom pregunta: '¿Quién eres?' ¿Cómo lo saludas?" },
             context: { en: "You need to make a good first impression on the guard.", ko: "경비원에게 좋은 첫인상을 남겨야 한다.", es: "Necesitas causar una buena primera impresión al guardia." },
-            answer: { en: "Hello! My name is... Nice to meet you.", ko: "안녕하세요! 제 이름은... 만나서 반갑습니다.", es: "¡Hola! Mi nombre es... Mucho gusto." },
+            answer: { en: "Hello! My name is...", ko: "안녕하세요! 제 이름은...입니다.", es: "¡Hola! Mi nombre es..." },
             wrong: [
               { en: "Goodbye! I don't understand!", ko: "안녕히 계세요! 이해 못 해요!", es: "¡Adiós! ¡No entiendo!" },
               { en: "Sorry! Where is the exit?", ko: "죄송합니다! 출구가 어디예요?", es: "¡Perdón! ¿Dónde está la salida?" },
             ],
           },
           {
-            prompt: { en: "Tom asks: 'Where are you from?'", ko: "톰이 묻는다: '어디서 왔어?'", es: "Tom pregunta: '¿De dónde eres?'" },
-            context: { en: "Tell him where you're from to build trust.", ko: "어디서 왔는지 말해서 신뢰를 쌓아야 한다.", es: "Dile de dónde eres para generar confianza." },
-            answer: { en: "I'm from... I am here to help with the investigation.", ko: "저는...에서 왔습니다. 수사를 도우러 왔어요.", es: "Soy de... Estoy aquí para ayudar con la investigación." },
+            prompt: { en: "Tom asks: 'Why are you here?'", ko: "톰이 묻는다: '왜 여기 온 거야?'", es: "Tom pregunta: '¿Por qué estás aquí?'" },
+            context: { en: "You need to connect your words to the case.", ko: "네 말이 사건과 연결되어 있다는 걸 보여줘야 한다.", es: "Necesitas conectar tus palabras con el caso." },
+            answer: { en: "I am here to help. Where is Dr. Ellis?", ko: "도우러 왔습니다. 엘리스 박사는 어디에 있나요?", es: "Estoy aquí para ayudar. ¿Dónde está la Dra. Ellis?" },
             wrong: [
               { en: "I'm fine, thank you. How are you?", ko: "잘 지내요, 감사합니다. 어떻게 지내세요?", es: "Estoy bien, gracias. ¿Cómo estás?" },
               { en: "Goodbye! See you tomorrow!", ko: "안녕히 계세요! 내일 봐요!", es: "¡Adiós! ¡Nos vemos mañana!" },
             ],
           },
           {
-            prompt: { en: "Tom asks: 'What do you do? What's your job?'", ko: "톰이 묻는다: '뭐하는 사람이야? 직업이 뭐야?'", es: "Tom pregunta: '¿A qué te dedicas? ¿Cuál es tu trabajo?'" },
-            context: { en: "Tell him your role to prove you belong here.", ko: "여기 있을 이유가 있다는 걸 증명하기 위해 역할을 말해야 한다.", es: "Dile tu rol para probar que perteneces aquí." },
-            answer: { en: "I am a detective's partner. I work with Rudy.", ko: "저는 탐정의 파트너입니다. 루디와 일해요.", es: "Soy compañero del detective. Trabajo con Rudy." },
+            prompt: { en: "Tom sighs: 'Fine. If I let you in, what do you say?'", ko: "톰이 한숨 쉰다: '좋아. 들여보내주면 뭐라고 해야 하지?'", es: "Tom suspira: 'Bien. Si te dejo entrar, ¿qué dices?'" },
+            context: { en: "Use the polite word that proves you understand the favor.", ko: "도움을 받았다는 걸 아는 예의 바른 표현을 써야 한다.", es: "Usa la palabra cortés que demuestra que entiendes el favor." },
+            answer: { en: "Thank you. Goodbye later, Tom.", ko: "감사합니다. 작별 인사는 나중에 할게요, 톰.", es: "Gracias. Adiós más tarde, Tom." },
             wrong: [
               { en: "I am a tourist. Where is the gift shop?", ko: "저는 관광객이에요. 기념품 가게가 어디예요?", es: "Soy turista. ¿Dónde está la tienda de regalos?" },
               { en: "I don't understand. Please help.", ko: "이해 못 해요. 도와주세요.", es: "No entiendo. Por favor ayuda." },
@@ -787,9 +808,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "자기소개를 해야 해 — 이름, 출신, 직업. 기초 표현들을 써봐", en: "You need to introduce yourself — name, origin, job. Use basic phrases", es: "Necesitas presentarte — nombre, origen, trabajo. Usa frases básicas" },
-          h2: { ko: "Hello로 시작, I'm from...으로 출신 말하기, I am a...로 직업 말하기", en: "Start with Hello, use I'm from... for origin, I am a... for job", es: "Empieza con Hola, usa Soy de... para el origen, Soy un... para el trabajo" },
-          h3: { ko: "Q1: Hello + My name is / Q2: I'm from... / Q3: I am a detective's partner", en: "Q1: Hello + My name is / Q2: I'm from... / Q3: I am a detective's partner", es: "P1: Hola + Mi nombre es / P2: Soy de... / P3: Soy compañero del detective" },
+          h1: { ko: "Tom에게는 세 가지가 필요해 — 인사, 이름, 도우러 온 이유", en: "Tom needs three things — a greeting, your name, and why you came to help", es: "Tom necesita tres cosas — saludo, nombre y por qué viniste a ayudar" },
+          h2: { ko: "Hello로 시작하고, My name is로 밝히고, Help/Where is로 사건에 연결해", en: "Start with Hello, use My name is, then connect it to Help and Where is", es: "Empieza con Hola, usa Mi nombre es, y conéctalo con ayuda y dónde está" },
+          h3: { ko: "Q1: Hello + My name is / Q2: Help + Where is / Q3: Thank you + Goodbye", en: "Q1: Hello + My name is / Q2: Help + Where is / Q3: Thank you + Goodbye", es: "P1: Hola + Mi nombre es / P2: ayuda + dónde está / P3: Gracias + Adiós" },
         },
       },
       {
@@ -797,9 +818,9 @@ const STORIES: Record<string, Story> = {
         charId: "tom",
         text: "Huh. Alright then. Didn't expect that, to be honest. Most people who show up at 4 AM can't even string a sentence together. You lot? Not bad. Not bad at all. Go on in, then. Break a leg, mate!",
         textKo: "흠. 그래. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 제대로 못 만들거든. 너희? 나쁘지 않아. 전혀. 들어가, 그럼. Break a leg, mate!",
-        textKoMix: "흠. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 못 만들거든. 너희? Not bad. 전혀. 들어가, 그럼. Goodbye는 아직 아니야 — Break a leg, mate!",
+        textKoMix: "흠. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 못 만들거든. 너희? Not bad. 전혀. 들어가, 그럼. Goodbye는 아직 아니야. Break a leg, mate!",
         textEs: "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoría de los que aparecen a las 4 AM ni pueden armar una frase. ¿Ustedes? Nada mal. Nada mal. Pasen, entonces. Break a leg, mate!",
-        textEsMix: "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoría que aparecen a las 4 AM ni pueden armar una frase. ¿Ustedes? Not bad. Nada mal. Pasen, entonces. Goodbye todavía no — Break a leg, mate!",
+        textEsMix: "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoría que aparecen a las 4 AM ni pueden armar una frase. ¿Ustedes? Not bad. Nada mal. Pasen, entonces. Goodbye todavía no. Break a leg, mate!",
         idiomRef: "idiom_tom_1",
       },
       {
@@ -808,274 +829,236 @@ const STORIES: Record<string, Story> = {
         titleEn: "Investigation Notes: Good Luck Around the World",
         titleKo: "수사 노트: 세계의 행운 표현",
         titleEs: "Notas de Investigación: Buena Suerte en el Mundo",
-        descEn: "Tom said 'Break a leg!' — a British theatre superstition. Saying 'good luck' directly is considered bad luck, so actors say the opposite instead. Every culture has its own way to wish someone well without saying it directly. Language is full of these hidden meanings.",
-        descKo: "톰이 'Break a leg!'이라고 했어 — 영국 극장의 미신이야. '행운을 빌어'라고 직접 말하면 불운하다고 여겨서, 배우들은 반대로 말해. 모든 문화에는 직접 말하지 않고 행운을 비는 고유한 표현이 있어. 언어에는 이런 숨겨진 의미가 가득해.",
-        descEs: "Tom dijo 'Break a leg!' — una superstición del teatro británico. Decir 'buena suerte' directamente se considera mala suerte, así que los actores dicen lo contrario. Cada cultura tiene su propia forma de desear suerte sin decirlo directamente. El lenguaje está lleno de estos significados ocultos.",
+        descEn: "Tom said 'Break a leg!', a British theatre superstition. Saying 'good luck' directly is considered bad luck, so actors say the opposite instead. Every culture has its own way to wish someone well without saying it directly. Language is full of these hidden meanings.",
+        descKo: "톰이 'Break a leg!'이라고 했어, 영국 극장의 미신이야. '행운을 빌어'라고 직접 말하면 불운하다고 여겨서, 배우들은 반대로 말해. 모든 문화에는 직접 말하지 않고 행운을 비는 고유한 표현이 있어. 언어에는 이런 숨겨진 의미가 가득해.",
+        descEs: "Tom dijo 'Break a leg!', una superstición del teatro británico. Decir 'buena suerte' directamente se considera mala suerte, así que los actores dicen lo contrario. Cada cultura tiene su propia forma de desear suerte sin decirlo directamente. El lenguaje está lleno de estos significados ocultos.",
       },
-      // ── Scene 3: The Crime Scene ──────────────────────────────────────────
+      // ── Scene 3: The Empty Case ───────────────────────────────────────────
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Inside the museum. Emergency lights cast long shadows across the marble floors. The Ancient Languages wing is behind police tape. In the center of the room: an empty display case. The glass isn't broken. The lock isn't forced. The Guardian Stone simply isn't there anymore, as if it decided to leave.)",
-        textKo: "(박물관 내부. 비상등이 대리석 바닥 위로 긴 그림자를 드리운다. 고대 언어관이 경찰 테이프 뒤에 있다. 방 한가운데: 빈 진열장. 유리는 깨지지 않았다. 자물쇠도 강제로 열리지 않았다. 수호석이 그냥 사라졌다, 마치 스스로 떠나기로 한 것처럼.)",
-        textEs: "(Dentro del museo. Las luces de emergencia proyectan sombras largas sobre los pisos de mármol. El ala de Lenguas Antiguas está detrás de la cinta policial. En el centro de la sala: una vitrina vacía. El vidrio no está roto. La cerradura no fue forzada. La Piedra Guardiana simplemente ya no está, como si decidiera irse.)",
+        text: "(Inside the museum. Emergency lights cast long shadows across the marble floor. In the Ancient Languages wing, a glass case stands open without a single crack. The London Stone is gone. Not smashed. Not stolen by force. Gone as if the word that held it here had been erased.)",
+        textKo: "(박물관 내부. 비상등이 대리석 바닥 위로 긴 그림자를 드리운다. 고대 언어관 한가운데, 유리 진열장이 금 하나 없이 열려 있다. London Stone이 사라졌다. 부서진 것도 아니고, 억지로 훔친 것도 아니다. 그것을 이곳에 붙잡아 두던 단어가 지워진 것처럼 사라졌다.)",
+        textEs: "(Dentro del museo. Las luces de emergencia proyectan sombras largas sobre el mármol. En el ala de Lenguas Antiguas, una vitrina está abierta sin una sola grieta. La London Stone desapareció. No rota. No robada por la fuerza. Desaparecida como si hubieran borrado la palabra que la mantenía allí.)",
+      },
+      {
+        kind: "scene",
+        charId: "eleanor",
+        text: "You came. Good. I am Eleanor Vale, assistant curator to Dr. Ellis. Or... I was. She is missing. The cafe footage is the last confirmed image we have. No body, no ransom, no clean explanation. Only one word: FIND.",
+        textKo: "와주셨군요. 다행이에요. 저는 엘리너 베일, 엘리스 박사의 후배 큐레이터예요. 아니... 그랬다고 해야겠죠. 박사님은 실종됐어요. 카페 영상이 우리가 가진 마지막 확인 장면입니다. 시신도, 협박도, 명확한 설명도 없어요. 단 한 단어만 남았죠. FIND.",
+        textKoMix: "와주셨군요. 저는 Eleanor Vale, 엘리스 박사의 후배 큐레이터예요. 박사님은 missing이에요. 카페 영상이 마지막이에요. 설명은 없고, 단 한 단어만 남았죠. FIND.",
+        textEs: "Viniste. Bien. Soy Eleanor Vale, curadora asistente de la Dra. Ellis. O... lo era. Ella desapareció. El video del café es la última imagen confirmada. Sin cuerpo, sin rescate, sin explicación limpia. Solo una palabra: FIND.",
+        textEsMix: "Viniste. Soy Eleanor Vale, curadora asistente de la Dra. Ellis. Ella está missing. El video del café es lo último. No hay explicación. Solo una palabra: FIND.",
+      },
+      {
+        kind: "scene",
+        charId: "eleanor",
+        text: "The man in the black coat did not break the case. He spoke to it. That is what terrifies me. Locks can be picked. Glass can be cut. But this? This was language obeying someone it should never have obeyed.",
+        textKo: "검은 코트의 남자는 진열장을 부수지 않았어요. 진열장에게 말했어요. 그게 무서운 점이에요. 자물쇠는 딸 수 있고, 유리는 자를 수 있죠. 하지만 이건... 언어가 절대 따라서는 안 될 사람의 명령을 따른 겁니다.",
+        textKoMix: "검은 코트의 남자는 진열장을 부수지 않았어요. 진열장에게 말했어요. 그래서 무서워요. 이건 language가 따라서는 안 될 사람의 명령을 따른 거예요.",
+        textEs: "El hombre del abrigo negro no rompió la vitrina. Le habló. Eso es lo que me asusta. Las cerraduras se abren. El vidrio se corta. Pero esto... fue el lenguaje obedeciendo a alguien a quien jamás debió obedecer.",
+        textEsMix: "El hombre del abrigo negro no rompió la vitrina. Le habló. Eso me asusta. El language obedeció a alguien que jamás debía obedecer.",
       },
       {
         kind: "scene",
         charId: "lingo",
-        isNarration: true,
-        text: "(Dr. Ellis sits on a bench near the case. A blanket around her shoulders. She stares at nothing. Her lips move but no sound comes out. A paramedic crouches beside her, helpless. Twenty years of research into ancient languages, and now she can't produce a single syllable.)",
-        textKo: "(엘리스 박사가 진열장 근처 벤치에 앉아 있다. 어깨에 담요를 두르고. 아무것도 보지 않는 눈으로 응시한다. 입술이 움직이지만 소리는 나지 않는다. 구급대원이 옆에 쭈그리고 앉아 있다, 속수무책으로. 20년간 고대 언어를 연구해온 사람이, 이제 음절 하나도 만들어내지 못한다.)",
-        textEs: "(La Dra. Ellis está sentada en un banco cerca de la vitrina. Una manta sobre sus hombros. Mira a la nada. Sus labios se mueven pero no sale ningún sonido. Un paramédico está agachado a su lado, impotente. Veinte años investigando lenguas antiguas, y ahora no puede producir una sola sílaba.)",
+        text: "Partner, this connects to Ellis's last word. FIND. She did not ask us to find her body. She asked us to find what the stone resisted. There has to be a clue left in this room.",
+        textKo: "파트너, 이건 엘리스 박사의 마지막 단어와 이어져. FIND. 박사님은 시신을 찾아달라고 한 게 아니야. 돌이 끝까지 저항하며 남긴 것을 찾아달라고 한 거야. 이 방 어딘가에 단서가 남아 있어.",
+        textKoMix: "파트너, Ellis의 마지막 단어와 이어져. FIND. 박사님은 시신을 찾으라는 게 아니야. 돌이 저항하며 남긴 clue를 찾으라는 거야.",
+        textEs: "Compañero, esto conecta con la última palabra de Ellis. FIND. No pidió que encontráramos su cuerpo. Pidió que encontráramos lo que la piedra resistió. Debe quedar una pista en esta sala.",
+        textEsMix: "Compañero, esto conecta con la última palabra de Ellis. FIND. No buscaba un cuerpo; buscaba una clue que la piedra dejó al resistir.",
       },
+      // ── Scene 4: The First Clue Hunt ─────────────────────────────────────
       {
         kind: "scene",
-        charId: "lingo",
-        isNarration: true,
-        text: "(Something about Ellis's expression when Rudy mentions the black coat. She recognised something. She knows the person who did this.)",
-        textKo: "(엘리스 박사의 표정에서 뭔가 보여. 루디가 검은 코트를 언급했을 때. 그녀가 뭔가를 알아본 것 같아. 이 일을 한 사람을 알고 있어.)",
-        textEs: "(Algo en la expresión de la Dra. Ellis cuando Rudy menciona el abrigo negro. Reconoció algo. Conoce a la persona que hizo esto.)",
-      },
-      {
-        kind: "scene",
-        charId: "lingo",
-        text: "Partner. Look at her. That's what the Guardian Stone can do. Or rather, that's what someone who knows how to use it can do. Steal a person's ability to speak. Every language, gone. Like it was never there. We need to find out what happened before this gets worse.",
-        textKo: "파트너. 저 분을 봐. 수호석이 할 수 있는 일이야. 정확히는, 그걸 쓸 줄 아는 누군가가 할 수 있는 일. 말하는 능력을 빼앗는 거야. 모든 언어가, 사라진 거야. 처음부터 없었던 것처럼. 상황이 더 나빠지기 전에 무슨 일이 있었는지 알아내야 해.",
-        textKoMix: "파트너. 저 분을 봐. 수호석이 할 수 있는 일이야. 말하는 능력을 빼앗는 거야. 모든 언어가, 사라진 거야. No — Hello도, Goodbye도, Thank you도 — 아무것도 안 남았어. Help가 필요해. 무슨 일이 있었는지 알아내야 해.",
-        textEs: "Compañero. Mírala. Eso es lo que la Piedra Guardiana puede hacer. O mejor dicho, lo que alguien que sabe usarla puede hacer. Robar la capacidad de hablar de una persona. Cada idioma, desaparecido. Como si nunca hubiera existido. Necesitamos averiguar qué pasó antes de que esto empeore.",
-        textEsMix: "Compañero. Mírala. Eso es lo que la Piedra Guardiana puede hacer. Robar la capacidad de hablar. Cada idioma, desaparecido. No — ni Hello, ni Goodbye, ni Thank you — nada queda. Necesitamos Help. Averigüemos qué pasó antes de que empeore.",
-      },
-      // ── Scene 4: The Threat ────────────────────────────────────────────
-      {
-        kind: "scene",
-        charId: "lingo",
-        isNarration: true,
-        text: "(Tom pulls up the security footage on his phone. Grainy black and white. A figure in a long black coat moves through the museum with impossible confidence. He doesn't sneak. He doesn't hide. He walks like a man browsing an art gallery. Then, just before leaving, he stops. He turns to the camera. And he looks directly into the lens.)",
-        textKo: "(톰이 핸드폰으로 보안 영상을 보여준다. 거칠고 흑백인 화면. 긴 검은 코트를 입은 인물이 믿을 수 없는 자신감으로 박물관을 이동한다. 몰래 다니지 않는다. 숨지 않는다. 미술관을 구경하는 사람처럼 걷는다. 그리고 나가기 직전, 멈춘다. 카메라를 향해 돈다. 렌즈를 똑바로 바라본다.)",
-        textEs: "(Tom saca las grabaciones de seguridad en su teléfono. Imagen granulada en blanco y negro. Una figura con un largo abrigo negro se mueve por el museo con una confianza imposible. No se esconde. No se escabulle. Camina como quien pasea por una galería de arte. Entonces, justo antes de irse, se detiene. Se gira hacia la cámara. Y mira directamente al lente.)",
-      },
-      {
-        kind: "scene",
-        charId: "tom",
-        text: "See that? He looked RIGHT at the camera. He KNEW it was there. Most thieves avoid cameras. This bloke? He posed for one. Like he wanted us to see his face. Except — you can't actually see his face. Just the coat and the smile. Gives me the creeps, mate.",
-        textKo: "저거 봤어? 카메라를 정면으로 봤어. 카메라가 있는 걸 알았던 거야. 대부분의 도둑들은 카메라를 피해. 이 놈은? 포즈를 취했어. 자기 얼굴을 보여주고 싶었던 것처럼. 근데 — 사실 얼굴은 안 보여. 코트랑 미소만 보여. 소름 돋아, 진짜.",
-        textKoMix: "저거 봤어? 카메라를 정면으로 봤어. 카메라가 있는 걸 알았던 거야. 대부분의 도둑들은 카메라를 피해. 이 놈은? 포즈를 취했어. I don't understand — 왜 자기 얼굴을 보여주고 싶어하는 거야? 근데 얼굴은 안 보여. 코트랑 미소만. 소름 돋아.",
-        textEs: "¿Ves eso? Miró DIRECTO a la cámara. SABÍA que estaba ahí. La mayoría de los ladrones evitan las cámaras. ¿Este tipo? Posó para una. Como si quisiera que viéramos su cara. Pero — en realidad no puedes ver su cara. Solo el abrigo y la sonrisa. Me pone los pelos de punta.",
-        textEsMix: "¿Ves eso? Miró DIRECTO a la cámara. SABÍA que estaba ahí. La mayoría de los ladrones evitan las cámaras. ¿Este tipo? Posó para una. I don't understand — ¿por qué querría que viéramos su cara? Pero no puedes ver su cara. Solo el abrigo y la sonrisa. Me pone los pelos de punta.",
-      },
-      {
-        kind: "scene",
-        charId: "lingo",
-        isNarration: true,
-        text: "(Rudy spots something else. On the floor where the stone used to sit — a single playing card. The Ace of Spades. Someone has written on it in red ink. One word: MADRID.)",
-        textKo: "(루디가 다른 것을 발견한다. 수호석이 있던 바닥 위에 — 카드 한 장. 스페이드 에이스. 누군가 빨간 잉크로 적었다. 단어 하나: MADRID.)",
-        textEs: "(Rudy nota algo más. En el piso donde solía estar la piedra — una sola carta de juego. El As de Espadas. Alguien ha escrito en ella con tinta roja. Una palabra: MADRID.)",
-      },
-      {
-        kind: "scene",
-        charId: "lingo",
-        text: "Madrid. He left us a destination. The Ace of Spades — in card games, it's the death card. The highest card in the deck. He's telling us two things at once: where he's going, and that he thinks he's already won. Cocky. Very cocky.",
-        textKo: "마드리드. 목적지를 남겨줬네. 스페이드 에이스 — 카드 게임에서 죽음의 카드야. 덱에서 가장 높은 카드. 두 가지를 동시에 말하고 있어: 어디로 가는지, 그리고 이미 이겼다고 생각한다는 것. 건방져. 아주 건방져.",
-        textEs: "Madrid. Nos dejó un destino. El As de Espadas — en los juegos de cartas, es la carta de la muerte. La carta más alta de la baraja. Nos dice dos cosas a la vez: adónde va, y que cree que ya ganó. Arrogante. Muy arrogante.",
-      },
-      // ── Writing Mission: Record Evidence ──────────────────────────────────
-      {
-        kind: "scene",
-        charId: "lingo",
-        isNarration: true,
-        text: "(Rudy pulls out a notebook. Before going further, he wants you to write down the key phrases from the crime scene — names, greetings, anything that might be a clue. A good detective always documents the evidence.)",
-        textKo: "(루디가 수첩을 꺼낸다. 더 진행하기 전에, 범죄 현장의 핵심 표현들을 적어두길 원해 — 이름, 인사, 단서가 될 수 있는 것들. 좋은 탐정은 항상 증거를 기록하지.)",
-        textEs: "(Rudy saca una libreta. Antes de continuar, quiere que escribas las frases clave de la escena del crimen — nombres, saludos, cualquier cosa que pueda ser una pista. Un buen detective siempre documenta la evidencia.)",
+        charId: "eleanor",
+        text: "Three things were left behind. A card, a smear of gold dust, and an old note Ellis hid under the case. One of them still contains a sentence. If we choose the wrong clue first, the seal may close around it.",
+        textKo: "남겨진 건 세 가지예요. 카드 한 장, 금빛 먼지 자국, 그리고 엘리스 박사가 진열장 아래 숨겨둔 오래된 메모. 그중 하나에는 아직 문장이 남아 있어요. 잘못된 단서부터 건드리면 봉인이 닫혀버릴 수도 있습니다.",
+        textKoMix: "남겨진 건 세 가지예요. card, gold dust, 그리고 Ellis의 오래된 note. 그중 하나에는 아직 sentence가 남아 있어요.",
+        textEs: "Quedaron tres cosas. Una carta, una mancha de polvo dorado y una nota antigua que Ellis escondió bajo la vitrina. Una de ellas todavía contiene una frase. Si elegimos mal primero, el sello podría cerrarse sobre ella.",
+        textEsMix: "Quedaron tres cosas. Una card, gold dust y una note antigua de Ellis. Una todavía tiene una sentence.",
       },
       {
         kind: "puzzle",
         puzzleNum: 3,
-        pType: "writing-mission",
+        pType: "investigation",
         tprsStage: 3,
-        targetExpressions: ["Hello, my name is ___", "Nice to meet you"],
-        previouslyLearned: ["Hello", "Goodbye", "Where is ___?", "I am a ___", "Nice to meet you", "I don't understand", "Can you say that again?"],
-        speakAfter: true,
-        storyReason: "Write down key evidence phrases for your detective notebook.",
-        storyConsequence: "Your notes help decode part of the cipher message.",
-        onFail: { addToWeakExpressions: ["Hello, my name is ___", "Nice to meet you"], reviewInDailyCourse: true, reviewDays: 3 },
-        title: { en: "Record the Evidence", ko: "증거 기록하기", es: "Registrar la Evidencia" },
-        context: { en: "Write down the key phrases from the investigation. A good detective documents everything!", ko: "수사에서 나온 핵심 표현들을 적어봐. 좋은 탐정은 모든 걸 기록해!", es: "Escribe las frases clave de la investigación. ¡Un buen detective documenta todo!" },
+        targetExpressions: ["FIND", "Where is ___?", "Help me"],
+        previouslyLearned: ["Hello", "Help me", "Where is ___?", "My name is ___", "Thank you", "Goodbye"],
+        speakAfter: false,
+        storyReason: "Find the clue that still carries Dr. Ellis's intent.",
+        storyConsequence: "The hidden note reveals the sealed door and prepares the Boss Spell.",
+        onFail: { addToWeakExpressions: ["Where is ___?", "Help me"], reviewInDailyCourse: true, reviewDays: 2 },
         questions: [
-          { word: { en: "Hello, my name is Rudy.", ko: "안녕하세요, 제 이름은 루디예요.", es: "Hola, me llamo Rudy." }, hint: { en: "Start with a greeting and your name", ko: "인사로 시작하고 이름을 말하세요", es: "Empieza con un saludo y tu nombre" }, acceptableAnswers: ["hello my name is rudy", "hi my name is rudy", "hello i am rudy", "hi i'm rudy"] },
-          { word: { en: "Nice to meet you.", ko: "만나서 반갑습니다.", es: "Mucho gusto." }, hint: { en: "A polite phrase when meeting someone", ko: "누군가를 만날 때 쓰는 예의 바른 표현", es: "Una frase cortés al conocer a alguien" }, acceptableAnswers: ["nice to meet you", "pleased to meet you", "good to meet you"] },
+          {
+            prompt: { en: "Which clue answers Dr. Ellis's final word: FIND?", ko: "엘리스 박사의 마지막 단어 FIND에 답하는 단서는 무엇일까?", es: "¿Qué pista responde a la última palabra de Ellis: FIND?" },
+            clues: [
+              { en: "The Madrid card: a taunt pointing to the next city.", ko: "마드리드 카드: 다음 도시를 가리키는 도발.", es: "La carta de Madrid: una provocación que señala la siguiente ciudad." },
+              { en: "The gold dust: a shard of the London Stone resisting the theft.", ko: "금빛 먼지: 도난에 저항한 London Stone의 파편.", es: "El polvo dorado: un fragmento de la London Stone resistiendo el robo." },
+              { en: "Ellis's hidden note: 'Hello. Help me. Where is the door?'", ko: "엘리스의 숨겨진 메모: 'Hello. Help me. Where is the door?'", es: "La nota oculta de Ellis: 'Hello. Help me. Where is the door?'" },
+            ],
+            answerIdx: 2,
+          },
         ],
+        hints: {
+          h1: { ko: "FIND는 장소 단서가 아니라 문장 단서를 찾으라는 말이었어", en: "FIND was not asking for a place first, but for a sentence clue", es: "FIND no pedía primero un lugar, sino una pista de frase" },
+          h2: { ko: "Boss Spell에 필요한 말이 남아 있는 단서를 골라", en: "Choose the clue that still has the words needed for the Boss Spell", es: "Elige la pista que aún tiene las palabras para el Boss Spell" },
+          h3: { ko: "문장이 적힌 메모가 정답이야", en: "The note with the sentence is the answer", es: "La nota con la frase es la respuesta" },
+        },
       },
-      // ── Scene 5: Decoding the Message ─────────────────────────────────────
+      // ── Scene 5: The Sealed Door ──────────────────────────────────────────
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Rudy notices something on the floor near the display case. A torn piece of paper. It must have fallen from the thief's pocket — or been left on purpose. The handwriting is careful, deliberate. This wasn't dropped by accident.)",
-        textKo: "(루디가 진열장 근처 바닥에서 뭔가를 발견한다. 찢어진 종이 한 장. 도둑의 주머니에서 떨어졌거나 — 일부러 남긴 것이다. 필체가 정성스럽고 의도적이다. 실수로 떨어뜨린 게 아니다.)",
-        textEs: "(Rudy nota algo en el piso cerca de la vitrina. Un trozo de papel rasgado. Debió caerse del bolsillo del ladrón — o fue dejado a propósito. La escritura es cuidadosa, deliberada. Esto no se cayó por accidente.)",
+        text: "(The hidden note is older than the theft. Ellis wrote it in the margin of a museum map, as if she had prepared for this exact night. When Rudy reads the sentence aloud, a service door behind the empty case answers with a thin line of gold.)",
+        textKo: "(숨겨진 메모는 도난 사건보다 오래되어 보인다. 엘리스 박사가 박물관 지도 가장자리에 적어둔 것이다. 마치 오늘 밤을 준비해둔 것처럼. 루디가 그 문장을 읽자, 빈 진열장 뒤의 직원용 문이 가느다란 금빛으로 응답한다.)",
+        textEs: "(La nota oculta parece más antigua que el robo. Ellis la escribió en el margen de un mapa del museo, como si hubiera preparado esta noche exacta. Cuando Rudy lee la frase, una puerta de servicio detrás de la vitrina vacía responde con una fina línea dorada.)",
       },
       {
         kind: "scene",
-        charId: "lingo",
-        text: "Well, well. Our thief left a note. How polite. Let me see... some words are smudged. Faded out. It's a message, but with gaps — missing words. Like a puzzle with pieces knocked out. Partner — whoever did this WANTS us to read it. This is either a trap or an invitation. Honestly? Probably both.",
-        textKo: "이런, 이런. 우리 도둑이 쪽지를 남겼네. 참 예의 바르지. 어디 보자... 단어 일부가 번져 있어. 흐릿해졌어. 메시지인데, 빈칸이 있어 — 빠진 단어들. 조각이 빠진 퍼즐처럼. 파트너 — 이걸 한 사람은 우리가 읽기를 원해. 이건 함정이거나 초대장이야. 솔직히? 아마 둘 다.",
-        textKoMix: "이런. 우리 도둑이 쪽지를 남겼네. 어디 보자... 단어 일부가 번져 있어. Hello... My name is... Goodbye... 빈칸이 있는 메시지야. 파트너 — 이걸 한 사람은 우리가 읽기를 원해. 함정이거나 초대장이야. 아마 둘 다.",
-        textEs: "Vaya, vaya. Nuestro ladrón dejó una nota. Qué educado. A ver... algunas palabras están borrosas. Desvanecidas. Es un mensaje, pero con huecos — palabras faltantes. Como un rompecabezas al que le faltan piezas. Compañero — quien hizo esto QUIERE que lo leamos. Es una trampa o una invitación. ¿Sinceramente? Probablemente ambas.",
-        textEsMix: "Vaya. Nuestro ladrón dejó una nota. A ver... algunas palabras están borrosas. Hello... My name is... Goodbye... Un mensaje con huecos. Compañero — quien hizo esto QUIERE que lo leamos. Es una trampa o una invitación. Probablemente ambas.",
+        charId: "eleanor",
+        text: "That door has no keyhole. Ellis called it a verbal lock. It opens only when a speaker gives it a sentence with need, direction, and a name. A little dramatic, yes. She was always like that.",
+        textKo: "저 문에는 열쇠구멍이 없어요. 엘리스 박사는 저걸 verbal lock이라고 불렀죠. 필요, 방향, 이름이 들어간 문장을 말해야만 열립니다. 조금 극적이죠. 네, 박사님은 늘 저랬어요.",
+        textKoMix: "저 문에는 열쇠구멍이 없어요. Ellis는 저걸 verbal lock이라고 불렀죠. need, direction, name이 들어간 sentence가 필요해요.",
+        textEs: "Esa puerta no tiene cerradura. Ellis la llamaba un verbal lock. Solo se abre cuando alguien le da una frase con necesidad, dirección y nombre. Un poco dramático, sí. Ella siempre era así.",
+        textEsMix: "Esa puerta no tiene llave. Ellis la llamaba verbal lock. Necesita una sentence con need, direction y name.",
       },
       {
         kind: "clue",
-        symbol: "📄",
-        titleEn: "Investigation Notes: The Thief's Message",
-        titleKo: "수사 노트: 도둑의 메시지",
-        titleEs: "Notas de Investigación: El Mensaje del Ladrón",
-        descEn: "A torn piece of paper found at the crime scene. The words are written in careful handwriting but some are smudged. The vocabulary is surprisingly simple — basic greetings and introductions. Why would a thief capable of stealing a priceless relic write like a beginner? Unless the simplicity IS the message.",
-        descKo: "범죄 현장에서 발견된 찢어진 종이. 단어들은 정성스러운 필체로 쓰여 있지만 일부가 번져 있다. 어휘가 놀라울 정도로 단순하다 — 기초 인사와 자기소개. 값을 매길 수 없는 유물을 훔칠 수 있는 도둑이 왜 초급 학생처럼 글을 쓸까? 단순함 자체가 메시지가 아니라면.",
-        descEs: "Un trozo de papel rasgado encontrado en la escena del crimen. Las palabras están escritas con caligrafía cuidadosa pero algunas están borrosas. El vocabulario es sorprendentemente simple — saludos básicos y presentaciones. ¿Por qué un ladrón capaz de robar una reliquia invaluable escribiría como un estudiante principiante? A menos que la simplicidad SEA el mensaje.",
+        symbol: "🚪",
+        titleEn: "Investigation Notes: The Verbal Lock",
+        titleKo: "수사 노트: 말의 자물쇠",
+        titleEs: "Notas de Investigación: La Cerradura Verbal",
+        descEn: "Ellis prepared a lock that accepts a beginner sentence. It does not need rare vocabulary. It needs honest intent: greet the world, ask for help, ask where Ellis is. In Enigma, simple words are not weak words. They are first spells.",
+        descKo: "엘리스는 초보자 문장을 받아들이는 자물쇠를 준비해두었다. 어려운 어휘는 필요 없다. 필요한 건 진심이다. 세계에 인사하고, 도움을 청하고, 엘리스가 어디 있는지 묻는 것. Enigma에서 쉬운 단어는 약한 단어가 아니다. 첫 주문이다.",
+        descEs: "Ellis preparó una cerradura que acepta una frase de principiante. No necesita vocabulario raro. Necesita intención honesta: saludar al mundo, pedir ayuda, preguntar dónde está Ellis. En Enigma, las palabras simples no son débiles. Son los primeros hechizos.",
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "Alright partner, let's crack this. The words on the paper — they're all basic phrases. Greetings, introductions, saying where you're from. Our thief wrote a self-introduction... but some words are missing. Like a language exercise with blanks. Help me fill in the gaps. Let's figure out who we're dealing with.",
-        textKo: "좋아 파트너, 이거 풀어보자. 종이 위의 단어들 — 전부 기초 표현이야. 인사, 자기소개, 출신 말하기. 도둑이 자기소개를 썼는데... 일부 단어가 빠져 있어. 빈칸이 있는 언어 연습문제처럼. 빈칸을 채워줘. 우리 상대가 누구인지 알아내자.",
-        textEs: "Bien compañero, descifremos esto. Las palabras en el papel — son todas frases básicas. Saludos, presentaciones, decir de dónde eres. Nuestro ladrón escribió una autopresentación... pero faltan palabras. Como un ejercicio de idioma con espacios en blanco. Ayúdame a completar los huecos. Averiguemos con quién estamos lidiando.",
+        text: "This is it. Not a rare spell. A beginner spell. We already have the pieces: Hello. Help me. Where is Dr. Ellis? Put them in order, partner. Let the door hear you.",
+        textKo: "이거야. 희귀한 주문이 아니야. 초보자의 주문. 우리는 이미 조각을 가지고 있어. Hello. Help me. Where is Dr. Ellis? 순서대로 맞춰줘, 파트너. 문이 네 말을 듣게 해.",
+        textKoMix: "이거야. 어려운 주문이 아니야. beginner spell. 우리는 이미 조각을 가지고 있어. Hello. Help me. Where is Dr. Ellis? 순서대로 맞춰줘.",
+        textEs: "Esto es. No un hechizo raro. Un hechizo de principiante. Ya tenemos las piezas: Hello. Help me. Where is Dr. Ellis? Ponlas en orden, compañero. Haz que la puerta te escuche.",
+        textEsMix: "Esto es. No es difícil. Un beginner spell. Ya tenemos las piezas: Hello. Help me. Where is Dr. Ellis? Ponlas en orden.",
       },
       {
         kind: "puzzle",
         puzzleNum: 4,
-        pType: "fill-blank",
+        pType: "boss-spell",
         tprsStage: 4,
-        targetExpressions: ["My name is ___", "I'm from ___", "Where is ___?"],
-        previouslyLearned: ["Hello", "Goodbye", "Where is ___?", "I am a ___", "Nice to meet you", "I don't understand", "Can you say that again?", "Hello, my name is ___"],
+        // Mastery contract: only chunks the player actually produces in this puzzle.
+        // Other Ch1 expressions (My name is, Thank you, Goodbye) are mastered by their
+        // own dedicated puzzles — listing them here would falsely mark them mastered
+        // on Boss Spell completion via handlePuzzleSolved.
+        targetExpressions: ["Hello", "Help me", "Where is ___?", "Dr. Ellis"],
+        previouslyLearned: ["Hello", "Help me", "Where is ___?", "My name is ___", "Thank you", "Goodbye"],
         speakAfter: true,
-        storyReason: "The cipher has missing words. Fill in the blanks to decode it.",
-        storyConsequence: "The decoded message reveals Miss Penny's involvement.",
-        onFail: { addToWeakExpressions: ["My name is ___", "Where is ___?"], reviewInDailyCourse: true, reviewDays: 3 },
+        storyReason: "Complete Ellis's Boss Spell to open the sealed door.",
+        storyConsequence: "The door opens and reveals a resisting shard of the London Stone.",
+        onFail: { addToWeakExpressions: ["Hello", "Help me", "Where is ___?", "Dr. Ellis"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            sentence: { en: "___, detective.", ko: "___, 탐정님.", es: "___, detective." },
-            answer: { en: "Hello", ko: "안녕하세요", es: "Hola" },
-            opts: [
-              { en: "Goodbye", ko: "안녕히", es: "Adiós" },
-              { en: "Sorry", ko: "죄송합니다", es: "Perdón" },
-            ],
-            hints: {
-              h1: { ko: "인사를 시작하는 단어야", en: "A word that starts a greeting", es: "Una palabra que inicia un saludo" },
-              h2: { ko: "누군가를 처음 만날 때 하는 첫 마디", en: "The first word when meeting someone", es: "La primera palabra al conocer a alguien" },
-              h3: { ko: "Hello = 안녕하세요", en: "Hello — the most basic greeting", es: "Hola — el saludo más básico" },
+            spellChunks: ["Hello", "Help me", "Where is", "Dr. Ellis"],
+            separators: [".", ".", " ", "?"],
+            wordPool: ["Hello", "Goodbye", "Help me", "Thank you", "Where is", "My name is", "Dr. Ellis"],
+            instruction: {
+              en: "Place each word-piece on the door.",
+              ko: "말 조각을 문 위에 순서대로 올려놓으세요.",
+              es: "Coloca cada pieza de palabra en la puerta.",
             },
-          },
-          {
-            sentence: { en: "My ___ is Mr. Black.", ko: "제 ___은 미스터 블랙입니다.", es: "Mi ___ es Mr. Black." },
-            answer: { en: "name", ko: "이름", es: "nombre" },
-            opts: [
-              { en: "friend", ko: "친구", es: "amigo" },
-              { en: "job", ko: "직업", es: "trabajo" },
-            ],
             hints: {
-              h1: { ko: "자기소개를 할 때 쓰는 단어야", en: "A word you use when introducing yourself", es: "Una palabra para presentarte" },
-              h2: { ko: "'My ___ is...' — 이름을 말할 때 쓰는 표현", en: "'My ___ is...' — the phrase for telling your name", es: "'Mi ___ es...' — la frase para decir tu nombre" },
-              h3: { ko: "name = 이름 / 'My name is Mr. Black'", en: "name — 'My name is Mr. Black'", es: "nombre — 'Mi nombre es Mr. Black'" },
+              h1: {
+                ko: "순서가 중요해요. 문장은 인사로 시작해야 해요.",
+                en: "The order matters. The sentence should begin with a greeting.",
+                es: "El orden importa. La frase debe empezar con un saludo.",
+              },
+              h2: {
+                ko: "첫 조각은 Hello예요. 그다음은 도움이 필요하다는 말이에요.",
+                en: "The first piece is Hello. The next piece asks for help.",
+                es: "La primera pieza es Hello. La siguiente pide ayuda.",
+              },
+              h3: {
+                ko: "정답 문장: Hello. Help me. Where is Dr. Ellis?",
+                en: "Answer sentence: Hello. Help me. Where is Dr. Ellis?",
+                es: "Frase correcta: Hello. Help me. Where is Dr. Ellis?",
+              },
             },
-          },
-          {
-            sentence: { en: "___, London.", ko: "___, 런던.", es: "___, Londres." },
-            answer: { en: "Goodbye", ko: "안녕히", es: "Adiós" },
-            opts: [
-              { en: "Hello", ko: "안녕하세요", es: "Hola" },
-              { en: "Thank you", ko: "감사합니다", es: "Gracias" },
-            ],
-            hints: {
-              h1: { ko: "떠날 때 하는 말이야", en: "What you say when leaving", es: "Lo que dices al irte" },
-              h2: { ko: "미스터 블랙이 런던을 떠나면서 한 마지막 인사", en: "Mr. Black's farewell as he left London", es: "La despedida de Mr. Black al irse de Londres" },
-              h3: { ko: "Goodbye = 안녕히 / 작별 인사", en: "Goodbye — farewell greeting", es: "Adiós — saludo de despedida" },
+            storyReason: {
+              en: "Open the sealed door to reach the stone shard.",
+              ko: "봉인된 문을 열어 돌의 파편에 닿으세요.",
+              es: "Abre la puerta sellada para alcanzar el fragmento de piedra.",
             },
+            storyConsequence: {
+              en: "The stone fragment falls into Rudy's light.",
+              ko: "돌의 파편이 루디의 빛 속으로 떨어집니다.",
+              es: "El fragmento de piedra cae dentro de la luz de Rudy.",
+            },
+            doorImage: ch1BossDoorImg,
           },
         ],
         hints: {
-          h1: { ko: "미스터 블랙의 메시지는 기초 자기소개야 — 인사, 이름, 작별", en: "Mr. Black's message is a basic self-introduction — greeting, name, farewell", es: "El mensaje de Mr. Black es una autopresentación básica — saludo, nombre, despedida" },
-          h2: { ko: "Hello → My name is → Goodbye 순서의 자기소개", en: "Hello → My name is → Goodbye — a self-introduction", es: "Hola → Mi nombre es → Adiós — una autopresentación" },
-          h3: { ko: "1: Hello (인사) / 2: name (이름) / 3: Goodbye (작별)", en: "1: Hello (greeting) / 2: name (identity) / 3: Goodbye (farewell)", es: "1: Hola (saludo) / 2: nombre (identidad) / 3: Adiós (despedida)" },
+          h1: { ko: "Boss Spell은 네 조각이야 — 인사, 도움 요청, 위치 질문, 이름", en: "The Boss Spell has four pieces — greeting, help, location question, name", es: "El Boss Spell tiene cuatro piezas — saludo, ayuda, pregunta de lugar, nombre" },
+          h2: { ko: "Hello → Help me → Where is → Dr. Ellis", en: "Hello → Help me → Where is → Dr. Ellis", es: "Hola → Ayúdame → Dónde está → Dra. Ellis" },
+          h3: { ko: "정답 문장: Hello. Help me. Where is Dr. Ellis?", en: "Answer sentence: Hello. Help me. Where is Dr. Ellis?", es: "Frase correcta: Hello. Help me. Where is Dr. Ellis?" },
         },
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "You got it. Listen to this: 'Hello, detective. My name is Mr. Black. I'm from everywhere. How are you? Goodbye, London.' He introduced himself. Like a student in lesson one. But perfect grammar, three languages. He's not a beginner — he's MOCKING beginners. He's mocking US. And the worst part? 'Goodbye, London' means he's already gone.",
-        textKo: "해냈어. 이거 들어봐: '안녕하세요, 탐정. 제 이름은 미스터 블랙입니다. 저는 모든 곳에서 왔어요. 어떻게 지내세요? 안녕히 계세요, 런던.' 자기소개를 했어. 첫 수업 학생처럼. 하지만 완벽한 문법, 세 개 언어. 초보자가 아니야 — 초보자를 조롱하고 있어. 우리를 조롱하는 거야. 최악인 건? '안녕히 계세요, 런던'은 이미 떠났다는 뜻이야.",
-        textKoMix: "해냈어. 들어봐: 'Hello, detective. My name is Mr. Black. I'm from everywhere. Goodbye, London.' 자기소개를 했어. 첫 수업 학생처럼. 하지만 완벽한 문법, 세 개 언어. 초보자가 아니야 — 초보자를 조롱하고 있어. 최악인 건? 'Goodbye, London'은 이미 떠났다는 뜻이야.",
-        textEs: "Lo lograste. Escucha esto: 'Hola, detective. Mi nombre es Mr. Black. Soy de todas partes. ¿Cómo estás? Adiós, Londres.' Se presentó. Como un estudiante en la lección uno. Pero gramática perfecta, tres idiomas. No es principiante — se está BURLANDO de los principiantes. Se burla de NOSOTROS. ¿Y lo peor? 'Adiós, Londres' significa que ya se fue.",
-        textEsMix: "Lo lograste. Escucha esto: 'Hello, detective. My name is Mr. Black. I'm from everywhere. Goodbye, London.' Se presentó. Como un estudiante en la lección uno. Pero gramática perfecta, tres idiomas. No es principiante — se está BURLANDO de los principiantes. ¿Y lo peor? 'Goodbye, London' significa que ya se fue.",
+        text: "You did it. The sentence holds. The door heard you. Look, partner... that glow is not the stone itself. It is a shard. A little piece the London Stone refused to give him.",
+        textKo: "해냈어. 문장이 버텼어. 문이 네 말을 들었어. 봐, 파트너... 저 빛은 돌 자체가 아니야. 파편이야. London Stone이 그에게 넘겨주길 거부한 작은 조각.",
+        textKoMix: "해냈어. sentence가 버텼어. 문이 네 말을 들었어. 저건 stone 자체가 아니야. shard야. London Stone이 넘겨주길 거부한 조각.",
+        textEs: "Lo lograste. La frase sostuvo. La puerta te oyó. Mira, compañero... esa luz no es la piedra misma. Es un fragmento. Una pequeña parte que la London Stone se negó a entregarle.",
+        textEsMix: "Lo lograste. La sentence sostuvo. La puerta te oyó. Esa luz no es la stone completa. Es un shard que la London Stone no quiso entregarle.",
       },
       {
         kind: "scene",
-        charId: "lingo",
-        text: "The pieces are coming together. Mr. Black stole the London Guardian Stone. He silenced Dr. Ellis — probably as a demonstration. He left his name, a playing card marked 'Madrid,' and a self-introduction written in beginner vocabulary. He's heading to Madrid. And he wants us to follow.",
-        textKo: "퍼즐이 맞춰지고 있어. 미스터 블랙이 런던 수호석을 훔쳤어. 엘리스 박사의 목소리를 빼앗았어 — 아마 시범으로. 자기 이름을 남기고, '마드리드'라고 적힌 카드를 남기고, 초급 어휘로 자기소개를 남겼어. 마드리드로 향하고 있어. 그리고 우리가 따라오길 원해.",
-        textEs: "Las piezas se están juntando. Mr. Black robó la Piedra Guardiana de Londres. Silenció a la Dra. Ellis — probablemente como demostración. Dejó su nombre, una carta marcada 'Madrid,' y una autopresentación escrita en vocabulario de principiante. Se dirige a Madrid. Y quiere que lo sigamos.",
+        charId: "eleanor",
+        text: "Thank you. Truly. If Ellis left this for anyone, she left it for a beginner brave enough to say the first sentence. But the figure who signs as B left one thing on purpose. Tom found it under the case.",
+        textKo: "감사합니다. 진심으로요. 엘리스 박사가 이걸 누군가에게 남겼다면, 첫 문장을 말할 만큼 용감한 초보자에게 남긴 거예요. 하지만 B라고 서명한 인물도 일부러 남긴 게 하나 있어요. 톰이 진열장 아래에서 찾았습니다.",
+        textKoMix: "Thank you. 진심이에요. Ellis가 이걸 남겼다면 첫 sentence를 말할 만큼 용감한 beginner에게 남긴 거예요. 하지만 B라고 서명한 사람이 일부러 남긴 게 있어요.",
+        textEs: "Gracias. De verdad. Si Ellis dejó esto para alguien, lo dejó para un principiante lo bastante valiente como para decir la primera frase. Pero la figura que firma como B dejó algo a propósito. Tom lo encontró bajo la vitrina.",
+        textEsMix: "Thank you. De verdad. Ellis dejó esto para un beginner valiente. Pero la figura que firma como B también dejó algo a propósito.",
       },
       {
         kind: "clue",
         symbol: "🃏",
-        titleEn: "Investigation Notes: The Madrid Stone",
-        titleKo: "수사 노트: 마드리드 석",
-        titleEs: "Notas de Investigación: La Piedra de Madrid",
-        descEn: "Rudy's deduction: If the London Guardian Stone was the first target, Madrid must be next. The Ace of Spades card is both a taunt and a map. Mr. Black isn't hiding — he's inviting pursuit. Why? What does he gain from being followed? Unless collecting the stones requires someone else to be there.",
-        descKo: "루디의 추론: 런던 수호석이 첫 번째 목표였다면, 마드리드가 다음이다. 스페이드 에이스 카드는 도발이자 지도다. 미스터 블랙은 숨지 않는다 — 추격을 초대하고 있다. 왜? 쫓기면 뭐가 좋은 거지? 돌을 모으려면 다른 사람이 있어야 하는 게 아닐까.",
-        descEs: "Deducción de Rudy: Si la Piedra Guardiana de Londres fue el primer objetivo, Madrid debe ser el siguiente. La carta del As de Espadas es una provocación y un mapa. Mr. Black no se esconde — está invitando a la persecución. ¿Por qué? ¿Qué gana siendo perseguido? A menos que recolectar las piedras requiera que alguien más esté ahí.",
+        titleEn: "Investigation Notes: The Madrid Card",
+        titleKo: "수사 노트: 마드리드 카드",
+        titleEs: "Notas de Investigación: La Carta de Madrid",
+        descEn: "A black playing card marked MADRID. Unlike the shard, this was left deliberately. The B signature is not hiding the next city. It is inviting pursuit. Why would someone stealing language want a beginner detective to follow?",
+        descKo: "MADRID라고 적힌 검은 카드. 파편과 달리, 이건 의도적으로 남겨졌다. B라는 서명은 다음 도시를 숨기지 않는다. 추격을 초대하고 있다. 언어를 훔치는 누군가가 왜 초보 탐정이 따라오길 바랄까?",
+        descEs: "Una carta negra marcada MADRID. A diferencia del fragmento, esto fue dejado deliberadamente. La firma B no oculta la siguiente ciudad. Invita a la persecución. ¿Por qué alguien que roba lenguaje querría que un detective principiante lo siguiera?",
       },
-      // ── Scene 6: The Cliffhanger ──────────────────────────────────────────
+      // ── Scene 6: London Close ─────────────────────────────────────────────
+      {
+        kind: "scene",
+        charId: "eleanor",
+        text: "Goodbye, Detective. And I mean that as a promise, not an ending. Find Ellis. Find out why she built a lock for beginners. Madrid is where B wants you to look next.",
+        textKo: "Goodbye, Detective. 끝이라는 뜻이 아니라 약속이라는 뜻으로요. 엘리스 박사를 찾아주세요. 왜 박사님이 초보자를 위한 자물쇠를 만들었는지도요. 마드리드는 B가 다음으로 보라고 남긴 곳입니다.",
+        textKoMix: "Goodbye, Detective. 끝이라는 뜻이 아니라 약속이에요. Ellis를 찾아주세요. 왜 beginner를 위한 lock을 만들었는지도요. Madrid가 다음 단서예요.",
+        textEs: "Goodbye, Detective. Y lo digo como una promesa, no como un final. Encuentra a Ellis. Descubre por qué construyó una cerradura para principiantes. Madrid es donde B quiere que mires después.",
+        textEsMix: "Goodbye, Detective. Lo digo como promesa, no como final. Encuentra a Ellis. Descubre por qué hizo un lock para beginners. Madrid es la siguiente pista.",
+      },
       {
         kind: "scene",
         charId: "lingo",
-        isNarration: true,
-        text: "(You're about to leave the museum when it happens. Dr. Ellis — silent, broken, staring-at-nothing Dr. Ellis — suddenly grabs your arm. Her grip is iron. Her eyes are wide and wild. And for one impossible moment, she speaks.)",
-        textKo: "(박물관을 나가려는 순간 그것이 일어난다. 엘리스 박사 — 침묵하고, 부서지고, 허공을 응시하던 엘리스 박사가 — 갑자기 네 팔을 붙잡는다. 쇠처럼 세게. 눈이 크게 뜨여 있고 거칠다. 그리고 불가능한 한 순간, 그녀가 말한다.)",
-        textEs: "(Estás a punto de salir del museo cuando sucede. La Dra. Ellis — silenciosa, rota, mirando-a-la-nada Dra. Ellis — de repente agarra tu brazo. Su agarre es de hierro. Sus ojos están abiertos y salvajes. Y por un momento imposible, habla.)",
-      },
-      {
-        kind: "scene",
-        charId: "ellis",
-        text: "He said... there are SIX stones. London was just the first. He said... when he has all six... no one will speak again. No one. Ever.",
-        textKo: "그가 말했어... 돌이 여섯 개래. 런던은 첫 번째일 뿐이래. 그가 말했어... 여섯 개를 모두 모으면... 아무도 다시 말하지 못할 거래. 아무도. 영원히.",
-        textKoMix: "그가 말했어... 돌이 여섯 개래. 런던은 첫 번째일 뿐이래. 여섯 개를 모두 모으면... no one will speak again. No. 아무도. 영원히.",
-        textEs: "Él dijo... que hay SEIS piedras. Londres fue solo la primera. Dijo... que cuando tenga las seis... nadie volverá a hablar. Nadie. Nunca.",
-        textEsMix: "Él dijo... que hay SEIS piedras. Londres fue solo la primera. Cuando tenga las seis... no one will speak again. No. Nadie. Nunca.",
-      },
-      {
-        kind: "scene",
-        charId: "ellis",
-        text: "The method. I know the method. Eleanor and I... we trained someone. Twenty years ago. We gave him every technique we knew. I didn't know we were teaching him how to steal.",
-        textKo: "이 방법. 이 방법을 알아요. 엘리너와 나... 우리가 어떤 사람을 가르쳤어요. 20년 전에. 우리가 아는 모든 기술을 가르쳐줬어요. 그게 훔치는 방법을 가르치는 건지 몰랐어요.",
-        textKoMix: "이 방법. 이 방법을 알아요. 엘리너와 나... 우리가 어떤 사람을 가르쳤어요. 20년 전에. 모든 기술을 가르쳐줬어요. I don't understand — 그게 훔치는 방법을 가르치는 건지 몰랐어요.",
-        textEs: "El método. Conozco el método. Eleanor y yo... entrenamos a alguien. Hace veinte años. Le dimos todas las técnicas que sabíamos. No supimos que le estábamos enseñando a robar.",
-        textEsMix: "El método. Conozco el método. Eleanor y yo... entrenamos a alguien. Hace veinte años. Le dimos todas las técnicas. I don't understand — no supimos que le estábamos enseñando a robar.",
+        text: "Seven stones are still a rumor, not proof. Good. Rumors can be investigated. For now we have one shard, one missing doctor, and one city name. Partner... Thank you. Our first spell worked.",
+        textKo: "일곱 개의 돌은 아직 증거가 아니라 소문이야. 좋아. 소문은 조사할 수 있어. 지금 우리에게 있는 건 파편 하나, 실종된 박사님 한 명, 그리고 도시 이름 하나. 파트너... Thank you. 우리의 첫 주문이 통했어.",
+        textKoMix: "일곱 개의 돌은 아직 proof가 아니라 rumor야. 지금 있는 건 shard 하나, missing doctor 한 명, city name 하나. Partner... Thank you. 첫 spell이 통했어.",
+        textEs: "Las siete piedras aún son un rumor, no una prueba. Bien. Los rumores se pueden investigar. Por ahora tenemos un fragmento, una doctora desaparecida y el nombre de una ciudad. Compañero... Thank you. Nuestro primer hechizo funcionó.",
+        textEsMix: "Las siete piedras aún son rumor, no proof. Tenemos un shard, una doctora missing y un city name. Compañero... Thank you. Nuestro primer spell funcionó.",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Then silence again. Dr. Ellis's hand falls from your arm. Her eyes go blank. The moment is over. She's gone back to wherever Mr. Black sent her. But that name — Eleanor. The curator who called us tonight. She trained the person who did this.)",
-        textKo: "(그리고 다시 침묵. 엘리스 박사의 손이 팔에서 떨어진다. 눈이 다시 텅 빈다. 순간이 끝났다. 미스터 블랙이 보낸 곳으로 다시 돌아갔다. 하지만 그 이름 — 엘리너. 오늘 밤 우리에게 전화한 큐레이터. 이 일을 한 사람을 그녀가 가르쳤다.)",
-        textEs: "(Luego silencio otra vez. La mano de la Dra. Ellis cae de tu brazo. Sus ojos quedan vacíos. El momento terminó. Volvió a donde Mr. Black la envió. Pero ese nombre — Eleanor. La curadora que nos llamó esta noche. Ella entrenó a la persona que hizo esto.)",
-      },
-      {
-        kind: "scene",
-        charId: "lingo",
-        text: "Six Guardian Stones. Six languages. If he collects them all... Partner, you heard her. This isn't about one stolen relic anymore. This is about every language on Earth. Every word anyone has ever spoken or will ever speak. And right now, Mr. Black has a head start and we have a playing card that says Madrid. So. Are you coming?",
-        textKo: "돌이 여섯 개. 언어가 여섯 개. 전부 모으면... 파트너, 들었지. 이건 더 이상 유물 하나가 도난당한 것이 아니야. 지구상의 모든 언어에 관한 거야. 누구든 지금까지 말했거나 앞으로 말할 모든 단어. 그리고 지금, 미스터 블랙은 앞서 있고 우리에게는 마드리드라고 적힌 카드 한 장이 있어. 그래서. 갈 거야?",
-        textKoMix: "돌이 여섯 개. 언어가 여섯 개. 전부 모으면... 파트너, 들었지. Hello, Goodbye, Thank you, My name is — 모든 단어가 사라져. 지금, 미스터 블랙은 앞서 있고 우리에게는 마드리드라고 적힌 카드 한 장이 있어. Help가 필요해. 그래서. 갈 거야?",
-        textEs: "Seis piedras. Seis idiomas. Si las reúne todas... Compañero, la escuchaste. Esto ya no es sobre una reliquia robada. Es sobre cada idioma en la Tierra. Cada palabra que alguien haya dicho o dirá jamás. Y ahora mismo, Mr. Black nos lleva ventaja y nosotros tenemos una carta que dice Madrid. Entonces. ¿Vienes?",
-        textEsMix: "Seis piedras. Seis idiomas. Si las reúne todas... Compañero, la escuchaste. Hello, Goodbye, Thank you, My name is — cada palabra desaparecerá. Ahora mismo, Mr. Black nos lleva ventaja y tenemos una carta que dice Madrid. Necesitamos Help. Entonces. ¿Vienes?",
-      },
-      {
-        kind: "scene",
-        charId: "lingo",
-        isNarration: true,
-        text: "(Next Chapter: The Madrid Disappearance — People are losing their words.)",
-        textKo: "(다음 챕터: 마드리드의 실종 — 사람들이 말을 잃고 있다.)",
-        textEs: "(Siguiente Capítulo: La Desaparición de Madrid — La gente está perdiendo sus palabras.)",
+        text: "(Next Chapter: The Madrid Disappearance. People are losing their words.)",
+        textKo: "(다음 챕터: 마드리드의 실종. 사람들이 말을 잃고 있다.)",
+        textEs: "(Siguiente Capítulo: La Desaparición de Madrid. La gente está perdiendo sus palabras.)",
       },
     ],
   },
@@ -1159,9 +1142,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Madrid Barajas Airport. Spanish sunshine instead of London fog. Rudy still chewing on his London failure — Mr. Black was right there and he missed him. He steps through the arrival gate, and a woman in a red jacket blocks his path. Eyes like fire.)",
-        textKo: "(마드리드 바라하스 공항. 런던의 안개 대신 스페인의 햇살. 루디는 아직 런던에서의 실패를 씹고 있다 — 미스터 블랙이 코앞에 있었는데 놓쳤다. 도착 게이트를 나서자마자, 빨간 재킷을 입은 여자가 가로막는다. 눈이 불꽃 같다.)",
-        textEs: "(Aeropuerto de Madrid Barajas. Sol español en lugar de niebla londinense. Rudy aún mastica su fracaso en Londres — Mr. Black estaba ahí mismo y se le escapó. En cuanto cruza la puerta de llegadas, una mujer con chaqueta roja le bloquea el paso. Ojos como fuego.)",
+        text: "(Madrid Barajas Airport. Spanish sunshine instead of London fog. Rudy still chewing on his London failure. Mr. Black was right there and he missed him. He steps through the arrival gate, and a woman in a red jacket blocks his path. Eyes like fire.)",
+        textKo: "(마드리드 바라하스 공항. 런던의 안개 대신 스페인의 햇살. 루디는 아직 런던에서의 실패를 씹고 있다. 미스터 블랙이 코앞에 있었는데 놓쳤다. 도착 게이트를 나서자마자, 빨간 재킷을 입은 여자가 가로막는다. 눈이 불꽃 같다.)",
+        textEs: "(Aeropuerto de Madrid Barajas. Sol español en lugar de niebla londinense. Rudy aún mastica su fracaso en Londres. Mr. Black estaba ahí mismo y se le escapó. En cuanto cruza la puerta de llegadas, una mujer con chaqueta roja le bloquea el paso. Ojos como fuego.)",
       },
       {
         kind: "scene",
@@ -1173,40 +1156,40 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
-        text: "I'm average height, thank you very much. You must be Isabel. Carlos's colleague — the one who called Eleanor.",
-        textKo: "평균 신장이거든, 정말 감사해요. 당신이 이사벨이겠지. 카를로스의 동료 — 엘리너한테 연락한 사람.",
-        textEs: "Soy de estatura promedio, muchas gracias. Debes ser Isabel. La colega de Carlos — la que llamó a Eleanor.",
+        text: "I'm average height, thank you very much. You must be Isabel. Carlos's colleague, the one who called Eleanor.",
+        textKo: "평균 신장이거든, 정말 감사해요. 당신이 이사벨이겠지. 카를로스의 동료, 엘리너한테 연락한 사람.",
+        textEs: "Soy de estatura promedio, muchas gracias. Debes ser Isabel. La colega de Carlos, la que llamó a Eleanor.",
       },
       {
         kind: "scene",
         charId: "isabel",
-        text: "Eleanor said you were funny. She was wrong. Listen, detective — Carlos disappeared three nights ago from the Prado. He was restoring a medieval fresco. I got his call at ten o'clock. He was screaming.",
-        textKo: "엘리너가 재밌는 사람이라고 했는데. 틀렸네. 들어, 탐정 — 카를로스가 3일 전에 프라도에서 사라졌어. 중세 프레스코화를 복원하고 있었어. 밤 10시에 전화가 왔어. 소리를 지르고 있었어.",
-        textEs: "Eleanor dijo que eras gracioso. Se equivocó. Escucha, detective — Carlos desapareció hace tres noches del Prado. Estaba restaurando un fresco medieval. Me llamó a las diez. Estaba gritando.",
+        text: "Eleanor said you were funny. She was wrong. Listen, detective. Carlos disappeared three nights ago from the Prado. He was restoring a medieval fresco. I got his call at ten o'clock. He was screaming.",
+        textKo: "엘리너가 재밌는 사람이라고 했는데. 틀렸네. 들어, 탐정. 카를로스가 3일 전에 프라도에서 사라졌어. 중세 프레스코화를 복원하고 있었어. 밤 10시에 전화가 왔어. 소리를 지르고 있었어.",
+        textEs: "Eleanor dijo que eras gracioso. Se equivocó. Escucha, detective. Carlos desapareció hace tres noches del Prado. Estaba restaurando un fresco medieval. Me llamó a las diez. Estaba gritando.",
         idiomRef: "idiom_isabel_1",
       },
       {
         kind: "scene",
         charId: "isabel",
-        text: "Simple words. Not in Spanish. Not in English. Things like 'Hello! Help! Where is the door? Please! Sorry!' — basic phrases, like a textbook. In a language I didn't recognize. Over and over. Then the line went dead.",
-        textKo: "간단한 단어들. 스페인어가 아니었어. 영어도 아니고. '안녕하세요! 도와주세요! 문이 어디예요? 제발! 죄송합니다!' — 교과서 같은 기초 표현을. 내가 모르는 언어로. 계속 반복하다가, 전화가 끊겼어.",
-        textEs: "Palabras simples. No en español. Tampoco en inglés. Cosas como '¡Hola! ¡Ayuda! ¿Dónde está la puerta? ¡Por favor! ¡Perdón!' — frases básicas, como de libro. En un idioma que no reconocí. Una y otra vez. Luego se cortó la línea.",
+        text: "Simple words. Not in Spanish. Not in English. Things like 'Hello! Help! Where is the door? Please! Sorry!', basic phrases, like a textbook. In a language I didn't recognize. Over and over. Then the line went dead.",
+        textKo: "간단한 단어들. 스페인어가 아니었어. 영어도 아니고. '안녕하세요! 도와주세요! 문이 어디예요? 제발! 죄송합니다!', 교과서 같은 기초 표현을. 내가 모르는 언어로. 계속 반복하다가, 전화가 끊겼어.",
+        textEs: "Palabras simples. No en español. Tampoco en inglés. Cosas como '¡Hola! ¡Ayuda! ¿Dónde está la puerta? ¡Por favor! ¡Perdón!', frases básicas, como de libro. En un idioma que no reconocí. Una y otra vez. Luego se cortó la línea.",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Basic phrases. Hello, help, where is, please, sorry. The same vocabulary from Day One. Something stripped away his Spanish, his English — and left him with nothing but the basics. Someone did this to him on purpose.)",
-        textKo: "(기초 표현들. 안녕, 도와주세요, 어디에, 제발, 미안해요. 1일차 어휘들. 무언가가 그의 스페인어, 영어를 벗겨갔어 — 그리고 기초 단어만 남겨놓은 거야. 누군가가 의도적으로 이걸 한 거야.)",
-        textEs: "(Frases básicas. Hola, ayuda, dónde está, por favor, perdón. El vocabulario del Día Uno. Algo le quitó su español, su inglés — y le dejó solo lo básico. Alguien le hizo esto a propósito.)",
+        text: "(Basic phrases. Hello, help, where is, please, sorry. The same vocabulary from Day One. Something stripped away his Spanish, his English, and left him with nothing but the basics. Someone did this to him on purpose.)",
+        textKo: "(기초 표현들. 안녕, 도와주세요, 어디에, 제발, 미안해요. 1일차 어휘들. 무언가가 그의 스페인어, 영어를 벗겨갔어, 그리고 기초 단어만 남겨놓은 거야. 누군가가 의도적으로 이걸 한 거야.)",
+        textEs: "(Frases básicas. Hola, ayuda, dónde está, por favor, perdón. El vocabulario del Día Uno. Algo le quitó su español, su inglés, y le dejó solo lo básico. Alguien le hizo esto a propósito.)",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Isabel wrote down every word Carlos screamed — but the words don't make sense yet. Before we can talk to anyone, we need to learn the key vocabulary first. Match each word to its meaning.)",
-        textKo: "(이사벨이 카를로스가 외친 모든 단어를 적어뒀다 — 하지만 아직 뜻이 통하지 않아. 누구와 대화하기 전에 먼저 핵심 단어들을 배워야 해. 각 단어를 뜻과 매칭해봐.)",
-        textEs: "(Isabel anotó cada palabra que Carlos gritó — pero aún no tienen sentido. Antes de hablar con alguien, necesitamos aprender el vocabulario clave primero. Relaciona cada palabra con su significado.)",
+        text: "(Isabel wrote down every word Carlos screamed. But the words don't make sense yet. Before we can talk to anyone, we need to learn the key vocabulary first. Match each word to its meaning.)",
+        textKo: "(이사벨이 카를로스가 외친 모든 단어를 적어뒀다. 하지만 아직 뜻이 통하지 않아. 누구와 대화하기 전에 먼저 핵심 단어들을 배워야 해. 각 단어를 뜻과 매칭해봐.)",
+        textEs: "(Isabel anotó cada palabra que Carlos gritó. Pero aún no tienen sentido. Antes de hablar con alguien, necesitamos aprender el vocabulario clave primero. Relaciona cada palabra con su significado.)",
       },
       {
         kind: "puzzle",
@@ -1281,23 +1264,23 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "carlos",
-        text: "*shown in a memory flashback* Isabella… escúchame. El lenguaje es poder. They took my words. If you find this… follow the ∆LX. Find the truth. *memory fades*",
-        textKo: "*기억 회상 속에서 보인다* 이사벨라… 들어줘. 언어는 힘이야. 그들이 내 말들을 빼앗아 갔어. 이걸 찾으면… ∆LX를 따라가. 진실을 찾아. *기억이 사라진다*",
-        textEs: "*se muestra en un flashback de memoria* Isabella… escúchame. El lenguaje es poder. Tomaron mis palabras. Si encuentras esto… sigue el ∆LX. Encuentra la verdad. *la memoria se desvanece*",
+        text: "*shown in a memory flashback* Isabella... escúchame. El lenguaje es poder. They took my words. If you find this... follow the ∆LX. Find the truth. *memory fades*",
+        textKo: "*기억 회상 속에서 보인다* 이사벨라... 들어줘. 언어는 힘이야. 그들이 내 말들을 빼앗아 갔어. 이걸 찾으면... ∆LX를 따라가. 진실을 찾아. *기억이 사라진다*",
+        textEs: "*se muestra en un flashback de memoria* Isabella... escúchame. El lenguaje es poder. Tomaron mis palabras. Si encuentras esto... sigue el ∆LX. Encuentra la verdad. *la memoria se desvanece*",
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "He wasn't speaking a foreign language, Isabel. He was speaking in the only language he had left. Something stripped away his Spanish, his English, everything — and left him with nothing but Day One vocabulary. Someone did this to him on purpose.",
-        textKo: "이사벨, 그가 외국어를 말한 게 아니야. 그에게 남은 유일한 언어를 말한 거야. 무언가가 그의 스페인어, 영어, 전부를 벗겨갔어 — 그리고 1일차 기초 단어만 남겨놓은 거야. 누군가가 의도적으로 이걸 한 거야.",
-        textEs: "No estaba hablando un idioma extranjero, Isabel. Estaba hablando en el único idioma que le quedaba. Algo le quitó su español, su inglés, todo — y le dejó solo con vocabulario del Día Uno. Alguien le hizo esto a propósito.",
+        text: "He wasn't speaking a foreign language, Isabel. He was speaking in the only language he had left. Something stripped away his Spanish, his English, everything, and left him with nothing but Day One vocabulary. Someone did this to him on purpose.",
+        textKo: "이사벨, 그가 외국어를 말한 게 아니야. 그에게 남은 유일한 언어를 말한 거야. 무언가가 그의 스페인어, 영어, 전부를 벗겨갔어, 그리고 1일차 기초 단어만 남겨놓은 거야. 누군가가 의도적으로 이걸 한 거야.",
+        textEs: "No estaba hablando un idioma extranjero, Isabel. Estaba hablando en el único idioma que le quedaba. Algo le quitó su español, su inglés, todo, y le dejó solo con vocabulario del Día Uno. Alguien le hizo esto a propósito.",
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "A week ago I would have said that's impossible. But a week ago I didn't know about magic stones that protect language — or a man who says 'thank you' after stealing them. Take me to the Prado. Now.",
+        text: "A week ago I would have said that's impossible. But a week ago I didn't know about magic stones that protect language, or a man who says 'thank you' after stealing them. Take me to the Prado. Now.",
         textKo: "일주일 전이었으면 불가능하다고 했을 거야. 하지만 일주일 전에는 언어를 보호하는 마법석이나, 수호석을 훔치고 '감사합니다'라고 말하는 남자에 대해 몰랐으니까. 프라도로 데려다줘. 지금.",
-        textEs: "Hace una semana habría dicho que es imposible. Pero hace una semana no sabía sobre piedras mágicas que protegen el lenguaje — ni sobre un hombre que dice 'gracias' después de robarlas. Llévame al Prado. Ahora.",
+        textEs: "Hace una semana habría dicho que es imposible. Pero hace una semana no sabía sobre piedras mágicas que protegen el lenguaje, ni sobre un hombre que dice 'gracias' después de robarlas. Llévame al Prado. Ahora.",
       },
       // ── Scene 2: Don Miguel's Market ──────────────────────────────────────
       {
@@ -1311,17 +1294,17 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "miguel",
-        text: "Isabel! And this must be the famous detective. Welcome! Please, sit. Are you hungry? Of course you're hungry — you're in Madrid! Nobody leaves my stall hungry. That's my one rule.",
-        textKo: "이사벨! 이분이 유명한 탐정이로구나. 환영해! 자, 앉아. 배고프지? 당연히 배고프겠지 — 마드리드에 왔으니까! 아무도 내 가판대에서 배고프게 보내지 않아. 그게 내 유일한 규칙이야.",
-        textEs: "¡Isabel! Y este debe ser el famoso detective. ¡Bienvenido! Por favor, siéntate. ¿Tienes hambre? ¡Claro que tienes hambre — estás en Madrid! Nadie se va de mi puesto con hambre. Esa es mi única regla.",
+        text: "Isabel! And this must be the famous detective. Welcome! Please, sit. Are you hungry? Of course you're hungry, you're in Madrid! Nobody leaves my stall hungry. That's my one rule.",
+        textKo: "이사벨! 이분이 유명한 탐정이로구나. 환영해! 자, 앉아. 배고프지? 당연히 배고프겠지, 마드리드에 왔으니까! 아무도 내 가판대에서 배고프게 보내지 않아. 그게 내 유일한 규칙이야.",
+        textEs: "¡Isabel! Y este debe ser el famoso detective. ¡Bienvenido! Por favor, siéntate. ¿Tienes hambre? ¡Claro que tienes hambre, estás en Madrid! Nadie se va de mi puesto con hambre. Esa es mi única regla.",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Good — you know the key words now. Time to use them with Don Miguel. He won't share information until you greet him and order properly. Use the vocabulary you just learned.)",
-        textKo: "(좋아 — 이제 핵심 단어들을 알았지. 돈 미겔에게 써먹을 차례야. 제대로 인사하고 주문하기 전에는 정보를 공유하지 않을 거야. 방금 배운 어휘를 사용해봐.)",
-        textEs: "(Bien — ahora conoces las palabras clave. Es hora de usarlas con Don Miguel. No compartirá información hasta que lo saludes y pidas correctamente. Usa el vocabulario que acabas de aprender.)",
+        text: "(Good. You know the key words now. Time to use them with Don Miguel. He won't share information until you greet him and order properly. Use the vocabulary you just learned.)",
+        textKo: "(좋아. 이제 핵심 단어들을 알았지. 돈 미겔에게 써먹을 차례야. 제대로 인사하고 주문하기 전에는 정보를 공유하지 않을 거야. 방금 배운 어휘를 사용해봐.)",
+        textEs: "(Bien. Ahora conoces las palabras clave. Es hora de usarlas con Don Miguel. No compartirá información hasta que lo saludes y pidas correctamente. Usa el vocabulario que acabas de aprender.)",
       },
       {
         kind: "puzzle",
@@ -1420,25 +1403,25 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "miguel",
-        text: "Yesterday, I forgot how to say 'friend' in Spanish. My own language. Forty years in this market and yesterday — the word just wasn't there. Like someone pulled it out of my head. My neighbor María forgot 'bread.' Eduardo forgot 'open.' As we say — 'No hay mal que por bien no venga.' But I'm struggling to find the silver in this one.",
-        textKo: "어제, '친구'라는 단어를 스페인어로 잊어버렸어. 내 모국어를. 40년간 이 시장을 운영했는데 어제 — 단어가 그냥 없었어. 누가 머릿속에서 뽑아간 것처럼. 이웃 마리아도 '빵'을 잊었어. 에두아르도는 '열다'를 잊어서 자기 가게를 못 열었어. 우리가 말하듯이 — '비 온 뒤에 땅이 굳는다'지만, 이번에는 좋은 점을 찾기 힘들어.",
-        textEs: "Ayer, olvidé cómo decir 'amigo' en español. Mi propio idioma. Cuarenta años en este mercado y ayer — la palabra simplemente no estaba. Como si alguien la arrancara de mi cabeza. Mi vecina María olvidó 'pan.' Eduardo olvidó 'abrir.' Como decimos — 'No hay mal que por bien no venga.' Pero me cuesta encontrar el bien en esto.",
+        text: "Yesterday, I forgot how to say 'friend' in Spanish. My own language. Forty years in this market and yesterday, the word just wasn't there. Like someone pulled it out of my head. My neighbor María forgot 'bread.' Eduardo forgot 'open.' As we say, 'No hay mal que por bien no venga.' But I'm struggling to find the silver in this one.",
+        textKo: "어제, '친구'라는 단어를 스페인어로 잊어버렸어. 내 모국어를. 40년간 이 시장을 운영했는데 어제, 단어가 그냥 없었어. 누가 머릿속에서 뽑아간 것처럼. 이웃 마리아도 '빵'을 잊었어. 에두아르도는 '열다'를 잊어서 자기 가게를 못 열었어. 우리가 말하듯이, '비 온 뒤에 땅이 굳는다'지만, 이번에는 좋은 점을 찾기 힘들어.",
+        textEs: "Ayer, olvidé cómo decir 'amigo' en español. Mi propio idioma. Cuarenta años en este mercado y ayer, la palabra simplemente no estaba. Como si alguien la arrancara de mi cabeza. Mi vecina María olvidó 'pan.' Eduardo olvidó 'abrir.' Como decimos, 'No hay mal que por bien no venga.' Pero me cuesta encontrar el bien en esto.",
         idiomRef: "idiom_miguel_1",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(He's forgetting words. Don Miguel — seventy years of daily Spanish — is forgetting simple words. And Carlos was shouting basic phrases before he disappeared. The device isn't just a threat. It's already working here. In Madrid. Right now.)",
-        textKo: "(단어를 잊고 있어. 돈 미겔 — 70년간 매일 스페인어를 해온 사람이 — 간단한 단어를 잊고 있어. 그리고 카를로스는 사라지기 전에 기초 표현을 소리치고 있었고. 그 장치는 위협만이 아니야. 이미 여기서 작동하고 있어. 마드리드에서. 지금.)",
-        textEs: "(Olvida palabras. Don Miguel — setenta años de español diario — olvida palabras simples. Y Carlos gritaba frases básicas antes de desaparecer. El dispositivo no es solo una amenaza. Ya está funcionando aquí. En Madrid. Ahora mismo.)",
+        text: "(He's forgetting words. Don Miguel, seventy years of daily Spanish, is forgetting simple words. And Carlos was shouting basic phrases before he disappeared. The device isn't just a threat. It's already working here. In Madrid. Right now.)",
+        textKo: "(단어를 잊고 있어. 돈 미겔, 70년간 매일 스페인어를 해온 사람이, 간단한 단어를 잊고 있어. 그리고 카를로스는 사라지기 전에 기초 표현을 소리치고 있었고. 그 장치는 위협만이 아니야. 이미 여기서 작동하고 있어. 마드리드에서. 지금.)",
+        textEs: "(Olvida palabras. Don Miguel, setenta años de español diario, olvida palabras simples. Y Carlos gritaba frases básicas antes de desaparecer. El dispositivo no es solo una amenaza. Ya está funcionando aquí. En Madrid. Ahora mismo.)",
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "Don Miguel. The man who took Carlos — did he come through this market? Tall, black coat, speaks perfect everything?",
-        textKo: "돈 미겔. 카를로스를 데려간 남자 — 이 시장을 지나간 적 있어요? 키 크고, 검은 코트, 모든 언어를 완벽하게 하는?",
-        textEs: "Don Miguel. El hombre que se llevó a Carlos — ¿pasó por este mercado? ¿Alto, abrigo negro, habla todo perfectamente?",
+        text: "Don Miguel. The man who took Carlos. Did he come through this market? Tall, black coat, speaks perfect everything?",
+        textKo: "돈 미겔. 카를로스를 데려간 남자. 이 시장을 지나간 적 있어요? 키 크고, 검은 코트, 모든 언어를 완벽하게 하는?",
+        textEs: "Don Miguel. El hombre que se llevó a Carlos. ¿Pasó por este mercado? ¿Alto, abrigo negro, habla todo perfectamente?",
       },
       {
         kind: "scene",
@@ -1452,9 +1435,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Retiro Park. Afternoon sun through the trees. The last place Carlos was seen. Then, across the path — a man. Tall. Silver hair. Impeccably dressed. Writing in a small notebook. That's him. That's Mr. Black. Right there. Twenty meters away.)",
-        textKo: "(레티로 공원. 오후의 햇살이 나무 사이로 쏟아진다. 카를로스가 마지막으로 목격된 곳. 그때, 길 건너편에서 — 한 남자. 키가 크다. 은발. 흠잡을 데 없이 차려입었다. 작은 노트에 무언가를 적고 있다. 저 사람이야. 미스터 블랙. 바로 저기. 20미터 앞에서.)",
-        textEs: "(Parque del Retiro. Sol de tarde entre los árboles. El último lugar donde vieron a Carlos. Entonces, al otro lado del camino — un hombre. Alto. Pelo plateado. Impecablemente vestido. Escribiendo en una libreta pequeña. Es él. Mr. Black. Justo ahí. A veinte metros.)",
+        text: "(Retiro Park. Afternoon sun through the trees. The last place Carlos was seen. Then, across the path, a man. Tall. Silver hair. Impeccably dressed. Writing in a small notebook. That's him. That's Mr. Black. Right there. Twenty meters away.)",
+        textKo: "(레티로 공원. 오후의 햇살이 나무 사이로 쏟아진다. 카를로스가 마지막으로 목격된 곳. 그때, 길 건너편에서, 한 남자. 키가 크다. 은발. 흠잡을 데 없이 차려입었다. 작은 노트에 무언가를 적고 있다. 저 사람이야. 미스터 블랙. 바로 저기. 20미터 앞에서.)",
+        textEs: "(Parque del Retiro. Sol de tarde entre los árboles. El último lugar donde vieron a Carlos. Entonces, al otro lado del camino, un hombre. Alto. Pelo plateado. Impecablemente vestido. Escribiendo en una libreta pequeña. Es él. Mr. Black. Justo ahí. A veinte metros.)",
       },
       {
         kind: "scene",
@@ -1481,9 +1464,9 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "mr_black",
-        text: "Number three, Calle del Prado. Third floor. The door is open. I don't lock doors, detective — you already know that about me.",
-        textKo: "칼레 델 프라도 3번지. 3층. 문은 열려 있어요. 저는 문을 잠그지 않아요, 탐정 — 이미 아시잖아요.",
-        textEs: "Número tres, Calle del Prado. Tercer piso. La puerta está abierta. Yo no cierro puertas, detective — eso ya lo sabe de mí.",
+        text: "Number three, Calle del Prado. Third floor. The door is open. I don't lock doors, detective. You already know that about me.",
+        textKo: "칼레 델 프라도 3번지. 3층. 문은 열려 있어요. 저는 문을 잠그지 않아요, 탐정. 이미 아시잖아요.",
+        textEs: "Número tres, Calle del Prado. Tercer piso. La puerta está abierta. Yo no cierro puertas, detective. Eso ya lo sabe de mí.",
       },
       {
         kind: "scene",
@@ -1511,9 +1494,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Later that night. Isabel sends a voice message. Three words: 'They got Juan.' Juan — her brother. The one who saw Mr. Black at the market. He had 40 words this morning. Now he has three. 'I. Don't. Remember.' This isn't a chess game anymore.)",
-        textKo: "(그날 밤 늦게. 이사벨에게서 음성 메시지가 와. 단어 세 개: '후안이 당했어.' 후안 — 그녀의 남동생. 시장에서 미스터 블랙을 본 사람. 오늘 아침에 40개의 단어를 갖고 있었어. 지금은 세 개야. '나. 기억. 없어.' 이제 체스 게임이 아니야.)",
-        textEs: "(Más tarde esa noche. Isabel manda un mensaje de voz. Tres palabras: 'Se llevaron a Juan.' Juan — su hermano. El que vio a Mr. Black en el mercado. Esta mañana tenía 40 palabras. Ahora tiene tres. 'Yo. No. Recuerdo.' Esto ya no es un juego de ajedrez.)",
+        text: "(Later that night. Isabel sends a voice message. Three words: 'They got Juan.' Juan, her brother. The one who saw Mr. Black at the market. He had 40 words this morning. Now he has three. 'I. Don't. Remember.' This isn't a chess game anymore.)",
+        textKo: "(그날 밤 늦게. 이사벨에게서 음성 메시지가 와. 단어 세 개: '후안이 당했어.' 후안, 그녀의 남동생. 시장에서 미스터 블랙을 본 사람. 오늘 아침에 40개의 단어를 갖고 있었어. 지금은 세 개야. '나. 기억. 없어.' 이제 체스 게임이 아니야.)",
+        textEs: "(Más tarde esa noche. Isabel manda un mensaje de voz. Tres palabras: 'Se llevaron a Juan.' Juan, su hermano. El que vio a Mr. Black en el mercado. Esta mañana tenía 40 palabras. Ahora tiene tres. 'Yo. No. Recuerdo.' Esto ya no es un juego de ajedrez.)",
       },
       {
         kind: "clue",
@@ -1521,9 +1504,9 @@ const STORIES: Record<string, Story> = {
         titleEn: "Mr. Black's Torn Notebook Page",
         titleKo: "미스터 블랙의 찢어진 노트 페이지",
         titleEs: "Página Arrancada del Cuaderno de Mr. Black",
-        descEn: "Numbers and words scrambled: '7000 — walls — goodbye — hello — editor — Calle del Prado 3.' Left deliberately. He wanted to be understood.",
-        descKo: "숫자와 단어가 뒤섞여 있다: '7000 — 벽 — 안녕히 계세요 — 안녕하세요 — 편집자 — 칼레 델 프라도 3.' 의도적으로 남겨둔 것이다. 이해받길 원했다.",
-        descEs: "Números y palabras mezclados: '7000 — muros — adiós — hola — editor — Calle del Prado 3.' Dejado deliberadamente. Quería ser entendido.",
+        descEn: "Numbers and words scrambled: '7000, walls, goodbye, hello, editor, Calle del Prado 3.' Left deliberately. He wanted to be understood.",
+        descKo: "숫자와 단어가 뒤섞여 있다: '7000, 벽, 안녕히 계세요, 안녕하세요, 편집자, 칼레 델 프라도 3.' 의도적으로 남겨둔 것이다. 이해받길 원했다.",
+        descEs: "Números y palabras mezclados: '7000, muros, adiós, hola, editor, Calle del Prado 3.' Dejado deliberadamente. Quería ser entendido.",
       },
       {
         kind: "puzzle",
@@ -1600,9 +1583,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Number three, Calle del Prado. Third floor. Door open, just as Mr. Black said. Inside: a dark room. An old machine — like an antique radio, but languages scroll across its screen. And in the corner, a man in a chair. Carlos. Alive. But his eyes are unfocused.)",
-        textKo: "(칼레 델 프라도 3번지. 3층. 미스터 블랙이 말한 대로 문이 열려 있다. 안에는 어두운 방. 오래된 기계 장치 — 앤티크 라디오를 닮았지만 화면에 언어가 스크롤되고 있다. 그리고 구석에, 의자에 앉아있는 남자. 카를로스. 살아있다. 하지만 눈이 초점을 잃었다.)",
-        textEs: "(Número tres, Calle del Prado. Tercer piso. Puerta abierta, tal como dijo Mr. Black. Dentro: una habitación oscura. Una máquina vieja — como una radio antigua, pero idiomas se desplazan en su pantalla. Y en la esquina, un hombre en una silla. Carlos. Vivo. Pero sus ojos están desenfocados.)",
+        text: "(Number three, Calle del Prado. Third floor. Door open, just as Mr. Black said. Inside: a dark room. An old machine, like an antique radio, but languages scroll across its screen. And in the corner, a man in a chair. Carlos. Alive. But his eyes are unfocused.)",
+        textKo: "(칼레 델 프라도 3번지. 3층. 미스터 블랙이 말한 대로 문이 열려 있다. 안에는 어두운 방. 오래된 기계 장치, 앤티크 라디오를 닮았지만 화면에 언어가 스크롤되고 있다. 그리고 구석에, 의자에 앉아있는 남자. 카를로스. 살아있다. 하지만 눈이 초점을 잃었다.)",
+        textEs: "(Número tres, Calle del Prado. Tercer piso. Puerta abierta, tal como dijo Mr. Black. Dentro: una habitación oscura. Una máquina vieja, como una radio antigua, pero idiomas se desplazan en su pantalla. Y en la esquina, un hombre en una silla. Carlos. Vivo. Pero sus ojos están desenfocados.)",
       },
       {
         kind: "scene",
@@ -1621,17 +1604,17 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "carlos",
-        text: "The machine... it erases. Languages. From your head. I found it hidden in the wall at the Prado. When I touched it — I heard every language I know start to dissolve. Like sugar in water. One word at a time. Until all I had left was... 'Hello. Help. Where is the door.'",
-        textKo: "기계가... 지워. 언어를. 머릿속에서. 프라도 벽 안에 숨겨진 걸 발견했어. 만졌더니 — 내가 아는 모든 언어가 녹기 시작하는 게 들렸어. 설탕이 물에 녹듯이. 한 단어씩. 남은 건... '안녕하세요. 도와주세요. 문이 어디예요.'뿐이었어.",
-        textEs: "La máquina... borra. Idiomas. De tu cabeza. La encontré escondida en la pared del Prado. Cuando la toqué — escuché cómo cada idioma que conozco empezaba a disolverse. Como azúcar en agua. Una palabra a la vez. Hasta que todo lo que me quedaba era... 'Hola. Ayuda. ¿Dónde está la puerta?'",
+        text: "The machine... it erases. Languages. From your head. I found it hidden in the wall at the Prado. When I touched it, I heard every language I know start to dissolve. Like sugar in water. One word at a time. Until all I had left was... 'Hello. Help. Where is the door.'",
+        textKo: "기계가... 지워. 언어를. 머릿속에서. 프라도 벽 안에 숨겨진 걸 발견했어. 만졌더니, 내가 아는 모든 언어가 녹기 시작하는 게 들렸어. 설탕이 물에 녹듯이. 한 단어씩. 남은 건... '안녕하세요. 도와주세요. 문이 어디예요.'뿐이었어.",
+        textEs: "La máquina... borra. Idiomas. De tu cabeza. La encontré escondida en la pared del Prado. Cuando la toqué, escuché cómo cada idioma que conozco empezaba a disolverse. Como azúcar en agua. Una palabra a la vez. Hasta que todo lo que me quedaba era... 'Hola. Ayuda. ¿Dónde está la puerta?'",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(A Language Erasure Device. Just a prototype — the final version needs all seven Guardian Stones. Seven stones, seven thousand languages erased. He's not a thief. He's an extinction event. I need to shut this machine down. Now.)",
-        textKo: "(언어 삭제 장치. 시제품일 뿐이야 — 최종 버전은 7개의 수호석이 모두 필요해. 7개의 수호석, 7천 개의 언어 삭제. 그는 도둑이 아니야. 멸종 사건이야. 지금 당장 이 기계를 꺼야 해.)",
-        textEs: "(Un Dispositivo de Borrado de Idiomas. Solo un prototipo — la versión final necesita las siete Piedras Guardianas. Siete piedras, siete mil idiomas borrados. No es un ladrón. Es un evento de extinción. Necesito apagar esta máquina. Ahora.)",
+        text: "(A Language Erasure Device. Just a prototype, the final version needs all seven Guardian Stones. Seven stones, seven thousand languages erased. He's not a thief. He's an extinction event. I need to shut this machine down. Now.)",
+        textKo: "(언어 삭제 장치. 시제품일 뿐이야. 최종 버전은 7개의 수호석이 모두 필요해. 7개의 수호석, 7천 개의 언어 삭제. 그는 도둑이 아니야. 멸종 사건이야. 지금 당장 이 기계를 꺼야 해.)",
+        textEs: "(Un Dispositivo de Borrado de Idiomas. Solo un prototipo, la versión final necesita las siete Piedras Guardianas. Siete piedras, siete mil idiomas borrados. No es un ladrón. Es un evento de extinción. Necesito apagar esta máquina. Ahora.)",
       },
       {
         kind: "puzzle",
@@ -1714,34 +1697,34 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
-        text: "The Madrid stone — do you know where it is?",
-        textKo: "마드리드 수호석 — 어디 있는지 알아?",
-        textEs: "¿La piedra de Madrid — sabes dónde está?",
+        text: "The Madrid stone, do you know where it is?",
+        textKo: "마드리드 수호석, 어디 있는지 알아?",
+        textEs: "¿La piedra de Madrid, sabes dónde está?",
       },
       {
         kind: "scene",
         charId: "carlos",
-        text: "Under the machine. There's a compartment. The stone was powering it — he used the Madrid stone to run the prototype.",
-        textKo: "기계 아래에. 칸이 있어. 수호석이 동력원이었어 — 시제품을 가동하는 데 마드리드 수호석을 사용한 거야.",
-        textEs: "Debajo de la máquina. Hay un compartimento. La piedra la alimentaba — usó la piedra de Madrid para hacer funcionar el prototipo.",
+        text: "Under the machine. There's a compartment. The stone was powering it. He used the Madrid stone to run the prototype.",
+        textKo: "기계 아래에. 칸이 있어. 수호석이 동력원이었어. 시제품을 가동하는 데 마드리드 수호석을 사용한 거야.",
+        textEs: "Debajo de la máquina. Hay un compartimento. La piedra la alimentaba. Usó la piedra de Madrid para hacer funcionar el prototipo.",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Rudy checks underneath the machine. There's a compartment. It opens. But inside — nothing. Where the stone should be, a single piece of paper.)",
-        textKo: "(루디가 기계 아래를 확인한다. 칸이 있다. 열린다. 하지만 안에는 — 아무것도 없다. 수호석이 있던 자리에 종이 한 장.)",
-        textEs: "(Rudy revisa debajo de la máquina. Hay un compartimento. Se abre. Pero dentro — nada. Donde debería estar la piedra, un solo papel.)",
+        text: "(Rudy checks underneath the machine. There's a compartment. It opens. But inside, nothing. Where the stone should be, a single piece of paper.)",
+        textKo: "(루디가 기계 아래를 확인한다. 칸이 있다. 열린다. 하지만 안에는, 아무것도 없다. 수호석이 있던 자리에 종이 한 장.)",
+        textEs: "(Rudy revisa debajo de la máquina. Hay un compartimento. Se abre. Pero dentro, nada. Donde debería estar la piedra, un solo papel.)",
       },
       {
         kind: "clue",
         symbol: "📝",
-        titleEn: "Mr. Black's Note — Left Behind",
+        titleEn: "Mr. Black's Note, Left Behind",
         titleKo: "미스터 블랙의 메모",
-        titleEs: "Nota de Mr. Black — Dejada Atrás",
-        descEn: "'Thank you for helping Carlos. I'm sorry about the machine. You found one stone. I have six. The numbers are not in your favor, detective. See you in Seoul. Goodbye, Madrid. — B'",
-        descKo: "'카를로스를 도와줘서 감사합니다. 기계는 죄송해요. 수호석 하나를 찾았네요. 저는 여섯 개 있어요. 숫자가 유리하지 않아요, 탐정. 서울에서 봐요. 안녕히 계세요, 마드리드. — B'",
-        descEs: "'Gracias por ayudar a Carlos. Perdón por la máquina. Encontraste una piedra. Yo tengo seis. Los números no están a tu favor, detective. Nos vemos en Seúl. Adiós, Madrid. — B'",
+        titleEs: "Nota de Mr. Black, Dejada Atrás",
+        descEn: "'Thank you for helping Carlos. I'm sorry about the machine. London and Madrid are only two of the four city stones. The last three are waiting at Babel. The numbers are not in your favor, detective. See you in Seoul. Goodbye, Madrid. -B'",
+        descKo: "'카를로스를 도와줘서 감사합니다. 기계는 죄송해요. 런던과 마드리드는 네 도시 수호석 중 두 개일 뿐입니다. 마지막 세 개는 바벨에서 기다리고 있어요. 숫자가 유리하지 않아요, 탐정. 서울에서 봐요. 안녕히 계세요, 마드리드. -B'",
+        descEs: "'Gracias por ayudar a Carlos. Perdón por la máquina. Londres y Madrid son solo dos de las cuatro piedras de ciudad. Las últimas tres esperan en Babel. Los números no están a tu favor, detective. Nos vemos en Seúl. Adiós, Madrid. -B'",
       },
       {
         kind: "scene",
@@ -1761,9 +1744,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Does it? One stone. He has six. He told me the math himself: 'The numbers are not in your favor.' He's right about the math. He's right about being ahead. The worst part — his seven thousand walls wasn't wrong as a problem. He's wrong about the solution. But the problem is real. Seoul. He said Seoul. Time to stop being one step behind.)",
-        textKo: "(그래? 수호석 하나. 그는 여섯 개를 가지고 있어. 직접 수학을 말해줬잖아: '숫자가 유리하지 않아요.' 맞는 말이야. 앞서고 있다는 것도 맞고. 최악인 건 — 7천 개의 벽에 대한 그의 말도 문제 자체로는 틀리지 않았어. 해법이 틀린 거야. 하지만 문제는 진짜야. 서울. 서울이라고 했어. 한 발 뒤처지는 건 그만 할 때야.)",
-        textEs: "(¿De verdad? Una piedra. Él tiene seis. Me dijo los números él mismo: 'Los números no están a tu favor.' Tiene razón con las matemáticas. Tiene razón en ir adelante. Lo peor — siete mil muros no era un problema equivocado. Se equivoca en la solución. Pero el problema es real. Seúl. Dijo Seúl. Hora de dejar de ir un paso atrás.)",
+        text: "(Does it? London. Madrid. Two city stones already compromised, two still ahead, and three foundation stones waiting at Babel. He told me the math himself: 'The numbers are not in your favor.' He's right about the math. He's right about being ahead. The worst part. His seven thousand walls wasn't wrong as a problem. He's wrong about the solution. But the problem is real. Seoul. He said Seoul. Time to stop being one step behind.)",
+        textKo: "(그래? 런던. 마드리드. 도시 수호석 두 개는 이미 위험해졌고, 두 개는 아직 앞에 있고, 바벨에는 기초석 세 개가 기다리고 있어. 직접 수학을 말해줬잖아: '숫자가 유리하지 않아요.' 맞는 말이야. 앞서고 있다는 것도 맞고. 최악인 건. 7천 개의 벽에 대한 그의 말도 문제 자체로는 틀리지 않았어. 해법이 틀린 거야. 하지만 문제는 진짜야. 서울. 서울이라고 했어. 한 발 뒤처지는 건 그만 할 때야.)",
+        textEs: "(¿De verdad? Londres. Madrid. Dos piedras de ciudad ya comprometidas, dos aún por delante, y tres piedras de cimiento esperando en Babel. Me dijo los números él mismo: 'Los números no están a tu favor.' Tiene razón con las matemáticas. Tiene razón en ir adelante. Lo peor. Siete mil muros no era un problema equivocado. Se equivoca en la solución. Pero el problema es real. Seúl. Dijo Seúl. Hora de dejar de ir un paso atrás.)",
       },
     ],
   },
@@ -1859,9 +1842,9 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
-        text: "Alright, partner. Confidence level: historically low. Phone is dead. Charger is in Madrid because apparently I pack like a disaster. I need to find Sujin — she is a linguist, Eleanor's contact in Seoul. But first I need to survive this airport using nothing but the Korean we learned in the last thirty days. No pressure.",
-        textKo: "좋아, 파트너. 자신감 레벨: 역대 최저. 핸드폰이 죽었어. 충전기는 마드리드에 있어, 왜냐면 나는 재앙처럼 짐을 싸니까. 수진을 찾아야 해 — 엘리너의 서울 연락책인 언어학자야. 하지만 먼저 지난 30일 동안 배운 한국어만으로 이 공항에서 살아남아야 해. 부담 없지.",
-        textEs: "Bien, compañero. Nivel de confianza: históricamente bajo. El teléfono está muerto. El cargador está en Madrid porque aparentemente empaco como un desastre. Necesito encontrar a Sujin — es lingüista, el contacto de Eleanor en Seúl. Pero primero necesito sobrevivir en este aeropuerto usando solo el coreano que aprendimos en los últimos treinta días. Sin presión.",
+        text: "Alright, partner. Confidence level: historically low. Phone is dead. Charger is in Madrid because apparently I pack like a disaster. I need to find Sujin, she is a linguist, Eleanor's contact in Seoul. But first I need to survive this airport using nothing but the Korean we learned in the last thirty days. No pressure.",
+        textKo: "좋아, 파트너. 자신감 레벨: 역대 최저. 핸드폰이 죽었어. 충전기는 마드리드에 있어, 왜냐면 나는 재앙처럼 짐을 싸니까. 수진을 찾아야 해, 엘리너의 서울 연락책인 언어학자야. 하지만 먼저 지난 30일 동안 배운 한국어만으로 이 공항에서 살아남아야 해. 부담 없지.",
+        textEs: "Bien, compañero. Nivel de confianza: históricamente bajo. El teléfono está muerto. El cargador está en Madrid porque aparentemente empaco como un desastre. Necesito encontrar a Sujin, es lingüista, el contacto de Eleanor en Seúl. Pero primero necesito sobrevivir en este aeropuerto usando solo el coreano que aprendimos en los últimos treinta días. Sin presión.",
       },
       {
         kind: "scene",
@@ -1961,9 +1944,9 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
-        text: "Great. My pronunciation is so bad that a stranger is having a medical event. You must be Minho — Sujin's friend?",
-        textKo: "좋아. 내 발음이 너무 안 좋아서 모르는 사람이 의료 사태를 겪고 있어. 민호지 — 수진의 친구?",
-        textEs: "Genial. Mi pronunciación es tan mala que un desconocido está teniendo una emergencia médica. ¿Debes ser Minho — el amigo de Sujin?",
+        text: "Great. My pronunciation is so bad that a stranger is having a medical event. You must be Minho, Sujin's friend?",
+        textKo: "좋아. 내 발음이 너무 안 좋아서 모르는 사람이 의료 사태를 겪고 있어. 민호지, 수진의 친구?",
+        textEs: "Genial. Mi pronunciación es tan mala que un desconocido está teniendo una emergencia médica. ¿Debes ser Minho, el amigo de Sujin?",
       },
       {
         kind: "scene",
@@ -1976,9 +1959,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Minho is loud, confident, and speaks in a mix of Korean slang and English. He wears his personality like his oversized jacket — big and impossible to ignore. He is already teaching you before you agreed to learn. Pick the right responses to his language lessons.)",
-        textKo: "(민호는 시끄럽고, 자신만만하고, 한국어 속어와 영어를 섞어 말한다. 그의 성격은 오버사이즈 재킷처럼 — 크고 무시할 수 없다. 배우겠다고 동의하기도 전에 이미 가르치고 있다. 그의 언어 수업에 올바른 답을 골라봐.)",
-        textEs: "(Minho es ruidoso, seguro de sí mismo y habla en una mezcla de argot coreano e inglés. Lleva su personalidad como su chaqueta enorme — grande e imposible de ignorar. Ya te está enseñando antes de que aceptaras aprender. Elige las respuestas correctas a sus lecciones.)",
+        text: "(Minho is loud, confident, and speaks in a mix of Korean slang and English. He wears his personality like his oversized jacket, big and impossible to ignore. He is already teaching you before you agreed to learn. Pick the right responses to his language lessons.)",
+        textKo: "(민호는 시끄럽고, 자신만만하고, 한국어 속어와 영어를 섞어 말한다. 그의 성격은 오버사이즈 재킷처럼, 크고 무시할 수 없다. 배우겠다고 동의하기도 전에 이미 가르치고 있다. 그의 언어 수업에 올바른 답을 골라봐.)",
+        textEs: "(Minho es ruidoso, seguro de sí mismo y habla en una mezcla de argot coreano e inglés. Lleva su personalidad como su chaqueta enorme, grande e imposible de ignorar. Ya te está enseñando antes de que aceptaras aprender. Elige las respuestas correctas a sus lecciones.)",
       },
       {
         kind: "puzzle",
@@ -2055,18 +2038,18 @@ const STORIES: Record<string, Story> = {
         titleEn: "Investigation Notes: Korean Street Talk",
         titleKo: "수사 노트: 한국 길거리 표현",
         titleEs: "Notas de Investigación: Expresiones Callejeras Coreanas",
-        descEn: "Minho's trendy expressions: JMT (존맛탱 — 'crazy delicious,' from internet slang). In English: 'That's fire!' In Spanish: '¡Está brutal!' Korean youth culture compresses entire feelings into three letters. Language evolves fastest on the street.",
-        descKo: "민호의 트렌디한 표현: JMT (존맛탱 — 인터넷 슬랭에서 유래). 영어로는: 'That's fire!' 스페인어로는: '¡Está brutal!' 한국 청년 문화는 감정 전체를 세 글자로 압축한다. 언어는 길거리에서 가장 빠르게 진화한다.",
-        descEs: "Las expresiones de moda de Minho: JMT (존맛탱 — 'locamente delicioso,' del argot de internet). En inglés: 'That is fire!' En español: '¡Está brutal!' La cultura juvenil coreana comprime sentimientos enteros en tres letras. El lenguaje evoluciona más rápido en la calle.",
+        descEn: "Minho's trendy expressions: JMT (존맛탱, 'crazy delicious,' from internet slang). In English: 'That's fire!' In Spanish: '¡Está brutal!' Korean youth culture compresses entire feelings into three letters. Language evolves fastest on the street.",
+        descKo: "민호의 트렌디한 표현: JMT (존맛탱, 인터넷 슬랭에서 유래). 영어로는: 'That's fire!' 스페인어로는: '¡Está brutal!' 한국 청년 문화는 감정 전체를 세 글자로 압축한다. 언어는 길거리에서 가장 빠르게 진화한다.",
+        descEs: "Las expresiones de moda de Minho: JMT (존맛탱, 'locamente delicioso,' del argot de internet). En inglés: 'That is fire!' En español: '¡Está brutal!' La cultura juvenil coreana comprime sentimientos enteros en tres letras. El lenguaje evoluciona más rápido en la calle.",
       },
       // ── Scene 3: Grandma Youngsook's Kitchen ───────────────────────────────
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Gwangjang Market. Steam rises from every stall. Minho leads Rudy through narrow alleys packed with food vendors. They stop at a small stall where an elderly woman in an apron stirs a massive pot. Her hands move with forty years of practice. This is Grandma Youngsook — Sujin's grandmother.)",
+        text: "(Gwangjang Market. Steam rises from every stall. Minho leads Rudy through narrow alleys packed with food vendors. They stop at a small stall where an elderly woman in an apron stirs a massive pot. Her hands move with forty years of practice. This is Grandma Youngsook, Sujin's grandmother.)",
         textKo: "(광장시장. 모든 가판대에서 김이 올라온다. 민호가 루디를 음식 상인으로 가득 찬 좁은 골목으로 안내한다. 앞치마를 입은 할머니가 거대한 냄비를 저으며 서 있는 작은 가판대에서 멈춘다. 40년의 연습이 담긴 손놀림. 수진의 할머니, 영숙 할머니다.)",
-        textEs: "(Mercado de Gwangjang. El vapor sube de cada puesto. Minho guía a Rudy por callejones estrechos llenos de vendedores de comida. Se detienen en un pequeño puesto donde una anciana con delantal revuelve una olla enorme. Sus manos se mueven con cuarenta años de práctica. Esta es la Abuela Youngsook — la abuela de Sujin.)",
+        textEs: "(Mercado de Gwangjang. El vapor sube de cada puesto. Minho guía a Rudy por callejones estrechos llenos de vendedores de comida. Se detienen en un pequeño puesto donde una anciana con delantal revuelve una olla enorme. Sus manos se mueven con cuarenta años de práctica. Esta es la Abuela Youngsook, la abuela de Sujin.)",
       },
       {
         kind: "scene",
@@ -2079,9 +2062,9 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "minho",
-        text: "Grandma, this is Rudy. The fox detective. He is here to find the Guardian Stone. But first — Grandma, make him the bibimbap. He NEEDS it. Trust me.",
-        textKo: "할머니, 이 사람 루디예요. 여우 탐정. 수호석 찾으러 왔어요. 근데 먼저 — 할머니, 비빔밥 해주세요. 이 사람한테 필요해요. 진짜로.",
-        textEs: "Abuela, este es Rudy. El detective zorro. Está aquí para encontrar la Piedra Guardiana. Pero primero — Abuela, hazle el bibimbap. Lo NECESITA. Créeme.",
+        text: "Grandma, this is Rudy. The fox detective. He is here to find the Guardian Stone. But first, Grandma, make him the bibimbap. He NEEDS it. Trust me.",
+        textKo: "할머니, 이 사람 루디예요. 여우 탐정. 수호석 찾으러 왔어요. 근데 먼저, 할머니, 비빔밥 해주세요. 이 사람한테 필요해요. 진짜로.",
+        textEs: "Abuela, este es Rudy. El detective zorro. Está aquí para encontrar la Piedra Guardiana. Pero primero, Abuela, hazle el bibimbap. Lo NECESITA. Créeme.",
       },
       {
         kind: "scene",
@@ -2104,9 +2087,9 @@ const STORIES: Record<string, Story> = {
         titleEn: "Investigation Notes: Grandma Youngsook's Proverb",
         titleKo: "수사 노트: 영숙 할머니의 속담",
         titleEs: "Notas de Investigación: Proverbio de la Abuela Youngsook",
-        descEn: "Youngsook's wisdom: '밥 없는 대화는 지도 없는 길 같단다' — 'A conversation without rice is like a map without streets' — 'Una conversación sin arroz es como un mapa sin calles.' In Korean culture, sharing food is not separate from communication. It IS communication.",
-        descKo: "영숙 할머니의 지혜: '밥 없는 대화는 지도 없는 길 같단다' — 한국 문화에서 음식을 나누는 것은 소통과 분리되지 않는다. 그것 자체가 소통이다.",
-        descEs: "La sabiduría de Youngsook: '밥 없는 대화는 지도 없는 길 같단다' — 'Una conversación sin arroz es como un mapa sin calles.' En la cultura coreana, compartir comida no está separado de la comunicación. ES comunicación.",
+        descEn: "Youngsook's wisdom: '밥 없는 대화는 지도 없는 길 같단다', 'A conversation without rice is like a map without streets', 'Una conversación sin arroz es como un mapa sin calles.' In Korean culture, sharing food is not separate from communication. It IS communication.",
+        descKo: "영숙 할머니의 지혜: '밥 없는 대화는 지도 없는 길 같단다', 한국 문화에서 음식을 나누는 것은 소통과 분리되지 않는다. 그것 자체가 소통이다.",
+        descEs: "La sabiduría de Youngsook: '밥 없는 대화는 지도 없는 길 같단다', 'Una conversación sin arroz es como un mapa sin calles.' En la cultura coreana, compartir comida no está separado de la comunicación. ES comunicación.",
       },
       {
         kind: "puzzle",
@@ -2132,37 +2115,37 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Sujin's linguistics lab. University building near Namsan. Bookshelves from floor to ceiling. Papers in twelve languages pinned to every wall. Sujin sits at a desk covered in ancient manuscripts. She looks up when Rudy enters — sharp eyes, no smile.)",
-        textKo: "(수진의 언어학 연구실. 남산 근처 대학 건물. 천장까지 닿는 책장. 열두 개 언어로 된 논문이 벽마다 꽂혀 있다. 수진이 고대 원고로 덮인 책상에 앉아 있다. 루디가 들어오자 고개를 든다 — 날카로운 눈, 미소 없음.)",
-        textEs: "(El laboratorio de lingüística de Sujin. Edificio universitario cerca de Namsan. Estanterías del suelo al techo. Documentos en doce idiomas clavados en cada pared. Sujin está sentada en un escritorio cubierto de manuscritos antiguos. Levanta la vista cuando entra Rudy — ojos agudos, sin sonrisa.)",
+        text: "(Sujin's linguistics lab. University building near Namsan. Bookshelves from floor to ceiling. Papers in twelve languages pinned to every wall. Sujin sits at a desk covered in ancient manuscripts. She looks up when Rudy enters, sharp eyes, no smile.)",
+        textKo: "(수진의 언어학 연구실. 남산 근처 대학 건물. 천장까지 닿는 책장. 열두 개 언어로 된 논문이 벽마다 꽂혀 있다. 수진이 고대 원고로 덮인 책상에 앉아 있다. 루디가 들어오자 고개를 든다, 날카로운 눈, 미소 없음.)",
+        textEs: "(El laboratorio de lingüística de Sujin. Edificio universitario cerca de Namsan. Estanterías del suelo al techo. Documentos en doce idiomas clavados en cada pared. Sujin está sentada en un escritorio cubierto de manuscritos antiguos. Levanta la vista cuando entra Rudy, ojos agudos, sin sonrisa.)",
       },
       {
         kind: "scene",
         charId: "sujin",
-        text: "You are late. Eleanor said you were coming yesterday. Also — she said you were smart. The pronunciation Minho described suggests otherwise. Sit down. We have work to do.",
-        textKo: "늦었어요. 엘리너가 어제 온다고 했어요. 그리고 — 똑똑하다고 했는데. 민호가 설명한 발음으로는 아닌 것 같아요. 앉으세요. 할 일이 있어요.",
-        textEs: "Llegas tarde. Eleanor dijo que venías ayer. Además — dijo que eras inteligente. La pronunciación que Minho describió sugiere lo contrario. Siéntate. Tenemos trabajo que hacer.",
+        text: "You are late. Eleanor said you were coming yesterday. Also, she said you were smart. The pronunciation Minho described suggests otherwise. Sit down. We have work to do.",
+        textKo: "늦었어요. 엘리너가 어제 온다고 했어요. 그리고, 똑똑하다고 했는데. 민호가 설명한 발음으로는 아닌 것 같아요. 앉으세요. 할 일이 있어요.",
+        textEs: "Llegas tarde. Eleanor dijo que venías ayer. Además, dijo que eras inteligente. La pronunciación que Minho describió sugiere lo contrario. Siéntate. Tenemos trabajo que hacer.",
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "Nice to meet you too, Sujin. Eleanor speaks highly of you. She said you are the best linguist in Seoul — possibly the best she has ever trained.",
-        textKo: "나도 만나서 반가워요, 수진. 엘리너가 높이 평가하더라고요. 서울 최고의 언어학자라고 — 아마 자기가 가르친 사람 중 최고라고.",
-        textEs: "Encantado de conocerte también, Sujin. Eleanor habla muy bien de ti. Dijo que eres la mejor lingüista de Seúl — posiblemente la mejor que ha formado.",
+        text: "Nice to meet you too, Sujin. Eleanor speaks highly of you. She said you are the best linguist in Seoul, possibly the best she has ever trained.",
+        textKo: "나도 만나서 반가워요, 수진. 엘리너가 높이 평가하더라고요. 서울 최고의 언어학자라고, 아마 자기가 가르친 사람 중 최고라고.",
+        textEs: "Encantado de conocerte también, Sujin. Eleanor habla muy bien de ti. Dijo que eres la mejor lingüista de Seúl, posiblemente la mejor que ha formado.",
       },
       {
         kind: "scene",
         charId: "sujin",
-        text: "The Seoul Guardian Stone is in danger. Mr. Black has been seen near Namsan Tower three times this week. He is not hiding. He is studying the tower. The stone is hidden inside — only someone who reads the Korean inscriptions can find it. That is why Eleanor sent you to me.",
-        textKo: "서울 수호석이 위험해요. 미스터 블랙이 이번 주에 남산타워 근처에서 세 번 목격됐어요. 숨지 않아요. 타워를 연구하고 있어요. 수호석은 안에 숨겨져 있어요 — 한국어 비문을 읽을 수 있는 사람만 찾을 수 있어요. 그래서 엘리너가 저한테 보낸 거예요.",
-        textEs: "La Piedra Guardiana de Seúl está en peligro. Mr. Black ha sido visto cerca de la Torre Namsan tres veces esta semana. No se esconde. Está estudiando la torre. La piedra está oculta dentro — solo alguien que lea las inscripciones coreanas puede encontrarla. Por eso Eleanor te envió a mí.",
+        text: "The Seoul Guardian Stone is in danger. Mr. Black has been seen near Namsan Tower three times this week. He is not hiding. He is studying the tower. The stone is hidden inside. Only someone who reads the Korean inscriptions can find it. That is why Eleanor sent you to me.",
+        textKo: "서울 수호석이 위험해요. 미스터 블랙이 이번 주에 남산타워 근처에서 세 번 목격됐어요. 숨지 않아요. 타워를 연구하고 있어요. 수호석은 안에 숨겨져 있어요. 한국어 비문을 읽을 수 있는 사람만 찾을 수 있어요. 그래서 엘리너가 저한테 보낸 거예요.",
+        textEs: "La Piedra Guardiana de Seúl está en peligro. Mr. Black ha sido visto cerca de la Torre Namsan tres veces esta semana. No se esconde. Está estudiando la torre. La piedra está oculta dentro. Solo alguien que lea las inscripciones coreanas puede encontrarla. Por eso Eleanor te envió a mí.",
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "So let me get this straight. I need to read Korean inscriptions — inscriptions that have been there for centuries — using vocabulary I learned in the last thirty days. Partner, this is either the bravest or the stupidest thing we have ever done.",
-        textKo: "그러니까 정리하면. 수백 년 된 한국어 비문을 — 지난 30일 동안 배운 어휘로 읽어야 한다고. 파트너, 이건 우리가 해본 것 중 가장 용감하거나 가장 멍청한 거야.",
-        textEs: "A ver si lo entiendo. Necesito leer inscripciones en coreano — inscripciones que han estado ahí durante siglos — usando vocabulario que aprendí en los últimos treinta días. Compañero, esto es lo más valiente o lo más estúpido que hemos hecho.",
+        text: "So let me get this straight. I need to read Korean inscriptions, inscriptions that have been there for centuries, using vocabulary I learned in the last thirty days. Partner, this is either the bravest or the stupidest thing we have ever done.",
+        textKo: "그러니까 정리하면. 수백 년 된 한국어 비문을, 지난 30일 동안 배운 어휘로 읽어야 한다고. 파트너, 이건 우리가 해본 것 중 가장 용감하거나 가장 멍청한 거야.",
+        textEs: "A ver si lo entiendo. Necesito leer inscripciones en coreano, inscripciones que han estado ahí durante siglos, usando vocabulario que aprendí en los últimos treinta días. Compañero, esto es lo más valiente o lo más estúpido que hemos hecho.",
       },
       {
         kind: "puzzle",
@@ -2224,9 +2207,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Namsan Tower. Night. The city of Seoul spreads out below like a circuit board of light. Rudy, Sujin, and Minho reach the observation deck. Behind a locked maintenance door — an inscription in old Korean. Sujin translates. Then a voice from behind them. Calm. Familiar. Mr. Black.)",
-        textKo: "(남산타워. 밤. 서울 도시가 아래로 빛의 회로판처럼 펼쳐진다. 루디, 수진, 민호가 전망대에 도착한다. 잠긴 관리실 문 뒤에 — 고대 한국어 비문. 수진이 번역한다. 그때 뒤에서 들리는 목소리. 차분한. 익숙한. 미스터 블랙.)",
-        textEs: "(Torre Namsan. Noche. La ciudad de Seúl se extiende abajo como un tablero de circuitos de luz. Rudy, Sujin y Minho llegan a la plataforma de observación. Detrás de una puerta de mantenimiento cerrada — una inscripción en coreano antiguo. Sujin traduce. Entonces una voz detrás de ellos. Tranquila. Familiar. Mr. Black.)",
+        text: "(Namsan Tower. Night. The city of Seoul spreads out below like a circuit board of light. Rudy, Sujin, and Minho reach the observation deck. Behind a locked maintenance door, an inscription in old Korean. Sujin translates. Then a voice from behind them. Calm. Familiar. Mr. Black.)",
+        textKo: "(남산타워. 밤. 서울 도시가 아래로 빛의 회로판처럼 펼쳐진다. 루디, 수진, 민호가 전망대에 도착한다. 잠긴 관리실 문 뒤에, 고대 한국어 비문. 수진이 번역한다. 그때 뒤에서 들리는 목소리. 차분한. 익숙한. 미스터 블랙.)",
+        textEs: "(Torre Namsan. Noche. La ciudad de Seúl se extiende abajo como un tablero de circuitos de luz. Rudy, Sujin y Minho llegan a la plataforma de observación. Detrás de una puerta de mantenimiento cerrada, una inscripción en coreano antiguo. Sujin traduce. Entonces una voz detrás de ellos. Tranquila. Familiar. Mr. Black.)",
       },
       {
         kind: "scene",
@@ -2238,9 +2221,9 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "sujin",
-        text: "You used us. You knew we would find the inscription before you could read it yourself. Your Korean is not good enough to read the old script — so you waited for someone who could.",
-        textKo: "우리를 이용했군요. 당신이 직접 읽기 전에 우리가 비문을 찾을 줄 알았던 거예요. 당신의 한국어 실력으로는 옛 문체를 읽을 수 없으니까 — 읽을 수 있는 사람을 기다린 거예요.",
-        textEs: "Nos usaste. Sabías que encontraríamos la inscripción antes de que pudieras leerla tú mismo. Tu coreano no es suficiente para leer la escritura antigua — así que esperaste a alguien que pudiera.",
+        text: "You used us. You knew we would find the inscription before you could read it yourself. Your Korean is not good enough to read the old script, so you waited for someone who could.",
+        textKo: "우리를 이용했군요. 당신이 직접 읽기 전에 우리가 비문을 찾을 줄 알았던 거예요. 당신의 한국어 실력으로는 옛 문체를 읽을 수 없으니까, 읽을 수 있는 사람을 기다린 거예요.",
+        textEs: "Nos usaste. Sabías que encontraríamos la inscripción antes de que pudieras leerla tú mismo. Tu coreano no es suficiente para leer la escritura antigua, así que esperaste a alguien que pudiera.",
       },
       {
         kind: "scene",
@@ -2253,9 +2236,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Mr. Black disappears into the elevator. On the railing — a folded note. Rudy picks it up. The entire note is written in Korean. No English. No Spanish. Just Korean. He left it knowing that Rudy would have to read it himself.)",
-        textKo: "(미스터 블랙이 엘리베이터로 사라진다. 난간 위에 — 접힌 메모. 루디가 집어든다. 메모 전체가 한국어로 쓰여 있다. 영어 없음. 스페인어 없음. 오직 한국어. 루디가 직접 읽어야 한다는 것을 알고 남긴 것이다.)",
-        textEs: "(Mr. Black desaparece en el ascensor. En la barandilla — una nota doblada. Rudy la recoge. La nota entera está escrita en coreano. Sin inglés. Sin español. Solo coreano. La dejó sabiendo que Rudy tendría que leerla él mismo.)",
+        text: "(Mr. Black disappears into the elevator. On the railing, a folded note. Rudy picks it up. The entire note is written in Korean. No English. No Spanish. Just Korean. He left it knowing that Rudy would have to read it himself.)",
+        textKo: "(미스터 블랙이 엘리베이터로 사라진다. 난간 위에, 접힌 메모. 루디가 집어든다. 메모 전체가 한국어로 쓰여 있다. 영어 없음. 스페인어 없음. 오직 한국어. 루디가 직접 읽어야 한다는 것을 알고 남긴 것이다.)",
+        textEs: "(Mr. Black desaparece en el ascensor. En la barandilla, una nota doblada. Rudy la recoge. La nota entera está escrita en coreano. Sin inglés. Sin español. Solo coreano. La dejó sabiendo que Rudy tendría que leerla él mismo.)",
       },
       {
         kind: "puzzle",
@@ -2291,19 +2274,19 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Silence on the observation deck. Minho looks at Rudy. Sujin looks at Rudy. The note is in his hands. Korean characters. No translation. No help. This is the moment — can the player actually read Korean now?)",
-        textKo: "(전망대의 침묵. 민호가 루디를 본다. 수진이 루디를 본다. 메모가 루디의 손에 있다. 한국어 글자. 번역 없음. 도움 없음. 이 순간이다 — 플레이어가 정말로 한국어를 읽을 수 있을까?)",
-        textEs: "(Silencio en la plataforma de observación. Minho mira a Rudy. Sujin mira a Rudy. La nota está en sus manos. Caracteres coreanos. Sin traducción. Sin ayuda. Este es el momento — ¿puede el jugador realmente leer coreano ahora?)",
+        text: "(Silence on the observation deck. Minho looks at Rudy. Sujin looks at Rudy. The note is in his hands. Korean characters. No translation. No help. This is the moment. Can the player actually read Korean now?)",
+        textKo: "(전망대의 침묵. 민호가 루디를 본다. 수진이 루디를 본다. 메모가 루디의 손에 있다. 한국어 글자. 번역 없음. 도움 없음. 이 순간이다. 플레이어가 정말로 한국어를 읽을 수 있을까?)",
+        textEs: "(Silencio en la plataforma de observación. Minho mira a Rudy. Sujin mira a Rudy. La nota está en sus manos. Caracteres coreanos. Sin traducción. Sin ayuda. Este es el momento. ¿Puede el jugador realmente leer coreano ahora?)",
       },
       {
         kind: "clue",
         symbol: "📝",
-        titleEn: "Mr. Black's Note — Korean Only",
-        titleKo: "미스터 블랙의 메모 — 한국어로만",
-        titleEs: "Nota de Mr. Black — Solo en Coreano",
-        descEn: "잘했어요. 다음은 카이로예요. 언어는 문이에요. 저는 열쇠를 갖고 있어요. — No English translation provided.",
+        titleEn: "Mr. Black's Note: Korean Only",
+        titleKo: "미스터 블랙의 메모: 한국어로만",
+        titleEs: "Nota de Mr. Black: Solo en Coreano",
+        descEn: "잘했어요. 다음은 카이로예요. 언어는 문이에요. 저는 열쇠를 갖고 있어요. No English translation provided.",
         descKo: "잘했어요. 다음은 카이로예요. 언어는 문이에요. 저는 열쇠를 갖고 있어요.",
-        descEs: "잘했어요. 다음은 카이로예요. 언어는 문이에요. 저는 열쇠를 갖고 있어요. — Sin traducción al español.",
+        descEs: "잘했어요. 다음은 카이로예요. 언어는 문이에요. 저는 열쇠를 갖고 있어요. Sin traducción al español.",
       },
       {
         kind: "scene",
@@ -2322,24 +2305,24 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "sujin",
-        text: "I saw it. *small smile — the first one* Eleanor was right about you after all. Cairo. We need to warn our contacts there. Mr. Black has the Seoul stone — but he showed us something important: his Korean is not perfect. He needed US to find the inscription. That is his weakness.",
-        textKo: "봤어. *작은 미소 — 처음으로* 결국 엘리너가 맞았네요. 카이로. 거기 연락책에 알려야 해요. 미스터 블랙이 서울 수호석을 가져갔지만 — 중요한 걸 보여줬어요: 그의 한국어는 완벽하지 않아요. 비문을 찾으려면 우리가 필요했어요. 그게 약점이에요.",
-        textEs: "Lo vi. *pequeña sonrisa — la primera* Eleanor tenía razón sobre ti después de todo. El Cairo. Necesitamos avisar a nuestros contactos allí. Mr. Black tiene la piedra de Seúl — pero nos mostró algo importante: su coreano no es perfecto. Nos necesitó para encontrar la inscripción. Esa es su debilidad.",
+        text: "I saw it. *small smile, the first one* Eleanor was right about you after all. Cairo. We need to warn our contacts there. Mr. Black has the Seoul stone. But he showed us something important: his Korean is not perfect. He needed US to find the inscription. That is his weakness.",
+        textKo: "봤어. *작은 미소, 처음으로* 결국 엘리너가 맞았네요. 카이로. 거기 연락책에 알려야 해요. 미스터 블랙이 서울 수호석을 가져갔지만, 중요한 걸 보여줬어요: 그의 한국어는 완벽하지 않아요. 비문을 찾으려면 우리가 필요했어요. 그게 약점이에요.",
+        textEs: "Lo vi. *pequeña sonrisa, la primera* Eleanor tenía razón sobre ti después de todo. El Cairo. Necesitamos avisar a nuestros contactos allí. Mr. Black tiene la piedra de Seúl. Pero nos mostró algo importante: su coreano no es perfecto. Nos necesitó para encontrar la inscripción. Esa es su debilidad.",
       },
       {
         kind: "scene",
         charId: "youngsook",
-        text: "*arrives with a container of food* For the plane. You cannot chase a villain on an empty stomach. Remember what I taught you, fox boy. Every word you learned at my table — those are your weapons now.",
-        textKo: "*음식 용기를 들고 도착하며* 비행기에서 먹어. 빈 속으로 악당을 쫓을 수는 없단다. 내가 가르친 것 기억해, 여우 도련님. 내 밥상에서 배운 모든 단어 — 그게 이제 네 무기야.",
-        textEs: "*llega con un recipiente de comida* Para el avión. No puedes perseguir a un villano con el estómago vacío. Recuerda lo que te enseñé, chico zorro. Cada palabra que aprendiste en mi mesa — esas son tus armas ahora.",
+        text: "*arrives with a container of food* For the plane. You cannot chase a villain on an empty stomach. Remember what I taught you, fox boy. Every word you learned at my table. Those are your weapons now.",
+        textKo: "*음식 용기를 들고 도착하며* 비행기에서 먹어. 빈 속으로 악당을 쫓을 수는 없단다. 내가 가르친 것 기억해, 여우 도련님. 내 밥상에서 배운 모든 단어. 그게 이제 네 무기야.",
+        textEs: "*llega con un recipiente de comida* Para el avión. No puedes perseguir a un villano con el estómago vacío. Recuerda lo que te enseñé, chico zorro. Cada palabra que aprendiste en mi mesa. Esas son tus armas ahora.",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Next Chapter: The Cairo Legacy — The stones are counting down.)",
-        textKo: "(다음 챕터: 카이로의 유산 — 수호석이 카운트다운 중이다.)",
-        textEs: "(Siguiente Capítulo: El Legado de El Cairo — Las piedras están en cuenta regresiva.)",
+        text: "(Next Chapter: The Cairo Legacy. The stones are counting down.)",
+        textKo: "(다음 챕터: 카이로의 유산. 수호석이 카운트다운 중이다.)",
+        textEs: "(Siguiente Capítulo: El Legado de El Cairo. Las piedras están en cuenta regresiva.)",
       },
     ],
   },
@@ -2397,23 +2380,23 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Cairo International Airport. Rudy opens his Arabic phrasebook — bought the night before in Seoul. Every page is blank. The cover is there. The words inside are gone. As if someone erased every letter.)",
-        textKo: "(카이로 국제공항. 루디가 아랍어 회화집을 펼친다 — 서울에서 전날 밤 산 것. 모든 페이지가 비어 있다. 표지는 있다. 안의 단어들이 사라졌다. 누군가 모든 글자를 지운 것처럼.)",
-        textEs: "(Aeropuerto Internacional de El Cairo. Rudy abre su libro de frases árabe — comprado la noche anterior en Seúl. Cada página está en blanco. La portada está ahí. Las palabras de dentro han desaparecido. Como si alguien hubiera borrado cada letra.)",
+        text: "(Cairo International Airport. Rudy opens his Arabic phrasebook, bought the night before in Seoul. Every page is blank. The cover is there. The words inside are gone. As if someone erased every letter.)",
+        textKo: "(카이로 국제공항. 루디가 아랍어 회화집을 펼친다. 서울에서 전날 밤 산 것. 모든 페이지가 비어 있다. 표지는 있다. 안의 단어들이 사라졌다. 누군가 모든 글자를 지운 것처럼.)",
+        textEs: "(Aeropuerto Internacional de El Cairo. Rudy abre su libro de frases árabe, comprado la noche anterior en Seúl. Cada página está en blanco. La portada está ahí. Las palabras de dentro han desaparecido. Como si alguien hubiera borrado cada letra.)",
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "Mr. Black erased my phrasebook. Before I even landed. He's not just ahead of me — he's arranging the board before I sit down. Fine. I survived London with no clues, Madrid without the stone, Seoul with no phone. Cairo with no phrasebook? Just another Tuesday.",
-        textKo: "미스터 블랙이 내 회화집을 지웠어. 내가 도착하기도 전에. 단순히 앞서가는 게 아니야 — 내가 앉기도 전에 판을 짜고 있어. 좋아. 런던에선 단서 없이, 마드리드에선 수호석 없이, 서울에선 핸드폰 없이 살아남았어. 카이로에서 회화집 없이? 그냥 또 하나의 화요일이야.",
-        textEs: "Mr. Black borró mi libro de frases. Antes de que aterrizara. No solo va por delante — está armando el tablero antes de que me siente. Bien. Sobreviví Londres sin pistas, Madrid sin la piedra, Seúl sin teléfono. ¿El Cairo sin libro de frases? Solo otro martes.",
+        text: "Mr. Black erased my phrasebook. Before I even landed. He's not just ahead of me. He's arranging the board before I sit down. Fine. I survived London with no clues, Madrid without the stone, Seoul with no phone. Cairo with no phrasebook? Just another Tuesday.",
+        textKo: "미스터 블랙이 내 회화집을 지웠어. 내가 도착하기도 전에. 단순히 앞서가는 게 아니야. 내가 앉기도 전에 판을 짜고 있어. 좋아. 런던에선 단서 없이, 마드리드에선 수호석 없이, 서울에선 핸드폰 없이 살아남았어. 카이로에서 회화집 없이? 그냥 또 하나의 화요일이야.",
+        textEs: "Mr. Black borró mi libro de frases. Antes de que aterrizara. No solo va por delante. Está armando el tablero antes de que me siente. Bien. Sobreviví Londres sin pistas, Madrid sin la piedra, Seúl sin teléfono. ¿El Cairo sin libro de frases? Solo otro martes.",
       },
       {
         kind: "scene",
         charId: "amira",
-        text: "You're Rudy. The fox detective. Sujin told me about you. Three cities. Zero stones recovered. Forgive me if I'm not impressed. Before I trust you with anything — prove you can actually communicate. Name these objects in three languages.",
-        textKo: "루디지. 여우 탐정. 수진이 말해줬어. 세 도시. 되찾은 수호석 제로. 감동 안 받은 거 이해해줘. 뭔가를 믿기 전에 — 실제로 소통할 수 있는지 증명해봐. 이 물건들의 이름을 세 개 언어로 말해봐.",
-        textEs: "Eres Rudy. El detective zorro. Sujin me habló de ti. Tres ciudades. Cero piedras recuperadas. Perdóname si no estoy impresionada. Antes de confiarte cualquier cosa — demuestra que puedes comunicarte. Di el nombre de estos objetos en tres idiomas.",
+        text: "You're Rudy. The fox detective. Sujin told me about you. Three cities. Zero stones recovered. Forgive me if I'm not impressed. Before I trust you with anything. Prove you can actually communicate. Name these objects in three languages.",
+        textKo: "루디지. 여우 탐정. 수진이 말해줬어. 세 도시. 되찾은 수호석 제로. 감동 안 받은 거 이해해줘. 뭔가를 믿기 전에. 실제로 소통할 수 있는지 증명해봐. 이 물건들의 이름을 세 개 언어로 말해봐.",
+        textEs: "Eres Rudy. El detective zorro. Sujin me habló de ti. Tres ciudades. Cero piedras recuperadas. Perdóname si no estoy impresionada. Antes de confiarte cualquier cosa. Demuestra que puedes comunicarte. Di el nombre de estos objetos en tres idiomas.",
       },
       {
         kind: "puzzle",
@@ -2489,8 +2472,8 @@ const STORIES: Record<string, Story> = {
         questions: [
           {
             prompt: { en: "Hassan keeps mixing clues with sales pitches. How do you get him to focus?", ko: "하산이 단서와 판매 권유를 계속 섞고 있어. 어떻게 집중하게 해?", es: "Hassan mezcla pistas con ventas. ¿Cómo lo concentras?" },
-            context: { en: "Hassan: 'The man in black — very serious, very pale — he bought nothing! Can you believe? Not even a small carpet. Then he asked me: where is the stone that does not move? Very strange question.'", ko: "하산: '검은 남자 — 아주 심각하고, 아주 창백해 — 아무것도 안 샀어요! 믿을 수 있어요? 작은 카펫도 아니고. 그러더니 물어보더라고요: 움직이지 않는 돌이 어디 있냐고? 아주 이상한 질문.'", es: "Hassan: 'El hombre de negro — muy serio, muy pálido — ¡no compró nada! ¿Puedes creerlo? Ni siquiera una pequeña alfombra. Luego me preguntó: ¿dónde está la piedra que no se mueve? Pregunta muy extraña.'" },
-            answer: { en: "'The stone that does not move' — that's an ancient guardian name. Hassan, did he say anything about where he was going next?", ko: "'움직이지 않는 돌' — 그건 고대 수호자의 이름이야. 하산, 그 다음에 어디 간다고 말했어?", es: "'La piedra que no se mueve' — ese es un nombre guardián antiguo. Hassan, ¿dijo algo sobre adónde iba después?" },
+            context: { en: "Hassan: 'The man in black, very serious, very pale, he bought nothing! Can you believe? Not even a small carpet. Then he asked me: where is the stone that does not move? Very strange question.'", ko: "하산: '검은 남자, 아주 심각하고, 아주 창백해, 아무것도 안 샀어요! 믿을 수 있어요? 작은 카펫도 아니고. 그러더니 물어보더라고요: 움직이지 않는 돌이 어디 있냐고? 아주 이상한 질문.'", es: "Hassan: 'El hombre de negro, muy serio, muy pálido, ¡no compró nada! ¿Puedes creerlo? Ni siquiera una pequeña alfombra. Luego me preguntó: ¿dónde está la piedra que no se mueve? Pregunta muy extraña.'" },
+            answer: { en: "'The stone that does not move', that's an ancient guardian name. Hassan, did he say anything about where he was going next?", ko: "'움직이지 않는 돌', 그건 고대 수호자의 이름이야. 하산, 그 다음에 어디 간다고 말했어?", es: "'La piedra que no se mueve', ese es un nombre guardián antiguo. Hassan, ¿dijo algo sobre adónde iba después?" },
             wrong: [
               { en: "Please just answer the question and stop selling things.", ko: "제발 질문에만 답하고 물건 팔지 마.", es: "Por favor solo responde la pregunta y deja de vender cosas." },
               { en: "I'll buy a carpet if you tell me more.", ko: "더 말해주면 카펫 살게.", es: "Compro una alfombra si me cuentas más." },
@@ -2498,7 +2481,7 @@ const STORIES: Record<string, Story> = {
           },
           {
             prompt: { en: "Hassan mentions 'the dig at Saqqara.' Amira goes silent. What do you ask?", ko: "하산이 '사카라 발굴지'를 언급해. 아미라가 침묵한다. 뭘 물어봐?", es: "Hassan menciona 'la excavación de Saqqara.' Amira queda en silencio. ¿Qué preguntas?" },
-            context: { en: "Hassan: 'The stone — it's not at the museum. It's at Saqqara. The old dig site. My cousin knows.' *Amira turns pale*", ko: "하산: '돌 — 박물관에 없어요. 사카라에 있어요. 옛날 발굴 현장. 사촌이 알아요.' *아미라가 창백해진다*", es: "Hassan: 'La piedra — no está en el museo. Está en Saqqara. El viejo sitio de excavación. Mi prima lo sabe.' *Amira se pone pálida*" },
+            context: { en: "Hassan: 'The stone, it's not at the museum. It's at Saqqara. The old dig site. My cousin knows.' *Amira turns pale*", ko: "하산: '돌, 박물관에 없어요. 사카라에 있어요. 옛날 발굴 현장. 사촌이 알아요.' *아미라가 창백해진다*", es: "Hassan: 'La piedra, no está en el museo. Está en Saqqara. El viejo sitio de excavación. Mi prima lo sabe.' *Amira se pone pálida*" },
             answer: { en: "Amira. You knew where it was all along. That's why Mr. Black came to you first.", ko: "아미라. 처음부터 어디 있는지 알고 있었어. 그래서 미스터 블랙이 먼저 너한테 온 거야.", es: "Amira. Sabías dónde estaba todo el tiempo. Por eso Mr. Black vino a ti primero." },
             wrong: [
               { en: "Hassan, stop revealing family secrets in a market.", ko: "하산, 시장에서 가족 비밀 그만 폭로해.", es: "Hassan, deja de revelar secretos familiares en el mercado." },
@@ -2541,9 +2524,9 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "penny",
-        text: "*steps from shadow behind a pillar* Hello, detective. You look surprised. You shouldn't be — I've been following you since London. I helped build the Universal Code. I thought it would create understanding between people. *voice breaks* I was wrong. And I need to make it right.",
-        textKo: "*기둥 뒤 그늘에서 나서며* 안녕하세요, 탐정님. 놀란 것 같네요. 그러지 마세요 — 런던부터 계속 따라다녔어요. 저는 유니버설 코드를 만드는 걸 도왔어요. 사람들 사이에 이해를 만들 줄 알았어요. *목소리가 갈라지며* 틀렸어요. 그리고 바로잡아야 해요.",
-        textEs: "*sale de las sombras detrás de un pilar* Hola, detective. Parece sorprendido. No debería — lo he seguido desde Londres. Ayudé a construir el Código Universal. Pensé que crearía entendimiento entre las personas. *la voz se quiebra* Estaba equivocada. Y necesito arreglarlo.",
+        text: "*steps from shadow behind a pillar* Hello, detective. You look surprised. You shouldn't be. I've been following you since London. I helped build the Universal Code. I thought it would create understanding between people. *voice breaks* I was wrong. And I need to make it right.",
+        textKo: "*기둥 뒤 그늘에서 나서며* 안녕하세요, 탐정님. 놀란 것 같네요. 그러지 마세요. 런던부터 계속 따라다녔어요. 저는 유니버설 코드를 만드는 걸 도왔어요. 사람들 사이에 이해를 만들 줄 알았어요. *목소리가 갈라지며* 틀렸어요. 그리고 바로잡아야 해요.",
+        textEs: "*sale de las sombras detrás de un pilar* Hola, detective. Parece sorprendido. No debería. Lo he seguido desde Londres. Ayudé a construir el Código Universal. Pensé que crearía entendimiento entre las personas. *la voz se quiebra* Estaba equivocada. Y necesito arreglarlo.",
         idiomRef: "idiom_penny_1",
       },
       {
@@ -2590,9 +2573,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Saqqara. The step pyramid. The oldest stone structure on Earth. Beneath the lowest step, exactly where Penny described — a small chamber. And inside the chamber, still intact, still glowing faintly: the Cairo Guardian Stone.)",
-        textKo: "(사카라. 계단 피라미드. 지구상에서 가장 오래된 석조 건축물. 가장 낮은 계단 아래, 페니가 설명한 그 자리 — 작은 방이 있다. 그리고 방 안에, 여전히 온전한, 여전히 희미하게 빛나는: 카이로 수호석.)",
-        textEs: "(Saqqara. La pirámide escalonada. La estructura de piedra más antigua de la Tierra. Bajo el escalón más bajo, exactamente donde Penny describió — una pequeña cámara. Y dentro de la cámara, todavía intacta, todavía brillando débilmente: la Piedra Guardiana de El Cairo.)",
+        text: "(Saqqara. The step pyramid. The oldest stone structure on Earth. Beneath the lowest step, exactly where Penny described, a small chamber. And inside the chamber, still intact, still glowing faintly: the Cairo Guardian Stone.)",
+        textKo: "(사카라. 계단 피라미드. 지구상에서 가장 오래된 석조 건축물. 가장 낮은 계단 아래, 페니가 설명한 그 자리, 작은 방이 있다. 그리고 방 안에, 여전히 온전한, 여전히 희미하게 빛나는: 카이로 수호석.)",
+        textEs: "(Saqqara. La pirámide escalonada. La estructura de piedra más antigua de la Tierra. Bajo el escalón más bajo, exactamente donde Penny describió, una pequeña cámara. Y dentro de la cámara, todavía intacta, todavía brillando débilmente: la Piedra Guardiana de El Cairo.)",
       },
       {
         kind: "scene",
@@ -2604,16 +2587,16 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
-        text: "Water. It means water. *quietly* And you're going to erase every language on Earth — because no one spoke your mother's.",
-        textKo: "물이요. 물이라는 뜻이에요. *조용히* 그리고 당신은 지구상의 모든 언어를 지우려 해요 — 아무도 당신 어머니의 언어를 몰랐기 때문에.",
-        textEs: "Agua. Significa agua. *en voz baja* Y vas a borrar todos los idiomas de la Tierra — porque nadie hablaba el de tu madre.",
+        text: "Water. It means water. *quietly* And you're going to erase every language on Earth. Because no one spoke your mother's.",
+        textKo: "물이요. 물이라는 뜻이에요. *조용히* 그리고 당신은 지구상의 모든 언어를 지우려 해요. 아무도 당신 어머니의 언어를 몰랐기 때문에.",
+        textEs: "Agua. Significa agua. *en voz baja* Y vas a borrar todos los idiomas de la Tierra. Porque nadie hablaba el de tu madre.",
       },
       {
         kind: "scene",
         charId: "mr_black",
-        text: "I'm going to give everyone THE SAME language. No one will ever die alone again — unable to say what they need. No more Carlos screaming 'help' in a room where no one understands. One language. Universal. Perfect.",
-        textKo: "모든 사람에게 같은 언어를 줄 거예요. 더 이상 아무도 혼자 죽지 않아도 돼요 — 필요한 걸 말하지 못해서. 카를로스처럼 '도와주세요'를 외치다가 아무도 못 알아듣는 방에서 죽지 않아도 돼요. 하나의 언어. 유니버설. 완벽해.",
-        textEs: "Voy a darle a todo el mundo EL MISMO idioma. Nadie volverá a morir solo — sin poder decir lo que necesita. No más Carlos gritando 'ayuda' en una habitación donde nadie entiende. Un idioma. Universal. Perfecto.",
+        text: "I'm going to give everyone THE SAME language. No one will ever die alone again. Unable to say what they need. No more Carlos screaming 'help' in a room where no one understands. One language. Universal. Perfect.",
+        textKo: "모든 사람에게 같은 언어를 줄 거예요. 더 이상 아무도 혼자 죽지 않아도 돼요. 필요한 걸 말하지 못해서. 카를로스처럼 '도와주세요'를 외치다가 아무도 못 알아듣는 방에서 죽지 않아도 돼요. 하나의 언어. 유니버설. 완벽해.",
+        textEs: "Voy a darle a todo el mundo EL MISMO idioma. Nadie volverá a morir solo. Sin poder decir lo que necesita. No más Carlos gritando 'ayuda' en una habitación donde nadie entiende. Un idioma. Universal. Perfecto.",
         idiomRef: "idiom_black_1",
       },
       {
@@ -2625,13 +2608,13 @@ const STORIES: Record<string, Story> = {
         previouslyLearned: ["Map", "Key", "Water", "Danger", "I need help", "Be careful", "Where is the market?", "How far is it?", "Near the ___", "At midnight", "The key is ___"],
         speakAfter: true,
         storyReason: "Examine all evidence to find the real thief before Mr. Black escapes.",
-        storyConsequence: "Miss Penny reveals herself as an ally — but Mr. Black already has 5 stones.",
+        storyConsequence: "Miss Penny reveals herself as an ally — but Mr. Black already has the Babel route.",
         onFail: { addToWeakExpressions: ["Where is ___?", "Near the ___"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
             prompt: { en: "Mr. Black's logic has a fatal flaw. Which evidence shows his plan would cause MORE harm than it prevents?", ko: "미스터 블랙의 논리에는 치명적인 결함이 있어. 어떤 증거가 그의 계획이 예방하는 것보다 더 큰 해를 끼친다는 걸 보여줘?", es: "La lógica de Mr. Black tiene un defecto fatal. ¿Qué evidencia muestra que su plan causaría MÁS daño del que previene?" },
             clues: [
-              { en: "Carlos only lost his language temporarily — he recovered it. But under Universal Code, loss would be permanent for all 8 billion people.", ko: "카를로스는 일시적으로만 언어를 잃었어 — 회복했어. 하지만 유니버설 코드 하에서 80억 명 모두에게 그 상실은 영구적이야.", es: "Carlos solo perdió su idioma temporalmente — se recuperó. Pero bajo el Código Universal, la pérdida sería permanente para los 8 mil millones de personas." },
+              { en: "Carlos only lost his language temporarily. He recovered it. But under Universal Code, loss would be permanent for all 8 billion people.", ko: "카를로스는 일시적으로만 언어를 잃었어. 회복했어. 하지만 유니버설 코드 하에서 80억 명 모두에게 그 상실은 영구적이야.", es: "Carlos solo perdió su idioma temporalmente. Se recuperó. Pero bajo el Código Universal, la pérdida sería permanente para los 8 mil millones de personas." },
               { en: "Mr. Black's mother would have been saved if ONE nurse had learned Welsh. The Code would delete Welsh instead of teaching it.", ko: "미스터 블랙의 어머니는 간호사 한 명이 웨일스어를 배웠다면 살 수 있었어. 유니버설 코드는 웨일스어를 가르치는 대신 지울 거야.", es: "La madre de Mr. Black podría haberse salvado si UNA enfermera hubiera aprendido galés. El Código borraría el galés en lugar de enseñarlo." },
               { en: "The Universal Code eliminates all grandmother's lullabies, all first words of every child, all poetry ever written.", ko: "유니버설 코드는 모든 할머니의 자장가, 모든 아이의 첫 마디, 쓰여진 모든 시를 없애.", es: "El Código Universal elimina todas las canciones de cuna de las abuelas, todas las primeras palabras de cada niño, toda la poesía jamás escrita." },
               { en: "Mr. Black wants coffee from the vending machine on floor 3.", ko: "미스터 블랙은 3층 자판기에서 커피를 원한다.", es: "Mr. Black quiere café de la máquina expendedora del piso 3." },
@@ -2648,16 +2631,16 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
-        text: "Your mother's language didn't need to be erased. It needed to be learned. By one more person. By the nurse. By the doctor. That's what language does — it spreads, it survives, it connects. Your solution kills the disease by killing the patient.",
-        textKo: "어머니의 언어는 지워질 필요가 없었어요. 더 많은 사람들이 배웠어야 했어요. 간호사가. 의사가. 그게 언어가 하는 일이에요 — 퍼지고, 살아남고, 연결해요. 당신의 해결책은 환자를 죽여서 병을 치료하는 거예요.",
-        textEs: "El idioma de tu madre no necesitaba ser borrado. Necesitaba ser aprendido. Por una persona más. Por la enfermera. Por el médico. Eso es lo que hace el idioma — se expande, sobrevive, conecta. Tu solución mata a la paciente para curar la enfermedad.",
+        text: "Your mother's language didn't need to be erased. It needed to be learned. By one more person. By the nurse. By the doctor. That's what language does. It spreads, it survives, it connects. Your solution kills the disease by killing the patient.",
+        textKo: "어머니의 언어는 지워질 필요가 없었어요. 더 많은 사람들이 배웠어야 했어요. 간호사가. 의사가. 그게 언어가 하는 일이에요. 퍼지고, 살아남고, 연결해요. 당신의 해결책은 환자를 죽여서 병을 치료하는 거예요.",
+        textEs: "El idioma de tu madre no necesitaba ser borrado. Necesitaba ser aprendido. Por una persona más. Por la enfermera. Por el médico. Eso es lo que hace el idioma. Se expande, sobrevive, conecta. Tu solución mata a la paciente para curar la enfermedad.",
       },
       {
         kind: "scene",
         charId: "mr_black",
-        text: "*takes the stone* I understand your argument, Detective. It's… not wrong. But I've been building this for thirty years. *vanishes into the dark* Five stones. I have five. You have two chances left. The clock has already started.",
+        text: "*takes the stone* I understand your argument, Detective. It's... not wrong. But I've been building this for thirty years. *vanishes into the dark* Four city stones. Three foundation stones. Seven locks. The clock has already started.",
         textKo: "*수호석을 집어들며* 당신의 논리는 이해해요, 탐정님. 틀리지 않아요. 하지만 30년 동안 이걸 만들어왔어요. *어둠 속으로 사라지며* 5개예요. 5개를 갖고 있어요. 당신에겐 두 번의 기회가 남아 있어요. 시계는 이미 돌아가고 있어요.",
-        textEs: "*toma la piedra* Entiendo tu argumento, detective. No está… equivocado. Pero he estado construyendo esto durante treinta años. *desaparece en la oscuridad* Cinco piedras. Tengo cinco. Te quedan dos oportunidades. El reloj ya ha empezado.",
+        textEs: "*toma la piedra* Entiendo tu argumento, detective. No está... equivocado. Pero he estado construyendo esto durante treinta años. *desaparece en la oscuridad* Cuatro piedras de ciudad. Tres piedras de cimiento. Siete candados. El reloj ya ha empezado.",
       },
       {
         kind: "clue",
@@ -2665,16 +2648,16 @@ const STORIES: Record<string, Story> = {
         titleEn: "The Seven Guardian Stones",
         titleKo: "7개의 수호석",
         titleEs: "Las Siete Piedras Guardianas",
-        descEn: "London (taken). Madrid (taken). Seoul (taken). Cairo (taken). Three remain. Two unknown cities. One final location. Mr. Black: 5 stones. Rudy: 0. Time: unknown.",
+        descEn: "City stones: London, Madrid, Seoul, Cairo. All compromised. Foundation stones: three, hidden at Babel. Total required: seven. Mr. Black has the route. Rudy has the allies. Time: almost gone.",
         descKo: "런던 (빼앗김). 마드리드 (빼앗김). 서울 (빼앗김). 카이로 (빼앗김). 세 개 남음. 두 개의 알 수 없는 도시. 하나의 최종 장소. 미스터 블랙: 5개. 루디: 0개. 시간: 알 수 없음.",
-        descEs: "Londres (tomada). Madrid (tomada). Seúl (tomada). El Cairo (tomada). Quedan tres. Dos ciudades desconocidas. Una ubicación final. Mr. Black: 5 piedras. Rudy: 0. Tiempo: desconocido.",
+        descEs: "Piedras de ciudad: Londres, Madrid, Seúl, El Cairo. Todas comprometidas. Piedras de cimiento: tres, ocultas en Babel. Total necesario: siete. Mr. Black tiene la ruta. Rudy tiene a sus aliados. Tiempo: casi agotado.",
       },
       {
         kind: "scene",
         charId: "penny",
-        text: "There is one place he can be stopped. Where the Universal Code was first designed. The Babel Tower — coordinates that only the seven stones combined can reveal. But Rudy... you cannot go alone. You need everyone. Every language you've collected. Everyone who helped you.",
-        textKo: "그를 막을 수 있는 장소가 하나 있어요. 유니버설 코드가 처음 설계된 곳. 바벨 타워 — 7개의 수호석이 합쳐져야만 드러나는 좌표. 하지만 루디... 혼자 갈 수 없어요. 모든 사람이 필요해요. 당신이 모은 모든 언어. 당신을 도운 모든 사람.",
-        textEs: "Hay un lugar donde se le puede detener. Donde el Código Universal fue diseñado por primera vez. La Torre de Babel — coordenadas que solo las siete piedras juntas pueden revelar. Pero Rudy... no puedes ir solo. Necesitas a todos. Cada idioma que has recopilado. A todos los que te ayudaron.",
+        text: "There is one place he can be stopped. Where the Universal Code was first designed. The Babel Tower, coordinates that only the four city stones can reveal. The final three are already there, buried in the foundation. But Rudy... you cannot go alone. You need everyone. Every language you've collected. Everyone who helped you.",
+        textKo: "그를 막을 수 있는 장소가 하나 있어요. 유니버설 코드가 처음 설계된 곳. 바벨 타워, 7개의 수호석이 합쳐져야만 드러나는 좌표. 하지만 루디... 혼자 갈 수 없어요. 모든 사람이 필요해요. 당신이 모은 모든 언어. 당신을 도운 모든 사람.",
+        textEs: "Hay un lugar donde se le puede detener. Donde el Código Universal fue diseñado por primera vez. La Torre de Babel, coordenadas que solo las cuatro piedras de ciudad pueden revelar. Las últimas tres ya están allí, enterradas en los cimientos. Pero Rudy... no puedes ir solo. Necesitas a todos. Cada idioma que has recopilado. A todos los que te ayudaron.",
       },
     ],
   },
@@ -2735,23 +2718,23 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(The four Guardian Stones pulsed together on Rudy's desk and revealed coordinates deep in Mesopotamia. Not an ancient ruin. A modern spire of glass and steel rising from the plain — the Babel Tower. Lexicon Society headquarters. At its peak, light pulses every seven seconds, like a heartbeat.)",
-        textKo: "(4개의 수호석이 루디의 책상 위에서 함께 진동하며 메소포타미아 깊숙이 좌표를 드러냈다. 고대 유적이 아니다. 현대적인 유리와 강철로 된 탑이 평원에서 솟아있다 — 바벨 타워. 렉시콘 소사이어티 본부. 꼭대기에서 빛이 7초마다 맥동한다, 심장 박동처럼.)",
-        textEs: "(Las cuatro Piedras Guardianas pulsaron juntas en el escritorio de Rudy y revelaron coordenadas en lo profundo de Mesopotamia. No una ruina antigua. Una aguja moderna de vidrio y acero que se eleva de la llanura — la Torre de Babel. Cuartel general de la Sociedad Lexicon. En su cima, la luz pulsa cada siete segundos, como un latido.)",
+        text: "(By dawn, every city answered. Tom recovered London during a Lexicon raid. Isabel and Carlos secured Madrid. Sujin intercepted Seoul. Amira and Hassan reclaimed Cairo. The four city stones pulsed together on Rudy's desk and revealed coordinates deep in Mesopotamia. Not an ancient ruin. A modern spire of glass and steel rising from the plain, the Babel Tower. Lexicon Society headquarters. At its peak, light pulses every seven seconds, like a heartbeat.)",
+        textKo: "(4개의 수호석이 루디의 책상 위에서 함께 진동하며 메소포타미아 깊숙이 좌표를 드러냈다. 고대 유적이 아니다. 현대적인 유리와 강철로 된 탑이 평원에서 솟아있다. 바벨 타워. 렉시콘 소사이어티 본부. 꼭대기에서 빛이 7초마다 맥동한다, 심장 박동처럼.)",
+        textEs: "(Al amanecer, cada ciudad respondió. Tom recuperó Londres durante una redada contra Lexicon. Isabel y Carlos aseguraron Madrid. Sujin interceptó Seúl. Amira y Hassan recuperaron El Cairo. Las cuatro piedras de ciudad pulsaron juntas en el escritorio de Rudy y revelaron coordenadas en lo profundo de Mesopotamia. No una ruina antigua. Una aguja moderna de vidrio y acero que se eleva de la llanura, la Torre de Babel. Cuartel general de la Sociedad Lexicon. En su cima, la luz pulsa cada siete segundos, como un latido.)",
       },
       {
         kind: "scene",
         charId: "penny",
-        text: "Five floors. Each one is a language gate — Mr. Black built them as tests. If you can't communicate in the language, the gate won't open. He believed only worthy linguists should reach the top. *quietly* He built them for himself. He passed all five alone.",
-        textKo: "5층이야. 각 층이 언어 관문이야 — 미스터 블랙이 시험으로 만들었어. 그 언어로 소통하지 못하면 관문이 안 열려. 오직 가치 있는 언어학자만이 꼭대기에 도달해야 한다고 믿었어. *조용히* 자기 자신을 위해 만들었어. 5개 모두 혼자 통과했어.",
-        textEs: "Cinco pisos. Cada uno es una puerta lingüística — Mr. Black las construyó como pruebas. Si no puedes comunicarte en ese idioma, la puerta no se abre. Creía que solo los lingüistas dignos debían llegar a la cima. *en voz baja* Las construyó para sí mismo. Las pasó todas solo.",
+        text: "Five floors. Each one is a language gate. Mr. Black built them as tests. If you can't communicate in the language, the gate won't open. He believed only worthy linguists should reach the top. *quietly* He built them for himself. He passed all five alone.",
+        textKo: "5층이야. 각 층이 언어 관문이야. 미스터 블랙이 시험으로 만들었어. 그 언어로 소통하지 못하면 관문이 안 열려. 오직 가치 있는 언어학자만이 꼭대기에 도달해야 한다고 믿었어. *조용히* 자기 자신을 위해 만들었어. 5개 모두 혼자 통과했어.",
+        textEs: "Cinco pisos. Cada uno es una puerta lingüística. Mr. Black las construyó como pruebas. Si no puedes comunicarte en ese idioma, la puerta no se abre. Creía que solo los lingüistas dignos debían llegar a la cima. *en voz baja* Las construyó para sí mismo. Las pasó todas solo.",
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "Five language gates and a man who wants to erase every word ever spoken. Sounds like a Tuesday. *looks at the assembled group: Tom, Isabel, Sujin, Amira, Penny* Except — this time I'm not alone. Before we face the gates, let's review the most important words from our journey. Know these, and we can face anything.",
-        textKo: "5개의 언어 관문과 지금껏 말해진 모든 단어를 지우려는 남자. 화요일 같은 느낌. *모인 그룹을 바라보며: 톰, 이사벨, 수진, 아미라, 페니* 하지만 — 이번엔 혼자가 아니야. 관문에 도전하기 전에 여정에서 배운 가장 중요한 단어들을 복습하자. 이것만 알면 뭐든 해낼 수 있어.",
-        textEs: "Cinco puertas de idiomas y un hombre que quiere borrar cada palabra jamás pronunciada. Suena como un martes. *mira al grupo reunido: Tom, Isabel, Sujin, Amira, Penny* Excepto que — esta vez no estoy solo. Antes de enfrentar las puertas, repasemos las palabras más importantes de nuestro viaje. Conócelas y podremos enfrentar cualquier cosa.",
+        text: "Five language gates and a man who wants to erase every word ever spoken. Sounds like a Tuesday. *looks at the assembled group: Tom, Isabel, Sujin, Amira, Penny* Except. This time I'm not alone. Before we face the gates, let's review the most important words from our journey. Know these, and we can face anything.",
+        textKo: "5개의 언어 관문과 지금껏 말해진 모든 단어를 지우려는 남자. 화요일 같은 느낌. *모인 그룹을 바라보며: 톰, 이사벨, 수진, 아미라, 페니* 하지만. 이번엔 혼자가 아니야. 관문에 도전하기 전에 여정에서 배운 가장 중요한 단어들을 복습하자. 이것만 알면 뭐든 해낼 수 있어.",
+        textEs: "Cinco puertas de idiomas y un hombre que quiere borrar cada palabra jamás pronunciada. Suena como un martes. *mira al grupo reunido: Tom, Isabel, Sujin, Amira, Penny* Excepto que. Esta vez no estoy solo. Antes de enfrentar las puertas, repasemos las palabras más importantes de nuestro viaje. Conócelas y podremos enfrentar cualquier cosa.",
       },
       {
         kind: "puzzle",
@@ -2811,9 +2794,9 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Good — you remember the words. Now use them to open the gates. Each gate demands you prove you can communicate — not just know words, but use them with meaning.)",
-        textKo: "(좋아 — 단어들을 기억하고 있네. 이제 관문을 열 때 써먹을 차례야. 각 관문은 단어만 아는 게 아니라 의미를 담아 소통할 수 있는지 증명하라고 요구해.)",
-        textEs: "(Bien — recuerdas las palabras. Ahora úsalas para abrir las puertas. Cada puerta exige que demuestres que puedes comunicarte — no solo saber palabras, sino usarlas con significado.)",
+        text: "(Good. You remember the words. Now use them to open the gates. Each gate demands you prove you can communicate, not just know words, but use them with meaning.)",
+        textKo: "(좋아. 단어들을 기억하고 있네. 이제 관문을 열 때 써먹을 차례야. 각 관문은 단어만 아는 게 아니라 의미를 담아 소통할 수 있는지 증명하라고 요구해.)",
+        textEs: "(Bien. Recuerdas las palabras. Ahora úsalas para abrir las puertas. Cada puerta exige que demuestres que puedes comunicarte, no solo saber palabras, sino usarlas con significado.)",
       },
       {
         kind: "puzzle",
@@ -2875,16 +2858,16 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(Four floors. Four gates. Four languages. The fifth floor chamber opens to reveal seven stone pedestals arranged in a circle. Four stones already glow in their places — Mr. Black's collection. The Universal Code hums at its center, waiting for the final three.)",
-        textKo: "(4층. 4개의 관문. 4개의 언어. 5층 방이 열리며 원형으로 배치된 7개의 수호석 받침대를 드러낸다. 4개의 수호석이 이미 자리에서 빛난다 — 미스터 블랙의 컬렉션. 유니버설 코드가 중앙에서 윙윙거리며 마지막 세 개를 기다린다.)",
-        textEs: "(Cuatro pisos. Cuatro puertas. Cuatro idiomas. La cámara del quinto piso se abre para revelar siete pedestales de piedra dispuestos en círculo. Cuatro piedras ya brillan en sus lugares — la colección de Mr. Black. El Código Universal zumba en su centro, esperando las últimas tres.)",
+        text: "(Four floors. Four gates. Four languages. The fifth floor chamber opens to reveal seven stone pedestals arranged in a circle. Four stones already glow in their places, carried here by Rudy and the allies who refused to let their languages disappear. The Universal Code hums at its center, waiting for the final three.)",
+        textKo: "(4층. 4개의 관문. 4개의 언어. 5층 방이 열리며 원형으로 배치된 7개의 수호석 받침대를 드러낸다. 4개의 수호석이 이미 자리에서 빛난다, 미스터 블랙의 컬렉션. 유니버설 코드가 중앙에서 윙윙거리며 마지막 세 개를 기다린다.)",
+        textEs: "(Cuatro pisos. Cuatro puertas. Cuatro idiomas. La cámara del quinto piso se abre para revelar siete pedestales de piedra dispuestos en círculo. Cuatro piedras ya brillan en sus lugares, traídas por Rudy y los aliados que se negaron a dejar desaparecer sus idiomas. El Código Universal zumba en su centro, esperando las últimas tres.)",
       },
       {
         kind: "scene",
         charId: "mr_black",
-        text: "*stands at the center* You made it. All five gates. I'm... genuinely impressed. *almost sad* But you're too late. The last three stones were always here — hidden in the tower's foundation for a hundred years. I found them twenty years ago.",
-        textKo: "*중앙에 서서* 해냈군요. 5개 관문 모두. 정말로... 감동이에요. *거의 슬프게* 하지만 너무 늦었어요. 마지막 세 개의 수호석은 항상 여기 있었어요 — 100년 동안 탑의 기초에 숨겨져 있었어요. 20년 전에 찾았어요.",
-        textEs: "*de pie en el centro* Lo lograste. Las cinco puertas. Estoy... genuinamente impresionado. *casi triste* Pero llegas demasiado tarde. Las últimas tres piedras siempre estuvieron aquí — escondidas en los cimientos de la torre durante cien años. Las encontré hace veinte años.",
+        text: "*stands at the center* You made it. All five gates. I'm... genuinely impressed. *almost sad* But you're too late. The last three stones were always here, hidden in the tower's foundation for a hundred years. I found them twenty years ago.",
+        textKo: "*중앙에 서서* 해냈군요. 5개 관문 모두. 정말로... 감동이에요. *거의 슬프게* 하지만 너무 늦었어요. 마지막 세 개의 수호석은 항상 여기 있었어요, 100년 동안 탑의 기초에 숨겨져 있었어요. 20년 전에 찾았어요.",
+        textEs: "*de pie en el centro* Lo lograste. Las cinco puertas. Estoy... genuinamente impresionado. *casi triste* Pero llegas demasiado tarde. Las últimas tres piedras siempre estuvieron aquí, escondidas en los cimientos de la torre durante cien años. Las encontré hace veinte años.",
       },
       {
         kind: "puzzle",
@@ -2918,16 +2901,16 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
-        text: "You're right about one thing. Language IS power. But not because you control it. Because it connects people. Your mother's Welsh — 'Dŵr,' water — that word didn't die with her. It lives in anyone who ever heard her say it. In you. You've been carrying it for thirty years.",
-        textKo: "한 가지는 맞아요. 언어는 힘이에요. 하지만 당신이 통제하기 때문이 아니라. 사람들을 연결하기 때문이에요. 어머니의 웨일스어 — 'Dŵr,' 물 — 그 단어는 어머니와 함께 죽지 않았어요. 그것을 들은 모든 사람 속에 살아있어요. 당신 안에. 30년 동안 그걸 간직해왔어요.",
-        textEs: "Tienes razón en una cosa. El idioma ES poder. Pero no porque lo controles. Sino porque conecta personas. El galés de tu madre — 'Dŵr,' agua — esa palabra no murió con ella. Vive en todos los que alguna vez la oyeron decirla. En ti. La has llevado durante treinta años.",
+        text: "You're right about one thing. Language IS power. But not because you control it. Because it connects people. Your mother's Welsh, 'Dŵr,' water, that word didn't die with her. It lives in anyone who ever heard her say it. In you. You've been carrying it for thirty years.",
+        textKo: "한 가지는 맞아요. 언어는 힘이에요. 하지만 당신이 통제하기 때문이 아니라. 사람들을 연결하기 때문이에요. 어머니의 웨일스어, 'Dŵr,' 물, 그 단어는 어머니와 함께 죽지 않았어요. 그것을 들은 모든 사람 속에 살아있어요. 당신 안에. 30년 동안 그걸 간직해왔어요.",
+        textEs: "Tienes razón en una cosa. El idioma ES poder. Pero no porque lo controles. Sino porque conecta personas. El galés de tu madre, 'Dŵr,' agua, esa palabra no murió con ella. Vive en todos los que alguna vez la oyeron decirla. En ti. La has llevado durante treinta años.",
       },
       {
         kind: "scene",
         charId: "mr_black",
-        text: "*long pause* She used to sing. A lullaby. 'Suo Gân.' I still know every word. *looks at his hands* But I haven't… spoken it. To anyone. *quietly* I've been trying to save her language by destroying all the others.",
+        text: "*long pause* She used to sing. A lullaby. 'Suo Gân.' I still know every word. *looks at his hands* But I haven't... spoken it. To anyone. *quietly* I've been trying to save her language by destroying all the others.",
         textKo: "*긴 침묵* 어머니는 노래를 불렀어요. 자장가. 'Suo Gân.' 아직도 모든 가사를 알아요. *손을 바라보며* 하지만... 말하지 않았어요. 아무에게도. *조용히* 다른 모든 언어를 파괴해서 어머니의 언어를 구하려 했던 거예요.",
-        textEs: "*larga pausa* Ella solía cantar. Una canción de cuna. 'Suo Gân.' Todavía sé cada palabra. *mira sus manos* Pero no la he… hablado. A nadie. *en voz baja* He estado intentando salvar el idioma de ella destruyendo todos los demás.",
+        textEs: "*larga pausa* Ella solía cantar. Una canción de cuna. 'Suo Gân.' Todavía sé cada palabra. *mira sus manos* Pero no la he... hablado. A nadie. *en voz baja* He estado intentando salvar el idioma de ella destruyendo todos los demás.",
       },
       {
         kind: "puzzle",
@@ -2961,41 +2944,41 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "penny",
-        text: "*steps forward* I was his student. When I helped build this, I believed in it too. That one shared language would mean no more wars over misunderstanding. No more deaths like your mother's. *to Mr. Black* But I was wrong. And you taught me something else — that learning someone's language is how you say: I see you. I am trying to understand you. You matter.",
-        textKo: "*앞으로 나서며* 저는 그의 학생이었어요. 이걸 만드는 걸 도울 때 저도 믿었어요. 하나의 공유된 언어가 오해로 인한 전쟁이 없어짐을 의미한다고. 당신 어머니 같은 죽음이 없어짐을. *미스터 블랙에게* 하지만 틀렸어요. 그리고 당신은 저에게 다른 것을 가르쳐줬어요 — 누군가의 언어를 배우는 것이 이렇게 말하는 방법이라는 것을: 당신이 보여요. 이해하려 노력하고 있어요. 당신은 소중해요.",
-        textEs: "*da un paso adelante* Fui su estudiante. Cuando ayudé a construir esto, también lo creía. Que un idioma compartido significaría no más guerras por malentendidos. No más muertes como la de tu madre. *a Mr. Black* Pero estaba equivocada. Y tú me enseñaste algo más — que aprender el idioma de alguien es la forma de decir: te veo. Estoy intentando entenderte. Eres importante.",
+        text: "*steps forward* I was his student. When I helped build this, I believed in it too. That one shared language would mean no more wars over misunderstanding. No more deaths like your mother's. *to Mr. Black* But I was wrong. And you taught me something else, that learning someone's language is how you say: I see you. I am trying to understand you. You matter.",
+        textKo: "*앞으로 나서며* 저는 그의 학생이었어요. 이걸 만드는 걸 도울 때 저도 믿었어요. 하나의 공유된 언어가 오해로 인한 전쟁이 없어짐을 의미한다고. 당신 어머니 같은 죽음이 없어짐을. *미스터 블랙에게* 하지만 틀렸어요. 그리고 당신은 저에게 다른 것을 가르쳐줬어요. 누군가의 언어를 배우는 것이 이렇게 말하는 방법이라는 것을: 당신이 보여요. 이해하려 노력하고 있어요. 당신은 소중해요.",
+        textEs: "*da un paso adelante* Fui su estudiante. Cuando ayudé a construir esto, también lo creía. Que un idioma compartido significaría no más guerras por malentendidos. No más muertes como la de tu madre. *a Mr. Black* Pero estaba equivocada. Y tú me enseñaste algo más, que aprender el idioma de alguien es la forma de decir: te veo. Estoy intentando entenderte. Eres importante.",
       },
       {
         kind: "scene",
         charId: "mr_black",
-        text: "*very long pause. Looks at each stone. Looks at Rudy. Looks at Penny.* ...Mae'r iaith yn fyw. *Welsh: The language lives.* *places his hand on the override panel* I never wanted to destroy language. I wanted… I just wanted my mother to be heard.",
+        text: "*very long pause. Looks at each stone. Looks at Rudy. Looks at Penny.* ...Mae'r iaith yn fyw. *Welsh: The language lives.* *places his hand on the override panel* I never wanted to destroy language. I wanted... I just wanted my mother to be heard.",
         textKo: "*아주 긴 침묵. 각 수호석을 바라본다. 루디를 바라본다. 페니를 바라본다.* ...Mae'r iaith yn fyw. *웨일스어: 언어는 살아있다.* *재정의 패널에 손을 올리며* 언어를 파괴하고 싶었던 게 아니야. 원한 건... 어머니의 말이 들려지기를 원했을 뿐이야.",
-        textEs: "*pausa muy larga. Mira cada piedra. Mira a Rudy. Mira a Penny.* ...Mae'r iaith yn fyw. *Galés: El idioma vive.* *coloca su mano en el panel de anulación* Nunca quise destruir el idioma. Quería… solo quería que escucharan a mi madre.",
+        textEs: "*pausa muy larga. Mira cada piedra. Mira a Rudy. Mira a Penny.* ...Mae'r iaith yn fyw. *Galés: El idioma vive.* *coloca su mano en el panel de anulación* Nunca quise destruir el idioma. Quería... solo quería que escucharan a mi madre.",
       },
       {
         kind: "scene",
         charId: "lingo",
         isNarration: true,
-        text: "(The Universal Code shuts down. One by one, the seven Guardian Stones release from their pedestals. The chamber goes quiet. Then, from everywhere at once — voices. Dozens. Hundreds. In every language. Tom on the radio. Isabel from Madrid. Sujin's voice from Seoul. Youngsook's from Gwangjang Market. Amira reciting in Arabic. Hassan in four languages at once. And underneath all of it, faint and clear: a Welsh lullaby.)",
-        textKo: "(유니버설 코드가 종료된다. 하나씩, 7개의 수호석이 받침대에서 풀려난다. 방이 조용해진다. 그때, 사방에서 한꺼번에 — 목소리들. 수십 개. 수백 개. 모든 언어로. 무선에서 톰. 마드리드에서 이사벨. 서울에서 수진의 목소리. 광장시장에서 영숙 할머니. 아랍어로 독경하는 아미라. 한꺼번에 네 개 언어로 말하는 하산. 그리고 그 모든 것 아래, 희미하고 선명하게: 웨일스 자장가.)",
-        textEs: "(El Código Universal se apaga. Una por una, las siete Piedras Guardianas se liberan de sus pedestales. La cámara queda en silencio. Entonces, desde todas partes a la vez — voces. Decenas. Cientos. En cada idioma. Tom en el radio. Isabel desde Madrid. La voz de Sujin desde Seúl. La de Youngsook desde el Mercado Gwangjang. Amira recitando en árabe. Hassan en cuatro idiomas a la vez. Y debajo de todo, tenue y claro: una nana en galés.)",
+        text: "(The Universal Code shuts down. One by one, the seven Guardian Stones release from their pedestals. The chamber goes quiet. Then, from everywhere at once. Voices. Dozens. Hundreds. In every language. Tom on the radio. Isabel from Madrid. Sujin's voice from Seoul. Youngsook's from Gwangjang Market. Amira reciting in Arabic. Hassan in four languages at once. And underneath all of it, faint and clear: a Welsh lullaby.)",
+        textKo: "(유니버설 코드가 종료된다. 하나씩, 7개의 수호석이 받침대에서 풀려난다. 방이 조용해진다. 그때, 사방에서 한꺼번에. 목소리들. 수십 개. 수백 개. 모든 언어로. 무선에서 톰. 마드리드에서 이사벨. 서울에서 수진의 목소리. 광장시장에서 영숙 할머니. 아랍어로 독경하는 아미라. 한꺼번에 네 개 언어로 말하는 하산. 그리고 그 모든 것 아래, 희미하고 선명하게: 웨일스 자장가.)",
+        textEs: "(El Código Universal se apaga. Una por una, las siete Piedras Guardianas se liberan de sus pedestales. La cámara queda en silencio. Entonces, desde todas partes a la vez. Voces. Decenas. Cientos. En cada idioma. Tom en el radio. Isabel desde Madrid. La voz de Sujin desde Seúl. La de Youngsook desde el Mercado Gwangjang. Amira recitando en árabe. Hassan en cuatro idiomas a la vez. Y debajo de todo, tenue y claro: una nana en galés.)",
       },
       {
         kind: "scene",
         charId: "lingo",
-        text: "Languages aren't tools. They're not systems. They're not barriers. They're people. Every single word is someone who spoke it, someone who heard it, someone who needed it. And as long as people exist, no device — no code — can ever erase them. *to Mr. Black* Mae'r iaith yn fyw. Your mother's language lives. It lives in you.",
-        textKo: "언어는 도구가 아니에요. 시스템도 아니에요. 장벽도 아니에요. 사람이에요. 모든 단어 하나하나가 그것을 말한 누군가, 들은 누군가, 필요했던 누군가예요. 그리고 사람이 존재하는 한, 어떤 장치도 — 어떤 코드도 — 그것들을 지울 수 없어요. *미스터 블랙에게* Mae'r iaith yn fyw. 어머니의 언어는 살아있어요. 당신 안에 살아있어요.",
-        textEs: "Los idiomas no son herramientas. No son sistemas. No son barreras. Son personas. Cada palabra es alguien que la habló, alguien que la oyó, alguien que la necesitó. Y mientras existan personas, ningún dispositivo — ningún código — podrá borrarlos jamás. *a Mr. Black* Mae'r iaith yn fyw. El idioma de tu madre vive. Vive en ti.",
+        text: "Languages aren't tools. They're not systems. They're not barriers. They're people. Every single word is someone who spoke it, someone who heard it, someone who needed it. And as long as people exist, no device, no code, can ever erase them. *to Mr. Black* Mae'r iaith yn fyw. Your mother's language lives. It lives in you.",
+        textKo: "언어는 도구가 아니에요. 시스템도 아니에요. 장벽도 아니에요. 사람이에요. 모든 단어 하나하나가 그것을 말한 누군가, 들은 누군가, 필요했던 누군가예요. 그리고 사람이 존재하는 한, 어떤 장치도, 어떤 코드도, 그것들을 지울 수 없어요. *미스터 블랙에게* Mae'r iaith yn fyw. 어머니의 언어는 살아있어요. 당신 안에 살아있어요.",
+        textEs: "Los idiomas no son herramientas. No son sistemas. No son barreras. Son personas. Cada palabra es alguien que la habló, alguien que la oyó, alguien que la necesitó. Y mientras existan personas, ningún dispositivo, ningún código, podrá borrarlos jamás. *a Mr. Black* Mae'r iaith yn fyw. El idioma de tu madre vive. Vive en ti.",
       },
       {
         kind: "clue",
         symbol: "🌍",
-        titleEn: "The Language Conspiracy — Solved",
-        titleKo: "언어 음모 — 해결",
-        titleEs: "La Conspiración del Lenguaje — Resuelta",
-        descEn: "Seven Guardian Stones returned to their keepers. The Universal Code dismantled. Mr. Black surrendered — not defeated, but understood. Miss Penny: pardoned. Carlos: recovered. Every language on Earth: intact. Detective Rudy: no longer a detective. Now a Language Guardian.",
-        descKo: "7개의 수호석이 수호자들에게 돌아갔다. 유니버설 코드가 해체되었다. 미스터 블랙이 항복했다 — 패배한 것이 아니라, 이해된 것이다. 미스 페니: 사면. 카를로스: 회복. 지구상의 모든 언어: 온전하다. 루디 탐정: 더 이상 탐정이 아니다. 이제는 언어 수호자.",
-        descEs: "Siete Piedras Guardianas devueltas a sus guardianes. El Código Universal desmantelado. Mr. Black se rindió — no derrotado, sino comprendido. Miss Penny: perdonada. Carlos: recuperado. Cada idioma en la Tierra: intacto. Detective Rudy: ya no es detective. Ahora es Guardián del Idioma.",
+        titleEn: "The Language Conspiracy, Solved",
+        titleKo: "언어 음모, 해결",
+        titleEs: "La Conspiración del Lenguaje, Resuelta",
+        descEn: "Seven Guardian Stones returned to their keepers. The Universal Code dismantled. Mr. Black surrendered. Not defeated, but understood. Miss Penny: pardoned. Carlos: recovered. Every language on Earth: intact. Detective Rudy: no longer a detective. Now a Language Guardian.",
+        descKo: "7개의 수호석이 수호자들에게 돌아갔다. 유니버설 코드가 해체되었다. 미스터 블랙이 항복했다. 패배한 것이 아니라, 이해된 것이다. 미스 페니: 사면. 카를로스: 회복. 지구상의 모든 언어: 온전하다. 루디 탐정: 더 이상 탐정이 아니다. 이제는 언어 수호자.",
+        descEs: "Siete Piedras Guardianas devueltas a sus guardianes. El Código Universal desmantelado. Mr. Black se rindió. No derrotado, sino comprendido. Miss Penny: perdonada. Carlos: recuperado. Cada idioma en la Tierra: intacto. Detective Rudy: ya no es detective. Ahora es Guardián del Idioma.",
       },
     ],
   },
@@ -3003,6 +2986,1677 @@ const STORIES: Record<string, Story> = {
 };
 
 /* ─────────────────── UNLOCK HELPER ─────────────────── */
+
+const MADRID_V21_STORY: Story = {
+  id: "madrid",
+  title: "The Festival Without Color",
+  titleKo: "색을 잃은 마드리드 축제",
+  titleEs: "El Festival Sin Color",
+  gradient: ["#0D0F1F", "#3A1010", "#A84A2A"],
+  accentColor: C.gold,
+  nextChapterId: "seoul",
+  chapterMeta: {
+    cefrLevel: "A1",
+    targetLangRatio: 38,
+    knownExpressions: ["Hello", "Thank you", "Goodbye", "I am happy", "It is beautiful", "Where is", "the festival", "red", "color"],
+    languageNote: "Madrid introduces feelings, color, and simple description while reusing Ch1 social phrases.",
+  },
+  characters: [
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
+    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", side: "right", avatarBg: "#C8232C" },
+    { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", side: "right", avatarBg: "#8B5A2B" },
+    { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", side: "right", avatarBg: "#6E4A35" },
+    { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg },
+  ],
+  sequence: [
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(Madrid does not greet you with sunshine. The plaza from the phone is close, but its flags hang gray, its lanterns burn cold, and every cheer sounds like it has been translated into silence.)",
+      textKo: "(마드리드는 햇빛으로 맞아주지 않는다. 휴대폰에서 본 광장은 가까이 있지만, 깃발은 회색으로 늘어져 있고 등불은 차갑게 타오르며 환호성은 침묵으로 번역된 것처럼 들린다.)",
+      textEs: "(Madrid no te recibe con sol. La plaza del teléfono está cerca, pero sus banderas cuelgan grises, sus faroles arden fríos y cada grito suena traducido al silencio.)",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "That voice from the speaker. I knew it before I knew why. He is not here in person, partner. But his rules are already in the air.",
+      textKo: "스피커에서 들린 그 목소리. 이유를 알기 전부터 알아본 것 같아요. 그는 직접 여기 있는 게 아니에요, 파트너. 하지만 그의 규칙은 이미 공기 속에 퍼졌어요.",
+      textKoMix: "스피커에서 들린 그 voice. 이유를 알기 전부터 알아본 것 같아요. 그는 직접 여기 있는 게 아니에요, partner. 하지만 그의 rules는 이미 공기 속에 퍼졌어요.",
+      textEs: "Esa voz del altavoz. La conocía antes de saber por qué. No está aquí en persona, compa. Pero sus reglas ya están en el aire.",
+      textEsMix: "Esa voice del speaker. La conocía antes de saber por qué. No está aquí en persona, partner. Pero sus rules ya están en el aire.",
+    },
+    {
+      kind: "scene",
+      charId: "isabel",
+      text: "You are the detective from London? Good. Carlos vanished while restoring the festival backdrop. One second he was calling me. The next, his words turned to gold dust and the whole plaza lost its color.",
+      textKo: "런던에서 온 탐정이죠? 좋아요. 카를로스는 축제 무대 배경을 복원하다가 사라졌어요. 방금 전까지 저와 통화하고 있었는데, 다음 순간 그의 말이 금빛 먼지가 되고 광장 전체가 색을 잃었어요.",
+      textKoMix: "런던에서 온 detective죠? 좋아요. Carlos는 festival 무대 배경을 복원하다가 사라졌어요. 그의 words가 gold dust가 되고 plaza 전체가 color를 잃었어요.",
+      textEs: "¿Eres el detective de Londres? Bien. Carlos desapareció mientras restauraba el decorado del festival. Un segundo me llamaba. Al siguiente, sus palabras se volvieron polvo dorado y toda la plaza perdió el color.",
+      textEsMix: "¿Eres el detective de London? Bien. Carlos desapareció restaurando el festival backdrop. Sus words se volvieron gold dust y la plaza perdió el color.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 1,
+      title: { en: "Recover the First Colors", ko: "첫 색을 되찾기", es: "Recuperar los primeros colores" },
+      context: {
+        en: "Isabel needs the words for feeling and color before she can explain what Carlos was restoring.",
+        ko: "이사벨이 카를로스가 무엇을 복원하고 있었는지 설명하려면 감정과 색의 말이 먼저 필요합니다.",
+        es: "Isabel necesita palabras de emoción y color antes de explicar qué restauraba Carlos.",
+      },
+      pType: "word-match",
+      tprsStage: 1,
+      targetExpressions: ["red", "color", "I am happy", "It is beautiful"],
+      previouslyLearned: ["Hello", "Thank you", "Goodbye"],
+      speakAfter: true,
+      storyReason: "Color words let the plaza resist the broadcast's flattening effect.",
+      storyConsequence: "A single red flag starts to return above Plaza Mayor.",
+      onFail: { addToWeakExpressions: ["red", "color", "I am happy", "It is beautiful"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          word: { en: "red", ko: "빨간색", es: "rojo" },
+          meaning: { en: "a warm bright color", ko: "따뜻하고 선명한 색", es: "un color cálido y vivo" },
+          wrong: [
+            { en: "a place", ko: "장소", es: "un lugar" },
+            { en: "a price", ko: "가격", es: "un precio" },
+            { en: "a goodbye", ko: "작별 인사", es: "una despedida" },
+          ],
+        },
+        {
+          word: { en: "color", ko: "색", es: "color" },
+          meaning: { en: "what the festival is losing", ko: "축제가 잃어가는 것", es: "lo que el festival está perdiendo" },
+          wrong: [
+            { en: "a guard's name", ko: "경비원의 이름", es: "el nombre de un guardia" },
+            { en: "a ticket", ko: "표", es: "un billete" },
+            { en: "a locked door", ko: "잠긴 문", es: "una puerta cerrada" },
+          ],
+        },
+        {
+          word: { en: "I am happy", ko: "나는 행복해요", es: "Estoy feliz" },
+          meaning: { en: "a feeling of joy", ko: "기쁜 감정", es: "un sentimiento de alegría" },
+          wrong: [
+            { en: "asking for a location", ko: "위치 묻기", es: "preguntar por un lugar" },
+            { en: "asking a price", ko: "가격 묻기", es: "preguntar un precio" },
+            { en: "saying sorry", ko: "사과하기", es: "pedir perdón" },
+          ],
+        },
+        {
+          word: { en: "It is beautiful", ko: "그것은 아름다워요", es: "Es hermoso" },
+          meaning: { en: "a simple description of something you admire", ko: "감탄하는 것을 묘사하는 쉬운 말", es: "una descripción sencilla de algo que admiras" },
+          wrong: [
+            { en: "an emergency request", ko: "긴급 도움 요청", es: "una petición urgente" },
+            { en: "a family title", ko: "가족 호칭", es: "un título familiar" },
+            { en: "a warning about danger", ko: "위험 경고", es: "una advertencia de peligro" },
+          ],
+        },
+      ],
+      hints: {
+        h1: { ko: "이번 장은 색과 감정이 핵심이에요.", en: "This chapter is about color and feeling.", es: "Este capítulo trata de color y emoción." },
+        h2: { ko: "red와 color는 광장의 시각 단서와 연결돼요.", en: "red and color connect to what you see in the plaza.", es: "red y color conectan con lo que ves en la plaza." },
+        h3: { ko: "happy는 감정, beautiful은 묘사예요.", en: "happy is a feeling; beautiful is a description.", es: "happy es un sentimiento; beautiful es una descripción." },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "isabel",
+      text: "There. That flag was red. Carlos painted it every year because he said the festival needed a heartbeat.",
+      textKo: "저기요. 저 깃발은 원래 빨간색이었어요. 카를로스는 매년 저걸 칠했죠. 축제에는 심장 박동이 필요하다고 했거든요.",
+      textKoMix: "저기요. 저 flag는 원래 red였어요. Carlos는 festival에는 heartbeat가 필요하다고 했어요.",
+      textEs: "Ahí. Esa bandera era roja. Carlos la pintaba cada año porque decía que el festival necesitaba un latido.",
+      textEsMix: "Ahí. Esa flag era red. Carlos decía que el festival necesitaba un heartbeat.",
+    },
+    {
+      kind: "scene",
+      charId: "miguel",
+      text: "I remember the plaza before the broadcast. People argued, sang badly, laughed too loudly. It was not perfect. That is why it was alive.",
+      textKo: "방송 전의 광장을 기억하오. 사람들은 다투고, 음정이 틀린 노래를 부르고, 너무 크게 웃었지. 완벽하지 않았소. 그래서 살아 있었소.",
+      textKoMix: "broadcast 전의 plaza를 기억하오. 사람들은 다투고, 노래하고, 크게 웃었지. perfect하지 않았소. 그래서 살아 있었소.",
+      textEs: "Recuerdo la plaza antes de la transmisión. La gente discutía, cantaba mal, reía demasiado fuerte. No era perfecta. Por eso estaba viva.",
+      textEsMix: "Recuerdo la plaza antes del broadcast. La gente discutía, cantaba mal, reía demasiado fuerte. No era perfect. Por eso estaba viva.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 2,
+      title: { en: "Speak With Feeling", ko: "감정으로 말하기", es: "Hablar con emoción" },
+      context: {
+        en: "Don Miguel can guide you to the sealed stage if you answer with feeling, not just information.",
+        ko: "돈 미겔은 정보만이 아니라 감정이 담긴 말에 반응합니다.",
+        es: "Don Miguel puede guiarte al escenario sellado si respondes con emoción, no solo con información.",
+      },
+      pType: "dialogue-choice",
+      tprsStage: 2,
+      targetExpressions: ["I am happy", "It is beautiful", "Where is the festival?"],
+      previouslyLearned: ["Hello", "Thank you", "Goodbye", "red", "color"],
+      speakAfter: true,
+      storyReason: "The Universal Code removes emotion first. Use emotion words to keep Don Miguel grounded.",
+      storyConsequence: "Don Miguel shows the way to the sealed festival stage.",
+      onFail: { addToWeakExpressions: ["I am happy", "It is beautiful", "Where is the festival?"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          prompt: { en: "Don Miguel asks: 'When the music returns, what do you feel?'", ko: "돈 미겔이 묻습니다: '음악이 돌아오면 무엇을 느끼나?'", es: "Don Miguel pregunta: 'Cuando vuelva la música, ¿qué sientes?'" },
+          context: { en: "Choose a feeling, not a price or a direction.", ko: "가격이나 방향이 아니라 감정을 고르세요.", es: "Elige un sentimiento, no un precio ni una dirección." },
+          answer: { en: "I am happy.", ko: "I am happy.", es: "I am happy." },
+          wrong: [
+            { en: "How much is it?", ko: "How much is it?", es: "How much is it?" },
+            { en: "Goodbye.", ko: "Goodbye.", es: "Goodbye." },
+          ],
+        },
+        {
+          prompt: { en: "He points to the gray stage: 'What was it, before the color left?'", ko: "그가 회색 무대를 가리킵니다: '색이 사라지기 전, 저건 무엇이었나?'", es: "Señala el escenario gris: '¿Qué era antes de perder el color?'" },
+          context: { en: "Give a simple description.", ko: "간단한 묘사를 말하세요.", es: "Da una descripción sencilla." },
+          answer: { en: "It is beautiful.", ko: "It is beautiful.", es: "It is beautiful." },
+          wrong: [
+            { en: "Bread please.", ko: "Bread please.", es: "Bread please." },
+            { en: "Where is Dr. Ellis?", ko: "Where is Dr. Ellis?", es: "Where is Dr. Ellis?" },
+          ],
+        },
+        {
+          prompt: { en: "Isabel needs the exact place. Ask for it.", ko: "이사벨은 정확한 장소가 필요합니다. 물어보세요.", es: "Isabel necesita el lugar exacto. Pregunta por él." },
+          context: { en: "Use the location question from the festival clue.", ko: "축제 단서에서 나온 위치 질문을 사용하세요.", es: "Usa la pregunta de lugar de la pista del festival." },
+          answer: { en: "Where is the festival?", ko: "Where is the festival?", es: "Where is the festival?" },
+          wrong: [
+            { en: "Thank you.", ko: "Thank you.", es: "Thank you." },
+            { en: "I am Carlos.", ko: "I am Carlos.", es: "I am Carlos." },
+          ],
+        },
+      ],
+      hints: {
+        h1: { ko: "감정, 묘사, 위치 질문 순서로 생각하세요.", en: "Think feeling, description, then location question.", es: "Piensa en emoción, descripción y pregunta de lugar." },
+        h2: { ko: "happy는 감정, beautiful은 묘사예요.", en: "happy is feeling; beautiful is description.", es: "happy es emoción; beautiful es descripción." },
+        h3: { ko: "정답 흐름: I am happy / It is beautiful / Where is the festival?", en: "Answer flow: I am happy / It is beautiful / Where is the festival?", es: "Flujo correcto: I am happy / It is beautiful / Where is the festival?" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "miguel",
+      text: "The stage is behind the fountain. It used to pull every color toward it. Now it eats color instead.",
+      textKo: "무대는 분수 뒤에 있소. 예전에는 모든 색을 끌어당겼지. 지금은 색을 먹어치우고 있소.",
+      textKoMix: "stage는 fountain 뒤에 있소. 예전에는 모든 color를 끌어당겼지. 지금은 color를 먹어치우고 있소.",
+      textEs: "El escenario está detrás de la fuente. Antes atraía todos los colores. Ahora se los come.",
+      textEsMix: "El stage está detrás de la fountain. Antes atraía todos los colors. Ahora se los come.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 3,
+      title: { en: "Find Carlos's Last Trace", ko: "카를로스의 마지막 흔적 찾기", es: "Encontrar el último rastro de Carlos" },
+      context: {
+        en: "The festival stage has three clues. One proves where Carlos disappeared.",
+        ko: "축제 무대에는 세 가지 단서가 있습니다. 그중 하나가 카를로스가 사라진 위치를 증명합니다.",
+        es: "El escenario tiene tres pistas. Una demuestra dónde desapareció Carlos.",
+      },
+      pType: "investigation",
+      tprsStage: 3,
+      targetExpressions: ["Where is the festival?", "color", "red"],
+      previouslyLearned: ["Hello", "Thank you", "I am happy", "It is beautiful"],
+      storyReason: "Identify the clue that connects Carlos, the speaker, and the sealed stage.",
+      storyConsequence: "The sealed stage opens a path to the Madrid Stone fragment.",
+      onFail: { addToWeakExpressions: ["Where is the festival?", "color", "red"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          prompt: { en: "Which evidence points to Carlos's exact disappearance point?", ko: "어떤 증거가 카를로스가 사라진 정확한 지점을 가리키나요?", es: "¿Qué evidencia señala el punto exacto donde desapareció Carlos?" },
+          clues: [
+            { en: "A paintbrush still wet with red paint beside the stage speaker.", ko: "무대 스피커 옆에 놓인, 아직 빨간 물감이 마르지 않은 붓.", es: "Un pincel aún mojado con pintura roja junto al altavoz del escenario." },
+            { en: "A food receipt from a nearby cafe.", ko: "근처 카페의 영수증.", es: "Un recibo de una cafetería cercana." },
+            { en: "A gray paper flower from the festival decorations.", ko: "축제 장식에서 떨어진 회색 종이꽃.", es: "Una flor de papel gris de la decoración del festival." },
+          ],
+          answerIdx: 0,
+        },
+      ],
+      hints: {
+        h1: { ko: "카를로스는 복원가예요. 그가 쓰던 도구를 찾으세요.", en: "Carlos is a restorer. Look for the tool he used.", es: "Carlos es restaurador. Busca la herramienta que usaba." },
+        h2: { ko: "붓과 빨간색은 깃발 회복과 연결돼요.", en: "The brush and red paint connect to the restored flag.", es: "El pincel y la pintura roja conectan con la bandera restaurada." },
+        h3: { ko: "정답: 스피커 옆의 빨간 붓.", en: "Answer: the red paintbrush beside the speaker.", es: "Respuesta: el pincel rojo junto al altavoz." },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "isabel",
+      text: "Carlos was here. The speaker took his voice, and the stage sealed around the last color he touched.",
+      textKo: "카를로스가 여기 있었어요. 스피커가 그의 목소리를 빼앗았고, 그가 마지막으로 만진 색을 중심으로 무대가 봉인됐어요.",
+      textKoMix: "Carlos가 여기 있었어요. speaker가 그의 voice를 빼앗았고, 그가 마지막으로 만진 color를 중심으로 stage가 봉인됐어요.",
+      textEs: "Carlos estuvo aquí. El altavoz tomó su voz, y el escenario se selló alrededor del último color que tocó.",
+      textEsMix: "Carlos estuvo aquí. El speaker tomó su voice, y el stage se selló alrededor del último color que tocó.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "The seal is not asking for a key. It is asking for a feeling, a place, and a promise that beauty still means something. Put the pieces in order.",
+      textKo: "봉인은 열쇠를 요구하는 게 아니에요. 감정, 장소, 그리고 아름다움이 아직 의미 있다는 약속을 요구하고 있어요. 조각을 순서대로 놓아봐요.",
+      textKoMix: "seal은 key를 요구하는 게 아니에요. feeling, place, 그리고 beautiful이라는 약속을 요구해요. pieces를 순서대로 놓아봐요.",
+      textEs: "El sello no pide una llave. Pide un sentimiento, un lugar y la promesa de que la belleza aún significa algo. Pon las piezas en orden.",
+      textEsMix: "El seal no pide una key. Pide feeling, place y la promesa de que beautiful todavía importa. Pon las pieces en orden.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 4,
+      title: { en: "Madrid Boss Spell", ko: "마드리드 보스 주문", es: "Hechizo Jefe de Madrid" },
+      context: { en: "Speak the festival back into shape.", ko: "축제가 다시 형태를 되찾도록 말하세요.", es: "Devuelve la forma al festival con tus palabras." },
+      pType: "boss-spell",
+      tprsStage: 4,
+      targetExpressions: ["I am happy", "Where is", "the festival", "It is beautiful"],
+      previouslyLearned: ["Hello", "Thank you", "Goodbye", "red", "color"],
+      speakAfter: true,
+      storyReason: "Complete the Madrid Boss Spell to unseal the festival stage.",
+      storyConsequence: "Color and movement return to the plaza, and Carlos can be reached.",
+      onFail: { addToWeakExpressions: ["I am happy", "Where is", "the festival", "It is beautiful"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          spellChunks: ["I am happy", "Where is", "the festival", "It is beautiful"],
+          separators: [".", " ", "?", "."],
+          wordPool: ["I am happy", "Where is", "the festival", "It is beautiful", "How much", "Thank you", "Bread please"],
+          instruction: { en: "Place each spell-piece on the sealed stage.", ko: "주문 조각을 봉인된 무대 위에 순서대로 놓으세요.", es: "Coloca cada pieza del hechizo sobre el escenario sellado." },
+          hints: {
+            h1: { ko: "순서가 중요해요. 먼저 감정을 말하세요.", en: "The order matters. Begin with the feeling.", es: "El orden importa. Empieza con el sentimiento." },
+            h2: { ko: "그다음은 장소 질문이에요: Where is + the festival.", en: "Next comes the place question: Where is + the festival.", es: "Después va la pregunta de lugar: Where is + the festival." },
+            h3: { ko: "정답 문장: I am happy. Where is the festival? It is beautiful.", en: "Answer sentence: I am happy. Where is the festival? It is beautiful.", es: "Frase correcta: I am happy. Where is the festival? It is beautiful." },
+          },
+          storyReason: { en: "Open the sealed stage to reach Carlos and the Madrid Stone fragment.", ko: "봉인된 무대를 열어 카를로스와 마드리드 스톤 파편에 닿으세요.", es: "Abre el escenario sellado para alcanzar a Carlos y el fragmento de la Piedra de Madrid." },
+          storyConsequence: { en: "The first red spark becomes a full dance step.", ko: "첫 빨간 불꽃이 온전한 춤 동작으로 이어집니다.", es: "La primera chispa roja se convierte en un paso de baile completo." },
+          doorImage: ch2BossStageImg,
+        },
+      ],
+      hints: {
+        h1: { ko: "Boss Spell은 감정, 위치 질문, 묘사로 이루어져요.", en: "The Boss Spell uses feeling, location, and description.", es: "El Boss Spell usa emoción, lugar y descripción." },
+        h2: { ko: "I am happy. Where is + the festival? It is beautiful.", en: "I am happy. Where is + the festival? It is beautiful.", es: "I am happy. Where is + the festival? It is beautiful." },
+        h3: { ko: "정답 문장: I am happy. Where is the festival? It is beautiful.", en: "Answer sentence: I am happy. Where is the festival? It is beautiful.", es: "Frase correcta: I am happy. Where is the festival? It is beautiful." },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(The sentence climbs the cracks. The stage exhales red. A flamenco dancer, frozen in gray, moves one hand, then one heel, then the whole plaza remembers how to clap.)",
+      textKo: "(문장이 금 간 틈을 타고 올라간다. 무대가 빨간 숨을 내쉰다. 회색으로 멈춰 있던 플라멩코 댄서가 한 손을 움직이고, 한 발꿈치를 울리고, 마침내 광장 전체가 박수를 기억해낸다.)",
+      textEs: "(La frase trepa por las grietas. El escenario exhala rojo. Una bailaora congelada en gris mueve una mano, luego un tacón, y por fin toda la plaza recuerda cómo aplaudir.)",
+    },
+    {
+      kind: "scene",
+      charId: "carlos",
+      text: "*breathing hard* I could hear everyone, but every word came back polished, smooth, empty. Isabel. Thank you. I thought nobody would find the color.",
+      textKo: "*거칠게 숨을 쉬며* 모두의 목소리가 들렸지만, 모든 단어가 매끈하고 비어 있는 말로 돌아왔어요. 이사벨. 고마워요. 아무도 그 색을 찾지 못할 줄 알았어요.",
+      textKoMix: "*거칠게 숨을 쉬며* 모두의 voice가 들렸지만, 모든 word가 smooth하고 empty하게 돌아왔어요. Isabel. Thank you. 아무도 color를 찾지 못할 줄 알았어요.",
+      textEs: "*respirando con fuerza* Podía oír a todos, pero cada palabra volvía pulida, suave, vacía. Isabel. Thank you. Pensé que nadie encontraría el color.",
+      textEsMix: "*respirando con fuerza* Podía oír a todos, pero cada word volvía smooth y empty. Isabel. Thank you. Pensé que nadie encontraría el color.",
+    },
+    {
+      kind: "scene",
+      charId: "miguel",
+      text: "A festival is not a schedule. It is the mistakes in the song, the accent in the shout, the red where someone loved it enough to repaint it.",
+      textKo: "축제는 일정표가 아니오. 노래 속 실수, 외침 속 억양, 누군가 사랑해서 다시 칠한 빨간색이 바로 축제요.",
+      textKoMix: "festival은 schedule이 아니오. 노래 속 mistake, 외침 속 accent, 누군가 사랑해서 다시 칠한 red가 바로 festival이오.",
+      textEs: "Un festival no es un horario. Son los errores en la canción, el acento en el grito, el rojo que alguien amó tanto que volvió a pintarlo.",
+      textEsMix: "Un festival no es un schedule. Son los mistakes en la canción, el accent en el grito, el red que alguien volvió a pintar.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(The plaza speakers crackle. No face appears. Only a calm voice, too clean for the noise around it.)",
+      textKo: "(광장 스피커가 지직거린다. 얼굴은 나타나지 않는다. 주변의 소음과 어울리지 않을 만큼 매끈한 목소리만 들린다.)",
+      textEs: "(Los altavoces de la plaza chisporrotean. No aparece ningún rostro. Solo una voz tranquila, demasiado limpia para el ruido que la rodea.)",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "\"What you call accent, I call distance. Bridges don't ask the river to stay narrow.\"",
+      textKo: "\"당신들이 억양이라고 부르는 것을 나는 거리라고 부른다. 다리는 강에게 좁게 남아 있으라고 요구하지 않는다.\"",
+      textEs: "\"Lo que llamas acento, yo lo llamo distancia. Los puentes no le piden al río que siga siendo estrecho.\"",
+    },
+    {
+      kind: "clue",
+      symbol: "✉",
+      titleEn: "Old Letter: Seoul",
+      titleKo: "오래된 편지: 서울",
+      titleEs: "Carta Antigua: Seúl",
+      descEn: "Carlos finds an old letter hidden under the stage boards. It names a Seoul market, a family lullaby, and a stone that remembers harmony.",
+      descKo: "카를로스가 무대 판자 아래에서 오래된 편지를 찾습니다. 편지에는 서울의 시장, 가족의 자장가, 그리고 조화를 기억하는 돌이 적혀 있습니다.",
+      descEs: "Carlos encuentra una carta antigua bajo las tablas del escenario. Nombra un mercado de Seúl, una nana familiar y una piedra que recuerda la armonía.",
+    },
+    {
+      kind: "scene",
+      charId: "eleanor",
+      text: "*on the phone from London* I received your images. London and Madrid are compromised. Two city stones remain before Babel reveals the final three. Seoul is next. Be careful, Detective.",
+      textKo: "*런던에서 전화로* 사진을 받았어요. 런던과 마드리드는 이미 흔들렸습니다. 바벨의 마지막 세 개가 드러나기 전, 도시 수호석은 두 개 남았어요. 다음은 서울입니다. 조심하세요, 탐정님.",
+      textKoMix: "*London에서 phone으로* 사진을 받았어요. London과 Madrid는 이미 흔들렸습니다. Babel의 final three 전, city stones는 두 개 남았어요. 다음은 Seoul입니다. 조심하세요, Detective.",
+      textEs: "*por teléfono desde Londres* Recibí tus imágenes. Londres y Madrid están comprometidos. Quedan dos piedras de ciudad antes de que Babel revele las tres finales. Seúl es el siguiente. Cuidado, Detective.",
+      textEsMix: "*por phone desde London* Recibí tus imágenes. London y Madrid están comprometidos. Quedan two city stones antes de Babel. Seoul es el siguiente. Cuidado, Detective.",
+    },
+    {
+      kind: "scene",
+      charId: "isabel",
+      text: "Then go. Carlos and I will keep the festival loud until you come back. Goodbye, Detective. And thank you.",
+      textKo: "그럼 가요. 당신이 돌아올 때까지 카를로스와 제가 축제를 크게 울리게 할게요. 안녕히 가요, 탐정님. 그리고 고마워요.",
+      textKoMix: "그럼 가요. 당신이 돌아올 때까지 Carlos와 제가 festival을 크게 울리게 할게요. Goodbye, Detective. 그리고 Thank you.",
+      textEs: "Entonces ve. Carlos y yo mantendremos el festival bien ruidoso hasta que vuelvas. Goodbye, Detective. Y thank you.",
+      textEsMix: "Entonces ve. Carlos y yo mantendremos el festival fuerte. Goodbye, Detective. Y Thank you.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(Madrid keeps one red flag awake. Somewhere in Seoul, an old market sign begins to flicker.)",
+      textKo: "(마드리드는 빨간 깃발 하나를 깨어 있게 지킨다. 서울 어딘가에서 오래된 시장 간판이 깜빡이기 시작한다.)",
+      textEs: "(Madrid mantiene despierta una bandera roja. En algún lugar de Seúl, un viejo cartel de mercado empieza a parpadear.)",
+    },
+  ],
+};
+
+const SEOUL_V21_STORY: Story = {
+  id: "seoul",
+  title: "The Seoul Order",
+  titleKo: "서울의 순서",
+  titleEs: "El Orden de Seúl",
+  gradient: ["#08111C", "#10251F", "#1A0F08"],
+  accentColor: C.gold,
+  nextChapterId: "cairo",
+  chapterMeta: {
+    cefrLevel: "A2",
+    targetLangRatio: 42,
+    knownExpressions: [
+      "Hello",
+      "Goodbye",
+      "안녕하세요",
+      "감사합니다",
+      "도와주세요",
+      "실례합니다",
+      "죄송합니다",
+      "박물관은 어디예요?",
+      "저는 박물관에 가요",
+    ],
+    languageNote:
+      "Seoul teaches Korean politeness and sentence order. The boss spell is fully Korean, with informal distractors used to teach register.",
+  },
+  characters: [
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
+    { id: "minho", emoji: "🚕", name: "Minho", nameKo: "민호", side: "right", avatarBg: "#1F6F8B" },
+    { id: "youngsook", emoji: "🍲", name: "Youngsook", nameKo: "영숙", side: "right", avatarBg: "#A15C38" },
+    { id: "sujin", emoji: "🔬", name: "Dr. Sujin Han", nameKo: "한수진 박사", side: "right", avatarBg: "#4C6B4F" },
+    { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg },
+  ],
+  sequence: [
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(Incheon Airport. 6:15 AM. Your phone dies before it can translate a single sign. Seoul does not lose every word at once. Here, the order falls apart first.)",
+      textKo: "(인천공항. 오전 6시 15분. 휴대폰은 표지판 하나를 번역하기도 전에 꺼진다. 서울은 모든 단어를 한꺼번에 잃지 않는다. 이곳에서는 먼저 순서가 무너진다.)",
+      textEs: "(Aeropuerto de Incheon. 6:15 AM. Tu teléfono muere antes de traducir un solo letrero. Seúl no pierde todas las palabras a la vez. Aquí, primero se rompe el orden.)",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "No signal. No translator. But we still have something stronger, partner: words we can say ourselves.",
+      textKo: "신호가 없어요. 번역기도 없어요. 그래도 우리에겐 더 강한 게 있어요, 파트너. 직접 말할 수 있는 단어요.",
+      textEs: "Sin señal. Sin traductor. Pero todavía tenemos algo más fuerte, compa: palabras que podemos decir nosotros mismos.",
+    },
+    {
+      kind: "scene",
+      charId: "minho",
+      text: "You look lost. Tourist? Detective? Either way, first rule in Seoul: start politely. 안녕하세요.",
+      textKo: "길 잃은 것 같은데요. 관광객? 탐정? 어느 쪽이든 서울의 첫 번째 규칙은 정중하게 시작하는 거예요. 안녕하세요.",
+      textEs: "Pareces perdido. ¿Turista? ¿Detective? Da igual: la primera regla en Seúl es empezar con cortesía. 안녕하세요.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 1,
+      title: { en: "Polite First Words", ko: "첫 정중 표현", es: "Primeras palabras formales" },
+      context: {
+        en: "Minho will help if you can separate polite Korean from casual speech.",
+        ko: "정중한 한국어와 반말을 구분하면 민호가 도와줄 거예요.",
+        es: "Minho ayudará si puedes separar el coreano formal del habla casual.",
+      },
+      pType: "word-match",
+      tprsStage: 1,
+      targetExpressions: ["안녕하세요", "감사합니다", "도와주세요", "실례합니다"],
+      previouslyLearned: ["Hello", "Thank you", "Goodbye"],
+      speakAfter: true,
+      storyReason: "Restore the polite phrases needed to move through Seoul without flattening anyone's voice.",
+      storyConsequence: "The airport exit sign steadies long enough for Minho to guide you toward the market.",
+      onFail: { addToWeakExpressions: ["안녕하세요", "감사합니다", "도와주세요", "실례합니다"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          word: { en: "안녕하세요", ko: "안녕하세요", es: "안녕하세요" },
+          meaning: { en: "a polite hello", ko: "정중한 인사", es: "un saludo formal" },
+          wrong: [
+            { en: "casual bye", ko: "반말 작별", es: "despedida casual" },
+            { en: "a price question", ko: "가격 질문", es: "pregunta de precio" },
+            { en: "a place name", ko: "장소 이름", es: "nombre de lugar" },
+          ],
+        },
+        {
+          word: { en: "감사합니다", ko: "감사합니다", es: "감사합니다" },
+          meaning: { en: "polite thank you", ko: "정중한 감사", es: "gracias formal" },
+          wrong: [
+            { en: "informal help", ko: "반말 도움 요청", es: "ayuda informal" },
+            { en: "left turn", ko: "왼쪽으로 돌기", es: "girar a la izquierda" },
+            { en: "a color", ko: "색깔", es: "un color" },
+          ],
+        },
+        {
+          word: { en: "도와주세요", ko: "도와주세요", es: "도와주세요" },
+          meaning: { en: "please help me", ko: "정중한 도움 요청", es: "por favor ayúdame" },
+          wrong: [
+            { en: "informal hey", ko: "반말 인사", es: "oye informal" },
+            { en: "a food order", ko: "음식 주문", es: "pedido de comida" },
+            { en: "a goodbye", ko: "작별 인사", es: "despedida" },
+          ],
+        },
+        {
+          word: { en: "실례합니다", ko: "실례합니다", es: "실례합니다" },
+          meaning: { en: "excuse me, politely", ko: "정중한 실례 표현", es: "disculpe, formal" },
+          wrong: [
+            { en: "where is", ko: "어디예요", es: "dónde está" },
+            { en: "red", ko: "빨간색", es: "rojo" },
+            { en: "informal thanks", ko: "반말 감사", es: "gracias informal" },
+          ],
+        },
+      ],
+      hints: {
+        h1: { ko: "끝에 -요 또는 -합니다가 있으면 보통 더 정중해요.", en: "Words ending in -요 or -합니다 usually sound more polite.", es: "Las formas que terminan en -요 o -합니다 suelen sonar más formales." },
+        h2: { ko: "안녕, 고마워, 도와줘는 가까운 사이의 반말이에요.", en: "안녕, 고마워, and 도와줘 are casual forms.", es: "안녕, 고마워 y 도와줘 son formas casuales." },
+        h3: { ko: "정중한 네 표현: 안녕하세요 / 감사합니다 / 도와주세요 / 실례합니다", en: "The four polite forms: 안녕하세요 / 감사합니다 / 도와주세요 / 실례합니다", es: "Las cuatro formas formales: 안녕하세요 / 감사합니다 / 도와주세요 / 실례합니다" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "minho",
+      text: "Better. My taxi app is broken, but my grandmother's market is not. If Seoul is losing order, Youngsook will feel it before any machine does.",
+      textKo: "좋아요. 제 택시 앱은 망가졌지만, 우리 할머니 시장은 아직 살아 있어요. 서울의 순서가 무너진다면 영숙 할머니가 기계보다 먼저 느낄 거예요.",
+      textEs: "Mejor. Mi app de taxi está rota, pero el mercado de mi abuela no. Si Seúl pierde el orden, Youngsook lo sentirá antes que cualquier máquina.",
+    },
+    {
+      kind: "scene",
+      charId: "youngsook",
+      text: "아이고, 먼 길 왔네. Sit. Eat first. Words come back better when people are fed.",
+      textKo: "아이고, 먼 길 왔네. 앉아. 먼저 먹어. 사람은 배가 차야 말도 제대로 돌아오는 법이야.",
+      textEs: "Ay, viniste de muy lejos. Siéntate. Come primero. Las palabras vuelven mejor cuando la gente está alimentada.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 2,
+      title: { en: "Choose the Polite Reply", ko: "정중한 대답 고르기", es: "Elige la respuesta formal" },
+      context: {
+        en: "Youngsook offers food and directions. Choose the reply that keeps the warmth in the conversation.",
+        ko: "영숙 할머니가 음식과 길을 내어줍니다. 대화의 온기를 지키는 대답을 고르세요.",
+        es: "Youngsook ofrece comida y dirección. Elige la respuesta que conserva la calidez de la conversación.",
+      },
+      pType: "dialogue-choice",
+      tprsStage: 2,
+      targetExpressions: ["감사합니다", "도와주세요", "실례합니다"],
+      previouslyLearned: ["안녕하세요", "Hello", "Thank you"],
+      speakAfter: true,
+      storyReason: "Politeness keeps the market voices human instead of flattened by the broadcast.",
+      storyConsequence: "Youngsook points you toward Sujin's lab and the old palace record.",
+      onFail: { addToWeakExpressions: ["감사합니다", "도와주세요", "실례합니다"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          prompt: { en: "Youngsook gives you soup and points toward the station.", ko: "영숙 할머니가 국을 내어주며 역 쪽을 가리킵니다.", es: "Youngsook te da sopa y señala hacia la estación." },
+          context: { en: "You want to thank her politely.", ko: "정중하게 감사해야 합니다.", es: "Quieres agradecerle de forma formal." },
+          answer: { en: "감사합니다", ko: "감사합니다", es: "감사합니다" },
+          wrong: [
+            { en: "고마워", ko: "고마워", es: "고마워" },
+            { en: "야", ko: "야", es: "야" },
+          ],
+        },
+        {
+          prompt: { en: "The market signs flicker and you need help finding Sujin's lab.", ko: "시장 간판이 깜빡이고 수진 박사의 연구실을 찾아야 합니다.", es: "Los letreros del mercado parpadean y necesitas encontrar el laboratorio de Sujin." },
+          context: { en: "Ask for help politely.", ko: "정중하게 도움을 요청하세요.", es: "Pide ayuda de forma formal." },
+          answer: { en: "도와주세요", ko: "도와주세요", es: "도와주세요" },
+          wrong: [
+            { en: "도와줘", ko: "도와줘", es: "도와줘" },
+            { en: "Help", ko: "Help", es: "Help" },
+          ],
+        },
+      ],
+      hints: {
+        h1: { ko: "시장에서는 말투가 관계를 만들어요.", en: "In the market, register creates relationship.", es: "En el mercado, el registro crea relación." },
+        h2: { ko: "정중함은 -요 / -합니다 쪽을 고르면 돼요.", en: "Choose the -요 / -합니다 forms for politeness.", es: "Elige formas con -요 / -합니다 para sonar formal." },
+        h3: { ko: "정답: 감사합니다, 도와주세요", en: "Answers: 감사합니다, 도와주세요", es: "Respuestas: 감사합니다, 도와주세요" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "youngsook",
+      text: "A sentence is like stew. Put the last thing first and the taste changes. Go to Dr. Han. She studies that sort of broken order.",
+      textKo: "문장은 찌개 같아. 마지막에 넣을 걸 처음에 넣으면 맛이 달라지지. 한 박사에게 가봐. 그 사람은 그런 무너진 순서를 연구해.",
+      textEs: "Una frase es como un guiso. Si pones primero lo que va al final, cambia el sabor. Ve con la Dra. Han. Ella estudia ese orden roto.",
+    },
+    {
+      kind: "scene",
+      charId: "sujin",
+      text: "You made it here without a translator? Good. Korean often waits until the end to reveal the verb. Black's system hates that patience.",
+      textKo: "번역기 없이 여기까지 왔다고요? 좋아요. 한국어는 동사를 끝까지 기다렸다가 보여줄 때가 많아요. 블랙의 시스템은 그 기다림을 싫어합니다.",
+      textEs: "¿Llegaste hasta aquí sin traductor? Bien. El coreano suele esperar hasta el final para revelar el verbo. El sistema de Black odia esa paciencia.",
+    },
+    {
+      kind: "scene",
+      charId: "sujin",
+      text: "Look: 저는 / 박물관에 / 가요. In English, you rush to the verb. In Korean, the path can come before the action.",
+      textKo: "보세요. 저는 / 박물관에 / 가요. 영어는 동사로 빨리 달려가지만, 한국어는 행동 전에 길을 먼저 말할 수 있어요.",
+      textEs: "Mira: 저는 / 박물관에 / 가요. En inglés corres hacia el verbo. En coreano, el camino puede aparecer antes de la acción.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 3,
+      title: { en: "Build the Korean Order", ko: "한국어 어순 만들기", es: "Construir el orden coreano" },
+      context: {
+        en: "Sujin needs you to place the sentence pieces in Korean order.",
+        ko: "수진 박사가 문장 조각을 한국어 순서로 놓아 달라고 합니다.",
+        es: "Sujin necesita que coloques las piezas en orden coreano.",
+      },
+      pType: "sentence-builder",
+      tprsStage: 3,
+      targetExpressions: ["저는", "박물관에", "가요", "박물관은 어디예요?"],
+      previouslyLearned: ["안녕하세요", "도와주세요"],
+      speakAfter: true,
+      storyReason: "Restore sentence order before approaching the sealed palace.",
+      storyConsequence: "The route to Gyeongbokgung stabilizes on Sujin's broken map.",
+      onFail: { addToWeakExpressions: ["저는 박물관에 가요", "박물관은 어디예요?"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          instruction: { en: "Build: I go to the museum.", ko: "문장을 만드세요: 저는 박물관에 가요.", es: "Construye: Voy al museo." },
+          words: [
+            { en: "저는", ko: "저는", es: "저는" },
+            { en: "박물관에", ko: "박물관에", es: "박물관에" },
+            { en: "가요", ko: "가요", es: "가요" },
+          ],
+          answerOrder: [0, 1, 2],
+        },
+        {
+          instruction: { en: "Build: Where is the museum?", ko: "문장을 만드세요: 박물관은 어디예요?", es: "Construye: ¿Dónde está el museo?" },
+          words: [
+            { en: "박물관은", ko: "박물관은", es: "박물관은" },
+            { en: "어디예요?", ko: "어디예요?", es: "어디예요?" },
+          ],
+          answerOrder: [0, 1],
+        },
+      ],
+      hints: {
+        h1: { ko: "한국어는 동사가 뒤에 오는 경우가 많아요.", en: "Korean often places the verb near the end.", es: "El coreano suele poner el verbo cerca del final." },
+        h2: { ko: "저는 → 박물관에 → 가요", en: "저는 → 박물관에 → 가요", es: "저는 → 박물관에 → 가요" },
+        h3: { ko: "질문은 박물관은 → 어디예요?", en: "The question is 박물관은 → 어디예요?", es: "La pregunta es 박물관은 → 어디예요?" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(Gyeongbokgung waits under a dark sky. The gate is still there, but parts of it blink like a sentence with its words in the wrong places.)",
+      textKo: "(경복궁은 어두운 하늘 아래 기다리고 있다. 문은 아직 그곳에 있지만, 일부는 단어의 순서가 어긋난 문장처럼 깜빡인다.)",
+      textEs: "(Gyeongbokgung espera bajo un cielo oscuro. La puerta sigue allí, pero partes parpadean como una frase con las palabras fuera de lugar.)",
+    },
+    {
+      kind: "scene",
+      charId: "sujin",
+      text: "This is not only a palace gate. It is a sentence. If the order collapses, the building forgets how to stand.",
+      textKo: "이건 단순한 궁궐 문이 아니에요. 문장입니다. 순서가 무너지면 건물은 서 있는 법을 잊어요.",
+      textEs: "No es solo una puerta de palacio. Es una frase. Si el orden colapsa, el edificio olvida cómo sostenerse.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 4,
+      title: { en: "Find the Ordered Clue", ko: "순서가 맞는 단서 찾기", es: "Encontrar la pista ordenada" },
+      context: {
+        en: "Three clues remain near the palace gate. Only one keeps the sentence order intact.",
+        ko: "궁궐 문 근처에 단서 세 개가 남아 있습니다. 그중 하나만 문장 순서를 온전히 지킵니다.",
+        es: "Quedan tres pistas junto a la puerta. Solo una conserva intacto el orden de la frase.",
+      },
+      pType: "investigation",
+      tprsStage: 3,
+      targetExpressions: ["박물관은 어디예요?", "순서", "도와주세요"],
+      previouslyLearned: ["안녕하세요", "실례합니다"],
+      storyReason: "Identify the clue Black left without accepting his flattened order.",
+      storyConsequence: "Sujin intercepts a clean, cold voice hidden under the palace signal.",
+      onFail: { addToWeakExpressions: ["박물관은 어디예요?", "도와주세요"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          prompt: { en: "Which clue still has human order?", ko: "어떤 단서가 아직 사람의 순서를 지키고 있나요?", es: "¿Qué pista conserva todavía el orden humano?" },
+          clues: [
+            { en: "A palace map where every label is alphabetized by machine.", ko: "모든 이름이 기계식 알파벳 순서로 정리된 궁궐 지도", es: "Un mapa del palacio con todas las etiquetas ordenadas por máquina" },
+            { en: "A note: 실례합니다. 박물관은 어디예요? The handwriting hesitates before 어디예요.", ko: "메모: 실례합니다. 박물관은 어디예요? 어디예요 앞에서 손글씨가 잠시 흔들린다.", es: "Una nota: 실례합니다. 박물관은 어디예요? La letra duda antes de 어디예요." },
+            { en: "A receipt where every Korean ending has been replaced by one smooth tone.", ko: "모든 한국어 어미가 하나의 매끈한 말투로 바뀐 영수증", es: "Un recibo donde cada final coreano fue reemplazado por un tono liso" },
+          ],
+          answerIdx: 1,
+        },
+      ],
+      hints: {
+        h1: { ko: "사람의 말에는 머뭇거림이 남아 있어요.", en: "Human language often leaves hesitation behind.", es: "El lenguaje humano suele dejar dudas." },
+        h2: { ko: "정중한 질문 형태를 찾으세요.", en: "Look for the polite question form.", es: "Busca la forma formal de pregunta." },
+        h3: { ko: "정답은 손글씨 메모예요: 실례합니다. 박물관은 어디예요?", en: "The answer is the handwritten note: 실례합니다. 박물관은 어디예요?", es: "La respuesta es la nota manuscrita: 실례합니다. 박물관은 어디예요?" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "sujin",
+      text: "I have the signal. It is not live video. It is an intercepted recording, buried inside the gate's static. No face. Only a voice.",
+      textKo: "신호를 잡았어요. 실시간 영상이 아니에요. 궁궐 문의 잡음 안에 묻힌 가로챈 녹음입니다. 얼굴은 없어요. 목소리뿐입니다.",
+      textEs: "Tengo la señal. No es video en vivo. Es una grabación interceptada, enterrada en la estática de la puerta. Sin rostro. Solo una voz.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "\"Translation isn't theft. Misunderstanding is.\"",
+      textKo: "\"번역은 도둑질이 아니다. 오해가 도둑질이다.\"",
+      textEs: "\"Traducir no es robar. Malentender sí lo es.\"",
+    },
+    {
+      kind: "clue",
+      symbol: "📻",
+      titleEn: "Intercepted Signal: B",
+      titleKo: "가로챈 신호: B",
+      titleEs: "Señal Interceptada: B",
+      descEn: "Sujin isolates a transmission hidden inside the palace static. The sender never appears on camera. The message insists that translation is protection, not theft. Rudy hears it and goes still.",
+      descKo: "수진은 궁궐의 잡음 속에 숨겨진 송신을 분리해낸다. 발신자는 카메라에 나타나지 않는다. 메시지는 번역이 도둑질이 아니라 보호라고 주장한다. 루디는 그 목소리를 듣고 굳어버린다.",
+      descEs: "Sujin aísla una transmisión oculta dentro de la estática del palacio. El emisor nunca aparece en cámara. El mensaje insiste en que traducir es proteger, no robar. Rudy lo oye y se queda inmóvil.",
+    },
+    {
+      kind: "scene",
+      charId: "sujin",
+      text: "There is one more line in Korean. 잘했어요. 다음은 카이로예요. He knew you would read it.",
+      textKo: "한국어로 한 줄이 더 있어요. 잘했어요. 다음은 카이로예요. 당신이 읽을 걸 알고 있었던 거예요.",
+      textEs: "Hay una línea más en coreano. 잘했어요. 다음은 카이로예요. Sabía que podrías leerla.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "The gate is listening. It does not need a perfect translation. It needs respect, help, and the right order.",
+      textKo: "문이 듣고 있어요. 완벽한 번역이 필요한 게 아니에요. 정중함, 도움 요청, 그리고 올바른 순서가 필요해요.",
+      textEs: "La puerta escucha. No necesita una traducción perfecta. Necesita respeto, ayuda y el orden correcto.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 5,
+      title: { en: "Seoul Boss Spell", ko: "서울 보스 주문", es: "Hechizo Jefe de Seúl" },
+      context: {
+        en: "Use polite Korean to open the palace gate.",
+        ko: "정중한 한국어로 궁궐 문을 열어요.",
+        es: "Usa coreano formal para abrir la puerta del palacio.",
+      },
+      pType: "boss-spell",
+      tprsStage: 4,
+      targetExpressions: ["안녕하세요", "도와주세요", "박물관은", "어디예요?"],
+      previouslyLearned: ["감사합니다", "실례합니다", "Hello", "Goodbye"],
+      speakAfter: true,
+      storyReason: "Complete the Korean Boss Spell to restore the palace order.",
+      storyConsequence: "The palace reassembles, and the Seoul Stone fragment answers Rudy.",
+      onFail: { addToWeakExpressions: ["안녕하세요", "도와주세요", "박물관은", "어디예요?"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          spellChunks: ["안녕하세요", "도와주세요", "박물관은", "어디예요?"],
+          separators: [".", ".", "", ""],
+          wordPool: ["안녕하세요", "도와주세요", "박물관은", "어디예요?", "안녕", "도와줘", "어디야?"],
+          instruction: {
+            en: "Use polite Korean to open the palace gate.",
+            ko: "정중한 한국어로 궁궐 문을 열어요.",
+            es: "Usa coreano formal para abrir la puerta del palacio.",
+          },
+          hints: {
+            h1: {
+              ko: "정중한 형태를 골라요. 반말은 이 문에 통하지 않아요.",
+              en: "Choose polite forms. Informal speech will not work on this gate.",
+              es: "Elige formas formales. El habla informal no funciona en esta puerta.",
+            },
+            h2: {
+              ko: "순서: 안녕하세요 → 도와주세요 → 박물관은 → 어디예요?",
+              en: "Order: 안녕하세요 → 도와주세요 → 박물관은 → 어디예요?",
+              es: "Orden: 안녕하세요 → 도와주세요 → 박물관은 → 어디예요?",
+            },
+            h3: {
+              ko: "정답 문장: 안녕하세요. 도와주세요. 박물관은 어디예요?",
+              en: "Answer: 안녕하세요. 도와주세요. 박물관은 어디예요?",
+              es: "Respuesta: 안녕하세요. 도와주세요. 박물관은 어디예요?",
+            },
+          },
+          storyReason: {
+            en: "The palace gate is sealed. Only polite Korean can open it.",
+            ko: "궁궐 문이 봉인되어 있어요. 정중한 한국어만이 열 수 있어요.",
+            es: "La puerta del palacio está sellada. Solo el coreano formal puede abrirla.",
+          },
+          storyConsequence: {
+            en: "The palace reassembles. Each chunk restores one wing.",
+            ko: "궁궐이 재조립돼요. 각 조각이 한 채씩 복구해요.",
+            es: "El palacio se reconstruye. Cada pieza restaura una sección.",
+          },
+          doorImage: ch3BossPalaceImg,
+        },
+      ],
+      hints: {
+        h1: { ko: "반말 distractor를 피하세요: 안녕 / 도와줘 / 어디야?", en: "Avoid the informal distractors: 안녕 / 도와줘 / 어디야?", es: "Evita los distractores informales: 안녕 / 도와줘 / 어디야?" },
+        h2: { ko: "정중한 순서: 안녕하세요. 도와주세요. 박물관은 어디예요?", en: "Polite order: 안녕하세요. 도와주세요. 박물관은 어디예요?", es: "Orden formal: 안녕하세요. 도와주세요. 박물관은 어디예요?" },
+        h3: { ko: "정답 문장: 안녕하세요. 도와주세요. 박물관은 어디예요?", en: "Answer sentence: 안녕하세요. 도와주세요. 박물관은 어디예요?", es: "Frase correcta: 안녕하세요. 도와주세요. 박물관은 어디예요?" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(The Korean sentence climbs the golden cracks. One roof beam returns. Then a painted bracket. Then a whole wing of the palace remembers how to stand.)",
+      textKo: "(한국어 문장이 금빛 균열을 타고 올라간다. 지붕 보 하나가 돌아온다. 단청 공포가 돌아온다. 마침내 궁궐 한 채가 서 있는 법을 기억해낸다.)",
+      textEs: "(La frase coreana trepa por las grietas doradas. Vuelve una viga del techo. Luego un soporte pintado. Por fin, un ala del palacio recuerda cómo sostenerse.)",
+    },
+    {
+      kind: "scene",
+      charId: "sujin",
+      text: "The fragment is responding. Voice, meaning, structure... Seoul's stone remembers harmony.",
+      textKo: "파편이 반응하고 있어요. 목소리, 의미, 구조... 서울의 돌은 조화를 기억합니다.",
+      textEs: "El fragmento responde. Voz, significado, estructura... la piedra de Seúl recuerda la armonía.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "I just read that. In Korean. Not through the phone. Not through him. I read it myself.",
+      textKo: "나 방금 읽었어요. 한국어로. 휴대폰도 아니고, 그 사람의 시스템도 아니고. 내가 직접 읽었어요.",
+      textEs: "Acabo de leer eso. En coreano. No por el teléfono. No por él. Lo leí yo mismo.",
+    },
+    {
+      kind: "clue",
+      symbol: "📀",
+      titleEn: "Old Record: Cairo Ward",
+      titleKo: "오래된 기록: 카이로 병동",
+      titleEs: "Registro Antiguo: Sala de El Cairo",
+      descEn: "Behind the restored gate, Sujin finds a hospital translation record. It names a young translator, a child, and a night when the word water failed to arrive in time. The next seal points to Cairo.",
+      descKo: "복원된 문 뒤에서 수진은 병원 통역 기록을 발견한다. 기록에는 젊은 통역사, 한 아이, 그리고 water라는 단어가 제때 도착하지 못했던 밤이 적혀 있다. 다음 봉인은 카이로를 가리킨다.",
+      descEs: "Detrás de la puerta restaurada, Sujin encuentra un registro de traducción hospitalaria. Nombra a un joven traductor, una niña y una noche en que la palabra water no llegó a tiempo. El siguiente sello apunta a El Cairo.",
+    },
+    {
+      kind: "scene",
+      charId: "eleanor",
+      text: "*from London* A hospital record? Send it to me. Ellis studied emergency translation before she disappeared. Detective, Cairo may be where Black's wound began.",
+      textKo: "*런던에서* 병원 기록이라고요? 제게 보내주세요. 엘리스는 사라지기 전 응급 통역을 연구하고 있었어요. 탐정님, 카이로가 블랙의 상처가 시작된 곳일지도 모릅니다.",
+      textEs: "*desde Londres* ¿Un registro de hospital? Envíamelo. Ellis estudiaba traducción de emergencia antes de desaparecer. Detective, quizá El Cairo sea donde empezó la herida de Black.",
+    },
+    {
+      kind: "scene",
+      charId: "youngsook",
+      text: "가야지. But eat one more bite before you go. Goodbye, Detective. And 감사합니다 for bringing the order back.",
+      textKo: "가야지. 그래도 가기 전에 한 입 더 먹고 가. Goodbye, 탐정. 그리고 순서를 되돌려줘서 감사합니다.",
+      textEs: "Tienes que ir. Pero come un bocado más antes. Goodbye, Detective. Y 감사합니다 por devolver el orden.",
+    },
+    {
+      kind: "clue",
+      symbol: "🏺",
+      titleEn: "Cairo Hook: The Word That Arrived Too Late",
+      titleKo: "카이로 단서: 너무 늦게 도착한 단어",
+      titleEs: "Gancho de El Cairo: La palabra que llegó tarde",
+      descEn: "The Seoul record connects Ellis, Black, and an old emergency ward in Cairo. It does not reveal his face, but it reveals the shape of his grief. The next city waits in dust, ink, and a grandmother's song.",
+      descKo: "서울의 기록은 엘리스, 블랙, 그리고 카이로의 오래된 응급 병동을 연결한다. 그의 얼굴은 드러나지 않지만, 그의 슬픔의 형태는 드러난다. 다음 도시는 먼지와 잉크, 그리고 할머니의 노래 속에서 기다린다.",
+      descEs: "El registro de Seúl conecta a Ellis, Black y una antigua sala de urgencias en El Cairo. No revela su rostro, pero sí la forma de su dolor. La próxima ciudad espera entre polvo, tinta y la canción de una abuela.",
+    },
+  ],
+};
+
+const CAIRO_V21_STORY: Story = {
+  id: "cairo",
+  title: "The Cairo Record",
+  titleKo: "카이로의 기록",
+  titleEs: "El Registro de El Cairo",
+  gradient: ["#120B05", "#2A1A0A", "#0D1B2A"],
+  accentColor: C.gold,
+  nextChapterId: "babel",
+  chapterMeta: {
+    cefrLevel: "A2",
+    targetLangRatio: 48,
+    knownExpressions: [
+      "I remember",
+      "She wrote",
+      "the lullaby",
+      "Where is the record?",
+      "It was beautiful",
+      "record",
+      "remember",
+      "wrote",
+      "lullaby",
+      "Hello",
+      "Thank you",
+      "Goodbye",
+    ],
+    languageNote:
+      "Cairo teaches records, memory, and simple past tense. The chapter also reveals the cost of Universal Code through Mira's flattened voice.",
+  },
+  characters: [
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
+    { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", side: "right", avatarBg: "#2F4A34" },
+    { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", side: "right", avatarBg: "#7A4D19" },
+    { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", side: "right", avatarBg: "#5A3216" },
+    { id: "black_partial", emoji: "◼", name: "A Voice in Shadow", nameKo: "그림자 속 목소리", side: "right", avatarBg: "#050505" },
+    { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg },
+  ],
+  sequence: [
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(Cairo. The record from Seoul ends at the museum archive. The file names a hospital ward, a translator, a child, and one word that arrived too late. Inside Rudy's pocket, the three city fragments pulse like they are afraid of what comes next.)",
+      textKo: "(카이로. 서울에서 발견한 기록은 박물관 기록실에서 끝난다. 파일에는 병동, 통역사, 한 아이, 그리고 너무 늦게 도착한 한 단어가 적혀 있다. 루디의 주머니 속 세 도시 파편이 다음에 올 일을 두려워하듯 떨린다.)",
+      textEs: "(El Cairo. El registro de Seúl termina en el archivo del museo. El expediente nombra una sala de hospital, un traductor, una niña y una palabra que llegó demasiado tarde. En el bolsillo de Rudy, los tres fragmentos de ciudad laten como si temieran lo que viene.)",
+    },
+    {
+      kind: "scene",
+      charId: "mira",
+      text: "Hello, Detective. I am so happy to see you again. Thank you for saving me that night.",
+      textKo: "안녕하세요, 탐정님. 다시 만나서 정말 기쁩니다. 그날 저를 구해주셔서 감사합니다.",
+      textEs: "Hola, Detective. Estoy muy feliz de verte de nuevo. Gracias por salvarme esa noche.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(Same face. The cafe worker from London. The words are right. The voice is right. But the way she says 'thank you' has no tremble, no relief, no breath between memory and meaning. A clean delivery. Like reading from a script.)",
+      textKo: "(같은 얼굴이다. 런던 카페의 그 직원. 단어는 정확하다. 목소리도 정확하다. 하지만 그녀가 'thank you'를 말하는 방식에는 떨림도, 안도도, 기억과 의미 사이의 숨도 없다. 깨끗한 전달. 대본을 읽는 것처럼.)",
+      textEs: "(El mismo rostro. La empleada del café de Londres. Las palabras son correctas. La voz es correcta. Pero cuando dice 'thank you' no hay temblor, ni alivio, ni respiración entre memoria y significado. Una entrega limpia. Como leer un guion.)",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "...Something is wrong. She is smooth. Too smooth. She used Universal Code, partner. It gave her every word and took away the person who needed them.",
+      textKo: "...뭔가 이상해요. 너무 매끈해요. 너무 정확해요. Universal Code를 쓴 거예요, 파트너. 모든 단어를 주고, 그 단어가 필요했던 사람을 가져갔어요.",
+      textEs: "...Algo está mal. Está demasiado pulida. Demasiado precisa. Usó el Código Universal, compa. Le dio cada palabra y le quitó a la persona que las necesitaba.",
+    },
+    {
+      kind: "scene",
+      charId: "amira",
+      text: "Eleanor said you would come. I wish it were under kinder circumstances. Records are disappearing from my archive. Not stolen. Not burned. Forgotten while still on the page.",
+      textKo: "엘리너가 당신이 올 거라고 했어요. 더 좋은 상황이었다면 좋았겠지만요. 제 기록실에서 기록들이 사라지고 있어요. 도난도 아니고, 불탄 것도 아니에요. 종이 위에 남아 있는 채로 잊혀지고 있습니다.",
+      textEs: "Eleanor dijo que vendrías. Ojalá fuera en mejores circunstancias. Los registros están desapareciendo de mi archivo. No robados. No quemados. Olvidados mientras siguen en la página.",
+    },
+    {
+      kind: "scene",
+      charId: "amira",
+      text: "Dr. Ellis came here before she vanished. She was studying emergency translation, old inscriptions, and a lullaby written in three languages. Then her notes began losing ink.",
+      textKo: "엘리스 박사는 사라지기 전에 이곳에 왔어요. 응급 통역, 오래된 비문, 그리고 세 언어로 적힌 자장가를 연구하고 있었죠. 그러다 그녀의 노트에서 잉크가 사라지기 시작했습니다.",
+      textEs: "La Dra. Ellis vino aquí antes de desaparecer. Estudiaba traducción de emergencia, inscripciones antiguas y una nana escrita en tres idiomas. Entonces sus notas empezaron a perder tinta.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 1,
+      title: { en: "Recover the Written Record", ko: "쓰인 기록 복원", es: "Recuperar el registro escrito" },
+      context: {
+        en: "Amira needs the first archive words before she can open Ellis's file.",
+        ko: "아미라는 엘리스의 파일을 열기 전에 기록실의 핵심 단어들을 복원해야 합니다.",
+        es: "Amira necesita las primeras palabras del archivo antes de abrir el expediente de Ellis.",
+      },
+      pType: "word-match",
+      tprsStage: 1,
+      targetExpressions: ["record", "remember", "wrote", "lullaby"],
+      previouslyLearned: ["Hello", "Thank you", "Where is ___?", "I am happy", "안녕하세요"],
+      speakAfter: true,
+      storyReason: "Recover the archive words before the hospital record goes blank.",
+      storyConsequence: "Ellis's file steadies long enough to reveal the archive wing.",
+      onFail: { addToWeakExpressions: ["record", "remember", "wrote", "lullaby"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          word: { en: "record", ko: "기록", es: "registro" },
+          meaning: { en: "proof that something happened", ko: "어떤 일이 있었다는 증거", es: "prueba de que algo ocurrió" },
+          wrong: [
+            { en: "a festival color", ko: "축제의 색", es: "un color de festival" },
+            { en: "a taxi direction", ko: "택시 방향", es: "una dirección de taxi" },
+            { en: "a casual greeting", ko: "가벼운 인사", es: "un saludo casual" },
+          ],
+        },
+        {
+          word: { en: "remember", ko: "기억하다", es: "recordar" },
+          meaning: { en: "to keep something in your mind", ko: "무언가를 마음속에 간직하다", es: "guardar algo en la mente" },
+          wrong: [
+            { en: "to erase a page", ko: "페이지를 지우다", es: "borrar una página" },
+            { en: "to ask a price", ko: "가격을 묻다", es: "preguntar un precio" },
+            { en: "to turn left", ko: "왼쪽으로 돌다", es: "girar a la izquierda" },
+          ],
+        },
+        {
+          word: { en: "wrote", ko: "썼다", es: "escribió" },
+          meaning: { en: "past tense of write", ko: "write의 과거형", es: "pasado de write" },
+          wrong: [
+            { en: "present tense of write", ko: "write의 현재형", es: "presente de write" },
+            { en: "a place in Seoul", ko: "서울의 장소", es: "un lugar en Seúl" },
+            { en: "a type of food", ko: "음식 종류", es: "un tipo de comida" },
+          ],
+        },
+        {
+          word: { en: "lullaby", ko: "자장가", es: "nana" },
+          meaning: { en: "a gentle song sung to a child", ko: "아이에게 불러주는 부드러운 노래", es: "una canción suave para dormir a un niño" },
+          wrong: [
+            { en: "a museum lock", ko: "박물관 자물쇠", es: "una cerradura de museo" },
+            { en: "a cold signal", ko: "차가운 신호", es: "una señal fría" },
+            { en: "a train ticket", ko: "기차표", es: "un billete de tren" },
+          ],
+        },
+      ],
+      hints: {
+        h1: { ko: "이번 장은 기록과 과거 시제예요.", en: "This chapter is about records and past tense.", es: "Este capítulo trata de registros y pasado." },
+        h2: { ko: "wrote는 write의 과거형이에요.", en: "wrote is the past tense of write.", es: "wrote es el pasado de write." },
+        h3: { ko: "핵심 단어: record / remember / wrote / lullaby", en: "Key words: record / remember / wrote / lullaby", es: "Palabras clave: record / remember / wrote / lullaby" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "hassan",
+      text: "My mother's mother sang a lullaby in Nubian, Arabic, and French. I remember only one line. My son remembers the tune. My granddaughter remembers the hand motion. Together, we still have the song.",
+      textKo: "제 어머니의 어머니는 누비아어, 아랍어, 프랑스어로 자장가를 불렀습니다. 저는 한 줄만 기억해요. 제 아들은 멜로디를 기억하고, 제 손녀는 손동작을 기억하죠. 함께라면 아직 그 노래가 남아 있습니다.",
+      textEs: "La madre de mi madre cantaba una nana en nubio, árabe y francés. Yo recuerdo solo una línea. Mi hijo recuerda la melodía. Mi nieta recuerda el gesto de la mano. Juntos, todavía tenemos la canción.",
+    },
+    {
+      kind: "scene",
+      charId: "hassan",
+      text: "A record is paper. Wisdom is what people carry when the paper burns. But if both disappear, even the dead become lonely.",
+      textKo: "기록은 종이입니다. 지혜는 그 종이가 타버린 뒤에도 사람들이 들고 가는 것이죠. 하지만 둘 다 사라지면, 죽은 사람들마저 외로워집니다.",
+      textEs: "Un registro es papel. La sabiduría es lo que la gente lleva cuando el papel se quema. Pero si ambos desaparecen, hasta los muertos se quedan solos.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 2,
+      title: { en: "Answer With Memory", ko: "기억으로 답하기", es: "Responder con memoria" },
+      context: {
+        en: "Hassan speaks in fragments of memory. Choose the answer that preserves the past, not the flat version.",
+        ko: "하산은 기억의 조각들로 말합니다. 평평한 답이 아니라 과거를 보존하는 답을 고르세요.",
+        es: "Hassan habla en fragmentos de memoria. Elige la respuesta que preserve el pasado, no la versión plana.",
+      },
+      pType: "dialogue-choice",
+      tprsStage: 2,
+      targetExpressions: ["I remember", "She wrote", "It was beautiful"],
+      previouslyLearned: ["record", "remember", "wrote", "lullaby"],
+      speakAfter: true,
+      storyReason: "Use memory and past tense to follow Hassan's oral clue.",
+      storyConsequence: "Hassan leads you to the inscription chamber where Ellis left her journal.",
+      onFail: { addToWeakExpressions: ["I remember", "She wrote", "It was beautiful"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          prompt: { en: "Hassan asks what survives when a page is erased.", ko: "하산은 페이지가 지워진 뒤 무엇이 남는지 묻습니다.", es: "Hassan pregunta qué sobrevive cuando se borra una página." },
+          context: { en: "Answer from memory.", ko: "기억으로 답하세요.", es: "Responde desde la memoria." },
+          answer: { en: "I remember.", ko: "I remember.", es: "I remember." },
+          wrong: [
+            { en: "I forget.", ko: "I forget.", es: "I forget." },
+            { en: "How much?", ko: "How much?", es: "How much?" },
+          ],
+        },
+        {
+          prompt: { en: "Amira shows a note in Ellis's handwriting. What do you say?", ko: "아미라가 엘리스의 필체로 된 메모를 보여줍니다. 뭐라고 말할까요?", es: "Amira muestra una nota con la letra de Ellis. ¿Qué dices?" },
+          context: { en: "Use past tense.", ko: "과거 시제를 쓰세요.", es: "Usa el pasado." },
+          answer: { en: "She wrote about it.", ko: "She wrote about it.", es: "She wrote about it." },
+          wrong: [
+            { en: "She writes about it.", ko: "She writes about it.", es: "She writes about it." },
+            { en: "She is happy.", ko: "She is happy.", es: "She is happy." },
+          ],
+        },
+        {
+          prompt: { en: "Hassan hums one surviving line of the lullaby.", ko: "하산이 살아남은 자장가 한 줄을 흥얼거립니다.", es: "Hassan tararea una línea sobreviviente de la nana." },
+          context: { en: "Describe what it was.", ko: "그것이 어땠는지 말하세요.", es: "Describe cómo era." },
+          answer: { en: "It was beautiful.", ko: "It was beautiful.", es: "It was beautiful." },
+          wrong: [
+            { en: "It is a taxi.", ko: "It is a taxi.", es: "It is a taxi." },
+            { en: "Bread please.", ko: "Bread please.", es: "Bread please." },
+          ],
+        },
+      ],
+      hints: {
+        h1: { ko: "과거를 말할 때 was / wrote를 써요.", en: "Use was / wrote when speaking about the past.", es: "Usa was / wrote para hablar del pasado." },
+        h2: { ko: "She writes는 현재, She wrote는 과거예요.", en: "She writes is present; She wrote is past.", es: "She writes es presente; She wrote es pasado." },
+        h3: { ko: "정답 흐름: I remember / She wrote about it / It was beautiful", en: "Answer flow: I remember / She wrote about it / It was beautiful", es: "Flujo correcto: I remember / She wrote about it / It was beautiful" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "amira",
+      text: "Here. Ellis's journal. The ink keeps trying to leave the page, but one line is still holding on.",
+      textKo: "여기요. 엘리스의 일지입니다. 잉크가 계속 페이지를 떠나려 하지만, 한 줄은 아직 버티고 있어요.",
+      textEs: "Aquí. El diario de Ellis. La tinta sigue intentando abandonar la página, pero una línea aún resiste.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 3,
+      title: { en: "Find Ellis's Page", ko: "엘리스의 페이지 찾기", es: "Encontrar la página de Ellis" },
+      context: {
+        en: "Three archive items remain. Only one is Ellis's true journal page.",
+        ko: "기록실에 세 가지 물건이 남아 있습니다. 그중 하나만 엘리스의 진짜 일지입니다.",
+        es: "Quedan tres objetos de archivo. Solo uno es la página verdadera del diario de Ellis.",
+      },
+      pType: "investigation",
+      tprsStage: 3,
+      targetExpressions: ["I was here", "She wrote", "Where is the record?"],
+      previouslyLearned: ["record", "remember", "wrote", "lullaby", "It was beautiful"],
+      storyReason: "Find the page Ellis left before the archive seal closes.",
+      storyConsequence: "Ellis's words reveal the Boss Spell hidden in the inscription chamber.",
+      onFail: { addToWeakExpressions: ["She wrote", "Where is the record?"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          prompt: { en: "Which item is Ellis's true journal page?", ko: "어느 물건이 엘리스의 진짜 일지 페이지인가요?", es: "¿Qué objeto es la página verdadera del diario de Ellis?" },
+          clues: [
+            { en: "A clean typed summary where every sentence is perfect and no one sounds afraid.", ko: "모든 문장이 완벽하고 아무도 두려워하지 않는 것처럼 보이는 깨끗한 요약문.", es: "Un resumen limpio donde cada frase es perfecta y nadie parece tener miedo." },
+            { en: "A torn journal page: 'I was here. I spoke. I mattered.' Beside it, a lullaby copied in three uneven hands.", ko: "찢어진 일지 페이지: 'I was here. I spoke. I mattered.' 그 옆에는 세 가지 다른 손글씨로 베껴 쓴 자장가.", es: "Una página rota: 'I was here. I spoke. I mattered.' Al lado, una nana copiada por tres manos distintas." },
+            { en: "A blank hospital form stamped with a machine translation seal.", ko: "기계 번역 도장이 찍힌 빈 병원 양식.", es: "Un formulario hospitalario en blanco con un sello de traducción automática." },
+          ],
+          answerIdx: 1,
+        },
+      ],
+      hints: {
+        h1: { ko: "진짜 기록은 완벽하지 않아도 사람의 흔적이 있어요.", en: "The true record has human traces, even if it is imperfect.", es: "El registro verdadero tiene huellas humanas, aunque sea imperfecto." },
+        h2: { ko: "Lock 문장: I was here. I spoke. I mattered.", en: "Lock line: I was here. I spoke. I mattered.", es: "Línea clave: I was here. I spoke. I mattered." },
+        h3: { ko: "정답은 찢어진 엘리스 일지 페이지예요.", en: "The answer is the torn Ellis journal page.", es: "La respuesta es la página rota del diario de Ellis." },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "She left this for us. Not a message to be translated. A proof that she was here.",
+      textKo: "엘리스가 우리에게 남긴 거예요. 번역하라고 남긴 메시지가 아니에요. 그녀가 여기 있었다는 증거예요.",
+      textEs: "Ella dejó esto para nosotros. No un mensaje para traducir. Una prueba de que estuvo aquí.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(The oil lamps dim. In the reflection of the cracked stone wall, a black coat stops behind you. Not a face. Not yet. Only a hand, a shard of gold, and a mouth half-hidden by shadow.)",
+      textKo: "(기름등이 어두워진다. 금이 간 돌벽의 반사 속에서 검은 코트가 뒤에 멈춘다. 얼굴은 아니다. 아직은. 손, 금빛 파편, 그리고 그림자에 반쯤 숨은 입가뿐이다.)",
+      textEs: "(Las lámparas de aceite se apagan un poco. En el reflejo del muro agrietado, un abrigo negro se detiene detrás de ti. No es un rostro. Todavía no. Solo una mano, un fragmento dorado y una boca medio oculta por la sombra.)",
+    },
+    {
+      kind: "scene",
+      charId: "black_partial",
+      text: "I'm not erasing your grandmother's lullaby. I'm making sure her great-grandchild understands every word of it.",
+      textKo: "나는 당신 할머니의 자장가를 지우는 게 아닙니다. 그분의 증손주가 그 모든 단어를 이해하게 만들고 있는 겁니다.",
+      textEs: "No estoy borrando la nana de tu abuela. Estoy asegurándome de que su bisnieto entienda cada palabra.",
+    },
+    {
+      kind: "scene",
+      charId: "black_partial",
+      text: "Find the record before I do, Detective. Or let me make it useful.",
+      textKo: "내가 찾기 전에 그 기록을 찾으세요, 탐정. 아니면 내가 그것을 쓸모 있게 만들게 두세요.",
+      textEs: "Encuentra el registro antes que yo, Detective. O deja que yo lo haga útil.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "We have what we need. Ellis wrote it down. Hassan remembered the song. Amira kept the archive alive. We just have to remember her.",
+      textKo: "필요한 건 다 있어요. 엘리스가 적어 두었고, 하산이 노래를 기억했고, 아미라가 기록실을 살려 두었어요. 우리는 그녀를 기억하기만 하면 돼요.",
+      textEs: "Tenemos lo que necesitamos. Ellis lo escribió. Hassan recordó la canción. Amira mantuvo vivo el archivo. Solo tenemos que recordarla.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 4,
+      title: { en: "Cairo Boss Spell", ko: "카이로 보스 주문", es: "Hechizo Jefe de El Cairo" },
+      context: {
+        en: "Use Ellis's words to restore what was lost.",
+        ko: "엘리스의 말로 잃어버린 것을 복원하세요.",
+        es: "Usa las palabras de Ellis para restaurar lo perdido.",
+      },
+      pType: "boss-spell",
+      tprsStage: 4,
+      targetExpressions: ["I remember", "She wrote", "the lullaby", "Where is the record?"],
+      previouslyLearned: ["record", "remember", "wrote", "lullaby", "It was beautiful"],
+      speakAfter: true,
+      storyReason: "Complete the Cairo Boss Spell to restore Ellis's archive record.",
+      storyConsequence: "Each line restores one inscription on the wall. Ellis's journal becomes whole.",
+      onFail: { addToWeakExpressions: ["I remember", "She wrote", "Where is the record?"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          spellChunks: ["I remember", "She wrote", "the lullaby", "Where is the record?"],
+          // Renders: "I remember. She wrote the lullaby. Where is the record?"
+          //                ^period   ^space     ^period after lullaby (was missing — caused mismatch with hint h3)
+          separators: [".", " ", ".", ""],
+          wordPool: ["I remember", "She wrote", "the lullaby", "Where is the record?", "I forget", "She writes", "the song"],
+          instruction: {
+            en: "Use Ellis's words to restore what was lost.",
+            ko: "엘리스의 말로 잃어버린 것을 복원하세요.",
+            es: "Usa las palabras de Ellis para restaurar lo perdido.",
+          },
+          hints: {
+            h1: {
+              ko: "과거 시제로 말하세요. Ellis는 이미 적었어요.",
+              en: "Use past tense. Ellis already wrote it.",
+              es: "Usa el tiempo pasado. Ellis ya lo escribió.",
+            },
+            h2: {
+              ko: "She writes는 현재형, She wrote는 과거형이에요.",
+              en: "She writes is present; She wrote is past.",
+              es: "She writes es presente; She wrote es pasado.",
+            },
+            h3: {
+              ko: "정답: I remember. She wrote the lullaby. Where is the record?",
+              en: "Answer: I remember. She wrote the lullaby. Where is the record?",
+              es: "Respuesta: I remember. She wrote the lullaby. Where is the record?",
+            },
+          },
+          storyReason: {
+            en: "The archive door is sealed. Ellis's words can open it.",
+            ko: "기록실 문이 봉인되어 있어요. Ellis의 말이 열 수 있어요.",
+            es: "La puerta del archivo está sellada. Las palabras de Ellis pueden abrirla.",
+          },
+          storyConsequence: {
+            en: "Each line restores one inscription on the wall. Ellis's journal becomes whole.",
+            ko: "각 줄이 벽의 비문 하나씩 복원해요. Ellis의 일지가 완전해져요.",
+            es: "Cada línea restaura una inscripción. El diario de Ellis se completa.",
+          },
+          doorImage: ch4BossArchiveImg,
+        },
+      ],
+      hints: {
+        h1: { ko: "기억으로 시작하세요: I remember.", en: "Start with memory: I remember.", es: "Empieza con la memoria: I remember." },
+        h2: { ko: "현재형 She writes가 아니라 과거형 She wrote예요.", en: "Use past tense She wrote, not present tense She writes.", es: "Usa el pasado She wrote, no el presente She writes." },
+        h3: { ko: "정답 문장: I remember. She wrote the lullaby. Where is the record?", en: "Answer sentence: I remember. She wrote the lullaby. Where is the record?", es: "Frase correcta: I remember. She wrote the lullaby. Where is the record?" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(The spell climbs the archive wall. One inscription returns, then another. Golden lines fill the broken carvings. The papyrus on the altar exhales sand, then ink, then memory.)",
+      textKo: "(주문이 기록실 벽을 타고 오른다. 비문 하나가 돌아오고, 또 하나가 돌아온다. 금빛 선들이 부서진 조각을 채운다. 제단 위 파피루스가 모래를 내쉬고, 잉크를 내쉬고, 마침내 기억을 되찾는다.)",
+      textEs: "(El hechizo trepa por el muro del archivo. Vuelve una inscripción, luego otra. Líneas doradas llenan los grabados rotos. El papiro del altar exhala arena, luego tinta, luego memoria.)",
+    },
+    {
+      kind: "scene",
+      charId: "amira",
+      text: "The fragment is here. Ellis knew this would happen. She left us a path, and she left proof that she walked it first.",
+      textKo: "파편이 여기 있어요. 엘리스는 이런 일이 일어날 걸 알고 있었어요. 그녀는 우리에게 길을 남겼고, 자신이 먼저 걸었다는 증거도 남겼습니다.",
+      textEs: "El fragmento está aquí. Ellis sabía que esto pasaría. Nos dejó un camino, y dejó prueba de que ella lo recorrió primero.",
+    },
+    {
+      kind: "clue",
+      symbol: "📜",
+      titleEn: "Ellis's Journal: Cairo Page",
+      titleKo: "엘리스의 일지: 카이로 페이지",
+      titleEs: "Diario de Ellis: Página de El Cairo",
+      descEn: "The restored page reads: 'I was here. I spoke. I mattered.' Beside the line is a lullaby copied in three uneven hands. The record does not solve Ellis's disappearance, but it proves she was leaving a trail.",
+      descKo: "복원된 페이지에는 이렇게 적혀 있다. 'I was here. I spoke. I mattered.' 그 옆에는 세 가지 다른 손글씨로 베껴 쓴 자장가가 있다. 이 기록은 엘리스의 실종을 해결하지는 못하지만, 그녀가 길을 남기고 있었다는 증거가 된다.",
+      descEs: "La página restaurada dice: 'I was here. I spoke. I mattered.' Al lado hay una nana copiada por tres manos distintas. El registro no resuelve la desaparición de Ellis, pero prueba que estaba dejando un camino.",
+    },
+    {
+      kind: "scene",
+      charId: "black_partial",
+      text: "You have not seen the most important three. Babel.",
+      textKo: "당신은 아직 가장 중요한 세 개를 보지 못했습니다. Babel.",
+      textEs: "Aún no has visto las tres más importantes. Babel.",
+    },
+    {
+      kind: "scene",
+      charId: "amira",
+      text: "Take this. Ellis would want you to have it. Records are not meant to sleep in locked rooms.",
+      textKo: "가져가세요. 엘리스라면 당신이 갖길 원했을 겁니다. 기록은 잠긴 방에서 잠들라고 있는 게 아니니까요.",
+      textEs: "Toma esto. Ellis querría que lo tuvieras. Los registros no nacen para dormir en habitaciones cerradas.",
+    },
+    {
+      kind: "scene",
+      charId: "hassan",
+      text: "My mother always said: words are the only things we leave behind that can still answer back. Goodbye, Detective. Remember us correctly.",
+      textKo: "제 어머니는 늘 말씀하셨습니다. 우리가 남기는 것 중 다시 대답할 수 있는 건 말뿐이라고요. 안녕히 가세요, 탐정. 우리를 제대로 기억해 주세요.",
+      textEs: "Mi madre siempre decía: las palabras son lo único que dejamos atrás que todavía puede responder. Goodbye, Detective. Recuérdanos correctamente.",
+    },
+    {
+      kind: "scene",
+      charId: "eleanor",
+      text: "*from London* Babel. Ellis wrote that word in the margin of every Cairo note. Detective, if Black is inviting you there, it means he thinks the ending has already been written.",
+      textKo: "*런던에서* Babel. 엘리스는 카이로 노트의 모든 여백에 그 단어를 적었어요. 탐정님, 블랙이 당신을 그곳으로 초대한다면, 그는 이미 결말이 쓰였다고 믿는 겁니다.",
+      textEs: "*desde Londres* Babel. Ellis escribió esa palabra en el margen de cada nota de El Cairo. Detective, si Black te invita allí, significa que cree que el final ya está escrito.",
+    },
+    {
+      kind: "clue",
+      symbol: "⬛",
+      titleEn: "Babel Invitation: The Final Three",
+      titleKo: "바벨 초대장: 마지막 세 개",
+      titleEs: "Invitación a Babel: Las Tres Finales",
+      descEn: "The Cairo archive restores a map edge marked only by one word: Babel. The four city fragments are not the whole lock. Three foundation stones are still hidden where Universal Code began.",
+      descKo: "카이로 기록실은 단 하나의 단어, Babel만 표시된 지도 가장자리를 복원한다. 네 도시 파편은 자물쇠 전체가 아니다. Universal Code가 시작된 곳에 세 개의 foundation stone이 아직 숨겨져 있다.",
+      descEs: "El archivo de El Cairo restaura el borde de un mapa marcado con una sola palabra: Babel. Los cuatro fragmentos de ciudad no son toda la cerradura. Tres piedras de fundación siguen ocultas donde nació el Código Universal.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "Whatever Babel is, we end it there. But not by erasing him. By remembering everyone he tried to flatten.",
+      textKo: "Babel이 무엇이든, 거기서 끝내요. 하지만 그를 지워서가 아니에요. 그가 평평하게 만들려 했던 모든 사람을 기억해서요.",
+      textEs: "Sea lo que sea Babel, lo terminamos allí. Pero no borrándolo a él. Recordando a todos los que intentó aplanar.",
+    },
+  ],
+};
+
+const BABEL_V21_STORY: Story = {
+  id: "babel",
+  title: "The Last Language",
+  titleKo: "최후의 언어",
+  titleEs: "El Último Idioma",
+  gradient: ["#050510", "#0A0A2A", "#050510"],
+  accentColor: "#9B7CFF",
+  chapterMeta: {
+    cefrLevel: "B1",
+    targetLangRatio: 72,
+    knownExpressions: [
+      "I am here",
+      "I see you",
+      "We are together",
+      "You translated",
+      "the words",
+      "You couldn't translate",
+      "why she said them",
+      "Mae'r iaith yn fyw",
+    ],
+    languageNote:
+      "Babel compresses the final three foundation stones into connection, memory, and beginning, then turns the final counterargument into player production.",
+  },
+  characters: [
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
+    { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", side: "right", avatarBg: "#1A0A2A" },
+    { id: "tom", emoji: "💂", name: "Tom", nameKo: "톰", side: "left", avatarBg: "#1E2A3A", portrait: ch1TomPortraitImg },
+    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", side: "right", avatarBg: "#3A1A0A" },
+    { id: "sujin", emoji: "👩‍🔬", name: "Sujin", nameKo: "수진", side: "left", avatarBg: "#1A2A3A" },
+    { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", side: "right", avatarBg: "#7A4D19" },
+    { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", side: "right", avatarBg: "#2A1A0A" },
+    { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", side: "right", avatarBg: "#2F4A34" },
+    { id: "mr_black", emoji: "🕴️", name: "Mr. Black", nameKo: "미스터 블랙", side: "right", avatarBg: "#050505", portrait: ch5BlackFaceImg },
+  ],
+  sequence: [
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(The four city stones answer at dawn. London fog, Madrid red, Seoul green, Cairo gold. Their light draws one coordinate across Rudy's desk: Babel. Not a ruin. A tower. The place where Universal Code began.)",
+      textKo: "(새벽에 네 도시의 수호석이 응답한다. 런던의 안개, 마드리드의 붉은빛, 서울의 초록빛, 카이로의 금빛. 그 빛이 루디의 책상 위에 하나의 좌표를 그린다: Babel. 유적이 아니다. 탑이다. Universal Code가 시작된 곳.)",
+      textEs: "(Al amanecer, las cuatro piedras de ciudad responden. La niebla de Londres, el rojo de Madrid, el verde de Seúl, el oro de El Cairo. Su luz dibuja una coordenada en el escritorio de Rudy: Babel. No es una ruina. Es una torre. El lugar donde empezó el Código Universal.)",
+    },
+    {
+      kind: "scene",
+      charId: "penny",
+      text: "Five language gates protect the tower core. The four city stones open the path, but the last three stones are already inside: Connection, Memory, and Beginning. He built Babel around them.",
+      textKo: "탑 중심부는 다섯 개의 언어 관문이 지키고 있어요. 네 도시의 수호석은 길을 열지만, 마지막 세 개의 돌은 이미 안에 있어요: Connection, Memory, Beginning. 그는 그 돌들을 중심으로 Babel을 지었어요.",
+      textKoMix: "탑 중심부는 five language gates가 지키고 있어요. 네 city stones는 길을 열지만, 마지막 세 개는 이미 안에 있어요: Connection, Memory, Beginning.",
+      textEs: "Cinco puertas de idioma protegen el núcleo de la torre. Las cuatro piedras de ciudad abren el camino, pero las últimas tres ya están dentro: Connection, Memory y Beginning. Construyó Babel alrededor de ellas.",
+      textEsMix: "Cinco language gates protegen el núcleo. Las cuatro city stones abren el camino, pero las últimas tres ya están dentro: Connection, Memory y Beginning.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "Then we do not go in as one language. We go in as everyone who helped us.",
+      textKo: "그럼 하나의 언어로 들어가지 않아요. 우리를 도와준 모두의 언어로 들어가는 거예요.",
+      textEs: "Entonces no entramos como un solo idioma. Entramos como todas las personas que nos ayudaron.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 1,
+      title: { en: "Open the Connection Gate", ko: "연결의 관문 열기", es: "Abrir la puerta de conexión" },
+      context: {
+        en: "The first Babel gate listens for words from every city.",
+        ko: "첫 번째 Babel 관문은 모든 도시에서 온 말을 듣습니다.",
+        es: "La primera puerta de Babel escucha palabras de cada ciudad.",
+      },
+      pType: "word-match",
+      tprsStage: 1,
+      targetExpressions: ["Hello", "Gracias", "안녕하세요", "Salaam"],
+      previouslyLearned: ["Hello", "Thank you", "안녕하세요", "I remember"],
+      speakAfter: true,
+      storyReason: "Use greetings from the journey to prove Babel cannot be opened by one language alone.",
+      storyConsequence: "The first foundation stone wakes: Connection.",
+      onFail: { addToWeakExpressions: ["Hello", "Thank you", "안녕하세요"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          word: { en: "Hello", ko: "Hello", es: "Hello" },
+          meaning: { en: "a greeting that starts a connection", ko: "연결을 시작하는 인사", es: "un saludo que inicia una conexión" },
+          wrong: [
+            { en: "a machine command", ko: "기계 명령", es: "un comando de máquina" },
+            { en: "a final goodbye", ko: "마지막 작별", es: "una despedida final" },
+            { en: "a hidden coordinate", ko: "숨겨진 좌표", es: "una coordenada oculta" },
+          ],
+        },
+        {
+          word: { en: "Gracias", ko: "Gracias", es: "Gracias" },
+          meaning: { en: "Spanish for thank you", ko: "스페인어 감사 표현", es: "gracias en español" },
+          wrong: [
+            { en: "Korean for palace", ko: "궁궐을 뜻하는 한국어", es: "coreano para palacio" },
+            { en: "Welsh for water", ko: "물을 뜻하는 웨일스어", es: "galés para agua" },
+            { en: "Arabic for record", ko: "기록을 뜻하는 아랍어", es: "árabe para registro" },
+          ],
+        },
+        {
+          word: { en: "안녕하세요", ko: "안녕하세요", es: "안녕하세요" },
+          meaning: { en: "polite Korean greeting", ko: "정중한 한국어 인사", es: "saludo formal en coreano" },
+          wrong: [
+            { en: "casual command", ko: "반말 명령", es: "mandato informal" },
+            { en: "a color word", ko: "색깔 단어", es: "una palabra de color" },
+            { en: "a place name", ko: "장소 이름", es: "un nombre de lugar" },
+          ],
+        },
+        {
+          word: { en: "Salaam", ko: "Salaam", es: "Salaam" },
+          meaning: { en: "a greeting of peace", ko: "평화를 담은 인사", es: "un saludo de paz" },
+          wrong: [
+            { en: "a stone pedestal", ko: "돌 받침대", es: "un pedestal de piedra" },
+            { en: "a erased page", ko: "지워진 페이지", es: "una página borrada" },
+            { en: "a tower floor", ko: "탑의 층", es: "un piso de la torre" },
+          ],
+        },
+      ],
+      hints: {
+        h1: { ko: "각 도시는 자기 방식으로 인사를 남겼어요.", en: "Each city left a greeting in its own way.", es: "Cada ciudad dejó un saludo a su manera." },
+        h2: { ko: "Connection은 같은 말이 아니라 서로 다른 말이 만나는 순간이에요.", en: "Connection is not one word. It is different words meeting.", es: "La conexión no es una palabra única. Es cuando se encuentran palabras distintas." },
+        h3: { ko: "Hello / Gracias / 안녕하세요 / Salaam", en: "Hello / Gracias / 안녕하세요 / Salaam", es: "Hello / Gracias / 안녕하세요 / Salaam" },
+      },
+    },
+    {
+      kind: "clue",
+      symbol: "🔗",
+      titleEn: "Babel Foundation Stone #1: CONNECTION",
+      titleKo: "바벨 기초석 #1: CONNECTION",
+      titleEs: "Piedra de Fundación #1: CONNECTION",
+      descEn: "The first stone wakes when four greetings overlap. It does not translate them into one word. It lets them remain different and still answer together.",
+      descKo: "네 개의 인사가 겹치자 첫 번째 돌이 깨어난다. 그 돌은 말을 하나로 번역하지 않는다. 서로 다르게 남아 있어도 함께 대답하게 한다.",
+      descEs: "La primera piedra despierta cuando cuatro saludos se superponen. No los traduce a una sola palabra. Les permite seguir siendo distintos y responder juntos.",
+    },
+    {
+      kind: "scene",
+      charId: "tom",
+      text: "Blimey. That thing opened because we all sounded different.",
+      textKo: "세상에. 우리가 전부 다르게 들렸기 때문에 저게 열린 거네.",
+      textEs: "Caray. Esa cosa se abrió porque todos sonábamos distinto.",
+    },
+    {
+      kind: "scene",
+      charId: "isabel",
+      text: "Good. A festival with one voice is not a festival.",
+      textKo: "좋아. 목소리가 하나뿐인 축제는 축제가 아니니까.",
+      textEs: "Bien. Un festival con una sola voz no es un festival.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 2,
+      title: { en: "Hold the Allies Together", ko: "동료들을 붙잡기", es: "Mantener unidos a los aliados" },
+      context: {
+        en: "The second gate attacks doubt. Choose the reply that keeps each ally present.",
+        ko: "두 번째 관문은 의심을 공격합니다. 각 동료가 여기 남아 있게 하는 대답을 고르세요.",
+        es: "La segunda puerta ataca la duda. Elige la respuesta que mantiene presente a cada aliado.",
+      },
+      pType: "dialogue-choice",
+      tprsStage: 2,
+      targetExpressions: ["I am here", "I see you", "We are together"],
+      previouslyLearned: ["Hello", "Thank you", "I remember", "It was beautiful"],
+      speakAfter: true,
+      storyReason: "Babel tries to isolate each speaker. Use connection phrases to keep the group whole.",
+      storyConsequence: "The allies reach the Memory Gate together.",
+      onFail: { addToWeakExpressions: ["I am here", "I see you", "We are together"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          prompt: { en: "Sujin says the Korean order feels fragile.", ko: "수진이 한국어 어순이 흔들리는 것 같다고 말합니다.", es: "Sujin dice que el orden coreano se siente frágil." },
+          context: { en: "Answer with presence.", ko: "함께 있다는 말로 답하세요.", es: "Responde con presencia." },
+          answer: { en: "I am here.", ko: "I am here.", es: "I am here." },
+          wrong: [
+            { en: "I forget.", ko: "I forget.", es: "I forget." },
+            { en: "How much?", ko: "How much?", es: "How much?" },
+          ],
+        },
+        {
+          prompt: { en: "Mira's recovered voice trembles for the first time.", ko: "Mira의 회복된 목소리가 처음으로 떨립니다.", es: "La voz recuperada de Mira tiembla por primera vez." },
+          context: { en: "Tell her she is not a script.", ko: "그녀가 대본이 아니라고 말해 주세요.", es: "Dile que no es un guion." },
+          answer: { en: "I see you.", ko: "I see you.", es: "I see you." },
+          wrong: [
+            { en: "You are perfect.", ko: "You are perfect.", es: "You are perfect." },
+            { en: "Read faster.", ko: "Read faster.", es: "Read faster." },
+          ],
+        },
+        {
+          prompt: { en: "The gate divides the group into separate echoes.", ko: "관문이 동료들을 따로따로 울리는 메아리로 나눕니다.", es: "La puerta divide al grupo en ecos separados." },
+          context: { en: "Use the plural truth.", ko: "함께라는 진실을 말하세요.", es: "Usa la verdad plural." },
+          answer: { en: "We are together.", ko: "We are together.", es: "We are together." },
+          wrong: [
+            { en: "I am alone.", ko: "I am alone.", es: "I am alone." },
+            { en: "The words are enough.", ko: "The words are enough.", es: "The words are enough." },
+          ],
+        },
+      ],
+      hints: {
+        h1: { ko: "Babel은 사람들을 혼자라고 느끼게 해요.", en: "Babel tries to make people feel alone.", es: "Babel intenta hacer que la gente se sienta sola." },
+        h2: { ko: "I / you / we 순서로 넓어져요.", en: "The answers widen: I / you / we.", es: "Las respuestas se amplían: I / you / we." },
+        h3: { ko: "I am here / I see you / We are together", en: "I am here / I see you / We are together", es: "I am here / I see you / We are together" },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "mr_black",
+      text: "Tell me, Detective. When you could not speak the language, did anyone ever look at you like you mattered?",
+      textKo: "말해 보세요, 탐정. 당신이 그 언어를 말하지 못했을 때, 누군가 당신을 중요한 사람처럼 바라봐 준 적이 있습니까?",
+      textEs: "Dime, Detective. Cuando no podías hablar el idioma, ¿alguien te miró alguna vez como si importaras?",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(For the first time, he steps fully into the light. Not a monster. Not a shadow. An old man carrying a stone in one hand and a wound in the other.)",
+      textKo: "(처음으로 그가 빛 속으로 완전히 걸어 나온다. 괴물이 아니다. 그림자도 아니다. 한 손에는 돌을, 다른 한 손에는 상처를 들고 있는 늙은 남자.)",
+      textEs: "(Por primera vez, entra por completo en la luz. No es un monstruo. No es una sombra. Un hombre viejo que lleva una piedra en una mano y una herida en la otra.)",
+    },
+    {
+      kind: "scene",
+      charId: "penny",
+      text: "I was your student. I believed one shared language would save people from humiliation, from panic, from grief. But I watched what it did to Mira. It gave her every word and took away the reason to say them.",
+      textKo: "저는 당신의 학생이었어요. 하나의 공유 언어가 사람들을 모욕과 공포와 슬픔에서 구할 거라고 믿었어요. 하지만 Mira에게 무슨 일이 일어났는지 봤어요. 모든 단어를 주고, 그 단어를 말해야 하는 이유를 빼앗았죠.",
+      textKoMix: "저는 당신의 student였어요. 하나의 shared language가 사람들을 구할 거라고 믿었어요. 하지만 Mira를 봤어요. 모든 words를 주고, 그 말을 해야 하는 reason을 빼앗았죠.",
+      textEs: "Fui tu estudiante. Creí que un idioma compartido salvaría a la gente de la humillación, del pánico, del dolor. Pero vi lo que le hizo a Mira. Le dio todas las palabras y le quitó la razón para decirlas.",
+      textEsMix: "Fui tu student. Creí que un shared language salvaría a la gente. Pero vi a Mira. Le dio todas las words y le quitó la razón para decirlas.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "Ellis wrote about you. Not your name, not all of it. A translator who lost everything and tried to build a world where no one would ever be unheard again.",
+      textKo: "Ellis가 당신에 대해 적었어요. 이름은 아니고, 전부도 아니지만. 모든 것을 잃고, 다시는 아무도 들리지 못한 채 남지 않는 세상을 만들려 했던 통역사에 대해.",
+      textEs: "Ellis escribió sobre ti. No tu nombre, no todo. Un traductor que lo perdió todo e intentó construir un mundo donde nadie volviera a quedar sin ser escuchado.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 3,
+      title: { en: "Find the Memory Stone", ko: "기억의 돌 찾기", es: "Encontrar la piedra de memoria" },
+      context: {
+        en: "Three memories echo in the chamber. Only one turns grief into truth instead of control.",
+        ko: "방 안에 세 개의 기억이 울립니다. 슬픔을 통제가 아니라 진실로 바꾸는 기억은 하나뿐입니다.",
+        es: "Tres recuerdos resuenan en la cámara. Solo uno convierte el dolor en verdad, no en control.",
+      },
+      pType: "investigation",
+      tprsStage: 3,
+      targetExpressions: ["I remember", "She wrote", "Mae'r iaith yn fyw"],
+      previouslyLearned: ["I remember", "She wrote", "the lullaby", "I see you"],
+      speakAfter: true,
+      storyReason: "Find the memory that can wake Babel's second foundation stone.",
+      storyConsequence: "The second foundation stone wakes: Memory.",
+      onFail: { addToWeakExpressions: ["I remember", "She wrote"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          prompt: { en: "Which memory should Rudy hold up to Mr. Black?", ko: "루디가 Mr. Black에게 어떤 기억을 내밀어야 할까요?", es: "¿Qué recuerdo debe mostrar Rudy a Mr. Black?" },
+          clues: [
+            { en: "A perfect Universal Code transcript with every sentence corrected.", ko: "모든 문장이 수정된 완벽한 Universal Code 기록.", es: "Una transcripción perfecta del Código Universal con cada frase corregida." },
+            { en: "Ellis's torn journal page: 'I was here. I spoke. I mattered.' Beside it, a Welsh lullaby copied by hand.", ko: "Ellis의 찢어진 일지 페이지: 'I was here. I spoke. I mattered.' 그 옆에는 손으로 베껴 쓴 웨일스 자장가.", es: "La página rota de Ellis: 'I was here. I spoke. I mattered.' Al lado, una nana galesa copiada a mano." },
+            { en: "A tower blueprint that marks every gate as efficient.", ko: "모든 관문을 효율적이라고 표시한 탑 설계도.", es: "Un plano de la torre que marca cada puerta como eficiente." },
+          ],
+          answerIdx: 1,
+        },
+      ],
+      hints: {
+        h1: { ko: "Memory는 완벽한 문장이 아니라 사람의 흔적에 반응해요.", en: "Memory responds to human traces, not perfect sentences.", es: "Memory responde a huellas humanas, no a frases perfectas." },
+        h2: { ko: "Ch4에서 회수한 Ellis 일지를 떠올려요.", en: "Remember Ellis's journal from Ch4.", es: "Recuerda el diario de Ellis de Ch4." },
+        h3: { ko: "정답은 Ellis의 찢어진 일지 페이지예요.", en: "The answer is Ellis's torn journal page.", es: "La respuesta es la página rota del diario de Ellis." },
+      },
+    },
+    {
+      kind: "clue",
+      symbol: "🕯️",
+      titleEn: "Babel Foundation Stone #2: MEMORY",
+      titleKo: "바벨 기초석 #2: MEMORY",
+      titleEs: "Piedra de Fundación #2: MEMORY",
+      descEn: "The second stone wakes when Ellis's journal is read aloud. It does not preserve perfect language. It preserves the proof that someone spoke.",
+      descKo: "Ellis의 일지가 소리 내어 읽히자 두 번째 돌이 깨어난다. 이 돌은 완벽한 언어를 보존하지 않는다. 누군가 말했었다는 증거를 보존한다.",
+      descEs: "La segunda piedra despierta cuando se lee el diario de Ellis en voz alta. No conserva el idioma perfecto. Conserva la prueba de que alguien habló.",
+    },
+    {
+      kind: "scene",
+      charId: "mr_black",
+      text: "My mother sang one line when the pain became too much. The nurse smiled and said she did not understand. The doctor smiled and said it in three languages. None of them were hers.",
+      textKo: "어머니는 고통이 너무 심해질 때 한 줄의 노래를 불렀습니다. 간호사는 웃으며 이해하지 못한다고 했죠. 의사는 세 가지 언어로 미안하다고 했습니다. 그중 어느 것도 어머니의 언어가 아니었어요.",
+      textEs: "Mi madre cantaba una línea cuando el dolor era demasiado. La enfermera sonrió y dijo que no entendía. El médico sonrió y lo dijo en tres idiomas. Ninguno era el suyo.",
+    },
+    {
+      kind: "scene",
+      charId: "hassan",
+      text: "A lullaby is not information. It is a hand on a forehead.",
+      textKo: "자장가는 정보가 아닙니다. 이마 위에 얹힌 손이에요.",
+      textEs: "Una nana no es información. Es una mano sobre la frente.",
+    },
+    {
+      kind: "clue",
+      symbol: "🌱",
+      titleEn: "Babel Foundation Stone #3: BEGINNING",
+      titleKo: "바벨 기초석 #3: BEGINNING",
+      titleEs: "Piedra de Fundación #3: BEGINNING",
+      descEn: "The third stone appears when the room stops arguing about which language should win. It is the beginning of speech: a reason to say something to someone.",
+      descKo: "어떤 언어가 이겨야 하는지에 대한 싸움이 멈추자 세 번째 돌이 나타난다. 이 돌은 말의 시작이다. 누군가에게 무언가를 말해야 하는 이유.",
+      descEs: "La tercera piedra aparece cuando la sala deja de discutir qué idioma debe ganar. Es el comienzo del habla: una razón para decir algo a alguien.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "Partner. The final spell is not a translation. It is the thing translation missed.",
+      textKo: "파트너. 마지막 주문은 번역이 아니에요. 번역이 놓친 바로 그거예요.",
+      textEs: "Compa. El hechizo final no es una traducción. Es aquello que la traducción no alcanzó.",
+    },
+    {
+      kind: "puzzle",
+      puzzleNum: 4,
+      title: { en: "Final Boss Spell", ko: "최종 보스 주문", es: "Hechizo Jefe Final" },
+      context: {
+        en: "Speak the difference between words and why they were spoken.",
+        ko: "단어와, 그 단어를 말한 이유의 차이를 말하세요.",
+        es: "Di la diferencia entre las palabras y la razón por la que fueron dichas.",
+      },
+      pType: "boss-spell",
+      tprsStage: 4,
+      targetExpressions: ["You translated", "the words", "You couldn't translate", "why she said them"],
+      previouslyLearned: ["I remember", "She wrote", "the lullaby", "I see you", "We are together"],
+      speakAfter: true,
+      storyReason: "Use the final counterspell to stop Universal Code without erasing Mr. Black.",
+      storyConsequence: "The seven stones release. Universal Code shuts down.",
+      onFail: { addToWeakExpressions: ["You translated", "You couldn't translate"], reviewInDailyCourse: true, reviewDays: 3 },
+      questions: [
+        {
+          spellChunks: ["You translated", "the words", "You couldn't translate", "why she said them"],
+          separators: ["", ".", "", "."],
+          wordPool: [
+            "You translated",
+            "the words",
+            "You couldn't translate",
+            "why she said them",
+            "You stopped",
+            "the meanings",
+            "You translated her",
+          ],
+          instruction: {
+            en: "Speak what Universal Code could never carry.",
+            ko: "Universal Code가 결코 담을 수 없었던 것을 말하세요.",
+            es: "Di lo que el Código Universal nunca pudo llevar.",
+          },
+          hints: {
+            h1: {
+              ko: "words와 why를 구분하세요.",
+              en: "Separate the words from the why.",
+              es: "Separa las palabras del porqué.",
+            },
+            h2: {
+              ko: "translated는 표면, couldn't translate는 마음이에요.",
+              en: "translated is the surface; couldn't translate is the heart.",
+              es: "translated es la superficie; couldn't translate es el corazón.",
+            },
+            h3: {
+              ko: "정답: You translated the words. You couldn't translate why she said them.",
+              en: "Answer: You translated the words. You couldn't translate why she said them.",
+              es: "Respuesta: You translated the words. You couldn't translate why she said them.",
+            },
+          },
+          storyReason: {
+            en: "The Babel core is sealed by perfect translation. Only meaning can open it.",
+            ko: "Babel 중심부는 완벽한 번역으로 봉인되어 있어요. 의미만이 열 수 있어요.",
+            es: "El núcleo de Babel está sellado por la traducción perfecta. Solo el significado puede abrirlo.",
+          },
+          storyConsequence: {
+            en: "Each line releases one layer of the Universal Code. The final seven-stone circuit breaks.",
+            ko: "각 문장이 Universal Code의 한 겹을 풀어냅니다. 마지막 7개 돌의 회로가 끊어져요.",
+            es: "Cada línea libera una capa del Código Universal. El circuito final de siete piedras se rompe.",
+          },
+          doorImage: ch5BossCoreImg,
+        },
+      ],
+      hints: {
+        h1: { ko: "단어 자체가 아니라 그 말을 한 이유를 말해야 해요.", en: "You need the reason she spoke, not only the words.", es: "Necesitas la razón por la que habló, no solo las palabras." },
+        h2: { ko: "You translated the words 다음에 You couldn't translate why...", en: "First: You translated the words. Then: You couldn't translate why...", es: "Primero: You translated the words. Luego: You couldn't translate why..." },
+        h3: { ko: "정답 문장: You translated the words. You couldn't translate why she said them.", en: "Answer sentence: You translated the words. You couldn't translate why she said them.", es: "Frase correcta: You translated the words. You couldn't translate why she said them." },
+      },
+    },
+    {
+      kind: "scene",
+      charId: "mr_black",
+      text: "*a very long silence* Mae'r iaith yn fyw. *Welsh: The language lives.* I never wanted to destroy language. I wanted... I just wanted my mother to be heard.",
+      textKo: "*아주 긴 침묵* Mae'r iaith yn fyw. *웨일스어: 언어는 살아 있다.* 언어를 파괴하고 싶었던 게 아니야. 원한 건... 어머니의 말이 들려지기를 원했을 뿐이야.",
+      textEs: "*un silencio muy largo* Mae'r iaith yn fyw. *Galés: El idioma vive.* Nunca quise destruir el idioma. Quería... solo quería que escucharan a mi madre.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(The Universal Code shuts down. One by one, the seven Guardian Stones release from their pedestals. Voices return from everywhere at once: Tom on the radio, Isabel from Madrid, Sujin from Seoul, Youngsook from Gwangjang Market, Amira in Arabic, Hassan in four languages, and Mira's voice, no longer smooth, trembling as she says thank you.)",
+      textKo: "(Universal Code가 종료된다. 하나씩, 7개의 수호석이 받침대에서 풀려난다. 사방에서 목소리가 돌아온다. 무선에서 톰, 마드리드에서 이사벨, 서울에서 수진, 광장시장에서 영숙 할머니, 아랍어로 말하는 아미라, 네 언어로 말하는 하산, 그리고 Mira의 목소리. 더 이상 매끈하지 않고, 떨리는 목소리로 thank you를 말한다.)",
+      textEs: "(El Código Universal se apaga. Una por una, las siete Piedras Guardianas se liberan de sus pedestales. Las voces vuelven desde todas partes: Tom en la radio, Isabel desde Madrid, Sujin desde Seúl, Youngsook desde el mercado Gwangjang, Amira en árabe, Hassan en cuatro idiomas, y la voz de Mira, ya no pulida, temblando mientras dice thank you.)",
+    },
+    {
+      kind: "scene",
+      charId: "mira",
+      text: "Th-thank you. I mean it this time. I can feel it shake.",
+      textKo: "Th-thank you. 이번엔 진심이에요. 떨리는 게 느껴져요.",
+      textEs: "Th-thank you. Esta vez lo digo de verdad. Puedo sentir cómo tiembla.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "Mr. Black. I remember now. I was part of you. The part that loved every language before grief taught you to fear them.",
+      textKo: "Mr. Black. 이제 기억나요. 나는 당신의 일부였어요. 슬픔이 언어를 두려워하게 만들기 전, 모든 언어를 사랑하던 부분.",
+      textEs: "Mr. Black. Ahora lo recuerdo. Yo era parte de ti. La parte que amaba cada idioma antes de que el dolor te enseñara a temerlos.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      isNarration: true,
+      text: "(For one breath, Rudy's detective coat flickers into golden particles. The hat, the glasses, the bow tie, all become light. The tiny fox spirit from the first night looks back at the old man. Then the coat returns. Rudy is still Rudy. But now he knows why.)",
+      textKo: "(한 번의 숨 동안, 루디의 탐정 코트가 금빛 입자로 깜빡인다. 모자, 안경, 나비넥타이, 전부 빛이 된다. 첫날 밤의 작은 여우 정령이 늙은 남자를 바라본다. 그리고 코트가 돌아온다. 루디는 여전히 루디다. 하지만 이제 이유를 안다.)",
+      textEs: "(Durante un respiro, el abrigo de detective de Rudy se vuelve partículas doradas. El sombrero, las gafas, la pajarita, todo se vuelve luz. El pequeño espíritu zorro de la primera noche mira al viejo. Luego vuelve el abrigo. Rudy sigue siendo Rudy. Pero ahora sabe por qué.)",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "I was part of you. I am no longer you. I am the part you saved by failing to erase it.",
+      textKo: "나는 당신의 일부였어요. 하지만 이제 당신은 아니에요. 지우지 못했기 때문에 당신이 살려낸 부분이에요.",
+      textEs: "Fui parte de ti. Ya no soy tú. Soy la parte que salvaste al no poder borrarla.",
+    },
+    {
+      kind: "scene",
+      charId: "penny",
+      text: "The stones are returning to their keepers. Mr. Black will answer for what he did. But not as a monster. As a man who finally heard the sentence he could not translate.",
+      textKo: "수호석들은 각자의 보호자에게 돌아가고 있어요. Mr. Black은 자신이 한 일에 책임을 질 거예요. 하지만 괴물로서가 아니에요. 자신이 번역하지 못했던 문장을 마침내 들은 사람으로서.",
+      textEs: "Las piedras vuelven a sus guardianes. Mr. Black responderá por lo que hizo. Pero no como un monstruo. Como un hombre que por fin oyó la frase que no pudo traducir.",
+    },
+    {
+      kind: "clue",
+      symbol: "🌍",
+      titleEn: "The Language Conspiracy, Solved",
+      titleKo: "언어 음모, 해결",
+      titleEs: "La Conspiración del Lenguaje, Resuelta",
+      descEn: "Seven Guardian Stones released. The Universal Code dismantled. Mr. Black surrendered, not defeated but understood. Mira's voice returned with feeling. Ellis's journal preserved the proof. Detective Rudy is no longer only a detective. He is a Language Guardian.",
+      descKo: "7개의 수호석이 풀려났다. Universal Code는 해체되었다. Mr. Black은 항복했다. 패배한 것이 아니라 이해된 것이다. Mira의 목소리는 감정을 되찾았다. Ellis의 일지는 증거를 보존했다. 탐정 루디는 더 이상 단지 탐정이 아니다. 그는 언어의 수호자다.",
+      descEs: "Siete Piedras Guardianas liberadas. El Código Universal desmantelado. Mr. Black se rindió, no derrotado sino comprendido. La voz de Mira volvió con emoción. El diario de Ellis conservó la prueba. Detective Rudy ya no es solo detective. Es un Guardián del Idioma.",
+    },
+    {
+      kind: "scene",
+      charId: "lingo",
+      text: "Partner, we did not save language because it is useful. We saved it because every word is someone reaching for someone else.",
+      textKo: "파트너, 우리는 언어가 유용해서 구한 게 아니에요. 모든 단어가 누군가가 다른 누군가에게 손을 뻗는 일이기 때문에 구한 거예요.",
+      textEs: "Compa, no salvamos el idioma porque sea útil. Lo salvamos porque cada palabra es alguien intentando alcanzar a otra persona.",
+    },
+  ],
+};
+
+STORIES.madrid = MADRID_V21_STORY;
+STORIES.seoul = SEOUL_V21_STORY;
+STORIES.cairo = CAIRO_V21_STORY;
+STORIES.babel = BABEL_V21_STORY;
 
 async function markChapterComplete(storyId: string, nextId?: string) {
   try {
@@ -3014,6 +4668,39 @@ async function markChapterComplete(storyId: string, nextId?: string) {
     if (nextId && !progress.unlocked.includes(nextId)) progress.unlocked.push(nextId);
     await AsyncStorage.setItem(STORY_PROGRESS_KEY, JSON.stringify(progress));
   } catch (e) { console.warn("[Story] markChapterComplete failed:", e); }
+}
+
+/* ─────────────────── DIALOGUE INDICATORS ─────────────────── */
+
+/**
+ * Small blinking ▼ shown next to the "Next" label after a typewriter
+ * line finishes. Mimics classic visual-novel "press to continue" cues.
+ */
+function BlinkingArrow({ color, size = 12 }: { color: string; size?: number }) {
+  const blinkAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnim, { toValue: 0.25, duration: 480, useNativeDriver: true }),
+        Animated.timing(blinkAnim, { toValue: 1,    duration: 480, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, []);
+  return (
+    <Animated.Text
+      style={{
+        marginLeft: 6,
+        color,
+        fontSize: size,
+        opacity: blinkAnim,
+        fontFamily: F.bodySemi,
+      }}
+    >
+      ▼
+    </Animated.Text>
+  );
 }
 
 /* ─────────────────── PUZZLE COMPONENTS ─────────────────── */
@@ -3362,7 +5049,7 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
         <Text style={styles.puzzleWordLabel}>{tri(q.instruction, lang)}</Text>
         <View style={styles.sbAnswerRow}>
           {placed.length === 0
-            ? <Text style={styles.sbAnswerPlaceholder}>{lang === "korean" ? "단어를 탭하세요…" : lang === "spanish" ? "Toca las palabras…" : "Tap words below…"}</Text>
+            ? <Text style={styles.sbAnswerPlaceholder}>{lang === "korean" ? "단어를 탭하세요..." : lang === "spanish" ? "Toca las palabras..." : "Tap words below..."}</Text>
             : placed.map((originalIdx, i) => (
                 <Pressable key={i} style={styles.sbAnswerChip} onPress={() => tapWord(originalIdx)}>
                   <Text style={styles.sbAnswerChipText}>{tri(q.words[originalIdx], learningLang)}</Text>
@@ -3433,6 +5120,12 @@ function InvestigationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
   }
 
   function handleNext() {
+    if (selected !== q.answerIdx) {
+      setSelected(null);
+      setConfirmed(false);
+      return;
+    }
+
     if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); onResetHints?.(); }
     else setSolved(true);
   }
@@ -3473,7 +5166,11 @@ function InvestigationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속 ▶" : "Continue ▶"}</Text>
+          <Text style={styles.puzzleConfirmText}>
+            {selected === q.answerIdx
+              ? (lang === "korean" ? "계속 ▶" : "Continue ▶")
+              : (lang === "korean" ? "다시 선택하기" : lang === "spanish" ? "Elegir otra vez" : "Choose again")}
+          </Text>
         </Pressable>
       )}
     </View>
@@ -3590,9 +5287,9 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
       ko ? `예: ${firstLetter} → ${decodedFirst}`
         : es ? `Ejemplo: ${firstLetter} → ${decodedFirst}`
         : `Example: ${firstLetter} → ${decodedFirst}`,
-      ko ? `단어의 앞부분: ${decodedHalf} — 나머지 글자도 같은 방법으로 풀어봐`
-        : es ? `Primeras letras descifradas: ${decodedHalf} — descifra el resto con el mismo método`
-        : `First letters decoded: ${decodedHalf} — apply the same shift to the rest`,
+      ko ? `단어의 앞부분: ${decodedHalf}. 나머지 글자도 같은 방법으로 풀어봐`
+        : es ? `Primeras letras descifradas: ${decodedHalf}. Descifra el resto con el mismo método`
+        : `First letters decoded: ${decodedHalf}. Apply the same shift to the rest`,
     ];
   }
 
@@ -3626,7 +5323,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
             <Text style={styles.cipherLingoEmoji}>🦊</Text>
             <View style={styles.cipherLingoBubble}>
               <Text style={styles.cipherLingoBubbleText}>
-                {ko ? "흠… 뭔가 조금 다른 것 같군요, 파트너." : es ? "Hmm… algo no está bien, compañero." : "Hmm… something's not quite right, partner."}
+                {ko ? "흠... 뭔가 조금 다른 것 같군요, 파트너." : es ? "Hmm... algo no está bien, compañero." : "Hmm... something's not quite right, partner."}
               </Text>
             </View>
           </View>
@@ -4208,7 +5905,7 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
         </Svg>
         {allPaths.length === 0 && currentPath.length === 0 && (
           <Text style={styles.hwPlaceholder}>
-            {ko ? "여기에 쓰세요…" : es ? "Escribe aquí…" : "Write here…"}
+            {ko ? "여기에 쓰세요..." : es ? "Escribe aquí..." : "Write here..."}
           </Text>
         )}
       </View>
@@ -4562,7 +6259,7 @@ function CompletionScreen({ story, lang, xpEarned }: { story: Story; lang: strin
           <Ionicons name="flash" size={22} color={C.bg1} />
           <Text style={styles.xpRewardNum}>+{xpEarned} XP</Text>
         </View>
-        <Text style={styles.completionMsg}>{lang === "korean" ? "훌륭해요! 언어 탐정으로서의 실력이 향상되었어요. 다음 챕터가 기다립니다…" : lang === "spanish" ? "¡Excelente! Tus habilidades como detective lingüístico han mejorado. El próximo capítulo te espera…" : "Excellent! Your skills as a Language Detective have grown. The next chapter awaits…"}</Text>
+        <Text style={styles.completionMsg}>{lang === "korean" ? "훌륭해요! 언어 탐정으로서의 실력이 향상되었어요. 다음 챕터가 기다립니다..." : lang === "spanish" ? "¡Excelente! Tus habilidades como detective lingüístico han mejorado. El próximo capítulo te espera..." : "Excellent! Your skills as a Language Detective have grown. The next chapter awaits..."}</Text>
         {story.nextChapterId && (
           <Pressable
             style={styles.completionNextBtn}
@@ -4584,8 +6281,8 @@ function CompletionScreen({ story, lang, xpEarned }: { story: Story; lang: strin
 
 export default function StoryScene() {
   const insets = useSafeAreaInsets();
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { nativeLanguage, learningLanguage, updateStats } = useLanguage();
+  const { id, intro, mute } = useLocalSearchParams<{ id: string; intro?: string; mute?: string }>();
+  const { nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
   const lang = nativeLanguage ?? "english";
   const learningLang = learningLanguage ?? "english";
 
@@ -4596,13 +6293,57 @@ export default function StoryScene() {
   const [sharedHintVisible, setSharedHintVisible] = useState(false);
   const [sharedHintLevel, setSharedHintLevel] = useState(0);
   const [puzzleScrollEnabled, setPuzzleScrollEnabled] = useState(true);
+  const [introStatus, setIntroStatus] = useState<"checking" | "visible" | "hidden">("checking");
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const bgmRef = useRef<Audio.Sound | null>(null);
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
+  const introSupported = hasIntroTimeline(story.id);
+  const introStorageKey = `@enigma_intro_seen_${story.id}`;
+  const introNativeLang = lang === "korean" || lang === "spanish" ? lang : "english";
+  const forceIntro = intro === "1" || intro === "true";
+  const audioMuted = mute === "1" || mute === "true";
+
+  const completeIntro = useCallback(async () => {
+    try {
+      await AsyncStorage.setItem(introStorageKey, "true");
+    } catch (e) {
+      console.warn("[Story] intro flag save failed:", e);
+    } finally {
+      setIntroStatus("hidden");
+    }
+  }, [introStorageKey]);
 
   useEffect(() => {
+    let mounted = true;
+
+    if (!introSupported) {
+      setIntroStatus("hidden");
+      return () => {
+        mounted = false;
+      };
+    }
+
+    setIntroStatus("checking");
+    AsyncStorage.getItem(introStorageKey)
+      .then((seen) => {
+        if (mounted) setIntroStatus(forceIntro || !seen ? "visible" : "hidden");
+      })
+      .catch((e) => {
+        console.warn("[Story] intro flag load failed:", e);
+        if (mounted) setIntroStatus("hidden");
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [forceIntro, introStorageKey, introSupported]);
+
+  useEffect(() => {
+    if (introStatus !== "hidden") return;
+    if (audioMuted) return;
+
     let mounted = true;
 
     async function startBGM() {
@@ -4640,7 +6381,7 @@ export default function StoryScene() {
         bgmRef.current = null;
       }
     };
-  }, []);
+  }, [audioMuted, introStatus]);
 
   const seq = story.sequence;
   const totalScenes = seq.filter((s) => s.kind === "scene").length;
@@ -4664,7 +6405,28 @@ export default function StoryScene() {
     });
   }
 
+  // Typewriter ref + done state for the currently-displayed scene/narration.
+  // Tap-to-skip semantics: first "Next" press while typing → reveal full text;
+  // second press (or press when already done) → actually advance to next scene.
+  const typewriterRef = useRef<TypewriterHandle | null>(null);
+  const [typingDone, setTypingDone] = useState(false);
+
+  // Reset typing-done flag whenever we move to a new scene; the Typewriter
+  // component itself resets internally via its `text` prop change, but the
+  // parent needs this for the ▼ blink indicator.
+  useEffect(() => {
+    setTypingDone(false);
+  }, [seqIdx]);
+
   function advance() {
+    // First-tap behavior: if the current scene's typewriter is still running,
+    // skip to full text instead of advancing. This matches Pokemon / VN UX.
+    if (typewriterRef.current && !typewriterRef.current.isDone()) {
+      typewriterRef.current.skip();
+      Haptics.selectionAsync();
+      return;
+    }
+
     setSharedHintVisible(false);
     setSharedHintLevel(0);
 
@@ -4702,7 +6464,7 @@ export default function StoryScene() {
     setXpEarned(earned);
     setCompleted(true);
     await markChapterComplete(story.id, story.nextChapterId);
-    try { await updateStats({ xp: earned }); } catch (e) { console.warn("[Story] finishChapter XP update failed:", e); }
+    try { await updateStats({ xp: stats.xp + earned }); } catch (e) { console.warn("[Story] finishChapter XP update failed:", e); }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }
 
@@ -4712,16 +6474,18 @@ export default function StoryScene() {
   }
 
   async function handlePuzzleSolved() {
-    try { await updateStats({ xp: 20 }); } catch (e) { console.warn('[Story] handlePuzzleSolved XP update failed:', e); }
+    try { await updateStats({ xp: stats.xp + 20 }); } catch (e) { console.warn('[Story] handlePuzzleSolved XP update failed:', e); }
 
     // Track expressions and I/O ratio for inline puzzles
     const currentItem = seq[seqIdx];
     if (currentItem?.kind === "puzzle") {
       const puzzleItem = currentItem as SeqPuzzle;
       const chapter = story.id === "london" ? "ch1" : story.id === "madrid" ? "ch2" : story.id === "seoul" ? "ch3" : story.id === "cairo" ? "ch4" : "ch5";
-      if (puzzleItem.targetExpressions?.length) {
-        addToExpressionBook(puzzleItem.targetExpressions, chapter, puzzleItem.tprsStage).catch((e: unknown) => console.warn('[Story] addToExpressionBook failed:', e));
-        if (puzzleItem.tprsStage === 4) markExpressionsMastered(puzzleItem.targetExpressions).catch((e: unknown) => console.warn('[Story] markExpressionsMastered failed:', e));
+      const targetExpressions = puzzleItem.targetExpressions;
+
+      if (puzzleItem.pType !== "investigation" && targetExpressions?.length) {
+        addToExpressionBook(targetExpressions, chapter, puzzleItem.tprsStage).catch((e: unknown) => console.warn('[Story] addToExpressionBook failed:', e));
+        if (puzzleItem.tprsStage === 4) markExpressionsMastered(targetExpressions).catch((e: unknown) => console.warn('[Story] markExpressionsMastered failed:', e));
       }
       trackQuizIO(chapter, puzzleItem.pType).catch((e: unknown) => console.warn('[Story] trackQuizIO failed:', e));
     }
@@ -4756,6 +6520,26 @@ export default function StoryScene() {
   }
 
   const titleLabel = lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : story.title;
+
+  if (introSupported && introStatus === "checking") {
+    return (
+      <View style={[styles.root, { paddingTop: topPad, alignItems: "center", justifyContent: "center" }]}>
+        <LinearGradient colors={story.gradient} style={StyleSheet.absoluteFill} />
+        <ActivityIndicator color={C.gold} />
+      </View>
+    );
+  }
+
+  if (introSupported && introStatus === "visible") {
+    return (
+      <StoryIntroMotionComic
+        chapterId={story.id as ChapterId}
+        nativeLang={introNativeLang}
+        muted={audioMuted}
+        onComplete={completeIntro}
+      />
+    );
+  }
 
   if (completed) {
     return (
@@ -4803,12 +6587,23 @@ export default function StoryScene() {
 
         {/* NARRATION */}
         {item.kind === "scene" && item.isNarration && (
-          <View style={styles.narrationArea}>
-            <Text style={styles.narrationText}>{getSceneText(item)}</Text>
-            <Pressable style={styles.narrationBtn} onPress={advance}>
-              <Text style={styles.narrationBtnText}>{lang === "korean" ? "다음 ▶" : lang === "spanish" ? "Siguiente ▶" : "Next ▶"}</Text>
-            </Pressable>
-          </View>
+          <Pressable style={styles.narrationArea} onPress={advance}>
+            <Typewriter
+              ref={typewriterRef}
+              text={getSceneText(item)}
+              speedMs={25}
+              textStyle={styles.narrationText}
+              onComplete={() => setTypingDone(true)}
+            />
+            <View style={styles.narrationBtn}>
+              <Text style={styles.narrationBtnText}>
+                {typingDone
+                  ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : "Next")
+                  : (lang === "korean" ? "전체 보기" : lang === "spanish" ? "Mostrar todo" : "Show all")}
+              </Text>
+              {typingDone && <BlinkingArrow color={C.gold} />}
+            </View>
+          </Pressable>
         )}
 
         {/* DIALOGUE SCENE */}
@@ -4821,6 +6616,22 @@ export default function StoryScene() {
                   style={styles.rudyStoryChar}
                   resizeMode="contain"
                 />
+              ) : character.portrait ? (
+                <>
+                  <View style={[styles.portraitCard, { shadowColor: story.accentColor }]}>
+                    <Image
+                      source={character.portrait}
+                      style={styles.characterPortrait}
+                      resizeMode="cover"
+                    />
+                    <LinearGradient
+                      colors={["transparent", "rgba(13,17,23,0.72)"]}
+                      style={styles.portraitFade}
+                    />
+                    <View style={[styles.avatarRing, styles.portraitRing, { borderColor: story.accentColor }]} />
+                  </View>
+                  <Text style={styles.charName}>{getCharName(character)}</Text>
+                </>
               ) : (
                 <>
                   <View style={[styles.avatarOuter, { shadowColor: story.accentColor }]}>
@@ -4834,23 +6645,34 @@ export default function StoryScene() {
               )}
             </View>
 
-            <View style={styles.dialogueBox}>
+            <Pressable style={styles.dialogueBox} onPress={advance}>
               <View style={styles.speakerTag}>
                 <Text style={styles.speakerEmoji}>{character.emoji}</Text>
                 <Text style={styles.speakerName}>{getCharName(character)}</Text>
               </View>
               <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 160 }}>
-                <Text style={styles.dialogueText}>{getSceneText(item)}</Text>
+                <Typewriter
+                  ref={typewriterRef}
+                  text={getSceneText(item)}
+                  speedMs={25}
+                  textStyle={styles.dialogueText}
+                  onComplete={() => setTypingDone(true)}
+                />
               </ScrollView>
               <View style={styles.dotsRow}>
                 {seq.slice(0, 5).map((_, i) => (
                   <View key={i} style={[styles.dot, { opacity: i === seqIdx % 5 ? 1 : 0.3 }]} />
                 ))}
               </View>
-              <Pressable style={styles.nextBtn} onPress={advance}>
-                <Text style={styles.nextBtnText}>{lang === "korean" ? "다음 ▶" : lang === "spanish" ? "Siguiente ▶" : "Next ▶"}</Text>
-              </Pressable>
-            </View>
+              <View style={styles.nextBtn}>
+                <Text style={styles.nextBtnText}>
+                  {typingDone
+                    ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : "Next")
+                    : (lang === "korean" ? "전체 보기" : lang === "spanish" ? "Mostrar todo" : "Show all")}
+                </Text>
+                {typingDone && <BlinkingArrow color={C.bg1} />}
+              </View>
+            </Pressable>
           </View>
         )}
 
@@ -4866,11 +6688,11 @@ export default function StoryScene() {
           const headerText = item.pType === "writing-mission"
             ? (ko ? `🎤 ${(item as any).title?.ko || "말하기 미션"}` : es ? `🎤 ${(item as any).title?.es || "Misión de habla"}` : `🎤 ${(item as any).title?.en || "Speaking Mission"}`)
             : ko
-            ? `🧩 퍼즐 ${item.puzzleNum} — 언어 실력을 증명하세요!`
+            ? `🧩 퍼즐 ${item.puzzleNum}: 언어 실력을 증명하세요!`
             : es
-            ? `🧩 Puzzle ${item.puzzleNum} — ¡Demuestra tus habilidades lingüísticas!`
-            : `🧩 Puzzle ${item.puzzleNum} — Prove your language skills!`;
-          const hasSharedHints = !!item.hints && item.pType !== "cipher" && item.pType !== "fill-blank";
+            ? `🧩 Puzzle ${item.puzzleNum}: ¡Demuestra tus habilidades lingüísticas!`
+            : `🧩 Puzzle ${item.puzzleNum}: Prove your language skills!`;
+          const hasSharedHints = !!item.hints && item.pType !== "cipher" && item.pType !== "fill-blank" && item.pType !== "boss-spell";
           const h1 = item.hints ? resolveHint(item.hints.h1, lang, learningLang) : "";
           const h2 = item.hints ? resolveHint(item.hints.h2, lang, learningLang) : "";
           const h3 = item.hints?.h3 ? resolveHint(item.hints.h3, lang, learningLang) : null;
@@ -4908,10 +6730,13 @@ export default function StoryScene() {
                 {item.pType === "writing-mission" && (
                   <WritingMissionPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
+                {item.pType === "boss-spell" && (
+                  <BossSpellPuzzle key={seqIdx} puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                )}
                 {item.pType === "word-puzzle" && (
                   <WordPuzzlePuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
-                {!["word-match","fill-blank","dialogue-choice","sentence-builder","investigation","cipher","listen-choose","pronunciation","writing-mission","word-puzzle","voice-power","debate-battle","npc-rescue"].includes(item.pType) && (
+                {!["word-match","fill-blank","dialogue-choice","sentence-builder","investigation","cipher","listen-choose","pronunciation","writing-mission","boss-spell","word-puzzle","voice-power","debate-battle","npc-rescue"].includes(item.pType) && (
                   <FallbackPuzzle lang={lang} onSolved={handlePuzzleSolved} />
                 )}
                 {hasSharedHints && (
@@ -5045,6 +6870,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 28,
     paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   narrationBtnText: { fontFamily: F.header, fontSize: 14, color: C.gold, letterSpacing: 0.5 },
 
@@ -5080,6 +6908,38 @@ const styles = StyleSheet.create({
   rudyStoryChar: {
     width: 180,
     height: 230,
+  },
+  portraitCard: {
+    width: 168,
+    height: 228,
+    borderRadius: 22,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.55)",
+    backgroundColor: C.bg2,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.42,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  characterPortrait: {
+    width: "100%",
+    height: "100%",
+  },
+  portraitFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 76,
+  },
+  portraitRing: {
+    top: -1,
+    left: -1,
+    width: 170,
+    height: 230,
+    borderRadius: 23,
+    opacity: 0.7,
   },
   avatarEmoji: { fontSize: 56 },
   avatarRing: {
@@ -5142,7 +7002,9 @@ const styles = StyleSheet.create({
     backgroundColor: C.gold,
     paddingVertical: 13,
     borderRadius: 14,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
   },
   nextBtnText: { fontSize: 14, fontFamily: F.header, color: C.bg1, letterSpacing: 0.5 },
 

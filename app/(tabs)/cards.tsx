@@ -1152,7 +1152,7 @@ export default function CardsScreen() {
             onPress={() => switchDeck("beginner")}
           >
             {deckType === "beginner" && (
-              <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} borderRadius={14} />
+              <LinearGradient colors={[C.gold, C.goldDark]} style={[StyleSheet.absoluteFill, { borderRadius: 14 }]} />
             )}
             <Text style={[styles.deckTabText, deckType === "beginner" && styles.deckTabTextActive]}>
               {nativeLang === "korean" ? "초급" : nativeLang === "spanish" ? "Principiante" : "Beginner"}
@@ -1163,7 +1163,7 @@ export default function CardsScreen() {
             onPress={() => switchDeck("advanced")}
           >
             {deckType === "advanced" && (
-              <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} borderRadius={14} />
+              <LinearGradient colors={[C.gold, C.goldDark]} style={[StyleSheet.absoluteFill, { borderRadius: 14 }]} />
             )}
             <Text style={[styles.deckTabText, deckType === "advanced" && styles.deckTabTextActive]}>
               {nativeLang === "korean" ? "고급" : nativeLang === "spanish" ? "Avanzado" : "Advanced"}

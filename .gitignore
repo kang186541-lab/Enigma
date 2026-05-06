@@ -7,7 +7,15 @@ node_modules/
 .expo/
 dist/
 web-build/
+web-dist/
+web-dist2/
+web-dist2-new/
+web-dist2-backup/
 expo-env.d.ts
+
+# Logs (covered by .railwayignore but Git also needs to ignore)
+*.log
+.expo-story-intro.*.log
 
 # Native
 ios/

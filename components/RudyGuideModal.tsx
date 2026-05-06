@@ -18,6 +18,7 @@ const { width: SCREEN_W } = Dimensions.get("window");
 const CARD_W = Math.min(SCREEN_W - 48, 360);
 
 const GUIDE_KEY = "rudy_guide_index";
+const GUIDE_LAST_SHOWN_KEY = "rudy_guide_last_shown"; // ISO date yyyy-mm-dd
 
 type GuideCard = {
   emoji: string;
@@ -198,7 +199,26 @@ const GUIDE_CARDS: GuideCard[] = [
   },
 ];
 
+function todayKey(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/**
+ * Returns the next guide card index to show.
+ * Returns null if either:
+ *  - all cards already seen, OR
+ *  - a card was already shown today (once-per-day throttle)
+ *
+ * This prevents the modal from blocking the home screen on every
+ * tab focus — the user only sees it once per calendar day.
+ */
 export async function getNextGuideIndex(): Promise<number | null> {
+  const lastShown = await AsyncStorage.getItem(GUIDE_LAST_SHOWN_KEY);
+  if (lastShown === todayKey()) return null; // already shown today
   const raw = await AsyncStorage.getItem(GUIDE_KEY);
   const idx = raw ? parseInt(raw, 10) : 0;
   if (idx >= GUIDE_CARDS.length) return null;
@@ -209,6 +229,8 @@ export async function advanceGuideIndex(): Promise<void> {
   const raw = await AsyncStorage.getItem(GUIDE_KEY);
   const idx = raw ? parseInt(raw, 10) : 0;
   await AsyncStorage.setItem(GUIDE_KEY, String(idx + 1));
+  // Mark today so we don't show another card until tomorrow
+  await AsyncStorage.setItem(GUIDE_LAST_SHOWN_KEY, todayKey());
 }
 
 export function RudyGuideModal({

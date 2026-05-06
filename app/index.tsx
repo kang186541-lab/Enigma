@@ -8,19 +8,23 @@ import { C } from "@/constants/theme";
 const DONE_KEY = (lang: string) => `basicCourseCompleted_${lang}`;
 
 export default function Index() {
-  const { hasOnboarded, nativeLanguage, learningLanguage } = useLanguage();
+  const { hasOnboarded, isHydrated, nativeLanguage, learningLanguage } = useLanguage();
   const [checked,     setChecked]     = useState(false);
   const [coursesDone, setCoursesDone] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (!isHydrated) {
+      setChecked(false);
+      return;
+    }
     if (!hasOnboarded || !learningLanguage) { setChecked(true); return; }
     AsyncStorage.getItem(DONE_KEY(learningLanguage)).then((v) => {
       setCoursesDone(v === "true");
       setChecked(true);
     });
-  }, [hasOnboarded, learningLanguage]);
+  }, [hasOnboarded, isHydrated, learningLanguage]);
 
-  if (!checked) {
+  if (!isHydrated || !checked) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: C.bg1 }}>
         <ActivityIndicator color={C.gold} />

@@ -41,14 +41,16 @@ export interface Step1Config {
 }
 
 export interface FillBlankQuiz {
-  type: "select" | "input" | "listening";
-  promptWithBlank: string;  // e.g. "My name ___ Rudy."
-  answer: string;           // correct word/phrase
-  options?: string[];        // only for "select" type
-  fullSentence: string;     // complete sentence for speak-after
-  fullSentenceMeaning: Tri; // translation for display
-  audioText?: string;       // text spoken aloud for "listening" type
-  audioOnly?: boolean;      // if true, user hears audio without seeing text
+  type: "select" | "input" | "listening" | "fill_blank";
+  promptWithBlank?: string;  // e.g. "My name ___ Rudy."
+  answer?: string;           // correct word/phrase
+  options?: string[];        // choices for select/listening variants
+  fullSentence?: string;     // complete sentence for speak-after
+  fullSentenceMeaning?: Tri; // translation for display
+  audioText?: string;        // text spoken aloud for "listening" type
+  audioOnly?: boolean;       // if true, user hears audio without seeing text
+  question?: Tri;            // listening prompt
+  correct?: number;          // index into options for listening prompts
 }
 
 export interface GrammarExplanation {
@@ -63,10 +65,17 @@ export interface Step2Data {
   quizzes: FillBlankQuiz[];
 }
 
+export interface CrossUnitReviewItem {
+  sentence: Tri;
+  fromDay: number;
+  context: Tri;
+}
+
 export interface DayLessonData {
   step1Sentences: LessonSentence[];
   step1Config?: Step1Config;
   step2: Step2Data;
+  crossUnitReview?: CrossUnitReviewItem[];
 }
 
 // ── STEP 3: Mission Talk ──────────────────────────────────────────────────────

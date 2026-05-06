@@ -673,6 +673,17 @@ function buildSession(
 
 type RecordState = "idle" | "listening" | "processing" | "done";
 
+type PronunciationAssessResponse = {
+  success?: boolean;
+  score?: number;
+  accuracyScore?: number;
+  fluencyScore?: number;
+  completenessScore?: number;
+  feedback?: string;
+  recognizedText?: string;
+  words?: { word: string; score: number; errorType: string; phonemes?: { phoneme: string; score: number }[] }[];
+};
+
 export default function SpeakScreen() {
   const insets = useSafeAreaInsets();
   const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
@@ -855,7 +866,7 @@ export default function SpeakScreen() {
     Animated.timing(pulseAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
   };
 
-  const processScoreData = (data: any) => {
+  const processScoreData = (data: PronunciationAssessResponse) => {
     const scoreVal = data.score ?? 0;
     setScore(scoreVal);
     setAccuracyScore(data.accuracyScore ?? null);
@@ -913,10 +924,11 @@ export default function SpeakScreen() {
         }),
       });
       if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
-      const data = await apiRes.json();
+      const data = await apiRes.json() as PronunciationAssessResponse;
       const scoreVal = processScoreData(data);
       if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase?.word ?? ""); }
       else { await removeWeakWord(phrase?.word ?? ""); }
+      if (data.success !== true) return;
       const xpEarned = scoreVal >= 90 ? 30 : 15;
       setXpGain(xpEarned);
       updateStats({ xp: statsRef.current.xp + xpEarned });
@@ -1078,11 +1090,12 @@ export default function SpeakScreen() {
             }),
           });
           if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
-          const data = await apiRes.json();
+          const data = await apiRes.json() as PronunciationAssessResponse;
 
           const scoreVal = processScoreData(data);
           if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase.word); }
           else { await removeWeakWord(phrase.word); }
+          if (data.success !== true) return;
           const xpEarned = scoreVal >= 90 ? 30 : 15;
           setXpGain(xpEarned);
           updateStats({ xp: statsRef.current.xp + xpEarned });
@@ -1426,7 +1439,7 @@ export default function SpeakScreen() {
                       </View>
 
                       {recognizedText ? (
-                        <Text style={styles.heardText}>"{recognizedText}"</Text>
+                        <Text style={styles.heardText}>&quot;{recognizedText}&quot;</Text>
                       ) : null}
                     </View>
                   </View>

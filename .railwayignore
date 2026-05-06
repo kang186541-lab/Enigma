@@ -1,0 +1,13 @@
+node_modules/
+.git/
+.expo/
+.vercel/
+dist/
+web-build/
+web-dist/
+web-dist2/
+web-dist2-new/
+web-dist2-backup/
+server_dist/
+*.log
+*.tsbuildinfo

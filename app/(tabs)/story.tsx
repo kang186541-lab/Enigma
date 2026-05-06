@@ -37,9 +37,9 @@ const CHAPTERS = [
     titleEn: "The London Cipher",
     titleKo: "런던의 암호",
     titleEs: "El Cifrado de Londres",
-    descEn: "Decode the ∆LX symbol before Mr. Black erases London's words",
-    descKo: "미스터 블랙이 런던의 단어들을 지우기 전에 ∆LX 기호를 해독하라",
-    descEs: "Descifra el símbolo ∆LX antes de que Mr. Black borre las palabras de Londres",
+    descEn: "Decode the ∆LX symbol before the black-coat thief erases London's words",
+    descKo: "검은 코트의 도둑이 런던의 단어들을 지우기 전에 ∆LX 기호를 해독하라",
+    descEs: "Descifra el símbolo ∆LX antes de que el ladrón del abrigo negro borre las palabras de Londres",
     characters: ["🕵️", "👩‍💼", "🕴️"],
     scenes: 17,
     missionEn: "4 puzzles + 2 clues",
@@ -59,9 +59,9 @@ const CHAPTERS = [
     titleEn: "The Madrid Disappearance",
     titleKo: "마드리드의 실종",
     titleEs: "La Desaparición de Madrid",
-    descEn: "Mr. Black has six stones. You have one. The numbers are not in your favor.",
-    descKo: "미스터 블랙은 여섯 개를 가지고 있다. 너는 하나. 숫자가 유리하지 않다.",
-    descEs: "Mr. Black tiene seis piedras. Tú tienes una. Los números no están a tu favor.",
+    descEn: "London and Madrid are compromised. Two city stones remain before Babel reveals the final three.",
+    descKo: "런던과 마드리드는 이미 위험해졌어. 바벨이 마지막 세 개를 드러내기 전, 도시 수호석 두 개가 남아 있어.",
+    descEs: "Londres y Madrid están comprometidas. Quedan dos piedras de ciudad antes de que Babel revele las tres finales.",
     characters: ["💃", "🥬", "🕴️"],
     scenes: 16,
     missionEn: "4 puzzles + 1 clue",
@@ -81,9 +81,9 @@ const CHAPTERS = [
     titleEn: "The Seoul Secret",
     titleKo: "서울의 비밀",
     titleEs: "El Secreto de Seúl",
-    descEn: "Project Erase — the Lexicon Society's plan to delete all world languages",
-    descKo: "이레이즈 프로젝트 — Lexicon Society의 전 세계 언어 삭제 계획",
-    descEs: "Proyecto Borrado — el plan de la Sociedad Lexicon para eliminar todos los idiomas",
+    descEn: "Project Erase, the Lexicon Society's plan to delete all world languages",
+    descKo: "이레이즈 프로젝트, Lexicon Society의 전 세계 언어 삭제 계획",
+    descEs: "Proyecto Borrado, el plan de la Sociedad Lexicon para eliminar todos los idiomas",
     characters: ["👨‍💼", "👩‍⚕️", "🕴️"],
     scenes: 15,
     missionEn: "4 puzzles + 1 clue",
@@ -103,9 +103,9 @@ const CHAPTERS = [
     titleEn: "The Cairo Stone",
     titleKo: "카이로의 수호석",
     titleEs: "La Piedra de El Cairo",
-    descEn: "Miss Penny holds the key — but Mr. Black is already at Saqqara",
-    descKo: "미스 페니가 열쇠를 쥐고 있다 — 하지만 미스터 블랙은 이미 사카라에",
-    descEs: "Miss Penny tiene la clave — pero Mr. Black ya está en Saqqara",
+    descEn: "Miss Penny holds the key, but Mr. Black is already at Saqqara",
+    descKo: "미스 페니가 열쇠를 쥐고 있다. 하지만 미스터 블랙은 이미 사카라에",
+    descEs: "Miss Penny tiene la clave, pero Mr. Black ya está en Saqqara",
     characters: ["🐪", "💃", "🕴️"],
     scenes: 18,
     missionEn: "4 puzzles + 2 clues",
@@ -243,10 +243,10 @@ export default function StoryTab() {
         </Text>
         <Text style={styles.headerSub}>
           {lang === "korean"
-            ? "∆LX — Lexicon Society의 비밀을 밝혀라"
+            ? "∆LX. Lexicon Society의 비밀을 밝혀라"
             : lang === "spanish"
-            ? "∆LX — Descubre el secreto de la Sociedad Lexicon"
-            : "∆LX — Uncover the secrets of the Lexicon Society"}
+            ? "∆LX. Descubre el secreto de la Sociedad Lexicon"
+            : "∆LX. Uncover the secrets of the Lexicon Society"}
         </Text>
       </LinearGradient>
 
@@ -490,7 +490,7 @@ export default function StoryTab() {
                       isLocked && { color: "rgba(255,255,255,0.18)" },
                     ]}
                   >
-                    ⚡ +100 XP
+                    ⚡ +150 XP
                     {lang === "korean"
                       ? " 보상"
                       : lang === "spanish"

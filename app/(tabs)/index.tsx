@@ -260,7 +260,7 @@ export default function HomeScreen() {
     { icon: "albums",      color: C.gold,    label: t("flashcards"),    desc: t("flashcards_desc"),    route: "/(tabs)/cards"  },
     { icon: "chatbubbles", color: "#7eb8c9", label: t("conversation"),  desc: t("conversation_desc"),  route: "/(tabs)/chat"   },
     { icon: "mic",         color: "#9b8bb4", label: t("pronunciation"), desc: t("pronunciation_desc"), route: "/(tabs)/speak"  },
-    { icon: "book",        color: "#c97b27", label: storyLabel,         desc: storyDesc,               route: "/story"         },
+    { icon: "book",        color: "#c97b27", label: storyLabel,         desc: storyDesc,               route: "/(tabs)/story"  },
     { icon: "pencil",      color: "#e8a87c", label: writingLabel,       desc: writingDesc,             route: "/writing-practice" },
   ];
 

@@ -999,11 +999,38 @@ function TimedBossView({
   const [correct, setCorrect] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [expired, setExpired] = useState(false);
+  const correctRef = useRef(correct);
+  const onDoneRef = useRef(onDone);
+  const totalRoundsRef = useRef(rounds.length);
+  const completedRef = useRef(false);
+
+  useEffect(() => {
+    correctRef.current = correct;
+  }, [correct]);
+
+  useEffect(() => {
+    onDoneRef.current = onDone;
+    totalRoundsRef.current = rounds.length;
+  }, [onDone, rounds.length]);
+
+  function completeQuiz(finalCorrect: number, total: number) {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onDoneRef.current(finalCorrect, total);
+  }
 
   useEffect(() => {
     if (expired) return;
     const t = setInterval(() => setTimeLeft(s => {
-      if (s <= 1) { clearInterval(t); setExpired(true); onDone(correct, rounds.length); return 0; }
+      if (s <= 1) {
+        clearInterval(t);
+        setExpired(true);
+        if (!completedRef.current) {
+          completedRef.current = true;
+          onDoneRef.current(correctRef.current, totalRoundsRef.current);
+        }
+        return 0;
+      }
       return s - 1;
     }), 1000);
     return () => clearInterval(t);
@@ -1016,12 +1043,13 @@ function TimedBossView({
 
   function advance(wasCorrect: boolean) {
     const newC = wasCorrect ? correct + 1 : correct;
+    correctRef.current = newC;
     setCorrect(newC);
     setFeedback(null);
     setInput("");
     setSelected(null);
     if (round + 1 >= rounds.length) {
-      onDone(newC, rounds.length);
+      completeQuiz(newC, rounds.length);
     } else {
       setRound(i => i + 1);
     }

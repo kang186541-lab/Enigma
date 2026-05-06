@@ -346,7 +346,7 @@ export default function DailyLessonScreen() {
               style={({ pressed }) => [styles.homeBtn, pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] }]}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                router.replace("/(tabs)/");
+                router.replace("/");
               }}
             >
               <LinearGradient colors={[C.gold, C.goldDark]} style={styles.homeBtnGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>

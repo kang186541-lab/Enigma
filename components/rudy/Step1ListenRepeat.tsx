@@ -536,9 +536,9 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
             <Pressable
               style={({ pressed }) => [s.playbackBtn, s.playbackBtnNative, pressed && { opacity: 0.8 }]}
               onPress={() => playTTS("normal")}
-              disabled={phase === "playing"}
+              disabled={playingMode === "normal"}
             >
-              {playingMode === "normal" && phase === "playing"
+              {playingMode === "normal"
                 ? <ActivityIndicator size="small" color={C.gold} />
                 : <Ionicons name="volume-medium-outline" size={15} color={C.gold} />
               }

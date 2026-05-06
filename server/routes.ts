@@ -15,6 +15,45 @@ function normalizeAudioMime(mime: string): string {
   return mime;
 }
 
+/**
+ * Voice endpoints (/api/stt, /api/pronunciation-assessment) handle learner audio.
+ * In production, the recognized text is PII — it's literally what the user said
+ * out loud. Production hosts (Railway/Vercel) retain logs for ~30 days, so any
+ * raw transcript or full provider payload would be quietly archived per request.
+ *
+ * `isVerboseVoiceLogging()` is true only outside production. Use it to gate any
+ * log line that includes recognized text, DisplayText, or a sliced provider
+ * response. Production paths should log only request shape (byte size, mime,
+ * status) plus opaque score bands — never the spoken content itself.
+ */
+function isVerboseVoiceLogging(): boolean {
+  return process.env.NODE_ENV !== "production";
+}
+
+/** Length-only summary of a transcript for production logs (no content). */
+function redactTranscript(text: string | undefined | null): string {
+  if (!text) return "(empty)";
+  return `(${text.length} chars)`;
+}
+
+/**
+ * Centralised error log for upstream provider (Azure / Google) failures.
+ * In dev mode the raw response body is preserved (debugging). In production
+ * we only emit `(N chars)` so partial recognition fragments, audio metadata,
+ * or anything else the provider may include in error bodies cannot be
+ * silently archived in Railway/Vercel logs (~30-day retention).
+ *
+ * Call this from every `if (!res.ok)` branch instead of `console.error(scope, status, body)`.
+ */
+function logProviderError(scope: string, status: number, body: string | undefined | null): void {
+  if (isVerboseVoiceLogging()) {
+    console.error(scope, status, body ?? "(empty)");
+  } else {
+    const length = body?.length ?? 0;
+    console.error(scope, status, `(${length} chars)`);
+  }
+}
+
 interface TutorInfo {
   id: string;
   name: string;
@@ -615,11 +654,12 @@ Student's ${learnName} answer: ${userAnswer}`;
         }
       }
 
-      let score = typeof parsed.score === "number" && parsed.score >= 0 && parsed.score <= 100
-        ? Math.round(parsed.score)
+      const evalResult = parsed ?? {};
+      let score = typeof evalResult.score === "number" && evalResult.score >= 0 && evalResult.score <= 100
+        ? Math.round(evalResult.score)
         : 50;
-      const feedback = typeof parsed.feedback === "string" ? parsed.feedback.slice(0, 500) : "";
-      const corrections = typeof parsed.corrections === "string" ? parsed.corrections.slice(0, 500) : "";
+      const feedback = typeof evalResult.feedback === "string" ? evalResult.feedback.slice(0, 500) : "";
+      const corrections = typeof evalResult.corrections === "string" ? evalResult.corrections.slice(0, 500) : "";
 
       // ── Safety net: apply self-contradiction guards ONLY when the source
       // is GPT (not Claude). GPT-4o has a documented bias where it scores
@@ -727,11 +767,10 @@ Student's ${learnName} answer: ${userAnswer}`;
     // Tutors
     jisu:      "ko-KR-Neural2-A",  // 따뜻한 여성
     minjun:    "ko-KR-Neural2-C",  // 젊은 남성
-    sujin:     "ko-KR-Neural2-B",  // 수진 — 차분한 여성 (tutor alias)
+    sujin:     "ko-KR-Neural2-B",  // 수진 — 차분한 여성
     minho_tutor: "ko-KR-Neural2-C", // 민호 — 젊은 남성 (tutor alias)
     // NPCs with specific voices
     youngsook: "ko-KR-Neural2-A",  // 할머니 영숙 — 따뜻한 여성
-    sujin:     "ko-KR-Neural2-B",  // 수진 — 차분한 여성
     minho:     "ko-KR-Neural2-C",  // 민호 — 젊은 남성
   };
   // Fallback: Azure Korean voice name → Google voice
@@ -764,7 +803,7 @@ Student's ${learnName} answer: ${userAnswer}`;
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error("Google TTS error:", res.status, errText);
+      logProviderError("Google TTS error:", res.status, errText);
       throw new Error(`Google TTS failed: ${res.status}`);
     }
 
@@ -839,8 +878,8 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       if (!azureRes.ok) {
         const azureErr = await azureRes.text();
-        console.error("Azure TTS error:", azureRes.status, azureErr);
-        return res.status(502).json({ error: "TTS failed", azureStatus: azureRes.status, azureError: azureErr, region: azureRegion });
+        logProviderError("Azure TTS error:", azureRes.status, azureErr);
+        return res.status(502).json({ error: "TTS failed" });
       }
 
       res.set("Content-Type", "audio/mpeg");
@@ -994,7 +1033,7 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       if (!azureRes.ok) {
         const errText = await azureRes.text();
-        console.error("Azure TTS error:", azureRes.status, errText);
+        logProviderError("Azure pronunciation TTS error:", azureRes.status, errText);
         return res.status(502).json({ error: "Azure TTS failed" });
       }
 
@@ -1074,19 +1113,24 @@ Student's ${learnName} answer: ${userAnswer}`;
           "Ocp-Apim-Subscription-Key": key,
           "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000",
         },
-        body: wavBuffer,
+        body: wavBuffer as unknown as BodyInit,
         signal: sttController.signal,
       });
 
       if (!azureRes.ok) {
         const errText = await azureRes.text();
-        console.error("[stt] Azure error:", azureRes.status, errText);
+        logProviderError("[stt] Azure error:", azureRes.status, errText);
         return res.status(502).json({ error: "STT failed" });
       }
 
       const data = (await azureRes.json()) as { RecognitionStatus: string; DisplayText?: string; NBest?: { Display?: string; Lexical?: string }[] };
       const text = data.DisplayText ?? data.NBest?.[0]?.Display ?? "";
-      console.log(`[stt] Azure status=${data.RecognitionStatus}  text="${text}"`);
+      // PII guard: never log raw learner transcripts in production.
+      if (isVerboseVoiceLogging()) {
+        console.log(`[stt] Azure status=${data.RecognitionStatus}  text="${text}"`);
+      } else {
+        console.log(`[stt] Azure status=${data.RecognitionStatus}  text=${redactTranscript(text)}`);
+      }
       res.json({ text, status: data.RecognitionStatus });
     } catch (err) {
       console.error("[stt] error:", err);
@@ -1208,27 +1252,37 @@ Student's ${learnName} answer: ${userAnswer}`;
             "Content-Type": azureContentType,
             "Pronunciation-Assessment": assessmentConfig,
           },
-          body: wavBuffer,
+          body: wavBuffer as unknown as BodyInit,
           signal: assessController.signal,
         }
       );
 
       if (!azureRes.ok) {
         const errText = await azureRes.text();
-        console.error("[assess] Azure HTTP error:", azureRes.status, errText);
+        logProviderError("[assess] Azure HTTP error:", azureRes.status, errText);
         return res.status(500).json({ error: "Azure assessment failed" });
       }
 
       // Azure may return scores nested under PronunciationAssessment OR flat on NBest[0]
       const data = await azureRes.json();
-      console.log(`[assess] Azure full response:`, JSON.stringify(data).slice(0, 2000));
+      // PII guard: full Azure response includes DisplayText and per-word phoneme
+      // confidence — strict dev-only. Production logs see only status + score band.
+      if (isVerboseVoiceLogging()) {
+        console.log(`[assess] Azure full response:`, JSON.stringify(data).slice(0, 2000));
+      }
 
       const nb0 = (data as any).NBest?.[0];
       // Support both nested (PronunciationAssessment.PronScore) and flat (PronScore) formats
       const pa = nb0?.PronunciationAssessment;
       const pronScoreRaw = pa?.PronScore ?? nb0?.PronScore;
       const hasPronScore = pronScoreRaw != null;
-      console.log(`[assess] Azure status=${data.RecognitionStatus}  display="${data.DisplayText}"  hasPronScore=${hasPronScore}  PronScore=${pronScoreRaw}  nested=${pa != null}`);
+      // PII guard: DisplayText is the raw learner transcript. Production logs only
+      // a content-free summary (length + score band).
+      if (isVerboseVoiceLogging()) {
+        console.log(`[assess] Azure status=${data.RecognitionStatus}  display="${data.DisplayText}"  hasPronScore=${hasPronScore}  PronScore=${pronScoreRaw}  nested=${pa != null}`);
+      } else {
+        console.log(`[assess] Azure status=${data.RecognitionStatus}  display=${redactTranscript(data.DisplayText)}  hasPronScore=${hasPronScore}  PronScore=${pronScoreRaw}`);
+      }
 
       // Localized feedback helper based on sttLang
       const isKo = sttLang.startsWith("ko");
@@ -1239,6 +1293,7 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       if (data.RecognitionStatus !== "Success" || !hasPronScore) {
         return res.json({
+          success: false,
           score: 0,
           accuracyScore: 0,
           fluencyScore: 0,
@@ -1288,6 +1343,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       const prosodyScore = Math.round(pa?.ProsodyScore ?? nb0?.ProsodyScore ?? 0);
 
       res.json({
+        success: true,
         score: pronScore,
         accuracyScore,
         fluencyScore,
@@ -1512,7 +1568,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       );
       if (!azureRes.ok) {
         const errText = await azureRes.text();
-        console.error("NPC TTS error:", azureRes.status, errText);
+        logProviderError("NPC TTS error:", azureRes.status, errText);
         return res.status(502).json({ error: "NPC TTS failed" });
       }
       res.set("Content-Type", "audio/mpeg");

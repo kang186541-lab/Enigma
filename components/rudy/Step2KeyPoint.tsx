@@ -73,7 +73,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   const shakeAnim    = useRef(new Animated.Value(0)).current;
 
   const apiBase    = getApiUrl();
-  const quiz: FillBlankQuiz | undefined = data.quizzes[quizIdx];
+  const currentQuiz: FillBlankQuiz | undefined = data.quizzes[quizIdx];
   const speechLang = SPEECH_LANG_MAP[learningLang] ?? "en-US";
 
   // Cleanup on unmount
@@ -87,7 +87,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   // Skip unsupported quiz types (e.g. "listening" without promptWithBlank)
   useEffect(() => {
     if (screenPhase !== "quiz") return;
-    if (quiz && quiz.promptWithBlank) return;
+    if (currentQuiz?.promptWithBlank && currentQuiz.answer && currentQuiz.fullSentence) return;
     if (quizIdx < data.quizzes.length - 1) {
       setQuizIdx(i => i + 1);
       setQuizPhase("question");
@@ -100,7 +100,28 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     } else {
       onComplete(correctCount);
     }
-  }, [quizIdx, screenPhase]);
+  }, [correctCount, currentQuiz, data.quizzes.length, onComplete, quizIdx, screenPhase]);
+
+  // Only enforce the quiz-shape guard when we're actually about to render the
+  // quiz. Without this scoping, a lesson whose first quiz is a listening-only
+  // shape (no promptWithBlank/answer/fullSentence) would return null during
+  // the explanation phase too — leaving the user on a blank screen because
+  // the skip effect only advances in quiz phase. Allowing the explanation
+  // render gives the user a path to tap "OK", which transitions to quiz
+  // phase and lets the skip effect handle the unsupported quiz.
+  if (screenPhase === "quiz" && (!currentQuiz?.promptWithBlank || !currentQuiz.answer || !currentQuiz.fullSentence)) {
+    return null;
+  }
+
+  // Type assertion for downstream quiz handlers/JSX. These are only invoked
+  // from the quiz-phase render branch, which is gated above by the guard.
+  // During explanation phase the cast claims fields that may be undefined,
+  // but no code path reads them then.
+  const quiz = currentQuiz as FillBlankQuiz & {
+    promptWithBlank: string;
+    answer: string;
+    fullSentence: string;
+  };
 
   function startPulse() {
     pulseLoop.current = Animated.loop(
@@ -556,7 +577,9 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
           {/* Full sentence display */}
           <View style={s.fullSentenceCard}>
             <Text style={s.fullSentenceText}>{quiz.fullSentence}</Text>
-            <Text style={s.fullSentenceMeaning}>{getMeaning(quiz.fullSentenceMeaning, lc)}</Text>
+            <Text style={s.fullSentenceMeaning}>
+              {quiz.fullSentenceMeaning ? getMeaning(quiz.fullSentenceMeaning, lc) : quiz.fullSentence}
+            </Text>
           </View>
 
           {/* Listen + mic row */}

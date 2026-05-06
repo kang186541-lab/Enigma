@@ -252,7 +252,7 @@ Preferred communication style: Simple, everyday language.
 
 - **Framework:** Express 5 (`server/index.ts`)
 - **Purpose:** Minimal at this stage — serves as a backend scaffold. No active API routes are defined yet beyond the HTTP server creation
-- **CORS:** Configured to allow Replit dev/deploy domains and localhost for Expo web
+- **CORS:** Configured to allow Replit dev/deploy domains, localhost for Expo web in development, and exact production browser origins from `CORS_ALLOWED_ORIGINS`
 - **Storage layer:** `server/storage.ts` defines a `MemStorage` class (in-memory user store with get/create methods) as a placeholder until database integration is completed
 - **Build:** `esbuild` bundles the server for production; `tsx` runs it in development
 
@@ -323,6 +323,7 @@ Preferred communication style: Simple, everyday language.
 - `@expo-google-fonts/inter` — Inter font family (loaded at app root)
 
 ### Deployment / Dev Tooling
-- Runs on Replit; `REPLIT_DEV_DOMAIN` and `REPLIT_INTERNAL_APP_DOMAIN` env vars used to configure CORS and the Expo packager proxy URL
+- Runs on Replit; `REPLIT_DEV_DOMAIN` and `REPLIT_DOMAINS` env vars are automatically allowed by backend CORS when present
 - `EXPO_PUBLIC_DOMAIN` env var used by the frontend's API client (`lib/query-client.ts`) to construct backend URLs
+- `CORS_ALLOWED_ORIGINS` env var required for production browser/API access when the frontend origin is not covered by Replit env vars. Set it to exact frontend origins, including `https://` and any port, separated by commas. Example: `CORS_ALLOWED_ORIGINS=https://enigma.example.com,https://www.enigma.example.com`
 - `DATABASE_URL` env var required for Drizzle/PostgreSQL connection

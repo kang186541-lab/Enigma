@@ -67,6 +67,9 @@ export default function RudyLessonScreen() {
   const [grammarNotes, setGrammarNotes] = useState<string[]>([]);
   const [progress, setProgress] = useState<DailyCourseProgress | null>(null);
   const [briefingMsg] = useState(() => getRandomBriefing(nativeLang));
+  // Tracks whether this completion is the FIRST clear of this day —
+  // used by CompleteScreen to grant XP only once (no double rewards on replay).
+  const [wasFirstClear, setWasFirstClear] = useState(false);
 
   const day = findDayById(dayId ?? "");
   const TOTAL_STEPS = 4;
@@ -103,6 +106,7 @@ export default function RudyLessonScreen() {
     try {
       const now = { ...progress };
       const isFirstClear = !now.completedDays.includes(day.id);
+      setWasFirstClear(isFirstClear);
       if (isFirstClear) {
         now.completedDays = [...now.completedDays, day.id];
       }
@@ -180,6 +184,7 @@ export default function RudyLessonScreen() {
       usedVoiceOnly={usedVoiceOnly}
       grammarNotes={grammarNotes}
       insets={insets}
+      wasFirstClear={wasFirstClear}
     />;
   }
 
@@ -658,14 +663,19 @@ function NoContentCard({
 // ── Complete Screen ──────────────────────────────────────────────────────────
 
 function CompleteScreen({
-  day, nativeLang, lc, sentenceCount, pronScores, usedVoiceOnly, grammarNotes, insets,
+  day, nativeLang, lc, sentenceCount, pronScores, usedVoiceOnly, grammarNotes, insets, wasFirstClear,
 }: {
   day: DayData; nativeLang: string; lc: "ko" | "en" | "es";
   sentenceCount: number; pronScores: number[]; usedVoiceOnly: boolean;
   grammarNotes: string[]; insets: ReturnType<typeof useSafeAreaInsets>;
+  /** True only when the learner cleared this day for the first time — gates the global XP grant. */
+  wasFirstClear: boolean;
 }) {
+  const { stats, updateStats } = useLanguage();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.7)).current;
+  // Guards against double-grant if the screen re-mounts (e.g. fast refresh during dev).
+  const xpGrantedRef = useRef(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -681,6 +691,16 @@ function CompleteScreen({
     : 0;
   const pronBonus = avgPron >= 90;
   const totalXP = rewards.xp + (usedVoiceOnly ? rewards.bonusAllVoice : 0) + (pronBonus ? rewards.bonusPronunciation : 0);
+
+  // Grant XP to global stats — only on first clear, only once per mount.
+  // Replays of the same day show the completion screen but do NOT re-award XP.
+  useEffect(() => {
+    if (!wasFirstClear || xpGrantedRef.current) return;
+    xpGrantedRef.current = true;
+    updateStats({ xp: stats.xp + totalXP }).catch((e) =>
+      console.warn("[RudyLesson] global XP update failed:", e),
+    );
+  }, [stats.xp, totalXP, updateStats, wasFirstClear]);
 
   // Find next day topic
   const allDays = UNITS.flatMap((u) => u.days);

@@ -574,7 +574,7 @@ export default function BasicCourseScreen() {
   const [greetPhase, setGreetPhase]   = useState<GreetPhase>("listen");
   const [greetScore, setGreetScore]   = useState<number | null>(null);
   const mediaRecorderRef              = useRef<any>(null);
-  const audioChunksRef                = useRef<Uint8Array[]>([]);
+  const audioChunksRef                = useRef<Blob[]>([]);
 
   const flipAnim  = useRef(new Animated.Value(0)).current;
   const xpAnim    = useRef(new Animated.Value(0)).current;

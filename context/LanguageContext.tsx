@@ -55,6 +55,7 @@ export interface LanguageContextType {
   learningLanguage: NativeLanguage | null;
   setLearningLanguage: (lang: NativeLanguage) => Promise<void>;
   hasOnboarded: boolean;
+  isHydrated: boolean;
   stats: UserStats;
   updateStats: (updates: Partial<UserStats>) => Promise<void>;
   t: (key: string) => string;
@@ -244,12 +245,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [nativeLanguage, setNativeLanguageState] = useState<NativeLanguage | null>(null);
   const [learningLanguage, setLearningLanguageState] = useState<NativeLanguage | null>(null);
   const [hasOnboarded, setHasOnboarded] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [pendingLevelUp, setPendingLevelUp] = useState<Level | null>(null);
+  // Zero-state defaults for new users. Real values are loaded from
+  // AsyncStorage in the effect below, so existing users see no regression.
   const [stats, setStats] = useState<UserStats>({
-    streak: 7,
-    wordsLearned: 142,
-    accuracy: 87,
-    xp: 1250,
+    streak: 0,
+    wordsLearned: 0,
+    accuracy: 0,
+    xp: 0,
   });
 
   useEffect(() => {
@@ -270,7 +274,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         if (statsStr) {
           setStats(JSON.parse(statsStr));
         }
-      } catch (e) { console.warn('[LanguageContext] Failed to load saved preferences:', e); }
+      } catch (e) {
+        console.warn('[LanguageContext] Failed to load saved preferences:', e);
+      } finally {
+        setIsHydrated(true);
+      }
     })();
   }, []);
 
@@ -318,7 +326,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, stats, updateStats, t, pendingLevelUp, clearLevelUp }}>
+    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, isHydrated, stats, updateStats, t, pendingLevelUp, clearLevelUp }}>
       {children}
     </LanguageContext.Provider>
   );

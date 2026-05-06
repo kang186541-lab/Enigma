@@ -95,7 +95,7 @@ export async function scheduleDailyReminder(
 export async function scheduleStreakWarning(lang: "ko" | "en" | "es" = "ko"): Promise<void> {
   if (Platform.OS === "web" || !Notifications) return;
 
-  await Notifications.cancelScheduledNotificationAsync("streak-warning").catch((e) => console.warn('[Notif] cancel streak-warning failed:', e));
+  await Notifications.cancelScheduledNotificationAsync("streak-warning").catch((e: unknown) => console.warn('[Notif] cancel streak-warning failed:', e));
 
   await Notifications.scheduleNotificationAsync({
     content: {
@@ -120,7 +120,7 @@ export async function scheduleSrsReminder(
 ): Promise<void> {
   if (Platform.OS === "web" || !Notifications || dueCount <= 0) return;
 
-  await Notifications.cancelScheduledNotificationAsync("srs-reminder").catch((e) => console.warn('[Notif] cancel srs-reminder failed:', e));
+  await Notifications.cancelScheduledNotificationAsync("srs-reminder").catch((e: unknown) => console.warn('[Notif] cancel srs-reminder failed:', e));
 
   await Notifications.scheduleNotificationAsync({
     content: {
@@ -139,7 +139,7 @@ export async function scheduleSrsReminder(
 /** Cancel daily reminder */
 export async function cancelDailyReminder(): Promise<void> {
   if (Platform.OS === "web" || !Notifications) return;
-  await Notifications.cancelScheduledNotificationAsync("daily-reminder").catch((e) => console.warn('[Notif] cancel daily-reminder failed:', e));
+  await Notifications.cancelScheduledNotificationAsync("daily-reminder").catch((e: unknown) => console.warn('[Notif] cancel daily-reminder failed:', e));
 }
 
 /** Cancel all scheduled notifications */
