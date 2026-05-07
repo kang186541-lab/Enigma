@@ -406,6 +406,10 @@ function DoorVisual({
     inputRange: [0, 0.55, 1],
     outputRange: [0.05, 0.45, 0.96],
   });
+  const completionOverlayOpacity = completionGlow.interpolate({
+    inputRange: [0, 0.18, 1],
+    outputRange: [0, 0.35, 1],
+  });
 
   return (
     <View style={styles.doorStage}>
@@ -418,11 +422,25 @@ function DoorVisual({
             <View style={styles.doorPanel} />
             <View style={styles.doorPanel} />
           </View>
-          <Animated.View style={[styles.crack, styles.crackA, { backgroundColor: pulseColor, transform: [{ scaleY: crackScale }] }]} />
-          <Animated.View style={[styles.crack, styles.crackB, { backgroundColor: pulseColor, transform: [{ scaleY: crackScale }] }]} />
-          <Animated.View style={[styles.doorLight, { opacity: doorOpenOpacity }]} />
         </View>
       )}
+      <Animated.View pointerEvents="none" style={[styles.doorCompletionOverlay, { opacity: completionOverlayOpacity }]}>
+        <Animated.View style={[styles.doorLight, { opacity: doorOpenOpacity }]} />
+        <Animated.View
+          style={[
+            styles.crack,
+            styles.crackA,
+            { backgroundColor: pulseColor, transform: [{ rotate: "-12deg" }, { scaleY: crackScale }] },
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.crack,
+            styles.crackB,
+            { backgroundColor: pulseColor, transform: [{ rotate: "17deg" }, { scaleY: crackScale }] },
+          ]}
+        />
+      </Animated.View>
       <View style={styles.slotHaloRow}>
         {[0, 1, 2, 3].map((i) => <Animated.View key={i} style={[styles.slotHalo, { borderColor: pulseColor }]} />)}
       </View>
@@ -547,6 +565,10 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: "100%",
     height: "100%",
+  },
+  doorCompletionOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
   },
   drawnDoor: {
     width: "62%",

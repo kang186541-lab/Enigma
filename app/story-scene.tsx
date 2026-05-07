@@ -41,10 +41,23 @@ const rudyStoryImg = require("@/assets/rudy_story.png");
 const ch1BossDoorImg = require("@/assets/story/chapter1_motion_comic/ch1_boss_door.png");
 const ch1TomPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_tom.png");
 const ch1EleanorPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_eleanor.png");
+const ch1EllisPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_ellis.png");
+const ch1MrBlackPortraitImg = require("@/assets/story/chapter1_motion_comic/mr_black_portrait.png");
 const ch2BossStageImg = require("@/assets/story/chapter2_motion_comic/ch2_boss_stage.png");
+const ch2IsabelPortraitImg = require("@/assets/story/chapter2_motion_comic/ch2_portrait_isabel.png");
+const ch2MiguelPortraitImg = require("@/assets/story/chapter2_motion_comic/ch2_portrait_miguel.png");
+const ch2CarlosPortraitImg = require("@/assets/story/chapter2_motion_comic/ch2_portrait_carlos.png");
 const ch3BossPalaceImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace.png");
+const ch3MinhoPortraitImg = require("@/assets/story/chapter3_motion_comic/ch3_portrait_minho.png");
+const ch3YoungsookPortraitImg = require("@/assets/story/chapter3_motion_comic/ch3_portrait_youngsook.png");
+const ch3SujinPortraitImg = require("@/assets/story/chapter3_motion_comic/ch3_portrait_sujin.png");
 const ch4BossArchiveImg = require("@/assets/story/chapter4_motion_comic/ch4_boss_archive.png");
+const ch4MiraPortraitImg = require("@/assets/story/chapter4_motion_comic/ch4_portrait_mira.png");
+const ch4AmiraPortraitImg = require("@/assets/story/chapter4_motion_comic/ch4_portrait_amira.png");
+const ch4HassanPortraitImg = require("@/assets/story/chapter4_motion_comic/ch4_portrait_hassan.png");
+const ch4BlackPartialPortraitImg = require("@/assets/story/chapter4_motion_comic/ch4_portrait_black_partial.png");
 const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
+const ch5PennyPortraitImg = require("@/assets/story/chapter5_motion_comic/ch5_portrait_penny.png");
 const ch5BlackFaceImg = require("@/assets/story/chapter5_motion_comic/ch5_intro_black_face.png");
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
@@ -640,6 +653,7 @@ const STORIES: Record<string, Story> = {
         nameKo: "엘리스 박사",
         side: "right",
         avatarBg: "#2A1A3A",
+        portrait: ch1EllisPortraitImg,
       },
       {
         id: "mr_black",
@@ -648,6 +662,7 @@ const STORIES: Record<string, Story> = {
         nameKo: "미스터 블랙",
         side: "right",
         avatarBg: "#0A0A0A",
+        portrait: ch1MrBlackPortraitImg,
       },
     ],
     sequence: [
@@ -3003,9 +3018,9 @@ const MADRID_V21_STORY: Story = {
   },
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
-    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", side: "right", avatarBg: "#C8232C" },
-    { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", side: "right", avatarBg: "#8B5A2B" },
-    { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", side: "right", avatarBg: "#6E4A35" },
+    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", side: "right", avatarBg: "#C8232C", portrait: ch2IsabelPortraitImg },
+    { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", side: "right", avatarBg: "#8B5A2B", portrait: ch2MiguelPortraitImg },
+    { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", side: "right", avatarBg: "#6E4A35", portrait: ch2CarlosPortraitImg },
     { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg },
   ],
   sequence: [
@@ -3369,9 +3384,9 @@ const SEOUL_V21_STORY: Story = {
   },
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
-    { id: "minho", emoji: "🚕", name: "Minho", nameKo: "민호", side: "right", avatarBg: "#1F6F8B" },
-    { id: "youngsook", emoji: "🍲", name: "Youngsook", nameKo: "영숙", side: "right", avatarBg: "#A15C38" },
-    { id: "sujin", emoji: "🔬", name: "Dr. Sujin Han", nameKo: "한수진 박사", side: "right", avatarBg: "#4C6B4F" },
+    { id: "minho", emoji: "🚕", name: "Minho", nameKo: "민호", side: "right", avatarBg: "#1F6F8B", portrait: ch3MinhoPortraitImg },
+    { id: "youngsook", emoji: "🍲", name: "Youngsook", nameKo: "영숙", side: "right", avatarBg: "#A15C38", portrait: ch3YoungsookPortraitImg },
+    { id: "sujin", emoji: "🔬", name: "Dr. Sujin Han", nameKo: "한수진 박사", side: "right", avatarBg: "#4C6B4F", portrait: ch3SujinPortraitImg },
     { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg },
   ],
   sequence: [
@@ -3817,10 +3832,10 @@ const CAIRO_V21_STORY: Story = {
   },
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
-    { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", side: "right", avatarBg: "#2F4A34" },
-    { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", side: "right", avatarBg: "#7A4D19" },
-    { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", side: "right", avatarBg: "#5A3216" },
-    { id: "black_partial", emoji: "◼", name: "A Voice in Shadow", nameKo: "그림자 속 목소리", side: "right", avatarBg: "#050505" },
+    { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", side: "right", avatarBg: "#2F4A34", portrait: ch4MiraPortraitImg },
+    { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", side: "right", avatarBg: "#7A4D19", portrait: ch4AmiraPortraitImg },
+    { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", side: "right", avatarBg: "#5A3216", portrait: ch4HassanPortraitImg },
+    { id: "black_partial", emoji: "◼", name: "A Voice in Shadow", nameKo: "그림자 속 목소리", side: "right", avatarBg: "#050505", portrait: ch4BlackPartialPortraitImg },
     { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg },
   ],
   sequence: [
@@ -4234,13 +4249,13 @@ const BABEL_V21_STORY: Story = {
   },
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
-    { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", side: "right", avatarBg: "#1A0A2A" },
+    { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", side: "right", avatarBg: "#1A0A2A", portrait: ch5PennyPortraitImg },
     { id: "tom", emoji: "💂", name: "Tom", nameKo: "톰", side: "left", avatarBg: "#1E2A3A", portrait: ch1TomPortraitImg },
-    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", side: "right", avatarBg: "#3A1A0A" },
-    { id: "sujin", emoji: "👩‍🔬", name: "Sujin", nameKo: "수진", side: "left", avatarBg: "#1A2A3A" },
-    { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", side: "right", avatarBg: "#7A4D19" },
-    { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", side: "right", avatarBg: "#2A1A0A" },
-    { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", side: "right", avatarBg: "#2F4A34" },
+    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", side: "right", avatarBg: "#3A1A0A", portrait: ch2IsabelPortraitImg },
+    { id: "sujin", emoji: "👩‍🔬", name: "Sujin", nameKo: "수진", side: "left", avatarBg: "#1A2A3A", portrait: ch3SujinPortraitImg },
+    { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", side: "right", avatarBg: "#7A4D19", portrait: ch4AmiraPortraitImg },
+    { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", side: "right", avatarBg: "#2A1A0A", portrait: ch4HassanPortraitImg },
+    { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", side: "right", avatarBg: "#2F4A34", portrait: ch4MiraPortraitImg },
     { id: "mr_black", emoji: "🕴️", name: "Mr. Black", nameKo: "미스터 블랙", side: "right", avatarBg: "#050505", portrait: ch5BlackFaceImg },
   ],
   sequence: [
@@ -6347,7 +6362,7 @@ export default function StoryScene() {
       })
       .catch((e) => {
         console.warn("[Story] intro flag load failed:", e);
-        if (mounted) setIntroStatus("hidden");
+        if (mounted) setIntroStatus(forceIntro ? "visible" : "hidden");
       });
 
     return () => {
@@ -6414,9 +6429,13 @@ export default function StoryScene() {
   const sceneCount = seq.slice(0, seqIdx).filter((s) => s.kind === "scene").length;
 
   function fadeTransition(cb: () => void) {
-    Animated.timing(fadeAnim, { toValue: 0, duration: 180, useNativeDriver: true }).start(() => {
+    // Fade-out 100ms (was 180) + fade-in 120ms (was 250) = ~220ms total transition.
+    // Web (react-native-web) animations fall back to JS-based and feel slower than
+    // native; tighter durations reduce the "scene appears blank" perception during
+    // dialogue/scene changes without breaking the cross-fade illusion.
+    Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
       cb();
-      Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }).start();
+      Animated.timing(fadeAnim, { toValue: 1, duration: 120, useNativeDriver: true }).start();
     });
   }
 
