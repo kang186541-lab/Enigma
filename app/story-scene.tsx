@@ -4965,6 +4965,16 @@ function DialogueChoicePuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
   }
 
   function handleNext() {
+    // Block advancement on a wrong-confirmed answer; the puzzle is a
+    // language-production check, so let the learner re-attempt instead of
+    // silently passing them through. Mirrors the WordMatchPuzzle "stay until
+    // correct" semantics.
+    if (selected !== answer) {
+      setConfirmed(false);
+      setSelected(null);
+      onResetHints?.();
+      return;
+    }
     if (idx < puzzle.questions.length - 1) { setIdx((i) => i + 1); setSelected(null); setConfirmed(false); onResetHints?.(); }
     else setSolved(true);
   }
@@ -6428,14 +6438,18 @@ export default function StoryScene() {
   }, [seqIdx]);
   const sceneCount = seq.slice(0, seqIdx).filter((s) => s.kind === "scene").length;
 
-  function fadeTransition(cb: () => void) {
+  function fadeTransition(cb: () => void, onFullyDone?: () => void) {
     // Fade-out 100ms (was 180) + fade-in 120ms (was 250) = ~220ms total transition.
     // Web (react-native-web) animations fall back to JS-based and feel slower than
     // native; tighter durations reduce the "scene appears blank" perception during
     // dialogue/scene changes without breaking the cross-fade illusion.
+    // `onFullyDone` fires after the fade-in completes so callers can release
+    // reentrancy guards covering the whole transition window.
     Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
       cb();
-      Animated.timing(fadeAnim, { toValue: 1, duration: 120, useNativeDriver: true }).start();
+      Animated.timing(fadeAnim, { toValue: 1, duration: 120, useNativeDriver: true }).start(() => {
+        onFullyDone?.();
+      });
     });
   }
 
@@ -6444,6 +6458,14 @@ export default function StoryScene() {
   // second press (or press when already done) → actually advance to next scene.
   const typewriterRef = useRef<TypewriterHandle | null>(null);
   const [typingDone, setTypingDone] = useState(false);
+
+  // Reentrancy guard for advance(). Without this, rapid taps queue multiple
+  // fadeTransition callbacks each calling setSeqIdx(i => i + 1), so the user
+  // can skip past unsolved puzzle nodes in the sequence (puzzles 2/3/4 of a
+  // chapter would silently disappear under impatient tapping). Ref true while
+  // a fade-out → seqIdx update → fade-in is in flight; released by the
+  // fadeTransition `onFullyDone` callback.
+  const advancingRef = useRef(false);
 
   // Reset typing-done flag whenever we move to a new scene; the Typewriter
   // component itself resets internally via its `text` prop change, but the
@@ -6460,6 +6482,10 @@ export default function StoryScene() {
       Haptics.selectionAsync();
       return;
     }
+
+    // Reentrancy guard: drop additional taps while a transition is in flight.
+    if (advancingRef.current) return;
+    advancingRef.current = true;
 
     setSharedHintVisible(false);
     setSharedHintLevel(0);
@@ -6484,13 +6510,18 @@ export default function StoryScene() {
       }
     }
 
-    fadeTransition(() => {
-      if (seqIdx < seq.length - 1) {
-        setSeqIdx((i) => i + 1);
-      } else {
-        finishChapter();
-      }
-    });
+    fadeTransition(
+      () => {
+        if (seqIdx < seq.length - 1) {
+          setSeqIdx((i) => i + 1);
+        } else {
+          finishChapter();
+        }
+      },
+      () => {
+        advancingRef.current = false;
+      },
+    );
   }
 
   async function finishChapter() {
