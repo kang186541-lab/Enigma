@@ -6467,11 +6467,22 @@ export default function StoryScene() {
   // fadeTransition `onFullyDone` callback.
   const advancingRef = useRef(false);
 
+  // Reentrancy guard for handlePuzzleSolved(). The advance() guard alone is
+  // not enough because handlePuzzleSolved is async: rapid taps on the
+  // PuzzleSolvedBadge "Continue" can each enter handlePuzzleSolved, await
+  // awardXp(20) (so +20 XP fires per tap) before any of them reach advance(),
+  // where the second/third advance is finally dropped. The skip is blocked,
+  // but XP and tracking side effects already double-fired. Ref is set on
+  // entry and cleared when seqIdx changes (i.e., after the new scene mounts
+  // and the badge is no longer on screen).
+  const puzzleSolvingRef = useRef(false);
+
   // Reset typing-done flag whenever we move to a new scene; the Typewriter
   // component itself resets internally via its `text` prop change, but the
   // parent needs this for the ▼ blink indicator.
   useEffect(() => {
     setTypingDone(false);
+    puzzleSolvingRef.current = false;
   }, [seqIdx]);
 
   function advance() {
@@ -6539,6 +6550,12 @@ export default function StoryScene() {
   }
 
   async function handlePuzzleSolved() {
+    // Reentrancy guard: drop rapid Continue taps so awardXp + tracking side
+    // effects only fire once per puzzle solve. Released when seqIdx changes
+    // (badge has been replaced by the next scene).
+    if (puzzleSolvingRef.current) return;
+    puzzleSolvingRef.current = true;
+
     await awardXp(20, "handlePuzzleSolved");
 
     // Track expressions and I/O ratio for inline puzzles
