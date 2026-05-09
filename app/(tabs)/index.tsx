@@ -27,6 +27,7 @@ import {
   UNITS,
   getTri,
   langToCode,
+  getCefrTierLabel,
   type DailyCourseProgress,
 } from "@/lib/dailyCourseData";
 import { getDueCount } from "@/lib/srsManager";
@@ -663,9 +664,10 @@ function RudyTrainingCard({
   const stepsCompleted = Object.values(steps).filter(Boolean).length;
   const totalSteps = 4;
 
-  const levelLabel = nativeLang === "korean" ? `${currentUnit.level} · ${getTri(currentUnit.title, lc)}`
-    : nativeLang === "spanish" ? `${currentUnit.level} · ${getTri(currentUnit.title, lc)}`
-    : `${currentUnit.level} · ${getTri(currentUnit.title, lc)}`;
+  // Show Korean tier names (입문/기초/실전/심화) on the Korean home;
+  // international users keep CEFR codes that are familiar to them.
+  const tierLabel = getCefrTierLabel(currentUnit.level, nativeLang);
+  const levelLabel = `${tierLabel} · ${getTri(currentUnit.title, lc)}`;
 
   const dayLabel = nativeLang === "korean"
     ? `Day ${currentDay.dayNumber}: ${getTri(currentDay.topic, lc)}`

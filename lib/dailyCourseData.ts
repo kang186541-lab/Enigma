@@ -234,3 +234,26 @@ export const STEP_LABELS: Record<string, [string, string, string, string]> = {
   english: ["See", "Build", "Speak", "Review"],
   spanish: ["Ver", "Construir", "Hablar", "Repasar"],
 };
+
+/**
+ * Convert a CEFR level code (A1/A2/B1/B2) into a Korean-market tier label
+ * that mirrors how local English-learning brands (시원스쿨, 야나두, 뇌새김)
+ * talk about progression. International (en/es) users keep the raw CEFR
+ * code since it is the international standard they recognise.
+ *
+ * Mapping rationale:
+ *  A1 입문   – first contact / absolute beginner
+ *  A2 기초   – basic survival / core daily phrases
+ *  B1 실전   – real-world conversations
+ *  B2 심화   – deeper expression
+ */
+export function getCefrTierLabel(level: CourseLevel, nativeLang: string): string {
+  if (nativeLang !== "korean") return level;
+  switch (level) {
+    case "A1": return "입문";
+    case "A2": return "기초";
+    case "B1": return "실전";
+    case "B2": return "심화";
+    default:   return level;
+  }
+}

@@ -19,9 +19,11 @@ import {
   UNITS,
   getTri,
   langToCode,
+  getCefrTierLabel,
   type DailyCourseProgress,
   type UnitData,
   type DayData,
+  type CourseLevel,
 } from "@/lib/dailyCourseData";
 
 export default function RudyCourseScreen() {
@@ -104,7 +106,7 @@ export default function RudyCourseScreen() {
       <View style={styles.summaryCard}>
         <View style={styles.summaryRow}>
           <View style={styles.levelPill}>
-            <Text style={styles.levelPillText}>{progress.currentLevel}</Text>
+            <Text style={styles.levelPillText}>{getCefrTierLabel(progress.currentLevel as CourseLevel, nativeLang)}</Text>
           </View>
           <Text style={styles.summaryLabel}>
             {levelLabel}: {getTri(UNITS[progress.currentUnitIndex]?.title ?? UNITS[0].title, lc)}
@@ -149,7 +151,7 @@ export default function RudyCourseScreen() {
                     {getTri(unit.title, lc)}
                   </Text>
                 </View>
-                <Text style={styles.dropdownItemLevel}>{unit.level}</Text>
+                <Text style={styles.dropdownItemLevel}>{getCefrTierLabel(unit.level, nativeLang)}</Text>
               </Pressable>
             ))}
           </View>
