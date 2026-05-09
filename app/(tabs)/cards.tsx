@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
@@ -1254,6 +1254,40 @@ export default function CardsScreen() {
               ? "Completa lecciones o historias\npara añadir tarjetas automáticamente!"
               : "Complete lessons or stories\nto add cards automatically!"}
           </Text>
+          {/* F3 fix (UX agent review): empty SRS state had no CTA, leaving
+              the user stuck inside the Cards tab with no obvious next step.
+              Two routes — Rudy lesson (where SRS gets seeded) or the static
+              beginner deck (so they still get value from this screen). */}
+          <View style={{ flexDirection: "row", gap: 12, marginTop: 18 }}>
+            <Pressable
+              style={({ pressed }) => [
+                { paddingVertical: 12, paddingHorizontal: 18, borderRadius: 14, backgroundColor: C.gold },
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push("/rudy-course" as any);
+              }}
+            >
+              <Text style={{ fontFamily: F.label, color: C.bg1, fontSize: 13 }}>
+                {nativeLang === "korean" ? "🦊 오늘의 훈련 시작" : nativeLang === "spanish" ? "🦊 Comenzar entrenamiento" : "🦊 Start training"}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                { paddingVertical: 12, paddingHorizontal: 18, borderRadius: 14, borderWidth: 1, borderColor: C.gold },
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                switchDeck("beginner");
+              }}
+            >
+              <Text style={{ fontFamily: F.label, color: C.gold, fontSize: 13 }}>
+                {nativeLang === "korean" ? "초급 덱 →" : nativeLang === "spanish" ? "Mazo principiante →" : "Beginner deck →"}
+              </Text>
+            </Pressable>
+          </View>
         </ScrollView>
       ) : dailyComplete ? (
         <ScrollView

@@ -23,6 +23,7 @@ import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
 import { C, F } from "@/constants/theme";
 import { PhonemeCoaching } from "@/components/rudy/PhonemeCoaching";
+import { getCefrTierLabel } from "@/lib/dailyCourseData";
 
 const TAB_BAR_HEIGHT = 49;
 const SESSION_SIZE = 8;
@@ -1310,14 +1311,14 @@ export default function SpeakScreen() {
                 return (
                   <View style={styles.pronLevelRow}>
                     <View style={styles.pronLevelBadge}>
-                      <Text style={styles.pronLevelBadgeText}>{prog.current}</Text>
+                      <Text style={styles.pronLevelBadgeText}>{getCefrTierLabel(prog.current as "A1"|"A2"|"B1"|"B2", nativeLang)}</Text>
                     </View>
                     {prog.next ? (
                       <Text style={styles.pronLevelHint}>
-                        {prog.done}/{prog.total} → {prog.next}
+                        {prog.done}/{prog.total} → {getCefrTierLabel(prog.next as "A1"|"A2"|"B1"|"B2", nativeLang)}
                       </Text>
                     ) : (
-                      <Text style={styles.pronLevelHint}>Max Level 🏆</Text>
+                      <Text style={styles.pronLevelHint}>{nativeLang === "korean" ? "최고 단계 🏆" : nativeLang === "spanish" ? "Nivel máximo 🏆" : "Max Level 🏆"}</Text>
                     )}
                   </View>
                 );

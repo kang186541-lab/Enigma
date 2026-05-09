@@ -365,8 +365,11 @@ function LessonScreen({
     : nativeLang === "spanish" ? "Siguiente →"
     : "Next →";
 
-  const completeStepLabel = nativeLang === "korean" ? "STEP 완료 →"
-    : nativeLang === "spanish" ? "Completar STEP →"
+  // F2 fix (UX agent review): drop the English "STEP" remnant from the
+  // localised buttons — Korean header uses "단계", Spanish uses "PASO".
+  // Keeping "STEP" mid-sentence in those locales reads as half-translated.
+  const completeStepLabel = nativeLang === "korean" ? "단계 완료 →"
+    : nativeLang === "spanish" ? "Completar PASO →"
     : "Complete STEP →";
 
   const selfCompletes = SELF_COMPLETING_STEPS.includes(currentStep);
