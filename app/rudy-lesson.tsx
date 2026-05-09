@@ -345,10 +345,13 @@ function LessonScreen({
     ],
   };
 
+  // Use the new 뇌새김 frame step labels ("만들기/뱉기/복습") instead of
+  // generic "STEP N" text — keeps the see → build → speak → review story
+  // consistent across the lesson UI.
   const NEXT_STEP_LABELS: Record<string, string[]> = {
-    korean: ["STEP 2로 →", "STEP 3으로 →", "STEP 4로 →"],
-    spanish: ["Al STEP 2 →", "Al STEP 3 →", "Al STEP 4 →"],
-    english: ["To STEP 2 →", "To STEP 3 →", "To STEP 4 →"],
+    korean: [`${stepLabels[1]}로 →`, `${stepLabels[2]}로 →`, `${stepLabels[3]}으로 →`],
+    spanish: [`A ${stepLabels[1]} →`, `A ${stepLabels[2]} →`, `A ${stepLabels[3]} →`],
+    english: [`To ${stepLabels[1]} →`, `To ${stepLabels[2]} →`, `To ${stepLabels[3]} →`],
   };
 
   const completeMsgs = STEP_COMPLETE_MSGS[nativeLang] ?? STEP_COMPLETE_MSGS.english;
@@ -446,9 +449,9 @@ function LessonScreen({
           ]}>
             <Text style={styles.stepCompleteEmoji}>✅</Text>
             <Text style={styles.stepCompleteTitle}>
-              {nativeLang === "korean" ? `STEP ${currentStep + 1} 완료! 🎉`
-                : nativeLang === "spanish" ? `¡STEP ${currentStep + 1} Completado! 🎉`
-                : `STEP ${currentStep + 1} Complete! 🎉`}
+              {nativeLang === "korean" ? `${stepLabels[currentStep]} 완료! 🎉`
+                : nativeLang === "spanish" ? `¡${stepLabels[currentStep]} Completado! 🎉`
+                : `${stepLabels[currentStep]} Complete! 🎉`}
             </Text>
             <View style={styles.stepCompleteRudy}>
               <Text style={styles.stepCompleteRudyTag}>🦊 루디</Text>

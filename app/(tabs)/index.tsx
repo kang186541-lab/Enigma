@@ -271,7 +271,7 @@ export default function HomeScreen() {
     { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
   ];
 
-  const missionLabel  = nativeLang === "korean" ? "오늘의 훈련" : nativeLang === "spanish" ? "Entrenamiento de Hoy" : "Today's Training";
+  const missionLabel  = nativeLang === "korean" ? "오늘의 훈련 · 10분" : nativeLang === "spanish" ? "Entrenamiento · 10 min" : "Today's Training · 10 min";
   const npcMissionLabel = nativeLang === "korean" ? "실전 미션" : nativeLang === "spanish" ? "Misión Real" : "Real Mission";
   const npcMissionDesc  = nativeLang === "korean" ? "NPC와 실전 대화로 레벨업!" : nativeLang === "spanish" ? "¡Habla con NPC en escenarios reales!" : "Practice real-world conversations with NPCs!";
 
@@ -628,10 +628,10 @@ function RudyTrainingCard({
 }) {
   const lc = langToCode(nativeLang);
   const trainingLabel = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : "Rudy's Training Camp";
-  const startLabel    = nativeLang === "korean" ? "훈련 시작 →" : nativeLang === "spanish" ? "Comenzar →" : "Start Training →";
-  const doneMsg       = nativeLang === "korean" ? "오늘의 훈련 완료! 내일 봐, 파트너! 🦊"
-    : nativeLang === "spanish" ? "¡Entrenamiento completado! ¡Hasta mañana! 🦊"
-    : "Training complete! See you tomorrow, partner! 🦊";
+  const startLabel    = nativeLang === "korean" ? "10분 훈련 시작 →" : nativeLang === "spanish" ? "10 min, comenzar →" : "Start 10-min Training →";
+  const doneMsg       = nativeLang === "korean" ? "10분 훈련 완료! 내일 봐, 파트너! 🦊"
+    : nativeLang === "spanish" ? "¡10 min completados! ¡Hasta mañana! 🦊"
+    : "10 min done! See you tomorrow, partner! 🦊";
 
   if (!dailyProgress) {
     return (

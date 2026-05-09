@@ -679,7 +679,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
               }}
             >
               <Text style={s.inlineDoneBtnText}>
-                {nativeLang === "korean" ? "STEP 4로 →" : nativeLang === "spanish" ? "PASO 4 →" : "To STEP 4 →"}
+                {nativeLang === "korean" ? "복습으로 →" : nativeLang === "spanish" ? "A Repasar →" : "To Review →"}
               </Text>
             </Pressable>
           </View>

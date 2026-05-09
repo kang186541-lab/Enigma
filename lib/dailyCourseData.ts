@@ -225,8 +225,12 @@ export function getRandomBriefing(nativeLang: string): string {
   return msgs[Math.floor(Math.random() * msgs.length)];
 }
 
+// "보기 → 만들기 → 뱉기 → 복습" — 뇌새김 시그니처 3단 학습 프레임 + 복습.
+// 한국 사용자에게 친숙한 카피로 정렬한 4-step Rudy 레슨 라벨.
+// Step 컴포넌트 내부의 자세한 instruction text(예: "듣고 따라해보세요")는
+// 그대로 두고, 헤더/탭/완료 화면에 표시되는 짧은 step name만 이걸로 통일.
 export const STEP_LABELS: Record<string, [string, string, string, string]> = {
-  korean:  ["듣고 따라하기", "핵심 포인트", "미션 토크", "오늘의 복습"],
-  english: ["Listen & Repeat", "Key Point", "Mission Talk", "Review"],
-  spanish: ["Escuchar y Repetir", "Punto Clave", "Misión de Hablar", "Repaso"],
+  korean:  ["보기", "만들기", "뱉기", "복습"],
+  english: ["See", "Build", "Speak", "Review"],
+  spanish: ["Ver", "Construir", "Hablar", "Repasar"],
 };
