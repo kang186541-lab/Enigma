@@ -31,9 +31,15 @@ const DONE_KEY     = (lang: string) => `basicCourseCompleted_${lang}`;
 
 let _bcNativeSound: Audio.Sound | null = null;
 
+// Trilingual meaning so the explanation renders in the learner's NATIVE
+// language regardless of which course (ko/en/es) they are taking. Previously
+// `meaning` was a single string baked to one language per course, so a
+// Spanish-native learner taking the Korean course saw English explanations.
+type TriText = { ko: string; en: string; es: string };
+
 interface CharItem    { char: string; roman: string; tip: string; }
-interface WordItem    { word: string; meaning: string; emoji: string; }
-interface GreetingItem { phrase: string; meaning: string; usage: { ko: string; en: string; es: string }; }
+interface WordItem    { word: string; meaning: TriText; emoji: string; }
+interface GreetingItem { phrase: string; meaning: TriText; usage: TriText; }
 
 interface CourseData {
   stepNames: [string, string, string, string];
@@ -81,21 +87,21 @@ const COURSES: Record<string, CourseData> = {
       { char: "ㅣ", roman: "i",     tip: "이 · 입술을 옆으로 당겨요" },
     ],
     words: [
-      { word: "안녕",    meaning: "Hello (informal)",  emoji: "👋" },
-      { word: "감사해요", meaning: "Thank you",          emoji: "🙏" },
-      { word: "네",      meaning: "Yes",                emoji: "✅" },
-      { word: "아니요",  meaning: "No",                 emoji: "❌" },
-      { word: "물",      meaning: "Water",              emoji: "💧" },
-      { word: "밥",      meaning: "Rice / Meal",        emoji: "🍚" },
-      { word: "사람",    meaning: "Person",             emoji: "👤" },
-      { word: "집",      meaning: "House / Home",       emoji: "🏠" },
-      { word: "학교",    meaning: "School",             emoji: "🏫" },
-      { word: "사랑",    meaning: "Love",               emoji: "❤️" },
+      { word: "안녕",    meaning: { ko: "친한 사이의 인사",   en: "Hello (informal)",  es: "Hola (informal)" },     emoji: "👋" },
+      { word: "감사해요", meaning: { ko: "고마움 표현",         en: "Thank you",          es: "Gracias" },              emoji: "🙏" },
+      { word: "네",      meaning: { ko: "긍정 답변",           en: "Yes",                es: "Sí" },                   emoji: "✅" },
+      { word: "아니요",  meaning: { ko: "부정 답변",           en: "No",                 es: "No" },                   emoji: "❌" },
+      { word: "물",      meaning: { ko: "물",                  en: "Water",              es: "Agua" },                 emoji: "💧" },
+      { word: "밥",      meaning: { ko: "밥 / 식사",           en: "Rice / Meal",        es: "Arroz / Comida" },       emoji: "🍚" },
+      { word: "사람",    meaning: { ko: "사람",                en: "Person",             es: "Persona" },              emoji: "👤" },
+      { word: "집",      meaning: { ko: "집 / 가정",           en: "House / Home",       es: "Casa / Hogar" },         emoji: "🏠" },
+      { word: "학교",    meaning: { ko: "학교",                en: "School",             es: "Escuela" },              emoji: "🏫" },
+      { word: "사랑",    meaning: { ko: "사랑",                en: "Love",               es: "Amor" },                 emoji: "❤️" },
     ],
     greetings: [
-      { phrase: "안녕하세요", meaning: "Hello (formal)",     usage: { ko: "처음 만날 때 사용해요", en: "Used when greeting someone formally", es: "Al saludar a alguien formalmente" } },
-      { phrase: "감사합니다", meaning: "Thank you (formal)", usage: { ko: "공식적인 자리에서 감사할 때", en: "To show formal gratitude", es: "Para mostrar gratitud formalmente" } },
-      { phrase: "죄송합니다", meaning: "I'm sorry (formal)", usage: { ko: "공식적으로 사과할 때", en: "To apologise formally", es: "Para disculparse formalmente" } },
+      { phrase: "안녕하세요", meaning: { ko: "정중한 인사",       en: "Hello (formal)",     es: "Hola (formal)" },        usage: { ko: "처음 만날 때 사용해요",         en: "Used when greeting someone formally", es: "Al saludar a alguien formalmente" } },
+      { phrase: "감사합니다", meaning: { ko: "정중한 감사 표현",   en: "Thank you (formal)", es: "Gracias (formal)" },     usage: { ko: "공식적인 자리에서 감사할 때",   en: "To show formal gratitude",            es: "Para mostrar gratitud formalmente" } },
+      { phrase: "죄송합니다", meaning: { ko: "정중한 사과",       en: "I'm sorry (formal)", es: "Lo siento (formal)" },   usage: { ko: "공식적으로 사과할 때",           en: "To apologise formally",               es: "Para disculparse formalmente" } },
     ],
   },
 
@@ -124,22 +130,22 @@ const COURSES: Record<string, CourseData> = {
       } as Record<string, string>)[c] ?? c,
     })),
     words: [
-      { word: "Hello",     meaning: "안녕하세요", emoji: "👋" },
-      { word: "Thank you", meaning: "감사합니다", emoji: "🙏" },
-      { word: "Yes",       meaning: "네",        emoji: "✅" },
-      { word: "No",        meaning: "아니요",    emoji: "❌" },
-      { word: "Water",     meaning: "물",        emoji: "💧" },
-      { word: "Food",      meaning: "음식",      emoji: "🍽️" },
-      { word: "House",     meaning: "집",        emoji: "🏠" },
-      { word: "School",    meaning: "학교",      emoji: "🏫" },
-      { word: "Love",      meaning: "사랑",      emoji: "❤️" },
-      { word: "Friend",    meaning: "친구",      emoji: "🤝" },
+      { word: "Hello",     meaning: { ko: "안녕하세요",  en: "A greeting",       es: "Hola" },         emoji: "👋" },
+      { word: "Thank you", meaning: { ko: "감사합니다",  en: "Expression of thanks", es: "Gracias" },  emoji: "🙏" },
+      { word: "Yes",       meaning: { ko: "네",          en: "Affirmative",      es: "Sí" },           emoji: "✅" },
+      { word: "No",        meaning: { ko: "아니요",      en: "Negative",         es: "No" },           emoji: "❌" },
+      { word: "Water",     meaning: { ko: "물",          en: "Water",            es: "Agua" },         emoji: "💧" },
+      { word: "Food",      meaning: { ko: "음식",        en: "Food",             es: "Comida" },       emoji: "🍽️" },
+      { word: "House",     meaning: { ko: "집",          en: "House",            es: "Casa" },         emoji: "🏠" },
+      { word: "School",    meaning: { ko: "학교",        en: "School",           es: "Escuela" },      emoji: "🏫" },
+      { word: "Love",      meaning: { ko: "사랑",        en: "Love",             es: "Amor" },         emoji: "❤️" },
+      { word: "Friend",    meaning: { ko: "친구",        en: "Friend",           es: "Amigo" },        emoji: "🤝" },
     ],
     greetings: [
-      { phrase: "Hello!",      meaning: "안녕하세요!", usage: { ko: "누군가를 만났을 때", en: "When meeting someone", es: "Al saludar a alguien" } },
-      { phrase: "Thank you!",  meaning: "감사합니다!", usage: { ko: "감사를 표현할 때", en: "To show gratitude", es: "Para mostrar gratitud" } },
-      { phrase: "I'm sorry.",  meaning: "죄송합니다.", usage: { ko: "사과할 때", en: "When apologising", es: "Para disculparse" } },
-      { phrase: "Excuse me.",  meaning: "실례합니다.", usage: { ko: "정중히 주의를 끌 때", en: "To get attention politely", es: "Para llamar la atención" } },
+      { phrase: "Hello!",      meaning: { ko: "안녕하세요!",  en: "A greeting",          es: "¡Hola!" },           usage: { ko: "누군가를 만났을 때",        en: "When meeting someone",          es: "Al saludar a alguien" } },
+      { phrase: "Thank you!",  meaning: { ko: "감사합니다!",  en: "Expression of thanks", es: "¡Gracias!" },        usage: { ko: "감사를 표현할 때",           en: "To show gratitude",             es: "Para mostrar gratitud" } },
+      { phrase: "I'm sorry.",  meaning: { ko: "죄송합니다.",  en: "Apology",             es: "Lo siento." },       usage: { ko: "사과할 때",                  en: "When apologising",              es: "Para disculparse" } },
+      { phrase: "Excuse me.",  meaning: { ko: "실례합니다.",  en: "Polite attention",    es: "Perdón." },          usage: { ko: "정중히 주의를 끌 때",         en: "To get attention politely",     es: "Para llamar la atención" } },
     ],
   },
 
@@ -165,22 +171,22 @@ const COURSES: Record<string, CourseData> = {
       { char: "ú", roman: "u (stressed)", tip: "Stressed 'u' — like in 'moon' 🌙" },
     ],
     words: [
-      { word: "Hola",    meaning: "Hello",     emoji: "👋" },
-      { word: "Gracias", meaning: "Thank you", emoji: "🙏" },
-      { word: "Sí",      meaning: "Yes",       emoji: "✅" },
-      { word: "No",      meaning: "No",        emoji: "❌" },
-      { word: "Agua",    meaning: "Water",     emoji: "💧" },
-      { word: "Comida",  meaning: "Food",      emoji: "🍽️" },
-      { word: "Casa",    meaning: "House",     emoji: "🏠" },
-      { word: "Escuela", meaning: "School",    emoji: "🏫" },
-      { word: "Amor",    meaning: "Love",      emoji: "❤️" },
-      { word: "Amigo",   meaning: "Friend",    emoji: "🤝" },
+      { word: "Hola",    meaning: { ko: "안녕",     en: "Hello",     es: "Saludo" },              emoji: "👋" },
+      { word: "Gracias", meaning: { ko: "감사",     en: "Thank you", es: "Expresión de gracias" },emoji: "🙏" },
+      { word: "Sí",      meaning: { ko: "네",       en: "Yes",       es: "Afirmativo" },          emoji: "✅" },
+      { word: "No",      meaning: { ko: "아니요",   en: "No",        es: "Negativo" },            emoji: "❌" },
+      { word: "Agua",    meaning: { ko: "물",       en: "Water",     es: "Agua" },                emoji: "💧" },
+      { word: "Comida",  meaning: { ko: "음식",     en: "Food",      es: "Comida" },              emoji: "🍽️" },
+      { word: "Casa",    meaning: { ko: "집",       en: "House",     es: "Casa / Hogar" },        emoji: "🏠" },
+      { word: "Escuela", meaning: { ko: "학교",     en: "School",    es: "Escuela" },             emoji: "🏫" },
+      { word: "Amor",    meaning: { ko: "사랑",     en: "Love",      es: "Amor" },                emoji: "❤️" },
+      { word: "Amigo",   meaning: { ko: "친구",     en: "Friend",    es: "Amigo" },               emoji: "🤝" },
     ],
     greetings: [
-      { phrase: "¡Hola!",     meaning: "Hello!",       usage: { ko: "누군가에게 인사할 때", en: "When greeting someone", es: "Al saludar a alguien" } },
-      { phrase: "¡Gracias!",  meaning: "Thank you!",   usage: { ko: "감사를 표현할 때", en: "To show gratitude", es: "Para mostrar gratitud" } },
-      { phrase: "Lo siento.", meaning: "I'm sorry.",   usage: { ko: "사과할 때", en: "When apologising", es: "Para disculparse" } },
-      { phrase: "Perdón.",    meaning: "Excuse me.",   usage: { ko: "정중히 주의를 끌 때", en: "To get attention politely", es: "Para llamar la atención" } },
+      { phrase: "¡Hola!",     meaning: { ko: "안녕하세요!",  en: "Hello!",       es: "Saludo informal" },     usage: { ko: "누군가에게 인사할 때",     en: "When greeting someone",     es: "Al saludar a alguien" } },
+      { phrase: "¡Gracias!",  meaning: { ko: "감사합니다!",  en: "Thank you!",   es: "Expresión de gracias" },usage: { ko: "감사를 표현할 때",         en: "To show gratitude",         es: "Para mostrar gratitud" } },
+      { phrase: "Lo siento.", meaning: { ko: "죄송합니다.",  en: "I'm sorry.",   es: "Disculpa formal" },     usage: { ko: "사과할 때",                en: "When apologising",          es: "Para disculparse" } },
+      { phrase: "Perdón.",    meaning: { ko: "실례합니다.",  en: "Excuse me.",   es: "Pedir paso o atención" },usage: { ko: "정중히 주의를 끌 때",      en: "To get attention politely", es: "Para llamar la atención" } },
     ],
   },
 };
@@ -1362,7 +1368,7 @@ export default function BasicCourseScreen() {
                   </Animated.View>
                   <Animated.View style={[s.flipCard, s.flipBack, { transform: [{ perspective: 1200 }, { rotateY: backRotate }] }]}>
                     <Text style={s.wordEmoji}>{wordItem.emoji}</Text>
-                    <Text style={s.wordMeaning}>{wordItem.meaning}</Text>
+                    <Text style={s.wordMeaning}>{wordItem.meaning[native === "korean" ? "ko" : native === "spanish" ? "es" : "en"]}</Text>
                     <Text style={s.wordSub}>{wordItem.word}</Text>
                   </Animated.View>
                 </Pressable>
@@ -1378,11 +1384,12 @@ export default function BasicCourseScreen() {
             {step === 2 && greetItem && (() => {
               const usageKey = native === "korean" ? "ko" : native === "spanish" ? "es" : "en";
               const usageText = greetItem.usage[usageKey as "ko" | "en" | "es"];
+              const meaningText = greetItem.meaning[usageKey as "ko" | "en" | "es"];
               return (
                 <>
                   <View style={s.greetCard}>
                     <Text style={s.greetPhrase}>{greetItem.phrase}</Text>
-                    <Text style={s.greetMeaning}>{greetItem.meaning}</Text>
+                    <Text style={s.greetMeaning}>{meaningText}</Text>
                     <Text style={s.greetUsage}>{usageText}</Text>
                   </View>
 
