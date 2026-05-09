@@ -455,7 +455,13 @@ export default function HomeScreen() {
             style={({ pressed }) => [styles.srsBanner, pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] }]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.push("/(tabs)/cards" as any);
+              // F6 fix: pass `deck=srs` so the Cards tab forces the SRS
+              // deck regardless of what the user toggled on a previous
+              // visit. Without this, the auto-switch only fires on first
+              // mount, so a user who toggled to "초급" then came back via
+              // this banner would land on the static deck — not the
+              // review screen the banner promised.
+              router.push({ pathname: "/(tabs)/cards", params: { deck: "srs" } } as any);
             }}
           >
             <Text style={styles.srsBannerEmoji}>🦊</Text>

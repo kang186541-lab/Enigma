@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { router, useFocusEffect } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
@@ -1004,6 +1004,10 @@ type DeckType = "srs" | "beginner" | "advanced";
 export default function CardsScreen() {
   const insets = useSafeAreaInsets();
   const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
+  // F6 fix: home SRS banner passes `deck=srs` to force this screen onto
+  // the review deck even on a return visit (where the auto-switch ref has
+  // already fired). Read once on mount and apply.
+  const { deck: deckParam } = useLocalSearchParams<{ deck?: string }>();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const nativeLang = nativeLanguage ?? "english";
   const lang: NativeLanguage = learningLanguage ?? getDefaultLearning(nativeLang as NativeLanguage);
@@ -1091,6 +1095,19 @@ export default function CardsScreen() {
       setDeckType("srs");
     }
   }, [srsDueCount, deckType]);
+
+  // F6 fix: respect the `deck` query param on every focus, not just first
+  // mount. Coming from the home SRS banner with `?deck=srs` should always
+  // land on the review screen — even if the user was last on "초급".
+  useFocusEffect(
+    useCallback(() => {
+      if (deckParam === "srs" || deckParam === "beginner" || deckParam === "advanced") {
+        if (deckType !== deckParam) setDeckType(deckParam as DeckType);
+      }
+      // We deliberately don't depend on deckType here — that would loop.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [deckParam])
+  );
 
   const frontRotate = flipAnim.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "180deg"] });
   const backRotate = flipAnim.interpolate({ inputRange: [0, 1], outputRange: ["180deg", "360deg"] });
