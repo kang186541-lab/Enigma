@@ -18,6 +18,8 @@ import * as Haptics from "expo-haptics";
 import { Audio } from "expo-av";
 import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
+import { getDueCards, getDueCount, recordReview } from "@/lib/srsManager";
+import { srsCardsToFlashCards } from "@/lib/srsCardAdapter";
 import { XPToast } from "@/components/XPToast";
 import { RippleButton } from "@/components/RippleButton";
 import { C, F } from "@/constants/theme";
@@ -992,7 +994,12 @@ function pickSessionCards(allCards: FlashCard[], count: number, lastSeenWords: s
   return merged.slice(0, Math.min(count, merged.length));
 }
 
-type DeckType = "beginner" | "advanced";
+// "srs" deck = today's due cards from the Leitner-5 SRS engine
+// (lib/srsManager). Source phrases come from rudy-lesson Day completion,
+// writing-practice mistakes, and (after this commit) story-scene puzzle
+// solves. Beginner/advanced are the legacy static decks — preserved as a
+// fallback so the screen never goes empty when SRS has nothing due.
+type DeckType = "srs" | "beginner" | "advanced";
 
 export default function CardsScreen() {
   const insets = useSafeAreaInsets();
@@ -1001,7 +1008,11 @@ export default function CardsScreen() {
   const nativeLang = nativeLanguage ?? "english";
   const lang: NativeLanguage = learningLanguage ?? getDefaultLearning(nativeLang as NativeLanguage);
 
+  // Default deck depends on SRS due count: if anything is due, the SRS deck
+  // becomes the user's primary entry; otherwise the legacy beginner deck is
+  // used so a fresh user (no SRS data yet) still has something to do.
   const [deckType, setDeckType] = useState<DeckType>("beginner");
+  const [srsDueCount, setSrsDueCount] = useState(0);
   const [sessionCards, setSessionCards] = useState<FlashCard[]>([]);
   const [sessionIndex, setSessionIndex] = useState(0);
   const [dailyCount, setDailyCount] = useState(0);
@@ -1025,6 +1036,12 @@ export default function CardsScreen() {
 
   const loadSession = useCallback(async () => {
     try {
+      // SRS due count is read regardless of current deck so the toggle pill
+      // ("복습 N") always shows the live number even while the user is in a
+      // static deck.
+      const dueCount = await getDueCount();
+      setSrsDueCount(dueCount);
+
       const todayKey = getTodayKey();
       const raw = await AsyncStorage.getItem(todayKey);
       const saved = raw ? JSON.parse(raw) : { count: 0 };
@@ -1032,9 +1049,19 @@ export default function CardsScreen() {
       setDailyCount(count);
       setDailyComplete(count >= DAILY_GOAL);
 
-      const lastSeenRaw = await AsyncStorage.getItem("cards_last_seen_words");
-      const lastSeen: string[] = lastSeenRaw ? JSON.parse(lastSeenRaw) : [];
-      const picked = pickSessionCards(allCards, DAILY_GOAL, lastSeen);
+      let picked: FlashCard[];
+      if (deckType === "srs") {
+        // SRS mode: hand the live due queue to the existing flashcard UI.
+        // Cap at DAILY_GOAL so a huge backlog doesn't overwhelm the user;
+        // they'll see the rest tomorrow as their box-1/2 cards keep
+        // returning to due.
+        const dueSrs = await getDueCards(DAILY_GOAL);
+        picked = srsCardsToFlashCards(dueSrs, nativeLang as NativeLanguage, lang) as FlashCard[];
+      } else {
+        const lastSeenRaw = await AsyncStorage.getItem("cards_last_seen_words");
+        const lastSeen: string[] = lastSeenRaw ? JSON.parse(lastSeenRaw) : [];
+        picked = pickSessionCards(allCards, DAILY_GOAL, lastSeen);
+      }
       setSessionCards(picked);
       setSessionIndex(0);
       setIsFlipped(false);
@@ -1043,7 +1070,7 @@ export default function CardsScreen() {
       flipAnim.setValue(0);
       slideAnim.setValue(0);
     } catch (e) { console.warn('[Cards] session load failed:', e); }
-  }, [deckType, lang]);
+  }, [deckType, lang, nativeLang, allCards]);
 
   useFocusEffect(useCallback(() => {
     loadSession();
@@ -1052,6 +1079,18 @@ export default function CardsScreen() {
   useEffect(() => {
     loadSession();
   }, [deckType, lang]);
+
+  // First-mount: if SRS has cards due, default to the SRS deck. Static decks
+  // remain as the fallback for fresh users (no SRS history) and for users
+  // who explicitly toggle away.
+  const autoSwitchedRef = useRef(false);
+  useEffect(() => {
+    if (autoSwitchedRef.current) return;
+    if (srsDueCount > 0 && deckType === "beginner") {
+      autoSwitchedRef.current = true;
+      setDeckType("srs");
+    }
+  }, [srsDueCount, deckType]);
 
   const frontRotate = flipAnim.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "180deg"] });
   const backRotate = flipAnim.interpolate({ inputRange: [0, 1], outputRange: ["180deg", "360deg"] });
@@ -1112,6 +1151,13 @@ export default function CardsScreen() {
       setAgain((a) => a + 1);
     }
 
+    // SRS mode: route the rating through the Leitner engine so this is the
+    // user's actual review. Static-deck modes ignore this — they don't
+    // promote/demote anything.
+    if (deckType === "srs" && card?.word) {
+      recordReview(card.word, knew).catch((e) => console.warn('[Cards] SRS recordReview failed:', e));
+    }
+
     const newCount = dailyCount + 1;
     setDailyCount(newCount);
     const todayKey = getTodayKey();
@@ -1147,6 +1193,17 @@ export default function CardsScreen() {
         <Text style={styles.title}>{t("card_deck")}</Text>
 
         <View style={styles.deckSwitcher}>
+          <Pressable
+            style={[styles.deckTab, deckType === "srs" && styles.deckTabActive]}
+            onPress={() => switchDeck("srs")}
+          >
+            {deckType === "srs" && (
+              <LinearGradient colors={[C.gold, C.goldDark]} style={[StyleSheet.absoluteFill, { borderRadius: 14 }]} />
+            )}
+            <Text style={[styles.deckTabText, deckType === "srs" && styles.deckTabTextActive]}>
+              {nativeLang === "korean" ? `복습 ${srsDueCount}` : nativeLang === "spanish" ? `Repaso ${srsDueCount}` : `Review ${srsDueCount}`}
+            </Text>
+          </Pressable>
           <Pressable
             style={[styles.deckTab, deckType === "beginner" && styles.deckTabActive]}
             onPress={() => switchDeck("beginner")}

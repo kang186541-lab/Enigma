@@ -29,6 +29,7 @@ import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
 import { C, F } from "@/constants/theme";
 import { getApiUrl, apiRequest } from "@/lib/query-client";
 import { addToExpressionBook, trackQuizIO, markExpressionsMastered } from "@/lib/storyUtils";
+import { addPhrases as addSrsPhrases } from "@/lib/srsManager";
 import { checkAnswer, AnswerResult } from "@/lib/answerUtils";
 import { Svg, Path } from "react-native-svg";
 import Typewriter, { TypewriterHandle } from "@/components/story/Typewriter";
@@ -6568,6 +6569,21 @@ export default function StoryScene() {
       if (puzzleItem.pType !== "investigation" && targetExpressions?.length) {
         addToExpressionBook(targetExpressions, chapter, puzzleItem.tprsStage).catch((e: unknown) => console.warn('[Story] addToExpressionBook failed:', e));
         if (puzzleItem.tprsStage === 4) markExpressionsMastered(targetExpressions).catch((e: unknown) => console.warn('[Story] markExpressionsMastered failed:', e));
+
+        // Seed the Leitner SRS so these story phrases enter the daily review
+        // queue (Cards tab "복습" deck). Previously the SRS engine only saw
+        // daily-lesson phrases — story-mode learners never had their solved
+        // expressions return for spaced reinforcement, so the SRS promise
+        // ("forgetting curve") was empty for the story-first learner persona.
+        // The phrase string is the source-of-truth target language; meaning
+        // is the chapter+puzzle slug (downstream UI shows it as
+        // "ch4 · puzzle 2" so the learner can locate where they met it).
+        const srsPhrases = targetExpressions.map((expr) => ({
+          phrase: expr,
+          meaning: `${chapter} · puzzle ${puzzleItem.puzzleNum}`,
+          source: `story-${story.id}-p${puzzleItem.puzzleNum}`,
+        }));
+        addSrsPhrases(srsPhrases).catch((e: unknown) => console.warn('[Story] addSrsPhrases failed:', e));
       }
       trackQuizIO(chapter, puzzleItem.pType).catch((e: unknown) => console.warn('[Story] trackQuizIO failed:', e));
     }

@@ -257,10 +257,22 @@ export default function HomeScreen() {
   const grammarLabel = nativeLang === "korean" ? "문법 팁" : nativeLang === "spanish" ? "Gramática" : "Grammar";
   const grammarDesc  = nativeLang === "korean" ? "핵심 문법 규칙 카드" : nativeLang === "spanish" ? "Tarjetas de reglas gramaticales" : "Key grammar rule cards";
 
+  // "AI 발음 클리닉" reframes the existing PhonemeCoaching + Speak-tab
+  // pipeline (Azure pronunciation-assess + IPA per-phoneme coaching) as a
+  // 뇌새김-recognisable signature surface. The technology was already there
+  // — just buried under a generic "Pronunciation" label. Korean learners
+  // searching for "AI 발음" land on something they can describe to a friend.
+  const pronunciationLabel = nativeLang === "korean" ? "AI 발음 클리닉"
+    : nativeLang === "spanish" ? "Clínica de Pronunciación IA"
+    : "AI Pronunciation Clinic";
+  const pronunciationDesc = nativeLang === "korean" ? "음소 단위 AI 발음 평가"
+    : nativeLang === "spanish" ? "Evaluación fonética con IA"
+    : "Phoneme-level AI coaching";
+
   const quickItems = [
     { icon: "albums",      color: C.gold,    label: t("flashcards"),    desc: t("flashcards_desc"),    route: "/(tabs)/cards"  },
     { icon: "chatbubbles", color: "#7eb8c9", label: t("conversation"),  desc: t("conversation_desc"),  route: "/(tabs)/chat"   },
-    { icon: "mic",         color: "#9b8bb4", label: t("pronunciation"), desc: t("pronunciation_desc"), route: "/(tabs)/speak"  },
+    { icon: "mic",         color: "#9b8bb4", label: pronunciationLabel, desc: pronunciationDesc,       route: "/(tabs)/speak"  },
     { icon: "book",        color: "#c97b27", label: storyLabel,         desc: storyDesc,               route: "/(tabs)/story"  },
     { icon: "pencil",      color: "#e8a87c", label: writingLabel,       desc: writingDesc,             route: "/writing-practice" },
   ];

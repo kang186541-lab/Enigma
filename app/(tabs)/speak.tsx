@@ -1295,7 +1295,15 @@ export default function SpeakScreen() {
         <View style={styles.headerSection}>
           <View style={styles.headerTop}>
             <View style={styles.headerText}>
-              <Text style={styles.title}>{t("speak_title")}</Text>
+              {/* Reframed from generic "speak_title" to "AI 발음 클리닉"
+                  brand surface — the underlying screen is already a
+                  phoneme-level Azure assessment loop, but the title made it
+                  look like a generic speaking drill. */}
+              <Text style={styles.title}>
+                {nativeLang === "korean" ? "AI 발음 클리닉"
+                  : nativeLang === "spanish" ? "Clínica de Pronunciación IA"
+                  : "AI Pronunciation Clinic"}
+              </Text>
               {/* Pronunciation level row */}
               {(() => {
                 const prog = pronLevelProgress(pronCount);
