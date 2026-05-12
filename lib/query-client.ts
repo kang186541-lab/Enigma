@@ -49,6 +49,22 @@ function getWebDevHost(): string {
   return hostname || "localhost";
 }
 
+function getWebRuntimeOrigin(): string | null {
+  if (Platform.OS !== "web") return null;
+
+  const origin =
+    typeof globalThis.location?.origin === "string"
+      ? globalThis.location.origin
+      : "";
+
+  return origin && origin !== "null" ? origin : null;
+}
+
+function getReleaseWebFallbackUrl(): string | null {
+  if (isDevBuild()) return null;
+  return getWebRuntimeOrigin();
+}
+
 function getDevFallbackHost(): string {
   if (Platform.OS === "web") {
     return `${getWebDevHost()}:${DEV_API_PORT}`;
@@ -112,9 +128,14 @@ export function getApiUrl(): string {
   let host = process.env.EXPO_PUBLIC_DOMAIN;
 
   if (!host) {
+    const webOrigin = getWebRuntimeOrigin();
+    if (!isDevBuild() && webOrigin) {
+      return toApiUrl(webOrigin);
+    }
+
     if (!isDevBuild()) {
       throw new Error(
-        "EXPO_PUBLIC_DOMAIN is required for production/release API requests.",
+        "EXPO_PUBLIC_DOMAIN is required for production/release API requests unless web API proxying is configured on the same origin.",
       );
     }
 
@@ -125,6 +146,14 @@ export function getApiUrl(): string {
   try {
     return toApiUrl(host);
   } catch (error) {
+    const webOrigin = getReleaseWebFallbackUrl();
+    if (webOrigin) {
+      console.warn(
+        "EXPO_PUBLIC_DOMAIN is not usable in production web; using same-origin API proxy instead.",
+      );
+      return toApiUrl(webOrigin);
+    }
+
     if (!isDevBuild()) {
       throw error;
     }

@@ -151,6 +151,12 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
+    if (iconsError) {
+      console.warn("[Layout] icon font load failed; web icons may render as squares:", iconsError);
+    }
+  }, [iconsError]);
+
+  useEffect(() => {
     if (fontsLoaded || fontError) SplashScreen.hideAsync();
   }, [fontsLoaded, fontError]);
 

@@ -7,8 +7,12 @@ import { Text, TextStyle, StyleProp, Platform } from "react-native";
  * On native platforms this is handled automatically; on web it isn't.
  */
 
-const EMOJI_RE =
-  /(\p{Emoji_Presentation}|\p{Extended_Pictographic}[\u{FE0F}\u{200D}]?)/gu;
+const EMOJI_SPLIT_RE =
+  /(\p{Emoji_Presentation}|\p{Extended_Pictographic}(?:\u{FE0F}|\u{200D})?)/gu;
+const EMOJI_TEST_RE =
+  /^(\p{Emoji_Presentation}|\p{Extended_Pictographic}(?:\u{FE0F}|\u{200D})?)$/u;
+const WEB_EMOJI_FONT_FAMILY =
+  '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", system-ui, sans-serif';
 
 interface Props {
   style?: StyleProp<TextStyle>;
@@ -21,7 +25,7 @@ export function EmojiText({ style, children, numberOfLines }: Props) {
     return <Text style={style} numberOfLines={numberOfLines}>{children}</Text>;
   }
 
-  const parts = children.split(EMOJI_RE).filter(Boolean);
+  const parts = children.split(EMOJI_SPLIT_RE).filter(Boolean);
   if (parts.length <= 1) {
     return <Text style={style} numberOfLines={numberOfLines}>{children}</Text>;
   }
@@ -29,8 +33,8 @@ export function EmojiText({ style, children, numberOfLines }: Props) {
   return (
     <Text style={style} numberOfLines={numberOfLines}>
       {parts.map((part, i) =>
-        EMOJI_RE.test(part) ? (
-          <Text key={i} style={{ fontFamily: "System" }}>{part}</Text>
+        EMOJI_TEST_RE.test(part) ? (
+          <Text key={i} style={{ fontFamily: WEB_EMOJI_FONT_FAMILY }}>{part}</Text>
         ) : (
           <Text key={i}>{part}</Text>
         )

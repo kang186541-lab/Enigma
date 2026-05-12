@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 export const C = {
   bg1:           "#1a0a05",
   bg2:           "#2c1810",
@@ -21,11 +23,16 @@ export const C = {
   success:       "#5a9",
 };
 
+const webFontFallback =
+  Platform.OS === "web"
+    ? ', "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", system-ui, sans-serif'
+    : "";
+
 export const F = {
-  title:     "Cinzel_900Black",
-  header:    "Cinzel_700Bold",
-  label:     "Cinzel_400Regular",
-  body:      "CrimsonText_400Regular",
-  bodySemi:  "CrimsonText_600SemiBold",
-  bodyBold:  "CrimsonText_700Bold",
+  title:     `Cinzel_900Black${webFontFallback}`,
+  header:    `Cinzel_700Bold${webFontFallback}`,
+  label:     `Cinzel_400Regular${webFontFallback}`,
+  body:      `CrimsonText_400Regular${webFontFallback}`,
+  bodySemi:  `CrimsonText_600SemiBold${webFontFallback}`,
+  bodyBold:  `CrimsonText_700Bold${webFontFallback}`,
 };

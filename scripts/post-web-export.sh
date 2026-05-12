@@ -8,11 +8,15 @@ sed -i 's|<title>Enigma Language Adventure</title>|<title>Enigma Language Advent
 # Add emoji font-family to body
 sed -i "s|body {|body {\n        font-family: system-ui, -apple-system, sans-serif, 'Noto Color Emoji';|" "$DIR/index.html"
 
-# Add vercel.json for SPA routing
+# Add vercel.json for API proxy + SPA routing
 cat > "$DIR/vercel.json" <<'EOF'
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://enigma-production-ea19.up.railway.app/api/:path*"
+    },
+    { "source": "/:path*", "destination": "/index.html" }
   ]
 }
 EOF

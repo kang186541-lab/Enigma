@@ -17,26 +17,40 @@ declare module "http" {
 function setupCors(app: express.Application) {
   app.use((req, res, next) => {
     const origins = new Set<string>();
+    const isDev = process.env.NODE_ENV !== "production";
+
+    const normalizeOrigin = (value: string): string | null => {
+      try {
+        return new URL(value).origin;
+      } catch {
+        return null;
+      }
+    };
+
+    const addOrigin = (value: string) => {
+      const origin = normalizeOrigin(value.trim());
+      if (origin) origins.add(origin);
+    };
 
     if (process.env.REPLIT_DEV_DOMAIN) {
-      origins.add(`https://${process.env.REPLIT_DEV_DOMAIN}`);
+      addOrigin(`https://${process.env.REPLIT_DEV_DOMAIN}`);
     }
 
     if (process.env.REPLIT_DOMAINS) {
       process.env.REPLIT_DOMAINS.split(",").forEach((d) => {
-        origins.add(`https://${d.trim()}`);
+        addOrigin(`https://${d.trim()}`);
       });
     }
 
     if (process.env.CORS_ALLOWED_ORIGINS) {
       process.env.CORS_ALLOWED_ORIGINS.split(",").forEach((allowedOrigin) => {
-        const trimmedOrigin = allowedOrigin.trim();
-        if (trimmedOrigin) origins.add(trimmedOrigin);
+        addOrigin(allowedOrigin);
       });
     }
 
-    const origin = req.header("origin");
-    const isDev = process.env.NODE_ENV !== "production";
+    const rawOrigin = req.header("origin");
+    const origin = rawOrigin ? normalizeOrigin(rawOrigin) : null;
+    res.header("Vary", "Origin");
 
     // Allow localhost origins for Expo web development only.
     const isLocalhost =
@@ -45,9 +59,10 @@ function setupCors(app: express.Application) {
         origin?.startsWith("http://127.0.0.1:"));
 
     // Allow requests with no origin (mobile apps, Expo Go, curl)
-    const noOrigin = !origin;
+    const noOrigin = !rawOrigin;
+    const allowed = noOrigin || (origin ? origins.has(origin) : false) || isLocalhost;
 
-    if (noOrigin || origins.has(origin!) || isLocalhost) {
+    if (allowed) {
       if (origin) {
         res.header("Access-Control-Allow-Origin", origin);
       } else {
@@ -65,6 +80,11 @@ function setupCors(app: express.Application) {
     }
 
     if (req.method === "OPTIONS") {
+      if (!allowed && !isDev) {
+        console.warn(`[cors] blocked origin: ${rawOrigin || "(invalid)"}`);
+        return res.status(403).send("CORS origin not allowed");
+      }
+
       return res.sendStatus(200);
     }
 
