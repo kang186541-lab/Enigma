@@ -23,6 +23,7 @@ interface ChatMsg {
   translation?: string;
   isVoice?: boolean;
   sttError?: boolean;
+  connectionError?: boolean;
 }
 
 interface WordLookupData {
@@ -41,6 +42,11 @@ interface Props {
   onComplete: (sentenceCount: number, usedVoiceOnly: boolean, grammarNotes: string[]) => void;
 }
 
+type RudyLineResult = {
+  text: string;
+  ok: boolean;
+};
+
 // ── STT language mapping ──────────────────────────────────────────────────────
 
 const STT_LANG: Record<string, string> = {
@@ -54,6 +60,8 @@ const RUDY_VOICE: Record<string, string> = {
   spanish: "es-ES-AlvaroNeural",
   korean:  "ko-KR-InJoonNeural",
 };
+
+const STT_TIMEOUT_MS = 22000;
 
 // ── Sanitize text for TTS (remove emojis + markdown) ─────────────────────────
 
@@ -129,6 +137,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const pulseLoop      = useRef<Animated.CompositeAnimation | null>(null);
   const sttFailCount   = useRef(0);
   const isProcessingRef = useRef(false);
+  const sendInFlightRef = useRef(false);
 
   const apiBase   = getApiUrl();
   // sttLang: use learningLang locale for Azure STT recognition (NOT speechLang which is TTS-only)
@@ -137,7 +146,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const rudyVoice = RUDY_VOICE[learningLang] ?? "en-GB-RyanNeural";
 
   const buildHistory = (msgs: ChatMsg[]) =>
-    msgs.filter((m) => !m.sttError).map((m) => ({
+    msgs.filter((m) => !m.sttError && !m.connectionError).map((m) => ({
       role: m.role === "rudy" ? "assistant" as const : "user" as const,
       content: m.text,
     }));
@@ -145,17 +154,23 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   // On mount — get Rudy's opening line; cleanup audio/recording on unmount
   useEffect(() => {
     (async () => {
-      const rudyText = await fetchRudyLine([]);
-      if (rudyText) {
-        const opening: ChatMsg = { role: "rudy", text: rudyText };
+      const rudyLine = await fetchRudyLine([]);
+      if (rudyLine.text) {
+        const opening: ChatMsg = {
+          role: "rudy",
+          text: rudyLine.text,
+          connectionError: !rudyLine.ok,
+        };
         setMessages([opening]);
-        playTTS(rudyText);
-        // Fetch translation in background
-        fetchTranslation(rudyText).then((tr) => {
-          if (tr && mountedRef.current) {
-            setMessages((prev) => prev.map((m, i) => i === 0 ? { ...m, translation: tr } : m));
-          }
-        });
+        if (rudyLine.ok) {
+          playTTS(rudyLine.text);
+          // Fetch translation in background
+          fetchTranslation(rudyLine.text).then((tr) => {
+            if (tr && mountedRef.current) {
+              setMessages((prev) => prev.map((m, i) => i === 0 ? { ...m, translation: tr } : m));
+            }
+          });
+        }
       }
       setPhase("idle");
     })();
@@ -184,7 +199,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
 
   // ── GPT call ─────────────────────────────────────────────────────────────────
 
-  async function fetchRudyLine(history: { role: "user" | "assistant"; content: string }[]): Promise<string> {
+  async function fetchRudyLine(history: { role: "user" | "assistant"; content: string }[]): Promise<RudyLineResult> {
     try {
       const url = new URL("/api/mission-chat", apiBase).toString();
       const res = await fetch(url, {
@@ -196,13 +211,16 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
           messages: history,
         }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(`HTTP ${res.status}: ${body.slice(0, 180)}`);
+      }
       const json = await res.json() as {
         reply: string; sentenceCount: number;
         grammarNote: string; shouldEnd: boolean;
       };
 
-      if (!mountedRef.current) return json.reply;
+      if (!mountedRef.current) return { text: json.reply, ok: true };
       if (json.sentenceCount > 0) setTotalSentences(json.sentenceCount);
       if (json.grammarNote) setGrammarNotes((prev) => [...prev, json.grammarNote]);
       if (json.shouldEnd) {
@@ -212,12 +230,17 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         }, 2500);
       }
 
-      return json.reply;
+      return { text: json.reply, ok: true };
     } catch (e) {
       console.warn('[API] mission chat request failed:', e);
-      return nativeLang === "korean"
-        ? "잠깐 연결에 문제가 생겼어. 다시 해볼까?"
-        : "There was a connection issue. Let's try again!";
+      return {
+        text: nativeLang === "korean"
+          ? "잠깐 연결에 문제가 생겼어. 다시 해볼까?"
+          : nativeLang === "spanish"
+          ? "Hubo un problema de conexión. ¿Intentamos de nuevo?"
+          : "There was a connection issue. Let's try again!",
+        ok: false,
+      };
     }
   }
 
@@ -450,6 +473,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   // ── STT ───────────────────────────────────────────────────────────────────────
 
   async function submitSTT(base64: string, mimeType: string, isVoice: boolean) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), STT_TIMEOUT_MS);
     try {
       console.log("[MissionTalk] Azure 전송 시도, mimeType:", mimeType, "lang:", sttLang, "base64 len:", base64.length);
       const url = new URL("/api/stt", apiBase).toString();
@@ -457,8 +482,15 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ audio: base64, mimeType, language: sttLang }),
+        signal: controller.signal,
       });
-      const json = res.ok ? await res.json() : {};
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        console.warn(`[MissionTalk] STT HTTP ${res.status}:`, body.slice(0, 180));
+        showSttError();
+        return;
+      }
+      const json = await res.json();
       console.log("[MissionTalk] Azure 응답:", json);
       const text: string = (json.text ?? "").trim();
       if (!text) {
@@ -469,6 +501,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       console.log("[MissionTalk] GPT 전송 시도, 텍스트:", text);
       await sendUserMessage(text, isVoice);
     } catch (e) { console.error("[MissionTalk] submitSTT 실패:", e); showSttError(); }
+    finally { clearTimeout(timeout); }
   }
 
   function showSttError() {
@@ -499,32 +532,45 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   // ── Send message ──────────────────────────────────────────────────────────────
 
   async function sendUserMessage(text: string, isVoice: boolean) {
-    sttFailCount.current = 0;   // reset on successful send
-    if (!isVoice) setUsedKeyboard(true);
-    const userMsg: ChatMsg = { role: "user", text, isVoice };
-    const newMsgs = [...messages, userMsg];
-    setMessages(newMsgs);
-    setInputText("");
+    if (sendInFlightRef.current) return;
+    sendInFlightRef.current = true;
+    setPhase("processing");
+    try {
+      sttFailCount.current = 0;   // reset on successful send
+      if (!isVoice) setUsedKeyboard(true);
+      const userMsg: ChatMsg = { role: "user", text, isVoice };
+      const newMsgs = [...messages, userMsg];
+      setMessages(newMsgs);
+      setInputText("");
 
-    const history = buildHistory(newMsgs);
-    const rudyText = await fetchRudyLine(history);
-    const rudyMsg: ChatMsg = { role: "rudy", text: rudyText };
-    setMessages((prev) => [...prev, rudyMsg]);
-    playTTS(rudyText);
-    // Fetch translation in background
-    fetchTranslation(rudyText).then((tr) => {
-      if (tr && mountedRef.current) {
-        setMessages((prev) => {
-          const copy = [...prev];
-          const lastRudyIdx = copy.length - 1 - [...copy].reverse().findIndex((m) => m.role === "rudy");
-          if (lastRudyIdx >= 0 && lastRudyIdx < copy.length) {
-            copy[lastRudyIdx] = { ...copy[lastRudyIdx], translation: tr };
+      const history = buildHistory(newMsgs);
+      const rudyLine = await fetchRudyLine(history);
+      const rudyMsg: ChatMsg = {
+        role: "rudy",
+        text: rudyLine.text,
+        connectionError: !rudyLine.ok,
+      };
+      setMessages((prev) => [...prev, rudyMsg]);
+      if (rudyLine.ok) {
+        playTTS(rudyLine.text);
+        // Fetch translation in background
+        fetchTranslation(rudyLine.text).then((tr) => {
+          if (tr && mountedRef.current) {
+            setMessages((prev) => {
+              const copy = [...prev];
+              const lastRudyIdx = copy.length - 1 - [...copy].reverse().findIndex((m) => m.role === "rudy" && !m.connectionError);
+              if (lastRudyIdx >= 0 && lastRudyIdx < copy.length) {
+                copy[lastRudyIdx] = { ...copy[lastRudyIdx], translation: tr };
+              }
+              return copy;
+            });
           }
-          return copy;
         });
       }
-    });
-    setPhase((cur) => cur === "done" ? "done" : "idle");
+    } finally {
+      sendInFlightRef.current = false;
+      setPhase((cur) => cur === "done" ? "done" : "idle");
+    }
   }
 
   async function sendKeyboardMessage() {
@@ -600,10 +646,10 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         showsVerticalScrollIndicator={false}
       >
         {messages.map((msg, i) => (
-          <View key={i} style={[s.bubble, msg.role === "rudy" ? s.rudyBubble : s.userBubble, msg.sttError && s.errorBubble]}>
+          <View key={i} style={[s.bubble, msg.role === "rudy" ? s.rudyBubble : s.userBubble, (msg.sttError || msg.connectionError) && s.errorBubble]}>
             {msg.role === "rudy" && (
-              <Text style={[s.rudyLabel, msg.sttError && s.errorLabel]}>
-                {msg.sttError ? "🦊 루디" : "🦊 RUDY"}
+              <Text style={[s.rudyLabel, (msg.sttError || msg.connectionError) && s.errorLabel]}>
+                {(msg.sttError || msg.connectionError) ? "🦊 루디" : "🦊 RUDY"}
               </Text>
             )}
             {msg.role === "rudy" ? (

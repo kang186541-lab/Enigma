@@ -970,7 +970,14 @@ Student's ${learnName} answer: ${userAnswer}`;
 
   app.get("/api/pronunciation-tts", async (req: Request, res: Response) => {
     try {
-      const { text, lang, tutorId, mode, voice } = req.query as { text?: string; lang?: string; tutorId?: string; mode?: string; voice?: string };
+      const { text, lang, tutorId, mode, voice, rate } = req.query as {
+        text?: string;
+        lang?: string;
+        tutorId?: string;
+        mode?: string;
+        voice?: string;
+        rate?: string;
+      };
       if (!text || !lang) {
         return res.status(400).json({ error: "text and lang required" });
       }
@@ -986,7 +993,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       // ── Korean pronunciation → Google Cloud TTS ──
       if (lang?.startsWith("ko")) {
         const gVoice = (tutorId && GOOGLE_KO_VOICES[tutorId]) || AZURE_KO_TO_GOOGLE[voiceName] || "ko-KR-Neural2-A";
-        const gRate = mode === "slow" ? 0.7 : 0.95;
+        const gRate = mode === "slow" || rate === "-20%" ? 0.7 : 0.95;
         console.log(`Pronunciation TTS [Google] voice=${gVoice} speed=${gRate}`);
         const buf = await googleTTS(text.slice(0, 500), gVoice, gRate);
         res.set("Content-Type", "audio/mpeg");
@@ -1000,7 +1007,8 @@ Student's ${learnName} answer: ${userAnswer}`;
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-      const prosodyRate = mode === "slow" ? "-30%" : "-5%";
+      const explicitRate = typeof rate === "string" && /^[-+]?\d+%$/.test(rate) ? rate : undefined;
+      const prosodyRate = explicitRate ?? (mode === "slow" ? "-30%" : "-5%");
       const textContent = mode === "letter"
         ? `<say-as interpret-as="characters">${safeText}</say-as>`
         : safeText;

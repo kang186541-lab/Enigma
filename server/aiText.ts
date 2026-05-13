@@ -23,12 +23,31 @@ function openAiErrorCode(error: unknown): string | undefined {
 }
 
 function shouldFallbackToClaude(error: unknown): boolean {
-  const err = error as { status?: number; code?: string; error?: { code?: string; type?: string } };
+  const err = error as {
+    status?: number;
+    code?: string;
+    name?: string;
+    message?: string;
+    error?: { code?: string; type?: string };
+  };
   const code = openAiErrorCode(error);
+  const message = err.message?.toLowerCase() ?? "";
   return (
     err.status === 429 ||
+    err.status === 500 ||
+    err.status === 502 ||
+    err.status === 503 ||
+    err.status === 504 ||
     code === "insufficient_quota" ||
-    code === "rate_limit_exceeded"
+    code === "rate_limit_exceeded" ||
+    code === "api_connection_error" ||
+    code === "api_timeout" ||
+    code === "timeout" ||
+    code === "ECONNRESET" ||
+    code === "ETIMEDOUT" ||
+    err.name === "AbortError" ||
+    message.includes("timeout") ||
+    message.includes("network")
   );
 }
 
