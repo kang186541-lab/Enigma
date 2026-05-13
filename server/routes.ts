@@ -2,6 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "node:http";
 import { openai } from "./openai";
 import { anthropic, hasAnthropic } from "./anthropic";
+import { completeImageText, completeText } from "./aiText";
 
 /**
  * Map browser-reported MIME types to what Azure STT actually accepts.
@@ -364,16 +365,15 @@ Never emit any block inside your conversational reply. Never emit a block that w
         ? `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}\n\n[PERSONALITY MODE OVERRIDE — apply this interaction style]\n${modePrompt}`
         : `${TTS_INSTRUCTION}\n\n${baseTutorPrompt}`) + learnerBlock + memoryBlock + diagnosticBlock + openingBlock + phaseInstruction + summaryRequestBlock + correctionBlock;
 
-      const completion = await openai.chat.completions.create({
+      const raw = await completeText({
+        taskLabel: "/api/chat",
         model: "gpt-4o",
-        max_completion_tokens: 350,
+        maxTokens: 350,
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
         ],
-      });
-
-      const raw = completion.choices[0]?.message?.content ?? "...";
+      }) || "...";
 
       // ── Parse [CORRECTION]{...}[/CORRECTION] block (if present + not opening) ──
       type CorrectionStrategy = "recast" | "elicit" | "mini_lesson";
@@ -636,16 +636,16 @@ Student's ${learnName} answer: ${userAnswer}`;
       // ── Fall back to GPT-4o ───────────────────────────────────────────────
       if (!parsed) {
         try {
-          const completion = await openai.chat.completions.create({
+          const raw = await completeText({
+            taskLabel: "/api/writing-eval",
             model: "gpt-4o",
-            max_completion_tokens: 500,
-            response_format: { type: "json_object" },
+            maxTokens: 500,
+            responseFormat: { type: "json_object" },
             messages: [
               { role: "system", content: systemPrompt },
               { role: "user", content: userMsg },
             ],
-          });
-          const raw = completion.choices[0]?.message?.content ?? "{}";
+          }) || "{}";
           parsed = JSON.parse(raw);
           source = source === "claude-sonnet-4-5" ? "claude-failed-gpt-fallback" : "gpt-4o";
         } catch (e) {
@@ -722,9 +722,10 @@ Student's ${learnName} answer: ${userAnswer}`;
         return res.status(400).json({ error: "text and targetLanguage are required" });
       }
 
-      const completion = await openai.chat.completions.create({
+      const translation = await completeText({
+        taskLabel: "/api/translate",
         model: "gpt-4o",
-        max_completion_tokens: 300,
+        maxTokens: 300,
         messages: [
           {
             role: "system",
@@ -733,8 +734,6 @@ Student's ${learnName} answer: ${userAnswer}`;
           { role: "user", content: text },
         ],
       });
-
-      const translation = completion.choices[0]?.message?.content?.trim() ?? "";
       res.json({ translation });
     } catch (err) {
       console.error("Translation error:", err);
@@ -1375,8 +1374,12 @@ Student's ${learnName} answer: ${userAnswer}`;
         return res.status(400).json({ error: "word and recognized are required" });
       }
 
-      const completion = await openai.chat.completions.create({
+      const raw = await completeText({
+        taskLabel: "/api/gpt-score",
         model: "gpt-4o-mini",
+        temperature: 0.7,
+        maxTokens: 120,
+        responseFormat: { type: "json_object" },
         messages: [
           {
             role: "system",
@@ -1396,12 +1399,7 @@ Student's ${learnName} answer: ${userAnswer}`;
               'Give your score and Korean feedback.',
           },
         ],
-        temperature: 0.7,
-        max_completion_tokens: 120,
-        response_format: { type: "json_object" },
-      });
-
-      const raw = completion.choices[0]?.message?.content ?? "{}";
+      }) || "{}";
       const parsed = JSON.parse(raw) as { score?: number; feedback?: string };
 
       res.json({
@@ -1708,13 +1706,12 @@ Student's ${learnName} answer: ${userAnswer}`;
         msgs.push(...messages);
       }
 
-      const completion = await openai.chat.completions.create({
+      const raw = await completeText({
+        taskLabel: "/api/npc-chat",
         model: "gpt-4o",
-        max_completion_tokens: 300,
+        maxTokens: 300,
         messages: msgs,
-      });
-
-      const raw = completion.choices[0]?.message?.content ?? "{}";
+      }) || "{}";
       const jsonStr = extractJsonFromText(raw);
 
       type RawChoice = string | { text?: string; translation?: string };
@@ -1780,16 +1777,15 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       const fullSystemPrompt = systemPrompt.replace("{targetLang}", langName) + commonRules;
 
-      const completion = await openai.chat.completions.create({
+      const raw = await completeText({
+        taskLabel: "/api/mission-chat",
         model: "gpt-4o",
-        max_completion_tokens: 400,
+        maxTokens: 400,
         messages: [
           { role: "system", content: fullSystemPrompt },
           ...messages,
         ],
       });
-
-      const raw = completion.choices[0]?.message?.content ?? "";
 
       // Parse [EVAL]{...}[/EVAL] block
       const evalMatch = raw.match(/\[EVAL\]([\s\S]*?)\[\/EVAL\]/);
@@ -1835,9 +1831,11 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       const hasSentence = !!(sentence && sentence.trim());
 
-      const completion = await openai.chat.completions.create({
+      const raw = await completeText({
+        taskLabel: "/api/word-lookup",
         model: "gpt-4o-mini",
-        max_completion_tokens: hasSentence ? 280 : 180,
+        maxTokens: hasSentence ? 280 : 180,
+        responseFormat: { type: "json_object" },
         messages: [
           {
             role: "system",
@@ -1855,7 +1853,6 @@ Student's ${learnName} answer: ${userAnswer}`;
         ],
       });
 
-      const raw = completion.choices[0]?.message?.content ?? "{}";
       const jsonStr = extractJsonFromText(raw);
       let parsed: { meaning?: string; partOfSpeech?: string; example?: string; sentenceTranslation?: string };
       try {
@@ -1870,15 +1867,15 @@ Student's ${learnName} answer: ${userAnswer}`;
       const sentenceTranslation = (parsed.sentenceTranslation ?? "").trim();
 
       if (!meaning) {
-        const retry = await openai.chat.completions.create({
+        const fallbackMeaning = await completeText({
+          taskLabel: "/api/word-lookup/retry",
           model: "gpt-4o-mini",
-          max_completion_tokens: 80,
+          maxTokens: 80,
           messages: [
             { role: "system", content: `Translate this ${tl} word/phrase to ${nl}. Return ONLY the translation, nothing else.` },
             { role: "user", content: word },
           ],
         });
-        const fallbackMeaning = (retry.choices[0]?.message?.content ?? "").trim();
         return res.json({ word, meaning: fallbackMeaning || word, partOfSpeech, example, sentenceTranslation });
       }
 
@@ -1899,27 +1896,13 @@ Student's ${learnName} answer: ${userAnswer}`;
       };
       const langName = langLabel[lang] ?? "English";
 
-      const completion = await openai.chat.completions.create({
+      const recognized = await completeImageText({
+        taskLabel: "/api/handwriting-recognize",
         model: "gpt-4o",
-        max_completion_tokens: 200,
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "image_url",
-                image_url: { url: imageBase64, detail: "high" },
-              },
-              {
-                type: "text",
-                text: `This image contains handwritten text in ${langName}. Please read and transcribe the handwritten text exactly as written. Return ONLY the transcribed text with no extra explanation. If the handwriting is unclear or partial, do your best to interpret it.`,
-              },
-            ],
-          },
-        ],
+        maxTokens: 200,
+        imageBase64,
+        prompt: `This image contains handwritten text in ${langName}. Please read and transcribe the handwritten text exactly as written. Return ONLY the transcribed text with no extra explanation. If the handwriting is unclear or partial, do your best to interpret it.`,
       });
-
-      const recognized = (completion.choices[0]?.message?.content ?? "").trim();
       res.json({ recognized });
     } catch (err) {
       console.error("Handwriting recognize error:", err);
@@ -1937,16 +1920,16 @@ Student's ${learnName} answer: ${userAnswer}`;
       if (!systemPrompt || !userMessage) {
         return res.status(400).json({ error: "systemPrompt and userMessage required" });
       }
-      const completion = await openai.chat.completions.create({
+      const raw = await completeText({
+        taskLabel: "/api/quiz-evaluate",
         model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage },
         ],
         temperature: 0.4,
-        max_completion_tokens: 400,
+        maxTokens: 400,
       });
-      const raw = completion.choices[0]?.message?.content ?? "";
       res.json({ reply: raw });
     } catch (err) {
       console.error("Quiz evaluate error:", err);
@@ -1970,13 +1953,13 @@ Student's ${learnName} answer: ${userAnswer}`;
         ...(history ?? []).map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
         { role: "user", content: userMessage },
       ];
-      const completion = await openai.chat.completions.create({
+      const raw = await completeText({
+        taskLabel: "/api/quiz-roleplay",
         model: "gpt-4o",
         messages: msgs,
         temperature: 0.7,
-        max_completion_tokens: 600,
+        maxTokens: 600,
       });
-      const raw = completion.choices[0]?.message?.content ?? "...";
       let parsedReply = raw;
       let extra: Record<string, unknown> = {};
       try {

@@ -1860,11 +1860,12 @@ Student's argument: "${input}"
 
 Score 0-100. Check if student used required expressions naturally. Respond ONLY with JSON: {"score": number, "feedback": "brief feedback", "expressionsUsed": string[]}`;
 
-      const data = await apiRequest("POST", "/api/quiz-evaluate", {
+      const response = await apiRequest("POST", "/api/quiz-evaluate", {
         systemPrompt: gptPrompt,
         userMessage: input,
-      }) as any;
-      const resultText = typeof data === "string" ? data : data?.result ?? data?.text ?? "{}";
+      });
+      const data = await response.json() as { reply?: string; result?: string; text?: string };
+      const resultText = data.reply ?? data.result ?? data.text ?? "{}";
       let parsed: { score?: number; feedback?: string } = {};
       try { parsed = JSON.parse(resultText); } catch (e) { console.warn('[API] debate result parse failed:', e); parsed = { score: 50, feedback: resultText?.slice?.(0, 200) ?? "" }; }
       const won = (parsed.score ?? 0) >= 60;

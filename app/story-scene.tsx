@@ -5855,8 +5855,9 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
       const resp = await apiRequest("POST", "/api/handwriting-recognize", {
         imageBase64,
         lang: learningLang,
-      }) as { recognized?: string };
-      const recognized = resp.recognized ?? "";
+      });
+      const data = await resp.json() as { recognized?: string };
+      const recognized = data.recognized ?? "";
       setRecognizedText(recognized);
       const score = wordMatchScore(targetWord, recognized);
       if (score >= 0.6) {

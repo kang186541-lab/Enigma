@@ -125,14 +125,14 @@ function toApiUrl(hostOrUrl: string): string {
  * @returns {string} The API base URL
  */
 export function getApiUrl(): string {
+  const releaseWebOrigin = getReleaseWebFallbackUrl();
+  if (releaseWebOrigin) {
+    return toApiUrl(releaseWebOrigin);
+  }
+
   let host = process.env.EXPO_PUBLIC_DOMAIN;
 
   if (!host) {
-    const webOrigin = getWebRuntimeOrigin();
-    if (!isDevBuild() && webOrigin) {
-      return toApiUrl(webOrigin);
-    }
-
     if (!isDevBuild()) {
       throw new Error(
         "EXPO_PUBLIC_DOMAIN is required for production/release API requests unless web API proxying is configured on the same origin.",
