@@ -2,6 +2,7 @@ node_modules/
 .git/
 .expo/
 .vercel/
+assets/
 dist/
 web-build/
 web-dist/
