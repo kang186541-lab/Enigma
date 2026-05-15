@@ -292,14 +292,35 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Pull server progress on sign-in and merge with local (server XP wins if
-  // higher — keeps progress safe across devices and reinstalls).
+  // higher — keeps progress safe across devices and reinstalls). On the very
+  // first sign-in for a user, we proactively push the local state up so the
+  // server row exists from minute one (otherwise an idle session would leave
+  // them with nothing to sync from on the next device).
   useEffect(() => {
+    if (!isHydrated) return; // wait for local stats to load first
     let cancelled = false;
     const reconcile = async () => {
       try {
         const remote = await fetchServerProgress();
-        if (!remote || cancelled) return;
+        if (cancelled) return;
         const local = statsRef.current;
+
+        if (!remote) {
+          // First sign-in for this user — seed the row with whatever local
+          // progress they already have (or zeros for a fresh install).
+          queueProgressPush({
+            xp: local.xp,
+            level: getLevel(local.xp).num,
+            streak_days: local.streak,
+            last_session_at: new Date().toISOString(),
+            native_lang: nativeLanguage ?? null,
+            learning_lang: learningLanguage ?? null,
+          });
+          return;
+        }
+
+        // Existing row — take the higher of (server, local) so reinstalls
+        // never lose progress and a stale device can't downgrade the server.
         const merged = { ...local };
         if (remote.xp > local.xp) merged.xp = remote.xp;
         if (remote.streak_days > local.streak) merged.streak = remote.streak_days;
@@ -308,12 +329,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           setStats(merged);
           await AsyncStorage.setItem("@lingua_stats", JSON.stringify(merged));
         }
-        // First-time row creation: push local values up so the server has them.
-        if (!remote.last_session_at && (local.xp > 0 || local.streak > 0)) {
+        // If local is ahead, push that up too.
+        if (local.xp > remote.xp || local.streak > remote.streak_days) {
           queueProgressPush({
-            xp: local.xp,
-            level: getLevel(local.xp).num,
-            streak_days: local.streak,
+            xp: Math.max(local.xp, remote.xp),
+            level: getLevel(Math.max(local.xp, remote.xp)).num,
+            streak_days: Math.max(local.streak, remote.streak_days),
             last_session_at: new Date().toISOString(),
           });
         }
@@ -322,7 +343,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Run once at mount (in case a session already exists) and on every login.
+    // Run once after hydration (in case a session already exists) and on
+    // every subsequent auth event.
     reconcile();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
@@ -333,7 +355,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [isHydrated, nativeLanguage, learningLanguage]);
 
   const setNativeLanguage = async (lang: NativeLanguage) => {
     await AsyncStorage.setItem("@lingua_language", lang);
