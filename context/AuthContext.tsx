@@ -28,6 +28,7 @@ interface AuthContextValue {
   session: Session | null;
   loading: boolean;
   signInWithGoogle: () => Promise<{ error: string | null }>;
+  signInWithEmail: (email: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -119,6 +120,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const signInWithEmail = useCallback(async (email: string) => {
+    try {
+      const trimmed = email.trim();
+      if (!trimmed) return { error: "Please enter your email." };
+      const redirectTo =
+        Platform.OS === "web"
+          ? window.location.origin
+          : Linking.createURL("auth-callback");
+      const { error } = await supabase.auth.signInWithOtp({
+        email: trimmed,
+        options: { emailRedirectTo: redirectTo },
+      });
+      if (error) return { error: error.message };
+      return { error: null };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Email sign-in failed.";
+      return { error: message };
+    }
+  }, []);
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
   }, []);
@@ -129,9 +150,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       loading,
       signInWithGoogle,
+      signInWithEmail,
       signOut,
     }),
-    [session, loading, signInWithGoogle, signOut],
+    [session, loading, signInWithGoogle, signInWithEmail, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

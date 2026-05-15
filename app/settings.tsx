@@ -7,6 +7,7 @@ import {
   Pressable,
   Switch,
   Platform,
+  TextInput,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,6 +34,11 @@ const T = {
   signOut:     { ko: "로그아웃",       en: "Sign out",           es: "Cerrar sesión" },
   signInBenefit: { ko: "로그인하면 진행 상황이 기기 간에 저장돼요", en: "Sign in to save progress across devices", es: "Inicia sesión para guardar tu progreso entre dispositivos" },
   signInError: { ko: "로그인 실패",    en: "Sign-in failed",     es: "Error al iniciar sesión" },
+  emailLabel:  { ko: "이메일",        en: "Email",              es: "Correo" },
+  emailPlaceholder: { ko: "you@example.com", en: "you@example.com", es: "tu@ejemplo.com" },
+  emailSendLink: { ko: "이메일로 로그인 링크 받기", en: "Send me a magic link", es: "Enviarme un enlace mágico" },
+  emailSent:   { ko: "메일을 확인해서 링크를 누르세요", en: "Check your email and click the link", es: "Revisa tu correo y haz clic en el enlace" },
+  divider:     { ko: "또는",          en: "or",                 es: "o" },
   notifTitle:  { ko: "알림",          en: "Notifications",      es: "Notificaciones" },
   notifDaily:  { ko: "매일 학습 알림", en: "Daily reminder",     es: "Recordatorio diario" },
   notifTime:   { ko: "알림 시간",      en: "Reminder time",      es: "Hora del recordatorio" },
@@ -70,15 +76,30 @@ export default function SettingsScreen() {
   const [notifMinute, setNotifMinute] = useState(0);
   const isWeb = Platform.OS === "web";
   const { mode: themeMode, setMode: setThemeMode } = useTheme();
-  const { user, signInWithGoogle, signOut, loading: authLoading } = useAuth();
+  const { user, signInWithGoogle, signInWithEmail, signOut, loading: authLoading } = useAuth();
   const [signInBusy, setSignInBusy] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
+  const [emailInput, setEmailInput] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
 
   const handleSignIn = async () => {
     setSignInBusy(true);
     setSignInError(null);
     const { error } = await signInWithGoogle();
     if (error) setSignInError(error);
+    setSignInBusy(false);
+  };
+
+  const handleEmailSignIn = async () => {
+    setSignInBusy(true);
+    setSignInError(null);
+    setEmailSent(false);
+    const { error } = await signInWithEmail(emailInput);
+    if (error) {
+      setSignInError(error);
+    } else {
+      setEmailSent(true);
+    }
     setSignInBusy(false);
   };
 
@@ -150,6 +171,39 @@ export default function SettingsScreen() {
           ) : (
             <>
               <Text style={[styles.label, { marginBottom: 12 }]}>{t(T.signInBenefit, lc)}</Text>
+
+              {/* Email magic-link — works without any provider setup */}
+              <Text style={[styles.label, { marginBottom: 6 }]}>{t(T.emailLabel, lc)}</Text>
+              <TextInput
+                value={emailInput}
+                onChangeText={setEmailInput}
+                placeholder={t(T.emailPlaceholder, lc)}
+                placeholderTextColor={C.goldDim}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                style={styles.emailInput}
+                editable={!signInBusy}
+              />
+              <Pressable
+                onPress={handleEmailSignIn}
+                disabled={signInBusy || authLoading || !emailInput.trim()}
+                style={[styles.emailBtn, { opacity: (signInBusy || authLoading || !emailInput.trim()) ? 0.5 : 1, marginTop: 8 }]}
+              >
+                <Ionicons name="mail-outline" size={18} color="#FFFFFF" />
+                <Text style={styles.googleBtnText}>{t(T.emailSendLink, lc)}</Text>
+              </Pressable>
+              {emailSent ? (
+                <Text style={[styles.webNote, { color: C.gold, marginTop: 8 }]}>
+                  {t(T.emailSent, lc)}
+                </Text>
+              ) : null}
+
+              {/* Divider */}
+              <Text style={[styles.webNote, { marginVertical: 10, color: C.goldDim }]}>
+                — {t(T.divider, lc)} —
+              </Text>
+
               <Pressable
                 onPress={handleSignIn}
                 disabled={signInBusy || authLoading}
@@ -352,6 +406,29 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#3367D6",
+  },
+  emailBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    backgroundColor: C.gold,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: C.goldDim,
+  },
+  emailInput: {
+    fontFamily: F.body,
+    fontSize: 15,
+    color: C.parchment,
+    backgroundColor: C.bg3,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: C.goldDim,
   },
   googleBtnText: {
     fontFamily: F.header,
