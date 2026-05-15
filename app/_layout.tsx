@@ -25,6 +25,7 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { queryClient } from "@/lib/query-client";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { C } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
@@ -168,10 +169,12 @@ export default function RootLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
           <KeyboardProvider>
             <ThemeProvider>
-              <LanguageProvider>
-                <OfflineBanner />
-                <RootLayoutNav />
-              </LanguageProvider>
+              <AuthProvider>
+                <LanguageProvider>
+                  <OfflineBanner />
+                  <RootLayoutNav />
+                </LanguageProvider>
+              </AuthProvider>
             </ThemeProvider>
           </KeyboardProvider>
         </GestureHandlerRootView>

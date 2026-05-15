@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { C, F } from "@/constants/theme";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 import {
   getNotifEnabled,
   setNotifEnabled,
@@ -26,6 +27,12 @@ import {
 
 const T = {
   title:       { ko: "설정",          en: "Settings",           es: "Ajustes" },
+  accountTitle:{ ko: "계정",          en: "Account",            es: "Cuenta" },
+  signInWithGoogle: { ko: "Google로 로그인", en: "Sign in with Google", es: "Iniciar sesión con Google" },
+  signedInAs:  { ko: "로그인됨",      en: "Signed in as",       es: "Sesión iniciada como" },
+  signOut:     { ko: "로그아웃",       en: "Sign out",           es: "Cerrar sesión" },
+  signInBenefit: { ko: "로그인하면 진행 상황이 기기 간에 저장돼요", en: "Sign in to save progress across devices", es: "Inicia sesión para guardar tu progreso entre dispositivos" },
+  signInError: { ko: "로그인 실패",    en: "Sign-in failed",     es: "Error al iniciar sesión" },
   notifTitle:  { ko: "알림",          en: "Notifications",      es: "Notificaciones" },
   notifDaily:  { ko: "매일 학습 알림", en: "Daily reminder",     es: "Recordatorio diario" },
   notifTime:   { ko: "알림 시간",      en: "Reminder time",      es: "Hora del recordatorio" },
@@ -63,6 +70,22 @@ export default function SettingsScreen() {
   const [notifMinute, setNotifMinute] = useState(0);
   const isWeb = Platform.OS === "web";
   const { mode: themeMode, setMode: setThemeMode } = useTheme();
+  const { user, signInWithGoogle, signOut, loading: authLoading } = useAuth();
+  const [signInBusy, setSignInBusy] = useState(false);
+  const [signInError, setSignInError] = useState<string | null>(null);
+
+  const handleSignIn = async () => {
+    setSignInBusy(true);
+    setSignInError(null);
+    const { error } = await signInWithGoogle();
+    if (error) setSignInError(error);
+    setSignInBusy(false);
+  };
+
+  const handleSignOut = async () => {
+    setSignInBusy(true);
+    try { await signOut(); } finally { setSignInBusy(false); }
+  };
 
   useEffect(() => {
     (async () => {
@@ -103,6 +126,49 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
+        {/* ── Account / Sign in ── */}
+        <Text style={styles.sectionTitle}>{t(T.accountTitle, lc)}</Text>
+        <View style={styles.card}>
+          {user ? (
+            <>
+              <View style={styles.row}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.label}>{t(T.signedInAs, lc)}</Text>
+                  <Text style={[styles.label, { color: C.gold, fontFamily: F.header, marginTop: 4 }]} numberOfLines={1}>
+                    {user.email ?? user.user_metadata?.name ?? user.id}
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={handleSignOut}
+                  disabled={signInBusy}
+                  style={[styles.pill, { opacity: signInBusy ? 0.5 : 1 }]}
+                >
+                  <Text style={styles.pillText}>{t(T.signOut, lc)}</Text>
+                </Pressable>
+              </View>
+            </>
+          ) : (
+            <>
+              <Text style={[styles.label, { marginBottom: 12 }]}>{t(T.signInBenefit, lc)}</Text>
+              <Pressable
+                onPress={handleSignIn}
+                disabled={signInBusy || authLoading}
+                style={[styles.googleBtn, { opacity: signInBusy || authLoading ? 0.5 : 1 }]}
+              >
+                <Ionicons name="logo-google" size={18} color="#FFFFFF" />
+                <Text style={styles.googleBtnText}>
+                  {t(T.signInWithGoogle, lc)}
+                </Text>
+              </Pressable>
+              {signInError ? (
+                <Text style={[styles.webNote, { color: "#F2697D", marginTop: 8 }]}>
+                  {t(T.signInError, lc)}: {signInError}
+                </Text>
+              ) : null}
+            </>
+          )}
+        </View>
+
         {/* ── Notifications ── */}
         <Text style={styles.sectionTitle}>{t(T.notifTitle, lc)}</Text>
         <View style={styles.card}>
@@ -274,6 +340,24 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "center",
     paddingVertical: 8,
+  },
+  googleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    backgroundColor: "#4285F4",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#3367D6",
+  },
+  googleBtnText: {
+    fontFamily: F.header,
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
   timeRow: {
     gap: 8,

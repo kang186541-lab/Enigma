@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useRef, ReactNod
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { checkAchievements } from "@/lib/achievementManager";
 import { addWeeklyXP } from "@/lib/leagueManager";
+import { fetchServerProgress, queueProgressPush } from "@/lib/progressSync";
+import { supabase } from "@/lib/supabase";
 
 export type NativeLanguage = "korean" | "english" | "spanish";
 
@@ -289,6 +291,50 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
+  // Pull server progress on sign-in and merge with local (server XP wins if
+  // higher — keeps progress safe across devices and reinstalls).
+  useEffect(() => {
+    let cancelled = false;
+    const reconcile = async () => {
+      try {
+        const remote = await fetchServerProgress();
+        if (!remote || cancelled) return;
+        const local = statsRef.current;
+        const merged = { ...local };
+        if (remote.xp > local.xp) merged.xp = remote.xp;
+        if (remote.streak_days > local.streak) merged.streak = remote.streak_days;
+        if (merged.xp !== local.xp || merged.streak !== local.streak) {
+          statsRef.current = merged;
+          setStats(merged);
+          await AsyncStorage.setItem("@lingua_stats", JSON.stringify(merged));
+        }
+        // First-time row creation: push local values up so the server has them.
+        if (!remote.last_session_at && (local.xp > 0 || local.streak > 0)) {
+          queueProgressPush({
+            xp: local.xp,
+            level: getLevel(local.xp).num,
+            streak_days: local.streak,
+            last_session_at: new Date().toISOString(),
+          });
+        }
+      } catch (e) {
+        console.warn('[LanguageContext] server reconcile failed:', e);
+      }
+    };
+
+    // Run once at mount (in case a session already exists) and on every login.
+    reconcile();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        reconcile();
+      }
+    });
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const setNativeLanguage = async (lang: NativeLanguage) => {
     await AsyncStorage.setItem("@lingua_language", lang);
     setNativeLanguageState(lang);
@@ -298,12 +344,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const defaultLL = getDefaultLearning(lang);
       await AsyncStorage.setItem("@lingua_learning_language", defaultLL);
       setLearningLanguageState(defaultLL);
+      queueProgressPush({ native_lang: lang, learning_lang: defaultLL });
+    } else {
+      queueProgressPush({ native_lang: lang });
     }
   };
 
   const setLearningLanguage = async (lang: NativeLanguage) => {
     await AsyncStorage.setItem("@lingua_learning_language", lang);
     setLearningLanguageState(lang);
+    queueProgressPush({ learning_lang: lang });
   };
 
   const updateStats = async (updates: Partial<UserStats>) => {
@@ -325,6 +375,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if (updates.xp !== undefined && updates.xp > currentStats.xp) {
       addWeeklyXP(updates.xp - currentStats.xp).catch((e) => console.warn('[League] weekly XP update failed:', e));
     }
+
+    // Fire-and-forget: push to Supabase if signed in (no-op otherwise — the
+    // queue helper itself checks for a session before sending).
+    queueProgressPush({
+      xp: newStats.xp,
+      level: newLevel.num,
+      streak_days: newStats.streak,
+      last_session_at: new Date().toISOString(),
+    });
   };
 
   const clearLevelUp = () => setPendingLevelUp(null);
