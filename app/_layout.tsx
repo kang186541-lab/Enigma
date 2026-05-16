@@ -22,6 +22,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { FirstTimeSignInModal } from "@/components/FirstTimeSignInModal";
 import { queryClient } from "@/lib/query-client";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/context/ThemeContext";
@@ -173,6 +174,7 @@ export default function RootLayout() {
                 <LanguageProvider>
                   <OfflineBanner />
                   <RootLayoutNav />
+                  <FirstTimeSignInModal />
                 </LanguageProvider>
               </AuthProvider>
             </ThemeProvider>

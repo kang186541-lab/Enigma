@@ -21,6 +21,7 @@ import { LevelUpModal } from "@/components/LevelUpModal";
 import { LanguageChangeModal } from "@/components/LanguageChangeModal";
 import { RudyGuideModal, getNextGuideIndex } from "@/components/RudyGuideModal";
 import { EmojiText } from "@/components/EmojiText";
+import { SignInPromoBanner } from "@/components/SignInPromoBanner";
 import { C, F } from "@/constants/theme";
 import {
   loadProgress,
@@ -360,6 +361,9 @@ export default function HomeScreen() {
         {/* Decorative bottom border */}
         <View style={styles.headerBorder} />
       </LinearGradient>
+
+      {/* ── SIGN-IN PROMO BANNER (smart-trigger: only when signed out + value earned) */}
+      <SignInPromoBanner />
 
       {/* ── STATS ROW ─────────────────────────────────── */}
       <View style={styles.statsRow}>
