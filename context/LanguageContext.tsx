@@ -312,6 +312,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             xp: local.xp,
             level: getLevel(local.xp).num,
             streak_days: local.streak,
+            words_learned: local.wordsLearned,
             last_session_at: new Date().toISOString(),
             native_lang: nativeLanguage ?? null,
             learning_lang: learningLanguage ?? null,
@@ -321,20 +322,32 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
         // Existing row — take the higher of (server, local) so reinstalls
         // never lose progress and a stale device can't downgrade the server.
+        const remoteWords = (remote as { words_learned?: number }).words_learned ?? 0;
         const merged = { ...local };
         if (remote.xp > local.xp) merged.xp = remote.xp;
         if (remote.streak_days > local.streak) merged.streak = remote.streak_days;
-        if (merged.xp !== local.xp || merged.streak !== local.streak) {
+        if (remoteWords > local.wordsLearned) merged.wordsLearned = remoteWords;
+        if (
+          merged.xp !== local.xp ||
+          merged.streak !== local.streak ||
+          merged.wordsLearned !== local.wordsLearned
+        ) {
           statsRef.current = merged;
           setStats(merged);
           await AsyncStorage.setItem("@lingua_stats", JSON.stringify(merged));
         }
         // If local is ahead, push that up too.
-        if (local.xp > remote.xp || local.streak > remote.streak_days) {
+        if (
+          local.xp > remote.xp ||
+          local.streak > remote.streak_days ||
+          local.wordsLearned > remoteWords
+        ) {
+          const bestXp = Math.max(local.xp, remote.xp);
           queueProgressPush({
-            xp: Math.max(local.xp, remote.xp),
-            level: getLevel(Math.max(local.xp, remote.xp)).num,
+            xp: bestXp,
+            level: getLevel(bestXp).num,
             streak_days: Math.max(local.streak, remote.streak_days),
+            words_learned: Math.max(local.wordsLearned, remoteWords),
             last_session_at: new Date().toISOString(),
           });
         }
@@ -386,6 +399,40 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if (newLevel.num > oldLevel.num) {
       setPendingLevelUp(newLevel);
     }
+
+    // ── Daily streak ─────────────────────────────────────────────────────────
+    // The streak counter was a dead field — UserStats.streak existed but
+    // nothing ever wrote to it. Anchor the increment on `updates.xp`: any
+    // call that hands us actual XP gain is, by definition, a real learning
+    // moment, so it counts as today's activity.
+    //
+    // Rules (Codex-approved plan):
+    //   - last session today      → no-op (already counted)
+    //   - last session yesterday  → streak + 1
+    //   - older / missing         → streak = 1 (fresh start)
+    if (updates.xp !== undefined && updates.xp > currentStats.xp) {
+      try {
+        const today = new Date().toISOString().slice(0, 10);
+        const last = await AsyncStorage.getItem("@lingua_last_session_date");
+        let nextStreak = currentStats.streak;
+        if (last === today) {
+          // already counted today; leave streak alone
+        } else {
+          const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+          if (last === yesterday) {
+            nextStreak = (currentStats.streak || 0) + 1;
+          } else {
+            // first ever session OR a gap > 1 day → restart at 1
+            nextStreak = 1;
+          }
+          await AsyncStorage.setItem("@lingua_last_session_date", today);
+        }
+        newStats.streak = nextStreak;
+      } catch (e) {
+        console.warn('[Streak] update failed:', e);
+      }
+    }
+
     statsRef.current = newStats;
     setStats(newStats);
     await AsyncStorage.setItem("@lingua_stats", JSON.stringify(newStats));
@@ -405,6 +452,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       level: newLevel.num,
       streak_days: newStats.streak,
       last_session_at: new Date().toISOString(),
+      words_learned: newStats.wordsLearned,
     });
   };
 

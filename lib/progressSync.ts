@@ -12,6 +12,7 @@ export interface ServerProgress {
   xp: number;
   level: number;
   streak_days: number;
+  words_learned: number;
   last_session_at: string | null;
   native_lang: string | null;
   learning_lang: string | null;
@@ -22,10 +23,16 @@ export interface ProgressPatch {
   xp?: number;
   level?: number;
   streak_days?: number;
+  words_learned?: number;
   last_session_at?: string | null;
   native_lang?: string | null;
   learning_lang?: string | null;
 }
+
+// Counter fields where the server should keep the higher value if the
+// caller's value is lower (protects against stale-device downgrades).
+const COUNTER_KEYS = ["xp", "level", "streak_days", "words_learned"] as const;
+type CounterKey = typeof COUNTER_KEYS[number];
 
 const TABLE = "linguaai_user_progress";
 
@@ -47,18 +54,43 @@ export async function fetchServerProgress(): Promise<ServerProgress | null> {
   return (data as ServerProgress | null) ?? null;
 }
 
-// Upsert progress for the current user. Caller passes only the fields it knows
-// — missing fields are left untouched on existing rows (server-side default
-// values fill in for first inserts).
+// Upsert progress for the current user.
+//
+// We first fetch the existing row and merge for counter columns: a stale
+// device must NEVER downgrade the server's xp / level / streak / words.
+// Non-counter fields (last_session_at, native_lang, learning_lang) are
+// authoritative from the latest caller.
+//
+// Missing fields are left untouched on existing rows.
 export async function pushServerProgress(patch: ProgressPatch): Promise<boolean> {
   const { data: userRes } = await supabase.auth.getUser();
   const user = userRes?.user;
   if (!user) return false;
 
+  // Fetch existing row (no error if missing — first push for this user).
+  const { data: existing, error: fetchErr } = await supabase
+    .from(TABLE)
+    .select("xp, level, streak_days, words_learned")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (fetchErr) {
+    console.warn("[progressSync] fetch-before-merge failed:", fetchErr.message);
+    // Fall through — we'd rather upsert with the local view than fail entirely.
+  }
+
   // Strip undefined keys so the upsert payload is minimal.
   const row: Record<string, unknown> = { user_id: user.id };
   for (const [k, v] of Object.entries(patch)) {
-    if (v !== undefined) row[k] = v;
+    if (v === undefined) continue;
+    if ((COUNTER_KEYS as readonly string[]).includes(k) && existing) {
+      const remote = (existing as Record<string, unknown>)[k];
+      if (typeof remote === "number" && typeof v === "number" && remote > v) {
+        // Server is ahead — keep server's value, don't downgrade.
+        row[k] = remote;
+        continue;
+      }
+    }
+    row[k] = v;
   }
 
   const { error } = await supabase

@@ -280,7 +280,37 @@ export default function DailyLessonScreen() {
       if (!xpAwarded) {
         setXpAwarded(true);
         setXpGain(50);
-        updateStats({ xp: statsRef.current.xp + 50, wordsLearned: statsRef.current.wordsLearned + sessionWords.length });
+        // Dedup learned words across all sessions — same word encountered in
+        // a future session should NOT bump the counter again. We persist a
+        // Set keyed by lowercased word and compute newly-learned-this-session
+        // from the delta.
+        (async () => {
+          try {
+            const KEY = "@lingua_known_words";
+            const raw = await AsyncStorage.getItem(KEY);
+            const known: string[] = raw ? JSON.parse(raw) : [];
+            const seen = new Set(known);
+            let added = 0;
+            for (const w of sessionWords) {
+              const key = (w.word || "").trim().toLowerCase();
+              if (!key) continue;
+              if (!seen.has(key)) { seen.add(key); added += 1; }
+            }
+            if (added > 0) {
+              await AsyncStorage.setItem(KEY, JSON.stringify(Array.from(seen)));
+            }
+            updateStats({
+              xp: statsRef.current.xp + 50,
+              wordsLearned: statsRef.current.wordsLearned + added,
+            });
+          } catch (e) {
+            console.warn('[daily-lesson] dedup failed, falling back to cumulative count:', e);
+            updateStats({
+              xp: statsRef.current.xp + 50,
+              wordsLearned: statsRef.current.wordsLearned + sessionWords.length,
+            });
+          }
+        })();
       }
     }
   };

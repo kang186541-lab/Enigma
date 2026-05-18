@@ -278,10 +278,12 @@ export default function HomeScreen() {
     { icon: "pencil",      color: "#e8a87c", label: writingLabel,       desc: writingDesc,             route: "/writing-practice" },
   ];
 
+  // 3 stat cards: streak / words / XP. Accuracy was a dead field (no code
+  // path updated it — it always rendered 0%), so we removed it. If/when we
+  // wire up a real rolling-average accuracy metric, drop it back in here.
   const statItems = [
     { label: nativeLang === "korean" ? "연속학습일" : nativeLang === "spanish" ? "Racha" : "Streak",   value: `${stats.streak}🔥` },
     { label: nativeLang === "korean" ? "단어"       : nativeLang === "spanish" ? "Palabras" : "Words", value: `${stats.wordsLearned}` },
-    { label: nativeLang === "korean" ? "정확도"     : nativeLang === "spanish" ? "Exactitud" : "Acc.", value: `${stats.accuracy}%`    },
     { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
   ];
 
