@@ -47,7 +47,7 @@ export function getTierInfo(tier: LeagueTier): {
   }
 }
 
-/** Add XP to weekly tracker */
+/** Add XP to weekly tracker (and mirror to Supabase) */
 export async function addWeeklyXP(amount: number): Promise<void> {
   try {
     const currentWeek = getWeekNumber();
@@ -63,8 +63,33 @@ export async function addWeeklyXP(amount: number): Promise<void> {
 
     await AsyncStorage.setItem(LEAGUE_WEEK_KEY, String(currentWeek));
     await AsyncStorage.setItem(WEEKLY_XP_KEY, String(weeklyXP));
+
+    // Mirror to Supabase as { week, xp } so reconciles can detect cross-week stale.
+    try {
+      const { queueProgressPush } = await import("@/lib/progressSync");
+      queueProgressPush({ weekly_xp: { week: currentWeek, xp: weeklyXP } });
+    } catch (err) {
+      console.warn("[League] sync queue error:", err);
+    }
   } catch (e) {
     console.warn("[League] addWeeklyXP failed:", e);
+  }
+}
+
+/** Hydrate weekly XP from server. Resets to 0 if server week is stale. */
+export async function hydrateWeeklyXPFromServer(payload: { week?: number; xp?: number } | null): Promise<void> {
+  try {
+    const currentWeek = getWeekNumber();
+    if (!payload || payload.week !== currentWeek) {
+      // Server data is from a previous week — treat as 0 for the current week.
+      await AsyncStorage.setItem(LEAGUE_WEEK_KEY, String(currentWeek));
+      await AsyncStorage.setItem(WEEKLY_XP_KEY, "0");
+      return;
+    }
+    await AsyncStorage.setItem(LEAGUE_WEEK_KEY, String(payload.week));
+    await AsyncStorage.setItem(WEEKLY_XP_KEY, String(payload.xp ?? 0));
+  } catch (err) {
+    console.warn("[League] hydrate error:", err);
   }
 }
 

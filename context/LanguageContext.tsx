@@ -308,6 +308,36 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         if (!remote) {
           // First sign-in for this user — seed the row with whatever local
           // progress they already have (or zeros for a fresh install).
+          // We also include the P2 blobs (SRS / course / achievements /
+          // weekly XP / learner profile) so a tester who's been progressing
+          // pre-auth doesn't lose anything the moment they sign in.
+          let srs: unknown = undefined;
+          let course: unknown = undefined;
+          let achievements: unknown = undefined;
+          let weeklyXp: unknown = undefined;
+          let profile: unknown = undefined;
+          try {
+            const raw = await AsyncStorage.getItem("@lingua_srs_data");
+            if (raw) srs = JSON.parse(raw);
+          } catch {}
+          try {
+            const raw = await AsyncStorage.getItem("@daily_course_progress");
+            if (raw) course = JSON.parse(raw);
+          } catch {}
+          try {
+            const raw = await AsyncStorage.getItem("@lingua_achievements");
+            if (raw) achievements = JSON.parse(raw);
+          } catch {}
+          try {
+            const w = await AsyncStorage.getItem("@lingua_league_week");
+            const xp = await AsyncStorage.getItem("@lingua_weekly_xp");
+            if (w && xp) weeklyXp = { week: Number(w), xp: Number(xp) };
+          } catch {}
+          try {
+            const raw = await AsyncStorage.getItem("@lingua_learner_profile");
+            if (raw) profile = JSON.parse(raw);
+          } catch {}
+
           queueProgressPush({
             xp: local.xp,
             level: getLevel(local.xp).num,
@@ -316,6 +346,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             last_session_at: new Date().toISOString(),
             native_lang: nativeLanguage ?? null,
             learning_lang: learningLanguage ?? null,
+            srs_data: srs,
+            daily_course_progress: course,
+            achievements: achievements,
+            weekly_xp: weeklyXp,
+            learner_profile: profile,
           });
           return;
         }
@@ -351,6 +386,44 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             last_session_at: new Date().toISOString(),
           });
         }
+
+        // ── P2 hydrate (SRS / course / achievements / weekly XP / profile) ──
+        // Server is authoritative for these blobs when present. Local edits
+        // before sign-in are preserved by the save() hooks (they push, so
+        // server has them) — so on a brand-new install, remote == null path
+        // above already mirrored local upstream. Here we're hydrating the
+        // OTHER direction: bringing the latest server snapshot down.
+        const r = remote as unknown as Record<string, unknown>;
+        try {
+          if (r.srs_data) {
+            const { hydrateSrsFromServer } = await import("@/lib/srsManager");
+            await hydrateSrsFromServer(r.srs_data as any);
+          }
+        } catch (e) { console.warn('[Sync] SRS hydrate failed:', e); }
+        try {
+          if (r.daily_course_progress) {
+            const { hydrateProgressFromServer } = await import("@/lib/dailyCourseData");
+            await hydrateProgressFromServer(r.daily_course_progress as any);
+          }
+        } catch (e) { console.warn('[Sync] course hydrate failed:', e); }
+        try {
+          if (Array.isArray(r.achievements)) {
+            const { hydrateAchievementsFromServer } = await import("@/lib/achievementManager");
+            await hydrateAchievementsFromServer(r.achievements as string[]);
+          }
+        } catch (e) { console.warn('[Sync] achievements hydrate failed:', e); }
+        try {
+          if (r.weekly_xp) {
+            const { hydrateWeeklyXPFromServer } = await import("@/lib/leagueManager");
+            await hydrateWeeklyXPFromServer(r.weekly_xp as { week?: number; xp?: number });
+          }
+        } catch (e) { console.warn('[Sync] weekly XP hydrate failed:', e); }
+        try {
+          if (r.learner_profile) {
+            const { hydrateLearnerProfileFromServer } = await import("@/lib/learnerProfile");
+            await hydrateLearnerProfileFromServer(r.learner_profile as any);
+          }
+        } catch (e) { console.warn('[Sync] learner profile hydrate failed:', e); }
       } catch (e) {
         console.warn('[LanguageContext] server reconcile failed:', e);
       }

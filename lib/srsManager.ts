@@ -76,13 +76,31 @@ export async function loadSrsData(): Promise<SrsData> {
   return { cards: {}, lastSessionDate: today() };
 }
 
-/** Save SRS data to AsyncStorage */
+/** Save SRS data to AsyncStorage AND mirror to Supabase (if signed in). */
 async function saveSrsData(data: SrsData): Promise<void> {
   try {
     const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
     await AsyncStorage.setItem(SRS_STORAGE_KEY, JSON.stringify(data));
   } catch (err) {
     console.warn("[SRS] save error:", err);
+  }
+  // Fire-and-forget server sync — no-op when signed out.
+  try {
+    const { queueProgressPush } = await import("@/lib/progressSync");
+    queueProgressPush({ srs_data: data });
+  } catch (err) {
+    console.warn("[SRS] sync queue error:", err);
+  }
+}
+
+/** Hydrate AsyncStorage with the server's SRS row (called on sign-in
+ *  reconcile). Caller picks which side wins — this just writes locally. */
+export async function hydrateSrsFromServer(data: SrsData): Promise<void> {
+  try {
+    const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+    await AsyncStorage.setItem(SRS_STORAGE_KEY, JSON.stringify(data));
+  } catch (err) {
+    console.warn("[SRS] hydrate error:", err);
   }
 }
 

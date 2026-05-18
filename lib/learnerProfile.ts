@@ -124,6 +124,22 @@ export async function saveLearnerProfile(profile: LearnerProfile): Promise<void>
   } catch (e) {
     console.warn("[LearnerProfile] save failed:", e);
   }
+  // Mirror to Supabase — no-op when signed out.
+  try {
+    const { queueProgressPush } = await import("@/lib/progressSync");
+    queueProgressPush({ learner_profile: profile });
+  } catch (err) {
+    console.warn("[LearnerProfile] sync queue error:", err);
+  }
+}
+
+/** Hydrate the local learner profile from a server snapshot. */
+export async function hydrateLearnerProfileFromServer(profile: LearnerProfile): Promise<void> {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+  } catch (err) {
+    console.warn("[LearnerProfile] hydrate error:", err);
+  }
 }
 
 // ── Update helpers (non-destructive merges) ──────────────────────────────────

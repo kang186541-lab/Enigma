@@ -109,6 +109,22 @@ export async function saveProgress(progress: DailyCourseProgress): Promise<void>
   } catch {
     // ignore
   }
+  // Fire-and-forget Supabase mirror — no-op when signed out.
+  try {
+    const { queueProgressPush } = await import("@/lib/progressSync");
+    queueProgressPush({ daily_course_progress: progress });
+  } catch (err) {
+    console.warn("[DailyCourse] sync queue error:", err);
+  }
+}
+
+/** Hydrate AsyncStorage with the server's daily-course row. */
+export async function hydrateProgressFromServer(progress: DailyCourseProgress): Promise<void> {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  } catch (err) {
+    console.warn("[DailyCourse] hydrate error:", err);
+  }
 }
 
 // ── Dummy curriculum data ─────────────────────────────────────────────────────

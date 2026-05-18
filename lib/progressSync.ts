@@ -16,6 +16,12 @@ export interface ServerProgress {
   last_session_at: string | null;
   native_lang: string | null;
   learning_lang: string | null;
+  // P2 — JSONB blobs the client owns the shape of.
+  srs_data: unknown | null;
+  daily_course_progress: unknown | null;
+  achievements: unknown | null;
+  weekly_xp: unknown | null;
+  learner_profile: unknown | null;
   updated_at: string;
 }
 
@@ -27,6 +33,12 @@ export interface ProgressPatch {
   last_session_at?: string | null;
   native_lang?: string | null;
   learning_lang?: string | null;
+  // P2 JSON blobs — pass the full object you want stored.
+  srs_data?: unknown;
+  daily_course_progress?: unknown;
+  achievements?: unknown;
+  weekly_xp?: unknown;
+  learner_profile?: unknown;
 }
 
 // Counter fields where the server should keep the higher value if the

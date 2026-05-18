@@ -15,12 +15,27 @@ export async function loadEarnedAchievements(): Promise<string[]> {
   }
 }
 
-/** Save earned achievement IDs */
+/** Save earned achievement IDs (and mirror to Supabase) */
 async function saveEarned(ids: string[]): Promise<void> {
   try {
     await AsyncStorage.setItem(EARNED_KEY, JSON.stringify(ids));
   } catch (e) {
     console.warn("[Achievements] save failed:", e);
+  }
+  try {
+    const { queueProgressPush } = await import("@/lib/progressSync");
+    queueProgressPush({ achievements: ids });
+  } catch (err) {
+    console.warn("[Achievements] sync queue error:", err);
+  }
+}
+
+/** Hydrate AsyncStorage with the server's achievements list. */
+export async function hydrateAchievementsFromServer(ids: string[]): Promise<void> {
+  try {
+    await AsyncStorage.setItem(EARNED_KEY, JSON.stringify(ids));
+  } catch (err) {
+    console.warn("[Achievements] hydrate error:", err);
   }
 }
 
