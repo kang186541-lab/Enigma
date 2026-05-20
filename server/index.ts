@@ -244,6 +244,9 @@ function setupErrorHandler(app: express.Application) {
 
     const status = error.status || error.statusCode || 500;
     const message = error.message || "Internal Server Error";
+    const isProd = process.env.NODE_ENV === "production";
+    const publicMessage =
+      isProd && status >= 500 ? "Internal Server Error" : message;
 
     console.error("Internal Server Error:", err);
 
@@ -251,7 +254,7 @@ function setupErrorHandler(app: express.Application) {
       return next(err);
     }
 
-    return res.status(status).json({ message });
+    return res.status(status).json({ message: publicMessage });
   });
 }
 

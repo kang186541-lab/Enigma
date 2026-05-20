@@ -55,6 +55,11 @@ function logProviderError(scope: string, status: number, body: string | undefine
   }
 }
 
+function sendVoiceServiceUnavailable(res: Response, scope: string): Response {
+  console.error(`${scope} unavailable: missing provider configuration`);
+  return res.status(503).json({ error: "Voice service unavailable" });
+}
+
 interface TutorInfo {
   id: string;
   name: string;
@@ -832,7 +837,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       const azureKey = process.env.AZURE_SPEECH_KEY?.trim();
       const azureRegion = process.env.AZURE_SPEECH_REGION?.trim();
       if (!azureKey || !azureRegion) {
-        return res.status(502).json({ error: "TTS unavailable — no Azure credentials" });
+        return sendVoiceServiceUnavailable(res, "Tutor TTS");
       }
 
       const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.1")));
@@ -985,7 +990,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       const key = process.env.AZURE_SPEECH_KEY?.trim();
       const region = process.env.AZURE_SPEECH_REGION?.trim();
       if (!key || !region) {
-        return res.status(500).json({ error: "Azure credentials not configured" });
+        return sendVoiceServiceUnavailable(res, "Pronunciation TTS");
       }
 
       const voiceName = voice ?? AZURE_TTS_VOICES[lang] ?? "en-US-JennyNeural";
@@ -1069,7 +1074,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       const key = process.env.AZURE_SPEECH_KEY?.trim();
       const region = process.env.AZURE_SPEECH_REGION?.trim();
       if (!key || !region) {
-        return res.status(500).json({ error: "Azure credentials not configured" });
+        return sendVoiceServiceUnavailable(res, "STT");
       }
 
       const rawBuffer = Buffer.from(audio, "base64");
@@ -1164,7 +1169,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       const key = process.env.AZURE_SPEECH_KEY?.trim();
       const region = process.env.AZURE_SPEECH_REGION?.trim();
       if (!key || !region) {
-        return res.status(500).json({ error: "Azure credentials not configured" });
+        return sendVoiceServiceUnavailable(res, "Pronunciation assessment");
       }
 
       const { detectAudioFormat } = await import("./replit_integrations/audio/client");
@@ -1512,7 +1517,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       }
       const key    = process.env.AZURE_SPEECH_KEY?.trim();
       const region = process.env.AZURE_SPEECH_REGION?.trim();
-      if (!key || !region) return res.status(500).json({ error: "Azure credentials not configured" });
+      if (!key || !region) return sendVoiceServiceUnavailable(res, "NPC TTS");
 
       const npcVoices = NPC_AZURE_VOICES[npcId];
       if (!npcVoices) return res.status(400).json({ error: "Unknown npcId" });
