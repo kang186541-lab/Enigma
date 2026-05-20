@@ -28,6 +28,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
 import { C, F } from "@/constants/theme";
 import { getApiUrl, apiRequest } from "@/lib/query-client";
+import { queueProgressPush } from "@/lib/progressSync";
 import { addToExpressionBook, trackQuizIO, markExpressionsMastered } from "@/lib/storyUtils";
 import { addPhrases as addSrsPhrases } from "@/lib/srsManager";
 import { checkAnswer, AnswerResult } from "@/lib/answerUtils";
@@ -4683,6 +4684,7 @@ async function markChapterComplete(storyId: string, nextId?: string) {
     if (!progress.completed.includes(storyId)) progress.completed.push(storyId);
     if (nextId && !progress.unlocked.includes(nextId)) progress.unlocked.push(nextId);
     await AsyncStorage.setItem(STORY_PROGRESS_KEY, JSON.stringify(progress));
+    queueProgressPush({ story_progress: progress });
   } catch (e) { console.warn("[Story] markChapterComplete failed:", e); }
 }
 

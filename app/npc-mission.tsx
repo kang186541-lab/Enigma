@@ -13,10 +13,6 @@ import {
   LayoutAnimation,
   UIManager,
 } from "react-native";
-
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -27,8 +23,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
 import { getNPC, NPC, NPC_EMOTIONS, NPC_REL_LEVELS, getRelTier, getRelLabel, RelationshipTier } from "@/constants/npcs";
 import { getApiUrl } from "@/lib/query-client";
+import { queueProgressPush } from "@/lib/progressSync";
 import { recordAudio } from "@/lib/audio";
 import { C, F } from "@/constants/theme";
+
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const REL_KEY = "npcRelationships";
 const EMO_KEY  = "npcEmotions";
@@ -180,6 +181,7 @@ export default function NpcMissionScreen() {
         AsyncStorage.setItem(REL_KEY, JSON.stringify(rels)),
         AsyncStorage.setItem(EMO_KEY, JSON.stringify(emos)),
       ]);
+      queueProgressPush({ npc_relationships: rels, npc_emotions: emos });
     } catch (e) { console.warn('[NpcMission] saveRelationship failed:', e); }
   }, []);
 

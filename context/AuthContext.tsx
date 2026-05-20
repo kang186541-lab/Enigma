@@ -22,6 +22,8 @@ import type { Session, User } from "@supabase/supabase-js";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { supabase } from "@/lib/supabase";
+import { flushProgressPush } from "@/lib/progressSync";
+import { clearLocalProgressState } from "@/lib/progressStorage";
 
 interface AuthContextValue {
   user: User | null;
@@ -141,7 +143,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    await flushProgressPush();
     await supabase.auth.signOut();
+    await clearLocalProgressState();
   }, []);
 
   const value = useMemo<AuthContextValue>(

@@ -14,6 +14,7 @@ export interface ServerProgress {
   streak_days: number;
   words_learned: number;
   last_session_at: string | null;
+  last_session_date: string | null;
   native_lang: string | null;
   learning_lang: string | null;
   // P2 — JSONB blobs the client owns the shape of.
@@ -22,6 +23,13 @@ export interface ServerProgress {
   achievements: unknown | null;
   weekly_xp: unknown | null;
   learner_profile: unknown | null;
+  story_progress: unknown | null;
+  npc_relationships: unknown | null;
+  npc_emotions: unknown | null;
+  expression_book: unknown | null;
+  story_io_ratio: unknown | null;
+  story_clues: unknown | null;
+  known_words: unknown | null;
   updated_at: string;
 }
 
@@ -31,6 +39,7 @@ export interface ProgressPatch {
   streak_days?: number;
   words_learned?: number;
   last_session_at?: string | null;
+  last_session_date?: string | null;
   native_lang?: string | null;
   learning_lang?: string | null;
   // P2 JSON blobs — pass the full object you want stored.
@@ -39,6 +48,21 @@ export interface ProgressPatch {
   achievements?: unknown;
   weekly_xp?: unknown;
   learner_profile?: unknown;
+  story_progress?: unknown;
+  npc_relationships?: unknown;
+  npc_emotions?: unknown;
+  expression_book?: unknown;
+  story_io_ratio?: unknown;
+  story_clues?: unknown;
+  known_words?: unknown;
+}
+
+export type ProgressSyncStatus = "idle" | "pending" | "syncing" | "synced" | "error";
+
+export interface ProgressSyncSnapshot {
+  status: ProgressSyncStatus;
+  lastSyncedAt: string | null;
+  lastError: string | null;
 }
 
 // Counter fields where the server should keep the higher value if the
@@ -47,6 +71,30 @@ const COUNTER_KEYS = ["xp", "level", "streak_days", "words_learned"] as const;
 type CounterKey = typeof COUNTER_KEYS[number];
 
 const TABLE = "linguaai_user_progress";
+
+let syncSnapshot: ProgressSyncSnapshot = {
+  status: "idle",
+  lastSyncedAt: null,
+  lastError: null,
+};
+const listeners = new Set<(snapshot: ProgressSyncSnapshot) => void>();
+
+function notifySync(snapshot: ProgressSyncSnapshot) {
+  syncSnapshot = snapshot;
+  listeners.forEach((listener) => listener(syncSnapshot));
+}
+
+export function getProgressSyncSnapshot(): ProgressSyncSnapshot {
+  return syncSnapshot;
+}
+
+export function subscribeProgressSync(
+  listener: (snapshot: ProgressSyncSnapshot) => void,
+): () => void {
+  listeners.add(listener);
+  listener(syncSnapshot);
+  return () => listeners.delete(listener);
+}
 
 export async function fetchServerProgress(): Promise<ServerProgress | null> {
   const { data: userRes } = await supabase.auth.getUser();
@@ -77,7 +125,11 @@ export async function fetchServerProgress(): Promise<ServerProgress | null> {
 export async function pushServerProgress(patch: ProgressPatch): Promise<boolean> {
   const { data: userRes } = await supabase.auth.getUser();
   const user = userRes?.user;
-  if (!user) return false;
+  if (!user) {
+    notifySync({ ...syncSnapshot, status: "idle" });
+    return false;
+  }
+  notifySync({ ...syncSnapshot, status: "syncing", lastError: null });
 
   // Fetch existing row (no error if missing — first push for this user).
   const { data: existing, error: fetchErr } = await supabase
@@ -111,8 +163,10 @@ export async function pushServerProgress(patch: ProgressPatch): Promise<boolean>
 
   if (error) {
     console.warn("[progressSync] push failed:", error.message);
+    notifySync({ ...syncSnapshot, status: "error", lastError: error.message });
     return false;
   }
+  notifySync({ status: "synced", lastSyncedAt: new Date().toISOString(), lastError: null });
   return true;
 }
 
@@ -123,6 +177,7 @@ let pendingPatch: ProgressPatch = {};
 
 export function queueProgressPush(patch: ProgressPatch, delayMs = 1000): void {
   pendingPatch = { ...pendingPatch, ...patch };
+  notifySync({ ...syncSnapshot, status: "pending", lastError: null });
   if (pendingTimer) clearTimeout(pendingTimer);
   pendingTimer = setTimeout(() => {
     const toSend = pendingPatch;
@@ -136,10 +191,12 @@ export function queueProgressPush(patch: ProgressPatch, delayMs = 1000): void {
 
 // Force-flush any pending queued push (e.g. on sign-out).
 export async function flushProgressPush(): Promise<void> {
-  if (!pendingTimer) return;
-  clearTimeout(pendingTimer);
-  pendingTimer = null;
+  if (pendingTimer) {
+    clearTimeout(pendingTimer);
+    pendingTimer = null;
+  }
   const toSend = pendingPatch;
   pendingPatch = {};
+  if (Object.keys(toSend).length === 0) return;
   await pushServerProgress(toSend);
 }

@@ -2,7 +2,21 @@ import React, { createContext, useContext, useState, useEffect, useRef, ReactNod
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { checkAchievements } from "@/lib/achievementManager";
 import { addWeeklyXP } from "@/lib/leagueManager";
-import { fetchServerProgress, queueProgressPush } from "@/lib/progressSync";
+import {
+  fetchServerProgress,
+  queueProgressPush,
+  subscribeProgressSync,
+  type ProgressSyncSnapshot,
+} from "@/lib/progressSync";
+import {
+  ACTIVE_USER_KEY,
+  DEFAULT_STATS,
+  clearLocalProgressForAccountSwitch,
+  localDateString,
+  localDateStringFromIso,
+  readJson,
+  writeJson,
+} from "@/lib/progressStorage";
 import { supabase } from "@/lib/supabase";
 
 export type NativeLanguage = "korean" | "english" | "spanish";
@@ -63,6 +77,7 @@ export interface LanguageContextType {
   t: (key: string) => string;
   pendingLevelUp: Level | null;
   clearLevelUp: () => void;
+  syncStatus: ProgressSyncSnapshot;
 }
 
 export function getDefaultLearning(native: NativeLanguage): NativeLanguage {
@@ -243,25 +258,79 @@ const translations: Record<NativeLanguage, Record<string, string>> = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+type StoryProgressBlob = { completed: string[]; unlocked: string[] };
+type RecordBlob = Record<string, unknown>;
+
+const STORY_PROGRESS_KEY = "lingo_story_progress";
+const NPC_REL_KEY = "npcRelationships";
+const NPC_EMO_KEY = "npcEmotions";
+const EXPRESSION_BOOK_KEY = "expressionBook";
+const STORY_IO_KEY = "ioRatioTracking";
+const STORY_CLUES_KEY = "storyCluesCollected";
+const KNOWN_WORDS_KEY = "@lingua_known_words";
+
+function isNativeLanguage(value: unknown): value is NativeLanguage {
+  return value === "korean" || value === "english" || value === "spanish";
+}
+
+function mergeStoryProgress(local: StoryProgressBlob | null, remote: unknown): StoryProgressBlob {
+  const r = (remote && typeof remote === "object" ? remote : {}) as Partial<StoryProgressBlob>;
+  const l = local ?? { completed: [], unlocked: ["london"] };
+  return {
+    completed: Array.from(new Set([...(r.completed ?? []), ...(l.completed ?? [])])),
+    unlocked: Array.from(new Set(["london", ...(r.unlocked ?? []), ...(l.unlocked ?? [])])),
+  };
+}
+
+function jsonEqual(a: unknown, b: unknown): boolean {
+  return JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+}
+
+function mergeNumericRecord(local: Record<string, number> | null, remote: unknown): Record<string, number> {
+  const merged: Record<string, number> = {};
+  const remoteObj = (remote && typeof remote === "object" ? remote : {}) as Record<string, unknown>;
+  for (const [key, value] of Object.entries(remoteObj)) {
+    if (typeof value === "number") merged[key] = value;
+  }
+  for (const [key, value] of Object.entries(local ?? {})) {
+    if (typeof value === "number") merged[key] = Math.max(merged[key] ?? 0, value);
+  }
+  return merged;
+}
+
+function mergeStringRecord(local: Record<string, string> | null, remote: unknown): Record<string, string> {
+  const remoteObj = (remote && typeof remote === "object" ? remote : {}) as Record<string, unknown>;
+  const merged: Record<string, string> = {};
+  for (const [key, value] of Object.entries(remoteObj)) {
+    if (typeof value === "string") merged[key] = value;
+  }
+  for (const [key, value] of Object.entries(local ?? {})) {
+    if (typeof value === "string") merged[key] = value;
+  }
+  return merged;
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [nativeLanguage, setNativeLanguageState] = useState<NativeLanguage | null>(null);
   const [learningLanguage, setLearningLanguageState] = useState<NativeLanguage | null>(null);
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [pendingLevelUp, setPendingLevelUp] = useState<Level | null>(null);
+  const [syncStatus, setSyncStatus] = useState<ProgressSyncSnapshot>({
+    status: "idle",
+    lastSyncedAt: null,
+    lastError: null,
+  });
   // Zero-state defaults for new users. Real values are loaded from
   // AsyncStorage in the effect below, so existing users see no regression.
-  const [stats, setStats] = useState<UserStats>({
-    streak: 0,
-    wordsLearned: 0,
-    accuracy: 0,
-    xp: 0,
-  });
+  const [stats, setStats] = useState<UserStats>(DEFAULT_STATS);
   const statsRef = useRef(stats);
 
   useEffect(() => {
     statsRef.current = stats;
   }, [stats]);
+
+  useEffect(() => subscribeProgressSync(setSyncStatus), []);
 
   useEffect(() => {
     (async () => {
@@ -299,11 +368,36 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isHydrated) return; // wait for local stats to load first
     let cancelled = false;
+    const resetInMemoryProgress = () => {
+      statsRef.current = DEFAULT_STATS;
+      setStats(DEFAULT_STATS);
+      setNativeLanguageState(null);
+      setLearningLanguageState(null);
+      setHasOnboarded(false);
+    };
     const reconcile = async () => {
       try {
+        const { data: userRes } = await supabase.auth.getUser();
+        const user = userRes?.user;
+        if (!user) return;
+
+        const previousUserId = await AsyncStorage.getItem(ACTIVE_USER_KEY);
+        const switchedUser = !!previousUserId && previousUserId !== user.id;
+        await clearLocalProgressForAccountSwitch(user.id);
+        if (switchedUser) resetInMemoryProgress();
+
         const remote = await fetchServerProgress();
         if (cancelled) return;
-        const local = statsRef.current;
+        const local = switchedUser ? DEFAULT_STATS : statsRef.current;
+        const localNativeRaw = await AsyncStorage.getItem("@lingua_language");
+        const localLearningRaw = await AsyncStorage.getItem("@lingua_learning_language");
+        const localNative = isNativeLanguage(localNativeRaw)
+          ? localNativeRaw
+          : switchedUser ? null : nativeLanguage;
+        const localLearning = isNativeLanguage(localLearningRaw)
+          ? localLearningRaw
+          : switchedUser ? null : learningLanguage;
+        const localLastSessionDate = await AsyncStorage.getItem("@lingua_last_session_date");
 
         if (!remote) {
           // First sign-in for this user — seed the row with whatever local
@@ -311,32 +405,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           // We also include the P2 blobs (SRS / course / achievements /
           // weekly XP / learner profile) so a tester who's been progressing
           // pre-auth doesn't lose anything the moment they sign in.
-          let srs: unknown = undefined;
-          let course: unknown = undefined;
-          let achievements: unknown = undefined;
-          let weeklyXp: unknown = undefined;
-          let profile: unknown = undefined;
-          try {
-            const raw = await AsyncStorage.getItem("@lingua_srs_data");
-            if (raw) srs = JSON.parse(raw);
-          } catch {}
-          try {
-            const raw = await AsyncStorage.getItem("@daily_course_progress");
-            if (raw) course = JSON.parse(raw);
-          } catch {}
-          try {
-            const raw = await AsyncStorage.getItem("@lingua_achievements");
-            if (raw) achievements = JSON.parse(raw);
-          } catch {}
-          try {
-            const w = await AsyncStorage.getItem("@lingua_league_week");
-            const xp = await AsyncStorage.getItem("@lingua_weekly_xp");
-            if (w && xp) weeklyXp = { week: Number(w), xp: Number(xp) };
-          } catch {}
-          try {
-            const raw = await AsyncStorage.getItem("@lingua_learner_profile");
-            if (raw) profile = JSON.parse(raw);
-          } catch {}
+          const srs = await readJson("@lingua_srs_data");
+          const course = await readJson("@daily_course_progress");
+          const achievements = await readJson("@lingua_achievements");
+          const profile = await readJson("@lingua_learner_profile");
+          const storyProgress = await readJson(STORY_PROGRESS_KEY);
+          const npcRelationships = await readJson(NPC_REL_KEY);
+          const npcEmotions = await readJson(NPC_EMO_KEY);
+          const expressionBook = await readJson(EXPRESSION_BOOK_KEY);
+          const storyIoRatio = await readJson(STORY_IO_KEY);
+          const storyClues = await readJson(STORY_CLUES_KEY);
+          const knownWords = await readJson(KNOWN_WORDS_KEY);
+          const w = await AsyncStorage.getItem("@lingua_league_week").catch(() => null);
+          const xp = await AsyncStorage.getItem("@lingua_weekly_xp").catch(() => null);
+          const weeklyXp = w && xp ? { week: Number(w), xp: Number(xp) } : undefined;
 
           queueProgressPush({
             xp: local.xp,
@@ -344,13 +426,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             streak_days: local.streak,
             words_learned: local.wordsLearned,
             last_session_at: new Date().toISOString(),
-            native_lang: nativeLanguage ?? null,
-            learning_lang: learningLanguage ?? null,
+            last_session_date: localLastSessionDate,
+            native_lang: localNative ?? null,
+            learning_lang: localLearning ?? null,
             srs_data: srs,
             daily_course_progress: course,
             achievements: achievements,
             weekly_xp: weeklyXp,
             learner_profile: profile,
+            story_progress: storyProgress,
+            npc_relationships: npcRelationships,
+            npc_emotions: npcEmotions,
+            expression_book: expressionBook,
+            story_io_ratio: storyIoRatio,
+            story_clues: storyClues,
+            known_words: knownWords,
           });
           return;
         }
@@ -371,11 +461,27 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           setStats(merged);
           await AsyncStorage.setItem("@lingua_stats", JSON.stringify(merged));
         }
+        const remoteLastDate = remote.last_session_date ?? localDateStringFromIso(remote.last_session_at);
+        const candidateDates = [localLastSessionDate, remoteLastDate].filter(Boolean).sort() as string[];
+        const bestLastDate = candidateDates.length ? candidateDates[candidateDates.length - 1] : null;
+        if (bestLastDate) await AsyncStorage.setItem("@lingua_last_session_date", bestLastDate);
+
+        if (!localNative && isNativeLanguage(remote.native_lang)) {
+          await AsyncStorage.setItem("@lingua_language", remote.native_lang);
+          setNativeLanguageState(remote.native_lang);
+          setHasOnboarded(true);
+        }
+        if (!localLearning && isNativeLanguage(remote.learning_lang)) {
+          await AsyncStorage.setItem("@lingua_learning_language", remote.learning_lang);
+          setLearningLanguageState(remote.learning_lang);
+        }
+
         // If local is ahead, push that up too.
         if (
           local.xp > remote.xp ||
           local.streak > remote.streak_days ||
-          local.wordsLearned > remoteWords
+          local.wordsLearned > remoteWords ||
+          (bestLastDate && bestLastDate !== remote.last_session_date)
         ) {
           const bestXp = Math.max(local.xp, remote.xp);
           queueProgressPush({
@@ -384,6 +490,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             streak_days: Math.max(local.streak, remote.streak_days),
             words_learned: Math.max(local.wordsLearned, remoteWords),
             last_session_at: new Date().toISOString(),
+            last_session_date: bestLastDate,
           });
         }
 
@@ -424,6 +531,50 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             await hydrateLearnerProfileFromServer(r.learner_profile as any);
           }
         } catch (e) { console.warn('[Sync] learner profile hydrate failed:', e); }
+        try {
+          const localStory = await readJson<StoryProgressBlob>(STORY_PROGRESS_KEY);
+          if (r.story_progress || localStory) {
+            const mergedStory = mergeStoryProgress(localStory, r.story_progress);
+            await writeJson(STORY_PROGRESS_KEY, mergedStory);
+            if (!jsonEqual(mergedStory, r.story_progress)) queueProgressPush({ story_progress: mergedStory });
+          }
+        } catch (e) { console.warn('[Sync] story progress hydrate failed:', e); }
+        try {
+          const localRel = await readJson<Record<string, number>>(NPC_REL_KEY);
+          if (r.npc_relationships || localRel) {
+            const mergedRel = mergeNumericRecord(localRel, r.npc_relationships);
+            await writeJson(NPC_REL_KEY, mergedRel);
+            if (!jsonEqual(mergedRel, r.npc_relationships)) queueProgressPush({ npc_relationships: mergedRel });
+          }
+        } catch (e) { console.warn('[Sync] NPC relationship hydrate failed:', e); }
+        try {
+          const localEmo = await readJson<Record<string, string>>(NPC_EMO_KEY);
+          if (r.npc_emotions || localEmo) {
+            const mergedEmo = mergeStringRecord(localEmo, r.npc_emotions);
+            await writeJson(NPC_EMO_KEY, mergedEmo);
+            if (!jsonEqual(mergedEmo, r.npc_emotions)) queueProgressPush({ npc_emotions: mergedEmo });
+          }
+        } catch (e) { console.warn('[Sync] NPC emotion hydrate failed:', e); }
+        try {
+          const localExpressionBook = await readJson<RecordBlob>(EXPRESSION_BOOK_KEY);
+          if (r.expression_book) await writeJson(EXPRESSION_BOOK_KEY, r.expression_book);
+          else if (localExpressionBook) queueProgressPush({ expression_book: localExpressionBook });
+        } catch (e) { console.warn('[Sync] expression book hydrate failed:', e); }
+        try {
+          const localIo = await readJson<RecordBlob>(STORY_IO_KEY);
+          if (r.story_io_ratio) await writeJson(STORY_IO_KEY, r.story_io_ratio);
+          else if (localIo) queueProgressPush({ story_io_ratio: localIo });
+        } catch (e) { console.warn('[Sync] story I/O hydrate failed:', e); }
+        try {
+          const localClues = await readJson<RecordBlob>(STORY_CLUES_KEY);
+          if (r.story_clues) await writeJson(STORY_CLUES_KEY, r.story_clues);
+          else if (localClues) queueProgressPush({ story_clues: localClues });
+        } catch (e) { console.warn('[Sync] story clues hydrate failed:', e); }
+        try {
+          const localKnownWords = await readJson<string[]>(KNOWN_WORDS_KEY);
+          if (r.known_words) await writeJson(KNOWN_WORDS_KEY, r.known_words);
+          else if (localKnownWords) queueProgressPush({ known_words: localKnownWords });
+        } catch (e) { console.warn('[Sync] known words hydrate failed:', e); }
       } catch (e) {
         console.warn('[LanguageContext] server reconcile failed:', e);
       }
@@ -435,13 +586,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
         reconcile();
+      } else if (event === "SIGNED_OUT") {
+        resetInMemoryProgress();
       }
     });
     return () => {
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, [isHydrated, nativeLanguage, learningLanguage]);
+  }, [isHydrated]);
 
   const setNativeLanguage = async (lang: NativeLanguage) => {
     await AsyncStorage.setItem("@lingua_language", lang);
@@ -485,13 +638,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     //   - older / missing         → streak = 1 (fresh start)
     if (updates.xp !== undefined && updates.xp > currentStats.xp) {
       try {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = localDateString();
         const last = await AsyncStorage.getItem("@lingua_last_session_date");
         let nextStreak = currentStats.streak;
         if (last === today) {
           // already counted today; leave streak alone
         } else {
-          const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+          const yesterday = localDateString(new Date(Date.now() - 86_400_000));
           if (last === yesterday) {
             nextStreak = (currentStats.streak || 0) + 1;
           } else {
@@ -525,6 +678,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       level: newLevel.num,
       streak_days: newStats.streak,
       last_session_at: new Date().toISOString(),
+      last_session_date: await AsyncStorage.getItem("@lingua_last_session_date").catch(() => null),
       words_learned: newStats.wordsLearned,
     });
   };
@@ -537,7 +691,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, isHydrated, stats, updateStats, t, pendingLevelUp, clearLevelUp }}>
+    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, isHydrated, stats, updateStats, t, pendingLevelUp, clearLevelUp, syncStatus }}>
       {children}
     </LanguageContext.Provider>
   );

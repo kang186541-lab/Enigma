@@ -6,6 +6,7 @@ import type {
   ChapterGauge, GaugeGrade, StoryClue,
 } from "@/constants/storyTypes";
 import { getGaugeGrade } from "@/constants/storyTypes";
+import { queueProgressPush } from "@/lib/progressSync";
 import storyData from "@/data/storyData.json";
 import quizData from "@/data/quizData.json";
 
@@ -297,6 +298,7 @@ export async function addToExpressionBook(
     }
 
     await AsyncStorage.setItem(EXPRESSION_BOOK_KEY, JSON.stringify(book));
+    queueProgressPush({ expression_book: book });
   } catch (err) {
     console.warn("[ExpressionBook] save error:", err);
   }
@@ -316,6 +318,7 @@ export async function markExpressionsMastered(phrases: string[]): Promise<void> 
       if (toMaster.has(expr.phrase.toLowerCase())) expr.mastered = true;
     }
     await AsyncStorage.setItem(EXPRESSION_BOOK_KEY, JSON.stringify(book));
+    queueProgressPush({ expression_book: book });
   } catch (err) {
     console.warn("[ExpressionBook] mastered error:", err);
   }
@@ -369,6 +372,7 @@ export async function trackQuizIO(
     if (category === "input") data.chapters[chapter].inputCount++;
     else data.chapters[chapter].outputCount++;
     await AsyncStorage.setItem(IO_RATIO_KEY, JSON.stringify(data));
+    queueProgressPush({ story_io_ratio: data });
   } catch (err) {
     console.warn("[IOTracker] save error:", err);
   }
@@ -441,6 +445,7 @@ export async function collectClue(clueId: string, chapter: string): Promise<void
       data[chapter].push(clueId);
     }
     await AsyncStorage.setItem(CLUE_STORAGE_KEY, JSON.stringify(data));
+    queueProgressPush({ story_clues: data });
   } catch (err) {
     console.warn("[Clue] save error:", err);
   }

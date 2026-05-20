@@ -18,6 +18,7 @@ import { Audio } from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
+import { queueProgressPush } from "@/lib/progressSync";
 import { XPToast } from "@/components/XPToast";
 import { C, F } from "@/constants/theme";
 
@@ -297,7 +298,9 @@ export default function DailyLessonScreen() {
               if (!seen.has(key)) { seen.add(key); added += 1; }
             }
             if (added > 0) {
-              await AsyncStorage.setItem(KEY, JSON.stringify(Array.from(seen)));
+              const nextKnownWords = Array.from(seen);
+              await AsyncStorage.setItem(KEY, JSON.stringify(nextKnownWords));
+              queueProgressPush({ known_words: nextKnownWords });
             }
             updateStats({
               xp: statsRef.current.xp + 50,

@@ -845,9 +845,6 @@ export default function ChatRoomScreen() {
     const trimmed = inputText.trim();
     if (!trimmed || !tutor || isTyping) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setXpGain(5);
-    sessionXpRef.current += 5;
-    updateStats({ xp: statsRef.current.xp + 5 });
 
     const userMsg: Message = {
       id: Date.now().toString() + "u",
@@ -910,6 +907,11 @@ export default function ChatRoomScreen() {
       });
 
       const data = await res.json();
+      if (res.ok) {
+        setXpGain(5);
+        sessionXpRef.current += 5;
+        updateStats({ xp: statsRef.current.xp + 5 });
+      }
       const responseText: string = res.ok
         ? (data.reply ?? "...")
         : (tutor.responses[Math.floor(Math.random() * tutor.responses.length)]);

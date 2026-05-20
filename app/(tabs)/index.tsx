@@ -22,6 +22,7 @@ import { LanguageChangeModal } from "@/components/LanguageChangeModal";
 import { RudyGuideModal, getNextGuideIndex } from "@/components/RudyGuideModal";
 import { EmojiText } from "@/components/EmojiText";
 import { SignInPromoBanner } from "@/components/SignInPromoBanner";
+import { useAuth } from "@/context/AuthContext";
 import { C, F } from "@/constants/theme";
 import {
   loadProgress,
@@ -158,11 +159,19 @@ const div = StyleSheet.create({
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { t, stats, nativeLanguage, learningLanguage, pendingLevelUp, clearLevelUp } = useLanguage();
+  const { t, stats, nativeLanguage, learningLanguage, pendingLevelUp, clearLevelUp, syncStatus } = useLanguage();
+  const { user } = useAuth();
   const topPad = Platform.OS === "web" ? 20 : insets.top;
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
   const lingoGreeting = getLingoGreeting(nativeLang);
   const lingoMood = stats.streak === 0 ? "sad" : stats.streak >= 7 ? "excited" : "happy";
+  const syncLabel = user
+    ? syncStatus.status === "error"
+      ? nativeLang === "korean" ? "저장 확인 필요" : nativeLang === "spanish" ? "Revisar guardado" : "Save needs check"
+      : syncStatus.status === "pending" || syncStatus.status === "syncing"
+      ? nativeLang === "korean" ? "저장 중" : nativeLang === "spanish" ? "Guardando" : "Saving"
+      : nativeLang === "korean" ? "동기화됨" : nativeLang === "spanish" ? "Sincronizado" : "Synced"
+    : nativeLang === "korean" ? "로그인 안 됨" : nativeLang === "spanish" ? "Sin sesión" : "Signed out";
 
   const level    = getLevel(stats.xp);
   const progress = getLevelProgress(stats.xp);
@@ -307,6 +316,16 @@ export default function HomeScreen() {
           <View style={{ flex: 1 }}>
             <Text style={styles.greeting} numberOfLines={1}>{lingoGreeting}</Text>
             <EmojiText style={styles.headerTitle} numberOfLines={1}>Enigma ✨</EmojiText>
+            <View style={[styles.syncChip, syncStatus.status === "error" && styles.syncChipError]}>
+              <Ionicons
+                name={user ? (syncStatus.status === "error" ? "cloud-offline-outline" : "cloud-done-outline") : "cloud-outline"}
+                size={12}
+                color={syncStatus.status === "error" ? "#f3a0a0" : C.goldDim}
+              />
+              <Text style={[styles.syncChipText, syncStatus.status === "error" && styles.syncChipTextError]} numberOfLines={1}>
+                {syncLabel}
+              </Text>
+            </View>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Pressable
@@ -753,6 +772,26 @@ const styles = StyleSheet.create({
   headerTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 14 },
   greeting: { fontSize: 14, fontFamily: F.body, color: C.goldDim, fontStyle: "italic", marginBottom: 4 },
   headerTitle: { fontSize: 30, fontFamily: F.title, color: C.gold, letterSpacing: 3 },
+  syncChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    alignSelf: "flex-start",
+    marginTop: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    backgroundColor: "rgba(201,162,39,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.18)",
+    maxWidth: 150,
+  },
+  syncChipError: {
+    backgroundColor: "rgba(180,70,70,0.12)",
+    borderColor: "rgba(220,90,90,0.28)",
+  },
+  syncChipText: { fontSize: 10, fontFamily: F.bodySemi, color: C.goldDim },
+  syncChipTextError: { color: "#f3a0a0" },
   lingoHeader: {
     width: 72, height: 72, borderRadius: 36,
     overflow: "hidden",
