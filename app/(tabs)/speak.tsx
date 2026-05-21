@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -498,12 +498,13 @@ const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] 
 ];
 
 // Overall score band thresholds. Kept in sync with sub-score color logic
-// (≥75 green / ≥50 amber / <50 red) and WEAK_THRESHOLD so the home stat
+// (≥75 success / ≥50 gold / <50 error) and WEAK_THRESHOLD so the home stat
 // card, the sub-score chips, and the weak-words save behaviour all agree.
+// Palette uses Enigma tokens (C.success/C.gold/C.error) — no Tailwind hex.
 function getScoreInfo(score: number): { label: string; color: string; emoji: string } {
-  if (score >= 75) return { label: "Excellent!", color: "#10B981", emoji: "🎉" };
-  if (score >= 50) return { label: "Good Job!", color: "#F59E0B", emoji: "😊" };
-  return { label: "Keep Practicing", color: "#EF4444", emoji: "💪" };
+  if (score >= 75) return { label: "Excellent!", color: C.success, emoji: "🎉" };
+  if (score >= 50) return { label: "Good Job!", color: C.gold, emoji: "😊" };
+  return { label: "Keep Practicing", color: C.error, emoji: "💪" };
 }
 
 let _pronunciationAudio: HTMLAudioElement | null = null;
@@ -1218,6 +1219,23 @@ export default function SpeakScreen() {
   const isBusy = isRecording || isProcessing;
   const scoreInfo = score !== null ? getScoreInfo(score) : null;
   const progressPct = sessionWords.length > 0 ? (sessionIdx / sessionWords.length) * 100 : 0;
+  // Memoized so CoachingCard's request payload stays referentially stable
+  // across unrelated re-renders. Without this, every keystroke / timer tick
+  // builds a new array and burns a GPT call.
+  const weakPhonemes = useMemo(() => {
+    const out: string[] = [];
+    const seen = new Set<string>();
+    for (const w of wordResults) {
+      for (const p of (w.phonemes ?? [])) {
+        if (p.score < 75 && p.phoneme && p.phoneme.trim() !== "" && !seen.has(p.phoneme)) {
+          seen.add(p.phoneme);
+          out.push(p.phoneme);
+          if (out.length >= 6) return out;
+        }
+      }
+    }
+    return out;
+  }, [wordResults]);
 
   // ── Session Complete ────────────────────────────────────────────────────────
   if (sessionComplete) {
@@ -1485,48 +1503,40 @@ export default function SpeakScreen() {
                     </View>
                   </View>
 
-                  {/* Sub-scores row */}
+                  {/* Sub-scores row — band colors map to Enigma palette
+                      (C.success / C.gold / C.error) for consistency with
+                      the CoachingCard shadow and the rest of the app. */}
                   {(accuracyScore !== null || fluencyScore !== null || completenessScore !== null) && (
                     <View style={styles.subScoreRow}>
                       {accuracyScore !== null && (
                         <View style={styles.subScoreBox}>
-                          <Text style={[styles.subScoreNum, { color: accuracyScore >= 75 ? "#10B981" : accuracyScore >= 50 ? "#F59E0B" : "#EF4444" }]}>{accuracyScore}</Text>
+                          <Text style={[styles.subScoreNum, { color: accuracyScore >= 75 ? C.success : accuracyScore >= 50 ? C.gold : C.error }]}>{accuracyScore}</Text>
                           <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "정확도" : nativeLang === "spanish" ? "Precisión" : "Accuracy"}</Text>
                         </View>
                       )}
                       {fluencyScore !== null && (
                         <View style={styles.subScoreBox}>
-                          <Text style={[styles.subScoreNum, { color: fluencyScore >= 75 ? "#10B981" : fluencyScore >= 50 ? "#F59E0B" : "#EF4444" }]}>{fluencyScore}</Text>
+                          <Text style={[styles.subScoreNum, { color: fluencyScore >= 75 ? C.success : fluencyScore >= 50 ? C.gold : C.error }]}>{fluencyScore}</Text>
                           <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "유창성" : nativeLang === "spanish" ? "Fluidez" : "Fluency"}</Text>
                         </View>
                       )}
                       {completenessScore !== null && (
                         <View style={styles.subScoreBox}>
-                          <Text style={[styles.subScoreNum, { color: completenessScore >= 75 ? "#10B981" : completenessScore >= 50 ? "#F59E0B" : "#EF4444" }]}>{completenessScore}</Text>
+                          <Text style={[styles.subScoreNum, { color: completenessScore >= 75 ? C.success : completenessScore >= 50 ? C.gold : C.error }]}>{completenessScore}</Text>
                           <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "완성도" : nativeLang === "spanish" ? "Integridad" : "Completeness"}</Text>
                         </View>
                       )}
                     </View>
                   )}
 
-                  {/* Word-level breakdown + phoneme coaching */}
-                  <PhonemeCoaching
-                    wordScores={wordResults}
-                    nativeLang={nativeLang}
-                    targetLang={activeLang}
-                    speechLang={phrase.speechLang}
-                    onRetry={resetPracticeState}
-                  />
-
-                  {gptFeedback ? (
-                    <Text style={styles.feedbackText}>{gptFeedback}</Text>
-                  ) : null}
-
-                  {/* Layered above Azure's deterministic feedback: a 1-2
-                      sentence GPT-4o-mini coaching note in the learner's
-                      native language. Failure is silent — the card hides
-                      itself, the rest of the screen stays usable. */}
-                  {phrase && score !== null && score > 0 ? (
+                  {/* GPT-4o-mini coaching note in the learner's native
+                      language. Sits between sub-scores and the deeper
+                      phoneme breakdown so the most empathetic feedback is
+                      the FIRST thing a user reads after the score, not
+                      the fifth. Renders for every score (including 0 /
+                      "weak" band — that's exactly the case that needs
+                      coaching). Silently hides on endpoint 404. */}
+                  {phrase && score !== null ? (
                     <CoachingCard
                       attemptId={attemptId}
                       word={phrase.word}
@@ -1537,18 +1547,22 @@ export default function SpeakScreen() {
                       fluencyScore={fluencyScore}
                       completenessScore={completenessScore}
                       recognizedText={recognizedText}
-                      weakPhonemes={
-                        wordResults
-                          .flatMap((w) => (w.phonemes ?? []).filter((p) => p.score < 75).map((p) => p.phoneme))
-                          .filter((s) => !!s && s.trim() !== "")
-                          .slice(0, 6)
-                      }
+                      weakPhonemes={weakPhonemes}
                     />
                   ) : null}
+
+                  {/* Phoneme-level drill-down. */}
+                  <PhonemeCoaching
+                    wordScores={wordResults}
+                    nativeLang={nativeLang}
+                    targetLang={activeLang}
+                    speechLang={phrase.speechLang}
+                    onRetry={resetPracticeState}
+                  />
                 </View>
               ) : (
                 <View style={styles.errorRow}>
-                  <Ionicons name="warning-outline" size={16} color="#EF4444" />
+                  <Ionicons name="warning-outline" size={16} color={C.error} />
                   <Text style={styles.errorText}>{sttError || (nativeLang === "korean" ? "음성 인식 실패. 다시 시도해 주세요." : nativeLang === "spanish" ? "Fallo en reconocimiento de voz." : "Speech recognition failed. Please try again.")}</Text>
                 </View>
               )}

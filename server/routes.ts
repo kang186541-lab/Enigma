@@ -1395,6 +1395,10 @@ Student's ${learnName} answer: ${userAnswer}`;
   type CoachComment = { ko: string; en: string; es: string };
   type CacheEntry = { value: CoachComment; at: number };
   const COACH_CACHE = new Map<string, CacheEntry>();
+  // In-flight requests by cache key — coalesces concurrent identical lookups
+  // so we don't fire the same GPT call multiple times before the first one
+  // populates the cache (QA Bug N1).
+  const COACH_IN_FLIGHT = new Map<string, Promise<CoachComment>>();
   const COACH_CACHE_MAX = 200;
   const COACH_CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
 
@@ -1407,32 +1411,37 @@ Student's ${learnName} answer: ${userAnswer}`;
 
   function fallbackCoach(word: string, score: number, weakPhonemes: string[]): CoachComment {
     const band = coachBand(score);
-    const w = weakPhonemes.length > 0 ? ` (Watch out for: ${weakPhonemes.join(", ")})` : "";
+    const wKo = weakPhonemes.length > 0 ? ` (특히 ${weakPhonemes.join(", ")} 소리에 주의해 보세요.)` : "";
+    const wEn = weakPhonemes.length > 0 ? ` Watch out for: ${weakPhonemes.join(", ")}.` : "";
+    const wEs = weakPhonemes.length > 0 ? ` Presta atención a: ${weakPhonemes.join(", ")}.` : "";
     if (band === "great") {
       return {
-        ko: `"${word}" 정말 자연스러워요! 이대로 계속 가세요. 🎉`,
+        ko: `"${word}" 정말 자연스러웠어요! 이대로 계속 가봐요. 🎉`,
         en: `Your "${word}" sounded natural — keep it up! 🎉`,
-        es: `Tu "${word}" sonó natural — ¡así se hace! 🎉`,
+        es: `¡Tu "${word}" sonó natural — así se hace! 🎉`,
       };
     }
     if (band === "good") {
       return {
-        ko: `"${word}" 거의 다 왔어요. 한 번만 더 듣고 따라 해 볼까요?${w}`,
-        en: `"${word}" was close — listen once more and try again.${w}`,
-        es: `"${word}" estuvo cerca — escucha una vez más e inténtalo.${w}`,
+        ko: `"${word}" 거의 다 왔어요. 한 번만 더 듣고 따라 해볼까요?${wKo}`,
+        en: `"${word}" was close — listen once more and give it another shot.${wEn}`,
+        es: `"${word}" estuvo cerca — escucha una vez más e inténtalo.${wEs}`,
       };
     }
     if (band === "fair") {
       return {
-        ko: `"${word}" 음절을 천천히 끊어서 발음해 봐요. 듣기 버튼이 도움이 될 거예요.${w}`,
-        en: `For "${word}", slow down each syllable. The listen button helps.${w}`,
-        es: `Para "${word}", reduce cada sílaba. El botón de escuchar ayuda.${w}`,
+        ko: `"${word}"의 음절을 천천히 끊어서 발음해 보세요. 듣기 버튼이 도움이 될 거예요.${wKo}`,
+        en: `For "${word}", slow down each syllable. The listen button helps.${wEn}`,
+        // FIX (es): "reduce cada sílaba" was a mistranslation (reducir = shrink),
+        // not "slow down". Use "pronuncia cada sílaba más despacio".
+        es: `Para "${word}", pronuncia cada sílaba más despacio. El botón de altavoz ayuda.${wEs}`,
       };
     }
     return {
-      ko: `먼저 듣기 버튼으로 "${word}"의 원어민 발음을 들어보세요. 우리는 천천히 가요. 🦊`,
+      // FIX (ko): "우리는 천천히 가요" was a calque — replaced with natural 함께 가봐요.
+      ko: `먼저 듣기 버튼으로 "${word}"의 원어민 발음을 들어봐요. 천천히 함께 가봐요. 🦊`,
       en: `Start by listening to "${word}" with the speaker button. We'll take it slow. 🦊`,
-      es: `Empieza escuchando "${word}" con el botón de altavoz. Iremos despacio. 🦊`,
+      es: `Empieza escuchando "${word}" con el botón de altavoz. Vamos despacio. 🦊`,
     };
   }
 
@@ -1475,7 +1484,11 @@ Student's ${learnName} answer: ${userAnswer}`;
       }
 
       const trimmedWord = word.slice(0, 60);
-      const weak = Array.isArray(weakPhonemes) ? weakPhonemes.slice(0, 6) : [];
+      // Normalize weak phonemes so ["t","r"] and ["r","t"] hit the same cache
+      // entry (QA Bug 4). Sort + lowercase keeps the key canonical.
+      const weak = Array.isArray(weakPhonemes)
+        ? [...new Set(weakPhonemes.map((p) => String(p).toLowerCase()))].slice(0, 6).sort()
+        : [];
       const band = coachBand(score);
       const cacheKey = `${trimmedWord.toLowerCase()}|${lang}|${band}|${weak.join(",")}`;
 
@@ -1483,6 +1496,18 @@ Student's ${learnName} answer: ${userAnswer}`;
       const cached = COACH_CACHE.get(cacheKey);
       if (cached && Date.now() - cached.at < COACH_CACHE_TTL) {
         return res.json({ ...cached.value, cached: true });
+      }
+
+      // Coalesce concurrent identical requests so a burst of 5 simultaneous
+      // calls for the same (word, band) only fires one GPT request.
+      const inFlight = COACH_IN_FLIGHT.get(cacheKey);
+      if (inFlight) {
+        try {
+          const value = await inFlight;
+          return res.json({ ...value, cached: true });
+        } catch {
+          // Fall through and let this caller do its own GPT call.
+        }
       }
 
       // Build the prompt. We always ask for all three languages so the same
@@ -1495,6 +1520,9 @@ Student's ${learnName} answer: ${userAnswer}`;
         : "Recogniser heard the word correctly";
       const weakNote = weak.length > 0 ? `Weak phonemes: ${weak.join(", ")}` : "No specific phoneme issues flagged";
 
+      // Anchored register examples — GPT-4o-mini consistently regresses to
+      // 합니다체 (Korean) and "usted" (Spanish) when only abstract labels
+      // are given. One-shot exemplars pin the voice reliably.
       const systemPrompt = [
         'You are Rudy, a friendly fox-tutor who gives pronunciation coaching to language learners.',
         'You receive an Azure assessment score and must respond with one SHORT (1-2 sentences) warm, specific coaching comment in EACH of Korean, English, and Spanish.',
@@ -1502,7 +1530,9 @@ Student's ${learnName} answer: ${userAnswer}`;
         '- Reference the target word by quoting it (e.g. "family", "안녕하세요").',
         '- Be concrete about WHAT to fix when score is below 90 (mention a specific phoneme, syllable, or rhythm).',
         '- Encouraging tone. Never shame the learner.',
-        '- Korean uses casual-polite (해요체). Spanish uses tú. English is friendly informal.',
+        '- Korean register example: "정말 좋아요! \'family\'의 \'a\' 소리를 조금만 더 길게 빼볼까요?" — ALWAYS 해요체 (~요/~봐요/~볼까요). NEVER 합니다체 (~합니다/~십시오) and NEVER 반말.',
+        '- Spanish register example: "¡Muy bien! Intenta alargar la \'ll\' en \'llamar\'." — ALWAYS tú-form. NEVER usted. Use suaves imperatives.',
+        '- English: friendly, lower-case start mid-sentence is fine. Encouraging not corrective.',
         '- 1-2 sentences max per language. No emoji unless score >= 90.',
         '- Return ONLY a JSON object with keys "ko", "en", "es". No prose around it.',
       ].join(' ');
@@ -1519,34 +1549,50 @@ Student's ${learnName} answer: ${userAnswer}`;
         weakNote,
       ].filter(Boolean).join('\n');
 
-      let payload: CoachComment | null = null;
+      const work = (async (): Promise<CoachComment> => {
+        let payload: CoachComment | null = null;
+        try {
+          const raw = await completeText({
+            taskLabel: "/api/pronunciation-coach",
+            model: "gpt-4o-mini",
+            temperature: 0.55,
+            maxTokens: 240,
+            responseFormat: { type: "json_object" },
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          });
+          const parsed = JSON.parse(raw);
+          const ko = typeof parsed.ko === "string" ? parsed.ko.trim() : "";
+          const en = typeof parsed.en === "string" ? parsed.en.trim() : "";
+          const es = typeof parsed.es === "string" ? parsed.es.trim() : "";
+          // Per-locale partial fallback (QA Bug N6): if GPT misses one locale,
+          // keep what it gave and patch the missing one from fallbackCoach
+          // rather than throwing away two good locales.
+          if (ko || en || es) {
+            const fb = fallbackCoach(trimmedWord, score, weak);
+            payload = {
+              ko: ko || fb.ko,
+              en: en || fb.en,
+              es: es || fb.es,
+            };
+          }
+        } catch (e) {
+          console.warn("[pronunciation-coach] GPT call failed, using fallback:", (e as Error)?.message ?? e);
+        }
+        if (!payload) payload = fallbackCoach(trimmedWord, score, weak);
+        COACH_CACHE.set(cacheKey, { value: payload, at: Date.now() });
+        pruneCoachCache();
+        return payload;
+      })();
+      COACH_IN_FLIGHT.set(cacheKey, work);
       try {
-        const raw = await completeText({
-          taskLabel: "/api/pronunciation-coach",
-          model: "gpt-4o-mini",
-          temperature: 0.55,
-          maxTokens: 240,
-          responseFormat: { type: "json_object" },
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-        });
-        const parsed = JSON.parse(raw);
-        // Be tolerant of stray fields; we only care about the three locales.
-        const ko = typeof parsed.ko === "string" ? parsed.ko.trim() : "";
-        const en = typeof parsed.en === "string" ? parsed.en.trim() : "";
-        const es = typeof parsed.es === "string" ? parsed.es.trim() : "";
-        if (ko && en && es) payload = { ko, en, es };
-      } catch (e) {
-        console.warn("[pronunciation-coach] GPT call failed, using fallback:", (e as Error)?.message ?? e);
+        const value = await work;
+        return res.json({ ...value, cached: false });
+      } finally {
+        COACH_IN_FLIGHT.delete(cacheKey);
       }
-
-      if (!payload) payload = fallbackCoach(trimmedWord, score, weak);
-
-      COACH_CACHE.set(cacheKey, { value: payload, at: Date.now() });
-      pruneCoachCache();
-      return res.json({ ...payload, cached: false });
     } catch (err) {
       console.error("Coach endpoint error:", err);
       return res.status(500).json({ error: "Coaching failed" });
