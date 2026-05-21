@@ -6539,7 +6539,16 @@ export default function StoryScene() {
     );
   }
 
+  // Set true at the first finishChapter entry and never released — the
+  // chapter ends here, so the guard only needs to survive long enough to
+  // block the ~100ms re-entry window between advance() releasing
+  // advancingRef and markChapterComplete/awardXp resolving. Without this,
+  // a rapid double-tap on the chapter-end button used to award +150 XP
+  // twice.
+  const finishingRef = useRef(false);
   async function finishChapter() {
+    if (finishingRef.current) return;
+    finishingRef.current = true;
     const earned = 150;
     setXpEarned(earned);
     setCompleted(true);

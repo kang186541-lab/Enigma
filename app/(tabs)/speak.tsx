@@ -496,9 +496,12 @@ const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] 
   { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#FF9D6B" },
 ];
 
+// Overall score band thresholds. Kept in sync with sub-score color logic
+// (≥75 green / ≥50 amber / <50 red) and WEAK_THRESHOLD so the home stat
+// card, the sub-score chips, and the weak-words save behaviour all agree.
 function getScoreInfo(score: number): { label: string; color: string; emoji: string } {
-  if (score >= 90) return { label: "Excellent!", color: "#10B981", emoji: "🎉" };
-  if (score >= 75) return { label: "Good Job!", color: "#F59E0B", emoji: "😊" };
+  if (score >= 75) return { label: "Excellent!", color: "#10B981", emoji: "🎉" };
+  if (score >= 50) return { label: "Good Job!", color: "#F59E0B", emoji: "😊" };
   return { label: "Keep Practicing", color: "#EF4444", emoji: "💪" };
 }
 
@@ -869,6 +872,27 @@ export default function SpeakScreen() {
 
   const processScoreData = (data: PronunciationAssessResponse) => {
     const scoreVal = data.score ?? 0;
+    // Azure recognition failure (success: false) used to paint a punitive
+    // red "0" overall circle and three "0" sub-score boxes. That looks like
+    // the user scored zero rather than that no voice was detected. Surface
+    // only the GPT feedback / error copy and skip the score UI entirely.
+    if (data.success !== true) {
+      setScore(null);
+      setAccuracyScore(null);
+      setFluencyScore(null);
+      setCompletenessScore(null);
+      setGptFeedback(data.feedback ?? "");
+      setRecognizedText("");
+      setWordResults([]);
+      const msg = data.feedback ||
+        (nativeLang === "korean"
+          ? "음성이 감지되지 않았어요. 다시 시도해 주세요."
+          : nativeLang === "spanish"
+          ? "No se detectó voz. Inténtalo de nuevo."
+          : "No voice detected. Please try again.");
+      setSttError(msg);
+      return 0;
+    }
     setScore(scoreVal);
     setAccuracyScore(data.accuracyScore ?? null);
     setFluencyScore(data.fluencyScore ?? null);
@@ -876,6 +900,7 @@ export default function SpeakScreen() {
     setGptFeedback(data.feedback ?? "");
     setRecognizedText(data.recognizedText ?? "");
     setWordResults(data.words ?? []);
+    setSttError("");
     Animated.timing(scoreAnim, { toValue: scoreVal / 100, duration: 900, useNativeDriver: false }).start();
     return scoreVal;
   };

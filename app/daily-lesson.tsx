@@ -283,8 +283,11 @@ export default function DailyLessonScreen() {
         setXpGain(50);
         // Dedup learned words across all sessions — same word encountered in
         // a future session should NOT bump the counter again. We persist a
-        // Set keyed by lowercased word and compute newly-learned-this-session
-        // from the delta.
+        // Set keyed by `<lang>:<lowercased-word>` so a Spanish learner who
+        // already learned "No" in English still gets +1 credit when "No"
+        // appears in the Spanish pool (and vice versa). The previous
+        // language-unscoped key silently undercounted cross-language
+        // overlaps like en/es "no", en/es "pizza", en/es "hotel".
         (async () => {
           try {
             const KEY = "@lingua_known_words";
@@ -293,8 +296,9 @@ export default function DailyLessonScreen() {
             const seen = new Set(known);
             let added = 0;
             for (const w of sessionWords) {
-              const key = (w.word || "").trim().toLowerCase();
-              if (!key) continue;
+              const word = (w.word || "").trim().toLowerCase();
+              if (!word) continue;
+              const key = `${learnLang}:${word}`;
               if (!seen.has(key)) { seen.add(key); added += 1; }
             }
             if (added > 0) {

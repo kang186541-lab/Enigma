@@ -1158,7 +1158,14 @@ export default function CardsScreen() {
     setTimeout(() => setIsSpeaking(false), 1500);
   }, [card]);
 
+  // Reentrancy guard — rapid "Got it" double-taps were doubling XP, both
+  // promoting the SRS box (combined with the recordReview write-race) and
+  // undercounting dailyCount because newCount = dailyCount + 1 captures a
+  // stale closure value. Held until the slide-out animation finishes.
+  const advancingRef = useRef(false);
   const advanceCard = (knew: boolean) => {
+    if (advancingRef.current) return;
+    advancingRef.current = true;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (knew) {
       setGotIt((g) => g + 1);
@@ -1199,6 +1206,7 @@ export default function CardsScreen() {
         setSessionIndex((i) => i + 1);
         Animated.spring(slideAnim, { toValue: 0, useNativeDriver: true, tension: 70, friction: 10 }).start();
       }
+      advancingRef.current = false;
     });
   };
 

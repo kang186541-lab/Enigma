@@ -50,14 +50,20 @@ export interface SrsData {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
+/** Local-timezone YYYY-MM-DD. UTC-based ISO would cost an Asian user up
+ *  to 9 hours of "due today" review windows every night. */
 function today(): string {
-  return new Date().toISOString().split("T")[0];
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function addDays(dateStr: string, days: number): string {
-  const d = new Date(dateStr);
+  // Treat the stored YYYY-MM-DD as a local-calendar date and add whole days
+  // in local time to keep the schedule timezone-stable.
+  const [y, m, dd] = dateStr.split("-").map(Number);
+  const d = new Date(y, (m || 1) - 1, dd || 1);
   d.setDate(d.getDate() + days);
-  return d.toISOString().split("T")[0];
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function isBeforeOrEqual(a: string, b: string): boolean {
@@ -163,31 +169,42 @@ export async function getDueCount(): Promise<number> {
  * Record a review result.
  * correct=true  → promote to next box (max 5)
  * correct=false → demote to box 1
+ *
+ * Serialized through an in-memory mutex so rapid "Got it" double-taps can't
+ * both read the same baseline and clobber the second promotion.
  */
+let _reviewLock: Promise<unknown> = Promise.resolve();
+
 export async function recordReview(
   phrase: string,
   correct: boolean
 ): Promise<SrsCard | null> {
-  const data = await loadSrsData();
-  const key = phrase.toLowerCase().trim();
-  const card = data.cards[key];
-  if (!card) return null;
+  const run = async (): Promise<SrsCard | null> => {
+    const data = await loadSrsData();
+    const key = phrase.toLowerCase().trim();
+    const card = data.cards[key];
+    if (!card) return null;
 
-  const now = today();
-  card.reviewCount++;
-  card.lastReview = now;
+    const now = today();
+    card.reviewCount++;
+    card.lastReview = now;
 
-  if (correct) {
-    card.streak++;
-    card.box = Math.min(5, card.box + 1);
-  } else {
-    card.streak = 0;
-    card.box = 1;
-  }
+    if (correct) {
+      card.streak++;
+      card.box = Math.min(5, card.box + 1);
+    } else {
+      card.streak = 0;
+      card.box = 1;
+    }
 
-  card.nextReview = addDays(now, BOX_INTERVALS[card.box]);
-  await saveSrsData(data);
-  return card;
+    card.nextReview = addDays(now, BOX_INTERVALS[card.box]);
+    await saveSrsData(data);
+    return card;
+  };
+
+  const next = _reviewLock.then(run, run);
+  _reviewLock = next.catch(() => null); // never break the chain
+  return next;
 }
 
 /**

@@ -292,6 +292,15 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   // ── TTS (sanitized + male Rudy voice) ────────────────────────────────────────
 
   async function playTTS(text: string) {
+    // Defense in depth: the mic button gates on `ttsPlaying`, so ANY path
+    // out of this function must reset it or the user is permanently locked
+    // out from speaking. A 30s watchdog catches the case where playback
+    // never reports didJustFinish (corrupt audio, network drop mid-stream).
+    let watchdog: ReturnType<typeof setTimeout> | null = null;
+    const finish = () => {
+      if (watchdog) { clearTimeout(watchdog); watchdog = null; }
+      setTtsPlaying(false);
+    };
     try {
       if (soundRef.current) {
         await soundRef.current.stopAsync().catch((e) => console.warn('[Step3] TTS stop failed:', e));
@@ -309,29 +318,42 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       url.searchParams.set("voice", rudyVoice);
 
       setTtsPlaying(true);
+      watchdog = setTimeout(() => {
+        console.warn('[Step3] TTS watchdog fired — releasing mic gate after 30s');
+        finish();
+      }, 30_000);
+
       if (Platform.OS === "web") {
         const res = await fetch(url.toString());
-        if (!res.ok) { setTtsPlaying(false); return; }
+        if (!res.ok) { finish(); return; }
         const blob = await res.blob();
         const objUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
         registerGlobalWebAudio(audio);
-        audio.onended = () => { URL.revokeObjectURL(objUrl); setTtsPlaying(false); };
-        audio.onerror = () => { URL.revokeObjectURL(objUrl); setTtsPlaying(false); };
-        audio.play().catch((e) => { console.warn('[Step3] Audio playback failed:', e); setTtsPlaying(false); });
+        audio.onended = () => { URL.revokeObjectURL(objUrl); finish(); };
+        audio.onerror = () => { URL.revokeObjectURL(objUrl); finish(); };
+        audio.play().catch((e) => { console.warn('[Step3] Audio playback failed:', e); finish(); });
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
         soundRef.current = sound;
         registerGlobalSound(sound);
         sound.setOnPlaybackStatusUpdate((st) => {
+          // Loaded + finished → normal end.
           if (st.isLoaded && st.didJustFinish) {
             sound.unloadAsync().catch((e) => console.warn('[Step3] Audio unload failed:', e));
             soundRef.current = null;
-            setTtsPlaying(false);
+            finish();
+            return;
+          }
+          // Loaded but errored mid-stream → release gate too.
+          if (st.isLoaded === false && (st as any).error) {
+            console.warn('[Step3] Audio playback error:', (st as any).error);
+            soundRef.current = null;
+            finish();
           }
         });
       }
-    } catch (e) { console.warn('[Audio] TTS playback failed:', e); setTtsPlaying(false); }
+    } catch (e) { console.warn('[Audio] TTS playback failed:', e); finish(); }
   }
 
   // ── Pulse anim ───────────────────────────────────────────────────────────────

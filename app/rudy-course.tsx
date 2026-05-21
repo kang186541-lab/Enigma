@@ -53,21 +53,33 @@ export default function RudyCourseScreen() {
   }
 
   const currentUnit = UNITS[selectedUnitIdx] ?? UNITS[0];
-  const activeDayId = UNITS[progress.currentUnitIndex]?.days[progress.currentDayIndex]?.id ?? "";
+  // When progress has marched past the last day (course fully complete),
+  // currentUnitIndex/currentDayIndex point at indexes that don't resolve;
+  // activeDayId becomes "" and every NON-completed day reads as "locked"
+  // — including review days the user wants to replay. Fall back to the
+  // last completed day so replay is always available.
+  const allDaysGlobal = UNITS.flatMap((u) => u.days);
+  const courseFullyDone =
+    allDaysGlobal.length > 0 &&
+    allDaysGlobal.every((d) => progress.completedDays.includes(d.id));
+  const directActiveId = UNITS[progress.currentUnitIndex]?.days[progress.currentDayIndex]?.id ?? "";
+  const activeDayId = directActiveId || (courseFullyDone ? allDaysGlobal[allDaysGlobal.length - 1].id : "");
 
   // Progress within selected unit
   const unitDays = currentUnit.days;
   const completedInUnit = unitDays.filter((d) => progress.completedDays.includes(d.id)).length;
 
-  // For locking: a day is unlocked if all previous days in that unit are completed OR it's the active day
+  // A day is unlocked if it's completed, it's the active day, or it sits
+  // before the active day globally. Once the course is fully done, every
+  // day is treated as completed (= unlocked + visited) so testers can
+  // replay any unit/day they want.
   function getDayState(day: DayData): "completed" | "active" | "locked" {
     if (progress!.completedDays.includes(day.id)) return "completed";
+    if (courseFullyDone) return "completed";
     if (day.id === activeDayId) return "active";
-    // find index within all days globally
-    const allDays = UNITS.flatMap((u) => u.days);
-    const dayGlobalIdx = allDays.findIndex((d) => d.id === day.id);
-    const activeGlobalIdx = allDays.findIndex((d) => d.id === activeDayId);
-    if (dayGlobalIdx <= activeGlobalIdx) return "active"; // unlocked but not today
+    const dayGlobalIdx = allDaysGlobal.findIndex((d) => d.id === day.id);
+    const activeGlobalIdx = allDaysGlobal.findIndex((d) => d.id === activeDayId);
+    if (dayGlobalIdx <= activeGlobalIdx) return "active";
     return "locked";
   }
 

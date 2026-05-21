@@ -218,7 +218,11 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
 
   if (wordScores.length === 0) return null;
 
-  const weakWords = wordScores.filter((w) => w.score < 70);
+  // Threshold kept in sync with WEAK_THRESHOLD (speak.tsx:30) and the
+  // sub-score color bands (75 = good, 50 = warn) so a word saved as "weak"
+  // in the speak tab is shown with the ⚠️ icon here, never the green check.
+  const WEAK_THRESHOLD = 75;
+  const weakWords = wordScores.filter((w) => w.score < WEAK_THRESHOLD);
   const hasWeak = weakWords.length > 0;
 
   return (
@@ -233,11 +237,11 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
 
       {/* Word-level breakdown */}
       {wordScores.map((w, i) => {
-        const isWeak = w.score < 70;
+        const isWeak = w.score < WEAK_THRESHOLD;
         const isExpanded = expandedWord === `${w.word}-${i}`;
         // Get up to 3 weakest phonemes (below 70) sorted by score ascending
         const weakPhonemes = (w.phonemes ?? [])
-          .filter(p => p.score < 70 && p.phoneme && p.phoneme.trim() !== "")
+          .filter(p => p.score < WEAK_THRESHOLD && p.phoneme && p.phoneme.trim() !== "")
           .sort((a, b) => a.score - b.score)
           .slice(0, 3);
         const lowestPhoneme = weakPhonemes.length > 0 ? weakPhonemes[0] : null;
@@ -253,7 +257,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                 playWordTTS(w.word, speechLang);
               }}
             >
-              <Text style={s.wordIcon}>{w.score >= 70 ? "✅" : "⚠️"}</Text>
+              <Text style={s.wordIcon}>{w.score >= WEAK_THRESHOLD ? "✅" : "⚠️"}</Text>
               <Text style={[s.wordText, isWeak && s.wordTextWeak]}>{w.word}</Text>
               <Text style={[s.wordScore, isWeak && s.wordScoreWeak]}>{w.score}%</Text>
               {isWeak ? (
@@ -294,7 +298,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                     </Text>
                     <View style={s.phonemeList}>
                       {w.phonemes.filter(p => p.phoneme && p.phoneme.trim() !== "").map((p, pi) => {
-                        const isLowest = lowestPhoneme?.phoneme === p.phoneme && p.score < 70;
+                        const isLowest = lowestPhoneme?.phoneme === p.phoneme && p.score < WEAK_THRESHOLD;
                         return (
                           <View key={pi} style={[s.phonemeRow, isLowest && s.phonemeRowHighlight]}>
                             <Text style={[s.phonemeLabel, isLowest && s.phonemeLabelWeak]}>
@@ -307,7 +311,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                                 style={[
                                   s.phonemeBarFill,
                                   { width: `${Math.max(p.score, 5)}%` },
-                                  p.score >= 70 ? s.phonemeBarGood : s.phonemeBarBad,
+                                  p.score >= WEAK_THRESHOLD ? s.phonemeBarGood : s.phonemeBarBad,
                                 ]}
                               />
                             </View>

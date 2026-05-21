@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { reloadAppAsync } from "expo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   StyleSheet,
   View,
@@ -18,6 +19,47 @@ export type ErrorFallbackProps = {
   resetError: () => void;
 };
 
+// Inline copy so we don't need the React tree (LanguageContext may be broken
+// when this component renders). Falls back to English.
+type Lang = "korean" | "english" | "spanish";
+const FALLBACK_COPY: Record<Lang, {
+  title: string;
+  message: string;
+  restart: string;
+  details: string;
+  copy: string;
+  copied: string;
+  close: string;
+}> = {
+  korean: {
+    title: "오류가 발생했어요",
+    message: "앱을 다시 불러와서 계속해 주세요.",
+    restart: "다시 시도",
+    details: "오류 정보",
+    copy: "복사",
+    copied: "복사됨",
+    close: "닫기",
+  },
+  english: {
+    title: "Something went wrong",
+    message: "Please reload the app to continue.",
+    restart: "Try Again",
+    details: "Error Details",
+    copy: "Copy",
+    copied: "Copied",
+    close: "Close",
+  },
+  spanish: {
+    title: "Algo salió mal",
+    message: "Vuelve a cargar la aplicación para continuar.",
+    restart: "Reintentar",
+    details: "Detalles del error",
+    copy: "Copiar",
+    copied: "Copiado",
+    close: "Cerrar",
+  },
+};
+
 export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -33,6 +75,16 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   };
 
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // Read language directly from AsyncStorage so we don't depend on
+  // LanguageContext (which may itself be the source of the crash).
+  const [lang, setLang] = useState<Lang>("english");
+  useEffect(() => {
+    AsyncStorage.getItem("@lingua_language").then((v) => {
+      if (v === "korean" || v === "spanish" || v === "english") setLang(v);
+    }).catch(() => {});
+  }, []);
+  const t = FALLBACK_COPY[lang];
 
   const handleRestart = async () => {
     try {
@@ -79,11 +131,11 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
 
       <View style={styles.content}>
         <Text style={[styles.title, { color: theme.text }]}>
-          Something went wrong
+          {t.title}
         </Text>
 
         <Text style={[styles.message, { color: theme.textSecondary }]}>
-          Please reload the app to continue.
+          {t.message}
         </Text>
 
         <Pressable
@@ -98,7 +150,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
           ]}
         >
           <Text style={[styles.buttonText, { color: theme.buttonText }]}>
-            Try Again
+            {t.restart}
           </Text>
         </Pressable>
       </View>
@@ -128,7 +180,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                 ]}
               >
                 <Text style={[styles.modalTitle, { color: theme.text }]}>
-                  Error Details
+                  {t.details}
                 </Text>
                 <Pressable
                   onPress={() => setIsModalVisible(false)}
