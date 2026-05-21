@@ -1379,6 +1379,180 @@ Student's ${learnName} answer: ${userAnswer}`;
     }
   });
 
+  // ─── Pronunciation coaching (GPT-4o-mini layered on Azure score) ────────────
+  //
+  // Azure tells you NUMBERS (75 / 60 / 90). Korean learners need to be told
+  // WHY in their own language and HOW to fix it — that's what this endpoint
+  // generates: 1-2 warm, specific sentences in ko / en / es, returned as a
+  // single JSON so we cache once per (word, score-band) and serve all three
+  // native-language readers from the same hit.
+  //
+  // Called by the client AFTER /api/pronunciation-assess returns, so the
+  // score circle paints immediately and the coaching card fades in over it.
+  //
+  // Cache: in-process LRU keyed by `${word}|${lang}|${band}|${weakKey}` so a
+  // tester repeating "family" with the same weak phoneme gets a snappy reply.
+  type CoachComment = { ko: string; en: string; es: string };
+  type CacheEntry = { value: CoachComment; at: number };
+  const COACH_CACHE = new Map<string, CacheEntry>();
+  const COACH_CACHE_MAX = 200;
+  const COACH_CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
+
+  function coachBand(score: number): string {
+    if (score >= 90) return "great";
+    if (score >= 75) return "good";
+    if (score >= 50) return "fair";
+    return "weak";
+  }
+
+  function fallbackCoach(word: string, score: number, weakPhonemes: string[]): CoachComment {
+    const band = coachBand(score);
+    const w = weakPhonemes.length > 0 ? ` (Watch out for: ${weakPhonemes.join(", ")})` : "";
+    if (band === "great") {
+      return {
+        ko: `"${word}" 정말 자연스러워요! 이대로 계속 가세요. 🎉`,
+        en: `Your "${word}" sounded natural — keep it up! 🎉`,
+        es: `Tu "${word}" sonó natural — ¡así se hace! 🎉`,
+      };
+    }
+    if (band === "good") {
+      return {
+        ko: `"${word}" 거의 다 왔어요. 한 번만 더 듣고 따라 해 볼까요?${w}`,
+        en: `"${word}" was close — listen once more and try again.${w}`,
+        es: `"${word}" estuvo cerca — escucha una vez más e inténtalo.${w}`,
+      };
+    }
+    if (band === "fair") {
+      return {
+        ko: `"${word}" 음절을 천천히 끊어서 발음해 봐요. 듣기 버튼이 도움이 될 거예요.${w}`,
+        en: `For "${word}", slow down each syllable. The listen button helps.${w}`,
+        es: `Para "${word}", reduce cada sílaba. El botón de escuchar ayuda.${w}`,
+      };
+    }
+    return {
+      ko: `먼저 듣기 버튼으로 "${word}"의 원어민 발음을 들어보세요. 우리는 천천히 가요. 🦊`,
+      en: `Start by listening to "${word}" with the speaker button. We'll take it slow. 🦊`,
+      es: `Empieza escuchando "${word}" con el botón de altavoz. Iremos despacio. 🦊`,
+    };
+  }
+
+  function pruneCoachCache() {
+    if (COACH_CACHE.size <= COACH_CACHE_MAX) return;
+    // Drop the oldest 20% to amortize eviction cost.
+    const entries = [...COACH_CACHE.entries()].sort((a, b) => a[1].at - b[1].at);
+    const drop = Math.ceil(COACH_CACHE_MAX * 0.2);
+    for (let i = 0; i < drop && i < entries.length; i++) {
+      COACH_CACHE.delete(entries[i][0]);
+    }
+  }
+
+  app.post("/api/pronunciation-coach", async (req: Request, res: Response) => {
+    try {
+      const {
+        word,
+        lang,                  // BCP-47 (en-US / es-ES / ko-KR)
+        nativeLang,            // ko / en / es (ISO-like)
+        score,
+        accuracyScore,
+        fluencyScore,
+        completenessScore,
+        recognizedText,
+        weakPhonemes,          // string[] (IPA chars) — optional
+      } = req.body as {
+        word?: string;
+        lang?: string;
+        nativeLang?: string;
+        score?: number;
+        accuracyScore?: number;
+        fluencyScore?: number;
+        completenessScore?: number;
+        recognizedText?: string;
+        weakPhonemes?: string[];
+      };
+
+      if (!word || typeof score !== "number" || !lang) {
+        return res.status(400).json({ error: "word, lang, and numeric score are required" });
+      }
+
+      const trimmedWord = word.slice(0, 60);
+      const weak = Array.isArray(weakPhonemes) ? weakPhonemes.slice(0, 6) : [];
+      const band = coachBand(score);
+      const cacheKey = `${trimmedWord.toLowerCase()}|${lang}|${band}|${weak.join(",")}`;
+
+      // Cache hit — instant return.
+      const cached = COACH_CACHE.get(cacheKey);
+      if (cached && Date.now() - cached.at < COACH_CACHE_TTL) {
+        return res.json({ ...cached.value, cached: true });
+      }
+
+      // Build the prompt. We always ask for all three languages so the same
+      // cache entry serves Korean/English/Spanish readers — the cost is 3x
+      // output tokens but the hit rate is much higher.
+      const langLabel = lang.startsWith("ko") ? "Korean" : lang.startsWith("es") ? "Spanish" : "English";
+      const nativeLabel = nativeLang === "korean" ? "Korean" : nativeLang === "spanish" ? "Spanish" : "English";
+      const recognizedNote = recognizedText && recognizedText.trim() && recognizedText.trim().toLowerCase() !== trimmedWord.toLowerCase()
+        ? `Speech recogniser heard: "${recognizedText.slice(0, 80)}"`
+        : "Recogniser heard the word correctly";
+      const weakNote = weak.length > 0 ? `Weak phonemes: ${weak.join(", ")}` : "No specific phoneme issues flagged";
+
+      const systemPrompt = [
+        'You are Rudy, a friendly fox-tutor who gives pronunciation coaching to language learners.',
+        'You receive an Azure assessment score and must respond with one SHORT (1-2 sentences) warm, specific coaching comment in EACH of Korean, English, and Spanish.',
+        'Always:',
+        '- Reference the target word by quoting it (e.g. "family", "안녕하세요").',
+        '- Be concrete about WHAT to fix when score is below 90 (mention a specific phoneme, syllable, or rhythm).',
+        '- Encouraging tone. Never shame the learner.',
+        '- Korean uses casual-polite (해요체). Spanish uses tú. English is friendly informal.',
+        '- 1-2 sentences max per language. No emoji unless score >= 90.',
+        '- Return ONLY a JSON object with keys "ko", "en", "es". No prose around it.',
+      ].join(' ');
+
+      const userPrompt = [
+        `Target word: "${trimmedWord}"`,
+        `Target language: ${langLabel} (${lang})`,
+        `Learner's native language: ${nativeLabel}`,
+        `Overall pronunciation score: ${Math.round(score)} / 100 (band: ${band})`,
+        typeof accuracyScore === "number" ? `Accuracy: ${Math.round(accuracyScore)}` : null,
+        typeof fluencyScore === "number" ? `Fluency: ${Math.round(fluencyScore)}` : null,
+        typeof completenessScore === "number" ? `Completeness: ${Math.round(completenessScore)}` : null,
+        recognizedNote,
+        weakNote,
+      ].filter(Boolean).join('\n');
+
+      let payload: CoachComment | null = null;
+      try {
+        const raw = await completeText({
+          taskLabel: "/api/pronunciation-coach",
+          model: "gpt-4o-mini",
+          temperature: 0.55,
+          maxTokens: 240,
+          responseFormat: { type: "json_object" },
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+        });
+        const parsed = JSON.parse(raw);
+        // Be tolerant of stray fields; we only care about the three locales.
+        const ko = typeof parsed.ko === "string" ? parsed.ko.trim() : "";
+        const en = typeof parsed.en === "string" ? parsed.en.trim() : "";
+        const es = typeof parsed.es === "string" ? parsed.es.trim() : "";
+        if (ko && en && es) payload = { ko, en, es };
+      } catch (e) {
+        console.warn("[pronunciation-coach] GPT call failed, using fallback:", (e as Error)?.message ?? e);
+      }
+
+      if (!payload) payload = fallbackCoach(trimmedWord, score, weak);
+
+      COACH_CACHE.set(cacheKey, { value: payload, at: Date.now() });
+      pruneCoachCache();
+      return res.json({ ...payload, cached: false });
+    } catch (err) {
+      console.error("Coach endpoint error:", err);
+      return res.status(500).json({ error: "Coaching failed" });
+    }
+  });
+
   // GPT to give a 0-100 score and short Korean feedback (legacy, kept as fallback).
   app.post("/api/gpt-score", async (req: Request, res: Response) => {
     try {

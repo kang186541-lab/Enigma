@@ -23,6 +23,7 @@ import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
 import { C, F } from "@/constants/theme";
 import { PhonemeCoaching } from "@/components/rudy/PhonemeCoaching";
+import { CoachingCard } from "@/components/rudy/CoachingCard";
 import { getCefrTierLabel } from "@/lib/dailyCourseData";
 
 const TAB_BAR_HEIGHT = 49;
@@ -735,6 +736,10 @@ export default function SpeakScreen() {
   const [recognizedText, setRecognizedText] = useState("");
   const [wordResults, setWordResults] = useState<{ word: string; score: number; errorType: string; phonemes?: { phoneme: string; score: number }[] }[]>([]);
   const [sttError, setSttError] = useState("");
+  // attemptId is bumped each time a fresh /api/pronunciation-assess succeeds.
+  // The CoachingCard uses it as its sole reset key so a new recording wipes
+  // the previous GPT comment and re-fetches.
+  const [attemptId, setAttemptId] = useState(0);
   const [hasListened, setHasListened] = useState(false);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -901,6 +906,8 @@ export default function SpeakScreen() {
     setRecognizedText(data.recognizedText ?? "");
     setWordResults(data.words ?? []);
     setSttError("");
+    // Bump so CoachingCard re-fetches with the new score for this attempt.
+    setAttemptId((n) => n + 1);
     Animated.timing(scoreAnim, { toValue: scoreVal / 100, duration: 900, useNativeDriver: false }).start();
     return scoreVal;
   };
@@ -1513,6 +1520,30 @@ export default function SpeakScreen() {
 
                   {gptFeedback ? (
                     <Text style={styles.feedbackText}>{gptFeedback}</Text>
+                  ) : null}
+
+                  {/* Layered above Azure's deterministic feedback: a 1-2
+                      sentence GPT-4o-mini coaching note in the learner's
+                      native language. Failure is silent — the card hides
+                      itself, the rest of the screen stays usable. */}
+                  {phrase && score !== null && score > 0 ? (
+                    <CoachingCard
+                      attemptId={attemptId}
+                      word={phrase.word}
+                      lang={phrase.speechLang}
+                      nativeLang={nativeLang}
+                      score={score}
+                      accuracyScore={accuracyScore}
+                      fluencyScore={fluencyScore}
+                      completenessScore={completenessScore}
+                      recognizedText={recognizedText}
+                      weakPhonemes={
+                        wordResults
+                          .flatMap((w) => (w.phonemes ?? []).filter((p) => p.score < 75).map((p) => p.phoneme))
+                          .filter((s) => !!s && s.trim() !== "")
+                          .slice(0, 6)
+                      }
+                    />
                   ) : null}
                 </View>
               ) : (
