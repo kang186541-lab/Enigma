@@ -181,6 +181,17 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         nativeRecRef.current.stopAndUnloadAsync().catch((e) => console.warn('[Step3] Recording cleanup failed:', e));
         nativeRecRef.current = null;
       }
+      // Web: stop the MediaRecorder AND release its audio stream tracks so
+      // the browser drops the mic indicator. Without this, navigating away
+      // mid-recording left the mic stream open until the tab closed.
+      if (mediaRecRef.current) {
+        try {
+          const rec = mediaRecRef.current;
+          if (rec.state && rec.state !== "inactive") rec.stop();
+          rec.stream?.getTracks?.().forEach((t: MediaStreamTrack) => { try { t.stop(); } catch {} });
+        } catch (e) { console.warn('[Step3] MediaRecorder cleanup failed:', e); }
+        mediaRecRef.current = null;
+      }
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
       if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
     };

@@ -311,7 +311,10 @@ async function fetchTranslation(
  * which works natively on iOS Safari 14.1+, Chrome, and Edge.
  * Returns the transcript on success, "" on no-speech, rejects on error.
  */
-function webSpeechRecognize(lang: string): Promise<string> {
+// Web Speech API recognizer with a hard 15s timeout. Without this, a stalled
+// mic stream that never fires onresult/onend would leave the promise unresolved
+// indefinitely, freezing the chat-room voice button.
+function webSpeechRecognize(lang: string, timeoutMs = 15_000): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const SR =
       (window as any).SpeechRecognition ||
@@ -327,8 +330,13 @@ function webSpeechRecognize(lang: string): Promise<string> {
     rec.maxAlternatives = 1;
 
     let settled = false;
+    let watchdog: ReturnType<typeof setTimeout> | null = null;
     const settle = (fn: () => void) => {
-      if (!settled) { settled = true; fn(); }
+      if (settled) return;
+      settled = true;
+      if (watchdog) { clearTimeout(watchdog); watchdog = null; }
+      try { rec.stop?.(); } catch {}
+      fn();
     };
 
     rec.onresult = (e: any) => {
@@ -350,6 +358,10 @@ function webSpeechRecognize(lang: string): Promise<string> {
     rec.onend = () => settle(() => resolve(""));
     try {
       rec.start();
+      watchdog = setTimeout(() => {
+        console.warn('[webSpeechRecognize] watchdog timeout after', timeoutMs, 'ms');
+        settle(() => resolve(""));
+      }, timeoutMs);
     } catch (err) {
       settle(() => reject(err));
     }
@@ -481,11 +493,51 @@ export default function ChatRoomScreen() {
     return () => { stopSpeech(); };
   }, []);
 
+  // Per-tutor message persistence so the conversation survives unmount and
+  // app restarts. Capped at HISTORY_MAX so AsyncStorage doesn't bloat.
+  const HISTORY_MAX = 60;
+  const historyKey = tutor ? `@chat_history_${tutor.id}` : null;
+
+  // Persist conversation history (debounced) so it survives unmount.
+  const persistDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (!tutor) return;
+    if (!historyKey || messages.length === 0) return;
+    if (persistDebounceRef.current) clearTimeout(persistDebounceRef.current);
+    persistDebounceRef.current = setTimeout(() => {
+      try {
+        const trimmedMsgs = messages.slice(0, HISTORY_MAX);
+        const trimmedHist = conversationHistoryRef.current.slice(-HISTORY_MAX);
+        AsyncStorage.setItem(historyKey, JSON.stringify({ messages: trimmedMsgs, history: trimmedHist }))
+          .catch((e) => console.warn('[chat-room] history save failed:', e));
+      } catch (e) { console.warn('[chat-room] history serialize failed:', e); }
+    }, 600);
+    return () => {
+      if (persistDebounceRef.current) clearTimeout(persistDebounceRef.current);
+    };
+  }, [messages, historyKey]);
+
+  useEffect(() => {
+    if (!tutor || !historyKey) return;
     let cancelled = false;
 
     const id = "greeting";
+
+    (async () => {
+      // Try to restore saved messages first. Only if NONE exist do we fall
+      // through to the static greeting / API path below.
+      try {
+        const raw = await AsyncStorage.getItem(historyKey);
+        if (cancelled) return;
+        if (raw) {
+          const saved = JSON.parse(raw) as { messages: Message[]; history: { role: "user" | "assistant"; content: string }[] };
+          if (Array.isArray(saved?.messages) && saved.messages.length > 0) {
+            setMessages(saved.messages);
+            conversationHistoryRef.current = Array.isArray(saved.history) ? saved.history : [];
+            return; // skip the greeting — user has a live conversation already
+          }
+        }
+      } catch (e) { console.warn('[chat-room] history load failed:', e); }
+    })();
 
     // ── STEP 1: Show static greeting IMMEDIATELY (proven, never fails) ──────
     const timer = setTimeout(() => {

@@ -143,7 +143,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    await flushProgressPush();
+    // Flush pending progress to Supabase BEFORE clearing local data.
+    // If the flush failed (offline / 5xx), keep the local state intact so
+    // the user can retry sign-out when connectivity returns — otherwise an
+    // offline sign-out would strand their unsynced XP forever.
+    const ok = await flushProgressPush();
+    if (!ok) {
+      console.warn("[Auth] sign-out aborted — could not flush progress to server. Try again when online.");
+      throw new Error("FLUSH_FAILED");
+    }
     await supabase.auth.signOut();
     await clearLocalProgressState();
   }, []);

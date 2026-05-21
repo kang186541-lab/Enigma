@@ -105,7 +105,21 @@ export default function SettingsScreen() {
 
   const handleSignOut = async () => {
     setSignInBusy(true);
-    try { await signOut(); } finally { setSignInBusy(false); }
+    setSignInError(null);
+    try {
+      await signOut();
+    } catch (e) {
+      // signOut throws FLUSH_FAILED when offline / server unavailable so
+      // we don't wipe local data the user hasn't synced yet.
+      const msg = (e as Error)?.message === "FLUSH_FAILED"
+        ? (lc === "ko" ? "오프라인이라 진행 상황 동기화에 실패했어요. 연결 후 다시 시도해 주세요."
+          : lc === "es" ? "Sin conexión, no se pudo sincronizar tu progreso. Intenta de nuevo cuando estés en línea."
+          : "Offline — couldn't sync progress. Try again when you're online.")
+        : ((e as Error)?.message ?? "Sign-out failed");
+      setSignInError(msg);
+    } finally {
+      setSignInBusy(false);
+    }
   };
 
   useEffect(() => {

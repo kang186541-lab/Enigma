@@ -189,14 +189,24 @@ export function queueProgressPush(patch: ProgressPatch, delayMs = 1000): void {
   }, delayMs);
 }
 
-// Force-flush any pending queued push (e.g. on sign-out).
-export async function flushProgressPush(): Promise<void> {
+// Force-flush any pending queued push (e.g. on sign-out). Returns true if
+// the flush succeeded (or there was nothing to flush). Callers can use the
+// return value to decide whether to clear local state, so a network failure
+// doesn't strand the user's unsynced XP.
+export async function flushProgressPush(): Promise<boolean> {
   if (pendingTimer) {
     clearTimeout(pendingTimer);
     pendingTimer = null;
   }
   const toSend = pendingPatch;
   pendingPatch = {};
-  if (Object.keys(toSend).length === 0) return;
-  await pushServerProgress(toSend);
+  if (Object.keys(toSend).length === 0) return true;
+  try {
+    return await pushServerProgress(toSend);
+  } catch (e) {
+    console.warn("[progressSync] flush failed:", e);
+    // Put it back so the next push attempt can retry.
+    pendingPatch = { ...toSend, ...pendingPatch };
+    return false;
+  }
 }

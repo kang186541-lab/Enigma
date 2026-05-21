@@ -19,6 +19,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 
 const DISMISS_KEY = "@lingua_signin_banner_dismissed_at";
+// Shared with FirstTimeSignInModal — the banner must not show until the
+// modal has been dismissed at least once, otherwise both render on the
+// same page and the user reads the same prompt twice.
+const MODAL_SEEN_KEY = "@lingua_signin_modal_seen_v1";
 const DISMISS_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const XP_THRESHOLD = 100;
 const STREAK_THRESHOLD = 3;
@@ -80,12 +84,19 @@ export function SignInPromoBanner() {
     if (!earnedSomething) { setEligible(false); return; }
 
     let cancelled = false;
-    AsyncStorage.getItem(DISMISS_KEY).then((v) => {
+    (async () => {
+      // Defer to FirstTimeSignInModal: if the one-shot modal hasn't been
+      // dismissed yet, suppress the banner so the user only sees ONE
+      // sign-in surface at a time.
+      const modalSeen = await AsyncStorage.getItem(MODAL_SEEN_KEY);
+      if (cancelled) return;
+      if (modalSeen !== "1") { setEligible(false); return; }
+      const v = await AsyncStorage.getItem(DISMISS_KEY);
       if (cancelled) return;
       const dismissedAt = v ? Number(v) : 0;
       const cooled = dismissedAt === 0 || Date.now() - dismissedAt > DISMISS_COOLDOWN_MS;
       setEligible(cooled);
-    });
+    })();
     return () => { cancelled = true; };
   }, [user, authLoading, hasOnboarded, isHydrated, stats.xp, stats.streak]);
 

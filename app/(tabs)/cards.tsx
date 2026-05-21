@@ -1198,10 +1198,19 @@ export default function CardsScreen() {
         setDailyComplete(true);
         slideAnim.setValue(0);
       } else if (sessionIndex + 1 >= sessionCards.length) {
-        const nextPicked = pickSessionCards(allCards, DAILY_GOAL, currentWords);
-        setSessionCards(nextPicked);
-        setSessionIndex(0);
-        slideAnim.setValue(0);
+        // SRS mode: when the live due queue is exhausted, don't silently
+        // fall through to static beginner/advanced cards — that would
+        // call recordReview() on words not in the SRS store and grant
+        // XP for fake reviews. Mark the day complete instead.
+        if (deckType === "srs") {
+          setDailyComplete(true);
+          slideAnim.setValue(0);
+        } else {
+          const nextPicked = pickSessionCards(allCards, DAILY_GOAL, currentWords);
+          setSessionCards(nextPicked);
+          setSessionIndex(0);
+          slideAnim.setValue(0);
+        }
       } else {
         setSessionIndex((i) => i + 1);
         Animated.spring(slideAnim, { toValue: 0, useNativeDriver: true, tension: 70, friction: 10 }).start();

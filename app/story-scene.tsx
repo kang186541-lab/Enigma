@@ -5018,7 +5018,11 @@ function DialogueChoicePuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
-          <Text style={styles.puzzleConfirmText}>{idx < puzzle.questions.length - 1 ? (lang === "korean" ? "다음 ▶" : "Next ▶") : (lang === "korean" ? "완료 ✓" : "Done ✓")}</Text>
+          <Text style={styles.puzzleConfirmText}>{
+            idx < puzzle.questions.length - 1
+              ? (lang === "korean" ? "다음 ▶" : lang === "spanish" ? "Siguiente ▶" : "Next ▶")
+              : (lang === "korean" ? "완료 ✓" : lang === "spanish" ? "Hecho ✓" : "Done ✓")
+          }</Text>
         </Pressable>
       )}
     </View>
@@ -5115,7 +5119,11 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={isCorrect ? handleNext : () => { setPlaced([]); setConfirmed(false); setIsCorrect(false); }}>
-          <Text style={styles.puzzleConfirmText}>{isCorrect ? (lang === "korean" ? "다음 ▶" : "Next ▶") : (lang === "korean" ? "다시 시도 ↺" : lang === "spanish" ? "Reintentar ↺" : "Try Again ↺")}</Text>
+          <Text style={styles.puzzleConfirmText}>{
+            isCorrect
+              ? (lang === "korean" ? "다음 ▶" : lang === "spanish" ? "Siguiente ▶" : "Next ▶")
+              : (lang === "korean" ? "다시 시도 ↺" : lang === "spanish" ? "Reintentar ↺" : "Try Again ↺")
+          }</Text>
         </Pressable>
       )}
     </View>

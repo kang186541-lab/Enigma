@@ -20,8 +20,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Animated, StyleSheet, Pressable, Platform, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
+import { registerGlobalSound, registerGlobalWebAudio } from "@/lib/ttsManager";
 
 const rudyBadge = require("@/assets/rudy_badge.png");
 
@@ -50,7 +52,34 @@ const L = (nl: NativeLang) => ({
   header: nl === "korean" ? "코치 한마디" : nl === "spanish" ? "Consejo del coach" : "Coach tip",
   failed: nl === "korean" ? "루디의 한 마디를 불러오지 못했어요." : nl === "spanish" ? "No se pudo cargar el comentario de Rudy." : "Couldn't load Rudy's note.",
   retry: nl === "korean" ? "다시 받기" : nl === "spanish" ? "Reintentar" : "Try again",
+  hearWord: nl === "korean" ? "원어민 발음 듣기" : nl === "spanish" ? "Escuchar palabra" : "Hear it",
+  weakLabel: nl === "korean" ? "약한 소리" : nl === "spanish" ? "Sonidos débiles" : "Weak sounds",
 });
+
+// Slow target-word TTS so the learner can re-listen as part of the coaching
+// loop. Uses the same /api/pronunciation-tts endpoint as the main listen
+// button, just with rate=-30% for a clearer model.
+async function playWordSlow(word: string, lang: string) {
+  try {
+    const url = new URL("/api/pronunciation-tts", getApiUrl());
+    url.searchParams.set("text", word);
+    url.searchParams.set("lang", lang);
+    url.searchParams.set("rate", "-30%");
+    if (Platform.OS === "web") {
+      const res = await fetch(url.toString());
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const objUrl = URL.createObjectURL(blob);
+      const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
+      registerGlobalWebAudio(audio);
+      audio.onended = () => URL.revokeObjectURL(objUrl);
+      await audio.play();
+    } else {
+      const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
+      registerGlobalSound(sound);
+    }
+  } catch (e) { console.warn('[CoachingCard] playWordSlow failed:', e); }
+}
 
 // Score band → shadow tint. Matches the unified 75/50 thresholds used by the
 // rest of speak.tsx and PhonemeCoaching. Uses Enigma palette tokens, not
@@ -199,22 +228,50 @@ export function CoachingCard(props: Props) {
           </Pressable>
         </View>
       ) : (
-        <View style={styles.commentWrap}>
-          {/* Placeholder text — visible immediately, fades out when GPT
-              version arrives so the user always reads something. */}
-          <Animated.Text style={[styles.comment, styles.commentLayer, { opacity: placeholderFade }]} accessibilityRole="text">
-            {placeholder}
-          </Animated.Text>
-          {/* GPT text — fades in over the placeholder. */}
-          {gptComment ? (
-            <Animated.Text
-              style={[styles.comment, styles.commentLayer, { opacity: gptFade, transform: [{ translateY }] }]}
-              accessibilityRole="text"
-            >
-              {gptComment}
+        <>
+          <View style={styles.commentWrap}>
+            {/* Placeholder text — visible immediately, fades out when GPT
+                version arrives so the user always reads something. */}
+            <Animated.Text style={[styles.comment, styles.commentLayer, { opacity: placeholderFade }]} accessibilityRole="text">
+              {placeholder}
             </Animated.Text>
-          ) : null}
-        </View>
+            {/* GPT text — fades in over the placeholder. */}
+            {gptComment ? (
+              <Animated.Text
+                style={[styles.comment, styles.commentLayer, { opacity: gptFade, transform: [{ translateY }] }]}
+                accessibilityRole="text"
+              >
+                {gptComment}
+              </Animated.Text>
+            ) : null}
+          </View>
+
+          {/* Action row — gives the user something to DO with the coaching
+              instead of a dead-end read. "Hear it" replays the target word
+              at -30% rate, and weak-phoneme pills surface the trouble
+              sounds so the user knows what to focus on. */}
+          <View style={styles.actionRow}>
+            <Pressable
+              onPress={() => { void playWordSlow(word, lang); }}
+              style={({ pressed }) => [styles.hearChip, pressed && { opacity: 0.6 }]}
+              accessibilityRole="button"
+              accessibilityLabel={labels.hearWord}
+            >
+              <Ionicons name="volume-medium-outline" size={14} color={C.gold} />
+              <Text style={styles.hearChipText} numberOfLines={1}>{labels.hearWord}</Text>
+            </Pressable>
+
+            {weakPhonemes && weakPhonemes.length > 0 ? (
+              <View style={styles.pillRow} accessibilityLabel={labels.weakLabel}>
+                {weakPhonemes.slice(0, 3).map((p, i) => (
+                  <View key={`${p}-${i}`} style={styles.phonemePill}>
+                    <Text style={styles.phonemePillText} numberOfLines={1}>/{p}/</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+          </View>
+        </>
       )}
     </View>
   );
@@ -306,5 +363,48 @@ const styles = StyleSheet.create({
     fontFamily: F.bodySemi,
     fontSize: 12,
     color: C.gold,
+  },
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 12,
+  },
+  hearChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    borderWidth: 1,
+    borderColor: C.border,
+    backgroundColor: C.bg3,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  hearChipText: {
+    fontFamily: F.bodySemi,
+    fontSize: 12,
+    color: C.gold,
+  },
+  pillRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  phonemePill: {
+    backgroundColor: C.bg3,
+    borderWidth: 1,
+    borderColor: C.error,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 12,
+  },
+  phonemePillText: {
+    fontFamily: F.bodySemi,
+    fontSize: 12,
+    color: C.error,
   },
 });

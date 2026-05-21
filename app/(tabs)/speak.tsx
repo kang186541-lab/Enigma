@@ -24,6 +24,7 @@ import { XPToast } from "@/components/XPToast";
 import { C, F } from "@/constants/theme";
 import { PhonemeCoaching } from "@/components/rudy/PhonemeCoaching";
 import { CoachingCard } from "@/components/rudy/CoachingCard";
+import { useLocalized } from "@/lib/runtimeTranslate";
 import { getCefrTierLabel } from "@/lib/dailyCourseData";
 
 const TAB_BAR_HEIGHT = 49;
@@ -756,12 +757,41 @@ export default function SpeakScreen() {
   const audioChunksRef = useRef<Blob[]>([]);
   const autoStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nativeRecordingRef = useRef<Audio.Recording | null>(null);
+  const RECORD_MAX_SEC = 8;
+  // Countdown shown to the user while a recording is in progress so they
+  // know HOW LONG they have before the 8-second auto-stop kicks in. Without
+  // a visible timer, slow speakers / long phrases ("Ferrocarril") used to
+  // get truncated mid-word with no warning, producing artificially low
+  // accuracy scores.
+  const [recordSecondsLeft, setRecordSecondsLeft] = useState<number | null>(null);
+  const recordTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const weakKey = `speak_weak_words_${activeLang}`;
   const lastSeenKey = `speak_last_seen_${activeLang}`;
 
+  const stopCountdown = useCallback(() => {
+    if (recordTickRef.current) { clearInterval(recordTickRef.current); recordTickRef.current = null; }
+    setRecordSecondsLeft(null);
+  }, []);
+
+  const startCountdown = useCallback(() => {
+    stopCountdown();
+    setRecordSecondsLeft(RECORD_MAX_SEC);
+    recordTickRef.current = setInterval(() => {
+      setRecordSecondsLeft((n) => {
+        if (n === null) return null;
+        if (n <= 1) {
+          if (recordTickRef.current) { clearInterval(recordTickRef.current); recordTickRef.current = null; }
+          return 0;
+        }
+        return n - 1;
+      });
+    }, 1000);
+  }, [stopCountdown]);
+
   const resetPracticeState = useCallback(() => {
     if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
+    stopCountdown();
     if (mediaRecorderRef.current?.state === "recording") { mediaRecorderRef.current.stop(); }
     if (nativeRecordingRef.current) {
       nativeRecordingRef.current.stopAndUnloadAsync().catch((e: unknown) => console.warn('[Audio] recording stopAndUnload cleanup failed:', e));
@@ -922,6 +952,7 @@ export default function SpeakScreen() {
     const rec = nativeRecordingRef.current;
     if (!rec) return;
     stopPulse();
+    stopCountdown();
     setRecordState("processing");
     recordStateRef.current = "processing";
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -1053,7 +1084,8 @@ export default function SpeakScreen() {
           setWordResults([]);
           setSttError("");
           startPulse();
-          autoStopTimerRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
+          startCountdown();
+          autoStopTimerRef.current = setTimeout(() => { stopNativeRecording(); }, RECORD_MAX_SEC * 1000);
         } catch (e) {
           console.warn('[Audio] microphone start failed:', e);
           // Restore audio mode so other sounds (NPC, tutor) can play again
@@ -1091,6 +1123,7 @@ export default function SpeakScreen() {
       recorder.onstop = async () => {
         stream.getTracks().forEach((t: any) => t.stop());
         stopPulse();
+        stopCountdown();
         setRecordState("processing");
         recordStateRef.current = "processing";
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -1172,13 +1205,14 @@ export default function SpeakScreen() {
       setWordResults([]);
       setSttError("");
       startPulse();
+      startCountdown();
 
-      // Auto-stop after 8 seconds
+      // Auto-stop after RECORD_MAX_SEC seconds
       autoStopTimerRef.current = setTimeout(() => {
         if (mediaRecorderRef.current?.state === "recording") {
           mediaRecorderRef.current.stop();
         }
-      }, 8000);
+      }, RECORD_MAX_SEC * 1000);
     }).catch((e) => {
       console.warn('[Speak] microphone access failed:', e);
       setSttError(nativeLang === "korean" ? "마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)" : nativeLang === "spanish" ? "Permite el acceso al micrófono.\n(Configuración del navegador → Micrófono)" : "Please allow microphone access.\n(Browser settings → Microphone)");
@@ -1224,6 +1258,17 @@ export default function SpeakScreen() {
   const isBusy = isRecording || isProcessing;
   const scoreInfo = score !== null ? getScoreInfo(score, nativeLang) : null;
   const progressPct = sessionWords.length > 0 ? (sessionIdx / sessionWords.length) * 100 : 0;
+
+  // The Phrase database has `meaning` mostly in Korean and `tip` mostly in
+  // English. For a Spanish or English-native user, that breaks the trilingual
+  // UX. Resolve through /api/translate at render time (cached per
+  // text + target so each phrase is translated exactly once across all
+  // future sessions). The `meaningEs` data field, where present, is still
+  // preferred for Spanish users — that's a no-op for the hook.
+  const phraseMeaningRaw = phrase ? ((nativeLang === "spanish" && phrase.meaningEs) ? phrase.meaningEs : phrase.meaning) : "";
+  const phraseTipRaw = phrase?.tip ?? "";
+  const localizedMeaning = useLocalized(phraseMeaningRaw, nativeLang);
+  const localizedTip = useLocalized(phraseTipRaw, nativeLang);
   // Memoized so CoachingCard's request payload stays referentially stable
   // across unrelated re-renders. Without this, every keystroke / timer tick
   // builds a new array and burns a GPT call.
@@ -1444,7 +1489,7 @@ export default function SpeakScreen() {
             </View>
 
             <View style={styles.cardDivider} />
-            <Text style={styles.meaningText}>{(nativeLang === "spanish" && phrase.meaningEs) ? phrase.meaningEs : phrase.meaning}</Text>
+            <Text style={styles.meaningText}>{localizedMeaning || phrase.meaning}</Text>
           </View>
         </View>
 
@@ -1453,7 +1498,7 @@ export default function SpeakScreen() {
           {phrase.tip && phrase.tip.trim() ? (
             <View style={styles.tipBox}>
               <Ionicons name="bulb-outline" size={14} color="#F59E0B" />
-              <Text style={styles.tipText} numberOfLines={2}>{phrase.tip}</Text>
+              <Text style={styles.tipText} numberOfLines={2}>{localizedTip || phrase.tip}</Text>
             </View>
           ) : null}
 
@@ -1606,7 +1651,13 @@ export default function SpeakScreen() {
 
               <Text style={styles.micHint}>
                 {isRecording
-                  ? (nativeLang === "korean" ? "녹음 중… 탭하여 정지" : nativeLang === "spanish" ? "Grabando… toca para parar" : "Recording… tap to stop")
+                  ? (() => {
+                      const sec = recordSecondsLeft ?? RECORD_MAX_SEC;
+                      const tail = `(${sec}s)`;
+                      if (nativeLang === "korean") return `녹음 중… 탭하여 정지 ${tail}`;
+                      if (nativeLang === "spanish") return `Grabando… toca para parar ${tail}`;
+                      return `Recording… tap to stop ${tail}`;
+                    })()
                   : isProcessing ? rudyListeningMsg
                   : hasListened
                     ? (nativeLang === "korean" ? "탭하여 발음 녹음" : nativeLang === "spanish" ? "Toca para grabar" : "Tap to record")
