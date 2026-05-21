@@ -501,10 +501,15 @@ const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] 
 // (≥75 success / ≥50 gold / <50 error) and WEAK_THRESHOLD so the home stat
 // card, the sub-score chips, and the weak-words save behaviour all agree.
 // Palette uses Enigma tokens (C.success/C.gold/C.error) — no Tailwind hex.
-function getScoreInfo(score: number): { label: string; color: string; emoji: string } {
-  if (score >= 75) return { label: "Excellent!", color: C.success, emoji: "🎉" };
-  if (score >= 50) return { label: "Good Job!", color: C.gold, emoji: "😊" };
-  return { label: "Keep Practicing", color: C.error, emoji: "💪" };
+// Label is localized — a Korean user used to see "Excellent!" in English
+// next to the score circle, which broke the trilingual UX.
+function getScoreInfo(score: number, nativeLang: "korean" | "english" | "spanish" = "english"): { label: string; color: string; emoji: string } {
+  const great = nativeLang === "korean" ? "훌륭해요!" : nativeLang === "spanish" ? "¡Excelente!" : "Excellent!";
+  const good = nativeLang === "korean" ? "잘했어요!" : nativeLang === "spanish" ? "¡Bien hecho!" : "Good Job!";
+  const keep = nativeLang === "korean" ? "계속 연습해요" : nativeLang === "spanish" ? "Sigue practicando" : "Keep Practicing";
+  if (score >= 75) return { label: great, color: C.success, emoji: "🎉" };
+  if (score >= 50) return { label: good, color: C.gold, emoji: "😊" };
+  return { label: keep, color: C.error, emoji: "💪" };
 }
 
 let _pronunciationAudio: HTMLAudioElement | null = null;
@@ -1217,7 +1222,7 @@ export default function SpeakScreen() {
   const isRecording = recordState === "listening";
   const isProcessing = recordState === "processing";
   const isBusy = isRecording || isProcessing;
-  const scoreInfo = score !== null ? getScoreInfo(score) : null;
+  const scoreInfo = score !== null ? getScoreInfo(score, nativeLang) : null;
   const progressPct = sessionWords.length > 0 ? (sessionIdx / sessionWords.length) * 100 : 0;
   // Memoized so CoachingCard's request payload stays referentially stable
   // across unrelated re-renders. Without this, every keystroke / timer tick
