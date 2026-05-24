@@ -55,3 +55,4 @@ server_dist/
 
 # claude local settings
 .claude/settings.local.json
+tsc_out.txt

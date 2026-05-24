@@ -15,11 +15,12 @@
  *
  * Key extractor
  * -------------
- * If `Authorization: Bearer <jwt>` is present we decode the JWT payload
- * (NO signature verification — this is only used as a rate-limit bucket key,
- * never for auth). We pull `sub` and prefix it with `u:` so user buckets are
- * disjoint from IP buckets. Otherwise we fall back to the request IP
- * (`req.ip`) prefixed with `ip:`. Bad / unparseable JWTs fall back to IP.
+ * Uses `req.userId` set by `optionalAuth` middleware (server/authMiddleware.ts)
+ * which VERIFIES the Supabase JWT signature via supabase.auth.getUser().
+ * No JWT signature → no user bucket → IP bucket. An attacker forging a JWT
+ * with an arbitrary `sub` claim is rejected at verification and lands in the
+ * IP-tier bucket (the lower cap), so forgery makes things worse for the
+ * attacker, not better.
  *
  * Storage
  * -------
@@ -55,56 +56,28 @@
 import type { Request, Response, NextFunction, RequestHandler } from "express";
 import rateLimit, { type Options } from "express-rate-limit";
 
-// ── JWT payload decoder (no signature verification) ──────────────────────
-// We need only the `sub` claim, used as a rate-limit bucket label. Decoding
-// without verification is safe HERE because:
-//   1. Forging a JWT only lets an attacker share a bucket with another user
-//      (which is worse for the attacker — they hit the cap faster).
-//   2. We never trust this value for authorization, only as a key in a Map.
-function decodeJwtSub(token: string): string | null {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-    const payload = parts[1];
-    // base64url → base64
-    const b64 = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
-    const json = Buffer.from(padded, "base64").toString("utf-8");
-    const obj = JSON.parse(json) as { sub?: unknown };
-    if (typeof obj.sub === "string" && obj.sub.length > 0 && obj.sub.length <= 128) {
-      return obj.sub;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 /**
  * Bucket key for a request. Always returns a non-empty string.
  *
- *   user-bucket  → `u:<sub>`
+ *   user-bucket  → `u:<verified-id>`   (only when `req.userId` was set by
+ *                                       optionalAuth — i.e. JWT signature
+ *                                       verified against Supabase)
  *   ip-bucket    → `ip:<address>`
  *
  * Exported for testing; not called outside this file in production.
  */
 export function keyFromReq(req: Request): string {
-  const auth = req.header("authorization") ?? req.header("Authorization");
-  if (auth && typeof auth === "string") {
-    const m = auth.match(/^Bearer\s+(.+)$/i);
-    if (m) {
-      const sub = decodeJwtSub(m[1].trim());
-      if (sub) return `u:${sub}`;
-    }
+  if (typeof req.userId === "string" && req.userId.length > 0) {
+    return `u:${req.userId}`;
   }
-  // Express 5 exposes a normalised string in `req.ip` (respects `trust proxy`).
+  // Express exposes a normalised string in `req.ip` (respects `trust proxy`).
   // Fall back to a stable placeholder so the limiter never NULL-keys.
   return `ip:${req.ip || req.socket?.remoteAddress || "unknown"}`;
 }
 
-/** True iff the request carries a (syntactically valid) Bearer JWT we can key on. */
+/** True iff the request carries a verified user identity. */
 function isAuthed(req: Request): boolean {
-  return keyFromReq(req).startsWith("u:");
+  return typeof req.userId === "string" && req.userId.length > 0;
 }
 
 // ── Shared 429 handler ───────────────────────────────────────────────────

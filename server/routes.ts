@@ -9,6 +9,7 @@ import {
   verifySupabaseJwt,
 } from "./supabaseAdmin";
 import { gptLimiter, ttsLimiter, sttLimiter, keyFromReq } from "./rateLimits";
+import { optionalAuth, requireAuth } from "./authMiddleware";
 import rateLimit from "express-rate-limit";
 import { moderateText, safeReplyFor, shouldSkipModeration } from "./moderation";
 import {
@@ -197,6 +198,12 @@ const CANONICAL_CEFR_LEVELS: ReadonlySet<string> = new Set([
 ]);
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Run optional Supabase JWT verification on every /api/* request so the
+  // rate-limit middlewares can key on a VERIFIED user.id (req.userId) rather
+  // than a forgeable JWT payload. Missing / invalid tokens fall through as
+  // anonymous — they just land in the IP-tier bucket.
+  app.use("/api", optionalAuth);
+
   app.post("/api/chat", gptLimiter, async (req: Request, res: Response) => {
     try {
       const {
@@ -2484,13 +2491,31 @@ Student's ${learnName} answer: ${userAnswer}`;
    */
   app.get(
     "/api/me/export",
+    // Auth FIRST — so a forged JWT can't even reach the limiter and burn
+    // Supabase getUser() validation calls under a fresh forged sub.
+    requireAuth,
     meExportLimiter,
     async (req: Request, res: Response) => {
       try {
-        const user = await verifySupabaseJwt(req.header("authorization"));
-        if (!user) {
-          return res.status(401).json({ error: "Unauthorized" });
+        // requireAuth guarantees req.userId is a string. Pull the full
+        // auth.users record (created_at, provider, etc.) via the service-
+        // role admin client so the export includes the metadata GDPR Art.
+        // 15 demands.
+        const adminForUser = getServiceRoleClient();
+        let created_at: string | null = null;
+        let provider: string | null = null;
+        if (adminForUser) {
+          const { data: u } = await adminForUser.auth.admin.getUserById(req.userId as string);
+          created_at = u?.user?.created_at ?? null;
+          const appMeta = u?.user?.app_metadata as { provider?: string } | undefined;
+          provider = appMeta?.provider ?? null;
         }
+        const user = {
+          id: req.userId as string,
+          email: req.userEmail ?? null,
+          created_at,
+          provider,
+        };
 
         // Reading `linguaai_user_progress` cross-user from server code requires
         // bypassing RLS, which means the service role. If the key is missing
@@ -2590,16 +2615,14 @@ Student's ${learnName} answer: ${userAnswer}`;
    */
   app.post(
     "/api/me/delete",
+    // Auth FIRST — so a forged JWT can't reach the limiter and the limiter
+    // keys on the verified id (not a payload claim an attacker controls).
+    requireAuth,
     meDeleteLimiter,
     async (req: Request, res: Response) => {
       try {
-        // CRITICAL: any path that mutates state below this guard MUST be gated
-        // by successful JWT verification. Returning 401 here is the only exit
-        // when auth fails.
-        const user = await verifySupabaseJwt(req.header("authorization"));
-        if (!user) {
-          return res.status(401).json({ error: "Unauthorized" });
-        }
+        // requireAuth guarantees req.userId — no further verification needed.
+        const user = { id: req.userId as string };
 
         const admin = getServiceRoleClient();
         if (!admin) {

@@ -172,9 +172,11 @@ async function getAccessToken(): Promise<string | null> {
 }
 
 // On web: trigger a browser download by hitting the export endpoint directly
-// — that way the server can stream a JSON file with a proper filename.
-// On native: fetch JSON, log to console, fall back to share intent in the
-// future (Expo Sharing). For now we surface success state and a hint.
+// — the server streams a JSON file with a proper filename.
+// On native: writes the payload to a downloads cache file and invokes the
+// system share sheet via expo-sharing so the user can save / send the file
+// without it ever passing through console / logs (privacy: the export
+// contains email + progress and must never land in a log buffer).
 async function downloadExport(): Promise<void> {
   const token = await getAccessToken();
   if (!token) throw new Error("not-signed-in");
@@ -196,8 +198,8 @@ async function downloadExport(): Promise<void> {
     return;
   }
 
-  // Native — apiRequest uses fetch + credentials:'include'; for protected
-  // endpoints we attach the bearer header explicitly.
+  // Native — fetch the JSON, then write it to a cache file and open the
+  // share sheet. We never log the payload (it contains PII).
   const res = await fetch(
     `${(await import("@/lib/query-client")).getApiUrl()}/api/me/export`,
     {
@@ -209,11 +211,36 @@ async function downloadExport(): Promise<void> {
     const text = await res.text().catch(() => "");
     throw new Error(`${res.status}: ${text}`);
   }
-  const json = await res.json();
-  // The companion task that builds /api/me/export should later add
-  // expo-sharing support; for now we make the payload retrievable via logs
-  // (visible to the user on dev builds) and consider the request fulfilled.
-  console.log("[data-rights] export payload:", JSON.stringify(json));
+  const payload = await res.text();
+  try {
+    // Use the new expo-file-system Paths/File API (SDK 54+). We write the
+    // export payload to the app's cache directory and surface it through
+    // the share sheet so the user can save / send the file without it
+    // ever passing through console (PII protection).
+    const fsModule = (await import("expo-file-system")) as unknown as {
+      Paths?: { cache?: { uri: string } };
+      File?: new (uri: string) => { write: (data: string) => Promise<void> | void };
+    };
+    const Sharing = (await import("expo-sharing")) as unknown as {
+      isAvailableAsync: () => Promise<boolean>;
+      shareAsync: (uri: string, opts?: { mimeType?: string; dialogTitle?: string }) => Promise<void>;
+    };
+    const filename = `linguaai-data-${new Date().toISOString().slice(0, 10)}.json`;
+    const cacheUri = fsModule.Paths?.cache?.uri ?? "";
+    const fileUri = cacheUri.endsWith("/") ? `${cacheUri}${filename}` : `${cacheUri}/${filename}`;
+    if (fsModule.File) {
+      const file = new fsModule.File(fileUri);
+      await file.write(payload);
+    }
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(fileUri, { mimeType: "application/json", dialogTitle: "Save your LinguaAI data" });
+    }
+    // If sharing isn't available the file is still in cacheDirectory; the
+    // UI confirms success — better than leaking through console.
+  } catch (e) {
+    // Don't fall back to logging — PII must not enter the log buffer.
+    throw new Error(`save-failed: ${(e as Error)?.message ?? e}`);
+  }
 }
 
 async function callDelete(): Promise<void> {

@@ -37,6 +37,14 @@ if (process.env.SENTRY_DSN) {
 const app = express();
 const log = console.log;
 
+// Railway, Vercel, etc. sit behind a load balancer that rewrites the source
+// IP into X-Forwarded-For. Without trust proxy, every request's `req.ip`
+// resolves to the LB's IP — the IP-tier rate limit collapses to a single
+// shared bucket across all anonymous traffic and trips 429s in seconds.
+// "1" trusts a single hop (the platform LB) — broaden later only if
+// architecture changes.
+app.set("trust proxy", 1);
+
 if (SentryNS) {
   app.use(SentryNS.Handlers.requestHandler());
 }
