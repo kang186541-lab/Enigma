@@ -1,8 +1,24 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, RequestHandler, Response } from "express";
 import { createServer, type Server } from "node:http";
 import { openai } from "./openai";
 import { anthropic, hasAnthropic } from "./anthropic";
 import { completeImageText, completeText } from "./aiText";
+import {
+  getServiceRoleClient,
+  hasServiceRole,
+  verifySupabaseJwt,
+} from "./supabaseAdmin";
+import { gptLimiter, ttsLimiter, sttLimiter, keyFromReq } from "./rateLimits";
+import rateLimit from "express-rate-limit";
+import { moderateText, safeReplyFor, shouldSkipModeration } from "./moderation";
+import {
+  applySubscriptionEvent,
+  createCheckoutSession,
+  createPortalSession,
+  getSubscriptionStatus,
+  isStripeConfigured,
+  verifyWebhookSignature,
+} from "./billing";
 
 /**
  * Map browser-reported MIME types to what Azure STT actually accepts.
@@ -181,7 +197,7 @@ const CANONICAL_CEFR_LEVELS: ReadonlySet<string> = new Set([
 ]);
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  app.post("/api/chat", async (req: Request, res: Response) => {
+  app.post("/api/chat", gptLimiter, async (req: Request, res: Response) => {
     try {
       const {
         tutorId, messages, mode, lessonTopic, nativeLang, isOpening,
@@ -213,6 +229,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const baseTutorPrompt = TUTOR_SYSTEM_PROMPTS[tutorId];
       if (!baseTutorPrompt) {
         return res.status(400).json({ error: "Unknown tutor" });
+      }
+
+      // ── Content moderation on latest user message ────────────────────────
+      // Run before any GPT call so flagged content costs us $0. Skip very short
+      // Korean utterances (greetings / noise) to save quota — `shouldSkipModeration`
+      // enforces the <20 chars + Hangul rule.
+      const latestUserMsg = [...messages].reverse().find((m) => m.role === "user");
+      if (latestUserMsg && typeof latestUserMsg.content === "string" && !shouldSkipModeration(latestUserMsg.content)) {
+        const mod = await moderateText(latestUserMsg.content);
+        if (mod.flagged) {
+          console.log(`[/api/chat] moderation flagged category=${mod.category ?? "unknown"}`);
+          return res.json({
+            reply: safeReplyFor(nativeLang),
+            correction: null,
+            diagnosis: null,
+            phaseAdvance: null,
+            sessionSummary: null,
+            moderated: true,
+          });
+        }
       }
 
       // Prepended to every prompt — keeps responses natural for TTS playback.
@@ -716,7 +752,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     }
   });
 
-  app.post("/api/translate", async (req: Request, res: Response) => {
+  app.post("/api/translate", gptLimiter, async (req: Request, res: Response) => {
     try {
       const { text, targetLanguage } = req.body as {
         text: string;
@@ -973,7 +1009,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     ].join("");
   }
 
-  app.get("/api/pronunciation-tts", async (req: Request, res: Response) => {
+  app.get("/api/pronunciation-tts", ttsLimiter, async (req: Request, res: Response) => {
     try {
       const { text, lang, tutorId, mode, voice, rate } = req.query as {
         text?: string;
@@ -1061,7 +1097,7 @@ Student's ${learnName} answer: ${userAnswer}`;
 
   // ── Azure Speech-to-Text (plain transcription, no assessment) ────────────
   // Used by the chat screen mic button to transcribe user speech to text.
-  app.post("/api/stt", async (req: Request, res: Response) => {
+  app.post("/api/stt", sttLimiter, async (req: Request, res: Response) => {
     try {
       const { audio, mimeType, language } = req.body as {
         audio?: string;
@@ -1154,7 +1190,7 @@ Student's ${learnName} answer: ${userAnswer}`;
   // Receives the target word and what the speech recogniser heard, then asks
   // Azure Pronunciation Assessment — sends real audio to Azure's phoneme-level scorer.
   // Accepts { word, lang, audio (base64), mimeType } and returns detailed pronunciation scores.
-  app.post("/api/pronunciation-assess", async (req: Request, res: Response) => {
+  app.post("/api/pronunciation-assess", gptLimiter, async (req: Request, res: Response) => {
     try {
       const { word, lang, audio, mimeType } = req.body as {
         word?: string;
@@ -1455,7 +1491,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     }
   }
 
-  app.post("/api/pronunciation-coach", async (req: Request, res: Response) => {
+  app.post("/api/pronunciation-coach", gptLimiter, async (req: Request, res: Response) => {
     try {
       const {
         word,
@@ -1600,7 +1636,7 @@ Student's ${learnName} answer: ${userAnswer}`;
   });
 
   // GPT to give a 0-100 score and short Korean feedback (legacy, kept as fallback).
-  app.post("/api/gpt-score", async (req: Request, res: Response) => {
+  app.post("/api/gpt-score", gptLimiter, async (req: Request, res: Response) => {
     try {
       const { word, recognized } = req.body as { word?: string; recognized?: string };
       if (!word || recognized === undefined) {
@@ -1975,12 +2011,13 @@ Student's ${learnName} answer: ${userAnswer}`;
   });
 
   // ── Mission Talk Chat (STEP 3) ────────────────────────────────────────────
-  app.post("/api/mission-chat", async (req: Request, res: Response) => {
+  app.post("/api/mission-chat", gptLimiter, async (req: Request, res: Response) => {
     try {
-      const { systemPrompt, targetLang, messages } = req.body as {
+      const { systemPrompt, targetLang, messages, nativeLang } = req.body as {
         systemPrompt: string;
         targetLang: string;
         messages: { role: "user" | "assistant"; content: string }[];
+        nativeLang?: "ko" | "en" | "es";
       };
 
       if (!systemPrompt || !targetLang || !Array.isArray(messages)) {
@@ -1992,6 +2029,25 @@ Student's ${learnName} answer: ${userAnswer}`;
         "en-US": "English", "es-ES": "Spanish", "ko-KR": "Korean",
       };
       const langName = LANG_FULL[targetLang] ?? "English";
+
+      // ── Content moderation on latest user message ────────────────────────
+      // Short Korean messages bypass moderation (greetings / noise). Other
+      // languages and longer inputs are always checked. Fail-open: a
+      // moderation outage returns flagged=false so learning continues.
+      const latestUserMsg = [...messages].reverse().find((m) => m.role === "user");
+      if (latestUserMsg && typeof latestUserMsg.content === "string" && !shouldSkipModeration(latestUserMsg.content)) {
+        const mod = await moderateText(latestUserMsg.content);
+        if (mod.flagged) {
+          console.log(`[/api/mission-chat] moderation flagged category=${mod.category ?? "unknown"}`);
+          return res.json({
+            reply: safeReplyFor(nativeLang),
+            sentenceCount: 0,
+            grammarNote: "",
+            shouldEnd: false,
+            moderated: true,
+          });
+        }
+      }
 
       const commonRules = [
         ``,
@@ -2044,7 +2100,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     }
   });
 
-  app.post("/api/word-lookup", async (req: Request, res: Response) => {
+  app.post("/api/word-lookup", gptLimiter, async (req: Request, res: Response) => {
     try {
       const { word, targetLanguage, nativeLanguage, sentence } = req.body as {
         word: string;
@@ -2209,6 +2265,418 @@ Student's ${learnName} answer: ${userAnswer}`;
       res.status(500).json({ error: "Roleplay failed" });
     }
   });
+
+  // ── Billing (Stripe Subscriptions, "Pro" tier) ──────────────────────────────
+  // All endpoints except the webhook require a valid Supabase JWT in the
+  // Authorization header (Bearer <access_token>). The webhook uses Stripe's
+  // own signature for authentication.
+  //
+  // When STRIPE_SECRET_KEY is unset (default until you wire up Stripe), the
+  // checkout/portal endpoints return { url: null, error: "Stripe not configured" }
+  // and the client renders that as "결제 시스템 준비 중" / "Billing coming soon".
+
+  app.post("/api/billing/checkout", async (req: Request, res: Response) => {
+    try {
+      const user = await verifySupabaseJwt(req.header("authorization"));
+      if (!user) return res.status(401).json({ error: "Unauthorized" });
+
+      const { return_url } = (req.body ?? {}) as { return_url?: string };
+      if (!return_url || typeof return_url !== "string") {
+        return res.status(400).json({ error: "return_url is required" });
+      }
+
+      const result = await createCheckoutSession({
+        user_id: user.id,
+        return_url,
+        customer_email: user.email,
+      });
+
+      // We still return 200 with `url: null` when Stripe isn't configured so
+      // the client can show a polite trilingual placeholder rather than a
+      // generic "request failed" toast.
+      return res.json(result);
+    } catch (err) {
+      console.error("[billing] /checkout error", err);
+      return res.status(500).json({ url: null, error: "Checkout failed" });
+    }
+  });
+
+  app.post("/api/billing/portal", async (req: Request, res: Response) => {
+    try {
+      const user = await verifySupabaseJwt(req.header("authorization"));
+      if (!user) return res.status(401).json({ error: "Unauthorized" });
+
+      const { return_url } = (req.body ?? {}) as { return_url?: string };
+      if (!return_url || typeof return_url !== "string") {
+        return res.status(400).json({ error: "return_url is required" });
+      }
+
+      const result = await createPortalSession({
+        user_id: user.id,
+        return_url,
+      });
+      return res.json(result);
+    } catch (err) {
+      console.error("[billing] /portal error", err);
+      return res.status(500).json({ url: null, error: "Portal failed" });
+    }
+  });
+
+  app.get("/api/billing/status", async (req: Request, res: Response) => {
+    try {
+      const user = await verifySupabaseJwt(req.header("authorization"));
+      if (!user) return res.status(401).json({ error: "Unauthorized" });
+
+      const status = await getSubscriptionStatus(user.id);
+      return res.json({
+        ...status,
+        stripe_configured: isStripeConfigured(),
+      });
+    } catch (err) {
+      console.error("[billing] /status error", err);
+      return res.status(500).json({ tier: "free", error: "Status check failed" });
+    }
+  });
+
+  // Stripe webhook. Authenticated by signature, NOT by Supabase JWT.
+  //
+  // Important: Stripe requires the raw request body for signature
+  // verification. server/index.ts already preserves req.rawBody via the
+  // express.json verify hook, so this endpoint can use it directly without
+  // a per-route middleware switch.
+  app.post("/api/billing/webhook", async (req: Request, res: Response) => {
+    try {
+      const signature = req.header("stripe-signature");
+      const rawBody = (req.rawBody as Buffer | string | undefined) ?? "";
+      const result = verifyWebhookSignature(rawBody, signature);
+
+      if (!result.ok || !result.event) {
+        // 400 on bad signature is the Stripe-recommended response — it tells
+        // Stripe to retry with a refreshed payload (which doesn't help us
+        // here, but keeps the dashboard's delivery log clean and accurate).
+        console.warn("[billing] webhook signature rejected:", result.error);
+        return res.status(400).json({ error: result.error ?? "Invalid signature" });
+      }
+
+      const event = result.event;
+      // We handle subscription lifecycle events. Everything else is acked
+      // with 200 so Stripe stops retrying.
+      switch (event.type) {
+        case "customer.subscription.created":
+        case "customer.subscription.updated":
+        case "customer.subscription.deleted": {
+          const applied = await applySubscriptionEvent(event);
+          if (!applied.handled) {
+            console.warn(
+              `[billing] webhook ${event.type} not applied:`,
+              applied.reason ?? "(no reason)",
+            );
+          }
+          break;
+        }
+        default:
+          // No-op — log so the dashboard correlates 200s with received types.
+          console.log(`[billing] webhook ignored event type: ${event.type}`);
+      }
+
+      return res.json({ received: true });
+    } catch (err) {
+      console.error("[billing] webhook handler error", err);
+      // Return 200 anyway — Stripe will retry on 5xx, and a thrown handler is
+      // almost always our bug rather than a transient issue worth re-delivering.
+      // For now we return 500 so the dashboard makes the bug loud.
+      return res.status(500).json({ error: "Webhook handler error" });
+    }
+  });
+
+  // ── GDPR / PIPA data-rights endpoints ──────────────────────────────────────
+  //
+  // /api/me/export   — Right to data portability (GDPR Art. 20, PIPA Art. 35)
+  // /api/me/delete   — Right to erasure / withdrawal of consent
+  //                    (GDPR Art. 17, PIPA Art. 36 & 37)
+  //
+  // Both endpoints require a valid Supabase JWT in `Authorization: Bearer …`.
+  // Failure of JWT verification ALWAYS produces 401 with no side effects —
+  // delete in particular must never touch storage without a verified caller.
+  //
+  // Rate limiting reuses server/rateLimits.ts's `keyFromReq` (so the user-
+  // bucket label is consistent with the rest of the API) but builds its own
+  // express-rate-limit instances because the brief mandates 1/min and 1/hr
+  // caps that don't match any tier already exported. See each handler's
+  // docstring for caps.
+  //
+  // Service-role usage: deletion of the auth user requires
+  // SUPABASE_SERVICE_ROLE_KEY. When absent, the endpoint returns 202 Accepted
+  // (no state change; admin will finish manually). Never expose this key to
+  // clients — set it only on Railway.
+  const meExportLimiter: RequestHandler = rateLimit({
+    windowMs: 60_000,
+    limit: 1,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    keyGenerator: keyFromReq,
+    handler: (_req: Request, res: Response) => {
+      res.status(429).json({
+        error: "rate_limited",
+        message: "Export is limited to once per minute. Please try again shortly.",
+      });
+    },
+  });
+  const meDeleteLimiter: RequestHandler = rateLimit({
+    windowMs: 60 * 60_000,
+    limit: 1,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    keyGenerator: keyFromReq,
+    handler: (_req: Request, res: Response) => {
+      res.status(429).json({
+        error: "rate_limited",
+        message: "Delete is limited to once per hour. Please try again later.",
+      });
+    },
+  });
+
+  /**
+   * @openapi
+   * /api/me/export:
+   *   get:
+   *     summary: Export the authenticated user's account data (GDPR Art. 20).
+   *     description: |
+   *       Returns a JSON snapshot of the caller's `auth.users` record and
+   *       `linguaai_user_progress` row. The response sets
+   *       `Content-Disposition: attachment` so browsers trigger a download
+   *       dialog instead of rendering JSON inline.
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: User data export.
+   *         headers:
+   *           Content-Disposition:
+   *             schema:
+   *               type: string
+   *             description: 'attachment; filename="linguaai-export-<date>.json"'
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 exported_at:
+   *                   type: string
+   *                   format: date-time
+   *                 user:
+   *                   type: object
+   *                   properties:
+   *                     id: { type: string, format: uuid }
+   *                     email: { type: string, nullable: true }
+   *                     created_at: { type: string, format: date-time, nullable: true }
+   *                     provider: { type: string, nullable: true }
+   *                 progress:
+   *                   type: object
+   *                   nullable: true
+   *                   description: Row from `public.linguaai_user_progress`, or null if none exists.
+   *       401:
+   *         description: Missing or invalid Supabase JWT.
+   *       429:
+   *         description: Rate limit exceeded (1 request / minute / user).
+   *       500:
+   *         description: Server misconfiguration or unexpected DB error.
+   */
+  app.get(
+    "/api/me/export",
+    meExportLimiter,
+    async (req: Request, res: Response) => {
+      try {
+        const user = await verifySupabaseJwt(req.header("authorization"));
+        if (!user) {
+          return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        // Reading `linguaai_user_progress` cross-user from server code requires
+        // bypassing RLS, which means the service role. If the key is missing
+        // we still return the auth.users summary — progress will be null and
+        // the response carries an explanatory note.
+        const admin = getServiceRoleClient();
+        let progress: unknown = null;
+        let progressNote: string | undefined;
+
+        if (admin) {
+          const { data, error } = await admin
+            .from("linguaai_user_progress")
+            .select("*")
+            .eq("user_id", user.id)
+            .maybeSingle();
+          if (error) {
+            console.error("[GDPR export] progress fetch error:", error.message);
+            return res.status(500).json({ error: "Failed to load progress" });
+          }
+          progress = data ?? null;
+        } else {
+          progressNote =
+            "Progress data unavailable: SUPABASE_SERVICE_ROLE_KEY is not configured on the server.";
+        }
+
+        const isoDate = new Date().toISOString();
+        const fileDate = isoDate.slice(0, 10); // YYYY-MM-DD
+        const payload: Record<string, unknown> = {
+          exported_at: isoDate,
+          user: {
+            id: user.id,
+            email: user.email,
+            created_at: user.created_at,
+            provider: user.provider,
+          },
+          progress,
+        };
+        if (progressNote) payload.note = progressNote;
+
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="linguaai-export-${fileDate}.json"`,
+        );
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.setHeader("Cache-Control", "no-store");
+        // Pretty-print to make manual inspection nicer; payload size is tiny.
+        return res.status(200).send(JSON.stringify(payload, null, 2));
+      } catch (err) {
+        console.error("[GDPR export] unexpected error:", err);
+        return res.status(500).json({ error: "Export failed" });
+      }
+    },
+  );
+
+  /**
+   * @openapi
+   * /api/me/delete:
+   *   post:
+   *     summary: Delete the authenticated user's account (GDPR Art. 17).
+   *     description: |
+   *       Idempotent. Removes the caller's row from
+   *       `public.linguaai_user_progress` and, when
+   *       `SUPABASE_SERVICE_ROLE_KEY` is configured, also deletes the
+   *       corresponding `auth.users` record via the admin API.
+   *
+   *       If the service-role key is not configured, no state change happens
+   *       and `202 Accepted` is returned so an operator can finish deletion
+   *       manually.
+   *
+   *       Auditing: each invocation logs
+   *       `[GDPR delete] <ISO timestamp> uid=<uuid> auth_removed=<bool>` to
+   *       stdout — uid only, no PII beyond the identifier.
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: false
+   *     responses:
+   *       200:
+   *         description: User fully deleted (progress row + auth user).
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 ok: { type: boolean }
+   *                 auth_user_deleted: { type: boolean }
+   *       202:
+   *         description: |
+   *           Deletion deferred (no service-role key configured); an admin
+   *           will complete the request manually. No data was deleted yet.
+   *       401:
+   *         description: Missing or invalid Supabase JWT — no state changed.
+   *       429:
+   *         description: Rate limit exceeded (1 request / hour / user).
+   *       500:
+   *         description: Unexpected error during deletion.
+   */
+  app.post(
+    "/api/me/delete",
+    meDeleteLimiter,
+    async (req: Request, res: Response) => {
+      try {
+        // CRITICAL: any path that mutates state below this guard MUST be gated
+        // by successful JWT verification. Returning 401 here is the only exit
+        // when auth fails.
+        const user = await verifySupabaseJwt(req.header("authorization"));
+        if (!user) {
+          return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const admin = getServiceRoleClient();
+        if (!admin) {
+          // No privileged client → we cannot reliably bypass RLS to delete the
+          // progress row and cannot call auth.admin.* at all. Surface 202 so
+          // the client can show "queued for admin" UX. Nothing was mutated.
+          console.log(
+            `[GDPR delete] ${new Date().toISOString()} uid=${user.id} auth_removed=false reason=no_service_role`,
+          );
+          return res.status(202).json({
+            ok: true,
+            auth_user_deleted: false,
+            note:
+              "SUPABASE_SERVICE_ROLE_KEY is not configured. Admin will process this deletion manually.",
+          });
+        }
+
+        // Step 1: delete the learner's progress row. .eq() ensures we only
+        // touch this user's row even with the service-role client. .delete()
+        // is naturally idempotent — deleting a non-existent row is a no-op
+        // (no error, no rows affected).
+        const { error: progressErr } = await admin
+          .from("linguaai_user_progress")
+          .delete()
+          .eq("user_id", user.id);
+        if (progressErr) {
+          console.error("[GDPR delete] progress delete error:", progressErr.message);
+          return res.status(500).json({ error: "Failed to delete progress" });
+        }
+
+        // Step 2: delete the auth user. Supabase returns an error if the user
+        // no longer exists — we treat "user not found" as success because the
+        // overall operation is idempotent. The Supabase JS SDK surfaces this
+        // via `error.status === 404` (or a message containing "not found").
+        let authRemoved = false;
+        const { error: authErr } = await admin.auth.admin.deleteUser(user.id);
+        if (authErr) {
+          const status = (authErr as { status?: number }).status;
+          const msg = authErr.message?.toLowerCase() ?? "";
+          const isNotFound = status === 404 || msg.includes("not found");
+          if (!isNotFound) {
+            console.error("[GDPR delete] auth.admin.deleteUser error:", authErr.message);
+            // Progress row is already gone; report partial failure so the
+            // client can retry only this step. Still 500 because the user
+            // did not get the full deletion they requested.
+            return res.status(500).json({
+              ok: false,
+              auth_user_deleted: false,
+              error: "Failed to delete auth user",
+            });
+          }
+          // 404 → already gone, treat as success but record for the audit log.
+          authRemoved = false;
+        } else {
+          authRemoved = true;
+        }
+
+        // Audit log — id only, no PII.
+        console.log(
+          `[GDPR delete] ${new Date().toISOString()} uid=${user.id} auth_removed=${authRemoved}`,
+        );
+
+        return res.status(200).json({
+          ok: true,
+          auth_user_deleted: authRemoved,
+        });
+      } catch (err) {
+        console.error("[GDPR delete] unexpected error:", err);
+        return res.status(500).json({ error: "Delete failed" });
+      }
+    },
+  );
+
+  // hasServiceRole is exported from supabaseAdmin for future health/status
+  // endpoints; reference it once to keep the unused-import linter quiet
+  // without changing module exports.
+  void hasServiceRole;
 
   const httpServer = createServer(app);
   return httpServer;

@@ -28,6 +28,9 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { C } from "@/constants/theme";
+import { initMonitoring } from "@/lib/monitoring";
+
+initMonitoring();
 
 SplashScreen.preventAutoHideAsync();
 

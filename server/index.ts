@@ -5,8 +5,41 @@ import { registerRoutes } from "./routes";
 import * as fs from "fs";
 import * as path from "path";
 
+// --- Sentry (server) ----------------------------------------------------
+// Optional: only initializes if SENTRY_DSN is set. Dynamic require keeps
+// @sentry/node a soft dependency so the server still boots when the package
+// is absent (e.g. minimal CI image).
+type SentryNode = {
+  init: (opts: Record<string, unknown>) => void;
+  Handlers: {
+    requestHandler: () => express.RequestHandler;
+    errorHandler: () => express.ErrorRequestHandler;
+  };
+  captureException: (err: unknown) => void;
+};
+let SentryNS: SentryNode | null = null;
+if (process.env.SENTRY_DSN) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    SentryNS = require("@sentry/node") as SentryNode;
+    SentryNS.init({
+      dsn: process.env.SENTRY_DSN,
+      sampleRate: 1.0,
+      tracesSampleRate: 0.1,
+      environment: process.env.NODE_ENV || "development",
+    });
+  } catch (e) {
+    SentryNS = null;
+    console.warn("[monitoring] @sentry/node init skipped:", e);
+  }
+}
+
 const app = express();
 const log = console.log;
+
+if (SentryNS) {
+  app.use(SentryNS.Handlers.requestHandler());
+}
 
 declare module "http" {
   interface IncomingMessage {
@@ -266,6 +299,12 @@ function setupErrorHandler(app: express.Application) {
   configureExpoAndLanding(app);
 
   const server = await registerRoutes(app);
+
+  // Sentry's error handler must come AFTER routes and BEFORE the app's own
+  // error handler so it captures the exception before we format the response.
+  if (SentryNS) {
+    app.use(SentryNS.Handlers.errorHandler());
+  }
 
   setupErrorHandler(app);
 

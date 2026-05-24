@@ -1526,9 +1526,17 @@ export default function SpeakScreen() {
               showsVerticalScrollIndicator={false}
             >
               {score !== null && scoreInfo ? (
-                <View>
+                <View
+                  accessibilityLiveRegion="polite"
+                  accessibilityLabel={`${scoreInfo.label}. ${nativeLang === "korean" ? `점수 ${score} / 100` : nativeLang === "spanish" ? `Puntuación ${score} de 100` : `Score ${score} out of 100`}`}
+                >
                   <View style={styles.resultRow}>
-                    <View style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}>
+                    <View
+                      style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}
+                      accessible
+                      accessibilityRole="text"
+                      accessibilityLabel={`${score} / 100`}
+                    >
                       <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
                       <Text style={styles.scoreDenom}>/100</Text>
                     </View>
@@ -1636,6 +1644,13 @@ export default function SpeakScreen() {
                   onPress={handleRecord}
                   disabled={isProcessing}
                   testID="mic-button"
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    isRecording
+                      ? (nativeLang === "korean" ? "녹음 중. 탭하여 정지" : nativeLang === "spanish" ? "Grabando. Toca para parar" : "Recording. Tap to stop")
+                      : (nativeLang === "korean" ? "발음 녹음 시작" : nativeLang === "spanish" ? "Iniciar grabación de pronunciación" : "Start recording pronunciation")
+                  }
+                  accessibilityState={{ disabled: isProcessing, busy: isProcessing }}
                 >
                   <LinearGradient
                     colors={isRecording ? ["#FF4081", "#E91E63"] : [tabInfo.color, tabInfo.color + "CC"]}

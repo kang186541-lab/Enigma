@@ -24,6 +24,7 @@ import * as Linking from "expo-linking";
 import { supabase } from "@/lib/supabase";
 import { flushProgressPush } from "@/lib/progressSync";
 import { clearLocalProgressState } from "@/lib/progressStorage";
+import { setUserContext } from "@/lib/monitoring";
 
 interface AuthContextValue {
   user: User | null;
@@ -50,6 +51,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
       setSession(data.session);
+      if (data.session?.user) {
+        setUserContext({
+          id: data.session.user.id,
+          email: data.session.user.email ?? undefined,
+        });
+      }
       setLoading(false);
     });
 
@@ -59,6 +66,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!mounted) return;
       setSession(nextSession);
+      if (nextSession?.user) {
+        setUserContext({
+          id: nextSession.user.id,
+          email: nextSession.user.email ?? undefined,
+        });
+      } else {
+        setUserContext(null);
+      }
       setLoading(false);
     });
 
@@ -154,6 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     await supabase.auth.signOut();
     await clearLocalProgressState();
+    setUserContext(null);
   }, []);
 
   const value = useMemo<AuthContextValue>(

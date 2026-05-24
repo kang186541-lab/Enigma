@@ -330,7 +330,10 @@ export default function HomeScreen() {
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Pressable
               onPress={() => router.push("/settings")}
-              style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+              style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, padding: 8, margin: -8 })}
+              accessibilityRole="button"
+              accessibilityLabel={nativeLang === "korean" ? "설정" : nativeLang === "spanish" ? "Ajustes" : "Settings"}
+              hitSlop={8}
             >
               <Ionicons name="settings-outline" size={22} color={C.goldDim} />
             </Pressable>

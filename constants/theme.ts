@@ -6,7 +6,10 @@ export const C = {
   bg3:           "#3d2418",
   tabBar:        "#0d0503",
   gold:          "#c9a227",
-  goldDim:       "#a07d1a",
+  // Bumped from #a07d1a (4.0:1 on bg2 — sub-AA at 12px) to ~5.5:1 on bg2
+  // so all the 11–13px goldDim labels (xpLabel, syncChip, quickDesc,
+  // srsBannerSub, settings pillText, etc.) clear WCAG 2.1 AA in one shot.
+  goldDim:       "#c19a26",
   goldDark:      "#8b6914",
   goldFaint:     "#c9a22722",
   parchment:     "#f4e8c1",

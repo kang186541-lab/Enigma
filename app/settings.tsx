@@ -25,9 +25,11 @@ import {
   scheduleDailyReminder,
   registerForPushNotifications,
 } from "@/lib/notificationManager";
+import PaywallCard from "@/components/PaywallCard";
 
 const T = {
   title:       { ko: "설정",          en: "Settings",           es: "Ajustes" },
+  membership:  { ko: "멤버십",        en: "Membership",         es: "Membresía" },
   accountTitle:{ ko: "계정",          en: "Account",            es: "Cuenta" },
   signInWithGoogle: { ko: "Google로 로그인", en: "Sign in with Google", es: "Iniciar sesión con Google" },
   signedInAs:  { ko: "로그인됨",      en: "Signed in as",       es: "Sesión iniciada como" },
@@ -56,6 +58,15 @@ const T = {
   themeLight:  { ko: "라이트",         en: "Light",              es: "Claro" },
   themeSystem: { ko: "시스템",         en: "System",             es: "Sistema" },
   back:        { ko: "뒤로",          en: "Back",               es: "Volver" },
+  helpLink:    { ko: "도움말",         en: "Help",               es: "Ayuda" },
+  // ── Privacy / Terms / My Data section
+  legalTitle:  { ko: "개인정보 / 약관 / 내 데이터", en: "Privacy / Terms / My Data", es: "Privacidad / Términos / Mis datos" },
+  privacy:     { ko: "개인정보처리방침", en: "Privacy Policy",   es: "Política de Privacidad" },
+  privacyDesc: { ko: "수집·이용·보관 안내", en: "What we collect and why", es: "Qué recopilamos y por qué" },
+  terms:       { ko: "이용약관",       en: "Terms of Service",  es: "Términos de Servicio" },
+  termsDesc:   { ko: "서비스 이용 조건", en: "Service conditions",      es: "Condiciones del servicio" },
+  myData:      { ko: "내 데이터",       en: "My Data",           es: "Mis datos" },
+  myDataDesc:  { ko: "내려받기·삭제",   en: "Download / delete", es: "Descargar / eliminar" },
 } as const;
 
 type LangKey = "ko" | "en" | "es";
@@ -161,6 +172,10 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
+        {/* ── Membership / Pro upgrade ── */}
+        <Text style={[styles.sectionTitle, { marginTop: 0 }]}>{t(T.membership, lc)}</Text>
+        <PaywallCard />
+
         {/* ── Account / Sign in ── */}
         <Text style={styles.sectionTitle}>{t(T.accountTitle, lc)}</Text>
         <View style={styles.card}>
@@ -235,6 +250,50 @@ export default function SettingsScreen() {
               ) : null}
             </>
           )}
+        </View>
+
+        {/* ── Privacy / Terms / My Data ── */}
+        <Text style={styles.sectionTitle}>{t(T.legalTitle, lc)}</Text>
+        <View style={styles.card}>
+          <Pressable
+            onPress={() => router.push("/legal/privacy" as any)}
+            style={styles.row}
+            accessibilityRole="link"
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>{t(T.privacy, lc)}</Text>
+              <Text style={[styles.webNote, { textAlign: "left", paddingVertical: 0, marginTop: 2 }]}>
+                {t(T.privacyDesc, lc)}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={C.gold} />
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/legal/terms" as any)}
+            style={styles.row}
+            accessibilityRole="link"
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>{t(T.terms, lc)}</Text>
+              <Text style={[styles.webNote, { textAlign: "left", paddingVertical: 0, marginTop: 2 }]}>
+                {t(T.termsDesc, lc)}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={C.gold} />
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/legal/data-rights" as any)}
+            style={styles.row}
+            accessibilityRole="link"
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>{t(T.myData, lc)}</Text>
+              <Text style={[styles.webNote, { textAlign: "left", paddingVertical: 0, marginTop: 2 }]}>
+                {t(T.myDataDesc, lc)}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={C.gold} />
+          </Pressable>
         </View>
 
         {/* ── Notifications ── */}
@@ -334,6 +393,14 @@ export default function SettingsScreen() {
               })}
             </View>
           </View>
+          <Pressable
+            onPress={() => router.push("/support" as any)}
+            style={styles.row}
+            accessibilityRole="link"
+          >
+            <Text style={styles.label}>{t(T.helpLink, lc)}</Text>
+            <Ionicons name="chevron-forward" size={18} color={C.gold} />
+          </Pressable>
         </View>
 
         <View style={{ height: 60 }} />
