@@ -880,6 +880,34 @@ function getGoalQuestion(nativeLang: NativeLanguage): string {
   return "What should Rudy help you say next?";
 }
 
+function getFirstMissionResultMessage(nativeLang: NativeLanguage, score: number): string {
+  if (score >= 75) {
+    if (nativeLang === "korean") return "Rudy가 들었어요. 이제 점수보다 중요한 건 다음 문장을 입 밖으로 꺼내는 거예요.";
+    if (nativeLang === "spanish") return "Rudy te escuchó. Ahora lo importante no es la nota, sino decir la siguiente frase.";
+    return "Rudy heard you. Now the important thing is not the score, but saying the next sentence.";
+  }
+  if (score >= 50) {
+    if (nativeLang === "korean") return "조금 흔들려도 괜찮아요. 한 번 말했으니, 다음 문장에서 더 편해질 거예요.";
+    if (nativeLang === "spanish") return "No importa si salió un poco tembloroso. Ya lo dijiste; la siguiente frase será más fácil.";
+    return "It is okay if it felt shaky. You said it once; the next sentence will feel easier.";
+  }
+  if (nativeLang === "korean") return "완벽하지 않아도 기록했어요. 다시 해도 좋고, 다음 문장으로 넘어가도 괜찮아요.";
+  if (nativeLang === "spanish") return "No tuvo que ser perfecto. Puedes repetirla o seguir con la siguiente frase.";
+  return "It did not have to be perfect. You can retry it or continue to the next sentence.";
+}
+
+function getNextMissionPreviewTitle(nativeLang: NativeLanguage, step: number): string {
+  if (nativeLang === "korean") return `다음 실제 문장 ${step}/${SPEAKING_DAILY_GOAL}`;
+  if (nativeLang === "spanish") return `Siguiente frase real ${step}/${SPEAKING_DAILY_GOAL}`;
+  return `Next real sentence ${step}/${SPEAKING_DAILY_GOAL}`;
+}
+
+function getNextMissionPreviewHint(nativeLang: NativeLanguage): string {
+  if (nativeLang === "korean") return "한 문장씩만. Rudy는 시험관이 아니라, 같이 입을 여는 파트너예요.";
+  if (nativeLang === "spanish") return "Una frase a la vez. Rudy no es examinador; abre la boca contigo.";
+  return "One sentence at a time. Rudy is not an examiner; he is here to speak with you.";
+}
+
 type SpeakingAssessmentStatus = "scored" | "unscored";
 
 function getScoreBand(score: number): "pass" | "coach" | "repair" {
@@ -1807,6 +1835,12 @@ export default function SpeakScreen() {
       ? `Siguiente frase ${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
       : `Next sentence ${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
     : nativeLang === "korean" ? "루디와 계속 말하기" : nativeLang === "spanish" ? "Seguir hablando con Rudy" : "Keep speaking with Rudy";
+  const nextMissionStep = Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL);
+  const nextMissionPreview = isFirstSpeakingMission && shouldContinueDailySpeaking
+    ? getDailySpeakingMissionPhrase(activeLang, selectedGoal, dailySpokenCount, nativeLang)
+    : null;
+  const showFirstMissionGoalPrompt = isFirstSpeakingMission && !selectedGoal;
+  const showDeepPronunciationCoach = !isFirstSpeakingMission;
 
   const idleRecordHint = hasListened
     ? (nativeLang === "korean" ? "탭하여 발음 녹음" : nativeLang === "spanish" ? "Toca para grabar" : "Tap to record")
@@ -1934,7 +1968,26 @@ export default function SpeakScreen() {
               ))}
             </View>
           )}
-          {isFirstSpeakingMission ? (
+          {isFirstSpeakingMission && nextMissionPreview ? (
+            <View style={styles.nextMissionPreviewBox}>
+              <View style={styles.nextMissionPreviewHeader}>
+                <Ionicons name="sparkles" size={16} color={C.gold} />
+                <Text style={styles.nextMissionPreviewTitle}>
+                  {getNextMissionPreviewTitle(nativeLang, nextMissionStep)}
+                </Text>
+              </View>
+              <Text style={styles.nextMissionPreviewPhrase} numberOfLines={2}>
+                “{nextMissionPreview.word}”
+              </Text>
+              <Text style={styles.nextMissionPreviewMeaning} numberOfLines={2}>
+                {nextMissionPreview.meaning}
+              </Text>
+              <Text style={styles.nextMissionPreviewHint}>
+                {getNextMissionPreviewHint(nativeLang)}
+              </Text>
+            </View>
+          ) : null}
+          {showFirstMissionGoalPrompt ? (
             <View style={styles.goalPromptBox}>
               <Text style={styles.goalPromptTitle}>{getGoalQuestion(nativeLang)}</Text>
               <View style={styles.goalChips}>
@@ -2187,11 +2240,7 @@ export default function SpeakScreen() {
                       <View style={styles.firstAttemptResultText}>
                         <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>{scoreInfo.label}</Text>
                         <Text style={styles.heardText}>
-                          {nativeLang === "korean"
-                            ? "점수보다 중요한 건 오늘 실제로 말한 횟수예요."
-                            : nativeLang === "spanish"
-                            ? "Lo importante hoy no es la nota, sino haberlo dicho."
-                            : "Today, the spoken attempt matters more than the score."}
+                          {getFirstMissionResultMessage(nativeLang, score)}
                         </Text>
                       </View>
                     </View>
@@ -2260,7 +2309,7 @@ export default function SpeakScreen() {
                       the fifth. Renders for every score (including 0 /
                       "weak" band — that's exactly the case that needs
                       coaching). Silently hides on endpoint 404. */}
-                  {phrase && score !== null ? (
+                  {phrase && score !== null && showDeepPronunciationCoach ? (
                     <CoachingCard
                       attemptId={attemptId}
                       word={phrase.word}
@@ -2276,13 +2325,15 @@ export default function SpeakScreen() {
                   ) : null}
 
                   {/* Phoneme-level drill-down. */}
-                  <PhonemeCoaching
-                    wordScores={wordResults}
-                    nativeLang={nativeLang}
-                    targetLang={activeLang}
-                    speechLang={phrase.speechLang}
-                    onRetry={resetPracticeState}
-                  />
+                  {showDeepPronunciationCoach ? (
+                    <PhonemeCoaching
+                      wordScores={wordResults}
+                      nativeLang={nativeLang}
+                      targetLang={activeLang}
+                      speechLang={phrase.speechLang}
+                      onRetry={resetPracticeState}
+                    />
+                  ) : null}
                 </View>
               ) : (
                 <View style={showAcceptedUnscoredNotice ? styles.noticeRow : styles.errorRow}>
@@ -2726,6 +2777,49 @@ const styles = StyleSheet.create({
   weakBoxHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
   weakBoxTitle: { fontSize: 12, fontFamily: F.bodySemi, color: "#EF4444" },
   weakWord: { fontSize: 14, fontFamily: F.body, color: C.parchment, paddingLeft: 4 },
+  nextMissionPreviewBox: {
+    width: "100%",
+    backgroundColor: "rgba(201,162,39,0.10)",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.28)",
+    padding: 14,
+    gap: 8,
+  },
+  nextMissionPreviewHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  nextMissionPreviewTitle: {
+    fontSize: 12,
+    fontFamily: F.label,
+    color: C.gold,
+    letterSpacing: 0.5,
+  },
+  nextMissionPreviewPhrase: {
+    fontSize: 20,
+    fontFamily: F.header,
+    color: C.parchment,
+    textAlign: "center",
+    lineHeight: 28,
+  },
+  nextMissionPreviewMeaning: {
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: C.goldDim,
+    textAlign: "center",
+    lineHeight: 18,
+  },
+  nextMissionPreviewHint: {
+    fontSize: 12,
+    fontFamily: F.body,
+    color: C.goldDim,
+    textAlign: "center",
+    fontStyle: "italic",
+    lineHeight: 17,
+  },
   goalPromptBox: {
     width: "100%",
     backgroundColor: C.bg2,

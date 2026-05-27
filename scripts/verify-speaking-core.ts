@@ -20,6 +20,7 @@ import { RUDY_GUIDE_CARDS } from "../lib/rudyGuideCards";
 const languages: DailySpeakingLanguage[] = ["korean", "english", "spanish"];
 const goals: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"];
 const onboardingSource = readFileSync("app/onboarding.tsx", "utf8");
+const speakSource = readFileSync("app/(tabs)/speak.tsx", "utf8");
 
 assert.equal(RUDY_GUIDE_CARDS.length, 8, "Rudy's Language Guide should stay at the 8 philosophy cards from replit.md");
 assert.deepEqual(
@@ -48,6 +49,19 @@ assert.ok(
 assert.ok(
   onboardingSource.includes('mission: "first-sentence"') && onboardingSource.includes("goal: goalSel"),
   "Onboarding should route the learner into a personalized first speaking sentence"
+);
+assert.ok(
+  speakSource.includes("nextMissionPreview") && speakSource.includes("getNextMissionPreviewTitle"),
+  "First speaking completion should preview the next real sentence instead of feeling like a dead-end completion screen"
+);
+assert.ok(
+  speakSource.includes("showFirstMissionGoalPrompt = isFirstSpeakingMission && !selectedGoal"),
+  "First speaking completion should not ask for the same goal again after onboarding already captured it"
+);
+assert.ok(
+  speakSource.includes("phrase && score !== null && showDeepPronunciationCoach") &&
+  speakSource.includes("showDeepPronunciationCoach ? ("),
+  "First speaking result should keep deep diagnostic coaching out of the first 10-minute path"
 );
 
 for (const lang of languages) {

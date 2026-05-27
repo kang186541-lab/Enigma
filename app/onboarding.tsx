@@ -48,10 +48,10 @@ function RudySplashPlaceholder() {
 
 type Step = 1 | 2 | 3;
 
-const ALL_LANGS: { id: NativeLanguage; flag: string; nameMap: Record<NativeLanguage, string> }[] = [
-  { id: "korean",  flag: "🇰🇷", nameMap: { korean: "한국어",    english: "Korean",  spanish: "Coreano" } },
-  { id: "english", flag: "🇺🇸", nameMap: { korean: "영어",      english: "English", spanish: "Inglés"  } },
-  { id: "spanish", flag: "🇪🇸", nameMap: { korean: "스페인어",  english: "Spanish", spanish: "Español" } },
+const ALL_LANGS: { id: NativeLanguage; badge: string; nameMap: Record<NativeLanguage, string> }[] = [
+  { id: "korean",  badge: "KO", nameMap: { korean: "한국어",    english: "Korean",  spanish: "Coreano" } },
+  { id: "english", badge: "EN", nameMap: { korean: "영어",      english: "English", spanish: "Inglés"  } },
+  { id: "spanish", badge: "ES", nameMap: { korean: "스페인어",  english: "Spanish", spanish: "Español" } },
 ];
 
 const UI: Record<NativeLanguage, {
@@ -63,7 +63,7 @@ const UI: Record<NativeLanguage, {
   cta1: string; cta2: string; back: string;
 }> = {
   korean: {
-    step1Title: "모국어를 선택해주세요",
+    step1Title: "모국어 선택",
     step1Sub:   "더 나은 학습 경험을 위해 모국어를 알려주세요",
     guideEyebrow: "Rudy의 언어 가이드",
     guideNext: "다음 카드",
@@ -76,7 +76,7 @@ const UI: Record<NativeLanguage, {
     cta1: "다음", cta2: "말하기 시작", back: "뒤로",
   },
   english: {
-    step1Title: "What's your native language?",
+    step1Title: "Native language?",
     step1Sub:   "Choose the language you speak at home",
     guideEyebrow: "Rudy's Language Guide",
     guideNext: "Next card",
@@ -89,7 +89,7 @@ const UI: Record<NativeLanguage, {
     cta1: "Next", cta2: "Start speaking", back: "Back",
   },
   spanish: {
-    step1Title: "¿Cuál es tu idioma nativo?",
+    step1Title: "Idioma nativo?",
     step1Sub:   "Elige el idioma que hablas en casa",
     guideEyebrow: "Guía de idiomas de Rudy",
     guideNext: "Siguiente tarjeta",
@@ -258,7 +258,9 @@ export default function OnboardingScreen() {
                     style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
                     onPress={() => handleNativePick(lang.id)}
                   >
-                    <Text style={styles.flag}>{lang.flag}</Text>
+                    <View style={styles.langBadge}>
+                      <Text style={styles.langBadgeText}>{lang.badge}</Text>
+                    </View>
                     <Text style={[styles.cardName, sel && styles.cardNameSel]}>
                       {lang.nameMap[uiLang]}
                     </Text>
@@ -347,7 +349,9 @@ export default function OnboardingScreen() {
                     style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
                     onPress={() => handleLearnPick(lang.id)}
                   >
-                    <Text style={styles.flag}>{lang.flag}</Text>
+                    <View style={styles.langBadge}>
+                      <Text style={styles.langBadgeText}>{lang.badge}</Text>
+                    </View>
                     <Text style={[styles.cardName, sel && styles.cardNameSel]}>
                       {lang.nameMap[uiLang]}
                     </Text>
@@ -420,7 +424,7 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { flexGrow: 1 },
+  scrollContent: { flexGrow: 1, width: "100%", maxWidth: "100%", overflow: "hidden" },
   topBorder: { height: 2, backgroundColor: C.gold, marginHorizontal: 24, marginTop: 8, borderRadius: 1 },
   splashWrap: {
     alignItems: "center", justifyContent: "center",
@@ -434,12 +438,22 @@ const styles = StyleSheet.create({
   dots: { flexDirection: "row", justifyContent: "center", gap: 8, marginBottom: 16 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.goldDark },
   dotActive: { width: 26, backgroundColor: C.gold },
-  textBlock: { alignItems: "center", paddingHorizontal: 32, marginBottom: 14 },
+  textBlock: {
+    width: "100%",
+    maxWidth: 520,
+    alignSelf: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    marginBottom: 14,
+  },
   title: {
-    fontSize: 22, fontFamily: F.header, color: C.gold,
-    textAlign: "center", marginBottom: 10, lineHeight: 32, letterSpacing: 1,
+    width: "100%",
+    maxWidth: "100%",
+    fontSize: 20, fontFamily: F.header, color: C.gold,
+    textAlign: "center", marginBottom: 10, lineHeight: 28, letterSpacing: 0,
   },
   subtitle: {
+    width: "100%",
     fontSize: 15, fontFamily: F.body, color: C.goldDim,
     textAlign: "center", lineHeight: 22, fontStyle: "italic",
   },
@@ -451,7 +465,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     textTransform: "uppercase",
   },
-  cards: { paddingHorizontal: 24, gap: 14 },
+  cards: { width: "100%", maxWidth: 520, alignSelf: "center", paddingHorizontal: 24, gap: 14 },
   card: {
     flexDirection: "row", alignItems: "center",
     backgroundColor: C.bg2,
@@ -462,7 +476,22 @@ const styles = StyleSheet.create({
     backgroundColor: C.parchment, borderColor: C.gold,
   },
   cardPress: { opacity: 0.85, transform: [{ scale: 0.98 }] },
-  flag:     { fontSize: 34 },
+  langBadge: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: "rgba(201,162,39,0.16)",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.32)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  langBadgeText: {
+    fontSize: 14,
+    fontFamily: F.header,
+    color: C.gold,
+    letterSpacing: 0.8,
+  },
   cardName: { flex: 1, fontSize: 18, fontFamily: F.bodySemi, color: C.parchment },
   cardNameSel: { color: C.textParchment },
   check: {
