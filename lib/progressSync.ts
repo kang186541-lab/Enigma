@@ -73,6 +73,180 @@ const COUNTER_KEYS = ["xp", "level", "words_learned"] as const;
 type CounterKey = typeof COUNTER_KEYS[number];
 
 const TABLE = "linguaai_user_progress";
+const PROGRESS_MERGE_SELECT = [
+  "xp",
+  "level",
+  "streak_days",
+  "words_learned",
+  "srs_data",
+  "daily_course_progress",
+  "achievements",
+  "weekly_xp",
+  "learner_profile",
+  "story_progress",
+  "npc_relationships",
+  "npc_emotions",
+  "expression_book",
+  "story_io_ratio",
+  "story_clues",
+  "known_words",
+].join(", ");
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function stringItems(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+export function mergeStringArrayBlob(local: unknown, remote: unknown): string[] {
+  const seen = new Set<string>();
+  const merged: string[] = [];
+  for (const item of [...stringItems(remote), ...stringItems(local)]) {
+    const key = item.trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    merged.push(item);
+  }
+  return merged;
+}
+
+export function mergeStoryProgressBlob(local: unknown, remote: unknown): { completed: string[]; unlocked: string[] } {
+  const localObj = isRecord(local) ? local : {};
+  const remoteObj = isRecord(remote) ? remote : {};
+  return {
+    completed: mergeStringArrayBlob(localObj.completed, remoteObj.completed),
+    unlocked: mergeStringArrayBlob(
+      ["london", ...stringItems(localObj.unlocked)],
+      stringItems(remoteObj.unlocked),
+    ),
+  };
+}
+
+export function mergeNumericRecordBlob(local: unknown, remote: unknown): Record<string, number> {
+  const merged: Record<string, number> = {};
+  const remoteObj = isRecord(remote) ? remote : {};
+  const localObj = isRecord(local) ? local : {};
+  for (const [key, value] of Object.entries(remoteObj)) {
+    if (typeof value === "number") merged[key] = value;
+  }
+  for (const [key, value] of Object.entries(localObj)) {
+    if (typeof value === "number") merged[key] = Math.max(merged[key] ?? 0, value);
+  }
+  return merged;
+}
+
+export function mergeStringRecordBlob(local: unknown, remote: unknown): Record<string, string> {
+  const merged: Record<string, string> = {};
+  const remoteObj = isRecord(remote) ? remote : {};
+  const localObj = isRecord(local) ? local : {};
+  for (const [key, value] of Object.entries(remoteObj)) {
+    if (typeof value === "string") merged[key] = value;
+  }
+  for (const [key, value] of Object.entries(localObj)) {
+    if (typeof value === "string") merged[key] = value;
+  }
+  return merged;
+}
+
+function firstNonEmpty(...values: unknown[]): unknown {
+  for (const value of values) {
+    if (value == null) continue;
+    if (typeof value === "string" && value.trim().length === 0) continue;
+    return value;
+  }
+  return undefined;
+}
+
+function mergeExpressionItem(local: Record<string, unknown>, remote: Record<string, unknown>): Record<string, unknown> {
+  const learnedDates = [local.learnedAt, remote.learnedAt].filter((value): value is string => typeof value === "string");
+  return {
+    ...remote,
+    ...local,
+    phrase: firstNonEmpty(local.phrase, remote.phrase),
+    meaning: firstNonEmpty(local.meaning, remote.meaning) ?? "",
+    collection: firstNonEmpty(local.collection, remote.collection),
+    chapter: firstNonEmpty(local.chapter, remote.chapter),
+    tprsStage: Math.max(
+      typeof local.tprsStage === "number" ? local.tprsStage : 0,
+      typeof remote.tprsStage === "number" ? remote.tprsStage : 0,
+    ) || undefined,
+    mastered: Boolean(local.mastered || remote.mastered),
+    learnedAt: learnedDates.sort()[0] ?? local.learnedAt ?? remote.learnedAt,
+  };
+}
+
+export function mergeExpressionBookBlob(local: unknown, remote: unknown): Record<string, unknown> {
+  const localObj = isRecord(local) ? local : {};
+  const remoteObj = isRecord(remote) ? remote : {};
+  const byPhrase = new Map<string, Record<string, unknown>>();
+  for (const item of [...(Array.isArray(remoteObj.expressions) ? remoteObj.expressions : []), ...(Array.isArray(localObj.expressions) ? localObj.expressions : [])]) {
+    if (!isRecord(item) || typeof item.phrase !== "string") continue;
+    const key = item.phrase.trim().toLowerCase();
+    if (!key) continue;
+    const existing = byPhrase.get(key);
+    byPhrase.set(key, existing ? mergeExpressionItem(item, existing) : item);
+  }
+  return {
+    ...remoteObj,
+    ...localObj,
+    expressions: Array.from(byPhrase.values()),
+  };
+}
+
+export function mergeStoryIoRatioBlob(local: unknown, remote: unknown): Record<string, unknown> {
+  const localObj = isRecord(local) ? local : {};
+  const remoteObj = isRecord(remote) ? remote : {};
+  const localChapters = isRecord(localObj.chapters) ? localObj.chapters : {};
+  const remoteChapters = isRecord(remoteObj.chapters) ? remoteObj.chapters : {};
+  const chapters: Record<string, { inputCount: number; outputCount: number }> = {};
+  for (const chapter of new Set([...Object.keys(remoteChapters), ...Object.keys(localChapters)])) {
+    const localStats = isRecord(localChapters[chapter]) ? localChapters[chapter] : {};
+    const remoteStats = isRecord(remoteChapters[chapter]) ? remoteChapters[chapter] : {};
+    chapters[chapter] = {
+      inputCount: Math.max(
+        typeof localStats.inputCount === "number" ? localStats.inputCount : 0,
+        typeof remoteStats.inputCount === "number" ? remoteStats.inputCount : 0,
+      ),
+      outputCount: Math.max(
+        typeof localStats.outputCount === "number" ? localStats.outputCount : 0,
+        typeof remoteStats.outputCount === "number" ? remoteStats.outputCount : 0,
+      ),
+    };
+  }
+  return { ...remoteObj, ...localObj, chapters };
+}
+
+export function mergeStoryCluesBlob(local: unknown, remote: unknown): Record<string, string[]> {
+  const localObj = isRecord(local) ? local : {};
+  const remoteObj = isRecord(remote) ? remote : {};
+  const merged: Record<string, string[]> = {};
+  for (const chapter of new Set([...Object.keys(remoteObj), ...Object.keys(localObj)])) {
+    merged[chapter] = mergeStringArrayBlob(localObj[chapter], remoteObj[chapter]);
+  }
+  return merged;
+}
+
+export function mergeWeeklyXpBlob(local: unknown, remote: unknown): Record<string, number> | unknown {
+  const localObj = isRecord(local) ? local : null;
+  const remoteObj = isRecord(remote) ? remote : null;
+  if (!localObj) return remote;
+  if (!remoteObj) return local;
+  const localWeek = typeof localObj.week === "number" ? localObj.week : 0;
+  const remoteWeek = typeof remoteObj.week === "number" ? remoteObj.week : 0;
+  if (localWeek > remoteWeek) return local;
+  if (remoteWeek > localWeek) return remote;
+  return {
+    ...remoteObj,
+    ...localObj,
+    week: localWeek || remoteWeek,
+    xp: Math.max(
+      typeof localObj.xp === "number" ? localObj.xp : 0,
+      typeof remoteObj.xp === "number" ? remoteObj.xp : 0,
+    ),
+  };
+}
 
 let syncSnapshot: ProgressSyncSnapshot = {
   status: "idle",
@@ -109,6 +283,24 @@ function notifySync(snapshot: ProgressSyncSnapshot) {
 
 export function getProgressSyncSnapshot(): ProgressSyncSnapshot {
   return syncSnapshot;
+}
+
+/**
+ * Signal that a reconcile cycle finished — server snapshot has been merged
+ * into local AsyncStorage — even when no push was needed (server already
+ * had everything local has).
+ *
+ * Home and other screens subscribe to `lastSyncedAt` to know when to
+ * re-read AsyncStorage. Without this notification, a sign-in / account-
+ * switch that doesn't trigger any queueProgressPush leaves Home reading
+ * stale state until next focus.
+ */
+export function notifyHydrateComplete(): void {
+  notifySync({
+    status: "synced",
+    lastSyncedAt: new Date().toISOString(),
+    lastError: null,
+  });
 }
 
 export function subscribeProgressSync(
@@ -168,7 +360,7 @@ export async function pushServerProgress(
   // Fetch existing row (no error if missing — first push for this user).
   const { data: existing, error: fetchErr } = await supabase
     .from(TABLE)
-    .select("xp, level, streak_days, words_learned, srs_data, daily_course_progress, learner_profile")
+    .select(PROGRESS_MERGE_SELECT)
     .eq("user_id", user.id)
     .maybeSingle();
   if (fetchErr) {
@@ -176,39 +368,80 @@ export async function pushServerProgress(
     // Fall through — we'd rather upsert with the local view than fail entirely.
   }
 
+  const existingRow = existing as unknown as Record<string, unknown> | null;
+
   // Strip undefined keys so the upsert payload is minimal.
   const row: Record<string, unknown> = { user_id: user.id };
   for (const [k, v] of Object.entries(patch)) {
     if (v === undefined) continue;
-    if ((COUNTER_KEYS as readonly string[]).includes(k) && existing) {
-      const remote = (existing as Record<string, unknown>)[k];
+    if ((COUNTER_KEYS as readonly string[]).includes(k) && existingRow) {
+      const remote = existingRow[k];
       if (typeof remote === "number" && typeof v === "number" && remote > v) {
         // Server is ahead — keep server's value, don't downgrade.
         row[k] = remote;
         continue;
       }
     }
-    if (k === "learner_profile" && existing && v && typeof v === "object") {
-      const remoteProfile = (existing as Record<string, unknown>).learner_profile;
+    if (k === "learner_profile" && existingRow && v && typeof v === "object") {
+      const remoteProfile = existingRow.learner_profile;
       if (remoteProfile && typeof remoteProfile === "object") {
         const { mergeLearnerProfiles } = await import("@/lib/learnerProfile");
         row[k] = mergeLearnerProfiles(v as any, remoteProfile as any);
         continue;
       }
     }
-    if (k === "daily_course_progress" && existing && v && typeof v === "object") {
-      const remoteDailyCourse = (existing as Record<string, unknown>).daily_course_progress;
+    if (k === "daily_course_progress" && existingRow && v && typeof v === "object") {
+      const remoteDailyCourse = existingRow.daily_course_progress;
       if (remoteDailyCourse && typeof remoteDailyCourse === "object") {
         const { mergeDailyCourseProgress } = await import("@/lib/dailyCourseData");
         row[k] = mergeDailyCourseProgress(v as any, remoteDailyCourse as any);
         continue;
       }
     }
-    if (k === "srs_data" && existing && v && typeof v === "object") {
-      const remoteSrs = (existing as Record<string, unknown>).srs_data;
+    if (k === "srs_data" && existingRow && v && typeof v === "object") {
+      const remoteSrs = existingRow.srs_data;
       if (remoteSrs && typeof remoteSrs === "object") {
         const { mergeSrsData } = await import("@/lib/srsManager");
         row[k] = mergeSrsData(v as any, remoteSrs as any);
+        continue;
+      }
+    }
+    if (existingRow) {
+      const remote = existingRow[k];
+      if (k === "achievements") {
+        row[k] = mergeStringArrayBlob(v, remote);
+        continue;
+      }
+      if (k === "weekly_xp") {
+        row[k] = mergeWeeklyXpBlob(v, remote);
+        continue;
+      }
+      if (k === "story_progress") {
+        row[k] = mergeStoryProgressBlob(v, remote);
+        continue;
+      }
+      if (k === "npc_relationships") {
+        row[k] = mergeNumericRecordBlob(v, remote);
+        continue;
+      }
+      if (k === "npc_emotions") {
+        row[k] = mergeStringRecordBlob(v, remote);
+        continue;
+      }
+      if (k === "expression_book") {
+        row[k] = mergeExpressionBookBlob(v, remote);
+        continue;
+      }
+      if (k === "story_io_ratio") {
+        row[k] = mergeStoryIoRatioBlob(v, remote);
+        continue;
+      }
+      if (k === "story_clues") {
+        row[k] = mergeStoryCluesBlob(v, remote);
+        continue;
+      }
+      if (k === "known_words") {
+        row[k] = mergeStringArrayBlob(v, remote);
         continue;
       }
     }
@@ -230,6 +463,10 @@ export async function pushServerProgress(
 
 export function queueProgressPush(patch: ProgressPatch, delayMs = 1000): void {
   const queueUserId = currentAuthUserId;
+  if (!queueUserId) {
+    notifySync({ ...syncSnapshot, status: "idle", lastError: null });
+    return;
+  }
   if (pendingUserId !== queueUserId) {
     if (pendingTimer) clearTimeout(pendingTimer);
     pendingTimer = null;
@@ -282,6 +519,7 @@ export async function flushProgressPush(): Promise<boolean> {
   pendingPatch = {};
   pendingUserId = null;
   if (Object.keys(toSend).length === 0) return true;
+  if (!toSendUserId) return true;
   try {
     const ok = await pushServerProgress(toSend, toSendUserId);
     if (!ok) {

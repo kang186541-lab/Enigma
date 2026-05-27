@@ -87,14 +87,17 @@ let _weeklyXpLock: Promise<void> = Promise.resolve();
 export async function hydrateWeeklyXPFromServer(payload: { week?: number; xp?: number } | null): Promise<void> {
   try {
     const currentWeek = getWeekNumber();
+    const savedWeek = await AsyncStorage.getItem(LEAGUE_WEEK_KEY);
+    const savedXP = await AsyncStorage.getItem(WEEKLY_XP_KEY);
+    const localXP = savedWeek === String(currentWeek) && savedXP ? parseInt(savedXP, 10) : 0;
     if (!payload || payload.week !== currentWeek) {
       // Server data is from a previous week — treat as 0 for the current week.
       await AsyncStorage.setItem(LEAGUE_WEEK_KEY, String(currentWeek));
-      await AsyncStorage.setItem(WEEKLY_XP_KEY, "0");
+      await AsyncStorage.setItem(WEEKLY_XP_KEY, String(Math.max(0, localXP)));
       return;
     }
     await AsyncStorage.setItem(LEAGUE_WEEK_KEY, String(payload.week));
-    await AsyncStorage.setItem(WEEKLY_XP_KEY, String(payload.xp ?? 0));
+    await AsyncStorage.setItem(WEEKLY_XP_KEY, String(Math.max(localXP, payload.xp ?? 0)));
   } catch (err) {
     console.warn("[League] hydrate error:", err);
   }

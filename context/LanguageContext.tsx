@@ -5,6 +5,12 @@ import { addWeeklyXP } from "@/lib/leagueManager";
 import {
   clearProgressPushQueue,
   fetchServerProgress,
+  mergeExpressionBookBlob,
+  mergeStoryCluesBlob,
+  mergeStoryIoRatioBlob,
+  mergeStringArrayBlob,
+  mergeWeeklyXpBlob,
+  notifyHydrateComplete,
   queueProgressPush,
   subscribeProgressSync,
   type ProgressSyncSnapshot,
@@ -552,17 +558,26 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         } catch (e) { console.warn('[Sync] course hydrate failed:', e); }
         try {
           const localAchievements = await readJson("@lingua_achievements");
-          if (Array.isArray(r.achievements)) {
+          if (Array.isArray(r.achievements) || Array.isArray(localAchievements)) {
+            const mergedAchievements = mergeStringArrayBlob(localAchievements, r.achievements);
             const { hydrateAchievementsFromServer } = await import("@/lib/achievementManager");
-            await hydrateAchievementsFromServer(r.achievements as string[]);
+            await hydrateAchievementsFromServer(mergedAchievements);
+            if (!jsonEqual(mergedAchievements, r.achievements)) queueProgressPush({ achievements: mergedAchievements });
           } else if (localAchievements) {
             queueProgressPush({ achievements: localAchievements });
           }
         } catch (e) { console.warn('[Sync] achievements hydrate failed:', e); }
         try {
-          if (r.weekly_xp) {
+          const localWeek = await AsyncStorage.getItem("@lingua_league_week").catch(() => null);
+          const localWeeklyRaw = await AsyncStorage.getItem("@lingua_weekly_xp").catch(() => null);
+          const localWeeklyXp = localWeek && localWeeklyRaw
+            ? { week: Number(localWeek), xp: Number(localWeeklyRaw) }
+            : null;
+          const mergedWeeklyXp = mergeWeeklyXpBlob(localWeeklyXp, r.weekly_xp);
+          if (mergedWeeklyXp) {
             const { hydrateWeeklyXPFromServer } = await import("@/lib/leagueManager");
-            await hydrateWeeklyXPFromServer(r.weekly_xp as { week?: number; xp?: number });
+            await hydrateWeeklyXPFromServer(mergedWeeklyXp as { week?: number; xp?: number });
+            if (!jsonEqual(mergedWeeklyXp, r.weekly_xp)) queueProgressPush({ weekly_xp: mergedWeeklyXp });
           }
         } catch (e) { console.warn('[Sync] weekly XP hydrate failed:', e); }
         try {
@@ -600,24 +615,43 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         } catch (e) { console.warn('[Sync] NPC emotion hydrate failed:', e); }
         try {
           const localExpressionBook = await readJson<RecordBlob>(EXPRESSION_BOOK_KEY);
-          if (r.expression_book) await writeJson(EXPRESSION_BOOK_KEY, r.expression_book);
-          else if (localExpressionBook) queueProgressPush({ expression_book: localExpressionBook });
+          if (r.expression_book || localExpressionBook) {
+            const mergedExpressionBook = mergeExpressionBookBlob(localExpressionBook, r.expression_book);
+            await writeJson(EXPRESSION_BOOK_KEY, mergedExpressionBook);
+            if (!jsonEqual(mergedExpressionBook, r.expression_book)) queueProgressPush({ expression_book: mergedExpressionBook });
+          }
         } catch (e) { console.warn('[Sync] expression book hydrate failed:', e); }
         try {
           const localIo = await readJson<RecordBlob>(STORY_IO_KEY);
-          if (r.story_io_ratio) await writeJson(STORY_IO_KEY, r.story_io_ratio);
-          else if (localIo) queueProgressPush({ story_io_ratio: localIo });
+          if (r.story_io_ratio || localIo) {
+            const mergedIo = mergeStoryIoRatioBlob(localIo, r.story_io_ratio);
+            await writeJson(STORY_IO_KEY, mergedIo);
+            if (!jsonEqual(mergedIo, r.story_io_ratio)) queueProgressPush({ story_io_ratio: mergedIo });
+          }
         } catch (e) { console.warn('[Sync] story I/O hydrate failed:', e); }
         try {
           const localClues = await readJson<RecordBlob>(STORY_CLUES_KEY);
-          if (r.story_clues) await writeJson(STORY_CLUES_KEY, r.story_clues);
-          else if (localClues) queueProgressPush({ story_clues: localClues });
+          if (r.story_clues || localClues) {
+            const mergedClues = mergeStoryCluesBlob(localClues, r.story_clues);
+            await writeJson(STORY_CLUES_KEY, mergedClues);
+            if (!jsonEqual(mergedClues, r.story_clues)) queueProgressPush({ story_clues: mergedClues });
+          }
         } catch (e) { console.warn('[Sync] story clues hydrate failed:', e); }
         try {
           const localKnownWords = await readJson<string[]>(KNOWN_WORDS_KEY);
-          if (r.known_words) await writeJson(KNOWN_WORDS_KEY, r.known_words);
-          else if (localKnownWords) queueProgressPush({ known_words: localKnownWords });
+          if (r.known_words || localKnownWords) {
+            const mergedKnownWords = mergeStringArrayBlob(localKnownWords, r.known_words);
+            await writeJson(KNOWN_WORDS_KEY, mergedKnownWords);
+            if (!jsonEqual(mergedKnownWords, r.known_words)) queueProgressPush({ known_words: mergedKnownWords });
+          }
         } catch (e) { console.warn('[Sync] known words hydrate failed:', e); }
+
+        // P2 fix: AsyncStorage is now in sync with the server. Bump
+        // lastSyncedAt so Home (and anyone subscribed to ProgressSync) re-
+        // reads its derived state immediately — even if no push was needed.
+        // Without this, a sign-in / account-switch where the server already
+        // had every blob leaves Home showing stale numbers until next focus.
+        if (!cancelled) notifyHydrateComplete();
       } catch (e) {
         console.warn('[LanguageContext] server reconcile failed:', e);
       }

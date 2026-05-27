@@ -280,6 +280,14 @@ export default function HomeScreen() {
     refreshHomeProgress();
   }, [refreshHomeProgress, syncStatus.lastSyncedAt]);
 
+  // Defense in depth: when the signed-in user changes (sign-in, sign-out,
+  // account switch), re-read AsyncStorage immediately even before the sync
+  // notification lands — `user.id` flipping is the authoritative signal
+  // that local state may no longer match what the user expects.
+  useEffect(() => {
+    refreshHomeProgress();
+  }, [user?.id, refreshHomeProgress]);
+
   useEffect(() => {
     if (spokenToday <= 0) {
       setShowGuide(false);

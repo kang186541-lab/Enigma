@@ -467,7 +467,12 @@ assert.ok(
   "Learner profile should be the canonical synced store for Basic Course, pronunciation practice, and Cards daily review memory"
 );
 assert.ok(
-  progressSyncSource.includes('select("xp, level, streak_days, words_learned, srs_data, daily_course_progress, learner_profile")') &&
+  progressSyncSource.includes("const PROGRESS_MERGE_SELECT") &&
+  progressSyncSource.includes('"story_progress"') &&
+  progressSyncSource.includes('"npc_relationships"') &&
+  progressSyncSource.includes('"expression_book"') &&
+  progressSyncSource.includes('"known_words"') &&
+  progressSyncSource.includes(".select(PROGRESS_MERGE_SELECT)") &&
   progressSyncSource.includes('k === "learner_profile"') &&
   progressSyncSource.includes('await import("@/lib/learnerProfile")') &&
   progressSyncSource.includes("mergeLearnerProfiles(v as any, remoteProfile as any)") &&
@@ -477,13 +482,30 @@ assert.ok(
   progressSyncSource.includes('k === "srs_data"') &&
   progressSyncSource.includes('await import("@/lib/srsManager")') &&
   progressSyncSource.includes("mergeSrsData(v as any, remoteSrs as any)") &&
+  progressSyncSource.includes('k === "story_progress"') &&
+  progressSyncSource.includes("mergeStoryProgressBlob(v, remote)") &&
+  progressSyncSource.includes('k === "npc_relationships"') &&
+  progressSyncSource.includes("mergeNumericRecordBlob(v, remote)") &&
+  progressSyncSource.includes('k === "expression_book"') &&
+  progressSyncSource.includes("mergeExpressionBookBlob(v, remote)") &&
+  progressSyncSource.includes('k === "story_io_ratio"') &&
+  progressSyncSource.includes("mergeStoryIoRatioBlob(v, remote)") &&
+  progressSyncSource.includes('k === "story_clues"') &&
+  progressSyncSource.includes("mergeStoryCluesBlob(v, remote)") &&
+  progressSyncSource.includes('k === "known_words"') &&
+  progressSyncSource.includes("mergeStringArrayBlob(v, remote)") &&
+  progressSyncSource.includes("if (!queueUserId)") &&
+  progressSyncSource.includes("if (!toSendUserId) return true;") &&
   languageContextSource.includes('const localSrs = await readJson("@lingua_srs_data")') &&
   languageContextSource.includes("queueProgressPush({ srs_data: localSrs })") &&
   languageContextSource.includes('const localCourse = await readJson("@daily_course_progress")') &&
   languageContextSource.includes("queueProgressPush({ daily_course_progress: localCourse })") &&
   languageContextSource.includes('const localProfile = await readJson("@lingua_learner_profile")') &&
-  languageContextSource.includes("queueProgressPush({ learner_profile: localProfile })"),
-  "Progress sync should merge profile, daily course, and SRS blobs with the server row before pushing, and existing server rows should backfill missing blobs from local state"
+  languageContextSource.includes("queueProgressPush({ learner_profile: localProfile })") &&
+  languageContextSource.includes("const mergedExpressionBook = mergeExpressionBookBlob") &&
+  languageContextSource.includes("const mergedClues = mergeStoryCluesBlob") &&
+  languageContextSource.includes("const mergedKnownWords = mergeStringArrayBlob"),
+  "Progress sync should merge every progress blob with the server row before pushing, block anonymous queued server writes, and backfill missing blobs from local state"
 );
 assert.ok(
   srsManagerSource.includes("export function mergeSrsData") &&
@@ -494,8 +516,10 @@ assert.ok(
 );
 assert.ok(
   leagueManagerSource.includes("let _weeklyXpLock") &&
-  leagueManagerSource.includes("_weeklyXpLock = _weeklyXpLock.then(run, run)"),
-  "Weekly XP should serialize burst rewards so leaderboard XP does not undercount"
+  leagueManagerSource.includes("_weeklyXpLock = _weeklyXpLock.then(run, run)") &&
+  leagueManagerSource.includes("const localXP = savedWeek === String(currentWeek)") &&
+  leagueManagerSource.includes("String(Math.max(localXP, payload.xp ?? 0))"),
+  "Weekly XP should serialize burst rewards and hydrate without overwriting newer local current-week XP"
 );
 assert.ok(
   !achievementsSource.includes("ach.xpReward") &&
