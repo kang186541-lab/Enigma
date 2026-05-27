@@ -140,6 +140,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const sttFailCount   = useRef(0);
   const isProcessingRef = useRef(false);
   const sendInFlightRef = useRef(false);
+  const completeFiredRef = useRef(false);
 
   const apiBase   = getApiUrl();
   // sttLang: use learningLang locale for Azure STT recognition (NOT speechLang which is TTS-only)
@@ -152,6 +153,13 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       role: m.role === "rudy" ? "assistant" as const : "user" as const,
       content: m.text,
     }));
+
+  const completeMissionTalkOnce = () => {
+    if (completeFiredRef.current) return;
+    completeFiredRef.current = true;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    onComplete(spokenSentencesRef.current, !usedKeyboard, grammarNotes);
+  };
 
   // On mount — get Rudy's opening line; cleanup audio/recording on unmount
   useEffect(() => {
@@ -784,10 +792,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
             </Text>
             <Pressable
               style={({ pressed }) => [s.inlineDoneBtn, pressed && { opacity: 0.82 }]}
-              onPress={() => {
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                onComplete(spokenSentencesRef.current, !usedKeyboard, grammarNotes);
-              }}
+              onPress={completeMissionTalkOnce}
             >
               <Text style={s.inlineDoneBtnText}>
                 {nativeLang === "korean" ? "복습으로 →" : nativeLang === "spanish" ? "A Repasar →" : "To Review →"}

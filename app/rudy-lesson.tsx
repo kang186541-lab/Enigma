@@ -79,6 +79,7 @@ export default function RudyLessonScreen() {
 
   // Step progress animation
   const stepAnim = useRef(new Animated.Value(0)).current;
+  const stepCompletingRef = useRef(false);
 
   useEffect(() => {
     loadProgress().then(setProgress);
@@ -91,6 +92,10 @@ export default function RudyLessonScreen() {
       useNativeDriver: false,
     }).start();
   }, [currentStep]);
+
+  useEffect(() => {
+    stepCompletingRef.current = false;
+  }, [currentStep, phase]);
 
   const addSentenceCount = React.useCallback((count: number) => {
     const safeCount = Math.max(0, Number.isFinite(count) ? count : 0);
@@ -115,6 +120,8 @@ export default function RudyLessonScreen() {
 
   // Called when each STEP is completed
   function handleStepComplete() {
+    if (stepCompletingRef.current) return;
+    stepCompletingRef.current = true;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     if (currentStep + 1 >= TOTAL_STEPS) {
       if (sentenceCountRef.current < SPEAKING_DAILY_GOAL) {

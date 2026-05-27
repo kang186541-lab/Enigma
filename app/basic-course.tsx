@@ -21,7 +21,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, getEffectiveLearningLanguage, type NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { C, F } from "@/constants/theme";
-import { addDayPhrases } from "@/lib/srsManager";
 import { EmojiText } from "@/components/EmojiText";
 
 const { width: SW } = Dimensions.get("window");
@@ -232,52 +231,6 @@ function stopBcTTS() {
   }
 }
 
-/** Play TTS via Azure /api/pronunciation-tts endpoint.
- *  For single letters, uses phonetic name + letter mode for best results. */
-async function speak(text: string, courseLang: string) {
-  try { await stopBcSound(); } catch (e) { console.warn('[BasicCourse] Failed to stop previous sound:', e); }
-  stopBcWebAudio();
-
-  const isSingleChar = text.length === 1;
-  // Use phonetic name for letters so Azure says "ay" for "A", not just the letter sound
-  const ttsText = isSingleChar ? getPhoneticName(text, courseLang) : text;
-  const voice = BC_VOICES[courseLang];
-
-  let url: URL;
-  try {
-    url = new URL("/api/pronunciation-tts", getApiUrl());
-  } catch (e) { console.warn('[BasicCourse] Failed to construct TTS URL:', e); return; }
-  url.searchParams.set("text", ttsText);
-  url.searchParams.set("lang", courseLang);
-  if (voice) url.searchParams.set("voice", voice);
-
-  try {
-    if (Platform.OS === "web") {
-      const res = await fetch(url.toString());
-      if (!res.ok) throw new Error("tts-fail");
-      const blob = await res.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
-      _bcWebAudio = audio;
-      audio.onended = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
-      audio.onerror = () => { URL.revokeObjectURL(objectUrl); _bcWebAudio = null; };
-      await audio.play();
-    } else {
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch((e) => console.warn('[BasicCourse] setAudioMode failed:', e));
-      const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true, volume: 1.0 });
-      _bcNativeSound = sound;
-      sound.setOnPlaybackStatusUpdate((st: any) => {
-        if (st.isLoaded && st.didJustFinish) {
-          sound.unloadAsync().catch((e) => console.warn('[BasicCourse] sound unload failed:', e));
-          _bcNativeSound = null;
-        }
-      });
-    }
-  } catch (e) {
-    console.warn('[BasicCourse] Azure TTS playback failed:', e);
-  }
-}
-
 /* ─────────────────────────────────────────────
    Per-letter tip data (phonetics + example words)
    ───────────────────────────────────────────── */
@@ -402,6 +355,25 @@ function getPhoneticName(word: string, courseLang: string): string {
   if (courseLang.startsWith("ko")) return KO_LET[word]?.name ?? word;
   if (courseLang.startsWith("es")) return ES_PHONETIC[word.toUpperCase()] ?? ES_PHONETIC[word] ?? word;
   return word;
+}
+
+function getBasicCourseTtsText(text: string, courseLang: string): string {
+  // Regression guard for the known "A sounds like I" bug: English letters
+  // must reach Azure as their spoken name ("ay"), not the raw glyph ("A").
+  return text.length === 1 ? getPhoneticName(text, courseLang) : text;
+}
+
+function buildBasicCourseTtsUrl(text: string, courseLang: string, voice?: string): URL | null {
+  try {
+    const url = new URL("/api/pronunciation-tts", getApiUrl());
+    url.searchParams.set("text", getBasicCourseTtsText(text, courseLang));
+    url.searchParams.set("lang", courseLang);
+    if (voice) url.searchParams.set("voice", voice);
+    return url;
+  } catch (e) {
+    console.warn('[BasicCourse] Failed to construct TTS URL:', e);
+    return null;
+  }
 }
 
 function getCharTip(char: string, learning: string, native: string): string {
@@ -539,6 +511,14 @@ const tc = StyleSheet.create({
    ───────────────────────────────────────────── */
 type ReviewSection = "write" | "listen" | "speak" | "full";
 const REVIEW_TS_KEY = (section: ReviewSection, lang: string) => `basicReviewTs_${section}_${lang}`;
+const REVIEW_SECTIONS = new Set<ReviewSection>(["write", "listen", "speak", "full"]);
+
+function parseReviewSection(value: unknown): ReviewSection | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return typeof raw === "string" && REVIEW_SECTIONS.has(raw as ReviewSection)
+    ? raw as ReviewSection
+    : null;
+}
 
 function daysAgoLabel(ts: number | null, native: string): string {
   if (!ts) return native === "korean" ? "미복습" : native === "spanish" ? "Sin repasar" : "Not reviewed";
@@ -551,8 +531,9 @@ function daysAgoLabel(ts: number | null, native: string): string {
 export default function BasicCourseScreen() {
   const insets = useSafeAreaInsets();
   const { learningLanguage, nativeLanguage, awardXp } = useLanguage();
-  const { review } = useLocalSearchParams<{ review?: string }>();
+  const { review, section } = useLocalSearchParams<{ review?: string; section?: string }>();
   const isReviewMode = review === "1";
+  const initialReviewSection = isReviewMode ? parseReviewSection(section) : null;
 
   const native = (nativeLanguage ?? "english") as NativeLanguage;
   const lang   = getEffectiveLearningLanguage(native, learningLanguage) as string;
@@ -561,15 +542,15 @@ export default function BasicCourseScreen() {
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
-  const [showReviewMenu, setShowReviewMenu] = useState(isReviewMode);
-  const [reviewSection,  setReviewSection]  = useState<ReviewSection | null>(null);
+  const [showReviewMenu, setShowReviewMenu] = useState(isReviewMode && !initialReviewSection);
+  const [reviewSection,  setReviewSection]  = useState<ReviewSection | null>(initialReviewSection);
   const [reviewTs,       setReviewTs]       = useState<Record<ReviewSection, number | null>>({
     write: null, listen: null, speak: null, full: null,
   });
 
   const [showIntro,        setShowIntro]        = useState(!isReviewMode);
   const [showSkipConfirm,  setShowSkipConfirm]  = useState(false);
-  const [step,        setStep]        = useState(0);
+  const [step,        setStep]        = useState(initialReviewSection === "speak" ? 2 : 0);
   const [subIdx,      setSubIdx]      = useState(0);
   const [flipped,     setFlipped]     = useState(false);
   const [traced,      setTraced]      = useState(false);  // step 0: user has drawn enough
@@ -608,6 +589,12 @@ export default function BasicCourseScreen() {
       });
     });
   }, [isReviewMode, lang]);
+
+  useEffect(() => {
+    if (!isReviewMode || !initialReviewSection) return;
+    AsyncStorage.setItem(REVIEW_TS_KEY(initialReviewSection, lang), String(Date.now()))
+      .catch((e) => console.warn('[BasicCourse] Failed to mark review timestamp:', e));
+  }, [initialReviewSection, isReviewMode, lang]);
 
   const startReviewSection = async (section: ReviewSection) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -694,21 +681,14 @@ export default function BasicCourseScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setAudioPlayed(true);
 
-    // For single letters, use phonetic name for better TTS results
-    const isSingleChar = rawText.length === 1;
-    const ttsText = isSingleChar ? getPhoneticName(rawText, course.lang) : rawText;
     const voice = BC_VOICES[course.lang];
+    const url = buildBasicCourseTtsUrl(rawText, course.lang, voice);
+    if (!url) return;
 
     try {
       // Stop any previous sound to prevent overlapping playback
       await stopBcSound();
       stopBcWebAudio();
-
-      const url = new URL("/api/pronunciation-tts", getApiUrl());
-      url.searchParams.set("text", ttsText);
-      url.searchParams.set("lang", course.lang);
-      if (voice) url.searchParams.set("voice", voice);
-      // Don't set mode=letter — phonetic name is already expanded (e.g. "A" → "ay")
 
       if (Platform.OS === "web") {
         const res = await fetch(url.toString());
@@ -738,6 +718,17 @@ export default function BasicCourseScreen() {
 
   const goNext = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const stepReady = step === 0
+      ? traced
+      : step === 1
+        ? flipped
+        : step === 2
+          ? greetPhase === "done"
+          : true;
+    if (!isReviewMode && step < 3 && !stepReady) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      return;
+    }
     if (step === 3) { finishCourse(); return; }
     if (subIdx >= currentItems.length - 1) {
       // In review mode: "full" section advances through all steps (0→1→2→3),
@@ -797,15 +788,12 @@ export default function BasicCourseScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setAudioPlayed(true);
     const voice = BC_VOICES[course.lang];
+    const url = buildBasicCourseTtsUrl(greetItem.phrase, course.lang, voice);
+    if (!url) return;
     try {
       // Stop any previous sound to prevent overlapping playback
       await stopBcSound();
       stopBcWebAudio();
-
-      const url = new URL("/api/pronunciation-tts", getApiUrl());
-      url.searchParams.set("text", greetItem.phrase);
-      url.searchParams.set("lang", course.lang);
-      if (voice) url.searchParams.set("voice", voice);
 
       if (Platform.OS === "web") {
         const res = await fetch(url.toString());
@@ -970,7 +958,7 @@ export default function BasicCourseScreen() {
           </View>
 
           {/* Skip current item */}
-          {step < 3 && (
+          {isReviewMode && step < 3 && (
             <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
               <Text style={s.inlineSkip}>
                 {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
@@ -1198,13 +1186,6 @@ export default function BasicCourseScreen() {
         ) : (
           <View style={s.topRightRow}>
             <Text style={s.stepNum}>{step + 1}/{totalSteps}</Text>
-            {step < 3 && (
-              <Pressable onPress={goNext} hitSlop={10}>
-                <Text style={s.topSkipTxt}>
-                  {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
-                </Text>
-              </Pressable>
-            )}
             <Pressable onPress={() => { stopBcTTS(); setShowSkipConfirm(true); }} hitSlop={10}>
               <Ionicons name="home-outline" size={18} color={C.goldDim} />
             </Pressable>
@@ -1343,11 +1324,13 @@ export default function BasicCourseScreen() {
                 </Text>
               </Pressable>
             </View>
-            <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
-              <Text style={s.inlineSkip}>
-                {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
-              </Text>
-            </Pressable>
+            {isReviewMode && (
+              <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+                <Text style={s.inlineSkip}>
+                  {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                </Text>
+              </Pressable>
+            )}
           </View>
 
         </Animated.View>
@@ -1411,11 +1394,13 @@ export default function BasicCourseScreen() {
                           {native === "korean" ? "🔊  듣기" : native === "spanish" ? "🔊  Escuchar" : "🔊  Listen"}
                         </Text>
                       </Pressable>
-                      <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
-                        <Text style={s.inlineSkip}>
-                          {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
-                        </Text>
-                      </Pressable>
+                      {isReviewMode && (
+                        <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+                          <Text style={s.inlineSkip}>
+                            {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                          </Text>
+                        </Pressable>
+                      )}
                     </>
                   )}
 
@@ -1431,11 +1416,13 @@ export default function BasicCourseScreen() {
                           {native === "korean" ? "🎤  따라 말하기" : native === "spanish" ? "🎤  Repetir" : "🎤  Speak Now"}
                         </Text>
                       </Pressable>
-                      <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
-                        <Text style={s.inlineSkip}>
-                          {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
-                        </Text>
-                      </Pressable>
+                      {isReviewMode && (
+                        <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+                          <Text style={s.inlineSkip}>
+                            {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                          </Text>
+                        </Pressable>
+                      )}
                     </View>
                   )}
 
@@ -1566,7 +1553,6 @@ const s = StyleSheet.create({
   lingoStripText: { fontSize: 11, fontFamily: F.body, color: C.goldDim, flexShrink: 1 },
   stepNum: { fontSize: 11, fontFamily: F.label, color: C.goldDim },
   topRightRow: { flexDirection: "column", alignItems: "flex-end", gap: 2 },
-  topSkipTxt: { fontSize: 11, fontFamily: F.label, color: C.gold, letterSpacing: 0.3 },
   inlineSkipWrap: { alignSelf: "center", paddingVertical: 4 },
   inlineSkip: { fontSize: 12, fontFamily: F.label, color: C.gold, letterSpacing: 0.3 },
 

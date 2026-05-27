@@ -84,6 +84,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   const [showComplete, setShowComplete] = useState(false);
   const [canSkipScoring, setCanSkipScoring] = useState(false);
   const skipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const completeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const completeFiredRef = useRef(false);
 
   const nativeRecRef      = useRef<Audio.Recording | null>(null);
   const audioChunksRef    = useRef<Blob[]>([]);
@@ -110,6 +112,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     return () => {
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
       if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
+      if (completeTimerRef.current) clearTimeout(completeTimerRef.current);
       if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
       if (nativeRecRef.current) {
         nativeRecRef.current.stopAndUnloadAsync().catch((e) => console.warn('[Step4] Recording cleanup failed:', e));
@@ -480,6 +483,15 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
 
   // ── Navigation ────────────────────────────────────────────────────────────
 
+  function finishReviewOnce() {
+    if (completeFiredRef.current) return;
+    completeFiredRef.current = true;
+    setShowComplete(true);
+    completeTimerRef.current = setTimeout(() => {
+      onComplete(allScores, spokenAttemptsRef.current);
+    }, 1500);
+  }
+
   function skipQuestion() {
     setQPhase("revealed");
     setPronScore(0);
@@ -490,8 +502,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   function nextQuestion() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (qIndex + 1 >= total) {
-      setShowComplete(true);
-      setTimeout(() => onComplete(allScores, spokenAttemptsRef.current), 1500);
+      finishReviewOnce();
       return;
     }
     setQIndex((i) => i + 1);

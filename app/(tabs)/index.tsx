@@ -734,7 +734,7 @@ export default function HomeScreen() {
             ]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push((courseCompleted ? "/basic-course?review=1" : "/basic-course") as any);
+              router.push((courseCompleted ? "/basic-course?review=1&section=full" : "/basic-course") as any);
             }}
           >
             <Text style={styles.basicCoursePillText}>

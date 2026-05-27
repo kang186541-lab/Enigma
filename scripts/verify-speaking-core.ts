@@ -333,7 +333,7 @@ const firstSpeakingCtaIndex = homeSource.indexOf("TODAY'S FIRST SPEAKING MISSION
 const morePracticeGateIndex = homeSource.indexOf("styles.morePracticeGate");
 const secondarySectionsIndex = homeSource.indexOf("{showSecondaryHomeSections && (");
 const rudyCourseRouteIndex = homeSource.indexOf('router.push("/rudy-course" as any)');
-const basicCourseRouteIndex = homeSource.indexOf('router.push((courseCompleted ? "/basic-course?review=1" : "/basic-course") as any)');
+const basicCourseRouteIndex = homeSource.indexOf('router.push((courseCompleted ? "/basic-course?review=1&section=full" : "/basic-course") as any)');
 const statsRowIndex = homeSource.indexOf("STATS ROW");
 const streakCardIndex = homeSource.indexOf("STREAK CARD");
 const npcRouteIndex = homeSource.indexOf('router.push("/npc-list" as any)');
@@ -478,6 +478,29 @@ assert.ok(
   basicCourseSource.includes("await awardXp(5);"),
   "Basic Course Go Home should not mark the course complete, and completion/greeting rewards should use delta XP"
 );
+assert.ok(
+  basicCourseSource.includes('EN_PHONETIC: Record<string, string>') &&
+  basicCourseSource.includes('A:"ay"') &&
+  basicCourseSource.includes("function getBasicCourseTtsText") &&
+  basicCourseSource.includes("return text.length === 1 ? getPhoneticName(text, courseLang) : text;") &&
+  basicCourseSource.includes('url.searchParams.set("text", getBasicCourseTtsText(text, courseLang));'),
+  "Basic Course letter TTS should send phonetic names such as A -> ay to Azure"
+);
+assert.ok(
+  homeSource.includes('/basic-course?review=1&section=full') &&
+  basicCourseSource.includes('type ReviewSection = "write" | "listen" | "speak" | "full"') &&
+  basicCourseSource.includes('const initialReviewSection = isReviewMode ? parseReviewSection(section) : null;') &&
+  basicCourseSource.includes('const [showReviewMenu, setShowReviewMenu] = useState(isReviewMode && !initialReviewSection);') &&
+  basicCourseSource.includes('reviewSection === "full" && step < 2') &&
+  basicCourseSource.includes('setStep(s => s + 1);'),
+  "Basic Course review entry should open full review by default and protect full review step progression"
+);
+assert.ok(
+  basicCourseSource.includes("const stepReady = step === 0") &&
+  basicCourseSource.includes("if (!isReviewMode && step < 3 && !stepReady)") &&
+  !basicCourseSource.includes('topSkipTxt:'),
+  "Basic Course normal path should not let Skip advance to completion without tracing, flipping, or speaking"
+);
 for (const [name, source] of [
   ["Speak", speakSource],
   ["Cards", cardsSource],
@@ -515,6 +538,20 @@ assert.ok(
   rudyStep3Source.includes("onComplete(spokenSentencesRef.current") &&
   rudyStep4Source.includes("onComplete(allScores, spokenAttemptsRef.current)"),
   "Rudy steps should report actual spoken attempts, not correct answers or GPT text counters"
+);
+assert.ok(
+  rudyLessonSource.includes("const stepCompletingRef = useRef(false);") &&
+  rudyLessonSource.includes("stepCompletingRef.current = false;") &&
+  rudyLessonSource.includes("if (stepCompletingRef.current) return;") &&
+  rudyLessonSource.includes("stepCompletingRef.current = true;") &&
+  rudyStep3Source.includes("const completeFiredRef = useRef(false);") &&
+  rudyStep3Source.includes("const completeMissionTalkOnce = () =>") &&
+  rudyStep3Source.includes("onPress={completeMissionTalkOnce}") &&
+  rudyStep4Source.includes("const completeTimerRef = useRef") &&
+  rudyStep4Source.includes("const completeFiredRef = useRef(false);") &&
+  rudyStep4Source.includes("function finishReviewOnce()") &&
+  rudyStep4Source.includes("if (completeFiredRef.current) return;"),
+  "Rudy step completion should be reentrancy guarded so rapid taps cannot double-count spoken progress"
 );
 assert.ok(
   !rudyStep2Source.includes("NotificationFeedbackType.Error") &&
