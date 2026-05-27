@@ -217,14 +217,27 @@ assert.ok(
 assert.ok(
   homeSource.includes("showSecondaryHomeSections") &&
   homeSource.includes("setShowMorePractice((v) => !v)") &&
-  homeSource.includes("todaySpeakingMission.rudyTip"),
+  homeSource.includes("todaySpeakingMission.rudyTip") &&
+  homeSource.includes("const shouldFocusSpeaking = !todaySpeakingMission.dailyGoalMet;") &&
+  homeSource.includes("const showSecondaryHomeSections = !shouldFocusSpeaking || showMorePractice;") &&
+  homeSource.includes("{shouldFocusSpeaking && ("),
   "Home should keep today's real spoken sentence primary and progressively disclose secondary practice"
+);
+assert.ok(
+  homeSource.includes('pathname: "/(tabs)/speak"') &&
+  homeSource.includes('mission: "first-sentence"') &&
+  homeSource.includes('goal: todaySpeakingMission.goal ?? ""') &&
+  homeSource.includes("targetLang: todaySpeakingMission.targetLanguage") &&
+  homeSource.includes('router.push("/(tabs)/speak" as any);'),
+  "Home primary CTA should route unfinished learners into the first-sentence speaking mission, and completed learners into open Speak practice"
 );
 const firstSpeakingCtaIndex = homeSource.indexOf("TODAY'S FIRST SPEAKING MISSION");
 const morePracticeGateIndex = homeSource.indexOf("styles.morePracticeGate");
 const secondarySectionsIndex = homeSource.indexOf("{showSecondaryHomeSections && (");
 const rudyCourseRouteIndex = homeSource.indexOf('router.push("/rudy-course" as any)');
 const basicCourseRouteIndex = homeSource.indexOf('router.push((courseCompleted ? "/basic-course?review=1" : "/basic-course") as any)');
+const statsRowIndex = homeSource.indexOf("STATS ROW");
+const streakCardIndex = homeSource.indexOf("STREAK CARD");
 assert.ok(
   firstSpeakingCtaIndex >= 0 &&
   morePracticeGateIndex > firstSpeakingCtaIndex &&
@@ -232,9 +245,29 @@ assert.ok(
   rudyCourseRouteIndex > secondarySectionsIndex &&
   basicCourseRouteIndex > secondarySectionsIndex &&
   rudyCourseRouteIndex < basicCourseRouteIndex &&
+  statsRowIndex > secondarySectionsIndex &&
+  streakCardIndex > secondarySectionsIndex &&
+  homeSource.includes("const showProgressSummary = todaySpeakingMission.dailyGoalMet") &&
+  homeSource.includes("const showDueReviewBanner = todaySpeakingMission.dailyGoalMet && srsDueCount > 0") &&
+  homeSource.includes("{showProgressSummary && (") &&
+  homeSource.includes("{showDueReviewBanner && (") &&
   homeSource.includes("Optional Basics") &&
   !homeSource.includes('📚  Basic Course'),
-  "Home should show the first speaking CTA first, hide secondary practice behind the gate, and place Rudy Training before optional Basic Course"
+  "Home should show the first speaking CTA first, hide secondary practice behind the gate, place Rudy Training before optional Basic Course, and keep progress/review summaries quiet until today's speaking goal is met"
+);
+const quickItemsStart = homeSource.indexOf("const quickItems = [");
+const quickItemsEnd = quickItemsStart >= 0 ? homeSource.indexOf("];", quickItemsStart) : -1;
+const quickItemsBlock = quickItemsStart >= 0 && quickItemsEnd > quickItemsStart
+  ? homeSource.slice(quickItemsStart, quickItemsEnd)
+  : "";
+const quickRouteCount = (quickItemsBlock.match(/route:/g) ?? []).length;
+assert.ok(
+  quickRouteCount > 0 &&
+  quickRouteCount <= 5 &&
+  !quickItemsBlock.includes("/basic-course") &&
+  !quickItemsBlock.includes("/daily-lesson") &&
+  !quickItemsBlock.includes("/stats-dashboard"),
+  "Home quick practice should stay compact and avoid legacy, foundation, or status routes"
 );
 assert.ok(
   languageContextSource.includes("export function getEffectiveLearningLanguage") &&

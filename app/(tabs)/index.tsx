@@ -266,6 +266,8 @@ export default function HomeScreen() {
     : `You spoke ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL} sentences today`;
   const shouldFocusSpeaking = !todaySpeakingMission.dailyGoalMet;
   const showSecondaryHomeSections = !shouldFocusSpeaking || showMorePractice;
+  const showProgressSummary = todaySpeakingMission.dailyGoalMet;
+  const showDueReviewBanner = todaySpeakingMission.dailyGoalMet && srsDueCount > 0;
   const morePracticeTitle = showMorePractice
     ? nativeLang === "korean" ? "다시 말하기에 집중하기" : nativeLang === "spanish" ? "Volver a enfocarme en hablar" : "Refocus on speaking"
     : nativeLang === "korean" ? "다른 학습도 보기" : nativeLang === "spanish" ? "Ver otras prácticas" : "Show other practice";
@@ -559,69 +561,73 @@ export default function HomeScreen() {
       {showSecondaryHomeSections && (
       <>
       {/* ── STATS ROW ─────────────────────────────────── */}
-      <View style={styles.statsRow}>
-        {statItems.map((s, i) => (
-          <View key={i} style={styles.statCard}>
-            <EmojiText style={styles.statValue}>{s.value}</EmojiText>
-            <Text style={styles.statLabel}>{s.label}</Text>
-          </View>
-        ))}
-      </View>
+      {showProgressSummary && (
+      <>
+        <View style={styles.statsRow}>
+          {statItems.map((s, i) => (
+            <View key={i} style={styles.statCard}>
+              <EmojiText style={styles.statValue}>{s.value}</EmojiText>
+              <Text style={styles.statLabel}>{s.label}</Text>
+            </View>
+          ))}
+        </View>
 
-      {/* ── STREAK CARD ───────────────────────────────── */}
-      <GoldDivider label={nativeLang === "korean" ? "연속 학습" : nativeLang === "spanish" ? "RACHA DIARIA" : "DAILY STREAK"} />
-      <View style={styles.pad}>
-        <View style={styles.streakCard}>
-          <View style={styles.streakHeader}>
-            <View style={styles.streakLeft}>
-              <RudyMascot size={100} mood={lingoMood} />
-              <View>
-                <Animated.View style={{ transform: [{ scale: fireScale }] }}>
-                  <Animated.Text style={[styles.streakCount, { opacity: flickerOp }]}>
-                    {stats.streak}
-                  </Animated.Text>
-                </Animated.View>
-                <Text style={styles.streakLabel}>
-                  {nativeLang === "korean" ? "일 연속 학습" : nativeLang === "spanish" ? "días seguidos" : "day streak"}
+        {/* ── STREAK CARD ───────────────────────────────── */}
+        <GoldDivider label={nativeLang === "korean" ? "연속 학습" : nativeLang === "spanish" ? "RACHA DIARIA" : "DAILY STREAK"} />
+        <View style={styles.pad}>
+          <View style={styles.streakCard}>
+            <View style={styles.streakHeader}>
+              <View style={styles.streakLeft}>
+                <RudyMascot size={100} mood={lingoMood} />
+                <View>
+                  <Animated.View style={{ transform: [{ scale: fireScale }] }}>
+                    <Animated.Text style={[styles.streakCount, { opacity: flickerOp }]}>
+                      {stats.streak}
+                    </Animated.Text>
+                  </Animated.View>
+                  <Text style={styles.streakLabel}>
+                    {nativeLang === "korean" ? "일 연속 학습" : nativeLang === "spanish" ? "días seguidos" : "day streak"}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.streakBadge}>
+                <Ionicons name="trophy" size={14} color={C.gold} />
+                <Text style={styles.streakBadgeText}>
+                  {nativeLang === "korean" ? "최고 기록" : nativeLang === "spanish" ? "Récord" : "Best"}
                 </Text>
               </View>
             </View>
-            <View style={styles.streakBadge}>
-              <Ionicons name="trophy" size={14} color={C.gold} />
-              <Text style={styles.streakBadgeText}>
-                {nativeLang === "korean" ? "최고 기록" : nativeLang === "spanish" ? "Récord" : "Best"}
-              </Text>
+
+            {/* Weekly calendar */}
+            <View style={styles.weekRow}>
+              {weekData.map((d, i) => (
+                <View key={i} style={styles.dayCol}>
+                  <Text style={[styles.dayLabel, d.isToday && styles.dayLabelToday]}>{d.label}</Text>
+                  {d.status === "fire" ? (
+                    <View style={[styles.dayCircle, styles.dayCircleFire]}>
+                      <Animated.Text style={[styles.dayEmoji, { opacity: d.isToday ? flickerOp : 1 }]}>🔥</Animated.Text>
+                    </View>
+                  ) : d.status === "missed" ? (
+                    <View style={[styles.dayCircle, styles.dayCircleMissed]}>
+                      <Text style={styles.dayEmojiSmall}>✕</Text>
+                    </View>
+                  ) : (
+                    <View style={[styles.dayCircle, styles.dayCircleFuture]} />
+                  )}
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.streakMotivation}>
+              <EmojiText style={styles.streakMotivationText}>{streakText}</EmojiText>
             </View>
           </View>
-
-          {/* Weekly calendar */}
-          <View style={styles.weekRow}>
-            {weekData.map((d, i) => (
-              <View key={i} style={styles.dayCol}>
-                <Text style={[styles.dayLabel, d.isToday && styles.dayLabelToday]}>{d.label}</Text>
-                {d.status === "fire" ? (
-                  <View style={[styles.dayCircle, styles.dayCircleFire]}>
-                    <Animated.Text style={[styles.dayEmoji, { opacity: d.isToday ? flickerOp : 1 }]}>🔥</Animated.Text>
-                  </View>
-                ) : d.status === "missed" ? (
-                  <View style={[styles.dayCircle, styles.dayCircleMissed]}>
-                    <Text style={styles.dayEmojiSmall}>✕</Text>
-                  </View>
-                ) : (
-                  <View style={[styles.dayCircle, styles.dayCircleFuture]} />
-                )}
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.streakMotivation}>
-            <EmojiText style={styles.streakMotivationText}>{streakText}</EmojiText>
-          </View>
         </View>
-      </View>
+      </>
+      )}
 
       {/* ── SRS REVIEW BANNER ─────────────────────────── */}
-      {srsDueCount > 0 && (
+      {showDueReviewBanner && (
         <View style={styles.pad}>
           <Pressable
             style={({ pressed }) => [styles.srsBanner, pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] }]}
