@@ -14,6 +14,8 @@ import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { PhonemeCoaching } from "./PhonemeCoaching";
 
+const RUDY_RECORDING_MS = 8000;
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type QPhase = "ready" | "recording" | "assessing" | "revealed" | "done";
@@ -129,16 +131,17 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     };
   }, []);
 
-  // Safety timeout: if "assessing" outlives the server/Azure window, force reveal with default score.
+  // Safety timeout: if "assessing" outlives the server/Azure window, reveal
+  // the attempt without inventing a passing pronunciation score.
   useEffect(() => {
     if (qPhase === "assessing") {
       if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
       safetyTimeoutRef.current = setTimeout(() => {
         if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
         setCanSkipScoring(false);
-        setPronScore(70);
-        setAllScores((prev) => [...prev, 70]);
-        setStars(2);
+        setPronScore(0);
+        setAllScores((prev) => [...prev, 0]);
+        setStars(0);
         setQPhase("revealed");
       }, 25000);
     } else {
@@ -155,7 +158,6 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     if (qPhase === "ready" || qPhase === "recording") {
       setTimerRunning(false);
       if (qPhase === "recording") stopRecordAndAssess(q);
-      else skipQuestion();
     }
   }, [qPhase, q]);
 
@@ -289,7 +291,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         await rec.prepareToRecordAsync(recOptions);
         await rec.startAsync();
         nativeRecRef.current = rec;
-        autoStopRef.current = setTimeout(() => stopRecordAndAssess(q), 7000);
+        autoStopRef.current = setTimeout(() => stopRecordAndAssess(q), RUDY_RECORDING_MS);
       } catch (e) { console.warn('[Speech] recording start failed:', e); stopPulse(); setQPhase("ready"); }
     } else {
       if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); fallbackReveal(); return; }
@@ -322,17 +324,16 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         fallbackReveal();
         return;
       }
-      autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, 7000);
+      autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, RUDY_RECORDING_MS);
     }
   }
 
   function fallbackReveal() {
     if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
     setCanSkipScoring(false);
-    setPronScore(70);
-    setAllScores((prev) => [...prev, 70]);
-    setStars(2);
-    setQPhase("revealed");
+    setPronScore(0);
+    setStars(0);
+    setQPhase("ready");
   }
 
   function markSpokenAttempt() {
@@ -456,9 +457,9 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   function skipScoring() {
     if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
     setCanSkipScoring(false);
-    setPronScore(70);
-    setAllScores((prev) => [...prev, 70]);
-    setStars(2);
+    setPronScore(0);
+    setAllScores((prev) => [...prev, 0]);
+    setStars(0);
     setQPhase("revealed");
   }
 
@@ -490,13 +491,6 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     completeTimerRef.current = setTimeout(() => {
       onComplete(allScores, spokenAttemptsRef.current);
     }, 1500);
-  }
-
-  function skipQuestion() {
-    setQPhase("revealed");
-    setPronScore(0);
-    setAllScores((prev) => [...prev, 0]);
-    setStars(0);
   }
 
   function nextQuestion() {

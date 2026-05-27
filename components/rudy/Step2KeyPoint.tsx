@@ -14,6 +14,8 @@ import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { PhonemeCoaching } from "./PhonemeCoaching";
 
+const RUDY_RECORDING_MS = 8000;
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type ScreenPhase = "explanation" | "quiz";
@@ -61,6 +63,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   const [speakPhase,  setSpeakPhase]  = useState<SpeakPhase>("idle");
   const [speakScore,  setSpeakScore]  = useState<number | null>(null);
   const [speakWords, setSpeakWords]  = useState<WordScore[]>([]);
+  const [speakAccepted, setSpeakAccepted] = useState(false);
   const [wrongFeedback, setWrongFeedback] = useState("");
   const [inputError,  setInputError]  = useState(false);
 
@@ -72,10 +75,15 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   const pulseAnim    = useRef(new Animated.Value(1)).current;
   const pulseLoop    = useRef<Animated.CompositeAnimation | null>(null);
   const spokenAttemptsRef = useRef(0);
+  const advancingRef = useRef(false);
 
   const apiBase    = getApiUrl();
   const currentQuiz: FillBlankQuiz | undefined = data.quizzes[quizIdx];
   const speechLang = SPEECH_LANG_MAP[learningLang] ?? "en-US";
+
+  useEffect(() => {
+    advancingRef.current = false;
+  }, [quizIdx, quizPhase, speakPhase]);
 
   // Cleanup on unmount
   React.useEffect(() => {
@@ -213,6 +221,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   function showSpeakMicUnavailable() {
     stopPulse();
     setSpeakScore(0);
+    setSpeakAccepted(false);
     setSpeakPhase("done");
   }
 
@@ -257,7 +266,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         await rec.prepareToRecordAsync(recOptions);
         await rec.startAsync();
         nativeRecRef.current = rec;
-        autoStopRef.current = setTimeout(() => stopSpeakNativeRecording(), 4000);
+        autoStopRef.current = setTimeout(() => stopSpeakNativeRecording(), RUDY_RECORDING_MS);
       } catch { stopPulse(); setSpeakPhase("idle"); }
     } else {
       if (!navigator?.mediaDevices?.getUserMedia) { showSpeakMicUnavailable(); return; }
@@ -288,7 +297,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         showSpeakMicUnavailable();
         return;
       }
-      autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 4000);
+      autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, RUDY_RECORDING_MS);
     }
   }
 
@@ -343,10 +352,10 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     if (!isValidAudio(base64)) {
       console.warn('[STEP2] Audio too short — user probably said nothing');
       setSpeakScore(0);
+      setSpeakAccepted(false);
       setSpeakPhase("done");
       return;
     }
-    markSpokenAttempt();
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 25000);
@@ -363,11 +372,14 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       if (!hasRecognizedSpeech(data)) {
         console.warn('[STEP2] Azure returned no recognized speech');
         setSpeakScore(0);
+        setSpeakAccepted(false);
         return;
       }
+      markSpokenAttempt();
+      setSpeakAccepted(true);
       setSpeakScore(data.pronunciationScore ?? data.score ?? 0);
       setSpeakWords(data.words ?? []);
-    } catch { setSpeakScore(0); }
+    } catch { setSpeakAccepted(false); setSpeakScore(0); }
     finally { setSpeakPhase("done"); }
   }
 
@@ -383,9 +395,12 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
 
   // ── Advance quiz ──────────────────────────────────────────────────────────────
 
-  function proceedToSpeak() { setQuizPhase("speak"); setSpeakPhase("idle"); setSpeakScore(null); }
+  function proceedToSpeak() { setQuizPhase("speak"); setSpeakPhase("idle"); setSpeakScore(null); setSpeakAccepted(false); }
 
   function advanceQuiz() {
+    if (quizPhase === "speak" && !speakAccepted) return;
+    if (advancingRef.current) return;
+    advancingRef.current = true;
     if (quizIdx < data.quizzes.length - 1) {
       setQuizIdx(quizIdx + 1);
       setQuizPhase("question");
@@ -395,6 +410,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       setInputError(false);
       setSpeakPhase("idle");
       setSpeakScore(null);
+      setSpeakAccepted(false);
     } else {
       onComplete(spokenAttemptsRef.current);
     }
@@ -409,6 +425,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     setWrongFeedback("");
     setInputError(false);
     setSpeakWords([]);
+    setSpeakAccepted(false);
   }
 
   // ── Labels ────────────────────────────────────────────────────────────────────
@@ -417,7 +434,6 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   const speakLabel    = speakPhase === "recording"
     ? (nativeLang === "korean" ? "탭하여 중지 ■" : nativeLang === "spanish" ? "Toca para parar ■" : "Tap to stop ■")
     : (nativeLang === "korean" ? "따라 말해봐요 🎤" : nativeLang === "spanish" ? "Repite 🎤" : "Repeat it 🎤");
-  const skipLabel     = nativeLang === "korean" ? "넘어가기 →" : nativeLang === "spanish" ? "Omitir →" : "Skip →";
   const nextLabel     = nativeLang === "korean" ? "다음 →" : nativeLang === "spanish" ? "Siguiente →" : "Next →";
   const doneLabel     = nativeLang === "korean" ? "완료! →" : nativeLang === "spanish" ? "¡Listo! →" : "Done! →";
   const retryLabel    = nativeLang === "korean" ? "다시 시도 🔄" : nativeLang === "spanish" ? "Reintentar 🔄" : "Retry 🔄";
@@ -664,12 +680,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
 
           {/* Next / skip */}
           <View style={s.speakNav}>
-            {speakPhase === "idle" && (
-              <Pressable style={({ pressed }) => [s.skipBtn, pressed && { opacity: 0.8 }]} onPress={advanceQuiz}>
-                <Text style={s.skipBtnText}>{skipLabel}</Text>
-              </Pressable>
-            )}
-            {speakPhase === "done" && (
+            {speakPhase === "done" && speakAccepted && (
               <Pressable style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]} onPress={advanceQuiz}>
                 <Text style={s.nextBtnText}>{isLast ? doneLabel : nextLabel}</Text>
                 <Ionicons name="arrow-forward" size={13} color={C.bg1} />

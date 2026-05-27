@@ -20,6 +20,9 @@ import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, getEffectiveLearningLanguage, type NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
+import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
+import { recordAudio } from "@/lib/audio";
+import { buildSpeakingPromptKey, recordSpokenSentence } from "@/lib/speakingProgress";
 import { C, F } from "@/constants/theme";
 import { EmojiText } from "@/components/EmojiText";
 
@@ -28,6 +31,8 @@ const CARD_W = Math.min(SW - 48, 360);
 
 const PROGRESS_KEY = (lang: string) => `basicCourseProgress_${lang}`;
 const DONE_KEY     = (lang: string) => `basicCourseCompleted_${lang}`;
+const BASIC_COURSE_RECORDING_MS = 8000;
+const MIN_SPOKEN_AUDIO_BASE64_LEN = 2000;
 
 let _bcNativeSound: Audio.Sound | null = null;
 
@@ -376,6 +381,14 @@ function buildBasicCourseTtsUrl(text: string, courseLang: string, voice?: string
   }
 }
 
+function isValidSpokenAudio(base64: string): boolean {
+  return base64.length >= MIN_SPOKEN_AUDIO_BASE64_LEN;
+}
+
+function isAcceptedPronunciationResult(data: Record<string, any> | null): data is { score: number } {
+  return data?.success === true && typeof data.score === "number";
+}
+
 function getCharTip(char: string, learning: string, native: string): string {
   const up = char.toUpperCase();
 
@@ -561,9 +574,8 @@ export default function BasicCourseScreen() {
   type GreetPhase = "listen" | "speak" | "recording" | "processing" | "done";
   const [greetPhase, setGreetPhase]   = useState<GreetPhase>("listen");
   const [greetScore, setGreetScore]   = useState<number | null>(null);
-  const mediaRecorderRef              = useRef<any>(null);
-  const audioChunksRef                = useRef<Blob[]>([]);
   const greetAttemptAwardedRef        = useRef(false);
+  const courseCompletingRef           = useRef(false);
 
   const flipAnim  = useRef(new Animated.Value(0)).current;
   const xpAnim    = useRef(new Animated.Value(0)).current;
@@ -769,6 +781,8 @@ export default function BasicCourseScreen() {
   };
 
   const finishCourse = async () => {
+    if (courseCompletingRef.current) return;
+    courseCompletingRef.current = true;
     stopBcTTS();
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     await markDone();
@@ -828,6 +842,12 @@ export default function BasicCourseScreen() {
     if (greetAttemptAwardedRef.current) return;
     greetAttemptAwardedRef.current = true;
     try {
+      const promptKey = buildSpeakingPromptKey({
+        targetLanguage: course.lang,
+        source: "basic-course",
+        phrase: greetItem?.phrase ?? "",
+      });
+      await recordSpokenSentence({ targetLanguage: course.lang, promptKey });
       await awardXp(5);
     } catch (e) {
       console.warn('[BasicCourse] Failed to award greeting attempt XP:', e);
@@ -837,65 +857,38 @@ export default function BasicCourseScreen() {
   const handleGreetRecord = async () => {
     if (!greetItem || greetPhase === "processing" || greetPhase === "recording") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-
-    if (Platform.OS !== "web") {
-      // Native does not run this lightweight web recorder; count the spoken attempt without a fake score.
-      await markGreetAttemptComplete(null);
-      return;
-    }
-
-    if (!navigator?.mediaDevices?.getUserMedia) {
-      await markGreetAttemptComplete(null);
-      return;
-    }
-
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
-    if (!stream) {
-      await markGreetAttemptComplete(null);
-      return;
-    }
-    audioChunksRef.current = [];
-    const mimeType = (window as any).MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-      ? "audio/webm;codecs=opus"
-      : "audio/webm";
-    const recorder = new (window as any).MediaRecorder(stream, { mimeType });
-    mediaRecorderRef.current = recorder;
+    stopBcTTS();
+    setGreetScore(null);
     setGreetPhase("recording");
 
-    recorder.ondataavailable = (e: any) => {
-      if (e.data?.size > 0) audioChunksRef.current.push(e.data);
-    };
-
-    recorder.onstop = async () => {
-      stream.getTracks().forEach((t: any) => t.stop());
-      setGreetPhase("processing");
-      try {
-        const blob = new Blob(audioChunksRef.current, { type: mimeType });
-        const base64: string = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve((reader.result as string).split(",")[1] ?? "");
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
-        const res = await fetch(apiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word: getPhoneticName(greetItem.phrase, course.lang), lang: course.lang, audio: base64, mimeType }),
-        });
-        const data = res.ok ? await res.json() : null;
-        const scoreVal = typeof data?.score === "number" ? data.score : null;
-        await markGreetAttemptComplete(scoreVal);
-      } catch (e) {
-        console.warn('[BasicCourse] Pronunciation assessment failed:', e);
-        await markGreetAttemptComplete(null);
+    try {
+      const { base64, mimeType } = await recordAudio(BASIC_COURSE_RECORDING_MS);
+      if (!isValidSpokenAudio(base64)) {
+        console.warn('[BasicCourse] Greeting audio too short; not counting as a spoken attempt');
+        setGreetScore(0);
+        setGreetPhase("speak");
+        return;
       }
-    };
-
-    recorder.start();
-    setTimeout(() => {
-      if (recorder.state === "recording") recorder.stop();
-    }, 4000);
+      setGreetPhase("processing");
+      const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+      const res = await apiFetchWithAuth(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: getPhoneticName(greetItem.phrase, course.lang), lang: course.lang, audio: base64, mimeType }),
+      });
+      const data = res.ok ? await res.json() : null;
+      if (!isAcceptedPronunciationResult(data)) {
+        console.warn('[BasicCourse] Greeting pronunciation was not accepted; retry required');
+        setGreetScore(0);
+        setGreetPhase("speak");
+        return;
+      }
+      await markGreetAttemptComplete(data.score);
+    } catch (e) {
+      console.warn('[BasicCourse] Pronunciation assessment failed:', e);
+      setGreetScore(0);
+      setGreetPhase("speak");
+    }
   };
 
   const handleGreetRetry = () => {

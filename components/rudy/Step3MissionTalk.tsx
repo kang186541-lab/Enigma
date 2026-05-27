@@ -14,6 +14,8 @@ import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/l
 import { type MissionTalkLangData } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 
+const RUDY_RECORDING_MS = 8000;
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type Phase = "loading" | "idle" | "recording" | "processing" | "done";
@@ -447,7 +449,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         await rec.startAsync();
         nativeRecRef.current = rec;
         console.log("[MissionTalk] 녹음 시작 성공 (native)");
-        autoStopRef.current = setTimeout(() => stopNativeRecording(), 7000);
+        autoStopRef.current = setTimeout(() => stopNativeRecording(), RUDY_RECORDING_MS);
       } catch (e) { console.error("[MissionTalk] 녹음 시작 실패:", e); stopPulse(); setPhase("idle"); }
     } else {
       if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); showSttError(); return; }
@@ -482,7 +484,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         showSttError();
         return;
       }
-      autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, 7000);
+      autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, RUDY_RECORDING_MS);
     }
   }
 

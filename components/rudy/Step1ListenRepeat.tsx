@@ -14,6 +14,8 @@ import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { PhonemeCoaching } from "./PhonemeCoaching";
 
+const RUDY_RECORDING_MS = 8000;
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type Phase = "idle" | "playing" | "recording" | "assessing" | "result";
@@ -53,6 +55,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   const [score, setScore] = useState<number | null>(null);
   const [feedback, setFeedback] = useState("");
   const [wordScores, setWordScores] = useState<WordScore[]>([]);
+  const [acceptedSpokenAttempt, setAcceptedSpokenAttempt] = useState(false);
   const [totalSpoken, setTotalSpoken] = useState(0);
   const [playingMode, setPlayingMode] = useState<"slow" | "normal" | null>(null);
   const [textRevealed, setTextRevealed] = useState(false); // for round 3: reveal text after attempt
@@ -100,9 +103,14 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   const mediaRecRef   = useRef<any>(null);
   const pulseAnim     = useRef(new Animated.Value(1)).current;
   const pulseLoop     = useRef<Animated.CompositeAnimation | null>(null);
+  const advancingRef  = useRef(false);
 
   const apiBase = getApiUrl();
   const sentence = sentences[sentIdx];
+
+  useEffect(() => {
+    advancingRef.current = false;
+  }, [sentIdx, round, phase]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -191,6 +199,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
 
   function showMicUnavailable() {
     stopPulse();
+    setAcceptedSpokenAttempt(false);
     setScore(0);
     setFeedback(nativeLang === "korean"
       ? "브라우저 마이크 권한을 허용한 뒤 다시 시도해 주세요."
@@ -244,7 +253,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         await rec.prepareToRecordAsync(recOptions);
         await rec.startAsync();
         nativeRecRef.current = rec;
-        autoStopRef.current = setTimeout(() => stopNativeRecording(), 4000);
+        autoStopRef.current = setTimeout(() => stopNativeRecording(), RUDY_RECORDING_MS);
       } catch (e) {
         console.warn('[Speech] recording start failed:', e);
         stopPulse();
@@ -279,7 +288,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         showMicUnavailable();
         return;
       }
-      autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 4000);
+      autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, RUDY_RECORDING_MS);
     }
   }
 
@@ -361,6 +370,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
     // Empty audio guard
     if (!isValidAudio(base64)) {
       console.warn('[STEP1] Audio too short — user probably said nothing');
+      setAcceptedSpokenAttempt(false);
       setScore(0);
       setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
       setPhase("result");
@@ -381,11 +391,13 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       // No speech recognized → 0 score
       if (!hasRecognizedSpeech(data)) {
         console.warn('[STEP1] Azure returned no recognized speech');
+        setAcceptedSpokenAttempt(false);
         setScore(0);
         setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
         return;
       }
       const s: number = data.pronunciationScore ?? data.score ?? 0;
+      setAcceptedSpokenAttempt(true);
       setScore(s);
       setWordScores(data.words ?? []);
       setFeedback(s >= 90 ? getRandomFeedback("excellent", nativeLang)
@@ -394,6 +406,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       Haptics.notificationAsync(s >= 70 ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning);
     } catch (e) {
       console.warn('[API] pronunciation assessment failed:', e);
+      setAcceptedSpokenAttempt(false);
       setScore(0);
       setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
     } finally {
@@ -416,6 +429,9 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   // ── Advance to next sentence / round ────────────────────────────────────────
 
   function advance() {
+    if (!acceptedSpokenAttempt) return;
+    if (advancingRef.current) return;
+    advancingRef.current = true;
     const newSpoken = totalSpoken + 1;
     setTotalSpoken(newSpoken);
 
@@ -428,6 +444,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       setWordScores([]);
       setTextRevealed(false);
       setRecordedAudio(null);
+      setAcceptedSpokenAttempt(false);
     } else if (sentIdx < sentences.length - 1) {
       setSentIdx(sentIdx + 1);
       setRound(0);
@@ -437,6 +454,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       setWordScores([]);
       setTextRevealed(false);
       setRecordedAudio(null);
+      setAcceptedSpokenAttempt(false);
     } else {
       // All done
       onComplete(newSpoken);
@@ -600,18 +618,20 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
             {score < 70 && (
               <Pressable
                 style={({ pressed }) => [s.retryBtn, pressed && { opacity: 0.8 }]}
-                onPress={() => { setPhase("idle"); setScore(null); setFeedback(""); setWordScores([]); }}
+                onPress={() => { setPhase("idle"); setScore(null); setFeedback(""); setWordScores([]); setAcceptedSpokenAttempt(false); }}
               >
                 <Text style={s.retryBtnText}>{retryLabel}</Text>
               </Pressable>
             )}
-            <Pressable
-              style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]}
-              onPress={advance}
-            >
-              <Text style={s.nextBtnText}>{nextLabel}</Text>
-              <Ionicons name="arrow-forward" size={13} color={C.bg1} />
-            </Pressable>
+            {acceptedSpokenAttempt && (
+              <Pressable
+                style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]}
+                onPress={advance}
+              >
+                <Text style={s.nextBtnText}>{nextLabel}</Text>
+                <Ionicons name="arrow-forward" size={13} color={C.bg1} />
+              </Pressable>
+            )}
           </View>
         </View>
       )}

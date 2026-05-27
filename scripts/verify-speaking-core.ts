@@ -501,6 +501,19 @@ assert.ok(
   !basicCourseSource.includes('topSkipTxt:'),
   "Basic Course normal path should not let Skip advance to completion without tracing, flipping, or speaking"
 );
+assert.ok(
+  basicCourseSource.includes("import { recordAudio } from \"@/lib/audio\";") &&
+  basicCourseSource.includes("recordSpokenSentence") &&
+  basicCourseSource.includes("const BASIC_COURSE_RECORDING_MS = 8000;") &&
+  basicCourseSource.includes("recordAudio(BASIC_COURSE_RECORDING_MS)") &&
+  basicCourseSource.includes("if (!isValidSpokenAudio(base64))") &&
+  basicCourseSource.includes("isAcceptedPronunciationResult(data)") &&
+  basicCourseSource.includes("const courseCompletingRef") &&
+  basicCourseSource.includes("if (courseCompletingRef.current) return;") &&
+  !basicCourseSource.includes("Native does not run this lightweight web recorder") &&
+  !basicCourseSource.includes("await markGreetAttemptComplete(null);\n      return;\n    }\n\n    if (!navigator?.mediaDevices?.getUserMedia)"),
+  "Basic Course greeting practice should require accepted captured audio, update speaking progress, and avoid duplicate completion"
+);
 for (const [name, source] of [
   ["Speak", speakSource],
   ["Cards", cardsSource],
@@ -538,6 +551,47 @@ assert.ok(
   rudyStep3Source.includes("onComplete(spokenSentencesRef.current") &&
   rudyStep4Source.includes("onComplete(allScores, spokenAttemptsRef.current)"),
   "Rudy steps should report actual spoken attempts, not correct answers or GPT text counters"
+);
+assert.ok(
+  rudyStep1Source.includes("acceptedSpokenAttempt") &&
+  rudyStep1Source.includes("if (!acceptedSpokenAttempt) return;") &&
+  rudyStep1Source.includes("{acceptedSpokenAttempt && (") &&
+  rudyStep1Source.includes("const advancingRef") &&
+  rudyStep2Source.includes("speakAccepted") &&
+  rudyStep2Source.includes('if (quizPhase === "speak" && !speakAccepted) return;') &&
+  rudyStep2Source.includes('{speakPhase === "done" && speakAccepted && (') &&
+  rudyStep2Source.includes("const advancingRef"),
+  "Rudy Step1/Step2 should count and advance only accepted spoken attempts, with rapid-tap guards"
+);
+assert.ok(
+  rudyStep1Source.includes("const RUDY_RECORDING_MS = 8000;") &&
+  rudyStep2Source.includes("const RUDY_RECORDING_MS = 8000;") &&
+  rudyStep3Source.includes("const RUDY_RECORDING_MS = 8000;") &&
+  rudyStep4Source.includes("const RUDY_RECORDING_MS = 8000;") &&
+  !rudyStep1Source.includes("}, 4000);") &&
+  !rudyStep2Source.includes("}, 4000);") &&
+  !rudyStep3Source.includes("}, 7000);") &&
+  !rudyStep4Source.includes("}, 7000);"),
+  "Rudy spoken practice should give learners the same 8-second recording window as the main Speak flow"
+);
+const rudyStep2SpeakNavStart = rudyStep2Source.indexOf("{/* Next / skip */}");
+const rudyStep2SpeakNavEnd = rudyStep2Source.indexOf("</View>", rudyStep2SpeakNavStart);
+const rudyStep2SpeakNav = rudyStep2SpeakNavStart >= 0 && rudyStep2SpeakNavEnd > rudyStep2SpeakNavStart
+  ? rudyStep2Source.slice(rudyStep2SpeakNavStart, rudyStep2SpeakNavEnd)
+  : "";
+assert.ok(
+  rudyStep2SpeakNav &&
+  !rudyStep2SpeakNav.includes('speakPhase === "idle"') &&
+  rudyStep2SpeakNav.includes('speakPhase === "done"'),
+  "Rudy Step2 should not show an idle skip path that advances before a spoken attempt"
+);
+assert.ok(
+  !rudyStep4Source.includes("skipQuestion()") &&
+  !rudyStep4Source.includes("setPronScore(70)") &&
+  !rudyStep4Source.includes("...prev, 70") &&
+  rudyStep4Source.includes("without inventing a passing pronunciation score") &&
+  rudyStep4Source.includes('setQPhase("ready");'),
+  "Rudy Step4 should not auto-complete or fake a passing score when no spoken attempt was captured"
 );
 assert.ok(
   rudyLessonSource.includes("const stepCompletingRef = useRef(false);") &&
@@ -594,11 +648,12 @@ assert.ok(
   apiFetchWithAuthSource.includes('next.set("Authorization", `Bearer ${token}`)') &&
   speakSource.includes("apiFetchWithAuth(apiUrl") &&
   speakSource.includes("apiFetchWithAuth(urlStr") &&
+  basicCourseSource.includes("apiFetchWithAuth(apiUrl") &&
   rudyStep1Source.includes("apiFetchWithAuth(apiUrl") &&
   rudyStep2Source.includes("apiFetchWithAuth(apiUrl") &&
   rudyStep3Source.includes("apiFetchWithAuth(url") &&
   rudyStep4Source.includes("apiFetchWithAuth(url"),
-  "Signed-in learners should send Supabase bearer tokens to voice and Rudy API calls so server rate limits use user buckets"
+  "Signed-in learners should send Supabase bearer tokens to voice, Basic Course, and Rudy API calls so server rate limits use user buckets"
 );
 assert.ok(
   speakSource.includes("contentContainerStyle={[styles.screenScrollContent") &&
