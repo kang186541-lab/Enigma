@@ -238,6 +238,13 @@ const rudyCourseRouteIndex = homeSource.indexOf('router.push("/rudy-course" as a
 const basicCourseRouteIndex = homeSource.indexOf('router.push((courseCompleted ? "/basic-course?review=1" : "/basic-course") as any)');
 const statsRowIndex = homeSource.indexOf("STATS ROW");
 const streakCardIndex = homeSource.indexOf("STREAK CARD");
+const npcRouteIndex = homeSource.indexOf('router.push("/npc-list" as any)');
+const moreToolsGateIndex = homeSource.indexOf("setShowMoreTools((v) => !v)");
+const moreToolsContentIndex = homeSource.indexOf("{showMoreTools && (");
+const myProgressIndex = homeSource.indexOf('"MY PROGRESS"', moreToolsContentIndex);
+const culturalNoteIndex = homeSource.indexOf("<CulturalNoteSection", moreToolsContentIndex);
+const quickPracticeIndex = homeSource.indexOf('"QUICK PRACTICE"', moreToolsContentIndex);
+const secondaryClosedSpacerIndex = homeSource.indexOf("{!showSecondaryHomeSections &&", moreToolsContentIndex);
 assert.ok(
   firstSpeakingCtaIndex >= 0 &&
   morePracticeGateIndex > firstSpeakingCtaIndex &&
@@ -254,6 +261,17 @@ assert.ok(
   homeSource.includes("Optional Basics") &&
   !homeSource.includes('📚  Basic Course'),
   "Home should show the first speaking CTA first, hide secondary practice behind the gate, place Rudy Training before optional Basic Course, and keep progress/review summaries quiet until today's speaking goal is met"
+);
+assert.ok(
+  homeSource.includes("const [showMoreTools, setShowMoreTools] = React.useState(false)") &&
+  npcRouteIndex > secondarySectionsIndex &&
+  moreToolsGateIndex > npcRouteIndex &&
+  moreToolsContentIndex > moreToolsGateIndex &&
+  myProgressIndex > moreToolsContentIndex &&
+  culturalNoteIndex > myProgressIndex &&
+  quickPracticeIndex > culturalNoteIndex &&
+  secondaryClosedSpacerIndex > quickPracticeIndex,
+  "Home secondary tools should stay behind a second explicit gate after the core Rudy/NPC actions"
 );
 const quickItemsStart = homeSource.indexOf("const quickItems = [");
 const quickItemsEnd = quickItemsStart >= 0 ? homeSource.indexOf("];", quickItemsStart) : -1;

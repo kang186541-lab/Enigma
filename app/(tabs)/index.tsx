@@ -188,6 +188,7 @@ export default function HomeScreen() {
   const [primaryGoal, setPrimaryGoal] = React.useState<LearningGoal | null>(null);
   const [spokenToday, setSpokenToday] = React.useState(0);
   const [showMorePractice, setShowMorePractice] = React.useState(false);
+  const [showMoreTools, setShowMoreTools] = React.useState(false);
   const effectiveLearningLang = getEffectiveLearningLanguage(nativeLang, learningLanguage);
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
@@ -276,6 +277,14 @@ export default function HomeScreen() {
     : nativeLang === "spanish"
     ? "Primero di tus frases reales de hoy. Después puedes repasar, jugar historia o hablar con NPCs."
     : "Say today's real sentences first. Then review, story, and NPC practice stay one tap away.";
+  const moreToolsTitle = showMoreTools
+    ? nativeLang === "korean" ? "추가 연습 접기" : nativeLang === "spanish" ? "Ocultar práctica extra" : "Hide extra practice"
+    : nativeLang === "korean" ? "추가 연습 더 보기" : nativeLang === "spanish" ? "Ver más práctica" : "Show more practice";
+  const moreToolsSub = nativeLang === "korean"
+    ? "통계, 문화노트, 빠른 학습은 말하기 흐름 뒤에 가볍게 열어요."
+    : nativeLang === "spanish"
+    ? "Estadísticas, notas culturales y práctica rápida quedan después de hablar."
+    : "Stats, culture notes, and quick practice stay behind the speaking flow.";
 
   useEffect(() => {
     void trackLearningEvent("first_speaking_cta_seen", {
@@ -734,6 +743,29 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
+      <View style={styles.pad}>
+        <Pressable
+          style={({ pressed }) => [styles.morePracticeGate, pressed && { opacity: 0.82 }]}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setShowMoreTools((v) => !v);
+          }}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: showMoreTools }}
+          accessibilityLabel={moreToolsTitle}
+        >
+          <View style={styles.morePracticeGateIcon}>
+            <Ionicons name={showMoreTools ? "chevron-up" : "chevron-down"} size={18} color={C.gold} />
+          </View>
+          <View style={styles.morePracticeGateText}>
+            <Text style={styles.morePracticeGateTitle}>{moreToolsTitle}</Text>
+            <Text style={styles.morePracticeGateSub}>{moreToolsSub}</Text>
+          </View>
+        </Pressable>
+      </View>
+
+      {showMoreTools && (
+      <>
       {/* ── FEATURE SHORTCUTS (Stats, Achievements, Leaderboard) ── */}
       <GoldDivider label={nativeLang === "korean" ? "나의 성장" : nativeLang === "spanish" ? "MI PROGRESO" : "MY PROGRESS"} />
       <View style={styles.pad}>
@@ -796,6 +828,8 @@ export default function HomeScreen() {
           ))}
         </View>
       </View>
+      </>
+      )}
 
       <View style={{ height: 120 }} />
       </>
