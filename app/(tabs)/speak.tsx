@@ -527,6 +527,28 @@ function getVoiceServiceUnavailableMessage(nativeLang: NativeLanguage): string {
   return "Voice service is not connected yet. Check the API domain configuration.";
 }
 
+function getUnsupportedRecordingMessage(nativeLang: NativeLanguage): string {
+  if (nativeLang === "korean") {
+    return "이 브라우저는 마이크 녹음을 지원하지 않습니다.\nChrome 또는 Safari 최신 버전을 사용해 주세요.";
+  }
+  if (nativeLang === "spanish") {
+    return "Este navegador no soporta grabación con micrófono.\nUsa una versión reciente de Chrome o Safari.";
+  }
+  return "This browser doesn't support microphone recording.\nUse a current version of Chrome or Safari.";
+}
+
+function getContinueWithoutScoreLabel(nativeLang: NativeLanguage): string {
+  if (nativeLang === "korean") return "점수 없이 시도 기록";
+  if (nativeLang === "spanish") return "Contar sin nota";
+  return "Count without score";
+}
+
+function getContinueWithoutScoreHint(nativeLang: NativeLanguage): string {
+  if (nativeLang === "korean") return "정말로 말했는데 채점만 실패했을 때 사용하세요.";
+  if (nativeLang === "spanish") return "Úsalo solo si hablaste y falló la evaluación.";
+  return "Use this only if you spoke and the scorer failed.";
+}
+
 function tryGetApiUrl(scope: string): string | null {
   try {
     return getApiUrl();
@@ -1017,6 +1039,7 @@ export default function SpeakScreen() {
   const [recognizedText, setRecognizedText] = useState("");
   const [wordResults, setWordResults] = useState<{ word: string; score: number; errorType: string; phonemes?: { phoneme: string; score: number }[] }[]>([]);
   const [sttError, setSttError] = useState("");
+  const [canContinueWithoutScore, setCanContinueWithoutScore] = useState(false);
   // attemptId is bumped each time a fresh /api/pronunciation-assess succeeds.
   // The CoachingCard uses it as its sole reset key so a new recording wipes
   // the previous GPT comment and re-fetches.
@@ -1034,6 +1057,7 @@ export default function SpeakScreen() {
   // Bumped whenever the visible prompt/session changes so stale scoring callbacks
   // cannot award XP or attach feedback to the wrong sentence.
   const practiceGenerationRef = useRef(0);
+  const unscoredFallbackAttemptRef = useRef<number | null>(null);
   const RECORD_MAX_SEC = 8;
   // Countdown shown to the user while a recording is in progress so they
   // know HOW LONG they have before the 8-second auto-stop kicks in. Without
@@ -1094,6 +1118,8 @@ export default function SpeakScreen() {
     setRecognizedText("");
     setWordResults([]);
     setSttError("");
+    setCanContinueWithoutScore(false);
+    unscoredFallbackAttemptRef.current = null;
     setHasListened(false);
     pulseLoop.current?.stop();
     Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
@@ -1413,9 +1439,11 @@ export default function SpeakScreen() {
 
   const acceptUnscoredGuidedAttempt = useCallback(async (attemptGeneration: number): Promise<boolean> => {
     if (!isGuidedSentenceMission || !isCurrentPracticeAttempt(attemptGeneration)) return false;
-    setSpokenAttemptAccepted(true);
     const counted = await recordSpokenAttempt(0, attemptGeneration, "unscored");
     if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
+    if (counted) setSpokenAttemptAccepted(true);
+    setCanContinueWithoutScore(false);
+    unscoredFallbackAttemptRef.current = null;
     setScore(null);
     setAccuracyScore(null);
     setFluencyScore(null);
@@ -1426,6 +1454,18 @@ export default function SpeakScreen() {
     setSttError(getUnscoredAttemptAcceptedMessage(nativeLang));
     return counted;
   }, [isCurrentPracticeAttempt, isGuidedSentenceMission, nativeLang, recordSpokenAttempt]);
+
+  const offerContinueWithoutScore = useCallback((attemptGeneration: number) => {
+    if (!isGuidedSentenceMission || !isCurrentPracticeAttempt(attemptGeneration)) return;
+    unscoredFallbackAttemptRef.current = attemptGeneration;
+    setCanContinueWithoutScore(true);
+  }, [isCurrentPracticeAttempt, isGuidedSentenceMission]);
+
+  const handleContinueWithoutScore = useCallback(async () => {
+    const attemptGeneration = unscoredFallbackAttemptRef.current;
+    if (attemptGeneration === null) return;
+    await acceptUnscoredGuidedAttempt(attemptGeneration);
+  }, [acceptUnscoredGuidedAttempt]);
 
   const stopNativeRecording = async () => {
     const attemptGeneration = practiceGenerationRef.current;
@@ -1469,7 +1509,7 @@ export default function SpeakScreen() {
       if (!apiBaseUrl) {
         setScore(0);
         setSttError(getVoiceServiceUnavailableMessage(nativeLang));
-        await acceptUnscoredGuidedAttempt(attemptGeneration);
+        offerContinueWithoutScore(attemptGeneration);
         return;
       }
       const apiUrl = new URL("/api/pronunciation-assess", apiBaseUrl).toString();
@@ -1491,7 +1531,10 @@ export default function SpeakScreen() {
       if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase?.word ?? ""); }
       else { await removeWeakWord(phrase?.word ?? ""); }
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
-      if (data.success !== true) return;
+      if (data.success !== true) {
+        await acceptUnscoredGuidedAttempt(attemptGeneration);
+        return;
+      }
       setSpokenAttemptAccepted(true);
       const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
@@ -1516,7 +1559,7 @@ export default function SpeakScreen() {
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
       if (hasRecordableAudio) {
-        await acceptUnscoredGuidedAttempt(attemptGeneration);
+        offerContinueWithoutScore(attemptGeneration);
       }
     } finally {
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
@@ -1609,7 +1652,15 @@ export default function SpeakScreen() {
     }
 
     if (!navigator?.mediaDevices?.getUserMedia) {
-      setSttError(nativeLang === "korean" ? "이 브라우저는 마이크 녹음을 지원하지 않습니다.\nChrome을 사용해 주세요." : nativeLang === "spanish" ? "Este navegador no soporta grabación.\nUsa Chrome." : "This browser doesn't support recording.\nPlease use Chrome.");
+      setSttError(getUnsupportedRecordingMessage(nativeLang));
+      setRecordState("done");
+      recordStateRef.current = "done";
+      return;
+    }
+
+    const MediaRecorderCtor = typeof window !== "undefined" ? (window as any).MediaRecorder : undefined;
+    if (typeof MediaRecorderCtor !== "function") {
+      setSttError(getUnsupportedRecordingMessage(nativeLang));
       setRecordState("done");
       recordStateRef.current = "done";
       return;
@@ -1622,12 +1673,25 @@ export default function SpeakScreen() {
       }
       audioChunksRef.current = [];
 
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+      const isTypeSupported = typeof MediaRecorderCtor.isTypeSupported === "function"
+        ? MediaRecorderCtor.isTypeSupported.bind(MediaRecorderCtor)
+        : null;
+      const mimeType = isTypeSupported?.("audio/webm;codecs=opus")
         ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/webm")
+        : isTypeSupported?.("audio/webm")
         ? "audio/webm"
         : "";
-      const recorder = new (window as any).MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      let recorder: MediaRecorder;
+      try {
+        recorder = new MediaRecorderCtor(stream, mimeType ? { mimeType } : undefined);
+      } catch (e) {
+        console.warn("[Speak] MediaRecorder creation failed:", e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        setSttError(getUnsupportedRecordingMessage(nativeLang));
+        setRecordState("done");
+        recordStateRef.current = "done";
+        return;
+      }
       mediaRecorderRef.current = recorder;
 
       recorder.ondataavailable = (e: any) => {
@@ -1671,7 +1735,7 @@ export default function SpeakScreen() {
           if (!apiBaseUrl) {
             setScore(0);
             setSttError(getVoiceServiceUnavailableMessage(nativeLang));
-            await acceptUnscoredGuidedAttempt(attemptGeneration);
+            offerContinueWithoutScore(attemptGeneration);
             return;
           }
           const apiUrl = new URL("/api/pronunciation-assess", apiBaseUrl).toString();
@@ -1694,7 +1758,10 @@ export default function SpeakScreen() {
           if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase.word); }
           else { await removeWeakWord(phrase.word); }
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
-          if (data.success !== true) return;
+          if (data.success !== true) {
+            await acceptUnscoredGuidedAttempt(attemptGeneration);
+            return;
+          }
           setSpokenAttemptAccepted(true);
           const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
@@ -1717,7 +1784,7 @@ export default function SpeakScreen() {
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
           if (hasRecordableAudio) {
-            await acceptUnscoredGuidedAttempt(attemptGeneration);
+            offerContinueWithoutScore(attemptGeneration);
           }
         } finally {
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
@@ -1727,7 +1794,17 @@ export default function SpeakScreen() {
         }
       };
 
-      recorder.start(100); // collect chunks every 100ms
+      try {
+        recorder.start(100); // collect chunks every 100ms
+      } catch (e) {
+        console.warn("[Speak] MediaRecorder start failed:", e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        mediaRecorderRef.current = null;
+        setSttError(getUnsupportedRecordingMessage(nativeLang));
+        setRecordState("done");
+        recordStateRef.current = "done";
+        return;
+      }
       setRecordState("listening");
       recordStateRef.current = "listening";
       setScore(null);
@@ -2372,6 +2449,22 @@ export default function SpeakScreen() {
                 </View>
               )}
 
+              {canContinueWithoutScore && !showAcceptedUnscoredNotice ? (
+                <View style={styles.unscoredFallbackBox}>
+                  <Text style={styles.unscoredFallbackHint}>{getContinueWithoutScoreHint(nativeLang)}</Text>
+                  <Pressable
+                    style={({ pressed }) => [styles.unscoredContinueChip, pressed && { opacity: 0.8 }]}
+                    onPress={handleContinueWithoutScore}
+                    accessibilityRole="button"
+                    accessibilityLabel={getContinueWithoutScoreLabel(nativeLang)}
+                    testID="continue-without-score-button"
+                  >
+                    <Ionicons name="checkmark-circle" size={14} color={C.bg1} />
+                    <Text style={styles.unscoredContinueText}>{getContinueWithoutScoreLabel(nativeLang)}</Text>
+                  </Pressable>
+                </View>
+              ) : null}
+
               {/* Retry inline */}
               <Pressable
                 style={({ pressed }) => [styles.retryChip, pressed && { opacity: 0.75 }]}
@@ -2711,6 +2804,34 @@ const styles = StyleSheet.create({
     borderRadius: 16, borderWidth: 1, borderColor: C.border, backgroundColor: C.bg2,
   },
   retryChipText: { fontSize: 12, fontFamily: F.bodySemi },
+  unscoredFallbackBox: {
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "rgba(201,162,39,0.08)",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.20)",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  unscoredFallbackHint: {
+    fontSize: 11,
+    fontFamily: F.body,
+    color: C.goldDim,
+    textAlign: "center",
+    lineHeight: 16,
+  },
+  unscoredContinueChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    alignSelf: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: C.gold,
+  },
+  unscoredContinueText: { fontSize: 12, fontFamily: F.bodySemi, color: C.bg1 },
   errorRow: {
     flexDirection: "row", gap: 6, alignItems: "flex-start",
     backgroundColor: "rgba(239,68,68,0.08)", borderRadius: 10,

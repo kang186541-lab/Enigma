@@ -57,9 +57,12 @@ const ALL_LANGS: { id: NativeLanguage; badge: string; nameMap: Record<NativeLang
 const UI: Record<NativeLanguage, {
   step1Title: string; step1Sub: string;
   guideEyebrow: string; guideNext: string; guideStart: string;
+  guideFinalHint: string;
   step2Title: string; step2Sub: string;
   firstSpeechTitle: string; firstSpeechSub: string;
   goalPrompt: string;
+  setupLanguageLabel: string; setupGoalLabel: string;
+  chooseLanguageCta: string; chooseGoalCta: string;
   cta1: string; cta2: string; back: string;
 }> = {
   korean: {
@@ -68,11 +71,16 @@ const UI: Record<NativeLanguage, {
     guideEyebrow: "Rudy의 언어 가이드",
     guideNext: "다음 카드",
     guideStart: "이제 시작하자",
+    guideFinalHint: "다음: 배울 언어와 실제 상황을 고르고 한 문장을 말해요.",
     step2Title: "어떤 언어를 배우고 싶으세요?",
     step2Sub:   "학습할 언어를 선택하세요",
     firstSpeechTitle: "다음은 바로 한 문장 말하기",
     firstSpeechSub: "틀려도 괜찮아요. Rudy는 점수보다 시도를 먼저 기록해요.",
     goalPrompt: "먼저 실제로 쓸 상황을 골라주세요",
+    setupLanguageLabel: "배울 언어",
+    setupGoalLabel: "실제로 쓸 상황",
+    chooseLanguageCta: "배울 언어 선택",
+    chooseGoalCta: "상황 선택",
     cta1: "다음", cta2: "말하기 시작", back: "뒤로",
   },
   english: {
@@ -81,11 +89,16 @@ const UI: Record<NativeLanguage, {
     guideEyebrow: "Rudy's Language Guide",
     guideNext: "Next card",
     guideStart: "Let's start",
+    guideFinalHint: "Next: choose your language and real-use situation, then say one sentence.",
     step2Title: "What do you want to learn?",
     step2Sub:   "Pick the language you'd like to master",
     firstSpeechTitle: "Next: say one real sentence",
     firstSpeechSub: "Mistakes are fine. Rudy counts the spoken attempt before the score.",
     goalPrompt: "First, choose where you will actually use it",
+    setupLanguageLabel: "Learning language",
+    setupGoalLabel: "Real-use situation",
+    chooseLanguageCta: "Choose a language",
+    chooseGoalCta: "Choose a situation",
     cta1: "Next", cta2: "Start speaking", back: "Back",
   },
   spanish: {
@@ -94,11 +107,16 @@ const UI: Record<NativeLanguage, {
     guideEyebrow: "Guía de idiomas de Rudy",
     guideNext: "Siguiente tarjeta",
     guideStart: "Empecemos",
+    guideFinalHint: "Ahora: elige idioma y situación real, y di una frase.",
     step2Title: "¿Qué idioma quieres aprender?",
     step2Sub:   "Selecciona el idioma que quieres dominar",
     firstSpeechTitle: "Ahora: di una frase real",
     firstSpeechSub: "Los errores están bien. Rudy cuenta el intento antes que la nota.",
     goalPrompt: "Primero, elige dónde lo usarás de verdad",
+    setupLanguageLabel: "Idioma que aprenderás",
+    setupGoalLabel: "Situación real",
+    chooseLanguageCta: "Elige un idioma",
+    chooseGoalCta: "Elige una situación",
     cta1: "Siguiente", cta2: "Empezar a hablar", back: "Atrás",
   },
 };
@@ -120,6 +138,7 @@ export default function OnboardingScreen() {
   const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel);
   const guideCard = RUDY_GUIDE_CARDS[guideIdx] ?? RUDY_GUIDE_CARDS[0];
   const isLastGuideCard = guideIdx >= RUDY_GUIDE_CARDS.length - 1;
+  const setupCtaLabel = !learnSel ? ui.chooseLanguageCta : !goalSel ? ui.chooseGoalCta : ui.cta2;
 
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Math.max((Platform.OS === "web" ? 34 : insets.bottom) + 16, 34);
@@ -298,13 +317,21 @@ export default function OnboardingScreen() {
               </Text>
             </View>
 
-            <View style={styles.guideCard}>
+            <Pressable
+              style={({ pressed }) => [styles.guideCard, pressed && styles.guideCardPress]}
+              onPress={handleGuideNext}
+              accessibilityRole="button"
+              accessibilityLabel={isLastGuideCard ? ui.guideStart : ui.guideNext}
+            >
               <View style={styles.guideEmojiWrap}>
                 <EmojiText style={styles.guideEmoji}>{guideCard.emoji}</EmojiText>
               </View>
               <Text style={styles.guideBody}>
                 {guideCard.body[uiLang] ?? guideCard.body.english}
               </Text>
+              {isLastGuideCard ? (
+                <Text style={styles.guideNextHint}>{ui.guideFinalHint}</Text>
+              ) : null}
               <View style={styles.guideTrack}>
                 <View
                   style={[
@@ -313,7 +340,7 @@ export default function OnboardingScreen() {
                   ]}
                 />
               </View>
-            </View>
+            </Pressable>
 
             <View style={styles.bottom}>
               <Pressable style={styles.backBtn} onPress={handleBack}>
@@ -338,6 +365,21 @@ export default function OnboardingScreen() {
             <View style={styles.textBlock}>
               <Text style={styles.title}>{ui.step2Title}</Text>
               <Text style={styles.subtitle}>{ui.step2Sub}</Text>
+            </View>
+
+            <View style={styles.setupChecklist}>
+              <View style={styles.setupChecklistItem}>
+                <Ionicons name={learnSel ? "checkmark-circle" : "ellipse-outline"} size={16} color={learnSel ? C.gold : C.goldDim} />
+                <Text style={[styles.setupChecklistText, learnSel && styles.setupChecklistTextDone]}>
+                  1. {ui.setupLanguageLabel}
+                </Text>
+              </View>
+              <View style={styles.setupChecklistItem}>
+                <Ionicons name={goalSel ? "checkmark-circle" : "ellipse-outline"} size={16} color={goalSel ? C.gold : C.goldDim} />
+                <Text style={[styles.setupChecklistText, goalSel && styles.setupChecklistTextDone]}>
+                  2. {ui.setupGoalLabel}
+                </Text>
+              </View>
             </View>
 
             <View style={styles.cards}>
@@ -412,7 +454,7 @@ export default function OnboardingScreen() {
                 onPress={handleStep2Next}
                 disabled={!learnSel || !goalSel || loading}
               >
-                <Text style={styles.ctaText}>{ui.cta2}</Text>
+                <Text style={styles.ctaText}>{setupCtaLabel}</Text>
               </Pressable>
             </View>
           </>
@@ -513,6 +555,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 6,
   },
+  guideCardPress: { transform: [{ scale: 0.99 }], opacity: 0.94 },
   guideEmojiWrap: {
     width: 68,
     height: 68,
@@ -531,6 +574,14 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 18,
   },
+  guideNextHint: {
+    marginBottom: 14,
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.gold,
+    textAlign: "center",
+    lineHeight: 18,
+  },
   guideTrack: {
     width: "100%",
     height: 7,
@@ -545,6 +596,27 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: C.gold,
   },
+  setupChecklist: {
+    marginHorizontal: 24,
+    marginBottom: 10,
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.22)",
+    backgroundColor: "rgba(201,162,39,0.07)",
+    gap: 8,
+  },
+  setupChecklistItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  setupChecklistText: {
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.goldDim,
+  },
+  setupChecklistTextDone: { color: C.parchment },
   promiseCard: {
     marginHorizontal: 24,
     marginTop: 14,

@@ -48,6 +48,12 @@ assert.ok(
   "Onboarding should render all guide cards and mark them complete after first-launch onboarding"
 );
 assert.ok(
+  onboardingSource.includes("style={({ pressed }) => [styles.guideCard, pressed && styles.guideCardPress]}") &&
+  onboardingSource.includes("guideFinalHint") &&
+  onboardingSource.includes("setupCtaLabel"),
+  "Onboarding should keep Rudy's guide intact while reducing friction before the first spoken sentence"
+);
+assert.ok(
   onboardingSource.includes('mission: "first-sentence"') && onboardingSource.includes("goal: goalSel"),
   "Onboarding should route the learner into a personalized first speaking sentence"
 );
@@ -74,6 +80,28 @@ assert.ok(
   speakSource.includes('assessmentStatus === "unscored" ? 10') &&
   speakSource.includes("awardSpokenAttemptXp(scoreVal, assessmentStatus)"),
   "Accepted unscored speech should still award XP so the attempt-over-accuracy philosophy is real"
+);
+assert.ok(
+  speakSource.includes("if (data.success !== true) {\n        await acceptUnscoredGuidedAttempt(attemptGeneration);") &&
+  speakSource.includes("if (data.success !== true) {\n            await acceptUnscoredGuidedAttempt(attemptGeneration);"),
+  "Recordable audio with an unrecognized provider result should still count as an unscored guided attempt"
+);
+assert.ok(
+  speakSource.includes("typeof MediaRecorderCtor !== \"function\"") &&
+  speakSource.includes("MediaRecorder creation failed") &&
+  speakSource.includes("MediaRecorder start failed"),
+  "Web recording should guard browsers that expose getUserMedia without a usable MediaRecorder"
+);
+assert.ok(
+  speakSource.includes("offerContinueWithoutScore(attemptGeneration)") &&
+  speakSource.includes("continue-without-score-button") &&
+  !speakSource.includes("if (hasRecordableAudio) {\n        await acceptUnscoredGuidedAttempt(attemptGeneration);") &&
+  !speakSource.includes("if (hasRecordableAudio) {\n            await acceptUnscoredGuidedAttempt(attemptGeneration);"),
+  "Network or server scoring failures should ask before counting an unscored speaking attempt"
+);
+assert.ok(
+  speakSource.includes("if (counted) setSpokenAttemptAccepted(true);"),
+  "Unscored acceptance should only show as accepted after the guided sentence is actually counted"
 );
 assert.ok(
   speakSource.includes("if (!isGuidedSentenceMission)") &&
