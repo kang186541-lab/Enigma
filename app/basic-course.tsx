@@ -981,19 +981,19 @@ export default function BasicCourseScreen() {
       "🦊 루디 교수의 기초 과정에 오신 걸 환영해요!",
       "기초 과정은 알파벳부터 시작됩니다.",
       "글자를 배우고, 듣고, 직접 써보세요!",
-      "기초 과정을 완료하면 모든 기능이 잠금 해제됩니다.",
+      "필요할 때 돌아와서 글자와 소리를 차근차근 다질 수 있어요.",
     ],
     english: [
       "🦊 Welcome to Rudy's Basic Course!",
       "The basic course starts with the alphabet.",
       "Learn each letter, listen to pronunciation, and trace it yourself!",
-      "Complete the basic course to unlock all features.",
+      "Come back anytime when you want to strengthen letters and sounds.",
     ],
     spanish: [
       "🦊 ¡Bienvenido al Curso Básico de Rudy!",
       "El curso básico comienza con el alfabeto.",
       "¡Aprende cada letra, escucha la pronunciación y trázala tú mismo!",
-      "Completa el curso básico para desbloquear todas las funciones.",
+      "Vuelve cuando quieras reforzar letras y sonidos.",
     ],
   };
   const introLines = introText[native] ?? introText.english;

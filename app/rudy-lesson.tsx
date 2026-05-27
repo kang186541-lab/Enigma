@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
-import { useLanguage } from "@/context/LanguageContext";
+import { getEffectiveLearningLanguage, useLanguage, type NativeLanguage } from "@/context/LanguageContext";
 import { C, F } from "@/constants/theme";
 import { stopAllTTSSync } from "@/lib/ttsManager";
 import {
@@ -55,8 +55,8 @@ export default function RudyLessonScreen() {
   const insets = useSafeAreaInsets();
   const { dayId } = useLocalSearchParams<{ dayId: string }>();
   const { nativeLanguage, learningLanguage } = useLanguage();
-  const nativeLang = (nativeLanguage ?? "english") as string;
-  const learnLang = (learningLanguage ?? "english") as string;
+  const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
+  const learnLang = getEffectiveLearningLanguage(nativeLang, learningLanguage) as LearningLangKey;
   const lc = langToCode(nativeLang);
 
   const [phase, setPhase] = useState<Phase>("briefing");

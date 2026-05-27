@@ -228,13 +228,31 @@ assert.ok(
   homeSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)") &&
   cardsSource.includes("getEffectiveLearningLanguage(native, learningLanguage)") &&
   basicCourseSource.includes("getEffectiveLearningLanguage(native, learningLanguage)") &&
-  dailyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)"),
-  "Shared language selection should prevent native-language courses across Home, Cards, Basic Course, and Daily Lesson"
+  dailyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)") &&
+  rudyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)"),
+  "Shared language selection should prevent native-language courses across Home, Cards, Basic Course, Daily Lesson, and Rudy Lesson"
 );
 assert.ok(
   !languageContextSource.includes("const native = nativeLanguage ?? (isNativeLanguage(storedNative)") &&
   !homeSource.includes('learningLanguage ?? "english"'),
   "Language fallback should use the effective target language, including sequential native/learning changes"
+);
+assert.ok(
+  dailyLessonSource.includes("loadTodaySpeakingProgress") &&
+  dailyLessonSource.includes("getSpeakingCountForLanguage") &&
+  dailyLessonSource.includes("LESSON_CONTENT") &&
+  dailyLessonSource.includes("router.push(`/rudy-lesson?dayId=${state.day.id}`") &&
+  !dailyLessonSource.includes("updateStats(") &&
+  !dailyLessonSource.includes("wordsLearned") &&
+  !dailyLessonSource.includes("SESSION_SIZE") &&
+  !dailyLessonSource.includes("XPToast"),
+  "Daily Lesson route should be a speaking-first Rudy bridge, not a word-card XP loop"
+);
+assert.ok(
+  !basicCourseSource.includes("unlock all features") &&
+  !basicCourseSource.includes("desbloquear todas las funciones") &&
+  !basicCourseSource.includes("모든 기능이 잠금 해제"),
+  "Basic Course copy should not claim it gates or unlocks the app"
 );
 assert.ok(
   rudyLessonSource.includes("SPEAKING_DAILY_GOAL") &&
