@@ -577,11 +577,13 @@ export default function BasicCourseScreen() {
   const [canvasKey, setCanvasKey] = useState(0); // increment to reset canvas
 
   // Greetings step pronunciation flow
-  type GreetPhase = "listen" | "speak" | "recording" | "processing" | "pass" | "fail";
+  type GreetPhase = "listen" | "speak" | "recording" | "processing" | "done";
   const [greetPhase, setGreetPhase]   = useState<GreetPhase>("listen");
   const [greetScore, setGreetScore]   = useState<number | null>(null);
   const mediaRecorderRef              = useRef<any>(null);
   const audioChunksRef                = useRef<Blob[]>([]);
+  const statsRef                      = useRef(stats);
+  const greetAttemptAwardedRef        = useRef(false);
 
   const flipAnim  = useRef(new Animated.Value(0)).current;
   const xpAnim    = useRef(new Animated.Value(0)).current;
@@ -592,6 +594,8 @@ export default function BasicCourseScreen() {
   const currentItems = stepItems[step] ?? [];
   const totalItems   = currentItems.length || 1;
   const overallPct   = (step * 100 + (subIdx / totalItems) * 100) / totalSteps / 100;
+
+  useEffect(() => { statsRef.current = stats; }, [stats]);
 
   useEffect(() => { if (!isReviewMode) loadProgress(); }, []);
 
@@ -615,6 +619,7 @@ export default function BasicCourseScreen() {
     setSubIdx(0);
     setFlipped(false); setTraced(false); setAudioPlayed(false);
     setGreetPhase("listen"); setGreetScore(null);
+    greetAttemptAwardedRef.current = false;
     setCanvasKey(k => k + 1);
     if (section === "speak") {
       setStep(2);
@@ -637,7 +642,8 @@ export default function BasicCourseScreen() {
     setCanvasKey(k => k + 1);
     flipAnim.setValue(0);
     setGreetPhase("listen"); setGreetScore(null);
-  }, [subIdx]);
+    greetAttemptAwardedRef.current = false;
+  }, [step, subIdx]);
 
   const handleRetry = () => {
     setTraced(false);
@@ -831,26 +837,38 @@ export default function BasicCourseScreen() {
     setGreetPhase("speak");
   };
 
+  const markGreetAttemptComplete = async (score: number | null) => {
+    setGreetScore(score);
+    setGreetPhase("done");
+    if (greetAttemptAwardedRef.current) return;
+    greetAttemptAwardedRef.current = true;
+    try {
+      await updateStats({ xp: statsRef.current.xp + 5 });
+    } catch (e) {
+      console.warn('[BasicCourse] Failed to award greeting attempt XP:', e);
+    }
+  };
+
   const handleGreetRecord = async () => {
-    if (!greetItem || greetPhase === "processing") return;
+    if (!greetItem || greetPhase === "processing" || greetPhase === "recording") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
     if (Platform.OS !== "web") {
-      // Native: just grant pass after listen so course isn't blocked
-      setGreetScore(85);
-      setGreetPhase("pass");
-      await updateStats({ xp: stats.xp + 5 });
+      // Native does not run this lightweight web recorder; count the spoken attempt without a fake score.
+      await markGreetAttemptComplete(null);
       return;
     }
 
     if (!navigator?.mediaDevices?.getUserMedia) {
-      setGreetScore(85);
-      setGreetPhase("pass");
+      await markGreetAttemptComplete(null);
       return;
     }
 
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
-    if (!stream) return;
+    if (!stream) {
+      await markGreetAttemptComplete(null);
+      return;
+    }
     audioChunksRef.current = [];
     const mimeType = (window as any).MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
       ? "audio/webm;codecs=opus"
@@ -866,33 +884,26 @@ export default function BasicCourseScreen() {
     recorder.onstop = async () => {
       stream.getTracks().forEach((t: any) => t.stop());
       setGreetPhase("processing");
-      const blob = new Blob(audioChunksRef.current, { type: mimeType });
-      const base64: string = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve((reader.result as string).split(",")[1] ?? "");
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
       try {
+        const blob = new Blob(audioChunksRef.current, { type: mimeType });
+        const base64: string = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve((reader.result as string).split(",")[1] ?? "");
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
         const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
         const res = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ word: getPhoneticName(greetItem.phrase, course.lang), lang: course.lang, audio: base64, mimeType }),
         });
-        const data = res.ok ? await res.json() : { score: 60 };
-        const scoreVal = data.score ?? 60;
-        setGreetScore(scoreVal);
-        if (scoreVal >= 80) {
-          setGreetPhase("pass");
-          await updateStats({ xp: stats.xp + 5 });
-        } else {
-          setGreetPhase("fail");
-        }
+        const data = res.ok ? await res.json() : null;
+        const scoreVal = typeof data?.score === "number" ? data.score : null;
+        await markGreetAttemptComplete(scoreVal);
       } catch (e) {
         console.warn('[BasicCourse] Pronunciation assessment failed:', e);
-        setGreetScore(60);
-        setGreetPhase("fail");
+        await markGreetAttemptComplete(null);
       }
     };
 
@@ -917,7 +928,7 @@ export default function BasicCourseScreen() {
     : step === 0
       ? (isReviewMode && reviewSection === "listen" ? audioPlayed : traced)
     : step === 1 ? flipped
-    : (isReviewMode ? (greetPhase === "pass" || greetPhase === "fail") : greetPhase === "pass");
+    : greetPhase === "done";
 
   const frontRotate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["0deg", "180deg"] });
   const backRotate  = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["180deg", "360deg"] });
@@ -1448,40 +1459,21 @@ export default function BasicCourseScreen() {
                     </Text>
                   )}
 
-                  {/* Phase: pass */}
-                  {greetPhase === "pass" && (
-                    <View style={s.scorePass}>
-                      <Text style={s.scorePassEmoji}>🎉</Text>
-                      <Text style={s.scorePassTxt}>
-                        {native === "korean" ? "잘했어요! +5 XP" : native === "spanish" ? "¡Muy bien! +5 XP" : "Great job! +5 XP"}
+                  {/* Phase: done */}
+                  {greetPhase === "done" && (
+                    <View style={s.scoreDone}>
+                      <Text style={s.scoreDoneEmoji}>🎉</Text>
+                      <Text style={s.scoreDoneTxt}>
+                        {native === "korean" ? "시도 완료! +5 XP" : native === "spanish" ? "¡Intento contado! +5 XP" : "Attempt counted! +5 XP"}
                       </Text>
                       {greetScore !== null && (
                         <Text style={s.scoreNum}>{Math.round(greetScore)}</Text>
                       )}
-                    </View>
-                  )}
-
-                  {/* Phase: fail */}
-                  {greetPhase === "fail" && (
-                    <View style={s.scoreFail}>
-                      {greetScore !== null && (
-                        <Text style={s.scoreNum}>{Math.round(greetScore)}</Text>
-                      )}
-                      <Text style={s.scoreFailTxt}>
-                        {native === "korean" ? "다시 해볼게요" : native === "spanish" ? "Inténtalo de nuevo" : "Try once more"}
-                      </Text>
-                      <View style={s.failBtns}>
-                        <Pressable style={({ pressed }) => [s.retrySmBtn, pressed && { opacity: 0.75 }]} onPress={handleGreetRetry}>
-                          <Text style={s.retrySmTxt}>
-                            {native === "korean" ? "🔄  다시" : native === "spanish" ? "🔄  Otra vez" : "🔄  Retry"}
-                          </Text>
-                        </Pressable>
-                        <Pressable style={({ pressed }) => [s.skipSmBtn, pressed && { opacity: 0.75 }]} onPress={goNext}>
-                          <Text style={s.skipSmTxt}>
-                            {native === "korean" ? "⏭️  건너뛰기" : native === "spanish" ? "⏭️  Saltar" : "⏭️  Skip"}
-                          </Text>
-                        </Pressable>
-                      </View>
+                      <Pressable style={({ pressed }) => [s.retrySmBtn, pressed && { opacity: 0.75 }]} onPress={handleGreetRetry}>
+                        <Text style={s.retrySmTxt}>
+                          {native === "korean" ? "한 번 더 말해보기" : native === "spanish" ? "Decirlo otra vez" : "Say it once more"}
+                        </Text>
+                      </Pressable>
                     </View>
                   )}
 
@@ -1688,32 +1680,24 @@ const s = StyleSheet.create({
 
   micBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
-    backgroundColor: "#c0392b", borderRadius: 20,
+    backgroundColor: C.gold, borderRadius: 20,
     paddingHorizontal: 26, paddingVertical: 13,
-    shadowColor: "#c0392b", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8,
+    shadowColor: C.gold, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.28, shadowRadius: 8,
   },
   recordingRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   recDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: "#e74c3c" },
   recordingTxt: { fontSize: 15, fontFamily: F.bodySemi, color: "#e74c3c" },
   processingTxt: { fontSize: 15, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
 
-  scorePass: { alignItems: "center", gap: 6, padding: 16, borderRadius: 20, backgroundColor: "rgba(39,174,96,0.12)", borderWidth: 1.5, borderColor: "rgba(39,174,96,0.35)", width: CARD_W },
-  scorePassEmoji: { fontSize: 32 },
-  scorePassTxt: { fontSize: 16, fontFamily: F.header, color: "#27ae60", textAlign: "center" },
+  scoreDone: { alignItems: "center", gap: 8, padding: 16, borderRadius: 20, backgroundColor: "rgba(201,162,39,0.12)", borderWidth: 1.5, borderColor: "rgba(201,162,39,0.35)", width: CARD_W },
+  scoreDoneEmoji: { fontSize: 32 },
+  scoreDoneTxt: { fontSize: 16, fontFamily: F.header, color: C.gold, textAlign: "center" },
   scoreNum: { fontSize: 40, fontFamily: F.title, color: C.gold, letterSpacing: 2 },
-  scoreFail: { alignItems: "center", gap: 8, padding: 16, borderRadius: 20, backgroundColor: "rgba(231,76,60,0.1)", borderWidth: 1.5, borderColor: "rgba(231,76,60,0.3)", width: CARD_W },
-  scoreFailTxt: { fontSize: 15, fontFamily: F.body, color: "#e74c3c", textAlign: "center" },
-  failBtns: { flexDirection: "row", gap: 12, marginTop: 4 },
   retrySmBtn: {
-    flex: 1, paddingVertical: 11, borderRadius: 16, alignItems: "center", justifyContent: "center",
+    paddingHorizontal: 16, paddingVertical: 11, borderRadius: 16, alignItems: "center", justifyContent: "center",
     backgroundColor: C.bg2, borderWidth: 1.5, borderColor: C.border,
   },
   retrySmTxt: { fontSize: 14, fontFamily: F.bodySemi, color: C.goldDim },
-  skipSmBtn: {
-    flex: 1, paddingVertical: 11, borderRadius: 16, alignItems: "center", justifyContent: "center",
-    backgroundColor: "rgba(201,162,39,0.12)", borderWidth: 1.5, borderColor: C.border,
-  },
-  skipSmTxt: { fontSize: 14, fontFamily: F.bodySemi, color: C.gold },
 
   reviewBackBtn: {
     width: 34, height: 34, borderRadius: 10,

@@ -255,6 +255,20 @@ assert.ok(
   "Basic Course copy should not claim it gates or unlocks the app"
 );
 assert.ok(
+  basicCourseSource.includes('type GreetPhase = "listen" | "speak" | "recording" | "processing" | "done"') &&
+  basicCourseSource.includes("markGreetAttemptComplete") &&
+  basicCourseSource.includes('setGreetPhase("done")') &&
+  !basicCourseSource.includes("scoreVal >= 80") &&
+  !basicCourseSource.includes('setGreetPhase("pass")') &&
+  !basicCourseSource.includes('setGreetPhase("fail")') &&
+  !basicCourseSource.includes('greetPhase === "fail"') &&
+  !basicCourseSource.includes("scoreFail") &&
+  !basicCourseSource.includes("scoreFailTxt") &&
+  !basicCourseSource.includes("failBtns") &&
+  !basicCourseSource.includes("rgba(231,76,60"),
+  "Basic Course greetings should count spoken attempts without score gating or red fail UI"
+);
+assert.ok(
   rudyLessonSource.includes("SPEAKING_DAILY_GOAL") &&
   rudyLessonSource.includes("recordSpokenSentence") &&
   rudyLessonSource.includes("sentenceCountRef.current < SPEAKING_DAILY_GOAL") &&
