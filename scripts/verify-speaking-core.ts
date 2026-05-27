@@ -220,6 +220,22 @@ assert.ok(
   homeSource.includes("todaySpeakingMission.rudyTip"),
   "Home should keep today's real spoken sentence primary and progressively disclose secondary practice"
 );
+const firstSpeakingCtaIndex = homeSource.indexOf("TODAY'S FIRST SPEAKING MISSION");
+const morePracticeGateIndex = homeSource.indexOf("styles.morePracticeGate");
+const secondarySectionsIndex = homeSource.indexOf("{showSecondaryHomeSections && (");
+const rudyCourseRouteIndex = homeSource.indexOf('router.push("/rudy-course" as any)');
+const basicCourseRouteIndex = homeSource.indexOf('router.push((courseCompleted ? "/basic-course?review=1" : "/basic-course") as any)');
+assert.ok(
+  firstSpeakingCtaIndex >= 0 &&
+  morePracticeGateIndex > firstSpeakingCtaIndex &&
+  secondarySectionsIndex > morePracticeGateIndex &&
+  rudyCourseRouteIndex > secondarySectionsIndex &&
+  basicCourseRouteIndex > secondarySectionsIndex &&
+  rudyCourseRouteIndex < basicCourseRouteIndex &&
+  homeSource.includes("Optional Basics") &&
+  !homeSource.includes('📚  Basic Course'),
+  "Home should show the first speaking CTA first, hide secondary practice behind the gate, and place Rudy Training before optional Basic Course"
+);
 assert.ok(
   languageContextSource.includes("export function getEffectiveLearningLanguage") &&
   languageContextSource.includes("const effectiveLearning = getEffectiveLearningLanguage") &&

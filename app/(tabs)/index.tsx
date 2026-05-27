@@ -194,7 +194,6 @@ export default function HomeScreen() {
   const shimmerX  = useRef(new Animated.Value(-200)).current;
   const fireScale = useRef(new Animated.Value(1)).current;
   const flickerOp = useRef(new Animated.Value(1)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.spring(xpAnim, { toValue: progress, useNativeDriver: false, tension: 40, friction: 8 }).start();
@@ -223,21 +222,6 @@ export default function HomeScreen() {
     });
     return () => { cancelled = true; };
   }, [spokenToday]);
-
-  useEffect(() => {
-    if (courseCompleted === false) {
-      const loop = Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, { toValue: 1.06, duration: 800, useNativeDriver: true }),
-          Animated.timing(pulseAnim, { toValue: 1,    duration: 800, useNativeDriver: true }),
-        ])
-      );
-      loop.start();
-      return () => loop.stop();
-    } else {
-      pulseAnim.setValue(1);
-    }
-  }, [courseCompleted]);
 
   useEffect(() => {
     const shimmer = Animated.loop(
@@ -636,31 +620,6 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* ── BASIC COURSE PILL ─────────────────────────── */}
-      {courseCompleted !== null && (
-        <View style={styles.basicCourseRow}>
-          <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.basicCoursePill,
-                courseCompleted && styles.basicCoursePillDone,
-                pressed && { opacity: 0.8 },
-              ]}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push((courseCompleted ? "/basic-course?review=1" : "/basic-course") as any);
-              }}
-            >
-              <Text style={styles.basicCoursePillText}>
-                {courseCompleted
-                  ? (nativeLang === "korean" ? "📚  기초 과정 복습" : nativeLang === "spanish" ? "📚  Repasar curso" : "📚  Review Course")
-                  : (nativeLang === "korean" ? "📚  기초 과정 시작" : nativeLang === "spanish" ? "📚  Curso básico" : "📚  Basic Course")}
-              </Text>
-            </Pressable>
-          </Animated.View>
-        </View>
-      )}
-
       {/* ── SRS REVIEW BANNER ─────────────────────────── */}
       {srsDueCount > 0 && (
         <View style={styles.pad}>
@@ -711,6 +670,29 @@ export default function HomeScreen() {
           }}
         />
       </View>
+
+      {/* ── OPTIONAL BASIC COURSE PILL ────────────────── */}
+      {courseCompleted !== null && (
+        <View style={styles.basicCourseRow}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.basicCoursePill,
+              courseCompleted && styles.basicCoursePillDone,
+              pressed && { opacity: 0.8 },
+            ]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push((courseCompleted ? "/basic-course?review=1" : "/basic-course") as any);
+            }}
+          >
+            <Text style={styles.basicCoursePillText}>
+              {courseCompleted
+                ? (nativeLang === "korean" ? "📚  기초 과정 복습" : nativeLang === "spanish" ? "📚  Repasar curso" : "📚  Review Course")
+                : (nativeLang === "korean" ? "📚  선택 기초 연습" : nativeLang === "spanish" ? "📚  Base opcional" : "📚  Optional Basics")}
+            </Text>
+          </Pressable>
+        </View>
+      )}
 
       {/* ── NPC REAL MISSION ──────────────────────────── */}
       <GoldDivider label={npcMissionLabel} />
