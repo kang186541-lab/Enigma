@@ -19,6 +19,7 @@ import * as Haptics from "expo-haptics";
 import { Audio } from "expo-av";
 import { useLanguage, NativeLanguage, getEffectiveLearningLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
+import { apiFetchWithAuth, getAuthHeaderRecord } from "@/lib/apiFetchWithAuth";
 import { getDueCards, getDueCount, recordReview } from "@/lib/srsManager";
 import { srsCardsToFlashCards } from "@/lib/srsCardAdapter";
 import { trackLearningEvent } from "@/lib/learningEvents";
@@ -940,7 +941,7 @@ async function speakWord(word: string, lang: string) {
       const url = new URL("/api/pronunciation-tts", getApiUrl());
       url.searchParams.set("text", word);
       url.searchParams.set("lang", lang);
-      const res = await fetch(url.toString());
+      const res = await apiFetchWithAuth(url.toString());
       if (!res.ok) throw new Error(`TTS ${res.status}`);
       const blob = await res.blob();
       const objectUrl = URL.createObjectURL(blob);
@@ -968,7 +969,7 @@ async function speakWord(word: string, lang: string) {
       url.searchParams.set("text", word);
       url.searchParams.set("lang", lang);
       const { sound } = await Audio.Sound.createAsync(
-        { uri: url.toString() },
+        { uri: url.toString(), headers: await getAuthHeaderRecord() },
         { shouldPlay: true, volume: 1.0 }
       );
       _cardNativeSound = sound;

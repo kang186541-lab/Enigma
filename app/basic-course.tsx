@@ -20,7 +20,7 @@ import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, getEffectiveLearningLanguage, type NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
-import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
+import { apiFetchWithAuth, getAuthHeaderRecord } from "@/lib/apiFetchWithAuth";
 import { recordAudio } from "@/lib/audio";
 import { buildSpeakingPromptKey, recordSpokenSentence } from "@/lib/speakingProgress";
 import {
@@ -745,7 +745,7 @@ export default function BasicCourseScreen() {
       stopBcWebAudio();
 
       if (Platform.OS === "web") {
-        const res = await fetch(url.toString());
+        const res = await apiFetchWithAuth(url.toString());
         if (!res.ok) throw new Error("tts-fail");
         const blob = await res.blob();
         const objectUrl = URL.createObjectURL(blob);
@@ -756,7 +756,10 @@ export default function BasicCourseScreen() {
         await audio.play();
       } else {
         await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch((e) => console.warn('[BasicCourse] setAudioMode failed:', e));
-        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true, volume: 1.0 });
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: url.toString(), headers: await getAuthHeaderRecord() },
+          { shouldPlay: true, volume: 1.0 }
+        );
         _bcNativeSound = sound;
         sound.setOnPlaybackStatusUpdate((st: any) => {
           if (st.isLoaded && st.didJustFinish) {
@@ -855,7 +858,7 @@ export default function BasicCourseScreen() {
       stopBcWebAudio();
 
       if (Platform.OS === "web") {
-        const res = await fetch(url.toString());
+        const res = await apiFetchWithAuth(url.toString());
         if (!res.ok) throw new Error("tts-fail");
         const blob = await res.blob();
         const objectUrl = URL.createObjectURL(blob);
@@ -866,7 +869,10 @@ export default function BasicCourseScreen() {
         await audio.play();
       } else {
         await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true }).catch((e) => console.warn('[BasicCourse] setAudioMode failed:', e));
-        const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true, volume: 1.0 });
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: url.toString(), headers: await getAuthHeaderRecord() },
+          { shouldPlay: true, volume: 1.0 }
+        );
         _bcNativeSound = sound;
         sound.setOnPlaybackStatusUpdate((s: any) => {
           if (s.isLoaded && s.didJustFinish) {

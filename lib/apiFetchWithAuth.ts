@@ -10,6 +10,15 @@ async function withAuthHeaders(headers?: HeadersInit): Promise<Headers> {
   return next;
 }
 
+export async function getAuthHeaderRecord(headers?: HeadersInit): Promise<Record<string, string>> {
+  const next = await withAuthHeaders(headers);
+  const out: Record<string, string> = {};
+  next.forEach((value, key) => {
+    out[key] = value;
+  });
+  return out;
+}
+
 export async function apiFetchWithAuth(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
   return fetch(input, {
     ...init,

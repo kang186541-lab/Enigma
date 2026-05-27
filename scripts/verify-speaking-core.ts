@@ -766,13 +766,18 @@ assert.ok(
 );
 assert.ok(
   apiFetchWithAuthSource.includes("supabase.auth.getSession()") &&
-  apiFetchWithAuthSource.includes('next.set("Authorization", `Bearer ${token}`)') &&
-  speakSource.includes("apiFetchWithAuth(apiUrl") &&
-  speakSource.includes("apiFetchWithAuth(urlStr") &&
-  basicCourseSource.includes("apiFetchWithAuth(apiUrl") &&
-  rudyStep1Source.includes("apiFetchWithAuth(apiUrl") &&
-  rudyStep2Source.includes("apiFetchWithAuth(apiUrl") &&
-  rudyStep3Source.includes("apiFetchWithAuth(url") &&
+    apiFetchWithAuthSource.includes('next.set("Authorization", `Bearer ${token}`)') &&
+    apiFetchWithAuthSource.includes("export async function getAuthHeaderRecord") &&
+    speakSource.includes("apiFetchWithAuth(apiUrl") &&
+    speakSource.includes("apiFetchWithAuth(urlStr") &&
+    basicCourseSource.includes("apiFetchWithAuth(apiUrl") &&
+    basicCourseSource.includes("apiFetchWithAuth(url.toString())") &&
+    basicCourseSource.includes("headers: await getAuthHeaderRecord()") &&
+    cardsSource.includes("apiFetchWithAuth(url.toString())") &&
+    cardsSource.includes("headers: await getAuthHeaderRecord()") &&
+    rudyStep1Source.includes("apiFetchWithAuth(apiUrl") &&
+    rudyStep2Source.includes("apiFetchWithAuth(apiUrl") &&
+    rudyStep3Source.includes("apiFetchWithAuth(url") &&
   rudyStep4Source.includes("apiFetchWithAuth(url"),
   "Signed-in learners should send Supabase bearer tokens to voice, Basic Course, and Rudy API calls so server rate limits use user buckets"
 );
