@@ -431,17 +431,25 @@ assert.ok(
 assert.ok(
   learnerProfileSource.includes("export interface BasicCourseState") &&
   learnerProfileSource.includes("export interface PronunciationPracticeState") &&
+  learnerProfileSource.includes("export interface CardPracticeState") &&
   learnerProfileSource.includes("function mergeBasicCourseState") &&
   learnerProfileSource.includes("function mergePronunciationPractice") &&
+  learnerProfileSource.includes("function mergeCardPractice") &&
   learnerProfileSource.includes("export async function loadBasicCourseState") &&
   learnerProfileSource.includes("export async function saveBasicCourseProgress") &&
   learnerProfileSource.includes("export async function markBasicCourseCompleted") &&
   learnerProfileSource.includes("export async function markBasicCourseReview") &&
   learnerProfileSource.includes("export async function loadPronunciationPractice") &&
   learnerProfileSource.includes("export async function updatePronunciationPractice") &&
+  learnerProfileSource.includes("export async function loadCardPractice") &&
+  learnerProfileSource.includes("export async function recordCardPracticeReview") &&
+  !learnerProfileSource.includes("export async function resetCardPracticeDay") &&
+  learnerProfileSource.includes("let _cardPracticeLock") &&
+  learnerProfileSource.includes("const reviewKey = normalizedWord ? `${deckType}:${normalizedWord}` : \"\";") &&
   learnerProfileSource.includes("basicCourse: mergeBasicCourseState") &&
-  learnerProfileSource.includes("pronunciationPractice: mergePronunciationPractice"),
-  "Learner profile should be the canonical synced store for Basic Course progress, completion, review timestamps, and pronunciation practice memory"
+  learnerProfileSource.includes("pronunciationPractice: mergePronunciationPractice") &&
+  learnerProfileSource.includes("cardPractice: mergeCardPractice"),
+  "Learner profile should be the canonical synced store for Basic Course, pronunciation practice, and Cards daily review memory"
 );
 assert.ok(
   progressSyncSource.includes('select("xp, level, streak_days, words_learned, learner_profile")') &&
@@ -549,6 +557,29 @@ assert.ok(
   basicCourseSource.includes("markReviewCompleted(reviewSection)") &&
   !basicCourseSource.includes("if (!isReviewMode || !initialReviewSection) return;"),
   "Basic Course review timestamps should be written when review is completed, not merely opened"
+);
+assert.ok(
+  cardsSource.includes("loadCardPractice") &&
+  cardsSource.includes("recordCardPracticeReview") &&
+  cardsSource.includes("saveCardPracticeSnapshot") &&
+  cardsSource.includes("localDateString()") &&
+  !cardsSource.includes("new Date().toISOString().slice(0, 10)") &&
+  cardsSource.includes("profileDay?.count") &&
+  cardsSource.includes("cardPractice?.lastSeenWords") &&
+  cardsSource.includes("const validDeckWords = new Set") &&
+  cardsSource.includes("card practice backfill failed") &&
+  cardsSource.includes("card practice legacy mirror failed") &&
+  cardsSource.includes("const reviewed = await recordReview") &&
+  cardsSource.includes("srsReviewAccepted") &&
+  cardsSource.includes("setSrsDueCount(await getDueCount())") &&
+  cardsSource.includes("extraPracticeModeRef") &&
+  cardsSource.includes("setSrsQueueEmpty(true)") &&
+  cardsSource.includes("const result = await recordCardPracticeReview") &&
+  cardsSource.includes("currentWords, deckType") &&
+  cardsSource.includes("if (knew && countedToday && !isExtraPractice && newCount <= DAILY_GOAL)") &&
+  !cardsSource.includes("AsyncStorage.removeItem(getTodayKey())") &&
+  !cardsSource.includes("resetCardPracticeDay(lang"),
+  "Cards daily review count, last-seen memory, SRS persistence, and daily XP should use local-date learner_profile state with legacy backfill and no reset-based re-awards"
 );
 assert.ok(
   speakSource.includes("loadPronunciationPractice") &&

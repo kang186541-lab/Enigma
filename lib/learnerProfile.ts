@@ -40,6 +40,18 @@ export interface PronunciationPracticeState {
   updatedAt: string;
 }
 
+export interface CardPracticeDay {
+  count: number;
+  reviewedKeys: string[];
+  updatedAt: string;
+}
+
+export interface CardPracticeState {
+  daily: Record<string, CardPracticeDay>;
+  lastSeenWords: string[];
+  updatedAt: string;
+}
+
 /**
  * Error pattern: a recurring type of mistake the learner makes.
  * `key` is a stable identifier like "past_tense_irregular", chosen by the AI
@@ -80,6 +92,7 @@ export interface LearnerProfile {
   speakingProgress: SpeakingProgress;
   basicCourse: Partial<Record<string, BasicCourseState>>;
   pronunciationPractice: Partial<Record<string, PronunciationPracticeState>>;
+  cardPractice: Partial<Record<string, CardPracticeState>>;
 
   // ── Phase 4: Persistent tutor memory ─────────────────────────────────────
   // Per-tutor state — each tutor remembers their own sessions with the learner,
@@ -141,6 +154,7 @@ const EMPTY_PROFILE: LearnerProfile = {
   },
   basicCourse: {},
   pronunciationPractice: {},
+  cardPractice: {},
   tutorMemory: {},
 };
 
@@ -296,6 +310,59 @@ function mergePronunciationPractice(
   return merged;
 }
 
+function cloneCardPracticeState(state: CardPracticeState): CardPracticeState {
+  const daily: Record<string, CardPracticeDay> = {};
+  for (const [date, day] of Object.entries(state.daily ?? {})) {
+    daily[date] = {
+      count: day.count ?? 0,
+      reviewedKeys: [...(day.reviewedKeys ?? [])],
+      updatedAt: day.updatedAt,
+    };
+  }
+  return {
+    daily,
+    lastSeenWords: [...(state.lastSeenWords ?? [])],
+    updatedAt: state.updatedAt,
+  };
+}
+
+function mergeCardPractice(
+  local: Partial<Record<string, CardPracticeState>> = {},
+  remote: Partial<Record<string, CardPracticeState>> = {},
+): Partial<Record<string, CardPracticeState>> {
+  const merged: Partial<Record<string, CardPracticeState>> = {};
+  for (const lang of new Set([...Object.keys(remote ?? {}), ...Object.keys(local ?? {})])) {
+    const l = local?.[lang];
+    const r = remote?.[lang];
+    if (!l && r) { merged[lang] = cloneCardPracticeState(r); continue; }
+    if (l && !r) { merged[lang] = cloneCardPracticeState(l); continue; }
+    if (!l || !r) continue;
+
+    const localTime = Date.parse(l.updatedAt ?? "") || 0;
+    const remoteTime = Date.parse(r.updatedAt ?? "") || 0;
+    const newer = localTime >= remoteTime ? l : r;
+    const older = localTime >= remoteTime ? r : l;
+    const daily: Record<string, CardPracticeDay> = {};
+    for (const date of new Set([...Object.keys(r.daily ?? {}), ...Object.keys(l.daily ?? {})])) {
+      const ld = l.daily?.[date];
+      const rd = r.daily?.[date];
+      const reviewedKeys = mergeRecentWords(ld?.reviewedKeys ?? [], rd?.reviewedKeys ?? [], 80);
+      daily[date] = {
+        count: Math.max(ld?.count ?? 0, rd?.count ?? 0, reviewedKeys.length),
+        reviewedKeys,
+        updatedAt: latestIso(ld?.updatedAt, rd?.updatedAt) ?? new Date().toISOString(),
+      };
+    }
+
+    merged[lang] = {
+      daily,
+      lastSeenWords: mergeRecentWords(newer.lastSeenWords ?? [], older.lastSeenWords ?? [], 60),
+      updatedAt: latestIso(l.updatedAt, r.updatedAt) ?? new Date().toISOString(),
+    };
+  }
+  return merged;
+}
+
 function mergeTutorMemory(
   local: Partial<Record<string, TutorMemory>>,
   remote: Partial<Record<string, TutorMemory>>,
@@ -350,6 +417,7 @@ export function mergeLearnerProfiles(local: LearnerProfile, remote: LearnerProfi
     ),
     basicCourse: mergeBasicCourseState(local.basicCourse ?? {}, remote.basicCourse ?? {}),
     pronunciationPractice: mergePronunciationPractice(local.pronunciationPractice ?? {}, remote.pronunciationPractice ?? {}),
+    cardPractice: mergeCardPractice(local.cardPractice ?? {}, remote.cardPractice ?? {}),
     tutorMemory: mergeTutorMemory(local.tutorMemory ?? {}, remote.tutorMemory ?? {}),
   };
 }
@@ -513,6 +581,92 @@ export async function updatePronunciationPractice(
     ...p,
     pronunciationPractice: { ...(p.pronunciationPractice ?? {}), [lang]: next },
   });
+  return next;
+}
+
+function getCardPractice(profile: LearnerProfile, lang: string): CardPracticeState | null {
+  return profile.cardPractice?.[lang] ?? null;
+}
+
+export async function loadCardPractice(lang: string): Promise<CardPracticeState | null> {
+  const p = await loadLearnerProfile();
+  return getCardPractice(p, lang);
+}
+
+export async function saveCardPracticeSnapshot(
+  lang: string,
+  params: {
+    date?: string;
+    count?: number;
+    reviewedKeys?: string[];
+    lastSeenWords?: string[];
+  },
+): Promise<CardPracticeState> {
+  const p = await loadLearnerProfile();
+  const prev = getCardPractice(p, lang);
+  const now = new Date().toISOString();
+  const daily = { ...(prev?.daily ?? {}) };
+  if (params.date) {
+    const prevDay = daily[params.date];
+    const reviewedKeys = mergeRecentWords(params.reviewedKeys ?? prevDay?.reviewedKeys ?? [], [], 80);
+    daily[params.date] = {
+      count: Math.max(0, params.count ?? prevDay?.count ?? reviewedKeys.length),
+      reviewedKeys,
+      updatedAt: now,
+    };
+  }
+  const next: CardPracticeState = {
+    daily,
+    lastSeenWords: mergeRecentWords(params.lastSeenWords ?? prev?.lastSeenWords ?? [], [], 60),
+    updatedAt: now,
+  };
+  await saveLearnerProfile({
+    ...p,
+    cardPractice: { ...(p.cardPractice ?? {}), [lang]: next },
+  });
+  return next;
+}
+
+let _cardPracticeLock: Promise<unknown> = Promise.resolve();
+
+export async function recordCardPracticeReview(
+  lang: string,
+  date: string,
+  word: string,
+  sessionWords: string[] = [],
+  deckType = "cards",
+): Promise<{ state: CardPracticeState; day: CardPracticeDay; counted: boolean }> {
+  const run = async (): Promise<{ state: CardPracticeState; day: CardPracticeDay; counted: boolean }> => {
+    const p = await loadLearnerProfile();
+    const prev = getCardPractice(p, lang);
+    const now = new Date().toISOString();
+    const daily = { ...(prev?.daily ?? {}) };
+    const prevDay = daily[date] ?? { count: 0, reviewedKeys: [], updatedAt: now };
+    const normalizedWord = word.trim().toLocaleLowerCase();
+    const reviewKey = normalizedWord ? `${deckType}:${normalizedWord}` : "";
+    const reviewedKeys = [...(prevDay.reviewedKeys ?? [])];
+    const counted = Boolean(reviewKey) && !reviewedKeys.includes(reviewKey);
+    if (counted) reviewedKeys.push(reviewKey);
+    const day: CardPracticeDay = {
+      count: counted ? Math.max(prevDay.count + 1, reviewedKeys.length) : Math.max(prevDay.count, reviewedKeys.length),
+      reviewedKeys,
+      updatedAt: now,
+    };
+    daily[date] = day;
+    const next: CardPracticeState = {
+      daily,
+      lastSeenWords: mergeRecentWords(sessionWords, prev?.lastSeenWords ?? [], 60),
+      updatedAt: now,
+    };
+    await saveLearnerProfile({
+      ...p,
+      cardPractice: { ...(p.cardPractice ?? {}), [lang]: next },
+    });
+    return { state: next, day, counted };
+  };
+
+  const next = _cardPracticeLock.then(run, run);
+  _cardPracticeLock = next.catch(() => null);
   return next;
 }
 

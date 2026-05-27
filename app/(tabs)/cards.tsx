@@ -24,6 +24,8 @@ import { srsCardsToFlashCards } from "@/lib/srsCardAdapter";
 import { trackLearningEvent } from "@/lib/learningEvents";
 import { saveSpeakMissionHandoff } from "@/lib/speakMissionHandoff";
 import { buildAcquisitionSession, mergeRecentFirst } from "@/lib/acquisitionSession";
+import { loadCardPractice, recordCardPracticeReview, saveCardPracticeSnapshot } from "@/lib/learnerProfile";
+import { localDateString } from "@/lib/progressStorage";
 import { XPToast } from "@/components/XPToast";
 import { RippleButton } from "@/components/RippleButton";
 import { EmojiText } from "@/components/EmojiText";
@@ -985,7 +987,7 @@ async function speakWord(word: string, lang: string) {
 const DAILY_GOAL = 10;
 
 function getTodayKey() {
-  return `cards_daily_${new Date().toISOString().slice(0, 10)}`;
+  return `cards_daily_${localDateString()}`;
 }
 
 function pickSessionCards(allCards: FlashCard[], count: number, lastSeenWords: string[]): FlashCard[] {
@@ -1070,8 +1072,11 @@ export default function CardsScreen() {
   const [gotIt, setGotIt] = useState(0);
   const [again, setAgain] = useState(0);
   const [dailyComplete, setDailyComplete] = useState(false);
+  const [extraPracticeMode, setExtraPracticeMode] = useState(false);
+  const [srsQueueEmpty, setSrsQueueEmpty] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [xpGain, setXpGain] = useState(0);
+  const extraPracticeModeRef = useRef(false);
 
   const flipAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -1090,13 +1095,41 @@ export default function CardsScreen() {
       // static deck.
       const dueCount = await getDueCount();
       setSrsDueCount(dueCount);
+      setSrsQueueEmpty(false);
 
       const todayKey = getTodayKey();
-      const raw = await AsyncStorage.getItem(todayKey);
+      const todayDate = localDateString();
+      const [cardPractice, raw, lastSeenRaw] = await Promise.all([
+        loadCardPractice(lang),
+        AsyncStorage.getItem(todayKey),
+        AsyncStorage.getItem("cards_last_seen_words"),
+      ]);
       const saved = raw ? JSON.parse(raw) : { count: 0 };
-      const count: number = saved.count ?? 0;
+      const profileDay = cardPractice?.daily?.[todayDate];
+      const legacyCount = saved.count ?? 0;
+      const count: number = Math.max(profileDay?.count ?? 0, legacyCount);
       setDailyCount(count);
-      setDailyComplete(count >= DAILY_GOAL);
+      setDailyComplete(!extraPracticeModeRef.current && count >= DAILY_GOAL);
+
+      const legacyLastSeenRaw: string[] = lastSeenRaw ? JSON.parse(lastSeenRaw) : [];
+      const validDeckWords = new Set([
+        ...BEGINNER_CARDS_BY_LANG[lang].map((c) => c.word),
+        ...ADVANCED_CARDS[lang].map((c) => c.word),
+      ]);
+      const legacyLastSeen = legacyLastSeenRaw.filter((word) => validDeckWords.has(word));
+      const lastSeen = cardPractice?.lastSeenWords ?? legacyLastSeen;
+      if (!cardPractice && (count > 0 || lastSeen.length > 0)) {
+        saveCardPracticeSnapshot(lang, {
+          date: todayDate,
+          count,
+          lastSeenWords: lastSeen,
+        }).catch((e: unknown) => console.warn('[Cards] card practice backfill failed:', e));
+      } else if (cardPractice) {
+        AsyncStorage.multiSet([
+          [todayKey, JSON.stringify({ count })],
+          ["cards_last_seen_words", JSON.stringify(lastSeen)],
+        ]).catch((e: unknown) => console.warn('[Cards] card practice legacy mirror failed:', e));
+      }
 
       let picked: FlashCard[];
       if (deckType === "srs") {
@@ -1106,9 +1139,8 @@ export default function CardsScreen() {
         // returning to due.
         const dueSrs = await getDueCards(DAILY_GOAL);
         picked = srsCardsToFlashCards(dueSrs, nativeLang as NativeLanguage, lang) as FlashCard[];
+        setSrsQueueEmpty(picked.length === 0);
       } else {
-        const lastSeenRaw = await AsyncStorage.getItem("cards_last_seen_words");
-        const lastSeen: string[] = lastSeenRaw ? JSON.parse(lastSeenRaw) : [];
         picked = pickSessionCards(allCards, DAILY_GOAL, lastSeen);
       }
       setSessionCards(picked);
@@ -1162,21 +1194,27 @@ export default function CardsScreen() {
   const switchDeck = (type: DeckType) => {
     if (type === deckType) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSrsQueueEmpty(false);
     setDeckType(type);
   };
 
   const resetState = () => {
+    extraPracticeModeRef.current = true;
+    setExtraPracticeMode(true);
     setSessionIndex(0);
     setIsFlipped(false);
     setGotIt(0);
     setAgain(0);
-    setDailyCount(0);
     setDailyComplete(false);
-    AsyncStorage.removeItem(getTodayKey()).catch((e) => console.warn('[Cards] daily reset failed:', e));
+    setSrsQueueEmpty(false);
     Animated.parallel([
       Animated.timing(flipAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
     ]).start();
+    if (deckType === "srs") {
+      setDeckType("beginner");
+      return;
+    }
     loadSession();
   };
 
@@ -1251,14 +1289,12 @@ export default function CardsScreen() {
   // undercounting dailyCount because newCount = dailyCount + 1 captures a
   // stale closure value. Held until the slide-out animation finishes.
   const advancingRef = useRef(false);
-  const advanceCard = (knew: boolean) => {
+  const advanceCard = async (knew: boolean) => {
     if (advancingRef.current) return;
     advancingRef.current = true;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (knew) {
       setGotIt((g) => g + 1);
-      setXpGain(10);
-      awardXp(10);
     } else {
       setAgain((a) => a + 1);
     }
@@ -1266,16 +1302,43 @@ export default function CardsScreen() {
     // SRS mode: route the rating through the Leitner engine so this is the
     // user's actual review. Static-deck modes ignore this — they don't
     // promote/demote anything.
+    const isExtraPractice = extraPracticeModeRef.current || extraPracticeMode;
+    let srsReviewAccepted = true;
     if (deckType === "srs" && card?.word) {
-      recordReview(card.word, knew).catch((e) => console.warn('[Cards] SRS recordReview failed:', e));
+      try {
+        const reviewed = await recordReview(card.word, knew);
+        srsReviewAccepted = Boolean(reviewed);
+        setSrsDueCount(await getDueCount());
+      } catch (e) {
+        srsReviewAccepted = false;
+        console.warn('[Cards] SRS recordReview failed:', e);
+      }
     }
 
-    const newCount = dailyCount + 1;
-    setDailyCount(newCount);
-    const todayKey = getTodayKey();
-    AsyncStorage.setItem(todayKey, JSON.stringify({ count: newCount })).catch((e) => console.warn('[Cards] daily count save failed:', e));
-
     const currentWords = sessionCards.map((c) => c.word);
+    let newCount = dailyCount;
+    let countedToday = false;
+    if (srsReviewAccepted) {
+      try {
+        const result = await recordCardPracticeReview(lang, localDateString(), card?.word ?? "", currentWords, deckType);
+        newCount = result.day.count;
+        countedToday = result.counted;
+      } catch (e) {
+        newCount = dailyCount + 1;
+        countedToday = true;
+        console.warn('[Cards] card practice profile save failed:', e);
+      }
+    }
+    if (knew && countedToday && !isExtraPractice && newCount <= DAILY_GOAL) {
+      setXpGain(10);
+      awardXp(10);
+    }
+    if (!isExtraPractice) setDailyCount(newCount);
+    const todayKey = getTodayKey();
+    if (!isExtraPractice) {
+      AsyncStorage.setItem(todayKey, JSON.stringify({ count: newCount })).catch((e) => console.warn('[Cards] daily count save failed:', e));
+    }
+
     AsyncStorage.getItem("cards_last_seen_words")
       .then((raw) => {
         const previous: string[] = raw ? JSON.parse(raw) : [];
@@ -1288,16 +1351,18 @@ export default function CardsScreen() {
       slideAnim.setValue(knew ? width : -width);
       flipAnim.setValue(0);
       setIsFlipped(false);
-      if (newCount >= DAILY_GOAL) {
+      if (!isExtraPractice && newCount >= DAILY_GOAL) {
         setDailyComplete(true);
         slideAnim.setValue(0);
       } else if (sessionIndex + 1 >= sessionCards.length) {
         // SRS mode: when the live due queue is exhausted, don't silently
         // fall through to static beginner/advanced cards — that would
         // call recordReview() on words not in the SRS store and grant
-        // XP for fake reviews. Mark the day complete instead.
+        // XP for fake reviews. Keep daily progress as-is and show a queue-clear CTA.
         if (deckType === "srs") {
-          setDailyComplete(true);
+          setSrsQueueEmpty(true);
+          setSessionCards([]);
+          setSessionIndex(0);
           slideAnim.setValue(0);
         } else {
           const nextPicked = pickSessionCards(allCards, DAILY_GOAL, currentWords);
@@ -1373,10 +1438,18 @@ export default function CardsScreen() {
         >
           <Text style={styles.completedEmoji}>📭</Text>
           <Text style={styles.completedTitle}>
-            {nativeLang === "korean" ? "복습할 카드가 없어요" : nativeLang === "spanish" ? "Sin tarjetas para revisar" : "No cards to review"}
+            {srsQueueEmpty
+              ? nativeLang === "korean" ? "오늘 복습 대기열을 비웠어요" : nativeLang === "spanish" ? "Repaso al día" : "Review queue clear"
+              : nativeLang === "korean" ? "복습할 카드가 없어요" : nativeLang === "spanish" ? "Sin tarjetas para revisar" : "No cards to review"}
           </Text>
           <Text style={styles.completedSub}>
-            {nativeLang === "korean"
+            {srsQueueEmpty
+              ? nativeLang === "korean"
+                ? "오늘 예정된 복습 카드는 모두 확인했어요.\n초급 덱에서 계속 연습할 수 있어요."
+                : nativeLang === "spanish"
+                ? "Ya revisaste todas las tarjetas pendientes.\nPuedes seguir con el mazo principiante."
+                : "You reviewed every due card for now.\nYou can keep practicing in the beginner deck."
+              : nativeLang === "korean"
               ? "레슨이나 스토리를 진행하면\n카드가 자동으로 추가됩니다!"
               : nativeLang === "spanish"
               ? "Completa lecciones o historias\npara añadir tarjetas automáticamente!"
