@@ -2063,12 +2063,17 @@ export default function SpeakScreen() {
     );
   }
 
-  // ── Main Screen (fixed layout, no scroll) ──────────────────────────────────
+  // ── Main Screen ────────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
 
-      <View style={[styles.screen, { paddingBottom: TAB_BAR_HEIGHT + bottomPad }]}>
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={[styles.screenScrollContent, { paddingBottom: TAB_BAR_HEIGHT + bottomPad }]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
 
         {/* ── LEVEL UP OVERLAY ─────────────────────────────────────────────── */}
         {levelUpShow && (
@@ -2193,7 +2198,9 @@ export default function SpeakScreen() {
               </Pressable>
             </View>
 
-            <Text style={styles.wordText}>{phrase.word}</Text>
+            <Text style={styles.wordText} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.62}>
+              {phrase.word}
+            </Text>
 
             <View style={styles.ipaRow}>
               <Text style={styles.ipaTag}>IPA</Text>
@@ -2425,7 +2432,7 @@ export default function SpeakScreen() {
             testID="prev-button"
           >
             <Ionicons name="arrow-back" size={16} color={sessionIdx === 0 ? C.goldDark : C.gold} />
-            <Text style={[styles.navBtnText, { color: sessionIdx === 0 ? C.goldDark : C.gold }]}>
+            <Text style={[styles.navBtnText, { color: sessionIdx === 0 ? C.goldDark : C.gold }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
               {nativeLang === "korean" ? "이전" : nativeLang === "spanish" ? "Anterior" : "Prev"}
             </Text>
           </Pressable>
@@ -2441,7 +2448,7 @@ export default function SpeakScreen() {
               testID="next-word-button"
               accessibilityState={{ disabled: false }}
             >
-              <Text style={styles.nextBtnText}>
+              <Text style={styles.nextBtnText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.68}>
                 {isFirstSpeakingMission && sessionIdx + 1 >= sessionWords.length && shouldContinueDailySpeaking
                   ? continueSpeakingLabel
                   : sessionIdx + 1 >= sessionWords.length
@@ -2461,7 +2468,7 @@ export default function SpeakScreen() {
               testID="next-button"
               accessibilityState={{ disabled: true }}
             >
-              <Text style={[styles.navBtnText, { color: C.goldDim }]}>
+              <Text style={[styles.navBtnText, { color: C.goldDim }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
                 {lockedNextLabel}
               </Text>
               <Ionicons name="arrow-forward" size={16} color={C.goldDim} />
@@ -2469,7 +2476,7 @@ export default function SpeakScreen() {
           )}
         </View>
 
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -2490,6 +2497,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === "web" ? 8 : 0,
     ...WEB_BORDER_BOX,
+  },
+  screenScrollContent: {
+    flexGrow: 1,
   },
 
   // ── Header (flex 2) ──────────────────────────────────────────────────────
@@ -2595,6 +2605,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 46,
     letterSpacing: 1,
+    flexShrink: 1,
   },
   ipaRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
   ipaTag: {
@@ -2731,12 +2742,12 @@ const styles = StyleSheet.create({
     backgroundColor: C.bg2, borderWidth: 1.5, borderColor: C.border,
   },
   navBtnDisabled: { opacity: 0.4 },
-  navBtnText: { fontSize: 14, fontFamily: F.bodySemi },
+  navBtnText: { fontSize: 14, fontFamily: F.bodySemi, flexShrink: 1 },
   navProgress: { alignItems: "center", minWidth: 44 },
   navProgressText: { fontSize: 13, fontFamily: F.bodySemi, color: C.goldDim },
   nextBtnActive: { overflow: "hidden" },
   nextBtnInactive: { backgroundColor: C.bg2, borderWidth: 1.5, borderColor: C.border },
-  nextBtnText: { fontSize: 14, fontFamily: F.bodySemi, color: "#fff" },
+  nextBtnText: { fontSize: 14, fontFamily: F.bodySemi, color: "#fff", flexShrink: 1, minWidth: 0 },
 
   // ── Completion screen ────────────────────────────────────────────────────
   completeWrap: {

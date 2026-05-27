@@ -21,6 +21,7 @@ const languages: DailySpeakingLanguage[] = ["korean", "english", "spanish"];
 const goals: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"];
 const onboardingSource = readFileSync("app/onboarding.tsx", "utf8");
 const speakSource = readFileSync("app/(tabs)/speak.tsx", "utf8");
+const homeSource = readFileSync("app/(tabs)/index.tsx", "utf8");
 
 assert.equal(RUDY_GUIDE_CARDS.length, 8, "Rudy's Language Guide should stay at the 8 philosophy cards from replit.md");
 assert.deepEqual(
@@ -80,6 +81,18 @@ assert.ok(
   speakSource.includes("const { day, counted } = await recordSpokenSentence"),
   "Pronunciation clinic XP must not inflate the guided daily real-sentence count"
 );
+assert.ok(
+  homeSource.includes("showSecondaryHomeSections") &&
+  homeSource.includes("setShowMorePractice((v) => !v)") &&
+  homeSource.includes("todaySpeakingMission.rudyTip"),
+  "Home should keep today's real spoken sentence primary and progressively disclose secondary practice"
+);
+assert.ok(
+  speakSource.includes("contentContainerStyle={[styles.screenScrollContent") &&
+  speakSource.includes("numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.62}") &&
+  speakSource.includes("numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.68}"),
+  "Speak should have a short-viewport fallback for long daily sentences and continuation CTAs"
+);
 
 for (const lang of languages) {
   for (const goal of goals) {
@@ -136,12 +149,14 @@ const activeHomeMission = getTodaySpeakingMission("english", "korean", "travel",
 assert.equal(activeHomeMission.dailyGoalMet, false);
 assert.notEqual(activeHomeMission.phrase, `${SPEAKING_DAILY_GOAL} / ${SPEAKING_DAILY_GOAL}`);
 assert.equal(activeHomeMission.button, "Start speaking");
+assert.ok(activeHomeMission.rudyTip.startsWith("Rudy: "), "active home mission should include a Rudy guidance line");
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);
 assert.equal(completedHomeMission.dailyGoalMet, true);
 assert.equal(completedHomeMission.phrase, `${SPEAKING_DAILY_GOAL} / ${SPEAKING_DAILY_GOAL}`);
 assert.equal(completedHomeMission.button, "Keep speaking");
 assert.ok(completedHomeMission.context.includes("free practice"));
+assert.ok(completedHomeMission.rudyTip.includes("habit"), "completed home mission should keep the habit frame");
 
 assert.equal(getTodaySpeakingMission("spanish", "korean", "travel", SPEAKING_DAILY_GOAL).button, "Seguir hablando");
 assert.equal(getTodaySpeakingMission("korean", "english", "travel", SPEAKING_DAILY_GOAL).button, "계속 말하기");

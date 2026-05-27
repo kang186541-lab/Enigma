@@ -188,6 +188,7 @@ export default function HomeScreen() {
   const [srsDueCount, setSrsDueCount] = React.useState(0);
   const [primaryGoal, setPrimaryGoal] = React.useState<LearningGoal | null>(null);
   const [spokenToday, setSpokenToday] = React.useState(0);
+  const [showMorePractice, setShowMorePractice] = React.useState(false);
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
@@ -282,6 +283,16 @@ export default function HomeScreen() {
     : nativeLang === "spanish"
     ? `Hoy dijiste ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL} frases`
     : `You spoke ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL} sentences today`;
+  const shouldFocusSpeaking = !todaySpeakingMission.dailyGoalMet;
+  const showSecondaryHomeSections = !shouldFocusSpeaking || showMorePractice;
+  const morePracticeTitle = showMorePractice
+    ? nativeLang === "korean" ? "다시 말하기에 집중하기" : nativeLang === "spanish" ? "Volver a enfocarme en hablar" : "Refocus on speaking"
+    : nativeLang === "korean" ? "다른 학습도 보기" : nativeLang === "spanish" ? "Ver otras prácticas" : "Show other practice";
+  const morePracticeSub = nativeLang === "korean"
+    ? "오늘의 실제 문장을 먼저 입 밖으로 꺼내고, 필요하면 복습과 스토리로 이어가요."
+    : nativeLang === "spanish"
+    ? "Primero di tus frases reales de hoy. Después puedes repasar, jugar historia o hablar con NPCs."
+    : "Say today's real sentences first. Then review, story, and NPC practice stay one tap away.";
 
   useEffect(() => {
     void trackLearningEvent("first_speaking_cta_seen", {
@@ -493,6 +504,10 @@ export default function HomeScreen() {
           </View>
 
           <Text style={styles.todaySpeechContext}>{todaySpeakingMission.context}</Text>
+          <View style={styles.todayRudyTip}>
+            <Ionicons name="sparkles" size={14} color={C.gold} />
+            <Text style={styles.todayRudyTipText}>{todaySpeakingMission.rudyTip}</Text>
+          </View>
           <View style={styles.todayGoalPicker}>
             <Text style={styles.todayGoalPrompt}>{getHomeGoalPrompt(nativeLang)}</Text>
             <View style={styles.todayGoalChips}>
@@ -537,6 +552,31 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
+      {shouldFocusSpeaking && (
+        <View style={styles.pad}>
+          <Pressable
+            style={({ pressed }) => [styles.morePracticeGate, pressed && { opacity: 0.82 }]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setShowMorePractice((v) => !v);
+            }}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: showMorePractice }}
+            accessibilityLabel={morePracticeTitle}
+          >
+            <View style={styles.morePracticeGateIcon}>
+              <Ionicons name={showMorePractice ? "chevron-up" : "chevron-down"} size={18} color={C.gold} />
+            </View>
+            <View style={styles.morePracticeGateText}>
+              <Text style={styles.morePracticeGateTitle}>{morePracticeTitle}</Text>
+              <Text style={styles.morePracticeGateSub}>{morePracticeSub}</Text>
+            </View>
+          </Pressable>
+        </View>
+      )}
+
+      {showSecondaryHomeSections && (
+      <>
       {/* ── STATS ROW ─────────────────────────────────── */}
       <View style={styles.statsRow}>
         {statItems.map((s, i) => (
@@ -773,6 +813,9 @@ export default function HomeScreen() {
       </View>
 
       <View style={{ height: 120 }} />
+      </>
+      )}
+      {!showSecondaryHomeSections && <View style={{ height: 120 }} />}
     </ScrollView>
 
     <LevelUpModal
@@ -1050,6 +1093,25 @@ const styles = StyleSheet.create({
     color: C.parchmentDark,
     lineHeight: 19,
   },
+  todayRudyTip: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.22)",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+    backgroundColor: "rgba(201,162,39,0.08)",
+  },
+  todayRudyTipText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+    lineHeight: 17,
+  },
   todayGoalPicker: {
     marginTop: 12,
     gap: 8,
@@ -1139,6 +1201,44 @@ const styles = StyleSheet.create({
     fontFamily: F.header,
     color: C.bg1,
     letterSpacing: 0.4,
+  },
+
+  morePracticeGate: {
+    marginTop: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.28)",
+    borderRadius: 14,
+    padding: 12,
+    backgroundColor: "rgba(201,162,39,0.07)",
+  },
+  morePracticeGateIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(201,162,39,0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.24)",
+  },
+  morePracticeGateText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  morePracticeGateTitle: {
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: C.gold,
+    marginBottom: 2,
+  },
+  morePracticeGateSub: {
+    fontSize: 11,
+    fontFamily: F.body,
+    color: C.goldDim,
+    lineHeight: 16,
   },
 
   /* ─ STATS ─ */

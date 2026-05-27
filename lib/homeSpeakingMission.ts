@@ -12,6 +12,7 @@ export type HomeSpeakingMission = {
   eyebrow: string;
   title: string;
   context: string;
+  rudyTip: string;
   button: string;
 };
 
@@ -81,6 +82,11 @@ export function getTodaySpeakingMission(
         : nativeLang === "spanish"
         ? `Ya dijiste ${SPEAKING_DAILY_GOAL} frases en ${targetName[nativeLang][learningLang]}. Puedes seguir con práctica libre.`
         : `You already said ${SPEAKING_DAILY_GOAL} ${targetName[nativeLang][learningLang]} sentences out loud. You can keep shaping them in free practice.`,
+      rudyTip: nativeLang === "korean"
+        ? "Rudy: 오늘은 충분히 입 밖으로 꺼냈어요. 더 하고 싶다면 가볍게 이어가요."
+        : nativeLang === "spanish"
+        ? "Rudy: Ya hablaste lo suficiente para crear hábito. Si quieres, seguimos suave."
+        : "Rudy: You spoke enough to build the habit today. If you want, keep it light.",
       button: nativeLang === "korean" ? "계속 말하기" : nativeLang === "spanish" ? "Seguir hablando" : "Keep speaking",
     };
   }
@@ -104,6 +110,11 @@ export function getTodaySpeakingMission(
         : nativeLang === "spanish"
         ? `Empieza con un saludo en ${targetName[nativeLang][learningLang]}. No pasa nada si sale imperfecto.`
         : `Start with a ${targetName[nativeLang][learningLang]} greeting. It does not need to be perfect.`,
+    rudyTip: nativeLang === "korean"
+      ? "Rudy: 완벽하게 만들지 말고 먼저 소리 내요. 말한 뒤에 같이 다듬으면 돼요."
+      : nativeLang === "spanish"
+      ? "Rudy: No la prepares perfecta. Dila primero y la pulimos después."
+      : `Rudy: ${missionPhrase?.contextTip ?? missionPhrase?.tip ?? "Say it first. We can shape it after it is out loud."}`,
     button: nativeLang === "korean" ? "말하기 시작" : nativeLang === "spanish" ? "Empezar a hablar" : "Start speaking",
   };
 }
