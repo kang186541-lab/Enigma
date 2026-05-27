@@ -6319,10 +6319,9 @@ function CompletionScreen({ story, lang, xpEarned }: { story: Story; lang: strin
 export default function StoryScene() {
   const insets = useSafeAreaInsets();
   const { id, intro, mute } = useLocalSearchParams<{ id: string; intro?: string; mute?: string }>();
-  const { nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
+  const { nativeLanguage, learningLanguage, awardXp: grantXp } = useLanguage();
   const lang = nativeLanguage ?? "english";
   const learningLang = learningLanguage ?? "english";
-  const statsRef = useRef(stats);
 
   const story = STORIES[id ?? "london"] ?? STORIES.london;
   const [seqIdx, setSeqIdx] = useState(0);
@@ -6343,15 +6342,9 @@ export default function StoryScene() {
   const forceIntro = intro === "1" || intro === "true";
   const audioMuted = mute === "1" || mute === "true";
 
-  useEffect(() => {
-    statsRef.current = stats;
-  }, [stats]);
-
   async function awardXp(amount: number, source: string) {
-    const nextStats = { ...statsRef.current, xp: statsRef.current.xp + amount };
-    statsRef.current = nextStats;
     try {
-      await updateStats({ xp: nextStats.xp });
+      await grantXp(amount);
     } catch (e) {
       console.warn(`[Story] ${source} XP update failed:`, e);
     }

@@ -66,7 +66,7 @@ const EXERCISES: Exercise[] = [
 export default function WritingPractice() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { nativeLanguage: nativeLang, learningLanguage, updateStats, stats } = useLanguage();
+  const { nativeLanguage: nativeLang, learningLanguage, awardXp } = useLanguage();
   const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
 
   const [exerciseIdx, setExerciseIdx] = useState(0);
@@ -99,7 +99,7 @@ export default function WritingPractice() {
       Haptics.impactAsync(correct ? Haptics.ImpactFeedbackStyle.Light : Haptics.ImpactFeedbackStyle.Heavy);
       if (correct) {
         setTotalScore((s) => s + 10);
-        updateStats({ xp: stats.xp + 5 });
+        awardXp(5);
       }
       setCompleted((c) => c + 1);
       return;
@@ -148,7 +148,7 @@ export default function WritingPractice() {
     setPhase("result");
     setCompleted((c) => c + 1);
     setTotalScore((s) => s + 5);
-    updateStats({ xp: stats.xp + 5 });
+    awardXp(5);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     // Add wrong answers to SRS

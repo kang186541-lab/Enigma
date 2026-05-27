@@ -151,10 +151,117 @@ export async function saveLearnerProfile(profile: LearnerProfile): Promise<void>
   }
 }
 
+function latestIso(a: string | null | undefined, b: string | null | undefined): string | null {
+  if (!a) return b ?? null;
+  if (!b) return a;
+  return Date.parse(a) >= Date.parse(b) ? a : b;
+}
+
+function earliestIso(a: string | null | undefined, b: string | null | undefined): string | null {
+  if (!a) return b ?? null;
+  if (!b) return a;
+  return Date.parse(a) <= Date.parse(b) ? a : b;
+}
+
+function mergeSpeakingProgress(local: SpeakingProgress, remote: SpeakingProgress): SpeakingProgress {
+  const history: Record<string, SpeakingDayProgress> = {};
+  const dates = new Set([
+    ...Object.keys(remote?.history ?? {}),
+    ...Object.keys(local?.history ?? {}),
+  ]);
+  for (const date of dates) {
+    const l = local.history?.[date];
+    const r = remote.history?.[date];
+    const byLanguage: Partial<Record<string, number>> = {};
+    for (const lang of new Set([
+      ...Object.keys(r?.byLanguage ?? {}),
+      ...Object.keys(l?.byLanguage ?? {}),
+    ])) {
+      byLanguage[lang] = Math.max(r?.byLanguage?.[lang] ?? 0, l?.byLanguage?.[lang] ?? 0);
+    }
+    history[date] = {
+      date,
+      count: Math.max(r?.count ?? 0, l?.count ?? 0),
+      byLanguage,
+      promptKeys: { ...(r?.promptKeys ?? {}), ...(l?.promptKeys ?? {}) },
+      updatedAt: latestIso(l?.updatedAt, r?.updatedAt) ?? new Date().toISOString(),
+    };
+  }
+  const keep = Object.keys(history).sort().slice(-45);
+  const trimmed: Record<string, SpeakingDayProgress> = {};
+  for (const key of keep) trimmed[key] = history[key];
+  return {
+    dailyGoal: local.dailyGoal || remote.dailyGoal || EMPTY_PROFILE.speakingProgress.dailyGoal,
+    history: trimmed,
+  };
+}
+
+function mergeTutorMemory(
+  local: Partial<Record<string, TutorMemory>>,
+  remote: Partial<Record<string, TutorMemory>>,
+): Partial<Record<string, TutorMemory>> {
+  const merged: Partial<Record<string, TutorMemory>> = { ...remote };
+  for (const [id, localMem] of Object.entries(local ?? {})) {
+    if (!localMem) continue;
+    const remoteMem = remote?.[id];
+    if (!remoteMem) {
+      merged[id] = localMem;
+      continue;
+    }
+    const sessions = [...(remoteMem.recentSessions ?? []), ...(localMem.recentSessions ?? [])];
+    const unique = new Map<string, SessionSummary>();
+    for (const session of sessions) {
+      unique.set(`${session.date}|${session.topic ?? ""}|${session.highlight ?? ""}`, session);
+    }
+    const sessionCount = Math.max(remoteMem.sessionCount ?? 0, localMem.sessionCount ?? 0);
+    merged[id] = {
+      ...remoteMem,
+      ...localMem,
+      sessionCount,
+      firstMetAt: earliestIso(localMem.firstMetAt, remoteMem.firstMetAt) ?? localMem.firstMetAt,
+      lastMetAt: latestIso(localMem.lastMetAt, remoteMem.lastMetAt) ?? localMem.lastMetAt,
+      tier: tierFromSessionCount(sessionCount),
+      recentSessions: [...unique.values()]
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .slice(-5),
+    };
+  }
+  return merged;
+}
+
+export function mergeLearnerProfiles(local: LearnerProfile, remote: LearnerProfile): LearnerProfile {
+  return {
+    ...remote,
+    ...local,
+    diagnosed: Boolean(local.diagnosed || remote.diagnosed),
+    firstMetAt: earliestIso(local.firstMetAt, remote.firstMetAt),
+    level: { ...(remote.level ?? {}), ...(local.level ?? {}) },
+    goals: Array.from(new Set([...(local.goals ?? []), ...(remote.goals ?? [])])),
+    motivationText: local.motivationText ?? remote.motivationText,
+    interests: Array.from(new Set([...(local.interests ?? []), ...(remote.interests ?? [])])),
+    occupation: local.occupation ?? remote.occupation,
+    country: local.country ?? remote.country,
+    errorPatterns: { ...(remote.errorPatterns ?? {}), ...(local.errorPatterns ?? {}) },
+    sessionCount: Math.max(local.sessionCount ?? 0, remote.sessionCount ?? 0),
+    lastSessionAt: latestIso(local.lastSessionAt, remote.lastSessionAt),
+    speakingProgress: mergeSpeakingProgress(
+      local.speakingProgress ?? EMPTY_PROFILE.speakingProgress,
+      remote.speakingProgress ?? EMPTY_PROFILE.speakingProgress,
+    ),
+    tutorMemory: mergeTutorMemory(local.tutorMemory ?? {}, remote.tutorMemory ?? {}),
+  };
+}
+
 /** Hydrate the local learner profile from a server snapshot. */
 export async function hydrateLearnerProfileFromServer(profile: LearnerProfile): Promise<void> {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    const local = await loadLearnerProfile();
+    const merged = mergeLearnerProfiles(local, profile);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    if (JSON.stringify(merged) !== JSON.stringify(profile)) {
+      const { queueProgressPush } = await import("@/lib/progressSync");
+      queueProgressPush({ learner_profile: merged });
+    }
   } catch (err) {
     console.warn("[LearnerProfile] hydrate error:", err);
   }

@@ -550,7 +550,7 @@ function daysAgoLabel(ts: number | null, native: string): string {
 
 export default function BasicCourseScreen() {
   const insets = useSafeAreaInsets();
-  const { learningLanguage, nativeLanguage, updateStats, stats } = useLanguage();
+  const { learningLanguage, nativeLanguage, awardXp } = useLanguage();
   const { review } = useLocalSearchParams<{ review?: string }>();
   const isReviewMode = review === "1";
 
@@ -582,7 +582,6 @@ export default function BasicCourseScreen() {
   const [greetScore, setGreetScore]   = useState<number | null>(null);
   const mediaRecorderRef              = useRef<any>(null);
   const audioChunksRef                = useRef<Blob[]>([]);
-  const statsRef                      = useRef(stats);
   const greetAttemptAwardedRef        = useRef(false);
 
   const flipAnim  = useRef(new Animated.Value(0)).current;
@@ -594,8 +593,6 @@ export default function BasicCourseScreen() {
   const currentItems = stepItems[step] ?? [];
   const totalItems   = currentItems.length || 1;
   const overallPct   = (step * 100 + (subIdx / totalItems) * 100) / totalSteps / 100;
-
-  useEffect(() => { statsRef.current = stats; }, [stats]);
 
   useEffect(() => { if (!isReviewMode) loadProgress(); }, []);
 
@@ -652,7 +649,6 @@ export default function BasicCourseScreen() {
 
   const handleSkip = async () => {
     stopBcTTS();
-    try { await AsyncStorage.setItem(DONE_KEY(lang), "true"); } catch (e) { console.warn('[BasicCourse] Failed to save skip state:', e); }
     router.replace("/(tabs)");
   };
 
@@ -673,9 +669,10 @@ export default function BasicCourseScreen() {
 
   const markDone = async () => {
     try {
+      const alreadyDone = await AsyncStorage.getItem(DONE_KEY(lang));
       await AsyncStorage.setItem(DONE_KEY(lang), "true");
       await AsyncStorage.removeItem(PROGRESS_KEY(lang));
-      await updateStats({ xp: stats.xp + 100 });
+      if (alreadyDone !== "true" && !isReviewMode) await awardXp(100);
     } catch (e) { console.warn('[BasicCourse] Failed to mark course done:', e); }
   };
 
@@ -843,7 +840,7 @@ export default function BasicCourseScreen() {
     if (greetAttemptAwardedRef.current) return;
     greetAttemptAwardedRef.current = true;
     try {
-      await updateStats({ xp: statsRef.current.xp + 5 });
+      await awardXp(5);
     } catch (e) {
       console.warn('[BasicCourse] Failed to award greeting attempt XP:', e);
     }

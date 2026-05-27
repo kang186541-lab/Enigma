@@ -371,11 +371,9 @@ function webSpeechRecognize(lang: string, timeoutMs = 15_000): Promise<string> {
 export default function ChatRoomScreen() {
   const { tutorId } = useLocalSearchParams<{ tutorId: string }>();
   const insets = useSafeAreaInsets();
-  const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
+  const { t, nativeLanguage, learningLanguage, awardXp } = useLanguage();
   const [xpGain, setXpGain] = useState(0);
-  const statsRef = useRef(stats);
   const sessionXpRef = useRef(0);
-  useEffect(() => { statsRef.current = stats; }, [stats]);
 
   // Session tracking: start on mount, end on unmount
   useEffect(() => {
@@ -962,7 +960,7 @@ export default function ChatRoomScreen() {
       if (res.ok) {
         setXpGain(5);
         sessionXpRef.current += 5;
-        updateStats({ xp: statsRef.current.xp + 5 });
+        awardXp(5);
       }
       const responseText: string = res.ok
         ? (data.reply ?? "...")

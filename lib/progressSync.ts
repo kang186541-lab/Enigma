@@ -65,9 +65,11 @@ export interface ProgressSyncSnapshot {
   lastError: string | null;
 }
 
-// Counter fields where the server should keep the higher value if the
+// Monotonic fields where the server should keep the higher value if the
 // caller's value is lower (protects against stale-device downgrades).
-const COUNTER_KEYS = ["xp", "level", "streak_days", "words_learned"] as const;
+// `streak_days` is deliberately excluded: current streaks must be allowed to
+// reset after a missed day.
+const COUNTER_KEYS = ["xp", "level", "words_learned"] as const;
 type CounterKey = typeof COUNTER_KEYS[number];
 
 const TABLE = "linguaai_user_progress";
@@ -78,6 +80,27 @@ let syncSnapshot: ProgressSyncSnapshot = {
   lastError: null,
 };
 const listeners = new Set<(snapshot: ProgressSyncSnapshot) => void>();
+
+let pendingTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingPatch: ProgressPatch = {};
+let pendingUserId: string | null = null;
+let currentAuthUserId: string | null = null;
+
+supabase.auth.getSession()
+  .then(({ data }) => {
+    currentAuthUserId = data.session?.user?.id ?? null;
+  })
+  .catch(() => {
+    currentAuthUserId = null;
+  });
+
+supabase.auth.onAuthStateChange((_event, session) => {
+  const nextUserId = session?.user?.id ?? null;
+  if (pendingUserId && nextUserId && pendingUserId !== nextUserId) {
+    clearProgressPushQueue();
+  }
+  currentAuthUserId = nextUserId;
+});
 
 function notifySync(snapshot: ProgressSyncSnapshot) {
   syncSnapshot = snapshot;
@@ -122,11 +145,22 @@ export async function fetchServerProgress(): Promise<ServerProgress | null> {
 // authoritative from the latest caller.
 //
 // Missing fields are left untouched on existing rows.
-export async function pushServerProgress(patch: ProgressPatch): Promise<boolean> {
+export async function pushServerProgress(
+  patch: ProgressPatch,
+  expectedUserId?: string | null,
+): Promise<boolean> {
   const { data: userRes } = await supabase.auth.getUser();
   const user = userRes?.user;
   if (!user) {
     notifySync({ ...syncSnapshot, status: "idle" });
+    return false;
+  }
+  if (expectedUserId && user.id !== expectedUserId) {
+    notifySync({
+      ...syncSnapshot,
+      status: "error",
+      lastError: "Progress sync user changed before flush.",
+    });
     return false;
   }
   notifySync({ ...syncSnapshot, status: "syncing", lastError: null });
@@ -170,23 +204,44 @@ export async function pushServerProgress(patch: ProgressPatch): Promise<boolean>
   return true;
 }
 
-// Debounce helper — many AsyncStorage writes can fire in a burst (e.g. inside
-// a lesson). We coalesce them so the server only sees one upsert per ~1s.
-let pendingTimer: ReturnType<typeof setTimeout> | null = null;
-let pendingPatch: ProgressPatch = {};
-
 export function queueProgressPush(patch: ProgressPatch, delayMs = 1000): void {
+  const queueUserId = currentAuthUserId;
+  if (pendingUserId !== queueUserId) {
+    if (pendingTimer) clearTimeout(pendingTimer);
+    pendingTimer = null;
+    pendingPatch = {};
+    pendingUserId = queueUserId;
+  }
   pendingPatch = { ...pendingPatch, ...patch };
+  pendingUserId = queueUserId;
   notifySync({ ...syncSnapshot, status: "pending", lastError: null });
   if (pendingTimer) clearTimeout(pendingTimer);
   pendingTimer = setTimeout(() => {
     const toSend = pendingPatch;
+    const toSendUserId = pendingUserId;
     pendingPatch = {};
+    pendingUserId = null;
     pendingTimer = null;
-    pushServerProgress(toSend).catch((e) =>
+    pushServerProgress(toSend, toSendUserId).then((ok) => {
+      if (!ok && toSendUserId === currentAuthUserId) {
+        pendingPatch = { ...toSend, ...pendingPatch };
+        pendingUserId = toSendUserId;
+        notifySync({ ...syncSnapshot, status: "error", lastError: "Progress sync failed; retry pending." });
+      }
+    }).catch((e) =>
       console.warn("[progressSync] queued push error:", e),
     );
   }, delayMs);
+}
+
+export function clearProgressPushQueue(): void {
+  if (pendingTimer) {
+    clearTimeout(pendingTimer);
+    pendingTimer = null;
+  }
+  pendingPatch = {};
+  pendingUserId = null;
+  notifySync({ ...syncSnapshot, status: "idle" });
 }
 
 // Force-flush any pending queued push (e.g. on sign-out). Returns true if
@@ -199,14 +254,22 @@ export async function flushProgressPush(): Promise<boolean> {
     pendingTimer = null;
   }
   const toSend = pendingPatch;
+  const toSendUserId = pendingUserId;
   pendingPatch = {};
+  pendingUserId = null;
   if (Object.keys(toSend).length === 0) return true;
   try {
-    return await pushServerProgress(toSend);
+    const ok = await pushServerProgress(toSend, toSendUserId);
+    if (!ok) {
+      pendingPatch = { ...toSend, ...pendingPatch };
+      pendingUserId = toSendUserId;
+    }
+    return ok;
   } catch (e) {
     console.warn("[progressSync] flush failed:", e);
     // Put it back so the next push attempt can retry.
     pendingPatch = { ...toSend, ...pendingPatch };
+    pendingUserId = toSendUserId;
     return false;
   }
 }

@@ -49,32 +49,39 @@ export function getTierInfo(tier: LeagueTier): {
 
 /** Add XP to weekly tracker (and mirror to Supabase) */
 export async function addWeeklyXP(amount: number): Promise<void> {
-  try {
-    const currentWeek = getWeekNumber();
-    const savedWeek = await AsyncStorage.getItem(LEAGUE_WEEK_KEY);
-    const savedXP = await AsyncStorage.getItem(WEEKLY_XP_KEY);
-
-    let weeklyXP = 0;
-    if (savedWeek === String(currentWeek) && savedXP) {
-      weeklyXP = parseInt(savedXP, 10);
-    }
-    // Reset if new week
-    weeklyXP += amount;
-
-    await AsyncStorage.setItem(LEAGUE_WEEK_KEY, String(currentWeek));
-    await AsyncStorage.setItem(WEEKLY_XP_KEY, String(weeklyXP));
-
-    // Mirror to Supabase as { week, xp } so reconciles can detect cross-week stale.
+  const run = async (): Promise<void> => {
     try {
-      const { queueProgressPush } = await import("@/lib/progressSync");
-      queueProgressPush({ weekly_xp: { week: currentWeek, xp: weeklyXP } });
-    } catch (err) {
-      console.warn("[League] sync queue error:", err);
+      const currentWeek = getWeekNumber();
+      const savedWeek = await AsyncStorage.getItem(LEAGUE_WEEK_KEY);
+      const savedXP = await AsyncStorage.getItem(WEEKLY_XP_KEY);
+
+      let weeklyXP = 0;
+      if (savedWeek === String(currentWeek) && savedXP) {
+        weeklyXP = parseInt(savedXP, 10);
+      }
+      // Reset if new week
+      weeklyXP += amount;
+
+      await AsyncStorage.setItem(LEAGUE_WEEK_KEY, String(currentWeek));
+      await AsyncStorage.setItem(WEEKLY_XP_KEY, String(weeklyXP));
+
+      // Mirror to Supabase as { week, xp } so reconciles can detect cross-week stale.
+      try {
+        const { queueProgressPush } = await import("@/lib/progressSync");
+        queueProgressPush({ weekly_xp: { week: currentWeek, xp: weeklyXP } });
+      } catch (err) {
+        console.warn("[League] sync queue error:", err);
+      }
+    } catch (e) {
+      console.warn("[League] addWeeklyXP failed:", e);
     }
-  } catch (e) {
-    console.warn("[League] addWeeklyXP failed:", e);
-  }
+  };
+
+  _weeklyXpLock = _weeklyXpLock.then(run, run);
+  return _weeklyXpLock;
 }
+
+let _weeklyXpLock: Promise<void> = Promise.resolve();
 
 /** Hydrate weekly XP from server. Resets to 0 if server week is stale. */
 export async function hydrateWeeklyXPFromServer(payload: { week?: number; xp?: number } | null): Promise<void> {

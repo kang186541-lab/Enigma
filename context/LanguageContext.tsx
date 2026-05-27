@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { checkAchievements } from "@/lib/achievementManager";
 import { addWeeklyXP } from "@/lib/leagueManager";
 import {
+  clearProgressPushQueue,
   fetchServerProgress,
   queueProgressPush,
   subscribeProgressSync,
@@ -65,6 +66,8 @@ export interface UserStats {
   xp: number;
 }
 
+export type StatsUpdate = Partial<UserStats> | ((current: UserStats) => Partial<UserStats>);
+
 export interface LanguageContextType {
   nativeLanguage: NativeLanguage | null;
   setNativeLanguage: (lang: NativeLanguage) => Promise<void>;
@@ -73,7 +76,8 @@ export interface LanguageContextType {
   hasOnboarded: boolean;
   isHydrated: boolean;
   stats: UserStats;
-  updateStats: (updates: Partial<UserStats>) => Promise<void>;
+  updateStats: (updates: StatsUpdate) => Promise<void>;
+  awardXp: (amount: number) => Promise<void>;
   t: (key: string) => string;
   pendingLevelUp: Level | null;
   clearLevelUp: () => void;
@@ -332,6 +336,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // AsyncStorage in the effect below, so existing users see no regression.
   const [stats, setStats] = useState<UserStats>(DEFAULT_STATS);
   const statsRef = useRef(stats);
+  const statsUpdateLockRef = useRef<Promise<void>>(Promise.resolve());
 
   useEffect(() => {
     statsRef.current = stats;
@@ -392,6 +397,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
         const previousUserId = await AsyncStorage.getItem(ACTIVE_USER_KEY);
         const switchedUser = !!previousUserId && previousUserId !== user.id;
+        if (switchedUser) clearProgressPushQueue();
         await clearLocalProgressForAccountSwitch(user.id);
         if (switchedUser) resetInMemoryProgress();
 
@@ -634,70 +640,84 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     queueProgressPush({ learning_lang: effectiveLearning });
   };
 
-  const updateStats = async (updates: Partial<UserStats>) => {
-    const currentStats = statsRef.current;
-    const oldLevel = getLevel(currentStats.xp);
-    const newStats = { ...currentStats, ...updates };
-    const newLevel = getLevel(newStats.xp);
-    if (newLevel.num > oldLevel.num) {
-      setPendingLevelUp(newLevel);
-    }
+  const updateStats = async (updates: StatsUpdate) => {
+    const run = async () => {
+      const currentStats = statsRef.current;
+      const oldLevel = getLevel(currentStats.xp);
+      const patch = typeof updates === "function" ? updates(currentStats) : updates;
+      const newStats: UserStats = { ...currentStats, ...patch };
 
-    // ── Daily streak ─────────────────────────────────────────────────────────
-    // The streak counter was a dead field — UserStats.streak existed but
-    // nothing ever wrote to it. Anchor the increment on `updates.xp`: any
-    // call that hands us actual XP gain is, by definition, a real learning
-    // moment, so it counts as today's activity.
-    //
-    // Rules (Codex-approved plan):
-    //   - last session today      → no-op (already counted)
-    //   - last session yesterday  → streak + 1
-    //   - older / missing         → streak = 1 (fresh start)
-    if (updates.xp !== undefined && updates.xp > currentStats.xp) {
-      try {
-        const today = localDateString();
-        const last = await AsyncStorage.getItem("@lingua_last_session_date");
-        let nextStreak = currentStats.streak;
-        if (last === today) {
-          // already counted today; leave streak alone
-        } else {
-          const yesterday = localDateString(new Date(Date.now() - 86_400_000));
-          if (last === yesterday) {
-            nextStreak = (currentStats.streak || 0) + 1;
-          } else {
-            // first ever session OR a gap > 1 day → restart at 1
-            nextStreak = 1;
-          }
-          await AsyncStorage.setItem("@lingua_last_session_date", today);
-        }
-        newStats.streak = nextStreak;
-      } catch (e) {
-        console.warn('[Streak] update failed:', e);
+      // Stats counters should never move backwards through the public update
+      // API. Resets/account switches use direct state writes instead.
+      if (typeof patch.xp === "number") newStats.xp = Math.max(currentStats.xp, patch.xp);
+      if (typeof patch.wordsLearned === "number") newStats.wordsLearned = Math.max(currentStats.wordsLearned, patch.wordsLearned);
+      if (typeof patch.streak === "number") newStats.streak = Math.max(currentStats.streak, patch.streak);
+
+      const newLevel = getLevel(newStats.xp);
+      const xpDelta = Math.max(0, newStats.xp - currentStats.xp);
+      if (newLevel.num > oldLevel.num) {
+        setPendingLevelUp(newLevel);
       }
-    }
 
-    statsRef.current = newStats;
-    setStats(newStats);
-    await AsyncStorage.setItem("@lingua_stats", JSON.stringify(newStats));
+      // ── Daily streak ─────────────────────────────────────────────────────────
+      // Any actual XP gain is a real learning moment, so it counts as today's
+      // activity. The whole stats write is serialized so burst rewards cannot
+      // each read the same stale XP/streak baseline.
+      if (xpDelta > 0) {
+        try {
+          const today = localDateString();
+          const last = await AsyncStorage.getItem("@lingua_last_session_date");
+          let nextStreak = currentStats.streak;
+          if (last === today) {
+            // already counted today; leave streak alone
+          } else {
+            const yesterday = localDateString(new Date(Date.now() - 86_400_000));
+            if (last === yesterday) {
+              nextStreak = (currentStats.streak || 0) + 1;
+            } else {
+              // first ever session OR a gap > 1 day → restart at 1
+              nextStreak = 1;
+            }
+            await AsyncStorage.setItem("@lingua_last_session_date", today);
+          }
+          newStats.streak = nextStreak;
+        } catch (e) {
+          console.warn('[Streak] update failed:', e);
+        }
+      }
 
-    // Fire-and-forget: check achievements after stats update
-    checkAchievements({ stats: newStats }).catch((e) => console.warn('[Achievements] check failed:', e));
+      statsRef.current = newStats;
+      setStats(newStats);
+      await AsyncStorage.setItem("@lingua_stats", JSON.stringify(newStats));
 
-    // Fire-and-forget: track weekly XP if XP changed
-    if (updates.xp !== undefined && updates.xp > currentStats.xp) {
-      addWeeklyXP(updates.xp - currentStats.xp).catch((e) => console.warn('[League] weekly XP update failed:', e));
-    }
+      // Fire-and-forget: check achievements after stats update
+      checkAchievements({ stats: newStats }).catch((e) => console.warn('[Achievements] check failed:', e));
 
-    // Fire-and-forget: push to Supabase if signed in (no-op otherwise — the
-    // queue helper itself checks for a session before sending).
-    queueProgressPush({
-      xp: newStats.xp,
-      level: newLevel.num,
-      streak_days: newStats.streak,
-      last_session_at: new Date().toISOString(),
-      last_session_date: await AsyncStorage.getItem("@lingua_last_session_date").catch(() => null),
-      words_learned: newStats.wordsLearned,
-    });
+      // Fire-and-forget: track weekly XP if XP changed
+      if (xpDelta > 0) {
+        addWeeklyXP(xpDelta).catch((e) => console.warn('[League] weekly XP update failed:', e));
+      }
+
+      // Fire-and-forget: push to Supabase if signed in (no-op otherwise — the
+      // queue helper itself checks for a session before sending).
+      queueProgressPush({
+        xp: newStats.xp,
+        level: newLevel.num,
+        streak_days: newStats.streak,
+        last_session_at: new Date().toISOString(),
+        last_session_date: await AsyncStorage.getItem("@lingua_last_session_date").catch(() => null),
+        words_learned: newStats.wordsLearned,
+      });
+    };
+
+    statsUpdateLockRef.current = statsUpdateLockRef.current.then(run, run);
+    return statsUpdateLockRef.current;
+  };
+
+  const awardXp = async (amount: number) => {
+    const safeAmount = Math.max(0, Math.floor(amount));
+    if (safeAmount <= 0) return;
+    await updateStats((current) => ({ xp: current.xp + safeAmount }));
   };
 
   const clearLevelUp = () => setPendingLevelUp(null);
@@ -708,7 +728,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, isHydrated, stats, updateStats, t, pendingLevelUp, clearLevelUp, syncStatus }}>
+    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, isHydrated, stats, updateStats, awardXp, t, pendingLevelUp, clearLevelUp, syncStatus }}>
       {children}
     </LanguageContext.Provider>
   );

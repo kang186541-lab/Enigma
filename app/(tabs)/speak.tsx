@@ -983,10 +983,8 @@ export default function SpeakScreen() {
     missionId?: string | string[];
     missionIndex?: string | string[];
   }>();
-  const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
+  const { t, nativeLanguage, learningLanguage, awardXp } = useLanguage();
   const [xpGain, setXpGain] = useState(0);
-  const statsRef = useRef(stats);
-  useEffect(() => { statsRef.current = stats; }, [stats]);
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
@@ -1398,8 +1396,8 @@ export default function SpeakScreen() {
   const awardSpokenAttemptXp = useCallback((scoreVal: number, assessmentStatus: SpeakingAssessmentStatus) => {
     const xpEarned = assessmentStatus === "unscored" ? 10 : scoreVal >= 90 ? 30 : 15;
     setXpGain(xpEarned);
-    updateStats({ xp: statsRef.current.xp + xpEarned });
-  }, [updateStats]);
+    awardXp(xpEarned);
+  }, [awardXp]);
 
   const recordSpokenAttempt = useCallback(async (
     scoreVal: number,

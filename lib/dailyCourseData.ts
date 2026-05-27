@@ -118,10 +118,54 @@ export async function saveProgress(progress: DailyCourseProgress): Promise<void>
   }
 }
 
+function mergeStepState(
+  local: DailyCourseProgress["todayStepsCompleted"],
+  remote: DailyCourseProgress["todayStepsCompleted"],
+): DailyCourseProgress["todayStepsCompleted"] {
+  return {
+    listenRepeat: Boolean(local.listenRepeat || remote.listenRepeat),
+    keyPoint: Boolean(local.keyPoint || remote.keyPoint),
+    missionTalk: Boolean(local.missionTalk || remote.missionTalk),
+    review: Boolean(local.review || remote.review),
+  };
+}
+
+export function mergeDailyCourseProgress(
+  local: DailyCourseProgress,
+  remote: DailyCourseProgress,
+): DailyCourseProgress {
+  const localRank = (local.currentUnitIndex ?? 0) * 100 + (local.currentDayIndex ?? 0);
+  const remoteRank = (remote.currentUnitIndex ?? 0) * 100 + (remote.currentDayIndex ?? 0);
+  const winner = localRank >= remoteRank ? local : remote;
+  const sameToday = local.todayDate === remote.todayDate;
+  return {
+    ...remote,
+    ...winner,
+    completedDays: Array.from(new Set([...(remote.completedDays ?? []), ...(local.completedDays ?? [])])),
+    todayDate: winner.todayDate || todayDateString(),
+    todayCompleted: sameToday ? Boolean(local.todayCompleted || remote.todayCompleted) : winner.todayCompleted,
+    todayStepsCompleted: sameToday
+      ? mergeStepState(local.todayStepsCompleted, remote.todayStepsCompleted)
+      : winner.todayStepsCompleted,
+    stats: {
+      totalSentencesSpoken: Math.max(local.stats?.totalSentencesSpoken ?? 0, remote.stats?.totalSentencesSpoken ?? 0),
+      totalDaysCompleted: Math.max(local.stats?.totalDaysCompleted ?? 0, remote.stats?.totalDaysCompleted ?? 0),
+      averagePronunciationScore: Math.max(local.stats?.averagePronunciationScore ?? 0, remote.stats?.averagePronunciationScore ?? 0),
+      currentStreak: Math.max(local.stats?.currentStreak ?? 0, remote.stats?.currentStreak ?? 0),
+    },
+  };
+}
+
 /** Hydrate AsyncStorage with the server's daily-course row. */
 export async function hydrateProgressFromServer(progress: DailyCourseProgress): Promise<void> {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    const local = await loadProgress();
+    const merged = mergeDailyCourseProgress(local, progress);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    if (JSON.stringify(merged) !== JSON.stringify(progress)) {
+      const { queueProgressPush } = await import("@/lib/progressSync");
+      queueProgressPush({ daily_course_progress: merged });
+    }
   } catch (err) {
     console.warn("[DailyCourse] hydrate error:", err);
   }

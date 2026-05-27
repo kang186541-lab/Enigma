@@ -96,7 +96,7 @@ function stripEmojis(text: string): string {
 export default function NpcMissionScreen() {
   const { npcId } = useLocalSearchParams<{ npcId: string }>();
   const insets = useSafeAreaInsets();
-  const { learningLanguage, nativeLanguage, stats, updateStats } = useLanguage();
+  const { learningLanguage, nativeLanguage, awardXp } = useLanguage();
 
   const npc = getNPC(npcId ?? "") as NPC | undefined;
   const language = (learningLanguage ?? "english") as string;
@@ -136,8 +136,6 @@ export default function NpcMissionScreen() {
 
   const conversationRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
   const inputRef = useRef<TextInput>(null);
-  const statsRef = useRef(stats);
-  useEffect(() => { statsRef.current = stats; }, [stats]);
 
   const tier: RelationshipTier = getRelTier(relationship);
   const level = NPC_REL_LEVELS[tier];
@@ -317,7 +315,7 @@ export default function NpcMissionScreen() {
         setEmotion(newEmotion ?? "neutral");
         saveRelationship(npc.id, newScore, newEmotion ?? "neutral");
         showScoreChange(scoreChange);
-        updateStats({ xp: statsRef.current.xp + Math.max(0, scoreChange) });
+        awardXp(Math.max(0, scoreChange));
       } else {
         setEmotion(newEmotion ?? "neutral");
       }
@@ -335,7 +333,7 @@ export default function NpcMissionScreen() {
     } finally {
       if (!isStart) setIsTyping(false);
     }
-  }, [npc, language, native, playNpcTts, saveRelationship, showScoreChange, updateStats]);
+  }, [npc, language, native, playNpcTts, saveRelationship, showScoreChange, awardXp]);
 
   const sendMessage = useCallback(async (text: string) => {
     const trimmed = text.trim();

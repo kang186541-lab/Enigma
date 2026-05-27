@@ -103,39 +103,47 @@ export function getSpeakingCountForLanguage(day: SpeakingDayProgress, targetLang
   return day.byLanguage?.[targetLanguage] ?? 0;
 }
 
+let _spokenProgressLock: Promise<unknown> = Promise.resolve();
+
 export async function recordSpokenSentence(params: {
   targetLanguage: string;
   promptKey: string;
   shouldCommit?: () => boolean;
 }): Promise<{ day: SpeakingDayProgress; counted: boolean }> {
-  const profile = await loadLearnerProfile();
-  const progress = normalizeSpeakingProgress(profile.speakingProgress);
-  const date = getLocalDateKey();
-  const promptKey = normalizePromptKey(params.promptKey);
-  const previous = progress.history[date] ?? {
-    date,
-    count: 0,
-    byLanguage: {},
-    updatedAt: new Date().toISOString(),
+  const run = async (): Promise<{ day: SpeakingDayProgress; counted: boolean }> => {
+    const profile = await loadLearnerProfile();
+    const progress = normalizeSpeakingProgress(profile.speakingProgress);
+    const date = getLocalDateKey();
+    const promptKey = normalizePromptKey(params.promptKey);
+    const previous = progress.history[date] ?? {
+      date,
+      count: 0,
+      byLanguage: {},
+      updatedAt: new Date().toISOString(),
+    };
+    if (params.shouldCommit && !params.shouldCommit()) {
+      return { day: previous, counted: false };
+    }
+    const result = applySpokenSentenceProgress(progress, {
+      date,
+      targetLanguage: params.targetLanguage,
+      promptKey,
+      nowIso: new Date().toISOString(),
+    });
+    if (!result.counted) return { day: result.day, counted: false };
+
+    if (params.shouldCommit && !params.shouldCommit()) {
+      return { day: previous, counted: false };
+    }
+    await saveLearnerProfile({
+      ...profile,
+      speakingProgress: result.progress,
+    });
+
+    return { day: result.day, counted: true };
   };
-  if (params.shouldCommit && !params.shouldCommit()) {
-    return { day: previous, counted: false };
-  }
-  const result = applySpokenSentenceProgress(progress, {
-    date,
-    targetLanguage: params.targetLanguage,
-    promptKey,
-    nowIso: new Date().toISOString(),
-  });
-  if (!result.counted) return { day: result.day, counted: false };
 
-  if (params.shouldCommit && !params.shouldCommit()) {
-    return { day: previous, counted: false };
-  }
-  await saveLearnerProfile({
-    ...profile,
-    speakingProgress: result.progress,
-  });
-
-  return { day: result.day, counted: true };
+  const next = _spokenProgressLock.then(run, run);
+  _spokenProgressLock = next.catch(() => null);
+  return next;
 }

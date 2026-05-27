@@ -25,9 +25,17 @@ const onboardingSource = readFileSync("app/onboarding.tsx", "utf8");
 const speakSource = readFileSync("app/(tabs)/speak.tsx", "utf8");
 const homeSource = readFileSync("app/(tabs)/index.tsx", "utf8");
 const cardsSource = readFileSync("app/(tabs)/cards.tsx", "utf8");
+const achievementsSource = readFileSync("app/achievements.tsx", "utf8");
 const basicCourseSource = readFileSync("app/basic-course.tsx", "utf8");
 const dailyLessonSource = readFileSync("app/daily-lesson.tsx", "utf8");
 const languageContextSource = readFileSync("context/LanguageContext.tsx", "utf8");
+const progressSyncSource = readFileSync("lib/progressSync.ts", "utf8");
+const progressStorageSource = readFileSync("lib/progressStorage.ts", "utf8");
+const speakingProgressSource = readFileSync("lib/speakingProgress.ts", "utf8");
+const srsManagerSource = readFileSync("lib/srsManager.ts", "utf8");
+const dailyCourseDataSource = readFileSync("lib/dailyCourseData.ts", "utf8");
+const learnerProfileSource = readFileSync("lib/learnerProfile.ts", "utf8");
+const leagueManagerSource = readFileSync("lib/leagueManager.ts", "utf8");
 const rudyLessonSource = readFileSync("app/rudy-lesson.tsx", "utf8");
 const rudyStep1Source = readFileSync("components/rudy/Step1ListenRepeat.tsx", "utf8");
 const rudyStep2Source = readFileSync("components/rudy/Step2KeyPoint.tsx", "utf8");
@@ -286,6 +294,14 @@ assert.ok(
   "Home and guided Speak should use target-language speaking counts, not global daily count"
 );
 assert.ok(
+  homeSource.includes("const [lastSessionDate, setLastSessionDate]") &&
+  homeSource.includes('AsyncStorage.getItem("@lingua_last_session_date").then(setLastSessionDate)') &&
+  homeSource.includes("const activeStreak = getActiveStreak(stats.streak, lastSessionDate)") &&
+  homeSource.includes('"Spoken today"') &&
+  !homeSource.includes('value: `${stats.wordsLearned}`'),
+  "Home should display date-accurate active streaks and a live spoken-sentence metric instead of dead Words"
+);
+assert.ok(
   !speakSource.includes("setSpokenAttemptAccepted(true);\n      const counted = await recordSpokenAttempt") &&
   !speakSource.includes("setSpokenAttemptAccepted(true);\n          const counted = await recordSpokenAttempt"),
   "Scored attempts should unlock Next only after spoken progress is actually counted"
@@ -371,6 +387,10 @@ assert.ok(
 );
 assert.ok(
   languageContextSource.includes("export function getEffectiveLearningLanguage") &&
+  languageContextSource.includes("export type StatsUpdate") &&
+  languageContextSource.includes("awardXp: (amount: number) => Promise<void>") &&
+  languageContextSource.includes("const statsUpdateLockRef = useRef<Promise<void>>(Promise.resolve())") &&
+  languageContextSource.includes("const awardXp = async (amount: number)") &&
   languageContextSource.includes("const effectiveLearning = getEffectiveLearningLanguage") &&
   languageContextSource.includes("const native = isNativeLanguage(storedNative) ? storedNative : nativeLanguage") &&
   languageContextSource.includes("if (remoteLearning !== remote.learning_lang)") &&
@@ -380,6 +400,50 @@ assert.ok(
   dailyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)") &&
   rudyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)"),
   "Shared language selection should prevent native-language courses across Home, Cards, Basic Course, Daily Lesson, and Rudy Lesson"
+);
+assert.ok(
+  progressSyncSource.includes("expectedUserId?: string | null") &&
+  progressSyncSource.includes("let pendingUserId: string | null = null") &&
+  progressSyncSource.includes("user.id !== expectedUserId") &&
+  progressSyncSource.includes("pendingPatch = { ...toSend, ...pendingPatch }") &&
+  progressSyncSource.includes('const COUNTER_KEYS = ["xp", "level", "words_learned"] as const') &&
+  !progressSyncSource.includes('"streak_days", "words_learned"'),
+  "Progress sync should preserve failed flushes, scope pending pushes to the queued user, and allow streak resets"
+);
+assert.ok(
+  progressStorageSource.includes('"@lingua_learning_events_v1"') &&
+  progressStorageSource.includes('"@lingua_speak_mission_handoffs_v1"') &&
+  progressStorageSource.includes('"rudy_guide_index"') &&
+  progressStorageSource.includes('"@chat_history_"'),
+  "Account switch cleanup should include local learning events, review handoffs, Rudy guide state, and tutor chat histories"
+);
+assert.ok(
+  speakingProgressSource.includes("let _spokenProgressLock") &&
+  speakingProgressSource.includes("_spokenProgressLock = next.catch(() => null)"),
+  "Daily spoken progress should serialize writes so rapid voice completions cannot drop counts"
+);
+assert.ok(
+  learnerProfileSource.includes("export function mergeLearnerProfiles") &&
+  learnerProfileSource.includes("mergeSpeakingProgress") &&
+  learnerProfileSource.includes("queueProgressPush({ learner_profile: merged })"),
+  "Learner profile hydrate should merge local speaking/tutor progress instead of blindly overwriting it"
+);
+assert.ok(
+  srsManagerSource.includes("export function mergeSrsData") &&
+  srsManagerSource.includes("queueProgressPush({ srs_data: merged })") &&
+  dailyCourseDataSource.includes("export function mergeDailyCourseProgress") &&
+  dailyCourseDataSource.includes("queueProgressPush({ daily_course_progress: merged })"),
+  "SRS and daily course hydrates should merge local progress instead of overwriting it"
+);
+assert.ok(
+  leagueManagerSource.includes("let _weeklyXpLock") &&
+  leagueManagerSource.includes("_weeklyXpLock = _weeklyXpLock.then(run, run)"),
+  "Weekly XP should serialize burst rewards so leaderboard XP does not undercount"
+);
+assert.ok(
+  !achievementsSource.includes("ach.xpReward") &&
+  !achievementsSource.includes("xpReward"),
+  "Achievements screen should not promise XP rewards unless the reward is actually granted"
 );
 assert.ok(
   !languageContextSource.includes("const native = nativeLanguage ?? (isNativeLanguage(storedNative)") &&
@@ -403,6 +467,25 @@ assert.ok(
   !basicCourseSource.includes("모든 기능이 잠금 해제"),
   "Basic Course copy should not claim it gates or unlocks the app"
 );
+const basicSkipStart = basicCourseSource.indexOf("const handleSkip = async () =>");
+const basicSkipEnd = basicCourseSource.indexOf("const loadProgress = async () =>", basicSkipStart);
+const basicSkipBlock = basicSkipStart >= 0 && basicSkipEnd > basicSkipStart ? basicCourseSource.slice(basicSkipStart, basicSkipEnd) : "";
+assert.ok(
+  basicSkipBlock &&
+  !basicSkipBlock.includes("DONE_KEY") &&
+  basicCourseSource.includes("const alreadyDone = await AsyncStorage.getItem(DONE_KEY(lang));") &&
+  basicCourseSource.includes('if (alreadyDone !== "true" && !isReviewMode) await awardXp(100);') &&
+  basicCourseSource.includes("await awardXp(5);"),
+  "Basic Course Go Home should not mark the course complete, and completion/greeting rewards should use delta XP"
+);
+for (const [name, source] of [
+  ["Speak", speakSource],
+  ["Cards", cardsSource],
+  ["BasicCourse", basicCourseSource],
+  ["RudyLesson", rudyLessonSource],
+] as const) {
+  assert.ok(!source.includes("updateStats({ xp:"), `${name} should not use stale absolute XP writes`);
+}
 assert.ok(
   basicCourseSource.includes('type GreetPhase = "listen" | "speak" | "recording" | "processing" | "done"') &&
   basicCourseSource.includes("markGreetAttemptComplete") &&

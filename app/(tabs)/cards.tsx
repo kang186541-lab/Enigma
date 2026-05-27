@@ -1048,7 +1048,7 @@ type DeckType = "srs" | "beginner" | "advanced";
 
 export default function CardsScreen() {
   const insets = useSafeAreaInsets();
-  const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
+  const { t, nativeLanguage, learningLanguage, awardXp } = useLanguage();
   // F6 fix: home SRS banner passes `deck=srs` to force this screen onto
   // the review deck even on a return visit (where the auto-switch ref has
   // already fired). Read once on mount and apply.
@@ -1072,8 +1072,6 @@ export default function CardsScreen() {
   const [dailyComplete, setDailyComplete] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [xpGain, setXpGain] = useState(0);
-  const statsRef = useRef(stats);
-  useEffect(() => { statsRef.current = stats; }, [stats]);
 
   const flipAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -1260,7 +1258,7 @@ export default function CardsScreen() {
     if (knew) {
       setGotIt((g) => g + 1);
       setXpGain(10);
-      updateStats({ xp: statsRef.current.xp + 10 });
+      awardXp(10);
     } else {
       setAgain((a) => a + 1);
     }

@@ -51,6 +51,19 @@ const LANG_FLAGS: Record<NativeLanguage, string> = {
   korean: "🇰🇷", english: "🇬🇧", spanish: "🇪🇸",
 };
 
+function parseLocalHomeDate(key: string | null): Date | null {
+  if (!key) return null;
+  const [y, m, d] = key.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  return new Date(y, m - 1, d);
+}
+
+function dayDiff(from: Date, to: Date): number {
+  const a = new Date(from.getFullYear(), from.getMonth(), from.getDate()).getTime();
+  const b = new Date(to.getFullYear(), to.getMonth(), to.getDate()).getTime();
+  return Math.round((b - a) / 86_400_000);
+}
+
 function RudyImageWithPlaceholder({ source, style, resizeMode }: { source: any; style: any; resizeMode?: any }) {
   const [loaded, setLoaded] = useState(false);
   const opacity = useRef(new Animated.Value(0)).current;
@@ -96,9 +109,17 @@ function getLingoGreeting(lang: NativeLanguage): string {
   return evening;
 }
 
-function getWeekStreakData(streak: number, nativeLang: NativeLanguage) {
+function getActiveStreak(streak: number, lastSessionDate: string | null): number {
+  const last = parseLocalHomeDate(lastSessionDate);
+  if (!last) return 0;
+  const daysSince = dayDiff(last, new Date());
+  return daysSince <= 1 ? streak : 0;
+}
+
+function getWeekStreakData(streak: number, nativeLang: NativeLanguage, lastSessionDate: string | null) {
   const today = new Date();
   const todayMonIdx = (today.getDay() + 6) % 7;
+  const last = parseLocalHomeDate(lastSessionDate);
   const dayLabels: Record<NativeLanguage, string[]> = {
     korean:  ["월", "화", "수", "목", "금", "토", "일"],
     english: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -107,10 +128,16 @@ function getWeekStreakData(streak: number, nativeLang: NativeLanguage) {
   const labels = dayLabels[nativeLang] ?? dayLabels.english;
   return labels.map((label, i) => {
     const daysAgo = todayMonIdx - i;
+    const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysAgo);
     let status: "fire" | "missed" | "future";
-    if (daysAgo === 0)       status = "fire";
-    else if (daysAgo > 0)    status = daysAgo < streak ? "fire" : "missed";
-    else                     status = "future";
+    if (daysAgo < 0) {
+      status = "future";
+    } else if (!last) {
+      status = "missed";
+    } else {
+      const daysFromLast = dayDiff(date, last);
+      status = daysFromLast >= 0 && daysFromLast < streak ? "fire" : "missed";
+    }
     return { label, status, isToday: i === todayMonIdx };
   });
 }
@@ -166,7 +193,6 @@ export default function HomeScreen() {
   const topPad = Platform.OS === "web" ? 20 : insets.top;
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
   const lingoGreeting = getLingoGreeting(nativeLang);
-  const lingoMood = stats.streak === 0 ? "sad" : stats.streak >= 7 ? "excited" : "happy";
   const syncLabel = user
     ? syncStatus.status === "error"
       ? nativeLang === "korean" ? "저장 확인 필요" : nativeLang === "spanish" ? "Revisar guardado" : "Save needs check"
@@ -187,6 +213,7 @@ export default function HomeScreen() {
   const [srsDueCount, setSrsDueCount] = React.useState(0);
   const [primaryGoal, setPrimaryGoal] = React.useState<LearningGoal | null>(null);
   const [spokenToday, setSpokenToday] = React.useState(0);
+  const [lastSessionDate, setLastSessionDate] = React.useState<string | null>(null);
   const [showMorePractice, setShowMorePractice] = React.useState(false);
   const [showMoreTools, setShowMoreTools] = React.useState(false);
   const effectiveLearningLang = getEffectiveLearningLanguage(nativeLang, learningLanguage);
@@ -205,12 +232,20 @@ export default function HomeScreen() {
     AsyncStorage.getItem(key).then(v => setCourseCompleted(v === "true"));
   }, [effectiveLearningLang]);
 
-  useFocusEffect(React.useCallback(() => {
+  const refreshHomeProgress = React.useCallback(() => {
     loadProgress().then(setDailyProgress);
     getDueCount().then(setSrsDueCount);
     loadLearnerProfile().then((profile) => setPrimaryGoal(profile.goals[0] ?? null));
     loadTodaySpeakingProgress().then((day) => setSpokenToday(getSpeakingCountForLanguage(day, effectiveLearningLang)));
-  }, [effectiveLearningLang]));
+    AsyncStorage.getItem("@lingua_last_session_date").then(setLastSessionDate);
+  }, [effectiveLearningLang]);
+
+  useFocusEffect(refreshHomeProgress);
+
+  useEffect(() => {
+    if (!syncStatus.lastSyncedAt) return;
+    refreshHomeProgress();
+  }, [refreshHomeProgress, syncStatus.lastSyncedAt]);
 
   useEffect(() => {
     if (spokenToday <= 0) {
@@ -255,8 +290,10 @@ export default function HomeScreen() {
   }, []);
 
   const barW = xpAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] });
-  const weekData   = getWeekStreakData(stats.streak, nativeLang);
-  const streakText = getStreakText(stats.streak, nativeLang);
+  const activeStreak = getActiveStreak(stats.streak, lastSessionDate);
+  const lingoMood = activeStreak === 0 ? "sad" : activeStreak >= 7 ? "excited" : "happy";
+  const weekData   = getWeekStreakData(stats.streak, nativeLang, lastSessionDate);
+  const streakText = getStreakText(activeStreak, nativeLang);
   const todaySpeakingMission = getTodaySpeakingMission(nativeLang, effectiveLearningLang, primaryGoal, spokenToday);
   const displayedSpokenToday = Math.min(spokenToday, SPEAKING_DAILY_GOAL);
   const spokenProgressPct = Math.min(100, (spokenToday / SPEAKING_DAILY_GOAL) * 100);
@@ -347,8 +384,8 @@ export default function HomeScreen() {
   // path updated it — it always rendered 0%), so we removed it. If/when we
   // wire up a real rolling-average accuracy metric, drop it back in here.
   const statItems = [
-    { label: nativeLang === "korean" ? "연속학습일" : nativeLang === "spanish" ? "Racha" : "Streak",   value: `${stats.streak}🔥` },
-    { label: nativeLang === "korean" ? "단어"       : nativeLang === "spanish" ? "Palabras" : "Words", value: `${stats.wordsLearned}` },
+    { label: nativeLang === "korean" ? "연속학습일" : nativeLang === "spanish" ? "Racha" : "Streak",   value: `${activeStreak}🔥` },
+    { label: nativeLang === "korean" ? "오늘 말한 문장" : nativeLang === "spanish" ? "Frases hoy" : "Spoken today", value: `${displayedSpokenToday}/${SPEAKING_DAILY_GOAL}` },
     { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
   ];
 
@@ -591,7 +628,7 @@ export default function HomeScreen() {
                 <View>
                   <Animated.View style={{ transform: [{ scale: fireScale }] }}>
                     <Animated.Text style={[styles.streakCount, { opacity: flickerOp }]}>
-                      {stats.streak}
+                      {activeStreak}
                     </Animated.Text>
                   </Animated.View>
                   <Text style={styles.streakLabel}>

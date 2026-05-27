@@ -732,7 +732,7 @@ function CompleteScreen({
   /** True only when the learner cleared this day for the first time — gates the global XP grant. */
   wasFirstClear: boolean;
 }) {
-  const { stats, updateStats } = useLanguage();
+  const { awardXp } = useLanguage();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.7)).current;
   // Guards against double-grant if the screen re-mounts (e.g. fast refresh during dev).
@@ -758,10 +758,10 @@ function CompleteScreen({
   useEffect(() => {
     if (!wasFirstClear || xpGrantedRef.current) return;
     xpGrantedRef.current = true;
-    updateStats({ xp: stats.xp + totalXP }).catch((e) =>
+    awardXp(totalXP).catch((e) =>
       console.warn("[RudyLesson] global XP update failed:", e),
     );
-  }, [stats.xp, totalXP, updateStats, wasFirstClear]);
+  }, [awardXp, totalXP, wasFirstClear]);
 
   // Find next day topic
   const allDays = UNITS.flatMap((u) => u.days);

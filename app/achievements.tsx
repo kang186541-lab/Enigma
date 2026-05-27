@@ -6,7 +6,7 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { C, F } from "@/constants/theme";
 import { useLanguage } from "@/context/LanguageContext";
-import { ACHIEVEMENTS, type Achievement } from "@/constants/achievements";
+import { ACHIEVEMENTS } from "@/constants/achievements";
 import { loadEarnedAchievements, getProgress } from "@/lib/achievementManager";
 
 const T = {
@@ -105,7 +105,6 @@ export default function AchievementsScreen() {
               ) : (
                 <Text style={styles.lockedText}>{t(T.locked, lc)}</Text>
               )}
-              <Text style={styles.xpReward}>+{ach.xpReward} XP</Text>
             </View>
           );
         })}
@@ -174,7 +173,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   progressFill: { height: "100%", backgroundColor: C.gold, borderRadius: 2 },
-  xpReward: { fontFamily: F.label, fontSize: 10, color: C.goldDark, marginTop: 2 },
   welcomeBanner: {
     width: "100%",
     backgroundColor: C.bg3,

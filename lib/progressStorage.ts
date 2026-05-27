@@ -21,6 +21,8 @@ const EXACT_PROGRESS_KEYS = [
   "@lingua_league_week",
   "@lingua_weekly_xp",
   "@lingua_learner_profile",
+  "@lingua_learning_events_v1",
+  "@lingua_speak_mission_handoffs_v1",
   "@lingua_difficulty_profile",
   "@lingua_difficulty_override",
   "@lingua_daily_sessions",
@@ -32,6 +34,8 @@ const EXACT_PROGRESS_KEYS = [
   "storyCluesCollected",
   "ioRatioTracking",
   "expressionBook",
+  "rudy_guide_index",
+  "rudy_guide_last_shown",
 ] as const;
 
 const PROGRESS_KEY_PREFIXES = [
@@ -45,6 +49,7 @@ const PROGRESS_KEY_PREFIXES = [
   "speak_last_seen_",
   "pron_count_",
   "pron_last_word_",
+  "@chat_history_",
   "@enigma_intro_seen_",
 ] as const;
 

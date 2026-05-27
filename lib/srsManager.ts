@@ -99,15 +99,41 @@ async function saveSrsData(data: SrsData): Promise<void> {
   }
 }
 
-/** Hydrate AsyncStorage with the server's SRS row (called on sign-in
- *  reconcile). Caller picks which side wins — this just writes locally. */
+/** Hydrate AsyncStorage with the server's SRS row while preserving local
+ *  reviews that happened offline or on another device before sync finished. */
 export async function hydrateSrsFromServer(data: SrsData): Promise<void> {
   try {
     const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
-    await AsyncStorage.setItem(SRS_STORAGE_KEY, JSON.stringify(data));
+    const local = await loadSrsData();
+    const merged = mergeSrsData(local, data);
+    await AsyncStorage.setItem(SRS_STORAGE_KEY, JSON.stringify(merged));
+    if (JSON.stringify(merged) !== JSON.stringify(data)) {
+      const { queueProgressPush } = await import("@/lib/progressSync");
+      queueProgressPush({ srs_data: merged });
+    }
   } catch (err) {
     console.warn("[SRS] hydrate error:", err);
   }
+}
+
+export function mergeSrsData(local: SrsData, remote: SrsData): SrsData {
+  const cards: Record<string, SrsCard> = { ...(remote.cards ?? {}) };
+  for (const [key, localCard] of Object.entries(local.cards ?? {})) {
+    const remoteCard = cards[key];
+    if (!remoteCard) {
+      cards[key] = localCard;
+      continue;
+    }
+    cards[key] = localCard.reviewCount > remoteCard.reviewCount
+      ? localCard
+      : remoteCard.reviewCount > localCard.reviewCount
+      ? remoteCard
+      : (localCard.lastReview >= remoteCard.lastReview ? localCard : remoteCard);
+  }
+  return {
+    cards,
+    lastSessionDate: [local.lastSessionDate, remote.lastSessionDate].filter(Boolean).sort().pop() ?? today(),
+  };
 }
 
 /**
