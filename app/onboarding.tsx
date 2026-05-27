@@ -22,6 +22,7 @@ import { trackLearningEvent } from "@/lib/learningEvents";
 import { getHomeGoalPrompt, getHomeLearningGoalOptions } from "@/lib/homeSpeakingMission";
 import { setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
 import { RUDY_GUIDE_CARDS } from "@/lib/rudyGuideCards";
+import { getDailySpeakingMissionPhrase, type DailySpeakingLanguage } from "@/lib/dailySpeakingMissions";
 
 const rudySplashImg = require("@/assets/rudy_splash.png");
 const { width: SCREEN_W } = Dimensions.get("window");
@@ -61,8 +62,10 @@ const UI: Record<NativeLanguage, {
   step2Title: string; step2Sub: string;
   firstSpeechTitle: string; firstSpeechSub: string;
   goalPrompt: string;
+  firstSentenceLabel: string;
+  firstSentenceWaiting: string;
   setupLanguageLabel: string; setupGoalLabel: string;
-  chooseLanguageCta: string; chooseGoalCta: string;
+  chooseLanguageCta: string; chooseGoalCta: string; continueToGuideCta: string;
   cta1: string; cta2: string; back: string;
 }> = {
   korean: {
@@ -71,16 +74,19 @@ const UI: Record<NativeLanguage, {
     guideEyebrow: "Rudy의 언어 가이드",
     guideNext: "다음 카드",
     guideStart: "이제 시작하자",
-    guideFinalHint: "다음: 배울 언어와 실제 상황을 고르고 한 문장을 말해요.",
+    guideFinalHint: "다음: 방금 고른 첫 문장을 바로 입 밖으로 말해요.",
     step2Title: "어떤 언어를 배우고 싶으세요?",
     step2Sub:   "학습할 언어를 선택하세요",
     firstSpeechTitle: "다음은 바로 한 문장 말하기",
     firstSpeechSub: "틀려도 괜찮아요. Rudy는 점수보다 시도를 먼저 기록해요.",
     goalPrompt: "먼저 실제로 쓸 상황을 골라주세요",
+    firstSentenceLabel: "첫 문장",
+    firstSentenceWaiting: "언어와 상황을 고르면 Rudy가 바로 말할 첫 문장을 보여줘요.",
     setupLanguageLabel: "배울 언어",
     setupGoalLabel: "실제로 쓸 상황",
     chooseLanguageCta: "배울 언어 선택",
     chooseGoalCta: "상황 선택",
+    continueToGuideCta: "Rudy 가이드 보기",
     cta1: "다음", cta2: "말하기 시작", back: "뒤로",
   },
   english: {
@@ -89,16 +95,19 @@ const UI: Record<NativeLanguage, {
     guideEyebrow: "Rudy's Language Guide",
     guideNext: "Next card",
     guideStart: "Let's start",
-    guideFinalHint: "Next: choose your language and real-use situation, then say one sentence.",
+    guideFinalHint: "Next: say the first sentence you just chose.",
     step2Title: "What do you want to learn?",
     step2Sub:   "Pick the language you'd like to master",
     firstSpeechTitle: "Next: say one real sentence",
     firstSpeechSub: "Mistakes are fine. Rudy counts the spoken attempt before the score.",
     goalPrompt: "First, choose where you will actually use it",
+    firstSentenceLabel: "First sentence",
+    firstSentenceWaiting: "Choose a language and situation, then Rudy will show the first sentence you will say.",
     setupLanguageLabel: "Learning language",
     setupGoalLabel: "Real-use situation",
     chooseLanguageCta: "Choose a language",
     chooseGoalCta: "Choose a situation",
+    continueToGuideCta: "Continue to Rudy's guide",
     cta1: "Next", cta2: "Start speaking", back: "Back",
   },
   spanish: {
@@ -107,16 +116,19 @@ const UI: Record<NativeLanguage, {
     guideEyebrow: "Guía de idiomas de Rudy",
     guideNext: "Siguiente tarjeta",
     guideStart: "Empecemos",
-    guideFinalHint: "Ahora: elige idioma y situación real, y di una frase.",
+    guideFinalHint: "Ahora: di la primera frase que acabas de elegir.",
     step2Title: "¿Qué idioma quieres aprender?",
     step2Sub:   "Selecciona el idioma que quieres dominar",
     firstSpeechTitle: "Ahora: di una frase real",
     firstSpeechSub: "Los errores están bien. Rudy cuenta el intento antes que la nota.",
     goalPrompt: "Primero, elige dónde lo usarás de verdad",
+    firstSentenceLabel: "Primera frase",
+    firstSentenceWaiting: "Elige idioma y situación, y Rudy mostrará la primera frase que vas a decir.",
     setupLanguageLabel: "Idioma que aprenderás",
     setupGoalLabel: "Situación real",
     chooseLanguageCta: "Elige un idioma",
     chooseGoalCta: "Elige una situación",
+    continueToGuideCta: "Continuar con Rudy",
     cta1: "Siguiente", cta2: "Empezar a hablar", back: "Atrás",
   },
 };
@@ -138,7 +150,11 @@ export default function OnboardingScreen() {
   const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel);
   const guideCard = RUDY_GUIDE_CARDS[guideIdx] ?? RUDY_GUIDE_CARDS[0];
   const isLastGuideCard = guideIdx >= RUDY_GUIDE_CARDS.length - 1;
-  const setupCtaLabel = !learnSel ? ui.chooseLanguageCta : !goalSel ? ui.chooseGoalCta : ui.cta2;
+  const setupCtaLabel = !learnSel ? ui.chooseLanguageCta : !goalSel ? ui.chooseGoalCta : ui.continueToGuideCta;
+  const firstSpeakingPreview = learnSel && goalSel
+    ? getDailySpeakingMissionPhrase(learnSel as DailySpeakingLanguage, goalSel, 0)
+    : null;
+  const firstSpeakingMeaning = firstSpeakingPreview?.meanings[uiLang] ?? null;
 
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Math.max((Platform.OS === "web" ? 34 : insets.bottom) + 16, 34);
@@ -151,6 +167,7 @@ export default function OnboardingScreen() {
   const handleLearnPick = (lang: NativeLanguage) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setLearnSel(lang);
+    setGoalSel((goal) => goal ?? getHomeLearningGoalOptions(uiLang)[0]?.key ?? "travel");
   };
 
   const handleGoalPick = (goal: LearningGoal) => {
@@ -177,27 +194,31 @@ export default function OnboardingScreen() {
       setGuideIdx((idx) => Math.min(idx + 1, RUDY_GUIDE_CARDS.length - 1));
       return;
     }
-    await markGuideComplete().catch((err: unknown) => {
-      console.warn("[Onboarding] guide completion save failed:", err);
-    });
-    setStep(3);
+    await handleStartSpeaking();
   };
 
   const handleBack = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (step === 3) {
+      setGuideIdx(0);
       setStep(2);
     } else if (step === 2) {
-      setGuideIdx(0);
       setStep(1);
     } else {
       setStep(1); setLearnSel(null); setGoalSel(null);
     }
   };
 
-  // Step 2: lock in the language picks and start with one spoken sentence.
+  const handleSetupNext = () => {
+    if (!nativeSel || !learnSel || !goalSel) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setGuideIdx(0);
+    setStep(3);
+  };
+
+  // Final guide card: lock in the language picks and start with one spoken sentence.
   // Sign-in reminders are delayed until the learner has progress worth saving.
-  const handleStep2Next = async () => {
+  const handleStartSpeaking = async () => {
     if (!nativeSel || !learnSel || !goalSel || submittingRef.current) return;
     submittingRef.current = true;
     setLoading(true);
@@ -207,6 +228,9 @@ export default function OnboardingScreen() {
       await setLearningLanguage(learnSel);
       await setPrimaryLearningGoal(goalSel).catch((err: unknown) => {
         console.warn("[Onboarding] learner goal save failed:", err);
+      });
+      await markGuideComplete().catch((err: unknown) => {
+        console.warn("[Onboarding] guide completion save failed:", err);
       });
       await trackLearningEvent("onboarding_first_speaking_started", {
         surface: "onboarding",
@@ -306,8 +330,8 @@ export default function OnboardingScreen() {
           </>
         )}
 
-        {/* ── STEP 2: Rudy's 8-card language philosophy ── */}
-        {step === 2 && (
+        {/* ── STEP 3: Rudy's 8-card language philosophy ── */}
+        {step === 3 && (
           <>
             <View style={styles.textBlock}>
               <Text style={styles.eyebrow}>{ui.guideEyebrow}</Text>
@@ -359,8 +383,8 @@ export default function OnboardingScreen() {
           </>
         )}
 
-        {/* ── STEP 3 ── */}
-        {step === 3 && (
+        {/* ── STEP 2 ── */}
+        {step === 2 && (
           <>
             <View style={styles.textBlock}>
               <Text style={styles.title}>{ui.step2Title}</Text>
@@ -414,6 +438,23 @@ export default function OnboardingScreen() {
               <View style={styles.promiseCopy}>
                 <Text style={styles.promiseTitle}>{ui.firstSpeechTitle}</Text>
                 <Text style={styles.promiseSub}>{ui.firstSpeechSub}</Text>
+                <View style={styles.firstSentencePreview}>
+                  <Text style={styles.firstSentenceLabel}>{ui.firstSentenceLabel}</Text>
+                  {firstSpeakingPreview ? (
+                    <>
+                      <Text style={styles.firstSentencePhrase} numberOfLines={2}>
+                        “{firstSpeakingPreview.phrase}”
+                      </Text>
+                      {firstSpeakingMeaning ? (
+                        <Text style={styles.firstSentenceMeaning} numberOfLines={2}>
+                          {firstSpeakingMeaning}
+                        </Text>
+                      ) : null}
+                    </>
+                  ) : (
+                    <Text style={styles.firstSentenceWaiting}>{ui.firstSentenceWaiting}</Text>
+                  )}
+                </View>
               </View>
             </View>
 
@@ -451,7 +492,7 @@ export default function OnboardingScreen() {
               </Pressable>
               <Pressable
                 style={({ pressed }) => [styles.cta, styles.ctaFlex, (!learnSel || !goalSel) && styles.ctaDim, pressed && learnSel && goalSel && styles.ctaPress]}
-                onPress={handleStep2Next}
+                onPress={handleSetupNext}
                 disabled={!learnSel || !goalSel || loading}
               >
                 <Text style={styles.ctaText}>{setupCtaLabel}</Text>
@@ -646,6 +687,38 @@ const styles = StyleSheet.create({
   },
   promiseSub: {
     marginTop: 3,
+    fontSize: 12,
+    fontFamily: F.body,
+    color: C.goldDim,
+    lineHeight: 17,
+  },
+  firstSentencePreview: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(201,162,39,0.22)",
+    gap: 3,
+  },
+  firstSentenceLabel: {
+    fontSize: 10,
+    fontFamily: F.label,
+    color: C.gold,
+    letterSpacing: 0.7,
+    textTransform: "uppercase",
+  },
+  firstSentencePhrase: {
+    fontSize: 17,
+    fontFamily: F.header,
+    color: C.parchment,
+    lineHeight: 22,
+  },
+  firstSentenceMeaning: {
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.goldDim,
+    lineHeight: 17,
+  },
+  firstSentenceWaiting: {
     fontSize: 12,
     fontFamily: F.body,
     color: C.goldDim,

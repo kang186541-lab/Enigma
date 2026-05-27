@@ -152,6 +152,32 @@ assert.ok(
   "Onboarding should route the learner into a personalized first speaking sentence"
 );
 assert.ok(
+  onboardingSource.includes("getDailySpeakingMissionPhrase") &&
+  onboardingSource.includes("firstSpeakingPreview") &&
+  onboardingSource.includes("firstSpeakingPreview.phrase") &&
+  onboardingSource.includes("firstSpeakingPreview?.meanings[uiLang]"),
+  "Onboarding should preview the actual goal-personalized first sentence before routing into Speak"
+);
+const onboardingSetupNextIndex = onboardingSource.indexOf("const handleSetupNext = () =>");
+const onboardingSetupToGuideIndex = onboardingSource.indexOf("setStep(3);", onboardingSetupNextIndex);
+const onboardingGuideNextIndex = onboardingSource.indexOf("const handleGuideNext = async () =>");
+const onboardingGuideStartIndex = onboardingSource.indexOf("await handleStartSpeaking();", onboardingGuideNextIndex);
+const onboardingStartSpeakingIndex = onboardingSource.indexOf("const handleStartSpeaking = async () =>");
+const onboardingSetNativeIndex = onboardingSource.indexOf("await setNativeLanguage(nativeSel);", onboardingStartSpeakingIndex);
+const onboardingSetGoalIndex = onboardingSource.indexOf("await setPrimaryLearningGoal(goalSel)", onboardingStartSpeakingIndex);
+const onboardingMarkGuideIndex = onboardingSource.indexOf("await markGuideComplete()", onboardingStartSpeakingIndex);
+assert.ok(
+  onboardingSource.includes("setGoalSel((goal) => goal ?? getHomeLearningGoalOptions(uiLang)[0]?.key ?? \"travel\")") &&
+  onboardingSource.includes("continueToGuideCta") &&
+  onboardingSetupToGuideIndex > onboardingSetupNextIndex &&
+  onboardingGuideStartIndex > onboardingGuideNextIndex &&
+  onboardingStartSpeakingIndex > onboardingGuideNextIndex &&
+  onboardingSetNativeIndex > onboardingStartSpeakingIndex &&
+  onboardingSetGoalIndex > onboardingSetNativeIndex &&
+  onboardingMarkGuideIndex > onboardingSetGoalIndex,
+  "Onboarding should pick a default goal, preview the first sentence, then show Rudy's guide as the pre-flight before starting speech"
+);
+assert.ok(
   speakSource.includes("nextMissionPreview") && speakSource.includes("getNextMissionPreviewTitle"),
   "First speaking completion should preview the next real sentence instead of feeling like a dead-end completion screen"
 );
