@@ -1346,6 +1346,12 @@ export default function SpeakScreen() {
     return scoreVal;
   };
 
+  const awardSpokenAttemptXp = useCallback((scoreVal: number, assessmentStatus: SpeakingAssessmentStatus) => {
+    const xpEarned = assessmentStatus === "unscored" ? 10 : scoreVal >= 90 ? 30 : 15;
+    setXpGain(xpEarned);
+    updateStats({ xp: statsRef.current.xp + xpEarned });
+  }, [updateStats]);
+
   const recordSpokenAttempt = useCallback(async (
     scoreVal: number,
     attemptGeneration: number,
@@ -1353,6 +1359,10 @@ export default function SpeakScreen() {
   ): Promise<boolean> => {
     try {
       if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
+      if (!isGuidedSentenceMission) {
+        awardSpokenAttemptXp(scoreVal, assessmentStatus);
+        return true;
+      }
       const promptKey = buildSpeakingPromptKey({
         targetLanguage: activeLang,
         phrase: phrase?.word ?? "",
@@ -1367,6 +1377,7 @@ export default function SpeakScreen() {
       dailySpokenCountRef.current = day.count;
       setDailySpokenCount(day.count);
       if (!counted) return false;
+      awardSpokenAttemptXp(scoreVal, assessmentStatus);
       if (isFirstSpeakingMission) {
         void trackLearningEvent("first_speaking_attempt_completed", {
           surface: "speak",
@@ -1398,7 +1409,7 @@ export default function SpeakScreen() {
       console.warn("[Speak] spoken sentence progress save failed:", err);
       return false;
     }
-  }, [activeLang, isCurrentPracticeAttempt, isFirstSpeakingMission, isReviewSentenceMission, nativeLang, phrase?.word, routeDeckType, sessionIdx]);
+  }, [activeLang, awardSpokenAttemptXp, isCurrentPracticeAttempt, isFirstSpeakingMission, isGuidedSentenceMission, isReviewSentenceMission, nativeLang, phrase?.word, routeDeckType, sessionIdx]);
 
   const acceptUnscoredGuidedAttempt = useCallback(async (attemptGeneration: number): Promise<boolean> => {
     if (!isGuidedSentenceMission || !isCurrentPracticeAttempt(attemptGeneration)) return false;
@@ -1485,9 +1496,6 @@ export default function SpeakScreen() {
       const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       if (counted) {
-        const xpEarned = scoreVal >= 90 ? 30 : 15;
-        setXpGain(xpEarned);
-        updateStats({ xp: statsRef.current.xp + xpEarned });
         const newCount = pronCountRef.current + 1;
         pronCountRef.current = newCount;
         setPronCount(newCount);
@@ -1691,9 +1699,6 @@ export default function SpeakScreen() {
           const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           if (counted) {
-            const xpEarned = scoreVal >= 90 ? 30 : 15;
-            setXpGain(xpEarned);
-            updateStats({ xp: statsRef.current.xp + xpEarned });
             const newCount = pronCountRef.current + 1;
             pronCountRef.current = newCount;
             setPronCount(newCount);
@@ -1768,6 +1773,18 @@ export default function SpeakScreen() {
     }
     const nextIdx = sessionIdx + 1;
     if (nextIdx >= sessionWords.length) {
+      if (isFirstSpeakingMission && dailySpokenCountRef.current < SPEAKING_DAILY_GOAL) {
+        void trackLearningEvent("first_speaking_next_sentence_started", {
+          surface: "speak",
+          nativeLanguage: nativeLang,
+          targetLanguage: activeLang,
+          goal: selectedGoalRef.current,
+          dailySpokenCount: dailySpokenCountRef.current,
+          dailyGoal: SPEAKING_DAILY_GOAL,
+        });
+        await loadSession(activeLang);
+        return;
+      }
       setSessionComplete(true);
     } else {
       setSessionIdx(nextIdx);
@@ -1909,16 +1926,16 @@ export default function SpeakScreen() {
           <Text style={styles.completeTrophy}>🏆</Text>
           <Text style={styles.completeTitle}>
             {isFirstSpeakingMission
-              ? nativeLang === "korean" ? "첫 실제 문장을\n말했어요!" : nativeLang === "spanish" ? "¡Dijiste tu primera\nfrase real!" : "You said your first\nreal sentence!"
+              ? nativeLang === "korean" ? "오늘의 말하기 목표\n완료!" : nativeLang === "spanish" ? "¡Meta oral de hoy\ncompleta!" : "Today's speaking goal\ncomplete!"
               : isReviewSentenceMission
               ? nativeLang === "korean" ? "복습 문장을\n말했어요!" : nativeLang === "spanish" ? "¡Dijiste la frase\nde repaso!" : "You said the\nreview sentence!"
               : nativeLang === "korean" ? "발음 연습\n완료!" : nativeLang === "spanish" ? "¡Práctica de pronunciación\ncompleta!" : "Pronunciation Practice\nComplete!"}
           </Text>
           <Text style={styles.completeSub}>
             {isFirstSpeakingMission
-              ? nativeLang === "korean" ? "완벽하지 않아도 괜찮아요. 입 밖으로 낸 순간부터 습득이 시작돼요."
-                : nativeLang === "spanish" ? "No tenía que ser perfecto. La adquisición empieza cuando lo dices en voz alta."
-                : "It did not have to be perfect. Acquisition starts when you say it out loud."
+              ? nativeLang === "korean" ? "한 문장씩 입 밖으로 꺼낸 오늘의 루프를 끝냈어요. 내일도 같은 방식으로 더 편해질 거예요."
+                : nativeLang === "spanish" ? "Terminaste el ciclo de hoy: una frase real a la vez. Mañana será un poco más fácil."
+                : "You finished today's loop: one real sentence out loud at a time. Tomorrow will feel a little easier."
               : isReviewSentenceMission
               ? nativeLang === "korean" ? "반복은 눈으로 볼 때보다 입 밖으로 말할 때 더 강해져요."
                 : nativeLang === "spanish" ? "La repetición se vuelve más fuerte cuando la dices en voz alta."
@@ -2425,11 +2442,17 @@ export default function SpeakScreen() {
               accessibilityState={{ disabled: false }}
             >
               <Text style={styles.nextBtnText}>
-                {sessionIdx + 1 >= sessionWords.length
+                {isFirstSpeakingMission && sessionIdx + 1 >= sessionWords.length && shouldContinueDailySpeaking
+                  ? continueSpeakingLabel
+                  : sessionIdx + 1 >= sessionWords.length
                   ? (nativeLang === "korean" ? "완료" : nativeLang === "spanish" ? "Completar" : "Done")
                   : (nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : "Next")}
               </Text>
-              <Ionicons name={sessionIdx + 1 >= sessionWords.length ? "checkmark" : "arrow-forward"} size={16} color="#fff" />
+              <Ionicons
+                name={isFirstSpeakingMission && shouldContinueDailySpeaking ? "arrow-forward" : sessionIdx + 1 >= sessionWords.length ? "checkmark" : "arrow-forward"}
+                size={16}
+                color="#fff"
+              />
             </Pressable>
           ) : (
             <Pressable

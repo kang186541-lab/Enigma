@@ -55,6 +55,12 @@ assert.ok(
   "First speaking completion should preview the next real sentence instead of feeling like a dead-end completion screen"
 );
 assert.ok(
+  speakSource.includes('trackLearningEvent("first_speaking_next_sentence_started"') &&
+  speakSource.includes("await loadSession(activeLang);") &&
+  speakSource.includes("Today's speaking goal\\ncomplete!"),
+  "First speaking should continue directly between daily sentences and reserve completion for the daily goal"
+);
+assert.ok(
   speakSource.includes("showFirstMissionGoalPrompt = isFirstSpeakingMission && !selectedGoal"),
   "First speaking completion should not ask for the same goal again after onboarding already captured it"
 );
@@ -62,6 +68,17 @@ assert.ok(
   speakSource.includes("phrase && score !== null && showDeepPronunciationCoach") &&
   speakSource.includes("showDeepPronunciationCoach ? ("),
   "First speaking result should keep deep diagnostic coaching out of the first 10-minute path"
+);
+assert.ok(
+  speakSource.includes('assessmentStatus === "unscored" ? 10') &&
+  speakSource.includes("awardSpokenAttemptXp(scoreVal, assessmentStatus)"),
+  "Accepted unscored speech should still award XP so the attempt-over-accuracy philosophy is real"
+);
+assert.ok(
+  speakSource.includes("if (!isGuidedSentenceMission)") &&
+  speakSource.includes("return true;") &&
+  speakSource.includes("const { day, counted } = await recordSpokenSentence"),
+  "Pronunciation clinic XP must not inflate the guided daily real-sentence count"
 );
 
 for (const lang of languages) {

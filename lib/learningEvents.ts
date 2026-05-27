@@ -8,6 +8,7 @@ export type LearningEventName =
   | "first_speaking_cta_pressed"
   | "first_speaking_screen_seen"
   | "first_speaking_attempt_completed"
+  | "first_speaking_next_sentence_started"
   | "review_sentence_cta_pressed"
   | "review_sentence_screen_seen"
   | "review_sentence_attempt_completed"
@@ -27,6 +28,7 @@ const ALLOWED_PROP_KEYS: Record<LearningEventName, readonly string[]> = {
   first_speaking_cta_pressed: ["surface", "nativeLanguage", "targetLanguage", "goal", "dailyGoalMet"],
   first_speaking_screen_seen: ["surface", "nativeLanguage", "targetLanguage", "goal"],
   first_speaking_attempt_completed: ["surface", "nativeLanguage", "targetLanguage", "scoreBand", "assessmentStatus", "platform", "goal", "dailySpokenCount", "dailyGoal"],
+  first_speaking_next_sentence_started: ["surface", "nativeLanguage", "targetLanguage", "goal", "dailySpokenCount", "dailyGoal"],
   review_sentence_cta_pressed: ["surface", "nativeLanguage", "targetLanguage", "deckType"],
   review_sentence_screen_seen: ["surface", "nativeLanguage", "targetLanguage", "deckType"],
   review_sentence_attempt_completed: ["surface", "nativeLanguage", "targetLanguage", "scoreBand", "assessmentStatus", "platform", "deckType", "dailySpokenCount", "dailyGoal"],
