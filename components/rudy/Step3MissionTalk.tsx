@@ -9,6 +9,7 @@ import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
+import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { type MissionTalkLangData } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
@@ -214,7 +215,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   async function fetchRudyLine(history: { role: "user" | "assistant"; content: string }[]): Promise<RudyLineResult> {
     try {
       const url = new URL("/api/mission-chat", apiBase).toString();
-      const res = await fetch(url, {
+      const res = await apiFetchWithAuth(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -262,7 +263,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   async function fetchTranslation(text: string): Promise<string> {
     try {
       const url = new URL("/api/translate", apiBase).toString();
-      const res = await fetch(url, {
+      const res = await apiFetchWithAuth(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: sanitizeForTTS(text), targetLanguage: NATIVE_LANG_LABEL[nativeLang] ?? "Korean" }),
@@ -280,7 +281,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     setWordPopup(null);
     try {
       const url = new URL("/api/word-lookup", apiBase).toString();
-      const res = await fetch(url, {
+      const res = await apiFetchWithAuth(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -335,7 +336,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       }, 30_000);
 
       if (Platform.OS === "web") {
-        const res = await fetch(url.toString());
+        const res = await apiFetchWithAuth(url.toString());
         if (!res.ok) { finish(); return; }
         const blob = await res.blob();
         const objUrl = URL.createObjectURL(blob);
@@ -385,6 +386,17 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
 
   // ── Recording (native) ────────────────────────────────────────────────────────
 
+  function getWebRecordingMimeType(MediaRecorderCtor: any): string {
+    const isTypeSupported = typeof MediaRecorderCtor.isTypeSupported === "function"
+      ? MediaRecorderCtor.isTypeSupported.bind(MediaRecorderCtor)
+      : null;
+    if (isTypeSupported?.("audio/webm;codecs=opus")) return "audio/webm;codecs=opus";
+    if (isTypeSupported?.("audio/mp4")) return "audio/mp4";
+    if (isTypeSupported?.("video/mp4")) return "video/mp4";
+    if (isTypeSupported?.("audio/webm")) return "audio/webm";
+    return "";
+  }
+
   async function startRecording() {
     if (phase !== "idle" || ttsPlaying) return;
     setShowKeyboard(false);
@@ -430,22 +442,38 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         autoStopRef.current = setTimeout(() => stopNativeRecording(), 7000);
       } catch (e) { console.error("[MissionTalk] 녹음 시작 실패:", e); stopPulse(); setPhase("idle"); }
     } else {
-      if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); setPhase("idle"); return; }
+      if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); showSttError(); return; }
+      const MediaRecorderCtor = typeof window !== "undefined" ? (window as any).MediaRecorder : undefined;
+      if (typeof MediaRecorderCtor !== "function") { stopPulse(); showSttError(); return; }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
-      if (!stream) { stopPulse(); setPhase("idle"); return; }
+      if (!stream) { stopPulse(); showSttError(); return; }
       audioChunksRef.current = [];
-      // Pick best supported MIME — must check audio/mp4 for iOS Safari
-      const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/mp4")
-        ? "audio/mp4"
-        : "audio/webm";
+      // Pick best supported MIME — must check audio/mp4/video/mp4 for iOS Safari.
+      const mime = getWebRecordingMimeType(MediaRecorderCtor);
       console.log("[MissionTalk] 녹음 시작 성공 (web), mime:", mime);
-      const rec = new (window as any).MediaRecorder(stream, { mimeType: mime });
+      let rec: MediaRecorder;
+      try {
+        rec = new MediaRecorderCtor(stream, mime ? { mimeType: mime } : undefined);
+      } catch (e) {
+        console.warn('[Step3] MediaRecorder creation failed:', e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        stopPulse();
+        showSttError();
+        return;
+      }
       mediaRecRef.current = rec;
       rec.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunksRef.current.push(e.data); };
-      rec.onstop = () => handleWebStop(mime, stream);
-      rec.start();
+      rec.onstop = () => handleWebStop(rec.mimeType || mime || "audio/webm", stream);
+      try {
+        rec.start();
+      } catch (e) {
+        console.warn('[Step3] MediaRecorder start failed:', e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        mediaRecRef.current = null;
+        stopPulse();
+        showSttError();
+        return;
+      }
       autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, 7000);
     }
   }
@@ -511,7 +539,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     try {
       console.log("[MissionTalk] Azure 전송 시도, mimeType:", mimeType, "lang:", sttLang, "base64 len:", base64.length);
       const url = new URL("/api/stt", apiBase).toString();
-      const res = await fetch(url, {
+      const res = await apiFetchWithAuth(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ audio: base64, mimeType, language: sttLang }),

@@ -8,6 +8,7 @@ import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
+import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import { type LessonSentence, type Step1Config, getRandomFeedback } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
@@ -107,6 +108,13 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   useEffect(() => {
     return () => {
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
+      if (mediaRecRef.current) {
+        try {
+          if (mediaRecRef.current.state === "recording") mediaRecRef.current.stop();
+          mediaRecRef.current.stream?.getTracks?.().forEach((t: MediaStreamTrack) => t.stop());
+        } catch (e) { console.warn('[Step1] MediaRecorder cleanup failed:', e); }
+        mediaRecRef.current = null;
+      }
       stopAllTTSSync();
     };
   }, []);
@@ -151,7 +159,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       if (mode === "slow") url.searchParams.set("mode", "slow");
 
       if (Platform.OS === "web") {
-        const res = await fetch(url.toString());
+        const res = await apiFetchWithAuth(url.toString());
         if (!res.ok) throw new Error("TTS failed");
         const blob = await res.blob();
         const objUrl = URL.createObjectURL(blob);
@@ -180,6 +188,28 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   }
 
   // ── Recording ────────────────────────────────────────────────────────────────
+
+  function showMicUnavailable() {
+    stopPulse();
+    setScore(0);
+    setFeedback(nativeLang === "korean"
+      ? "브라우저 마이크 권한을 허용한 뒤 다시 시도해 주세요."
+      : nativeLang === "spanish"
+      ? "Permite el micrófono del navegador e inténtalo de nuevo."
+      : "Allow browser microphone access, then try again.");
+    setPhase("result");
+  }
+
+  function getWebRecordingMimeType(MediaRecorderCtor: any): string {
+    const isTypeSupported = typeof MediaRecorderCtor.isTypeSupported === "function"
+      ? MediaRecorderCtor.isTypeSupported.bind(MediaRecorderCtor)
+      : null;
+    if (isTypeSupported?.("audio/webm;codecs=opus")) return "audio/webm;codecs=opus";
+    if (isTypeSupported?.("audio/mp4")) return "audio/mp4";
+    if (isTypeSupported?.("video/mp4")) return "video/mp4";
+    if (isTypeSupported?.("audio/webm")) return "audio/webm";
+    return "";
+  }
 
   async function startRecording() {
     if (phase !== "idle" && phase !== "result") return;
@@ -221,16 +251,34 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         setPhase("idle");
       }
     } else {
-      if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); setPhase("idle"); return; }
+      if (!navigator?.mediaDevices?.getUserMedia) { showMicUnavailable(); return; }
+      const MediaRecorderCtor = typeof window !== "undefined" ? (window as any).MediaRecorder : undefined;
+      if (typeof MediaRecorderCtor !== "function") { showMicUnavailable(); return; }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
-      if (!stream) { stopPulse(); setPhase("idle"); return; }
+      if (!stream) { showMicUnavailable(); return; }
       audioChunks.current = [];
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
-      const recorder = new (window as any).MediaRecorder(stream, { mimeType });
+      const mimeType = getWebRecordingMimeType(MediaRecorderCtor);
+      let recorder: MediaRecorder;
+      try {
+        recorder = new MediaRecorderCtor(stream, mimeType ? { mimeType } : undefined);
+      } catch (e) {
+        console.warn('[Step1] MediaRecorder creation failed:', e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        showMicUnavailable();
+        return;
+      }
       mediaRecRef.current = recorder;
       recorder.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunks.current.push(e.data); };
-      recorder.onstop = () => handleWebRecordingStop(mimeType, stream);
-      recorder.start();
+      recorder.onstop = () => handleWebRecordingStop(recorder.mimeType || mimeType || "audio/webm", stream);
+      try {
+        recorder.start();
+      } catch (e) {
+        console.warn('[Step1] MediaRecorder start failed:', e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        mediaRecRef.current = null;
+        showMicUnavailable();
+        return;
+      }
       autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 4000);
     }
   }
@@ -320,9 +368,9 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
     }
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
       const apiUrl = new URL("/api/pronunciation-assess", apiBase).toString();
-      const res = await fetch(apiUrl, {
+      const res = await apiFetchWithAuth(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word: sentence.text, lang: sentence.speechLang, audio: base64, mimeType }),

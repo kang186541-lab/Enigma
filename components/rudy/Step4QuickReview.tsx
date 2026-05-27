@@ -8,6 +8,7 @@ import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
+import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import type { ReviewQuestion } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
@@ -114,11 +115,18 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         nativeRecRef.current.stopAndUnloadAsync().catch((e) => console.warn('[Step4] Recording cleanup failed:', e));
         nativeRecRef.current = null;
       }
+      if (mediaRecRef.current) {
+        try {
+          if (mediaRecRef.current.state === "recording") mediaRecRef.current.stop();
+          mediaRecRef.current.stream?.getTracks?.().forEach((t: MediaStreamTrack) => t.stop());
+        } catch (e) { console.warn('[Step4] MediaRecorder cleanup failed:', e); }
+        mediaRecRef.current = null;
+      }
       stopAllTTSSync();
     };
   }, []);
 
-  // Safety timeout: if "assessing" lasts > 8s, force reveal with default score
+  // Safety timeout: if "assessing" outlives the server/Azure window, force reveal with default score.
   useEffect(() => {
     if (qPhase === "assessing") {
       if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
@@ -129,7 +137,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         setAllScores((prev) => [...prev, 70]);
         setStars(2);
         setQPhase("revealed");
-      }, 8000);
+      }, 25000);
     } else {
       if (safetyTimeoutRef.current) { clearTimeout(safetyTimeoutRef.current); safetyTimeoutRef.current = null; }
     }
@@ -202,7 +210,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       url.searchParams.set("lang", speechLang);
 
       if (Platform.OS === "web") {
-        const res = await fetch(url.toString());
+        const res = await apiFetchWithAuth(url.toString());
         if (!res.ok) return;
         const blob = await res.blob();
         const objUrl = URL.createObjectURL(blob);
@@ -226,6 +234,17 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   }
 
   // ── Recording ─────────────────────────────────────────────────────────────
+
+  function getWebRecordingMimeType(MediaRecorderCtor: any): string {
+    const isTypeSupported = typeof MediaRecorderCtor.isTypeSupported === "function"
+      ? MediaRecorderCtor.isTypeSupported.bind(MediaRecorderCtor)
+      : null;
+    if (isTypeSupported?.("audio/webm;codecs=opus")) return "audio/webm;codecs=opus";
+    if (isTypeSupported?.("audio/mp4")) return "audio/mp4";
+    if (isTypeSupported?.("video/mp4")) return "video/mp4";
+    if (isTypeSupported?.("audio/webm")) return "audio/webm";
+    return "";
+  }
 
   async function startRecording() {
     if (qPhase !== "ready") return;
@@ -270,20 +289,36 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         autoStopRef.current = setTimeout(() => stopRecordAndAssess(q), 7000);
       } catch (e) { console.warn('[Speech] recording start failed:', e); stopPulse(); setQPhase("ready"); }
     } else {
-      if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); setQPhase("ready"); return; }
+      if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); fallbackReveal(); return; }
+      const MediaRecorderCtor = typeof window !== "undefined" ? (window as any).MediaRecorder : undefined;
+      if (typeof MediaRecorderCtor !== "function") { stopPulse(); fallbackReveal(); return; }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
-      if (!stream) { stopPulse(); setQPhase("ready"); return; }
+      if (!stream) { stopPulse(); fallbackReveal(); return; }
       audioChunksRef.current = [];
-      const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/mp4")
-          ? "audio/mp4"
-          : "audio/webm";
-      const rec = new (window as any).MediaRecorder(stream, { mimeType: mime });
+      const mime = getWebRecordingMimeType(MediaRecorderCtor);
+      let rec: MediaRecorder;
+      try {
+        rec = new MediaRecorderCtor(stream, mime ? { mimeType: mime } : undefined);
+      } catch (e) {
+        console.warn('[Step4] MediaRecorder creation failed:', e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        stopPulse();
+        fallbackReveal();
+        return;
+      }
       mediaRecRef.current = rec;
       rec.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunksRef.current.push(e.data); };
-      rec.onstop = () => handleWebStop(mime, stream, q);
-      rec.start();
+      rec.onstop = () => handleWebStop(rec.mimeType || mime || "audio/webm", stream, q);
+      try {
+        rec.start();
+      } catch (e) {
+        console.warn('[Step4] MediaRecorder start failed:', e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        mediaRecRef.current = null;
+        stopPulse();
+        fallbackReveal();
+        return;
+      }
       autoStopRef.current = setTimeout(() => { if (rec.state === "recording") rec.stop(); }, 7000);
     }
   }
@@ -373,10 +408,10 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     try {
       const url = new URL("/api/pronunciation-assess", apiBase).toString();
       const abortCtrl = new AbortController();
-      const timeoutId = setTimeout(() => abortCtrl.abort(), 10000);
+      const timeoutId = setTimeout(() => abortCtrl.abort(), 25000);
       let data: Record<string, any> = {};
       try {
-        const res = await fetch(url, {
+        const res = await apiFetchWithAuth(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ word, lang, audio: base64, mimeType }),

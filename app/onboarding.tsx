@@ -64,6 +64,7 @@ const UI: Record<NativeLanguage, {
   goalPrompt: string;
   firstSentenceLabel: string;
   firstSentenceWaiting: string;
+  goalWaiting: string;
   setupLanguageLabel: string; setupGoalLabel: string;
   chooseLanguageCta: string; chooseGoalCta: string; continueToGuideCta: string;
   cta1: string; cta2: string; back: string;
@@ -74,7 +75,7 @@ const UI: Record<NativeLanguage, {
     guideEyebrow: "Rudy의 언어 가이드",
     guideNext: "다음 카드",
     guideStart: "이제 시작하자",
-    guideFinalHint: "다음: 방금 고른 첫 문장을 바로 입 밖으로 말해요.",
+    guideFinalHint: "다음: Rudy가 준비한 첫 문장을 바로 입 밖으로 말해요.",
     step2Title: "어떤 언어를 배우고 싶으세요?",
     step2Sub:   "학습할 언어를 선택하세요",
     firstSpeechTitle: "다음은 바로 한 문장 말하기",
@@ -82,6 +83,7 @@ const UI: Record<NativeLanguage, {
     goalPrompt: "먼저 실제로 쓸 상황을 골라주세요",
     firstSentenceLabel: "첫 문장",
     firstSentenceWaiting: "언어와 상황을 고르면 Rudy가 바로 말할 첫 문장을 보여줘요.",
+    goalWaiting: "먼저 배울 언어를 고르면 실제 상황을 선택할 수 있어요.",
     setupLanguageLabel: "배울 언어",
     setupGoalLabel: "실제로 쓸 상황",
     chooseLanguageCta: "배울 언어 선택",
@@ -95,7 +97,7 @@ const UI: Record<NativeLanguage, {
     guideEyebrow: "Rudy's Language Guide",
     guideNext: "Next card",
     guideStart: "Let's start",
-    guideFinalHint: "Next: say the first sentence you just chose.",
+    guideFinalHint: "Next: say the first sentence Rudy prepared for you.",
     step2Title: "What do you want to learn?",
     step2Sub:   "Pick the language you'd like to master",
     firstSpeechTitle: "Next: say one real sentence",
@@ -103,6 +105,7 @@ const UI: Record<NativeLanguage, {
     goalPrompt: "First, choose where you will actually use it",
     firstSentenceLabel: "First sentence",
     firstSentenceWaiting: "Choose a language and situation, then Rudy will show the first sentence you will say.",
+    goalWaiting: "Choose a learning language first, then pick the real-use situation.",
     setupLanguageLabel: "Learning language",
     setupGoalLabel: "Real-use situation",
     chooseLanguageCta: "Choose a language",
@@ -116,7 +119,7 @@ const UI: Record<NativeLanguage, {
     guideEyebrow: "Guía de idiomas de Rudy",
     guideNext: "Siguiente tarjeta",
     guideStart: "Empecemos",
-    guideFinalHint: "Ahora: di la primera frase que acabas de elegir.",
+    guideFinalHint: "Ahora: di la primera frase que Rudy preparó para ti.",
     step2Title: "¿Qué idioma quieres aprender?",
     step2Sub:   "Selecciona el idioma que quieres dominar",
     firstSpeechTitle: "Ahora: di una frase real",
@@ -124,6 +127,7 @@ const UI: Record<NativeLanguage, {
     goalPrompt: "Primero, elige dónde lo usarás de verdad",
     firstSentenceLabel: "Primera frase",
     firstSentenceWaiting: "Elige idioma y situación, y Rudy mostrará la primera frase que vas a decir.",
+    goalWaiting: "Primero elige un idioma, luego la situación real.",
     setupLanguageLabel: "Idioma que aprenderás",
     setupGoalLabel: "Situación real",
     chooseLanguageCta: "Elige un idioma",
@@ -167,10 +171,10 @@ export default function OnboardingScreen() {
   const handleLearnPick = (lang: NativeLanguage) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setLearnSel(lang);
-    setGoalSel((goal) => goal ?? getHomeLearningGoalOptions(uiLang)[0]?.key ?? "travel");
   };
 
   const handleGoalPick = (goal: LearningGoal) => {
+    if (!learnSel) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setGoalSel(goal);
     void trackLearningEvent("learning_goal_selected", {
@@ -255,6 +259,7 @@ export default function OnboardingScreen() {
         mission: "first-sentence",
         targetLang: learnSel,
         goal: goalSel ?? "",
+        missionIndex: "0",
       },
     } as any);
   };
@@ -300,6 +305,9 @@ export default function OnboardingScreen() {
                     key={lang.id}
                     style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
                     onPress={() => handleNativePick(lang.id)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: sel }}
+                    accessibilityLabel={lang.nameMap[uiLang]}
                   >
                     <View style={styles.langBadge}>
                       <Text style={styles.langBadgeText}>{lang.badge}</Text>
@@ -414,6 +422,9 @@ export default function OnboardingScreen() {
                     key={lang.id}
                     style={({ pressed }) => [styles.card, sel && styles.cardSel, pressed && styles.cardPress]}
                     onPress={() => handleLearnPick(lang.id)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: sel }}
+                    accessibilityLabel={lang.nameMap[uiLang]}
                   >
                     <View style={styles.langBadge}>
                       <Text style={styles.langBadgeText}>{lang.badge}</Text>
@@ -461,7 +472,7 @@ export default function OnboardingScreen() {
             <View style={styles.goalSection}>
               <Text style={styles.goalPrompt}>{ui.goalPrompt}</Text>
               <View style={styles.goalChips}>
-                {getHomeLearningGoalOptions(uiLang).map((option) => {
+                {learnSel ? getHomeLearningGoalOptions(uiLang).map((option) => {
                   const selected = goalSel === option.key;
                   return (
                     <Pressable
@@ -481,7 +492,9 @@ export default function OnboardingScreen() {
                       </Text>
                     </Pressable>
                   );
-                })}
+                }) : (
+                  <Text style={styles.goalLockedHint}>{ui.goalWaiting}</Text>
+                )}
               </View>
             </View>
 
@@ -740,6 +753,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
+  },
+  goalLockedHint: {
+    fontSize: 12,
+    fontFamily: F.body,
+    color: C.goldDim,
+    lineHeight: 17,
   },
   goalChip: {
     borderRadius: 15,

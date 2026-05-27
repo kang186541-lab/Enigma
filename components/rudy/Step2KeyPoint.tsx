@@ -8,6 +8,7 @@ import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
+import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import { type Step2Data, type FillBlankQuiz, type GrammarExplanation } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
@@ -80,6 +81,13 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   React.useEffect(() => {
     return () => {
       if (autoStopRef.current) clearTimeout(autoStopRef.current);
+      if (mediaRecRef.current) {
+        try {
+          if (mediaRecRef.current.state === "recording") mediaRecRef.current.stop();
+          mediaRecRef.current.stream?.getTracks?.().forEach((t: MediaStreamTrack) => t.stop());
+        } catch (e) { console.warn('[Step2] MediaRecorder cleanup failed:', e); }
+        mediaRecRef.current = null;
+      }
       stopAllTTSSync();
     };
   }, []);
@@ -176,7 +184,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       url.searchParams.set("text", quiz.fullSentence);
       url.searchParams.set("lang", speechLang);
       if (Platform.OS === "web") {
-        const res = await fetch(url.toString());
+        const res = await apiFetchWithAuth(url.toString());
         if (res.ok) {
           const blob = await res.blob();
           const objUrl = URL.createObjectURL(blob);
@@ -201,6 +209,23 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   }
 
   // ── Speak-after recording ─────────────────────────────────────────────────────
+
+  function showSpeakMicUnavailable() {
+    stopPulse();
+    setSpeakScore(0);
+    setSpeakPhase("done");
+  }
+
+  function getWebRecordingMimeType(MediaRecorderCtor: any): string {
+    const isTypeSupported = typeof MediaRecorderCtor.isTypeSupported === "function"
+      ? MediaRecorderCtor.isTypeSupported.bind(MediaRecorderCtor)
+      : null;
+    if (isTypeSupported?.("audio/webm;codecs=opus")) return "audio/webm;codecs=opus";
+    if (isTypeSupported?.("audio/mp4")) return "audio/mp4";
+    if (isTypeSupported?.("video/mp4")) return "video/mp4";
+    if (isTypeSupported?.("audio/webm")) return "audio/webm";
+    return "";
+  }
 
   async function startSpeakRecording() {
     if (speakPhase === "recording" || speakPhase === "assessing") return;
@@ -235,16 +260,34 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         autoStopRef.current = setTimeout(() => stopSpeakNativeRecording(), 4000);
       } catch { stopPulse(); setSpeakPhase("idle"); }
     } else {
-      if (!navigator?.mediaDevices?.getUserMedia) { stopPulse(); setSpeakPhase("idle"); return; }
+      if (!navigator?.mediaDevices?.getUserMedia) { showSpeakMicUnavailable(); return; }
+      const MediaRecorderCtor = typeof window !== "undefined" ? (window as any).MediaRecorder : undefined;
+      if (typeof MediaRecorderCtor !== "function") { showSpeakMicUnavailable(); return; }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
-      if (!stream) { stopPulse(); setSpeakPhase("idle"); return; }
+      if (!stream) { showSpeakMicUnavailable(); return; }
       audioChunks.current = [];
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
-      const recorder = new (window as any).MediaRecorder(stream, { mimeType });
+      const mimeType = getWebRecordingMimeType(MediaRecorderCtor);
+      let recorder: MediaRecorder;
+      try {
+        recorder = new MediaRecorderCtor(stream, mimeType ? { mimeType } : undefined);
+      } catch (e) {
+        console.warn('[Step2] MediaRecorder creation failed:', e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        showSpeakMicUnavailable();
+        return;
+      }
       mediaRecRef.current = recorder;
       recorder.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunks.current.push(e.data); };
-      recorder.onstop = () => handleSpeakWebStop(mimeType, stream);
-      recorder.start();
+      recorder.onstop = () => handleSpeakWebStop(recorder.mimeType || mimeType || "audio/webm", stream);
+      try {
+        recorder.start();
+      } catch (e) {
+        console.warn('[Step2] MediaRecorder start failed:', e);
+        stream.getTracks().forEach((t: any) => t.stop());
+        mediaRecRef.current = null;
+        showSpeakMicUnavailable();
+        return;
+      }
       autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 4000);
     }
   }
@@ -306,9 +349,9 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     markSpokenAttempt();
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
       const apiUrl = new URL("/api/pronunciation-assess", apiBase).toString();
-      const res = await fetch(apiUrl, {
+      const res = await apiFetchWithAuth(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word: quiz.fullSentence, lang: speechLang, audio: base64, mimeType }),

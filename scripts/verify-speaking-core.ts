@@ -29,9 +29,11 @@ const basicCourseSource = readFileSync("app/basic-course.tsx", "utf8");
 const dailyLessonSource = readFileSync("app/daily-lesson.tsx", "utf8");
 const languageContextSource = readFileSync("context/LanguageContext.tsx", "utf8");
 const rudyLessonSource = readFileSync("app/rudy-lesson.tsx", "utf8");
+const rudyStep1Source = readFileSync("components/rudy/Step1ListenRepeat.tsx", "utf8");
 const rudyStep2Source = readFileSync("components/rudy/Step2KeyPoint.tsx", "utf8");
 const rudyStep3Source = readFileSync("components/rudy/Step3MissionTalk.tsx", "utf8");
 const rudyStep4Source = readFileSync("components/rudy/Step4QuickReview.tsx", "utf8");
+const apiFetchWithAuthSource = readFileSync("lib/apiFetchWithAuth.ts", "utf8");
 
 const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string[]>> = {
   english: {
@@ -167,15 +169,34 @@ const onboardingSetNativeIndex = onboardingSource.indexOf("await setNativeLangua
 const onboardingSetGoalIndex = onboardingSource.indexOf("await setPrimaryLearningGoal(goalSel)", onboardingStartSpeakingIndex);
 const onboardingMarkGuideIndex = onboardingSource.indexOf("await markGuideComplete()", onboardingStartSpeakingIndex);
 assert.ok(
-  onboardingSource.includes("setGoalSel((goal) => goal ?? getHomeLearningGoalOptions(uiLang)[0]?.key ?? \"travel\")") &&
+  !onboardingSource.includes("setGoalSel((goal) => goal ?? getHomeLearningGoalOptions(uiLang)[0]?.key ?? \"travel\")") &&
+  onboardingSource.includes("if (!learnSel) return;") &&
   onboardingSource.includes("continueToGuideCta") &&
+  onboardingSource.includes("goalWaiting") &&
+  onboardingSource.includes('missionIndex: "0"') &&
+  onboardingSource.includes('accessibilityState={{ selected: sel }}') &&
   onboardingSetupToGuideIndex > onboardingSetupNextIndex &&
   onboardingGuideStartIndex > onboardingGuideNextIndex &&
   onboardingStartSpeakingIndex > onboardingGuideNextIndex &&
   onboardingSetNativeIndex > onboardingStartSpeakingIndex &&
   onboardingSetGoalIndex > onboardingSetNativeIndex &&
   onboardingMarkGuideIndex > onboardingSetGoalIndex,
-  "Onboarding should pick a default goal, preview the first sentence, then show Rudy's guide as the pre-flight before starting speech"
+  "Onboarding should require a conscious goal choice, preview the first sentence, then show Rudy's guide as the pre-flight before starting speech"
+);
+assert.ok(
+  !onboardingSource.includes("the first sentence you just chose") &&
+  !onboardingSource.includes("방금 고른 첫 문장") &&
+  !onboardingSource.includes("primera frase que acabas de elegir"),
+  "Onboarding copy should say Rudy prepared the first sentence, not that the learner manually chose it"
+);
+assert.ok(
+  speakSource.includes("missionIndex?: string | string[]") &&
+  speakSource.includes("const routeMissionIndex = normalizeMissionIndex(missionIndexParam);") &&
+  speakSource.includes("const firstMissionRouteIndexRef = useRef<number | null>(routeMissionIndex);") &&
+  speakSource.includes("const firstMissionIndex = firstMissionRouteIndexRef.current ?? spokenCountForMission;") &&
+  speakSource.includes("getDailySpeakingMissionPhrase(lang, selectedGoalRef.current, firstMissionIndex, nativeLang)") &&
+  speakSource.includes("if (isFirstSpeakingMission) firstMissionRouteIndexRef.current = null;"),
+  "First onboarding sentence should be frozen into the Speak handoff until the first guided attempt is counted"
 );
 assert.ok(
   speakSource.includes("nextMissionPreview") && speakSource.includes("getNextMissionPreviewTitle"),
@@ -213,6 +234,24 @@ assert.ok(
   speakSource.includes("MediaRecorder creation failed") &&
   speakSource.includes("MediaRecorder start failed"),
   "Web recording should guard browsers that expose getUserMedia without a usable MediaRecorder"
+);
+const recordStartRefIndex = speakSource.indexOf("const recordStartPendingRef = useRef(false);");
+const recordStartGuardIndex = speakSource.indexOf("if (recordStartPendingRef.current) return;");
+const recordStartSetIndex = speakSource.indexOf("recordStartPendingRef.current = true;", recordStartGuardIndex);
+const webGetUserMediaIndex = speakSource.indexOf("navigator.mediaDevices.getUserMedia({ audio: true }).then");
+const webRecorderStartIndex = speakSource.indexOf("recorder.start(100)", webGetUserMediaIndex);
+const webStartClearIndex = speakSource.indexOf("recordStartPendingRef.current = false;", webRecorderStartIndex);
+const webCatchIndex = speakSource.indexOf("microphone access failed", webGetUserMediaIndex);
+const webCatchClearIndex = speakSource.indexOf("recordStartPendingRef.current = false;", webCatchIndex);
+assert.ok(
+  recordStartRefIndex >= 0 &&
+  recordStartGuardIndex > recordStartRefIndex &&
+  recordStartSetIndex > recordStartGuardIndex &&
+  webGetUserMediaIndex > recordStartSetIndex &&
+  webRecorderStartIndex > webGetUserMediaIndex &&
+  webStartClearIndex > webRecorderStartIndex &&
+  webCatchClearIndex > webCatchIndex,
+  "Mic start should be reentrancy guarded while permission and MediaRecorder startup are pending"
 );
 assert.ok(
   speakSource.includes("offerContinueWithoutScore(attemptGeneration)") &&
@@ -400,6 +439,46 @@ assert.ok(
   !rudyStep4Source.includes("#e55757") &&
   rudyStep2Source.includes("Almost. Rudy would say it this way"),
   "Rudy correction UI should stay coach-like, not punishment-like"
+);
+for (const [name, source] of [
+  ["Step1", rudyStep1Source],
+  ["Step2", rudyStep2Source],
+  ["Step3", rudyStep3Source],
+  ["Step4", rudyStep4Source],
+] as const) {
+  assert.ok(
+    source.includes("getWebRecordingMimeType") &&
+    source.includes('isTypeSupported?.("audio/mp4")') &&
+    source.includes('isTypeSupported?.("video/mp4")') &&
+    source.includes("MediaRecorder creation failed") &&
+    source.includes("MediaRecorder start failed"),
+    `${name} should use Safari-safe MediaRecorder MIME fallback and catch startup failures`
+  );
+}
+assert.ok(
+  rudyStep1Source.includes("mediaRecRef.current.stream?.getTracks?.()") &&
+  rudyStep2Source.includes("mediaRecRef.current.stream?.getTracks?.()") &&
+  rudyStep4Source.includes("mediaRecRef.current.stream?.getTracks?.()") &&
+  rudyStep3Source.includes("rec.stream?.getTracks?.()"),
+  "Rudy web recording cleanup should stop microphone streams when leaving steps"
+);
+assert.ok(
+  rudyStep1Source.includes("controller.abort(), 25000") &&
+  rudyStep2Source.includes("controller.abort(), 25000") &&
+  rudyStep4Source.includes("abortCtrl.abort(), 25000") &&
+  rudyStep4Source.includes("}, 25000);"),
+  "Rudy pronunciation assessment timeouts should not fire before the server/Azure window"
+);
+assert.ok(
+  apiFetchWithAuthSource.includes("supabase.auth.getSession()") &&
+  apiFetchWithAuthSource.includes('next.set("Authorization", `Bearer ${token}`)') &&
+  speakSource.includes("apiFetchWithAuth(apiUrl") &&
+  speakSource.includes("apiFetchWithAuth(urlStr") &&
+  rudyStep1Source.includes("apiFetchWithAuth(apiUrl") &&
+  rudyStep2Source.includes("apiFetchWithAuth(apiUrl") &&
+  rudyStep3Source.includes("apiFetchWithAuth(url") &&
+  rudyStep4Source.includes("apiFetchWithAuth(url"),
+  "Signed-in learners should send Supabase bearer tokens to voice and Rudy API calls so server rate limits use user buckets"
 );
 assert.ok(
   speakSource.includes("contentContainerStyle={[styles.screenScrollContent") &&

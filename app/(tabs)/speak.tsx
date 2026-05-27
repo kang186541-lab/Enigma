@@ -30,6 +30,7 @@ import { loadLearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@
 import { buildSpeakingPromptKey, getSpeakingCountForLanguage, loadTodaySpeakingProgress, recordSpokenSentence, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 import { loadSpeakMissionHandoff, type SpeakMissionHandoff } from "@/lib/speakMissionHandoff";
 import { buildAcquisitionSession } from "@/lib/acquisitionSession";
+import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import {
   getDailySpeakingMissionPhrase as getSharedDailySpeakingMissionPhrase,
   getDailySpeakingSentenceLoop,
@@ -603,7 +604,7 @@ async function preloadPronunciationTTS(text: string, lang: string, apiBase: stri
   if (Platform.OS === "web") {
     if (_pronWebCache.has(key)) return;
     try {
-      const res = await fetch(urlStr);
+      const res = await apiFetchWithAuth(urlStr);
       if (!res.ok) return;
       const blob = await res.blob();
       _pronWebCache.set(key, URL.createObjectURL(blob));
@@ -644,7 +645,7 @@ async function playPronunciationTTS(text: string, lang: string, apiBase: string)
         await audio.play();
       } else {
         // Fallback: fetch on demand
-        const res = await fetch(urlStr);
+        const res = await apiFetchWithAuth(urlStr);
         if (!res.ok) throw new Error(`TTS ${res.status}`);
         const blob = await res.blob();
         const objectUrl = URL.createObjectURL(blob);
@@ -797,6 +798,12 @@ function normalizeLangTab(value: unknown): LangTab | null {
 
 function normalizeDeckType(value: unknown): "srs" | "beginner" | "advanced" {
   return value === "beginner" || value === "advanced" ? value : "srs";
+}
+
+function normalizeMissionIndex(value: string | undefined): number | null {
+  if (!value) return null;
+  const index = Number(value);
+  return Number.isInteger(index) && index >= 0 ? index : null;
 }
 
 function langFromSpeechLang(value: string | undefined): LangTab | null {
@@ -974,6 +981,7 @@ export default function SpeakScreen() {
     targetLang?: string | string[];
     returnDeck?: string | string[];
     missionId?: string | string[];
+    missionIndex?: string | string[];
   }>();
   const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
   const [xpGain, setXpGain] = useState(0);
@@ -990,12 +998,14 @@ export default function SpeakScreen() {
   const targetLangParam = routeParam(params.targetLang);
   const returnDeckParam = routeParam(params.returnDeck);
   const missionIdParam = routeParam(params.missionId);
+  const missionIndexParam = routeParam(params.missionIndex);
   const isFirstSpeakingMission = missionParam === "first-sentence";
   const isReviewSentenceMission = missionParam === "review-sentence";
   const isGuidedSentenceMission = isFirstSpeakingMission || isReviewSentenceMission;
   const routeGoal = normalizeLearningGoal(goalParam);
   const routeTargetLang = normalizeLangTab(targetLangParam) ?? langFromSpeechLang(speechLangParam);
   const routeDeckType = normalizeDeckType(returnDeckParam);
+  const routeMissionIndex = normalizeMissionIndex(missionIndexParam);
 
   const rudyListeningMsg = nativeLang === "korean"
     ? "루디가 듣고 있어요… 🦊"
@@ -1028,6 +1038,7 @@ export default function SpeakScreen() {
   const [selectedGoal, setSelectedGoal] = useState<LearningGoal | null>(routeGoal);
   const selectedGoalRef = useRef<LearningGoal | null>(routeGoal);
   useEffect(() => { selectedGoalRef.current = selectedGoal; }, [selectedGoal]);
+  const firstMissionRouteIndexRef = useRef<number | null>(routeMissionIndex);
   const [reviewMissionHandoff, setReviewMissionHandoff] = useState<SpeakMissionHandoff | null>(null);
   const [reviewHandoffReady, setReviewHandoffReady] = useState(!isReviewSentenceMission || !missionIdParam);
   const [dailySpokenCount, setDailySpokenCount] = useState(0);
@@ -1056,6 +1067,7 @@ export default function SpeakScreen() {
   const scoreAnim = useRef(new Animated.Value(0)).current;
   const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
   const recordStateRef = useRef<RecordState>("idle");
+  const recordStartPendingRef = useRef(false);
   const mediaRecorderRef = useRef<any>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const autoStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1109,6 +1121,7 @@ export default function SpeakScreen() {
     invalidatePracticeAttempt();
     if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
     stopCountdown();
+    recordStartPendingRef.current = false;
     if (mediaRecorderRef.current?.state === "recording") { mediaRecorderRef.current.stop(); }
     if (nativeRecordingRef.current) {
       nativeRecordingRef.current.stopAndUnloadAsync().catch((e: unknown) => console.warn('[Audio] recording stopAndUnload cleanup failed:', e));
@@ -1175,14 +1188,15 @@ export default function SpeakScreen() {
       const reviewPhrase = isReviewSentenceMission && !forceFullSession
         ? handoffPhrase ?? getReviewSentencePhrase(phraseParam, meaningParam, speechLangParam, nativeLang, lang)
         : null;
+      const firstMissionIndex = firstMissionRouteIndexRef.current ?? spokenCountForMission;
       const missionPhrase = reviewPhrase ?? (isFirstSpeakingMission && !forceFullSession
-        ? getDailySpeakingMissionPhrase(lang, selectedGoalRef.current, spokenCountForMission, nativeLang)
+        ? getDailySpeakingMissionPhrase(lang, selectedGoalRef.current, firstMissionIndex, nativeLang)
         : null);
       const session = missionPhrase ? [missionPhrase] : buildSession(lang, weak, last, level, lastWord, selectedGoalRef.current, nativeLang);
       currentPromptSourceRef.current = reviewPhrase
         ? `review-${missionIdParam || routeDeckType}`
         : isFirstSpeakingMission && !forceFullSession
-        ? `first-${spokenCountForMission}`
+        ? `first-${firstMissionIndex}`
         : `clinic-${lang}`;
       setSessionWords(session);
       setSessionIdx(0);
@@ -1459,6 +1473,7 @@ export default function SpeakScreen() {
         setCanContinueWithoutScore(true);
         return false;
       }
+      if (isFirstSpeakingMission) firstMissionRouteIndexRef.current = null;
       setSpokenAttemptAccepted(true);
       setCanContinueWithoutScore(false);
       unscoredFallbackAttemptRef.current = null;
@@ -1476,7 +1491,7 @@ export default function SpeakScreen() {
         unscoredAcceptingRef.current = null;
       }
     }
-  }, [isCurrentPracticeAttempt, isGuidedSentenceMission, nativeLang, recordSpokenAttempt]);
+  }, [isCurrentPracticeAttempt, isFirstSpeakingMission, isGuidedSentenceMission, nativeLang, recordSpokenAttempt]);
 
   const offerContinueWithoutScore = useCallback((attemptGeneration: number) => {
     if (!isGuidedSentenceMission || !isCurrentPracticeAttempt(attemptGeneration)) return;
@@ -1536,7 +1551,7 @@ export default function SpeakScreen() {
         return;
       }
       const apiUrl = new URL("/api/pronunciation-assess", apiBaseUrl).toString();
-      const apiRes = await fetch(apiUrl, {
+      const apiRes = await apiFetchWithAuth(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1562,6 +1577,7 @@ export default function SpeakScreen() {
       const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       if (counted) {
+        if (isFirstSpeakingMission) firstMissionRouteIndexRef.current = null;
         setSpokenAttemptAccepted(true);
         const newCount = pronCountRef.current + 1;
         pronCountRef.current = newCount;
@@ -1608,6 +1624,9 @@ export default function SpeakScreen() {
       }
       return;
     }
+
+    if (recordStartPendingRef.current) return;
+    recordStartPendingRef.current = true;
 
     // Native path (iOS / Android) — use expo-av Audio.Recording
     if (Platform.OS !== "web") {
@@ -1670,12 +1689,15 @@ export default function SpeakScreen() {
           setSttError(nativeLang === "korean" ? "마이크를 시작할 수 없습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se pudo iniciar el micrófono." : "Could not start microphone. Please try again.");
           setRecordState("done");
           recordStateRef.current = "done";
+        } finally {
+          recordStartPendingRef.current = false;
         }
       })();
       return;
     }
 
     if (!navigator?.mediaDevices?.getUserMedia) {
+      recordStartPendingRef.current = false;
       setSttError(getUnsupportedRecordingMessage(nativeLang));
       setRecordState("done");
       recordStateRef.current = "done";
@@ -1684,6 +1706,7 @@ export default function SpeakScreen() {
 
     const MediaRecorderCtor = typeof window !== "undefined" ? (window as any).MediaRecorder : undefined;
     if (typeof MediaRecorderCtor !== "function") {
+      recordStartPendingRef.current = false;
       setSttError(getUnsupportedRecordingMessage(nativeLang));
       setRecordState("done");
       recordStateRef.current = "done";
@@ -1693,6 +1716,7 @@ export default function SpeakScreen() {
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       if (!isCurrentPracticeAttempt(attemptGeneration)) {
         stream.getTracks().forEach((t: any) => t.stop());
+        recordStartPendingRef.current = false;
         return;
       }
       audioChunksRef.current = [];
@@ -1711,6 +1735,7 @@ export default function SpeakScreen() {
       } catch (e) {
         console.warn("[Speak] MediaRecorder creation failed:", e);
         stream.getTracks().forEach((t: any) => t.stop());
+        recordStartPendingRef.current = false;
         setSttError(getUnsupportedRecordingMessage(nativeLang));
         setRecordState("done");
         recordStateRef.current = "done";
@@ -1763,7 +1788,7 @@ export default function SpeakScreen() {
             return;
           }
           const apiUrl = new URL("/api/pronunciation-assess", apiBaseUrl).toString();
-          const apiRes = await fetch(apiUrl, {
+          const apiRes = await apiFetchWithAuth(apiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1790,6 +1815,7 @@ export default function SpeakScreen() {
           const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           if (counted) {
+            if (isFirstSpeakingMission) firstMissionRouteIndexRef.current = null;
             setSpokenAttemptAccepted(true);
             const newCount = pronCountRef.current + 1;
             pronCountRef.current = newCount;
@@ -1825,11 +1851,13 @@ export default function SpeakScreen() {
         console.warn("[Speak] MediaRecorder start failed:", e);
         stream.getTracks().forEach((t: any) => t.stop());
         mediaRecorderRef.current = null;
+        recordStartPendingRef.current = false;
         setSttError(getUnsupportedRecordingMessage(nativeLang));
         setRecordState("done");
         recordStateRef.current = "done";
         return;
       }
+      recordStartPendingRef.current = false;
       setRecordState("listening");
       recordStateRef.current = "listening";
       setScore(null);
@@ -1851,6 +1879,7 @@ export default function SpeakScreen() {
       }, RECORD_MAX_SEC * 1000);
     }).catch((e) => {
       console.warn('[Speak] microphone access failed:', e);
+      recordStartPendingRef.current = false;
       setSttError(nativeLang === "korean" ? "마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)" : nativeLang === "spanish" ? "Permite el acceso al micrófono.\n(Configuración del navegador → Micrófono)" : "Please allow microphone access.\n(Browser settings → Microphone)");
       setRecordState("done");
       recordStateRef.current = "done";
