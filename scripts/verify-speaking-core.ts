@@ -11,9 +11,11 @@ import {
 import {
   applySpokenSentenceProgress,
   buildSpeakingPromptKey,
+  getSpeakingCountForLanguage,
   SPEAKING_DAILY_GOAL,
 } from "../lib/speakingProgress";
 import { getTodaySpeakingMission } from "../lib/homeSpeakingMission";
+import { LESSON_CONTENT, MISSION_CONTENT, REVIEW_CONTENT, type LearningLangKey } from "../lib/lessonContent";
 import type { LearningGoal, SpeakingProgress } from "../lib/learnerProfile";
 import { RUDY_GUIDE_CARDS } from "../lib/rudyGuideCards";
 
@@ -22,6 +24,94 @@ const goals: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship
 const onboardingSource = readFileSync("app/onboarding.tsx", "utf8");
 const speakSource = readFileSync("app/(tabs)/speak.tsx", "utf8");
 const homeSource = readFileSync("app/(tabs)/index.tsx", "utf8");
+const cardsSource = readFileSync("app/(tabs)/cards.tsx", "utf8");
+const basicCourseSource = readFileSync("app/basic-course.tsx", "utf8");
+const dailyLessonSource = readFileSync("app/daily-lesson.tsx", "utf8");
+const languageContextSource = readFileSync("context/LanguageContext.tsx", "utf8");
+
+const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string[]>> = {
+  english: {
+    greeting: ["hello"],
+    goodbye: ["goodbye", "see you later", "take care"],
+    thanks: ["thank you"],
+    sorry: ["sorry"],
+    dont_understand: ["don't understand", "do not understand"],
+    repeat: ["say that again", "repeat"],
+    slow_speech: ["slowly", "speak more slowly"],
+    bridge_language: ["do you speak english"],
+    where: ["where is the bathroom"],
+    how_much: ["how much"],
+    yes: ["yes"],
+    no: ["no"],
+    help: ["help"],
+    name: ["my name"],
+  },
+  spanish: {
+    greeting: ["hola"],
+    goodbye: ["adiós", "hasta luego", "cuídate"],
+    thanks: ["gracias"],
+    sorry: ["lo siento"],
+    dont_understand: ["no entiendo"],
+    repeat: ["repetir", "repetirlo"],
+    slow_speech: ["despacio"],
+    bridge_language: ["hablas español"],
+    where: ["dónde está el baño"],
+    how_much: ["cuánto cuesta"],
+    yes: ["sí"],
+    no: ["no"],
+    help: ["ayuda"],
+    name: ["me llamo"],
+  },
+  korean: {
+    greeting: ["안녕하세요"],
+    goodbye: ["안녕히 가세요", "잘 가요", "다음에 봐요"],
+    thanks: ["감사"],
+    sorry: ["죄송"],
+    dont_understand: ["이해를 못"],
+    repeat: ["다시 한번 말"],
+    slow_speech: ["천천히"],
+    bridge_language: ["한국어 할 줄"],
+    where: ["화장실"],
+    how_much: ["얼마"],
+    yes: ["네"],
+    no: ["아니요"],
+    help: ["도와주세요", "도움"],
+    name: ["제 이름"],
+  },
+};
+
+function normalizeContentText(value: string): string {
+  return value
+    .normalize("NFC")
+    .toLocaleLowerCase()
+    .replace(/[!?.,¡¿—]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function collectDayOneToSixText(lang: LearningLangKey): string {
+  const lines: string[] = [];
+  for (let day = 1; day <= 6; day += 1) {
+    const key = `day_${day}`;
+    const lesson = LESSON_CONTENT[key]?.[lang];
+    if (lesson) {
+      for (const sentence of lesson.step1Sentences ?? []) lines.push(sentence.text);
+      for (const quiz of lesson.step2?.quizzes ?? []) {
+        if (quiz.promptWithBlank) lines.push(quiz.promptWithBlank);
+        if (quiz.fullSentence) lines.push(quiz.fullSentence);
+        if (quiz.audioText) lines.push(quiz.audioText);
+      }
+    }
+    const mission = MISSION_CONTENT[key]?.[lang];
+    if (mission) lines.push(...(mission.suggestedAnswers ?? []));
+    for (const review of REVIEW_CONTENT[key]?.[lang] ?? []) {
+      if (review.sentence) lines.push(review.sentence);
+      if (review.promptWithBlank) lines.push(review.promptWithBlank);
+      if (review.fullSentence) lines.push(review.fullSentence);
+    }
+  }
+  return normalizeContentText(lines.join(" "));
+}
 
 assert.equal(RUDY_GUIDE_CARDS.length, 8, "Rudy's Language Guide should stay at the 8 philosophy cards from replit.md");
 assert.deepEqual(
@@ -104,6 +194,17 @@ assert.ok(
   "Unscored acceptance should only show as accepted after the guided sentence is actually counted"
 );
 assert.ok(
+  homeSource.includes("getSpeakingCountForLanguage(day, effectiveLearningLang)") &&
+  speakSource.includes("getSpeakingCountForLanguage(day, lang)") &&
+  speakSource.includes("getSpeakingCountForLanguage(day, activeLang)"),
+  "Home and guided Speak should use target-language speaking counts, not global daily count"
+);
+assert.ok(
+  !speakSource.includes("setSpokenAttemptAccepted(true);\n      const counted = await recordSpokenAttempt") &&
+  !speakSource.includes("setSpokenAttemptAccepted(true);\n          const counted = await recordSpokenAttempt"),
+  "Scored attempts should unlock Next only after spoken progress is actually counted"
+);
+assert.ok(
   speakSource.includes("if (!isGuidedSentenceMission)") &&
   speakSource.includes("return true;") &&
   speakSource.includes("const { day, counted } = await recordSpokenSentence"),
@@ -116,11 +217,37 @@ assert.ok(
   "Home should keep today's real spoken sentence primary and progressively disclose secondary practice"
 );
 assert.ok(
+  languageContextSource.includes("export function getEffectiveLearningLanguage") &&
+  languageContextSource.includes("const effectiveLearning = getEffectiveLearningLanguage") &&
+  languageContextSource.includes("const native = isNativeLanguage(storedNative) ? storedNative : nativeLanguage") &&
+  languageContextSource.includes("if (remoteLearning !== remote.learning_lang)") &&
+  homeSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)") &&
+  cardsSource.includes("getEffectiveLearningLanguage(native, learningLanguage)") &&
+  basicCourseSource.includes("getEffectiveLearningLanguage(native, learningLanguage)") &&
+  dailyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)"),
+  "Shared language selection should prevent native-language courses across Home, Cards, Basic Course, and Daily Lesson"
+);
+assert.ok(
+  !languageContextSource.includes("const native = nativeLanguage ?? (isNativeLanguage(storedNative)") &&
+  !homeSource.includes('learningLanguage ?? "english"'),
+  "Language fallback should use the effective target language, including sequential native/learning changes"
+);
+assert.ok(
   speakSource.includes("contentContainerStyle={[styles.screenScrollContent") &&
   speakSource.includes("numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.62}") &&
   speakSource.includes("numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.68}"),
   "Speak should have a short-viewport fallback for long daily sentences and continuation CTAs"
 );
+
+for (const lang of languages) {
+  const courseText = collectDayOneToSixText(lang);
+  for (const [family, variants] of Object.entries(dayOneToSixSurvivalFamilies[lang])) {
+    assert.ok(
+      variants.some((variant) => courseText.includes(normalizeContentText(variant))),
+      `Day 1-6 ${lang} curriculum is missing survival phrase family: ${family}`
+    );
+  }
+}
 
 for (const lang of languages) {
   for (const goal of goals) {
@@ -230,6 +357,9 @@ assert.equal(second.counted, true);
 assert.equal(second.day.count, 2);
 assert.equal(second.day.byLanguage.english, 1);
 assert.equal(second.day.byLanguage.spanish, 1);
+assert.equal(getSpeakingCountForLanguage(second.day, "english"), 1);
+assert.equal(getSpeakingCountForLanguage(second.day, "spanish"), 1);
+assert.equal(getSpeakingCountForLanguage(second.day, "korean"), 0);
 
 const oldHistory: SpeakingProgress = { dailyGoal: SPEAKING_DAILY_GOAL, history: {} };
 for (let day = 1; day <= 50; day += 1) {

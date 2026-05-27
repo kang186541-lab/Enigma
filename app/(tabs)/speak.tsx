@@ -27,7 +27,7 @@ import { useLocalized } from "@/lib/runtimeTranslate";
 import { getCefrTierLabel } from "@/lib/dailyCourseData";
 import { trackLearningEvent } from "@/lib/learningEvents";
 import { loadLearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
-import { buildSpeakingPromptKey, loadTodaySpeakingProgress, recordSpokenSentence, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
+import { buildSpeakingPromptKey, getSpeakingCountForLanguage, loadTodaySpeakingProgress, recordSpokenSentence, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 import { loadSpeakMissionHandoff, type SpeakMissionHandoff } from "@/lib/speakMissionHandoff";
 import { buildAcquisitionSession } from "@/lib/acquisitionSession";
 import {
@@ -1148,9 +1148,9 @@ export default function SpeakScreen() {
       let spokenCountForMission = dailySpokenCountRef.current;
       if (isGuidedSentenceMission && !forceFullSession) {
         const day = await loadTodaySpeakingProgress();
-        spokenCountForMission = day.count;
-        dailySpokenCountRef.current = day.count;
-        setDailySpokenCount(day.count);
+        spokenCountForMission = getSpeakingCountForLanguage(day, lang);
+        dailySpokenCountRef.current = spokenCountForMission;
+        setDailySpokenCount(spokenCountForMission);
       }
       if (isReviewSentenceMission && missionIdParam && !reviewHandoffReady && !forceFullSession) {
         return;
@@ -1185,7 +1185,7 @@ export default function SpeakScreen() {
 
   useFocusEffect(useCallback(() => {
     loadSession(activeLang);
-    loadTodaySpeakingProgress().then((day) => setDailySpokenCount(day.count));
+    loadTodaySpeakingProgress().then((day) => setDailySpokenCount(getSpeakingCountForLanguage(day, activeLang)));
   }, [activeLang, loadSession]));
 
   useEffect(() => {
@@ -1400,8 +1400,9 @@ export default function SpeakScreen() {
         shouldCommit: () => isCurrentPracticeAttempt(attemptGeneration),
       });
       if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
-      dailySpokenCountRef.current = day.count;
-      setDailySpokenCount(day.count);
+      const targetDailyCount = getSpeakingCountForLanguage(day, activeLang);
+      dailySpokenCountRef.current = targetDailyCount;
+      setDailySpokenCount(targetDailyCount);
       if (!counted) return false;
       awardSpokenAttemptXp(scoreVal, assessmentStatus);
       if (isFirstSpeakingMission) {
@@ -1413,7 +1414,7 @@ export default function SpeakScreen() {
           assessmentStatus,
           platform: Platform.OS,
           goal: selectedGoalRef.current,
-          dailySpokenCount: day.count,
+          dailySpokenCount: targetDailyCount,
           dailyGoal: SPEAKING_DAILY_GOAL,
         });
       } else if (isReviewSentenceMission) {
@@ -1425,7 +1426,7 @@ export default function SpeakScreen() {
           assessmentStatus,
           platform: Platform.OS,
           deckType: routeDeckType,
-          dailySpokenCount: day.count,
+          dailySpokenCount: targetDailyCount,
           dailyGoal: SPEAKING_DAILY_GOAL,
         });
       }
@@ -1535,10 +1536,10 @@ export default function SpeakScreen() {
         await acceptUnscoredGuidedAttempt(attemptGeneration);
         return;
       }
-      setSpokenAttemptAccepted(true);
       const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       if (counted) {
+        setSpokenAttemptAccepted(true);
         const newCount = pronCountRef.current + 1;
         pronCountRef.current = newCount;
         setPronCount(newCount);
@@ -1762,10 +1763,10 @@ export default function SpeakScreen() {
             await acceptUnscoredGuidedAttempt(attemptGeneration);
             return;
           }
-          setSpokenAttemptAccepted(true);
           const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           if (counted) {
+            setSpokenAttemptAccepted(true);
             const newCount = pronCountRef.current + 1;
             pronCountRef.current = newCount;
             setPronCount(newCount);

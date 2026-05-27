@@ -85,6 +85,13 @@ export function getDefaultLearning(native: NativeLanguage): NativeLanguage {
   return all.find((l) => l !== native) ?? "english";
 }
 
+export function getEffectiveLearningLanguage(
+  native: NativeLanguage,
+  learning: NativeLanguage | null | undefined
+): NativeLanguage {
+  return learning && learning !== native ? learning : getDefaultLearning(native);
+}
+
 const translations: Record<NativeLanguage, Record<string, string>> = {
   english: {
     select_language: "Select Your Language",
@@ -339,12 +346,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         const ll = await AsyncStorage.getItem("@lingua_learning_language");
         const statsStr = await AsyncStorage.getItem("@lingua_stats");
         if (lang) {
-          setNativeLanguageState(lang as NativeLanguage);
+          const native = lang as NativeLanguage;
+          const learning = isNativeLanguage(ll) ? ll : null;
+          const effectiveLearning = getEffectiveLearningLanguage(native, learning);
+          setNativeLanguageState(native);
           setHasOnboarded(true);
-          if (ll) {
-            setLearningLanguageState(ll as NativeLanguage);
-          } else {
-            setLearningLanguageState(getDefaultLearning(lang as NativeLanguage));
+          setLearningLanguageState(effectiveLearning);
+          if (ll !== effectiveLearning) {
+            await AsyncStorage.setItem("@lingua_learning_language", effectiveLearning);
           }
         }
         if (statsStr) {
@@ -472,8 +481,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           setHasOnboarded(true);
         }
         if (!localLearning && isNativeLanguage(remote.learning_lang)) {
-          await AsyncStorage.setItem("@lingua_learning_language", remote.learning_lang);
-          setLearningLanguageState(remote.learning_lang);
+          const nativeForLearning = localNative ?? (isNativeLanguage(remote.native_lang) ? remote.native_lang : nativeLanguage) ?? "english";
+          const remoteLearning = getEffectiveLearningLanguage(nativeForLearning, remote.learning_lang);
+          await AsyncStorage.setItem("@lingua_learning_language", remoteLearning);
+          setLearningLanguageState(remoteLearning);
+          if (remoteLearning !== remote.learning_lang) {
+            queueProgressPush({ learning_lang: remoteLearning });
+          }
         }
 
         // If local is ahead, push that up too.
@@ -601,20 +615,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setNativeLanguageState(lang);
     setHasOnboarded(true);
     const currentLL = await AsyncStorage.getItem("@lingua_learning_language");
-    if (!currentLL) {
-      const defaultLL = getDefaultLearning(lang);
-      await AsyncStorage.setItem("@lingua_learning_language", defaultLL);
-      setLearningLanguageState(defaultLL);
-      queueProgressPush({ native_lang: lang, learning_lang: defaultLL });
+    const effectiveLearning = getEffectiveLearningLanguage(lang, isNativeLanguage(currentLL) ? currentLL : null);
+    if (!currentLL || currentLL !== effectiveLearning) {
+      await AsyncStorage.setItem("@lingua_learning_language", effectiveLearning);
+      setLearningLanguageState(effectiveLearning);
+      queueProgressPush({ native_lang: lang, learning_lang: effectiveLearning });
     } else {
       queueProgressPush({ native_lang: lang });
     }
   };
 
   const setLearningLanguage = async (lang: NativeLanguage) => {
-    await AsyncStorage.setItem("@lingua_learning_language", lang);
-    setLearningLanguageState(lang);
-    queueProgressPush({ learning_lang: lang });
+    const storedNative = await AsyncStorage.getItem("@lingua_language");
+    const native = isNativeLanguage(storedNative) ? storedNative : nativeLanguage;
+    const effectiveLearning = native ? getEffectiveLearningLanguage(native, lang) : lang;
+    await AsyncStorage.setItem("@lingua_learning_language", effectiveLearning);
+    setLearningLanguageState(effectiveLearning);
+    queueProgressPush({ learning_lang: effectiveLearning });
   };
 
   const updateStats = async (updates: Partial<UserStats>) => {

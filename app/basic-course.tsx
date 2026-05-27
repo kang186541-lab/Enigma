@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, getEffectiveLearningLanguage, type NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { C, F } from "@/constants/theme";
 import { addDayPhrases } from "@/lib/srsManager";
@@ -554,8 +554,8 @@ export default function BasicCourseScreen() {
   const { review } = useLocalSearchParams<{ review?: string }>();
   const isReviewMode = review === "1";
 
-  const lang   = (learningLanguage ?? "english") as string;
-  const native = (nativeLanguage ?? "english") as string;
+  const native = (nativeLanguage ?? "english") as NativeLanguage;
+  const lang   = getEffectiveLearningLanguage(native, learningLanguage) as string;
   const course = COURSES[lang] ?? COURSES.english;
 
   const topPad    = Platform.OS === "web" ? 67 : insets.top;

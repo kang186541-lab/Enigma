@@ -16,7 +16,7 @@ import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { Audio } from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/LanguageContext";
+import { useLanguage, NativeLanguage, getEffectiveLearningLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { queueProgressPush } from "@/lib/progressSync";
 import { XPToast } from "@/components/XPToast";
@@ -229,7 +229,7 @@ export default function DailyLessonScreen() {
   const apiBase = getApiUrl();
 
   const nativeLang: NativeLanguage = nativeLanguage ?? "english";
-  const learnLang: LearningLang = (learningLanguage as LearningLang) ?? getDefaultLearning(nativeLang) as LearningLang;
+  const learnLang: LearningLang = getEffectiveLearningLanguage(nativeLang, learningLanguage) as LearningLang;
 
   const [sessionWords, setSessionWords] = useState<LessonWord[]>([]);
   const [wordIndex, setWordIndex] = useState(0);

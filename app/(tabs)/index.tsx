@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLanguage, getLevel, getLevelProgress, getLevelName, NativeLanguage } from "@/context/LanguageContext";
+import { useLanguage, getLevel, getLevelProgress, getLevelName, getEffectiveLearningLanguage, NativeLanguage } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
 import { LanguageChangeModal } from "@/components/LanguageChangeModal";
@@ -37,9 +37,8 @@ import { getDueCount } from "@/lib/srsManager";
 import { getTodayNote } from "@/data/culturalNotes";
 import { trackLearningEvent } from "@/lib/learningEvents";
 import { loadLearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
-import { loadTodaySpeakingProgress, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
+import { getSpeakingCountForLanguage, loadTodaySpeakingProgress, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 import {
-  getFallbackLearningLanguage,
   getHomeGoalPrompt,
   getHomeLearningGoalOptions,
   getTodaySpeakingMission,
@@ -189,6 +188,7 @@ export default function HomeScreen() {
   const [primaryGoal, setPrimaryGoal] = React.useState<LearningGoal | null>(null);
   const [spokenToday, setSpokenToday] = React.useState(0);
   const [showMorePractice, setShowMorePractice] = React.useState(false);
+  const effectiveLearningLang = getEffectiveLearningLanguage(nativeLang, learningLanguage);
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
@@ -201,16 +201,16 @@ export default function HomeScreen() {
   }, [stats.xp]);
 
   useEffect(() => {
-    const key = `basicCourseCompleted_${learningLanguage ?? "english"}`;
+    const key = `basicCourseCompleted_${effectiveLearningLang}`;
     AsyncStorage.getItem(key).then(v => setCourseCompleted(v === "true"));
-  }, [learningLanguage]);
+  }, [effectiveLearningLang]);
 
   useFocusEffect(React.useCallback(() => {
     loadProgress().then(setDailyProgress);
     getDueCount().then(setSrsDueCount);
     loadLearnerProfile().then((profile) => setPrimaryGoal(profile.goals[0] ?? null));
-    loadTodaySpeakingProgress().then((day) => setSpokenToday(day.count));
-  }, []));
+    loadTodaySpeakingProgress().then((day) => setSpokenToday(getSpeakingCountForLanguage(day, effectiveLearningLang)));
+  }, [effectiveLearningLang]));
 
   useEffect(() => {
     if (spokenToday <= 0) {
@@ -272,9 +272,6 @@ export default function HomeScreen() {
   const barW = xpAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] });
   const weekData   = getWeekStreakData(stats.streak, nativeLang);
   const streakText = getStreakText(stats.streak, nativeLang);
-  const effectiveLearningLang = ((learningLanguage && learningLanguage !== nativeLang)
-    ? learningLanguage
-    : getFallbackLearningLanguage(nativeLang)) as NativeLanguage;
   const todaySpeakingMission = getTodaySpeakingMission(nativeLang, effectiveLearningLang, primaryGoal, spokenToday);
   const displayedSpokenToday = Math.min(spokenToday, SPEAKING_DAILY_GOAL);
   const spokenProgressPct = Math.min(100, (spokenToday / SPEAKING_DAILY_GOAL) * 100);
@@ -422,7 +419,7 @@ export default function HomeScreen() {
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowLangModal(true); }}
           >
             <Text style={styles.langChipText}>
-              {LANG_FLAGS[nativeLang]} → {LANG_FLAGS[(learningLanguage ?? "english") as NativeLanguage]}
+              {LANG_FLAGS[nativeLang]} → {LANG_FLAGS[effectiveLearningLang]}
             </Text>
             <Text style={styles.langChipEdit}>
               {nativeLang === "korean" ? "변경" : nativeLang === "spanish" ? "Cambiar" : "Change"}
@@ -784,7 +781,7 @@ export default function HomeScreen() {
       </View>
 
       {/* ── TODAY'S CULTURAL NOTE ── */}
-      <CulturalNoteSection nativeLang={nativeLang} learningLang={learningLanguage ?? "english"} />
+      <CulturalNoteSection nativeLang={nativeLang} learningLang={effectiveLearningLang} />
 
       {/* ── QUICK PRACTICE ────────────────────────────── */}
       <GoldDivider label={nativeLang === "korean" ? "빠른 학습" : nativeLang === "spanish" ? "PRÁCTICA RÁPIDA" : "QUICK PRACTICE"} />

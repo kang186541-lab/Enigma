@@ -99,6 +99,10 @@ export async function loadTodaySpeakingProgress(): Promise<SpeakingDayProgress> 
   };
 }
 
+export function getSpeakingCountForLanguage(day: SpeakingDayProgress, targetLanguage: string): number {
+  return day.byLanguage?.[targetLanguage] ?? 0;
+}
+
 export async function recordSpokenSentence(params: {
   targetLanguage: string;
   promptKey: string;
