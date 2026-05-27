@@ -19,7 +19,8 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { C, F } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, getEffectiveLearningLanguage } from "@/context/LanguageContext";
+import { getHeroCopy } from "@/lib/heroCopy";
 
 const SEEN_KEY = "@lingua_signin_modal_seen_v1";
 
@@ -80,7 +81,7 @@ const COPY: Record<LangKey, {
 
 export function FirstTimeSignInModal() {
   const { user, loading: authLoading, signInWithGoogle, signInWithEmail } = useAuth();
-  const { hasOnboarded, isHydrated, stats, nativeLanguage } = useLanguage();
+  const { hasOnboarded, isHydrated, stats, nativeLanguage, learningLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
   const [seenChecked, setSeenChecked] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -148,6 +149,13 @@ export function FirstTimeSignInModal() {
 
   const lc = (nativeLanguage ?? "english") as LangKey;
   const c = COPY[lc];
+  // Prepend the brand-promise tagline so the modal delivers the same
+  // "Rudy / 5 min / first sentence" message the home and onboarding hero
+  // cards do. Source of truth: lib/heroCopy.ts. Falls through to the
+  // self-learn placeholder when no learning language is set yet (rare —
+  // existing users hitting this modal already have onboarding done).
+  const effectiveLearning = getEffectiveLearningLanguage(lc, learningLanguage);
+  const heroTagline = getHeroCopy(lc, effectiveLearning).tagline;
 
   return (
     <Modal
@@ -159,6 +167,7 @@ export function FirstTimeSignInModal() {
       <View style={styles.backdrop}>
         <View style={styles.card}>
           <Text style={styles.title}>{c.title}</Text>
+          <Text style={styles.tagline}>{heroTagline}</Text>
           <Text style={styles.body}>{c.body(stats.xp, stats.streak)}</Text>
 
           <Pressable
@@ -244,6 +253,14 @@ const styles = StyleSheet.create({
     color: C.gold,
     lineHeight: 26,
     letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  tagline: {
+    fontFamily: F.bodySemi,
+    fontSize: 13.5,
+    color: C.gold,
+    lineHeight: 20,
+    fontStyle: "italic",
     marginBottom: 2,
   },
   body: {

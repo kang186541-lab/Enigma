@@ -21,10 +21,29 @@ import { Platform } from "react-native";
 import type { Session, User } from "@supabase/supabase-js";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/lib/supabase";
 import { flushProgressPush } from "@/lib/progressSync";
 import { clearLocalProgressState } from "@/lib/progressStorage";
 import { setUserContext } from "@/lib/monitoring";
+import { Analytics } from "@/lib/analytics";
+
+async function inferNativeLang(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem("@lingua_language");
+  } catch {
+    return null;
+  }
+}
+
+function identifyUser(userId: string): void {
+  // Fire-and-forget — Analytics.identify is internally a no-op when the
+  // provider is unconfigured, but we still defer the inference lookup so
+  // it never blocks the auth callback.
+  inferNativeLang().then((nativeLangInferred) => {
+    Analytics.identify(userId, { native_lang_inferred: nativeLangInferred });
+  });
+}
 
 interface AuthContextValue {
   user: User | null;
@@ -56,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: data.session.user.id,
           email: data.session.user.email ?? undefined,
         });
+        identifyUser(data.session.user.id);
       }
       setLoading(false);
     });
@@ -71,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: nextSession.user.id,
           email: nextSession.user.email ?? undefined,
         });
+        identifyUser(nextSession.user.id);
       } else {
         setUserContext(null);
       }
@@ -170,6 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     await clearLocalProgressState();
     setUserContext(null);
+    Analytics.reset();
   }, []);
 
   const value = useMemo<AuthContextValue>(

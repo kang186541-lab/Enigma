@@ -25,6 +25,7 @@ import {
   writeJson,
 } from "@/lib/progressStorage";
 import { supabase } from "@/lib/supabase";
+import { Analytics } from "@/lib/analytics";
 
 export type NativeLanguage = "korean" | "english" | "spanish";
 
@@ -88,6 +89,11 @@ export interface LanguageContextType {
   pendingLevelUp: Level | null;
   clearLevelUp: () => void;
   syncStatus: ProgressSyncSnapshot;
+  // One-question motivation survey — flipped to true at most once per
+  // installation, the very first time a user gains positive XP without an
+  // onboarding goal already on file. See components/MotivationSurvey.tsx.
+  showMotivationSurvey: boolean;
+  dismissMotivationSurvey: () => void;
 }
 
 export function getDefaultLearning(native: NativeLanguage): NativeLanguage {
@@ -286,6 +292,13 @@ const STORY_IO_KEY = "ioRatioTracking";
 const STORY_CLUES_KEY = "storyCluesCollected";
 const KNOWN_WORDS_KEY = "@lingua_known_words";
 
+/**
+ * Sticky flag for the one-question motivation survey. Stored under v1 so a
+ * future revision (e.g. seasonal re-ask) can pick a fresh key without
+ * disturbing existing users who already answered or skipped.
+ */
+const MOTIVATION_SURVEY_SEEN_KEY = "@lingua_motivation_survey_seen_v1";
+
 function isNativeLanguage(value: unknown): value is NativeLanguage {
   return value === "korean" || value === "english" || value === "spanish";
 }
@@ -333,6 +346,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [pendingLevelUp, setPendingLevelUp] = useState<Level | null>(null);
+  const [showMotivationSurvey, setShowMotivationSurvey] = useState(false);
+  // Guard: once a session has decided not to show the survey we don't bother
+  // re-checking on every XP delta. The check is also gated by the persisted
+  // SURVEY_SEEN_KEY flag so reinstalls behave correctly.
+  const motivationSurveyEvaluatedRef = useRef(false);
   const [syncStatus, setSyncStatus] = useState<ProgressSyncSnapshot>({
     status: "idle",
     lastSyncedAt: null,
@@ -349,6 +367,41 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [stats]);
 
   useEffect(() => subscribeProgressSync(setSyncStatus), []);
+
+  // ── day1_return analytics ──────────────────────────────────────────────────
+  // Fire once per UTC day when the learner comes back the calendar day after
+  // their previous session. We persist the UTC date of the last emission in
+  // AsyncStorage so a remount inside the same day cannot double-count.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const lastSessionDate = await AsyncStorage.getItem("@lingua_last_session_date");
+        if (!lastSessionDate) return;
+        const todayUtc = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+        if (todayUtc === lastSessionDate) return;
+        // Compute the calendar-day diff in UTC. We only want exact diff === 1.
+        const lastMs = Date.parse(`${lastSessionDate}T00:00:00Z`);
+        const todayMs = Date.parse(`${todayUtc}T00:00:00Z`);
+        if (!Number.isFinite(lastMs) || !Number.isFinite(todayMs)) return;
+        const diffDays = Math.round((todayMs - lastMs) / 86_400_000);
+        if (diffDays !== 1) return;
+        const emitted = await AsyncStorage.getItem("@lingua_day1_return_emitted");
+        if (emitted === todayUtc) return;
+        if (cancelled) return;
+        Analytics.track("day1_return");
+        await AsyncStorage.setItem("@lingua_day1_return_emitted", todayUtc);
+      } catch (e) {
+        // Telemetry must never throw. Best-effort only.
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("[Analytics] day1_return check failed:", e);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -697,6 +750,51 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     queueProgressPush({ learning_lang: effectiveLearning });
   };
 
+  // ── Motivation survey: eligibility check & dismiss ───────────────────────
+  //
+  // The survey is allowed to fire when ALL of the following hold:
+  //   1. The user just gained positive XP (gated at the call site).
+  //   2. The seen-flag at MOTIVATION_SURVEY_SEEN_KEY is unset.
+  //   3. `learner_profile.goals` is empty — onboarding step 3 (or a previous
+  //      survey answer) takes precedence and suppresses forever.
+  //
+  // The decision happens async so we never block the stats write. We import
+  // `loadLearnerProfile` lazily to avoid a static cycle (the profile module
+  // already imports from progressSync, which can transitively touch this
+  // file in some bundlers).
+  const evaluateMotivationSurvey = async () => {
+    try {
+      const seen = await AsyncStorage.getItem(MOTIVATION_SURVEY_SEEN_KEY);
+      if (seen === "1") return;
+      const { loadLearnerProfile } = await import("@/lib/learnerProfile");
+      const profile = await loadLearnerProfile();
+      if (profile.goals && profile.goals.length > 0) {
+        // Onboarding (or a prior survey) already captured a goal — never
+        // re-ask. Persist the flag so subsequent boots short-circuit at
+        // step 2 above and never even load the profile.
+        await AsyncStorage.setItem(MOTIVATION_SURVEY_SEEN_KEY, "1").catch(() => {});
+        return;
+      }
+      setShowMotivationSurvey(true);
+    } catch (e) {
+      // Survey is best-effort. A read failure shouldn't block learning.
+      if (process.env.NODE_ENV !== "production") {
+        console.warn('[MotivationSurvey] eligibility check failed:', e);
+      }
+    }
+  };
+
+  const dismissMotivationSurvey = () => {
+    setShowMotivationSurvey(false);
+    // Persist regardless of whether the user picked or skipped — either way
+    // we never want to re-prompt. Stays fire-and-forget.
+    AsyncStorage.setItem(MOTIVATION_SURVEY_SEEN_KEY, "1").catch((e) => {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn('[MotivationSurvey] persist seen failed:', e);
+      }
+    });
+  };
+
   const updateStats = async (updates: StatsUpdate) => {
     const run = async () => {
       const currentStats = statsRef.current;
@@ -755,6 +853,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         addWeeklyXP(xpDelta).catch((e) => console.warn('[League] weekly XP update failed:', e));
       }
 
+      // ── Motivation survey trigger ───────────────────────────────────────────
+      // We probe at most once per app session. The actual modal-vs-suppress
+      // decision is async (reads AsyncStorage + learner profile), so we kick
+      // it off fire-and-forget and let setShowMotivationSurvey flip the flag
+      // on a later tick. Whichever screen is mounted next picks it up.
+      if (xpDelta > 0 && !motivationSurveyEvaluatedRef.current) {
+        motivationSurveyEvaluatedRef.current = true;
+        void evaluateMotivationSurvey();
+      }
+
       // Fire-and-forget: push to Supabase if signed in (no-op otherwise — the
       // queue helper itself checks for a session before sending).
       queueProgressPush({
@@ -785,7 +893,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, isHydrated, stats, updateStats, awardXp, t, pendingLevelUp, clearLevelUp, syncStatus }}>
+    <LanguageContext.Provider value={{ nativeLanguage, setNativeLanguage, learningLanguage, setLearningLanguage, hasOnboarded, isHydrated, stats, updateStats, awardXp, t, pendingLevelUp, clearLevelUp, syncStatus, showMotivationSurvey, dismissMotivationSurvey }}>
       {children}
     </LanguageContext.Provider>
   );

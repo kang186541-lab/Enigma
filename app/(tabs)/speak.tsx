@@ -26,7 +26,9 @@ import { CoachingCard } from "@/components/rudy/CoachingCard";
 import { useLocalized } from "@/lib/runtimeTranslate";
 import { getCefrTierLabel } from "@/lib/dailyCourseData";
 import { trackLearningEvent } from "@/lib/learningEvents";
+import { Analytics } from "@/lib/analytics";
 import {
+  isLearningGoal,
   loadLearnerProfile,
   loadPronunciationPractice,
   setPrimaryLearningGoal,
@@ -1296,7 +1298,11 @@ export default function SpeakScreen() {
     loadLearnerProfile()
       .then((profile) => {
         if (cancelled) return;
-        const goal = profile.goals[0] ?? null;
+        // Goals may contain MotivationKey survey values mixed with the
+        // onboarding LearningGoal. Pick the first entry that's a true
+        // LearningGoal so the speak session honors the user's chosen practice
+        // context and ignores the orthogonal motivation answer.
+        const goal: LearningGoal | null = profile.goals.find(isLearningGoal) ?? null;
         selectedGoalRef.current = goal;
         setSelectedGoal(goal);
         if (goal) void loadSession(activeLang);
@@ -1411,6 +1417,14 @@ export default function SpeakScreen() {
       setSttError(msg);
       if (!data.feedback) setSttError(getNoVoiceDetectedMessage(nativeLang));
       return 0;
+    }
+    // First-ever successful utterance — emit BEFORE the per-attempt count
+    // increments downstream so the property reflects the original state.
+    if (pronCountRef.current === 0) {
+      Analytics.track("first_utterance_success", {
+        learning_lang: activeLang,
+        score: scoreVal,
+      });
     }
     setScore(scoreVal);
     setAccuracyScore(data.accuracyScore ?? null);
@@ -1660,6 +1674,11 @@ export default function SpeakScreen() {
 
     if (recordStartPendingRef.current) return;
     recordStartPendingRef.current = true;
+
+    // First-ever utterance attempt for this learner — fires once before count increments.
+    if (pronCountRef.current === 0) {
+      Analytics.track("first_utterance_attempt", { learning_lang: activeLang });
+    }
 
     // Native path (iOS / Android) — use expo-av Audio.Recording
     if (Platform.OS !== "web") {

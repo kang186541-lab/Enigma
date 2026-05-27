@@ -23,14 +23,18 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { FirstTimeSignInModal } from "@/components/FirstTimeSignInModal";
+import { MotivationSurvey } from "@/components/MotivationSurvey";
 import { queryClient } from "@/lib/query-client";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { C } from "@/constants/theme";
 import { initMonitoring } from "@/lib/monitoring";
+import { Analytics } from "@/lib/analytics";
 
 initMonitoring();
+Analytics.init();
+Analytics.track("app_open");
 
 SplashScreen.preventAutoHideAsync();
 
@@ -178,6 +182,7 @@ export default function RootLayout() {
                   <OfflineBanner />
                   <RootLayoutNav />
                   <FirstTimeSignInModal />
+                  <MotivationSurvey />
                 </LanguageProvider>
               </AuthProvider>
             </ThemeProvider>

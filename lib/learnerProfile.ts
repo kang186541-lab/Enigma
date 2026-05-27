@@ -21,6 +21,31 @@ export type CefrLevel =
 export type LearningGoal =
   | "travel" | "work" | "study" | "hobby" | "relationship" | "exam" | "unknown";
 
+/**
+ * One-question motivation survey (fires after the user's first XP-earning
+ * session — see components/MotivationSurvey.tsx). Stored alongside the
+ * onboarding `LearningGoal` in `learner_profile.goals`. The two namespaces are
+ * intentionally disjoint so a stored value identifies which path wrote it.
+ */
+export type MotivationKey =
+  | "drama" | "travel" | "friendship" | "work_study" | "curious" | "other";
+
+export const MOTIVATION_KEYS: readonly MotivationKey[] = [
+  "drama", "travel", "friendship", "work_study", "curious", "other",
+] as const;
+
+export function isMotivationKey(value: unknown): value is MotivationKey {
+  return typeof value === "string" && (MOTIVATION_KEYS as readonly string[]).includes(value);
+}
+
+export function isLearningGoal(value: unknown): value is LearningGoal {
+  return typeof value === "string" &&
+    ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"].includes(value);
+}
+
+/** Goal-array element: either an onboarding LearningGoal or a survey MotivationKey. */
+export type GoalEntry = LearningGoal | MotivationKey;
+
 export type BasicCourseReviewSection = "write" | "listen" | "speak" | "full";
 
 export interface BasicCourseState {
@@ -75,7 +100,9 @@ export interface LearnerProfile {
   level: Partial<Record<string, CefrLevel>>;  // { english: "A2-mid", spanish: "A1-low" }
 
   // Goals & motivation
-  goals: LearningGoal[];           // ranked most→least important
+  // ranked most→least important. May contain a mix of onboarding LearningGoal
+  // keys and one-question survey MotivationKey values.
+  goals: GoalEntry[];
   motivationText: string | null;   // free-form "why are you learning?"
 
   // Personal details the tutor learns
@@ -484,6 +511,49 @@ export async function setPrimaryLearningGoal(goal: LearningGoal): Promise<void> 
     ...p,
     goals: [goal, ...(p.goals ?? []).filter((g) => g !== goal)],
   });
+}
+
+/**
+ * Replace `goals` with the given array. Used by the one-question motivation
+ * survey (components/MotivationSurvey.tsx) so the user's chosen reason
+ * overwrites any prior state — by design the survey only fires when `goals`
+ * is empty, so this is effectively an initial write.
+ *
+ * When the call shape matches the survey (a single-element array of a known
+ * MotivationKey) we also emit a `motivation_chosen` analytics event so growth
+ * can correlate motivation buckets with retention without a separate hook.
+ */
+export async function updateGoals(
+  goals: GoalEntry[],
+  meta?: { learningLang?: string | null },
+): Promise<void> {
+  const p = await loadLearnerProfile();
+  // De-dupe while preserving order so the array stays meaningful.
+  const seen = new Set<string>();
+  const next: GoalEntry[] = [];
+  for (const g of goals) {
+    if (!g || seen.has(g)) continue;
+    seen.add(g);
+    next.push(g);
+  }
+  await saveLearnerProfile({ ...p, goals: next });
+
+  // Survey-shape detection: exactly one motivation key. Anything else is
+  // an onboarding/edit flow — leave it un-instrumented to avoid noisy events.
+  if (next.length === 1 && isMotivationKey(next[0])) {
+    try {
+      const { Analytics } = await import("@/lib/analytics");
+      Analytics.track("motivation_chosen", {
+        motivation: next[0],
+        learning_lang: meta?.learningLang ?? null,
+      });
+    } catch (err) {
+      // Analytics is fire-and-forget — never let it bubble.
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[learnerProfile] motivation analytics failed:", err);
+      }
+    }
+  }
 }
 
 /** Valid CEFR level values — used by the client to validate AI-returned levels. */
