@@ -23,6 +23,13 @@ import { getApiUrl } from "@/lib/query-client";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import { recordAudio } from "@/lib/audio";
 import { buildSpeakingPromptKey, recordSpokenSentence } from "@/lib/speakingProgress";
+import {
+  loadBasicCourseState,
+  markBasicCourseCompleted,
+  markBasicCourseReview,
+  saveBasicCourseProgress,
+  type BasicCourseReviewSection,
+} from "@/lib/learnerProfile";
 import { C, F } from "@/constants/theme";
 import { EmojiText } from "@/components/EmojiText";
 
@@ -522,7 +529,7 @@ const tc = StyleSheet.create({
 /* ─────────────────────────────────────────────
    Main Screen
    ───────────────────────────────────────────── */
-type ReviewSection = "write" | "listen" | "speak" | "full";
+type ReviewSection = BasicCourseReviewSection;
 const REVIEW_TS_KEY = (section: ReviewSection, lang: string) => `basicReviewTs_${section}_${lang}`;
 const REVIEW_SECTIONS = new Set<ReviewSection>(["write", "listen", "speak", "full"]);
 
@@ -592,25 +599,37 @@ export default function BasicCourseScreen() {
   useEffect(() => {
     if (!isReviewMode) return;
     const sections: ReviewSection[] = ["write", "listen", "speak", "full"];
-    Promise.all(sections.map(s => AsyncStorage.getItem(REVIEW_TS_KEY(s, lang)))).then(vals => {
-      setReviewTs({
-        write:  vals[0] ? Number(vals[0]) : null,
-        listen: vals[1] ? Number(vals[1]) : null,
-        speak:  vals[2] ? Number(vals[2]) : null,
-        full:   vals[3] ? Number(vals[3]) : null,
+    Promise.all([
+      loadBasicCourseState(lang),
+      ...sections.map(s => AsyncStorage.getItem(REVIEW_TS_KEY(s, lang))),
+    ]).then(([profileState, ...vals]) => {
+      const profileTs = profileState?.reviewTimestamps ?? {};
+      const nextReviewTs = {
+        write:  profileTs.write  ?? (vals[0] ? Number(vals[0]) : null),
+        listen: profileTs.listen ?? (vals[1] ? Number(vals[1]) : null),
+        speak:  profileTs.speak  ?? (vals[2] ? Number(vals[2]) : null),
+        full:   profileTs.full   ?? (vals[3] ? Number(vals[3]) : null),
+      };
+      setReviewTs(nextReviewTs);
+      sections.forEach((section, index) => {
+        const legacyValue = vals[index] ? Number(vals[index]) : null;
+        if (typeof legacyValue === "number" && !profileTs[section]) {
+          markBasicCourseReview(lang, section, legacyValue)
+            .catch((e) => console.warn('[BasicCourse] Failed to migrate review timestamp:', e));
+        }
       });
-    });
+    }).catch((e) => console.warn('[BasicCourse] Failed to load review timestamps:', e));
   }, [isReviewMode, lang]);
 
-  useEffect(() => {
-    if (!isReviewMode || !initialReviewSection) return;
-    AsyncStorage.setItem(REVIEW_TS_KEY(initialReviewSection, lang), String(Date.now()))
-      .catch((e) => console.warn('[BasicCourse] Failed to mark review timestamp:', e));
-  }, [initialReviewSection, isReviewMode, lang]);
+  const markReviewCompleted = async (section: ReviewSection) => {
+    const timestamp = Date.now();
+    setReviewTs(prev => ({ ...prev, [section]: timestamp }));
+    await AsyncStorage.setItem(REVIEW_TS_KEY(section, lang), String(timestamp));
+    await markBasicCourseReview(lang, section, timestamp);
+  };
 
   const startReviewSection = async (section: ReviewSection) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    await AsyncStorage.setItem(REVIEW_TS_KEY(section, lang), String(Date.now()));
     setReviewSection(section);
     setSubIdx(0);
     setFlipped(false); setTraced(false); setAudioPlayed(false);
@@ -653,25 +672,48 @@ export default function BasicCourseScreen() {
 
   const loadProgress = async () => {
     try {
+      const profileState = await loadBasicCourseState(lang);
+      if (profileState?.completed) {
+        setStep(3);
+        setSubIdx(0);
+        return;
+      }
+      if (profileState) {
+        setStep(profileState.step ?? 0);
+        setSubIdx(profileState.subIdx ?? 0);
+        return;
+      }
+      const legacyDone = await AsyncStorage.getItem(DONE_KEY(lang));
+      if (legacyDone === "true") {
+        await markBasicCourseCompleted(lang);
+        setStep(3);
+        setSubIdx(0);
+        return;
+      }
       const raw = await AsyncStorage.getItem(PROGRESS_KEY(lang));
       if (raw) {
         const p = JSON.parse(raw);
         setStep(p.step ?? 0);
         setSubIdx(p.subIdx ?? 0);
+        await saveBasicCourseProgress(lang, p.step ?? 0, p.subIdx ?? 0);
       }
     } catch (e) { console.warn('[BasicCourse] Failed to load progress:', e); }
   };
 
   const saveProgress = async (s: number, idx: number) => {
-    try { await AsyncStorage.setItem(PROGRESS_KEY(lang), JSON.stringify({ step: s, subIdx: idx })); } catch (e) { console.warn('[BasicCourse] Failed to save progress:', e); }
+    try {
+      await AsyncStorage.setItem(PROGRESS_KEY(lang), JSON.stringify({ step: s, subIdx: idx }));
+      await saveBasicCourseProgress(lang, s, idx);
+    } catch (e) { console.warn('[BasicCourse] Failed to save progress:', e); }
   };
 
   const markDone = async () => {
     try {
       const alreadyDone = await AsyncStorage.getItem(DONE_KEY(lang));
+      const { wasAlreadyCompleted } = await markBasicCourseCompleted(lang);
       await AsyncStorage.setItem(DONE_KEY(lang), "true");
       await AsyncStorage.removeItem(PROGRESS_KEY(lang));
-      if (alreadyDone !== "true" && !isReviewMode) await awardXp(100);
+      if (alreadyDone !== "true" && !wasAlreadyCompleted && !isReviewMode) await awardXp(100);
     } catch (e) { console.warn('[BasicCourse] Failed to mark course done:', e); }
   };
 
@@ -755,6 +797,9 @@ export default function BasicCourseScreen() {
           });
         } else {
           Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
+            if (reviewSection) {
+              markReviewCompleted(reviewSection).catch((e) => console.warn('[BasicCourse] Failed to mark review complete:', e));
+            }
             setShowReviewMenu(true);
             setReviewSection(null);
             Animated.timing(fadeAnim, { toValue: 1, duration: 220, useNativeDriver: true }).start();

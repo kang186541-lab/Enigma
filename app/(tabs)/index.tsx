@@ -36,7 +36,7 @@ import {
 import { getDueCount } from "@/lib/srsManager";
 import { getTodayNote } from "@/data/culturalNotes";
 import { trackLearningEvent } from "@/lib/learningEvents";
-import { loadLearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
+import { loadLearnerProfile, markBasicCourseCompleted, type LearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
 import { getSpeakingCountForLanguage, loadTodaySpeakingProgress, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 import {
   getHomeGoalPrompt,
@@ -227,18 +227,39 @@ export default function HomeScreen() {
     Animated.spring(xpAnim, { toValue: progress, useNativeDriver: false, tension: 40, friction: 8 }).start();
   }, [stats.xp]);
 
-  useEffect(() => {
+  const refreshBasicCourseCompleted = React.useCallback(async (profile?: LearnerProfile) => {
     const key = `basicCourseCompleted_${effectiveLearningLang}`;
-    AsyncStorage.getItem(key).then(v => setCourseCompleted(v === "true"));
+    const loadedProfile = profile ?? await loadLearnerProfile();
+    if (loadedProfile.basicCourse?.[effectiveLearningLang]?.completed === true) {
+      setCourseCompleted(true);
+      return;
+    }
+    const legacyDone = await AsyncStorage.getItem(key);
+    if (legacyDone === "true") {
+      await markBasicCourseCompleted(effectiveLearningLang);
+      setCourseCompleted(true);
+      return;
+    }
+    setCourseCompleted(false);
   }, [effectiveLearningLang]);
+
+  useEffect(() => {
+    refreshBasicCourseCompleted().catch((e) => {
+      console.warn("[Home] Failed to load Basic Course completion:", e);
+      setCourseCompleted(false);
+    });
+  }, [refreshBasicCourseCompleted]);
 
   const refreshHomeProgress = React.useCallback(() => {
     loadProgress().then(setDailyProgress);
     getDueCount().then(setSrsDueCount);
-    loadLearnerProfile().then((profile) => setPrimaryGoal(profile.goals[0] ?? null));
+    loadLearnerProfile().then((profile) => {
+      setPrimaryGoal(profile.goals[0] ?? null);
+      void refreshBasicCourseCompleted(profile);
+    });
     loadTodaySpeakingProgress().then((day) => setSpokenToday(getSpeakingCountForLanguage(day, effectiveLearningLang)));
     AsyncStorage.getItem("@lingua_last_session_date").then(setLastSessionDate);
-  }, [effectiveLearningLang]);
+  }, [effectiveLearningLang, refreshBasicCourseCompleted]);
 
   useFocusEffect(refreshHomeProgress);
 

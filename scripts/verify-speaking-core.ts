@@ -429,6 +429,23 @@ assert.ok(
   "Learner profile hydrate should merge local speaking/tutor progress instead of blindly overwriting it"
 );
 assert.ok(
+  learnerProfileSource.includes("export interface BasicCourseState") &&
+  learnerProfileSource.includes("function mergeBasicCourseState") &&
+  learnerProfileSource.includes("export async function loadBasicCourseState") &&
+  learnerProfileSource.includes("export async function saveBasicCourseProgress") &&
+  learnerProfileSource.includes("export async function markBasicCourseCompleted") &&
+  learnerProfileSource.includes("export async function markBasicCourseReview") &&
+  learnerProfileSource.includes("basicCourse: mergeBasicCourseState"),
+  "Learner profile should be the canonical synced store for Basic Course progress, completion, and review timestamps"
+);
+assert.ok(
+  progressSyncSource.includes('select("xp, level, streak_days, words_learned, learner_profile")') &&
+  progressSyncSource.includes('k === "learner_profile"') &&
+  progressSyncSource.includes('await import("@/lib/learnerProfile")') &&
+  progressSyncSource.includes("mergeLearnerProfiles(v as any, remoteProfile as any)"),
+  "Progress sync should merge learner_profile with the server row before pushing so devices do not clobber Basic Course or tutor data"
+);
+assert.ok(
   srsManagerSource.includes("export function mergeSrsData") &&
   srsManagerSource.includes("queueProgressPush({ srs_data: merged })") &&
   dailyCourseDataSource.includes("export function mergeDailyCourseProgress") &&
@@ -474,9 +491,10 @@ assert.ok(
   basicSkipBlock &&
   !basicSkipBlock.includes("DONE_KEY") &&
   basicCourseSource.includes("const alreadyDone = await AsyncStorage.getItem(DONE_KEY(lang));") &&
-  basicCourseSource.includes('if (alreadyDone !== "true" && !isReviewMode) await awardXp(100);') &&
+  basicCourseSource.includes("const { wasAlreadyCompleted } = await markBasicCourseCompleted(lang);") &&
+  basicCourseSource.includes('if (alreadyDone !== "true" && !wasAlreadyCompleted && !isReviewMode) await awardXp(100);') &&
   basicCourseSource.includes("await awardXp(5);"),
-  "Basic Course Go Home should not mark the course complete, and completion/greeting rewards should use delta XP"
+  "Basic Course Go Home should not mark the course complete, and completion/greeting rewards should use delta XP without duplicate profile-backed completion awards"
 );
 assert.ok(
   basicCourseSource.includes('EN_PHONETIC: Record<string, string>') &&
@@ -488,12 +506,15 @@ assert.ok(
 );
 assert.ok(
   homeSource.includes('/basic-course?review=1&section=full') &&
-  basicCourseSource.includes('type ReviewSection = "write" | "listen" | "speak" | "full"') &&
+  homeSource.includes("refreshBasicCourseCompleted") &&
+  homeSource.includes("markBasicCourseCompleted") &&
+  homeSource.includes("loadedProfile.basicCourse?.[effectiveLearningLang]?.completed === true") &&
+  basicCourseSource.includes('type ReviewSection = BasicCourseReviewSection;') &&
   basicCourseSource.includes('const initialReviewSection = isReviewMode ? parseReviewSection(section) : null;') &&
   basicCourseSource.includes('const [showReviewMenu, setShowReviewMenu] = useState(isReviewMode && !initialReviewSection);') &&
   basicCourseSource.includes('reviewSection === "full" && step < 2') &&
   basicCourseSource.includes('setStep(s => s + 1);'),
-  "Basic Course review entry should open full review by default and protect full review step progression"
+  "Basic Course review entry should open full review by default, refresh profile-backed completion on Home focus, and protect full review step progression"
 );
 assert.ok(
   basicCourseSource.includes("const stepReady = step === 0") &&
@@ -503,6 +524,10 @@ assert.ok(
 );
 assert.ok(
   basicCourseSource.includes("import { recordAudio } from \"@/lib/audio\";") &&
+  basicCourseSource.includes("loadBasicCourseState") &&
+  basicCourseSource.includes("saveBasicCourseProgress") &&
+  basicCourseSource.includes("markBasicCourseCompleted") &&
+  basicCourseSource.includes("markBasicCourseReview") &&
   basicCourseSource.includes("recordSpokenSentence") &&
   basicCourseSource.includes("const BASIC_COURSE_RECORDING_MS = 8000;") &&
   basicCourseSource.includes("recordAudio(BASIC_COURSE_RECORDING_MS)") &&
@@ -513,6 +538,12 @@ assert.ok(
   !basicCourseSource.includes("Native does not run this lightweight web recorder") &&
   !basicCourseSource.includes("await markGreetAttemptComplete(null);\n      return;\n    }\n\n    if (!navigator?.mediaDevices?.getUserMedia)"),
   "Basic Course greeting practice should require accepted captured audio, update speaking progress, and avoid duplicate completion"
+);
+assert.ok(
+  basicCourseSource.includes("const markReviewCompleted = async") &&
+  basicCourseSource.includes("markReviewCompleted(reviewSection)") &&
+  !basicCourseSource.includes("if (!isReviewMode || !initialReviewSection) return;"),
+  "Basic Course review timestamps should be written when review is completed, not merely opened"
 );
 for (const [name, source] of [
   ["Speak", speakSource],

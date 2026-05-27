@@ -21,6 +21,17 @@ export type CefrLevel =
 export type LearningGoal =
   | "travel" | "work" | "study" | "hobby" | "relationship" | "exam" | "unknown";
 
+export type BasicCourseReviewSection = "write" | "listen" | "speak" | "full";
+
+export interface BasicCourseState {
+  completed: boolean;
+  step: number;
+  subIdx: number;
+  updatedAt: string;
+  completedAt: string | null;
+  reviewTimestamps: Partial<Record<BasicCourseReviewSection, number>>;
+}
+
 /**
  * Error pattern: a recurring type of mistake the learner makes.
  * `key` is a stable identifier like "past_tense_irregular", chosen by the AI
@@ -59,6 +70,7 @@ export interface LearnerProfile {
   sessionCount: number;
   lastSessionAt: string | null;    // ISO
   speakingProgress: SpeakingProgress;
+  basicCourse: Partial<Record<string, BasicCourseState>>;
 
   // ── Phase 4: Persistent tutor memory ─────────────────────────────────────
   // Per-tutor state — each tutor remembers their own sessions with the learner,
@@ -118,6 +130,7 @@ const EMPTY_PROFILE: LearnerProfile = {
     dailyGoal: 19,
     history: {},
   },
+  basicCourse: {},
   tutorMemory: {},
 };
 
@@ -196,6 +209,47 @@ function mergeSpeakingProgress(local: SpeakingProgress, remote: SpeakingProgress
   };
 }
 
+const BASIC_COURSE_REVIEW_SECTIONS: BasicCourseReviewSection[] = ["write", "listen", "speak", "full"];
+
+function latestNum(a: number | null | undefined, b: number | null | undefined): number | null {
+  if (typeof a !== "number") return typeof b === "number" ? b : null;
+  if (typeof b !== "number") return a;
+  return Math.max(a, b);
+}
+
+function mergeBasicCourseState(
+  local: Partial<Record<string, BasicCourseState>> = {},
+  remote: Partial<Record<string, BasicCourseState>> = {},
+): Partial<Record<string, BasicCourseState>> {
+  const merged: Partial<Record<string, BasicCourseState>> = {};
+  for (const lang of new Set([...Object.keys(remote ?? {}), ...Object.keys(local ?? {})])) {
+    const l = local?.[lang];
+    const r = remote?.[lang];
+    if (!l && r) { merged[lang] = { ...r, reviewTimestamps: { ...(r.reviewTimestamps ?? {}) } }; continue; }
+    if (l && !r) { merged[lang] = { ...l, reviewTimestamps: { ...(l.reviewTimestamps ?? {}) } }; continue; }
+    if (!l || !r) continue;
+
+    const localTime = Date.parse(l.updatedAt ?? "") || 0;
+    const remoteTime = Date.parse(r.updatedAt ?? "") || 0;
+    const newer = localTime >= remoteTime ? l : r;
+    const reviewTimestamps: Partial<Record<BasicCourseReviewSection, number>> = {};
+    for (const section of BASIC_COURSE_REVIEW_SECTIONS) {
+      const ts = latestNum(l.reviewTimestamps?.[section], r.reviewTimestamps?.[section]);
+      if (typeof ts === "number") reviewTimestamps[section] = ts;
+    }
+
+    merged[lang] = {
+      completed: Boolean(l.completed || r.completed),
+      step: Math.max(0, newer.step ?? 0),
+      subIdx: Math.max(0, newer.subIdx ?? 0),
+      completedAt: latestIso(l.completedAt, r.completedAt),
+      updatedAt: latestIso(l.updatedAt, r.updatedAt) ?? new Date().toISOString(),
+      reviewTimestamps,
+    };
+  }
+  return merged;
+}
+
 function mergeTutorMemory(
   local: Partial<Record<string, TutorMemory>>,
   remote: Partial<Record<string, TutorMemory>>,
@@ -248,6 +302,7 @@ export function mergeLearnerProfiles(local: LearnerProfile, remote: LearnerProfi
       local.speakingProgress ?? EMPTY_PROFILE.speakingProgress,
       remote.speakingProgress ?? EMPTY_PROFILE.speakingProgress,
     ),
+    basicCourse: mergeBasicCourseState(local.basicCourse ?? {}, remote.basicCourse ?? {}),
     tutorMemory: mergeTutorMemory(local.tutorMemory ?? {}, remote.tutorMemory ?? {}),
   };
 }
@@ -317,6 +372,74 @@ export async function setPrimaryLearningGoal(goal: LearningGoal): Promise<void> 
 }
 
 /** Valid CEFR level values — used by the client to validate AI-returned levels. */
+function getBasicCourse(profile: LearnerProfile, lang: string): BasicCourseState | null {
+  return profile.basicCourse?.[lang] ?? null;
+}
+
+export async function loadBasicCourseState(lang: string): Promise<BasicCourseState | null> {
+  const p = await loadLearnerProfile();
+  return getBasicCourse(p, lang);
+}
+
+export async function saveBasicCourseProgress(lang: string, step: number, subIdx: number): Promise<BasicCourseState> {
+  const p = await loadLearnerProfile();
+  const prev = getBasicCourse(p, lang);
+  const now = new Date().toISOString();
+  const next: BasicCourseState = {
+    completed: prev?.completed ?? false,
+    step: Math.max(0, step),
+    subIdx: Math.max(0, subIdx),
+    updatedAt: now,
+    completedAt: prev?.completedAt ?? null,
+    reviewTimestamps: { ...(prev?.reviewTimestamps ?? {}) },
+  };
+  await saveLearnerProfile({
+    ...p,
+    basicCourse: { ...(p.basicCourse ?? {}), [lang]: next },
+  });
+  return next;
+}
+
+export async function markBasicCourseCompleted(lang: string): Promise<{ state: BasicCourseState; wasAlreadyCompleted: boolean }> {
+  const p = await loadLearnerProfile();
+  const prev = getBasicCourse(p, lang);
+  const now = new Date().toISOString();
+  const next: BasicCourseState = {
+    completed: true,
+    step: Math.max(prev?.step ?? 3, 3),
+    subIdx: prev?.subIdx ?? 0,
+    updatedAt: now,
+    completedAt: prev?.completedAt ?? now,
+    reviewTimestamps: { ...(prev?.reviewTimestamps ?? {}) },
+  };
+  await saveLearnerProfile({
+    ...p,
+    basicCourse: { ...(p.basicCourse ?? {}), [lang]: next },
+  });
+  return { state: next, wasAlreadyCompleted: prev?.completed === true };
+}
+
+export async function markBasicCourseReview(lang: string, section: BasicCourseReviewSection, timestamp = Date.now()): Promise<void> {
+  const p = await loadLearnerProfile();
+  const prev = getBasicCourse(p, lang);
+  const now = new Date().toISOString();
+  const next: BasicCourseState = {
+    completed: prev?.completed ?? false,
+    step: prev?.step ?? 0,
+    subIdx: prev?.subIdx ?? 0,
+    updatedAt: now,
+    completedAt: prev?.completedAt ?? null,
+    reviewTimestamps: {
+      ...(prev?.reviewTimestamps ?? {}),
+      [section]: timestamp,
+    },
+  };
+  await saveLearnerProfile({
+    ...p,
+    basicCourse: { ...(p.basicCourse ?? {}), [lang]: next },
+  });
+}
+
 export const CEFR_LEVELS: ReadonlyArray<CefrLevel> = [
   "A1-low", "A1-mid", "A1-high",
   "A2-low", "A2-mid", "A2-high",

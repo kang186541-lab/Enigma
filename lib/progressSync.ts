@@ -168,7 +168,7 @@ export async function pushServerProgress(
   // Fetch existing row (no error if missing — first push for this user).
   const { data: existing, error: fetchErr } = await supabase
     .from(TABLE)
-    .select("xp, level, streak_days, words_learned")
+    .select("xp, level, streak_days, words_learned, learner_profile")
     .eq("user_id", user.id)
     .maybeSingle();
   if (fetchErr) {
@@ -185,6 +185,14 @@ export async function pushServerProgress(
       if (typeof remote === "number" && typeof v === "number" && remote > v) {
         // Server is ahead — keep server's value, don't downgrade.
         row[k] = remote;
+        continue;
+      }
+    }
+    if (k === "learner_profile" && existing && v && typeof v === "object") {
+      const remoteProfile = (existing as Record<string, unknown>).learner_profile;
+      if (remoteProfile && typeof remoteProfile === "object") {
+        const { mergeLearnerProfiles } = await import("@/lib/learnerProfile");
+        row[k] = mergeLearnerProfiles(v as any, remoteProfile as any);
         continue;
       }
     }
