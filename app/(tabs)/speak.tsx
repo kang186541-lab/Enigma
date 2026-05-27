@@ -1453,11 +1453,11 @@ export default function SpeakScreen() {
       const targetDailyCount = getSpeakingCountForLanguage(day, activeLang);
       dailySpokenCountRef.current = targetDailyCount;
       setDailySpokenCount(targetDailyCount);
+      if (!counted) return false;
       if (!isGuidedSentenceMission) {
         awardSpokenAttemptXp(scoreVal, assessmentStatus);
         return true;
       }
-      if (!counted) return false;
       awardSpokenAttemptXp(scoreVal, assessmentStatus);
       if (isFirstSpeakingMission) {
         void trackLearningEvent("first_speaking_attempt_completed", {

@@ -463,9 +463,24 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         // Existing row — take the higher of (server, local) so reinstalls
         // never lose progress and a stale device can't downgrade the server.
         const remoteWords = (remote as { words_learned?: number }).words_learned ?? 0;
+        const remoteLastDate = remote.last_session_date ?? localDateStringFromIso(remote.last_session_at);
+        const candidateDates = [localLastSessionDate, remoteLastDate].filter(Boolean).sort() as string[];
+        const bestLastDate = candidateDates.length ? candidateDates[candidateDates.length - 1] : null;
+        const resolvedStreak =
+          localLastSessionDate && remoteLastDate
+            ? localLastSessionDate > remoteLastDate
+              ? local.streak
+              : remoteLastDate > localLastSessionDate
+              ? remote.streak_days
+              : Math.max(local.streak, remote.streak_days)
+            : localLastSessionDate
+            ? local.streak
+            : remoteLastDate
+            ? remote.streak_days
+            : Math.max(local.streak, remote.streak_days);
         const merged = { ...local };
         if (remote.xp > local.xp) merged.xp = remote.xp;
-        if (remote.streak_days > local.streak) merged.streak = remote.streak_days;
+        merged.streak = resolvedStreak;
         if (remoteWords > local.wordsLearned) merged.wordsLearned = remoteWords;
         if (
           merged.xp !== local.xp ||
@@ -476,9 +491,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           setStats(merged);
           await AsyncStorage.setItem("@lingua_stats", JSON.stringify(merged));
         }
-        const remoteLastDate = remote.last_session_date ?? localDateStringFromIso(remote.last_session_at);
-        const candidateDates = [localLastSessionDate, remoteLastDate].filter(Boolean).sort() as string[];
-        const bestLastDate = candidateDates.length ? candidateDates[candidateDates.length - 1] : null;
         if (bestLastDate) await AsyncStorage.setItem("@lingua_last_session_date", bestLastDate);
 
         if (!localNative && isNativeLanguage(remote.native_lang)) {
@@ -498,17 +510,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
         // If local is ahead, push that up too.
         if (
-          local.xp > remote.xp ||
-          local.streak > remote.streak_days ||
-          local.wordsLearned > remoteWords ||
+          merged.xp > remote.xp ||
+          merged.streak !== remote.streak_days ||
+          merged.wordsLearned > remoteWords ||
           (bestLastDate && bestLastDate !== remote.last_session_date)
         ) {
-          const bestXp = Math.max(local.xp, remote.xp);
           queueProgressPush({
-            xp: bestXp,
-            level: getLevel(bestXp).num,
-            streak_days: Math.max(local.streak, remote.streak_days),
-            words_learned: Math.max(local.wordsLearned, remoteWords),
+            xp: merged.xp,
+            level: getLevel(merged.xp).num,
+            streak_days: merged.streak,
+            words_learned: merged.wordsLearned,
             last_session_at: new Date().toISOString(),
             last_session_date: bestLastDate,
           });
@@ -522,21 +533,30 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         // OTHER direction: bringing the latest server snapshot down.
         const r = remote as unknown as Record<string, unknown>;
         try {
+          const localSrs = await readJson("@lingua_srs_data");
           if (r.srs_data) {
             const { hydrateSrsFromServer } = await import("@/lib/srsManager");
             await hydrateSrsFromServer(r.srs_data as any);
+          } else if (localSrs) {
+            queueProgressPush({ srs_data: localSrs });
           }
         } catch (e) { console.warn('[Sync] SRS hydrate failed:', e); }
         try {
+          const localCourse = await readJson("@daily_course_progress");
           if (r.daily_course_progress) {
             const { hydrateProgressFromServer } = await import("@/lib/dailyCourseData");
             await hydrateProgressFromServer(r.daily_course_progress as any);
+          } else if (localCourse) {
+            queueProgressPush({ daily_course_progress: localCourse });
           }
         } catch (e) { console.warn('[Sync] course hydrate failed:', e); }
         try {
+          const localAchievements = await readJson("@lingua_achievements");
           if (Array.isArray(r.achievements)) {
             const { hydrateAchievementsFromServer } = await import("@/lib/achievementManager");
             await hydrateAchievementsFromServer(r.achievements as string[]);
+          } else if (localAchievements) {
+            queueProgressPush({ achievements: localAchievements });
           }
         } catch (e) { console.warn('[Sync] achievements hydrate failed:', e); }
         try {
@@ -546,9 +566,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           }
         } catch (e) { console.warn('[Sync] weekly XP hydrate failed:', e); }
         try {
+          const localProfile = await readJson("@lingua_learner_profile");
           if (r.learner_profile) {
             const { hydrateLearnerProfileFromServer } = await import("@/lib/learnerProfile");
             await hydrateLearnerProfileFromServer(r.learner_profile as any);
+          } else if (localProfile) {
+            queueProgressPush({ learner_profile: localProfile });
           }
         } catch (e) { console.warn('[Sync] learner profile hydrate failed:', e); }
         try {

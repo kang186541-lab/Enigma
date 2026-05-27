@@ -178,7 +178,7 @@ export default function DailyLessonBridge() {
         day,
         sentence: getFirstSentence(day, learnLang),
         speakingCount: getSpeakingCountForLanguage(speakingDay, learnLang),
-        completed: progress.completedDays.includes(day.id) || progress.todayCompleted,
+        completed: progress.completedDays.includes(day.id),
       });
       setLoading(false);
     }

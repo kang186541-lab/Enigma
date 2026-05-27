@@ -306,11 +306,15 @@ assert.ok(
   !speakSource.includes("setSpokenAttemptAccepted(true);\n          const counted = await recordSpokenAttempt"),
   "Scored attempts should unlock Next only after spoken progress is actually counted"
 );
+const spokenSentenceRecordIndex = speakSource.indexOf("const { day, counted } = await recordSpokenSentence");
+const spokenCountGuardIndex = speakSource.indexOf("if (!counted) return false;", spokenSentenceRecordIndex);
+const openPracticeAwardIndex = speakSource.indexOf("if (!isGuidedSentenceMission)", spokenSentenceRecordIndex);
 assert.ok(
-  speakSource.includes("if (!isGuidedSentenceMission)") &&
-  speakSource.includes("return true;") &&
-  speakSource.includes("const { day, counted } = await recordSpokenSentence"),
-  "Open Speak pronunciation practice should record today's spoken progress while still accepting duplicate clinic attempts for UI flow"
+  spokenSentenceRecordIndex >= 0 &&
+  spokenCountGuardIndex > spokenSentenceRecordIndex &&
+  openPracticeAwardIndex > spokenCountGuardIndex &&
+  speakSource.includes("return true;"),
+  "Open Speak pronunciation practice should only award XP after the spoken attempt was counted"
 );
 assert.ok(
   homeSource.includes("showSecondaryHomeSections") &&
@@ -398,8 +402,10 @@ assert.ok(
   cardsSource.includes("getEffectiveLearningLanguage(native, learningLanguage)") &&
   basicCourseSource.includes("getEffectiveLearningLanguage(native, learningLanguage)") &&
   dailyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)") &&
+  dailyLessonSource.includes("completed: progress.completedDays.includes(day.id),") &&
+  !dailyLessonSource.includes("completed: progress.completedDays.includes(day.id) || progress.todayCompleted") &&
   rudyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)"),
-  "Shared language selection should prevent native-language courses across Home, Cards, Basic Course, Daily Lesson, and Rudy Lesson"
+  "Shared language selection should prevent native-language courses across Home, Cards, Basic Course, Daily Lesson, and Rudy Lesson; Daily Lesson completion must be day-specific"
 );
 assert.ok(
   progressSyncSource.includes("expectedUserId?: string | null") &&
@@ -407,8 +413,13 @@ assert.ok(
   progressSyncSource.includes("user.id !== expectedUserId") &&
   progressSyncSource.includes("pendingPatch = { ...toSend, ...pendingPatch }") &&
   progressSyncSource.includes('const COUNTER_KEYS = ["xp", "level", "words_learned"] as const') &&
-  !progressSyncSource.includes('"streak_days", "words_learned"'),
-  "Progress sync should preserve failed flushes, scope pending pushes to the queued user, and allow streak resets"
+  !progressSyncSource.includes('"streak_days", "words_learned"') &&
+  languageContextSource.includes("const resolvedStreak =") &&
+  languageContextSource.includes("localLastSessionDate > remoteLastDate") &&
+  languageContextSource.includes("remoteLastDate > localLastSessionDate") &&
+  languageContextSource.includes("streak_days: merged.streak") &&
+  !languageContextSource.includes("streak_days: Math.max(local.streak, remote.streak_days)"),
+  "Progress sync should preserve failed flushes, scope pending pushes to the queued user, and allow streak resets without stale-device resurrection"
 );
 assert.ok(
   progressStorageSource.includes('"@lingua_learning_events_v1"') &&
@@ -452,11 +463,23 @@ assert.ok(
   "Learner profile should be the canonical synced store for Basic Course, pronunciation practice, and Cards daily review memory"
 );
 assert.ok(
-  progressSyncSource.includes('select("xp, level, streak_days, words_learned, learner_profile")') &&
+  progressSyncSource.includes('select("xp, level, streak_days, words_learned, srs_data, daily_course_progress, learner_profile")') &&
   progressSyncSource.includes('k === "learner_profile"') &&
   progressSyncSource.includes('await import("@/lib/learnerProfile")') &&
-  progressSyncSource.includes("mergeLearnerProfiles(v as any, remoteProfile as any)"),
-  "Progress sync should merge learner_profile with the server row before pushing so devices do not clobber Basic Course or tutor data"
+  progressSyncSource.includes("mergeLearnerProfiles(v as any, remoteProfile as any)") &&
+  progressSyncSource.includes('k === "daily_course_progress"') &&
+  progressSyncSource.includes('await import("@/lib/dailyCourseData")') &&
+  progressSyncSource.includes("mergeDailyCourseProgress(v as any, remoteDailyCourse as any)") &&
+  progressSyncSource.includes('k === "srs_data"') &&
+  progressSyncSource.includes('await import("@/lib/srsManager")') &&
+  progressSyncSource.includes("mergeSrsData(v as any, remoteSrs as any)") &&
+  languageContextSource.includes('const localSrs = await readJson("@lingua_srs_data")') &&
+  languageContextSource.includes("queueProgressPush({ srs_data: localSrs })") &&
+  languageContextSource.includes('const localCourse = await readJson("@daily_course_progress")') &&
+  languageContextSource.includes("queueProgressPush({ daily_course_progress: localCourse })") &&
+  languageContextSource.includes('const localProfile = await readJson("@lingua_learner_profile")') &&
+  languageContextSource.includes("queueProgressPush({ learner_profile: localProfile })"),
+  "Progress sync should merge profile, daily course, and SRS blobs with the server row before pushing, and existing server rows should backfill missing blobs from local state"
 );
 assert.ok(
   srsManagerSource.includes("export function mergeSrsData") &&

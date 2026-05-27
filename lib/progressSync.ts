@@ -168,7 +168,7 @@ export async function pushServerProgress(
   // Fetch existing row (no error if missing — first push for this user).
   const { data: existing, error: fetchErr } = await supabase
     .from(TABLE)
-    .select("xp, level, streak_days, words_learned, learner_profile")
+    .select("xp, level, streak_days, words_learned, srs_data, daily_course_progress, learner_profile")
     .eq("user_id", user.id)
     .maybeSingle();
   if (fetchErr) {
@@ -193,6 +193,22 @@ export async function pushServerProgress(
       if (remoteProfile && typeof remoteProfile === "object") {
         const { mergeLearnerProfiles } = await import("@/lib/learnerProfile");
         row[k] = mergeLearnerProfiles(v as any, remoteProfile as any);
+        continue;
+      }
+    }
+    if (k === "daily_course_progress" && existing && v && typeof v === "object") {
+      const remoteDailyCourse = (existing as Record<string, unknown>).daily_course_progress;
+      if (remoteDailyCourse && typeof remoteDailyCourse === "object") {
+        const { mergeDailyCourseProgress } = await import("@/lib/dailyCourseData");
+        row[k] = mergeDailyCourseProgress(v as any, remoteDailyCourse as any);
+        continue;
+      }
+    }
+    if (k === "srs_data" && existing && v && typeof v === "object") {
+      const remoteSrs = (existing as Record<string, unknown>).srs_data;
+      if (remoteSrs && typeof remoteSrs === "object") {
+        const { mergeSrsData } = await import("@/lib/srsManager");
+        row[k] = mergeSrsData(v as any, remoteSrs as any);
         continue;
       }
     }
