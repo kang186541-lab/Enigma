@@ -402,7 +402,6 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
       setCanSkipScoring(false); setQPhase("revealed"); return;
     }
-    markSpokenAttempt();
 
     // Show skip button after 5 seconds
     setCanSkipScoring(false);
@@ -436,6 +435,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         setCanSkipScoring(false); setQPhase("revealed"); return;
       }
 
+      markSpokenAttempt();
       const score: number = data.pronunciationScore ?? data.score ?? 0;
       setPronScore(score);
       setWordScores(data.words ?? []);

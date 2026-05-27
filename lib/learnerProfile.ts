@@ -32,6 +32,14 @@ export interface BasicCourseState {
   reviewTimestamps: Partial<Record<BasicCourseReviewSection, number>>;
 }
 
+export interface PronunciationPracticeState {
+  count: number;
+  weakWords: string[];
+  lastSeen: string[];
+  lastWord: string | null;
+  updatedAt: string;
+}
+
 /**
  * Error pattern: a recurring type of mistake the learner makes.
  * `key` is a stable identifier like "past_tense_irregular", chosen by the AI
@@ -71,6 +79,7 @@ export interface LearnerProfile {
   lastSessionAt: string | null;    // ISO
   speakingProgress: SpeakingProgress;
   basicCourse: Partial<Record<string, BasicCourseState>>;
+  pronunciationPractice: Partial<Record<string, PronunciationPracticeState>>;
 
   // ── Phase 4: Persistent tutor memory ─────────────────────────────────────
   // Per-tutor state — each tutor remembers their own sessions with the learner,
@@ -131,6 +140,7 @@ const EMPTY_PROFILE: LearnerProfile = {
     history: {},
   },
   basicCourse: {},
+  pronunciationPractice: {},
   tutorMemory: {},
 };
 
@@ -250,6 +260,42 @@ function mergeBasicCourseState(
   return merged;
 }
 
+function mergeRecentWords(primary: string[] = [], secondary: string[] = [], limit = 24): string[] {
+  const out: string[] = [];
+  for (const word of [...secondary, ...primary]) {
+    if (word && !out.includes(word)) out.push(word);
+  }
+  return out.slice(-limit);
+}
+
+function mergePronunciationPractice(
+  local: Partial<Record<string, PronunciationPracticeState>> = {},
+  remote: Partial<Record<string, PronunciationPracticeState>> = {},
+): Partial<Record<string, PronunciationPracticeState>> {
+  const merged: Partial<Record<string, PronunciationPracticeState>> = {};
+  for (const lang of new Set([...Object.keys(remote ?? {}), ...Object.keys(local ?? {})])) {
+    const l = local?.[lang];
+    const r = remote?.[lang];
+    if (!l && r) { merged[lang] = { ...r, weakWords: [...(r.weakWords ?? [])], lastSeen: [...(r.lastSeen ?? [])] }; continue; }
+    if (l && !r) { merged[lang] = { ...l, weakWords: [...(l.weakWords ?? [])], lastSeen: [...(l.lastSeen ?? [])] }; continue; }
+    if (!l || !r) continue;
+
+    const localTime = Date.parse(l.updatedAt ?? "") || 0;
+    const remoteTime = Date.parse(r.updatedAt ?? "") || 0;
+    const newer = localTime >= remoteTime ? l : r;
+    const older = localTime >= remoteTime ? r : l;
+
+    merged[lang] = {
+      count: Math.max(l.count ?? 0, r.count ?? 0),
+      weakWords: [...(newer.weakWords ?? [])],
+      lastSeen: mergeRecentWords(newer.lastSeen ?? [], older.lastSeen ?? []),
+      lastWord: newer.lastWord ?? older.lastWord ?? null,
+      updatedAt: latestIso(l.updatedAt, r.updatedAt) ?? new Date().toISOString(),
+    };
+  }
+  return merged;
+}
+
 function mergeTutorMemory(
   local: Partial<Record<string, TutorMemory>>,
   remote: Partial<Record<string, TutorMemory>>,
@@ -303,6 +349,7 @@ export function mergeLearnerProfiles(local: LearnerProfile, remote: LearnerProfi
       remote.speakingProgress ?? EMPTY_PROFILE.speakingProgress,
     ),
     basicCourse: mergeBasicCourseState(local.basicCourse ?? {}, remote.basicCourse ?? {}),
+    pronunciationPractice: mergePronunciationPractice(local.pronunciationPractice ?? {}, remote.pronunciationPractice ?? {}),
     tutorMemory: mergeTutorMemory(local.tutorMemory ?? {}, remote.tutorMemory ?? {}),
   };
 }
@@ -438,6 +485,35 @@ export async function markBasicCourseReview(lang: string, section: BasicCourseRe
     ...p,
     basicCourse: { ...(p.basicCourse ?? {}), [lang]: next },
   });
+}
+
+function getPronunciationPractice(profile: LearnerProfile, lang: string): PronunciationPracticeState | null {
+  return profile.pronunciationPractice?.[lang] ?? null;
+}
+
+export async function loadPronunciationPractice(lang: string): Promise<PronunciationPracticeState | null> {
+  const p = await loadLearnerProfile();
+  return getPronunciationPractice(p, lang);
+}
+
+export async function updatePronunciationPractice(
+  lang: string,
+  updates: Partial<Omit<PronunciationPracticeState, "updatedAt">>,
+): Promise<PronunciationPracticeState> {
+  const p = await loadLearnerProfile();
+  const prev = getPronunciationPractice(p, lang);
+  const next: PronunciationPracticeState = {
+    count: Math.max(0, updates.count ?? prev?.count ?? 0),
+    weakWords: [...new Set(updates.weakWords ?? prev?.weakWords ?? [])],
+    lastSeen: mergeRecentWords(updates.lastSeen ?? prev?.lastSeen ?? [], [], 24),
+    lastWord: updates.lastWord ?? prev?.lastWord ?? null,
+    updatedAt: new Date().toISOString(),
+  };
+  await saveLearnerProfile({
+    ...p,
+    pronunciationPractice: { ...(p.pronunciationPractice ?? {}), [lang]: next },
+  });
+  return next;
 }
 
 export const CEFR_LEVELS: ReadonlyArray<CefrLevel> = [

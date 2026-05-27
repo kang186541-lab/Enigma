@@ -126,8 +126,6 @@ export default function RudyLessonScreen() {
     if (currentStep + 1 >= TOTAL_STEPS) {
       if (sentenceCountRef.current < SPEAKING_DAILY_GOAL) {
         setSpeakingGoalNudge(true);
-        setCurrentStep(2);
-        return;
       }
       completeMission();
     } else {

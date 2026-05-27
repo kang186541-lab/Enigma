@@ -26,7 +26,13 @@ import { CoachingCard } from "@/components/rudy/CoachingCard";
 import { useLocalized } from "@/lib/runtimeTranslate";
 import { getCefrTierLabel } from "@/lib/dailyCourseData";
 import { trackLearningEvent } from "@/lib/learningEvents";
-import { loadLearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
+import {
+  loadLearnerProfile,
+  loadPronunciationPractice,
+  setPrimaryLearningGoal,
+  updatePronunciationPractice,
+  type LearningGoal,
+} from "@/lib/learnerProfile";
 import { buildSpeakingPromptKey, getSpeakingCountForLanguage, loadTodaySpeakingProgress, recordSpokenSentence, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 import { loadSpeakMissionHandoff, type SpeakMissionHandoff } from "@/lib/speakMissionHandoff";
 import { buildAcquisitionSession } from "@/lib/acquisitionSession";
@@ -1148,16 +1154,39 @@ export default function SpeakScreen() {
   const loadSession = useCallback(async (lang: LangTab, forceFullSession = false) => {
     resetPracticeState();
     try {
-      const [weakRaw, lastRaw, countRaw, lastWordRaw] = await Promise.all([
+      const [profilePractice, weakRaw, lastRaw, countRaw, lastWordRaw] = await Promise.all([
+        loadPronunciationPractice(lang),
         AsyncStorage.getItem(`speak_weak_words_${lang}`),
         AsyncStorage.getItem(`speak_last_seen_${lang}`),
         AsyncStorage.getItem(`pron_count_${lang}`),
         AsyncStorage.getItem(`pron_last_word_${lang}`),
       ]);
-      const weak: string[] = weakRaw ? JSON.parse(weakRaw) : [];
-      const last: string[] = lastRaw ? JSON.parse(lastRaw) : [];
-      const count = countRaw ? parseInt(countRaw, 10) : 0;
-      const lastWord: string | undefined = lastWordRaw ?? undefined;
+      const legacyWeak: string[] = weakRaw ? JSON.parse(weakRaw) : [];
+      const legacyLast: string[] = lastRaw ? JSON.parse(lastRaw) : [];
+      const legacyCount = countRaw ? parseInt(countRaw, 10) : 0;
+      const weak = profilePractice?.weakWords ?? legacyWeak;
+      const last = profilePractice?.lastSeen ?? legacyLast;
+      const count = Math.max(profilePractice?.count ?? 0, Number.isFinite(legacyCount) ? legacyCount : 0);
+      const lastWord: string | undefined = profilePractice?.lastWord ?? lastWordRaw ?? undefined;
+      if (!profilePractice && (weak.length > 0 || last.length > 0 || count > 0 || lastWord)) {
+        updatePronunciationPractice(lang, {
+          count,
+          weakWords: weak,
+          lastSeen: last,
+          lastWord: lastWord ?? null,
+        }).catch((e: unknown) => console.warn('[Speak] pronunciation practice backfill failed:', e));
+      } else if (profilePractice && count > (profilePractice.count ?? 0)) {
+        updatePronunciationPractice(lang, { count })
+          .catch((e: unknown) => console.warn('[Speak] pronunciation practice count merge failed:', e));
+      }
+      if (profilePractice) {
+        await AsyncStorage.multiSet([
+          [`speak_weak_words_${lang}`, JSON.stringify(weak)],
+          [`speak_last_seen_${lang}`, JSON.stringify(last)],
+          [`pron_count_${lang}`, String(count)],
+          [`pron_last_word_${lang}`, lastWord ?? ""],
+        ]);
+      }
       const level = countToPronLevel(count);
       setWeakWords(weak);
       setPronCount(count);
@@ -1309,10 +1338,12 @@ export default function SpeakScreen() {
   const saveWeakWord = async (word: string) => {
     try {
       const raw = await AsyncStorage.getItem(weakKey);
-      const list: string[] = raw ? JSON.parse(raw) : [];
+      const legacyList: string[] = raw ? JSON.parse(raw) : [];
+      const list = Array.from(new Set([...weakWords, ...legacyList]));
       if (!list.includes(word)) {
         list.push(word);
         await AsyncStorage.setItem(weakKey, JSON.stringify(list));
+        await updatePronunciationPractice(activeLang, { weakWords: list });
         setWeakWords(list);
       }
     } catch (e) { console.warn('[Speak] addWeakWord failed:', e); }
@@ -1321,9 +1352,11 @@ export default function SpeakScreen() {
   const removeWeakWord = async (word: string) => {
     try {
       const raw = await AsyncStorage.getItem(weakKey);
-      const list: string[] = raw ? JSON.parse(raw) : [];
+      const legacyList: string[] = raw ? JSON.parse(raw) : [];
+      const list = Array.from(new Set([...weakWords, ...legacyList]));
       const updated = list.filter((w) => w !== word);
       await AsyncStorage.setItem(weakKey, JSON.stringify(updated));
+      await updatePronunciationPractice(activeLang, { weakWords: updated });
       setWeakWords(updated);
     } catch (e) { console.warn('[Speak] removeWeakWord failed:', e); }
   };
@@ -1406,10 +1439,6 @@ export default function SpeakScreen() {
   ): Promise<boolean> => {
     try {
       if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
-      if (!isGuidedSentenceMission) {
-        awardSpokenAttemptXp(scoreVal, assessmentStatus);
-        return true;
-      }
       const promptKey = buildSpeakingPromptKey({
         targetLanguage: activeLang,
         phrase: phrase?.word ?? "",
@@ -1424,6 +1453,10 @@ export default function SpeakScreen() {
       const targetDailyCount = getSpeakingCountForLanguage(day, activeLang);
       dailySpokenCountRef.current = targetDailyCount;
       setDailySpokenCount(targetDailyCount);
+      if (!isGuidedSentenceMission) {
+        awardSpokenAttemptXp(scoreVal, assessmentStatus);
+        return true;
+      }
       if (!counted) return false;
       awardSpokenAttemptXp(scoreVal, assessmentStatus);
       if (isFirstSpeakingMission) {
@@ -1582,6 +1615,8 @@ export default function SpeakScreen() {
         setPronCount(newCount);
         await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch((e: unknown) => console.warn('[Speak] pron count save failed:', e));
         await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase?.word ?? "").catch((e: unknown) => console.warn('[Speak] pron last word save failed:', e));
+        await updatePronunciationPractice(activeLang, { count: newCount, lastWord: phrase?.word ?? null })
+          .catch((e: unknown) => console.warn('[Speak] pronunciation practice save failed:', e));
         const newLevel = countToPronLevel(newCount);
         if (newLevel !== pronLevelRef.current) {
           pronLevelRef.current = newLevel;
@@ -1820,6 +1855,8 @@ export default function SpeakScreen() {
             setPronCount(newCount);
             await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch((e: unknown) => console.warn('[Speak] pron count save failed:', e));
             await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase.word).catch((e: unknown) => console.warn('[Speak] pron last word save failed:', e));
+            await updatePronunciationPractice(activeLang, { count: newCount, lastWord: phrase.word })
+              .catch((e: unknown) => console.warn('[Speak] pronunciation practice save failed:', e));
             const newLevel = countToPronLevel(newCount);
             if (newLevel !== pronLevelRef.current) {
               pronLevelRef.current = newLevel;
@@ -1887,12 +1924,17 @@ export default function SpeakScreen() {
   // Save current word to lastSeen (accumulate, keep last 3 sessions worth)
   const markWordSeen = useCallback(async (word: string) => {
     try {
-      const raw = await AsyncStorage.getItem(lastSeenKey);
-      const prev: string[] = raw ? JSON.parse(raw) : [];
+      const [profilePractice, raw] = await Promise.all([
+        loadPronunciationPractice(activeLang),
+        AsyncStorage.getItem(lastSeenKey),
+      ]);
+      const legacyPrev: string[] = raw ? JSON.parse(raw) : [];
+      const prev = Array.from(new Set([...(profilePractice?.lastSeen ?? []), ...legacyPrev]));
       const updated = [...prev.filter((w) => w !== word), word].slice(-(SESSION_SIZE * 3));
       await AsyncStorage.setItem(lastSeenKey, JSON.stringify(updated));
+      await updatePronunciationPractice(activeLang, { lastSeen: updated });
     } catch (e) { console.warn('[Speak] markWordSeen failed:', e); }
-  }, [lastSeenKey]);
+  }, [activeLang, lastSeenKey]);
 
   const goNextWord = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

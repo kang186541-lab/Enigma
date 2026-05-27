@@ -310,7 +310,7 @@ assert.ok(
   speakSource.includes("if (!isGuidedSentenceMission)") &&
   speakSource.includes("return true;") &&
   speakSource.includes("const { day, counted } = await recordSpokenSentence"),
-  "Pronunciation clinic XP must not inflate the guided daily real-sentence count"
+  "Open Speak pronunciation practice should record today's spoken progress while still accepting duplicate clinic attempts for UI flow"
 );
 assert.ok(
   homeSource.includes("showSecondaryHomeSections") &&
@@ -430,13 +430,18 @@ assert.ok(
 );
 assert.ok(
   learnerProfileSource.includes("export interface BasicCourseState") &&
+  learnerProfileSource.includes("export interface PronunciationPracticeState") &&
   learnerProfileSource.includes("function mergeBasicCourseState") &&
+  learnerProfileSource.includes("function mergePronunciationPractice") &&
   learnerProfileSource.includes("export async function loadBasicCourseState") &&
   learnerProfileSource.includes("export async function saveBasicCourseProgress") &&
   learnerProfileSource.includes("export async function markBasicCourseCompleted") &&
   learnerProfileSource.includes("export async function markBasicCourseReview") &&
-  learnerProfileSource.includes("basicCourse: mergeBasicCourseState"),
-  "Learner profile should be the canonical synced store for Basic Course progress, completion, and review timestamps"
+  learnerProfileSource.includes("export async function loadPronunciationPractice") &&
+  learnerProfileSource.includes("export async function updatePronunciationPractice") &&
+  learnerProfileSource.includes("basicCourse: mergeBasicCourseState") &&
+  learnerProfileSource.includes("pronunciationPractice: mergePronunciationPractice"),
+  "Learner profile should be the canonical synced store for Basic Course progress, completion, review timestamps, and pronunciation practice memory"
 );
 assert.ok(
   progressSyncSource.includes('select("xp, level, streak_days, words_learned, learner_profile")') &&
@@ -545,6 +550,22 @@ assert.ok(
   !basicCourseSource.includes("if (!isReviewMode || !initialReviewSection) return;"),
   "Basic Course review timestamps should be written when review is completed, not merely opened"
 );
+assert.ok(
+  speakSource.includes("loadPronunciationPractice") &&
+  speakSource.includes("updatePronunciationPractice") &&
+  speakSource.includes("profilePractice?.weakWords") &&
+  speakSource.includes("profilePractice?.lastSeen") &&
+  speakSource.includes("profilePractice?.count") &&
+  speakSource.includes("pronunciation practice backfill failed") &&
+  speakSource.includes("AsyncStorage.multiSet") &&
+  speakSource.includes("const prev = Array.from(new Set([...(profilePractice?.lastSeen ?? []), ...legacyPrev]));") &&
+  speakSource.includes("const list = Array.from(new Set([...weakWords, ...legacyList]));") &&
+  speakSource.includes("updatePronunciationPractice(activeLang, { weakWords: list })") &&
+  speakSource.includes("updatePronunciationPractice(activeLang, { weakWords: updated })") &&
+  speakSource.includes("updatePronunciationPractice(activeLang, { count: newCount, lastWord: phrase.word })") &&
+  speakSource.includes("updatePronunciationPractice(activeLang, { lastSeen: updated })"),
+  "Speak pronunciation count, weak words, last word, and recent-seen memory should sync through learner_profile with legacy-key backfill"
+);
 for (const [name, source] of [
   ["Speak", speakSource],
   ["Cards", cardsSource],
@@ -571,10 +592,12 @@ assert.ok(
   rudyLessonSource.includes("SPEAKING_DAILY_GOAL") &&
   rudyLessonSource.includes("recordSpokenSentence") &&
   rudyLessonSource.includes("sentenceCountRef.current < SPEAKING_DAILY_GOAL") &&
+  rudyLessonSource.includes("setSpeakingGoalNudge(true);") &&
+  !rudyLessonSource.includes("setCurrentStep(2);\n        return;") &&
   !rudyLessonSource.includes("onSentenceSpoken(correct)") &&
   !rudyLessonSource.includes("missionSentCount") &&
   !rudyLessonSource.includes("sentenceCount + missionSentCount"),
-  "Rudy Training Camp should use a real spoken-attempt counter and gate completion on the shared daily speaking goal"
+  "Rudy Training Camp should use a real spoken-attempt counter but should not trap lesson completion behind the 19-sentence daily goal"
 );
 assert.ok(
   rudyStep2Source.includes("onComplete(spokenAttemptsRef.current)") &&
@@ -623,6 +646,15 @@ assert.ok(
   rudyStep4Source.includes("without inventing a passing pronunciation score") &&
   rudyStep4Source.includes('setQPhase("ready");'),
   "Rudy Step4 should not auto-complete or fake a passing score when no spoken attempt was captured"
+);
+const step4NoSpeechIndex = rudyStep4Source.indexOf("if (!hasRecognizedSpeech(data))");
+const step4MarkSpokenIndex = rudyStep4Source.indexOf("markSpokenAttempt();");
+const step4ScoreIndex = rudyStep4Source.indexOf("const score: number", step4NoSpeechIndex);
+assert.ok(
+  step4NoSpeechIndex >= 0 &&
+  step4MarkSpokenIndex > step4NoSpeechIndex &&
+  step4ScoreIndex > step4MarkSpokenIndex,
+  "Rudy Step4 should count a spoken attempt only after speech recognition succeeds"
 );
 assert.ok(
   rudyLessonSource.includes("const stepCompletingRef = useRef(false);") &&
