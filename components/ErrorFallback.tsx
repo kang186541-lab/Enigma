@@ -64,6 +64,9 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
+  const showLocalDetails = Platform.OS === "web"
+    && typeof window !== "undefined"
+    && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
 
   const theme = {
     background: isDark ? "#000000" : "#FFFFFF",
@@ -111,7 +114,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {__DEV__ ? (
+      {(__DEV__ || showLocalDetails) ? (
         <Pressable
           onPress={() => setIsModalVisible(true)}
           accessibilityLabel="View error details"
@@ -155,7 +158,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
         </Pressable>
       </View>
 
-      {__DEV__ ? (
+      {(__DEV__ || showLocalDetails) ? (
         <Modal
           visible={isModalVisible}
           animationType="slide"

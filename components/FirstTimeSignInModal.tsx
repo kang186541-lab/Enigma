@@ -93,6 +93,8 @@ export function FirstTimeSignInModal() {
     if (!isHydrated || authLoading) return;
     if (user) { setOpen(false); return; }       // signed in → never show
     if (!hasOnboarded) { setOpen(false); return; } // new user → onboarding handles it
+    const hasProgressWorthSaving = stats.xp > 0 || stats.streak > 0 || stats.wordsLearned > 0;
+    if (!hasProgressWorthSaving) { setOpen(false); return; }
     if (seenChecked) return;                    // already checked
     let cancelled = false;
     AsyncStorage.getItem(SEEN_KEY).then((v) => {
@@ -101,7 +103,7 @@ export function FirstTimeSignInModal() {
       if (v !== "1") setOpen(true);
     });
     return () => { cancelled = true; };
-  }, [user, authLoading, hasOnboarded, isHydrated, seenChecked]);
+  }, [user, authLoading, hasOnboarded, isHydrated, seenChecked, stats.xp, stats.streak, stats.wordsLearned]);
 
   // If the user signs in while the modal is open, mark seen and close.
   useEffect(() => {

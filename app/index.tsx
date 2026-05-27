@@ -1,30 +1,12 @@
 import { Redirect } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { View, ActivityIndicator } from "react-native";
-import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { C } from "@/constants/theme";
 
-const DONE_KEY = (lang: string) => `basicCourseCompleted_${lang}`;
-
 export default function Index() {
-  const { hasOnboarded, isHydrated, nativeLanguage, learningLanguage } = useLanguage();
-  const [checked,     setChecked]     = useState(false);
-  const [coursesDone, setCoursesDone] = useState<boolean | null>(null);
+  const { hasOnboarded, isHydrated, nativeLanguage } = useLanguage();
 
-  useEffect(() => {
-    if (!isHydrated) {
-      setChecked(false);
-      return;
-    }
-    if (!hasOnboarded || !learningLanguage) { setChecked(true); return; }
-    AsyncStorage.getItem(DONE_KEY(learningLanguage)).then((v) => {
-      setCoursesDone(v === "true");
-      setChecked(true);
-    });
-  }, [hasOnboarded, isHydrated, learningLanguage]);
-
-  if (!isHydrated || !checked) {
+  if (!isHydrated) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: C.bg1 }}>
         <ActivityIndicator color={C.gold} />
@@ -36,9 +18,8 @@ export default function Index() {
     return <Redirect href="/onboarding" />;
   }
 
-  if (coursesDone === false) {
-    return <Redirect href="/basic-course" />;
-  }
-
+  // Do not gate the first Home visit behind alphabet/basic-course study.
+  // The core loop starts with one spoken sentence; Basic Course remains
+  // available from Home for users who want the foundation first.
   return <Redirect href="/(tabs)" />;
 }

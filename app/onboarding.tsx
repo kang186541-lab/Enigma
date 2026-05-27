@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -8,19 +8,20 @@ import {
   Animated,
   ScrollView,
   Dimensions,
-  TextInput,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
-import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
-
-const DONE_KEY = (lang: string) => `basicCourseCompleted_${lang}`;
+import { markGuideComplete } from "@/components/RudyGuideModal";
+import { trackLearningEvent } from "@/lib/learningEvents";
+import { getHomeGoalPrompt, getHomeLearningGoalOptions } from "@/lib/homeSpeakingMission";
+import { setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
+import { RUDY_GUIDE_CARDS } from "@/lib/rudyGuideCards";
 
 const rudySplashImg = require("@/assets/rudy_splash.png");
 const { width: SCREEN_W } = Dimensions.get("window");
@@ -55,87 +56,93 @@ const ALL_LANGS: { id: NativeLanguage; flag: string; nameMap: Record<NativeLangu
 
 const UI: Record<NativeLanguage, {
   step1Title: string; step1Sub: string;
+  guideEyebrow: string; guideNext: string; guideStart: string;
   step2Title: string; step2Sub: string;
-  step3Title: string; step3Sub: string;
-  step3Google: string; step3Email: string; step3Skip: string;
-  step3EmailPlaceholder: string; step3EmailSent: string; step3Or: string;
+  firstSpeechTitle: string; firstSpeechSub: string;
+  goalPrompt: string;
   cta1: string; cta2: string; back: string;
 }> = {
   korean: {
     step1Title: "모국어를 선택해주세요",
     step1Sub:   "더 나은 학습 경험을 위해 모국어를 알려주세요",
+    guideEyebrow: "Rudy의 언어 가이드",
+    guideNext: "다음 카드",
+    guideStart: "이제 시작하자",
     step2Title: "어떤 언어를 배우고 싶으세요?",
     step2Sub:   "학습할 언어를 선택하세요",
-    step3Title: "진행 상황을 저장할까요?",
-    step3Sub:   "로그인하면 기기가 바뀌어도 XP·연속학습일이 그대로 이어져요",
-    step3Google: "Google로 로그인", step3Email: "이메일로 로그인 링크 받기",
-    step3Skip: "나중에 할게요", step3EmailPlaceholder: "you@example.com",
-    step3EmailSent: "메일을 확인해서 링크를 누르세요", step3Or: "또는",
-    cta1: "다음", cta2: "다음", back: "뒤로",
+    firstSpeechTitle: "다음은 바로 한 문장 말하기",
+    firstSpeechSub: "틀려도 괜찮아요. Rudy는 점수보다 시도를 먼저 기록해요.",
+    goalPrompt: "먼저 실제로 쓸 상황을 골라주세요",
+    cta1: "다음", cta2: "말하기 시작", back: "뒤로",
   },
   english: {
     step1Title: "What's your native language?",
     step1Sub:   "Choose the language you speak at home",
+    guideEyebrow: "Rudy's Language Guide",
+    guideNext: "Next card",
+    guideStart: "Let's start",
     step2Title: "What do you want to learn?",
     step2Sub:   "Pick the language you'd like to master",
-    step3Title: "Save your progress?",
-    step3Sub:   "Sign in so your XP and streak follow you to any device",
-    step3Google: "Sign in with Google", step3Email: "Send me a magic link",
-    step3Skip: "Maybe later", step3EmailPlaceholder: "you@example.com",
-    step3EmailSent: "Check your email and click the link", step3Or: "or",
-    cta1: "Next", cta2: "Next", back: "Back",
+    firstSpeechTitle: "Next: say one real sentence",
+    firstSpeechSub: "Mistakes are fine. Rudy counts the spoken attempt before the score.",
+    goalPrompt: "First, choose where you will actually use it",
+    cta1: "Next", cta2: "Start speaking", back: "Back",
   },
   spanish: {
     step1Title: "¿Cuál es tu idioma nativo?",
     step1Sub:   "Elige el idioma que hablas en casa",
+    guideEyebrow: "Guía de idiomas de Rudy",
+    guideNext: "Siguiente tarjeta",
+    guideStart: "Empecemos",
     step2Title: "¿Qué idioma quieres aprender?",
     step2Sub:   "Selecciona el idioma que quieres dominar",
-    step3Title: "¿Guardar tu progreso?",
-    step3Sub:   "Inicia sesión para que tu XP y racha te sigan en cualquier dispositivo",
-    step3Google: "Iniciar sesión con Google", step3Email: "Enviarme un enlace mágico",
-    step3Skip: "Quizás más tarde", step3EmailPlaceholder: "tu@ejemplo.com",
-    step3EmailSent: "Revisa tu correo y haz clic en el enlace", step3Or: "o",
-    cta1: "Siguiente", cta2: "Siguiente", back: "Atrás",
+    firstSpeechTitle: "Ahora: di una frase real",
+    firstSpeechSub: "Los errores están bien. Rudy cuenta el intento antes que la nota.",
+    goalPrompt: "Primero, elige dónde lo usarás de verdad",
+    cta1: "Siguiente", cta2: "Empezar a hablar", back: "Atrás",
   },
 };
 
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const { setNativeLanguage, setLearningLanguage } = useLanguage();
-  const { user, signInWithGoogle, signInWithEmail } = useAuth();
 
   const [step,      setStep]      = useState<Step>(1);
   const [nativeSel, setNativeSel] = useState<NativeLanguage | null>(null);
   const [learnSel,  setLearnSel]  = useState<NativeLanguage | null>(null);
+  const [goalSel,   setGoalSel]   = useState<LearningGoal | null>(null);
+  const [guideIdx,  setGuideIdx]  = useState(0);
   const [loading,   setLoading]   = useState(false);
-  const [authBusy,  setAuthBusy]  = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [emailInput, setEmailInput] = useState("");
-  const [emailSent,  setEmailSent]  = useState(false);
-
-  // If user signs in successfully while on step 3, finish onboarding.
-  useEffect(() => {
-    if (step === 3 && user && nativeSel && learnSel) {
-      finishToCourse();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, step]);
+  const submittingRef = useRef(false);
 
   const uiLang: NativeLanguage = nativeSel ?? "english";
   const ui = UI[uiLang];
   const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel);
+  const guideCard = RUDY_GUIDE_CARDS[guideIdx] ?? RUDY_GUIDE_CARDS[0];
+  const isLastGuideCard = guideIdx >= RUDY_GUIDE_CARDS.length - 1;
 
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Math.max((Platform.OS === "web" ? 34 : insets.bottom) + 16, 34);
 
   const handleNativePick = (lang: NativeLanguage) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setNativeSel(lang); setLearnSel(null);
+    setNativeSel(lang); setLearnSel(null); setGoalSel(null); setGuideIdx(0);
   };
 
   const handleLearnPick = (lang: NativeLanguage) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setLearnSel(lang);
+  };
+
+  const handleGoalPick = (goal: LearningGoal) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setGoalSel(goal);
+    void trackLearningEvent("learning_goal_selected", {
+      surface: "onboarding",
+      nativeLanguage: nativeSel,
+      targetLanguage: learnSel,
+      goal,
+    });
   };
 
   const handleNext = () => {
@@ -145,66 +152,68 @@ export default function OnboardingScreen() {
     }
   };
 
+  const handleGuideNext = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (!isLastGuideCard) {
+      setGuideIdx((idx) => Math.min(idx + 1, RUDY_GUIDE_CARDS.length - 1));
+      return;
+    }
+    await markGuideComplete().catch((err: unknown) => {
+      console.warn("[Onboarding] guide completion save failed:", err);
+    });
+    setStep(3);
+  };
+
   const handleBack = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (step === 3) {
       setStep(2);
-      setAuthError(null);
-      setEmailSent(false);
+    } else if (step === 2) {
+      setGuideIdx(0);
+      setStep(1);
     } else {
-      setStep(1); setLearnSel(null);
+      setStep(1); setLearnSel(null); setGoalSel(null);
     }
   };
 
-  // Step 2 → 3: lock in the language picks and move to the sign-in invite.
-  // If user is already signed in (rare on first run), skip straight to course.
+  // Step 2: lock in the language picks and start with one spoken sentence.
+  // Sign-in reminders are delayed until the learner has progress worth saving.
   const handleStep2Next = async () => {
-    if (!nativeSel || !learnSel) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    await setNativeLanguage(nativeSel);
-    await setLearningLanguage(learnSel);
-    if (user) {
-      finishToCourse();
-      return;
+    if (!nativeSel || !learnSel || !goalSel || submittingRef.current) return;
+    submittingRef.current = true;
+    setLoading(true);
+    try {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      await setNativeLanguage(nativeSel);
+      await setLearningLanguage(learnSel);
+      await setPrimaryLearningGoal(goalSel).catch((err: unknown) => {
+        console.warn("[Onboarding] learner goal save failed:", err);
+      });
+      await trackLearningEvent("onboarding_first_speaking_started", {
+        surface: "onboarding",
+        nativeLanguage: nativeSel,
+        targetLanguage: learnSel,
+        goal: goalSel,
+      });
+      await finishToCourse();
+    } catch (err) {
+      console.warn("[Onboarding] start speaking failed:", err);
+      submittingRef.current = false;
+      setLoading(false);
     }
-    setStep(3);
   };
 
   const finishToCourse = async () => {
     if (!learnSel) return;
     setLoading(true);
-    const done = await AsyncStorage.getItem(DONE_KEY(learnSel));
-    if (done === "true") {
-      router.replace("/(tabs)");
-    } else {
-      router.replace("/basic-course");
-    }
-  };
-
-  const handleGoogle = async () => {
-    setAuthBusy(true);
-    setAuthError(null);
-    const { error } = await signInWithGoogle();
-    if (error) setAuthError(error);
-    setAuthBusy(false);
-    // success path is handled by the useEffect watching `user` above
-    // (Google OAuth redirects the whole page on web).
-  };
-
-  const handleMagicLink = async () => {
-    if (!emailInput.trim()) return;
-    setAuthBusy(true);
-    setAuthError(null);
-    setEmailSent(false);
-    const { error } = await signInWithEmail(emailInput);
-    if (error) setAuthError(error);
-    else setEmailSent(true);
-    setAuthBusy(false);
-  };
-
-  const handleSkipSignIn = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    finishToCourse();
+    router.replace({
+      pathname: "/(tabs)/speak",
+      params: {
+        mission: "first-sentence",
+        targetLang: learnSel,
+        goal: goalSel ?? "",
+      },
+    } as any);
   };
 
   return (
@@ -276,8 +285,53 @@ export default function OnboardingScreen() {
           </>
         )}
 
-        {/* ── STEP 2 ── */}
+        {/* ── STEP 2: Rudy's 8-card language philosophy ── */}
         {step === 2 && (
+          <>
+            <View style={styles.textBlock}>
+              <Text style={styles.eyebrow}>{ui.guideEyebrow}</Text>
+              <Text style={styles.title}>{guideCard.title[uiLang] ?? guideCard.title.english}</Text>
+              <Text style={styles.subtitle}>
+                {guideIdx + 1} / {RUDY_GUIDE_CARDS.length}
+              </Text>
+            </View>
+
+            <View style={styles.guideCard}>
+              <View style={styles.guideEmojiWrap}>
+                <EmojiText style={styles.guideEmoji}>{guideCard.emoji}</EmojiText>
+              </View>
+              <Text style={styles.guideBody}>
+                {guideCard.body[uiLang] ?? guideCard.body.english}
+              </Text>
+              <View style={styles.guideTrack}>
+                <View
+                  style={[
+                    styles.guideFill,
+                    { width: `${((guideIdx + 1) / RUDY_GUIDE_CARDS.length) * 100}%` },
+                  ]}
+                />
+              </View>
+            </View>
+
+            <View style={styles.bottom}>
+              <Pressable style={styles.backBtn} onPress={handleBack}>
+                <Ionicons name="chevron-back" size={18} color={C.gold} />
+                <Text style={styles.backText}>{ui.back}</Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.cta, styles.ctaFlex, pressed && styles.ctaPress]}
+                onPress={handleGuideNext}
+                accessibilityRole="button"
+              >
+                <Text style={styles.ctaText}>{isLastGuideCard ? ui.guideStart : ui.guideNext}</Text>
+                <Ionicons name={isLastGuideCard ? "sparkles" : "arrow-forward"} size={18} color={C.bg1} />
+              </Pressable>
+            </View>
+          </>
+        )}
+
+        {/* ── STEP 3 ── */}
+        {step === 3 && (
           <>
             <View style={styles.textBlock}>
               <Text style={styles.title}>{ui.step2Title}</Text>
@@ -307,93 +361,54 @@ export default function OnboardingScreen() {
               })}
             </View>
 
+            <View style={styles.promiseCard}>
+              <View style={styles.promiseIcon}>
+                <Ionicons name="mic" size={18} color={C.bg1} />
+              </View>
+              <View style={styles.promiseCopy}>
+                <Text style={styles.promiseTitle}>{ui.firstSpeechTitle}</Text>
+                <Text style={styles.promiseSub}>{ui.firstSpeechSub}</Text>
+              </View>
+            </View>
+
+            <View style={styles.goalSection}>
+              <Text style={styles.goalPrompt}>{ui.goalPrompt}</Text>
+              <View style={styles.goalChips}>
+                {getHomeLearningGoalOptions(uiLang).map((option) => {
+                  const selected = goalSel === option.key;
+                  return (
+                    <Pressable
+                      key={option.key}
+                      style={({ pressed }) => [
+                        styles.goalChip,
+                        selected && styles.goalChipSelected,
+                        pressed && styles.cardPress,
+                      ]}
+                      onPress={() => handleGoalPick(option.key)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected }}
+                      accessibilityLabel={`${getHomeGoalPrompt(uiLang)}: ${option.label}`}
+                    >
+                      <Text style={[styles.goalChipText, selected && styles.goalChipTextSelected]}>
+                        {option.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+
             <View style={styles.bottom}>
               <Pressable style={styles.backBtn} onPress={handleBack}>
                 <Ionicons name="chevron-back" size={18} color={C.gold} />
                 <Text style={styles.backText}>{ui.back}</Text>
               </Pressable>
               <Pressable
-                style={({ pressed }) => [styles.cta, styles.ctaFlex, !learnSel && styles.ctaDim, pressed && learnSel && styles.ctaPress]}
+                style={({ pressed }) => [styles.cta, styles.ctaFlex, (!learnSel || !goalSel) && styles.ctaDim, pressed && learnSel && goalSel && styles.ctaPress]}
                 onPress={handleStep2Next}
-                disabled={!learnSel || loading}
+                disabled={!learnSel || !goalSel || loading}
               >
                 <Text style={styles.ctaText}>{ui.cta2}</Text>
-              </Pressable>
-            </View>
-          </>
-        )}
-
-        {/* ── STEP 3: sign-in invite ── */}
-        {step === 3 && (
-          <>
-            <View style={styles.textBlock}>
-              <Text style={styles.title}>{ui.step3Title}</Text>
-              <Text style={styles.subtitle}>{ui.step3Sub}</Text>
-            </View>
-
-            <View style={[styles.cards, { gap: 10 }]}>
-              {/* Google */}
-              <Pressable
-                onPress={handleGoogle}
-                disabled={authBusy || loading}
-                style={({ pressed }) => [
-                  styles.authBtn,
-                  styles.googleBtn,
-                  (authBusy || loading) && styles.ctaDim,
-                  pressed && !authBusy && !loading && styles.ctaPress,
-                ]}
-              >
-                <Ionicons name="logo-google" size={18} color="#FFFFFF" />
-                <Text style={styles.authBtnText}>{ui.step3Google}</Text>
-              </Pressable>
-
-              {/* Divider */}
-              <Text style={styles.divider}>— {ui.step3Or} —</Text>
-
-              {/* Email */}
-              <TextInput
-                value={emailInput}
-                onChangeText={setEmailInput}
-                placeholder={ui.step3EmailPlaceholder}
-                placeholderTextColor={C.goldDim}
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="email-address"
-                style={styles.emailInput}
-                editable={!authBusy && !loading}
-              />
-              <Pressable
-                onPress={handleMagicLink}
-                disabled={authBusy || loading || !emailInput.trim()}
-                style={({ pressed }) => [
-                  styles.authBtn,
-                  styles.emailBtn,
-                  (authBusy || loading || !emailInput.trim()) && styles.ctaDim,
-                  pressed && !authBusy && !loading && emailInput.trim() && styles.ctaPress,
-                ]}
-              >
-                <Ionicons name="mail-outline" size={18} color="#FFFFFF" />
-                <Text style={styles.authBtnText}>{ui.step3Email}</Text>
-              </Pressable>
-              {emailSent ? (
-                <Text style={styles.authNote}>{ui.step3EmailSent}</Text>
-              ) : null}
-              {authError ? (
-                <Text style={[styles.authNote, { color: "#F2697D" }]}>{authError}</Text>
-              ) : null}
-            </View>
-
-            <View style={[styles.bottom, { marginTop: 6 }]}>
-              <Pressable style={styles.backBtn} onPress={handleBack}>
-                <Ionicons name="chevron-back" size={18} color={C.gold} />
-                <Text style={styles.backText}>{ui.back}</Text>
-              </Pressable>
-              <Pressable
-                style={({ pressed }) => [styles.skipBtn, pressed && styles.ctaPress]}
-                onPress={handleSkipSignIn}
-                disabled={loading}
-              >
-                <Text style={styles.skipBtnText}>{ui.step3Skip}</Text>
               </Pressable>
             </View>
           </>
@@ -428,6 +443,14 @@ const styles = StyleSheet.create({
     fontSize: 15, fontFamily: F.body, color: C.goldDim,
     textAlign: "center", lineHeight: 22, fontStyle: "italic",
   },
+  eyebrow: {
+    marginBottom: 8,
+    fontSize: 12,
+    fontFamily: F.label,
+    color: C.goldDim,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
   cards: { paddingHorizontal: 24, gap: 14 },
   card: {
     flexDirection: "row", alignItems: "center",
@@ -446,6 +469,125 @@ const styles = StyleSheet.create({
     width: 28, height: 28, borderRadius: 14,
     backgroundColor: C.gold,
     justifyContent: "center", alignItems: "center",
+  },
+  guideCard: {
+    marginHorizontal: 24,
+    padding: 22,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: C.gold,
+    backgroundColor: C.bg2,
+    alignItems: "center",
+    shadowColor: C.gold,
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+  },
+  guideEmojiWrap: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: "rgba(201,162,39,0.15)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  guideEmoji: { fontSize: 34 },
+  guideBody: {
+    fontSize: 15,
+    fontFamily: F.body,
+    color: C.parchment,
+    textAlign: "center",
+    lineHeight: 24,
+    marginBottom: 18,
+  },
+  guideTrack: {
+    width: "100%",
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: "rgba(201,162,39,0.18)",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.20)",
+  },
+  guideFill: {
+    height: "100%",
+    borderRadius: 4,
+    backgroundColor: C.gold,
+  },
+  promiseCard: {
+    marginHorizontal: 24,
+    marginTop: 14,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.38)",
+    backgroundColor: "rgba(201,162,39,0.10)",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  promiseIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: C.gold,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  promiseCopy: { flex: 1 },
+  promiseTitle: {
+    fontSize: 14,
+    fontFamily: F.header,
+    color: C.parchment,
+    lineHeight: 18,
+  },
+  promiseSub: {
+    marginTop: 3,
+    fontSize: 12,
+    fontFamily: F.body,
+    color: C.goldDim,
+    lineHeight: 17,
+  },
+  goalSection: {
+    marginHorizontal: 24,
+    marginTop: 12,
+    gap: 8,
+  },
+  goalPrompt: {
+    fontSize: 12,
+    fontFamily: F.label,
+    color: C.goldDim,
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+  },
+  goalChips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  goalChip: {
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.28)",
+    backgroundColor: "rgba(201,162,39,0.08)",
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+    minHeight: 34,
+    justifyContent: "center",
+  },
+  goalChipSelected: {
+    borderColor: C.gold,
+    backgroundColor: C.gold,
+  },
+  goalChipText: {
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+  },
+  goalChipTextSelected: {
+    color: C.bg1,
   },
   bottom: { paddingHorizontal: 24, paddingTop: 20, gap: 12 },
   backBtn: {

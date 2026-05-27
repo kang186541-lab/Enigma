@@ -22,6 +22,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { C, F } from "@/constants/theme";
 import { addDayPhrases } from "@/lib/srsManager";
+import { EmojiText } from "@/components/EmojiText";
 
 const { width: SW } = Dimensions.get("window");
 const CARD_W = Math.min(SW - 48, 360);
@@ -1362,12 +1363,12 @@ export default function BasicCourseScreen() {
               <>
                 <Pressable onPress={handleFlip} style={s.flipBox}>
                   <Animated.View style={[s.flipCard, { transform: [{ perspective: 1200 }, { rotateY: frontRotate }] }]}>
-                    <Text style={s.wordEmoji}>{wordItem.emoji}</Text>
+                    <EmojiText style={s.wordEmoji}>{wordItem.emoji}</EmojiText>
                     <Text style={s.wordText}>{wordItem.word}</Text>
                     <Text style={s.wordHint}>{native === "korean" ? "탭해서 의미 확인" : native === "spanish" ? "Toca para ver" : "Tap to reveal"}</Text>
                   </Animated.View>
                   <Animated.View style={[s.flipCard, s.flipBack, { transform: [{ perspective: 1200 }, { rotateY: backRotate }] }]}>
-                    <Text style={s.wordEmoji}>{wordItem.emoji}</Text>
+                    <EmojiText style={s.wordEmoji}>{wordItem.emoji}</EmojiText>
                     <Text style={s.wordMeaning}>{wordItem.meaning[native === "korean" ? "ko" : native === "spanish" ? "es" : "en"]}</Text>
                     <Text style={s.wordSub}>{wordItem.word}</Text>
                   </Animated.View>

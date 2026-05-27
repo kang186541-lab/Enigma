@@ -6,8 +6,8 @@ const outDir = process.argv[2] || "dist";
 const indexPath = path.join(outDir, "index.html");
 const vercelPath = path.join(outDir, "vercel.json");
 const ICON_FONT_FAMILIES = {
-  Ionicons: "ionicons",
-  Feather: "feather",
+  Ionicons: ["ionicons", "Ionicons"],
+  Feather: ["feather", "Feather"],
 };
 
 function writeIfChanged(filePath, nextContent) {
@@ -124,9 +124,17 @@ if (!html.includes("Noto+Color+Emoji")) {
   );
 }
 
+const webFontFallbackCss = [
+  '<style id="lingua-web-font-fallbacks">',
+  'body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji";}',
+  '</style>',
+].join("\n");
+
+html = injectBlock(html, "lingua-web-font-fallbacks", webFontFallbackCss);
+
 const assetFiles = walkFiles(path.join(outDir, "assets"));
 const iconFontEntries = Object.entries(ICON_FONT_FAMILIES)
-  .map(([filePrefix, family]) => {
+  .map(([filePrefix, families]) => {
     const filePath = assetFiles.find((file) => {
       const name = path.basename(file);
       // Match `Ionicons.<hash>.ttf` but not `Ionicons.Bold.<hash>.ttf` — the
@@ -134,21 +142,23 @@ const iconFontEntries = Object.entries(ICON_FONT_FAMILIES)
       return /^[^.]+\.[a-fA-F0-9]+\.ttf$/.test(name) && name.startsWith(`${filePrefix}.`);
     });
     if (!filePath) {
-      console.warn(`Icon font ${filePrefix} (.ttf) not found under assets/ — preload+@font-face injection skipped for ${family}.`);
+      console.warn(`Icon font ${filePrefix} (.ttf) not found under assets/; preload+@font-face injection skipped.`);
       return null;
     }
-    return { family, href: toWebPath(filePath) };
+    return { families, href: toWebPath(filePath) };
   })
   .filter(Boolean);
 
 if (iconFontEntries.length) {
-  const iconFontLinks = iconFontEntries
-    .map(({ href }) => `<link rel="preload" href="${href}" as="font" type="font/ttf" crossorigin />`)
+  const iconFontLinks = Array.from(new Set(iconFontEntries.map(({ href }) => href)))
+    .map((href) => `<link rel="preload" href="${href}" as="font" type="font/ttf" crossorigin />`)
     .join("\n");
   const iconFontCss = [
     "<style id=\"lingua-icon-font-faces\">",
-    ...iconFontEntries.map(({ family, href }) =>
-      `@font-face{font-family:"${family}";src:url("${href}") format("truetype");font-display:block;}`
+    ...iconFontEntries.flatMap(({ families, href }) =>
+      families.map((family) =>
+        `@font-face{font-family:"${family}";src:url("${href}") format("truetype");font-display:block;}`
+      )
     ),
     "</style>",
   ].join("\n");

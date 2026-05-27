@@ -9,16 +9,15 @@ import {
   Animated,
   ActivityIndicator,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useFocusEffect } from "expo-router";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as FileSystem from "expo-file-system/legacy";
-import { useLanguage, getDefaultLearning, NativeLanguage } from "@/context/LanguageContext";
+import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
 import { C, F } from "@/constants/theme";
@@ -26,6 +25,16 @@ import { PhonemeCoaching } from "@/components/rudy/PhonemeCoaching";
 import { CoachingCard } from "@/components/rudy/CoachingCard";
 import { useLocalized } from "@/lib/runtimeTranslate";
 import { getCefrTierLabel } from "@/lib/dailyCourseData";
+import { trackLearningEvent } from "@/lib/learningEvents";
+import { loadLearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
+import { buildSpeakingPromptKey, loadTodaySpeakingProgress, recordSpokenSentence, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
+import { loadSpeakMissionHandoff, type SpeakMissionHandoff } from "@/lib/speakMissionHandoff";
+import { buildAcquisitionSession } from "@/lib/acquisitionSession";
+import {
+  getDailySpeakingMissionPhrase as getSharedDailySpeakingMissionPhrase,
+  getDailySpeakingSentenceLoop,
+  type DailySpeakingPhrase,
+} from "@/lib/dailySpeakingMissions";
 
 const TAB_BAR_HEIGHT = 49;
 const SESSION_SIZE = 8;
@@ -41,6 +50,7 @@ interface Phrase {
   level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
   speechLang: string;
   tip: string;
+  contextTip?: string;
 }
 
 const PHRASE_SETS: Record<LangTab, Phrase[]> = {
@@ -498,19 +508,53 @@ const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] 
   { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#FF9D6B" },
 ];
 
-// Overall score band thresholds. Kept in sync with sub-score color logic
-// (≥75 success / ≥50 gold / <50 error) and WEAK_THRESHOLD so the home stat
-// card, the sub-score chips, and the weak-words save behaviour all agree.
-// Palette uses Enigma tokens (C.success/C.gold/C.error) — no Tailwind hex.
-// Label is localized — a Korean user used to see "Excellent!" in English
-// next to the score circle, which broke the trilingual UX.
-function getScoreInfo(score: number, nativeLang: "korean" | "english" | "spanish" = "english"): { label: string; color: string; emoji: string } {
+// Overall score bands are deliberately gentle. The app philosophy is
+// "say it first, shape it next", so low scores should invite another attempt
+// without feeling like a red failure state.
+function getGentleScoreColor(score: number): string {
+  if (score >= 75) return C.success;
+  if (score >= 50) return C.gold;
+  return C.goldDim;
+}
+
+function getVoiceServiceUnavailableMessage(nativeLang: NativeLanguage): string {
+  if (nativeLang === "korean") {
+    return "음성 서비스가 아직 연결되지 않았어요. API 도메인 설정을 확인해 주세요.";
+  }
+  if (nativeLang === "spanish") {
+    return "El servicio de voz aún no está conectado. Revisa la configuración del dominio API.";
+  }
+  return "Voice service is not connected yet. Check the API domain configuration.";
+}
+
+function tryGetApiUrl(scope: string): string | null {
+  try {
+    return getApiUrl();
+  } catch (error) {
+    if (__DEV__) console.warn(`[Speak] ${scope} skipped:`, error);
+    return null;
+  }
+}
+
+function getScoreInfo(
+  score: number,
+  nativeLang: "korean" | "english" | "spanish" = "english",
+  mode: "clinic" | "first-mission" = "clinic"
+): { label: string; color: string; emoji: string } {
+  if (mode === "first-mission") {
+    const clear = nativeLang === "korean" ? "루디가 잘 들었어요" : nativeLang === "spanish" ? "Rudy te escuchó bien" : "Rudy heard you clearly";
+    const heard = nativeLang === "korean" ? "입 밖으로 말했어요" : nativeLang === "spanish" ? "Lo dijiste en voz alta" : "You said it out loud";
+    const shape = nativeLang === "korean" ? "좋아요, 이제 다듬어봐요" : nativeLang === "spanish" ? "Bien, ahora lo pulimos" : "Good. Now we shape it";
+    if (score >= 75) return { label: clear, color: C.success, emoji: "" };
+    if (score >= 50) return { label: heard, color: C.gold, emoji: "" };
+    return { label: shape, color: C.goldDim, emoji: "" };
+  }
   const great = nativeLang === "korean" ? "훌륭해요!" : nativeLang === "spanish" ? "¡Excelente!" : "Excellent!";
   const good = nativeLang === "korean" ? "잘했어요!" : nativeLang === "spanish" ? "¡Bien hecho!" : "Good Job!";
   const keep = nativeLang === "korean" ? "계속 연습해요" : nativeLang === "spanish" ? "Sigue practicando" : "Keep Practicing";
   if (score >= 75) return { label: great, color: C.success, emoji: "🎉" };
   if (score >= 50) return { label: good, color: C.gold, emoji: "😊" };
-  return { label: keep, color: C.error, emoji: "💪" };
+  return { label: keep, color: C.goldDim, emoji: "" };
 }
 
 let _pronunciationAudio: HTMLAudioElement | null = null;
@@ -634,44 +678,70 @@ function pronLevelProgress(count: number): { current: Phrase["level"]; next: Phr
   return { current, next: PRON_LEVELS[idx + 1], done: count - baseCount, total: nextCount - baseCount };
 }
 
+function dailyPhraseToSpeakPhrase(phrase: DailySpeakingPhrase, nativeLang: NativeLanguage): Phrase {
+  return {
+    word: phrase.phrase,
+    ipa: phrase.ipa,
+    meaning: phrase.meanings[nativeLang],
+    meaningEs: phrase.meanings.spanish,
+    level: phrase.level,
+    speechLang: phrase.speechLang,
+    tip: phrase.tip,
+    contextTip: phrase.contextTip,
+  };
+}
+
+function getGoalSentencePack(lang: LangTab, goal: LearningGoal | null, nativeLang: NativeLanguage): Phrase[] {
+  return getDailySpeakingSentenceLoop(lang, goal).map((phrase) => dailyPhraseToSpeakPhrase(phrase, nativeLang));
+}
+
+function getDailySpeakingMissionPhrase(
+  lang: LangTab,
+  goal: LearningGoal | null,
+  spokenCount: number,
+  nativeLang: NativeLanguage
+): Phrase | null {
+  const phrase = getSharedDailySpeakingMissionPhrase(lang, goal, spokenCount);
+  return phrase ? dailyPhraseToSpeakPhrase(phrase, nativeLang) : null;
+}
+
 function buildSession(
   lang: LangTab,
   weakWords: string[],
   lastSeenWords: string[],
   pronLevel: Phrase["level"],
-  lastWord?: string
+  lastWord?: string,
+  goal?: LearningGoal | null,
+  nativeLang: NativeLanguage = "english"
 ): Phrase[] {
   const all = PHRASE_SETS[lang];
   const weakSet = new Set(weakWords);
   const lastSet = new Set(lastSeenWords);
   const shuffle = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5);
 
-  // STRICTLY filter to the exact current level only — never mix levels
+  // The review pool stays level-matched. A small real-sentence pack is
+  // prepended below because the app's core philosophy is acquisition through
+  // useful spoken sentences, not isolated word study.
   const userCefr: Phrase["level"] = PRON_LEVELS.includes(pronLevel) ? pronLevel : "B2";
   const levelWords = all.filter((p) => p.level === userCefr);
 
-  // Split into: never-seen > weak-seen > normal-seen
+  const realSentences = getGoalSentencePack(lang, goal ?? null, nativeLang);
+  const realSeen = shuffle(realSentences.filter((p) => lastSet.has(p.word) || weakSet.has(p.word)));
+  const realNew = shuffle(realSentences.filter((p) => !lastSet.has(p.word) && !weakSet.has(p.word)));
   const neverSeen = shuffle(levelWords.filter((p) => !lastSet.has(p.word) && !weakSet.has(p.word)));
   const weakAtLevel = shuffle(levelWords.filter((p) => weakSet.has(p.word)));
   const seenNormal = shuffle(levelWords.filter((p) => lastSet.has(p.word) && !weakSet.has(p.word)));
 
-  // Priority: fresh words first, then weak words for review, then seen words last
-  const pool = [...neverSeen, ...weakAtLevel, ...seenNormal];
-
-  const seenSet = new Set<string>();
-  const unique: Phrase[] = [];
-  for (const p of pool) {
-    if (!seenSet.has(p.word)) { seenSet.add(p.word); unique.push(p); }
-    if (unique.length >= SESSION_SIZE) break;
-  }
-
-  // Fallback: if not enough words at this level, cycle through all level words shuffled
-  if (unique.length < SESSION_SIZE) {
-    for (const p of shuffle(levelWords)) {
-      if (!seenSet.has(p.word)) { seenSet.add(p.word); unique.push(p); }
-      if (unique.length >= SESSION_SIZE) break;
-    }
-  }
+  // Acquisition mix: prefer roughly 80% known/review items and 20%
+  // guessable new items. Fresh users still get a full session because the
+  // fallback fills when there is not enough known material yet.
+  const unique = buildAcquisitionSession({
+    known: [...weakAtLevel, ...seenNormal, ...realSeen],
+    guessable: [...realNew, ...neverSeen],
+    fallback: shuffle([...realSentences, ...levelWords]),
+    count: SESSION_SIZE,
+    keyOf: (p) => p.word,
+  });
 
   // Anti-repetition: if the first word equals the last practiced word, rotate it to second position
   if (lastWord && unique.length > 1 && unique[0].word === lastWord) {
@@ -681,6 +751,147 @@ function buildSession(
   }
 
   return unique;
+}
+
+function normalizeLearningGoal(value: unknown): LearningGoal | null {
+  return value === "travel" || value === "work" || value === "study" || value === "hobby" || value === "relationship" || value === "exam" || value === "unknown"
+    ? value
+    : null;
+}
+
+function routeParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function normalizeLangTab(value: unknown): LangTab | null {
+  return value === "korean" || value === "english" || value === "spanish" ? value : null;
+}
+
+function normalizeDeckType(value: unknown): "srs" | "beginner" | "advanced" {
+  return value === "beginner" || value === "advanced" ? value : "srs";
+}
+
+function langFromSpeechLang(value: string | undefined): LangTab | null {
+  const lang = value?.toLowerCase();
+  if (!lang) return null;
+  if (lang.startsWith("ko")) return "korean";
+  if (lang.startsWith("en")) return "english";
+  if (lang.startsWith("es")) return "spanish";
+  return null;
+}
+
+function speechLangForLang(lang: LangTab): string {
+  if (lang === "korean") return "ko-KR";
+  if (lang === "spanish") return "es-ES";
+  return "en-US";
+}
+
+function stripRouteQuotes(value: string): string {
+  return value.trim().replace(/^["']+|["']+$/g, "");
+}
+
+function getReviewSentencePhrase(
+  phraseParam: string | undefined,
+  meaningParam: string | undefined,
+  speechLangParam: string | undefined,
+  nativeLang: NativeLanguage,
+  targetLang: LangTab
+): Phrase | null {
+  const word = phraseParam ? stripRouteQuotes(phraseParam) : "";
+  if (!word) return null;
+  const meaning = meaningParam?.trim() || word;
+  const tip = nativeLang === "korean"
+    ? "카드 문장을 통째로 말해보세요. 완벽하지 않아도 괜찮아요."
+    : nativeLang === "spanish"
+    ? "Di la frase completa. No tiene que salir perfecta."
+    : "Say the whole card sentence. It does not have to be perfect.";
+  return {
+    word,
+    ipa: "",
+    meaning,
+    meaningEs: nativeLang === "spanish" ? meaning : undefined,
+    level: "A1",
+    speechLang: speechLangParam?.trim() || speechLangForLang(targetLang),
+    tip,
+  };
+}
+
+function getFirstSpeakingMissionCopy(nativeLang: NativeLanguage, targetLang: LangTab, goal: LearningGoal | null) {
+  const targetName: Record<NativeLanguage, Record<LangTab, string>> = {
+    korean: { korean: "한국어", english: "영어", spanish: "스페인어" },
+    english: { korean: "Korean", english: "English", spanish: "Spanish" },
+    spanish: { korean: "coreano", english: "inglés", spanish: "español" },
+  };
+  const goalLabel: Partial<Record<LearningGoal, Record<NativeLanguage, string>>> = {
+    travel: { korean: "여행에서 쓸", english: "travel", spanish: "de viaje" },
+    work: { korean: "일에서 쓸", english: "work", spanish: "de trabajo" },
+    study: { korean: "학교에서 쓸", english: "school", spanish: "de estudios" },
+    hobby: { korean: "좋아하는 것에 대해 말할", english: "things you love", spanish: "sobre lo que te gusta" },
+    relationship: { korean: "사람들과 가까워질", english: "friends", spanish: "para amistades" },
+    exam: { korean: "시험에서 쓸", english: "exam", spanish: "de examen" },
+    unknown: { korean: "기본", english: "starter", spanish: "básica" },
+  };
+  const label = goal ? goalLabel[goal]?.[nativeLang] : null;
+  return {
+    title: nativeLang === "korean" ? "오늘의 실제 한 문장"
+      : nativeLang === "spanish" ? "Una frase real hoy"
+      : "Today's real sentence",
+    subtitle: nativeLang === "korean"
+      ? `${targetName[nativeLang][targetLang]}로 ${label ?? "처음 쓸"} 문장을 Rudy와 입 밖으로 말해요.`
+      : nativeLang === "spanish"
+      ? `Di una frase ${label ?? "real"} en ${targetName[nativeLang][targetLang]} con Rudy.`
+      : `Say one ${targetName[nativeLang][targetLang]} sentence for ${label ?? "real life"} out loud with Rudy.`,
+  };
+}
+
+function getReviewSentenceMissionCopy(nativeLang: NativeLanguage) {
+  if (nativeLang === "korean") {
+    return {
+      title: "복습 문장 말하기",
+      subtitle: "카드를 넘기는 데서 끝내지 않고, 입 밖으로 한 번 더 꺼내요.",
+    };
+  }
+  if (nativeLang === "spanish") {
+    return {
+      title: "Frase de repaso",
+      subtitle: "No solo mires la tarjeta. Dila una vez en voz alta.",
+    };
+  }
+  return {
+    title: "Review sentence",
+    subtitle: "Do not stop at recognizing the card. Say it once out loud.",
+  };
+}
+
+function getLearningGoalOptions(nativeLang: NativeLanguage): { key: LearningGoal; label: string }[] {
+  return [
+    { key: "travel", label: nativeLang === "korean" ? "여행" : nativeLang === "spanish" ? "Viajes" : "Travel" },
+    { key: "hobby", label: nativeLang === "korean" ? "콘텐츠/취미" : nativeLang === "spanish" ? "Series y gustos" : "Shows and interests" },
+    { key: "relationship", label: nativeLang === "korean" ? "친구/관계" : nativeLang === "spanish" ? "Amistades" : "Friends" },
+    { key: "work", label: nativeLang === "korean" ? "일" : nativeLang === "spanish" ? "Trabajo" : "Work" },
+    { key: "study", label: nativeLang === "korean" ? "학교" : nativeLang === "spanish" ? "Estudios" : "School" },
+    { key: "exam", label: nativeLang === "korean" ? "시험" : nativeLang === "spanish" ? "Examen" : "Exam" },
+  ];
+}
+
+function getGoalQuestion(nativeLang: NativeLanguage): string {
+  if (nativeLang === "korean") return "다음엔 어떤 상황을 말해볼까요?";
+  if (nativeLang === "spanish") return "¿Qué quieres decir con Rudy después?";
+  return "What should Rudy help you say next?";
+}
+
+type SpeakingAssessmentStatus = "scored" | "unscored";
+
+function getScoreBand(score: number): "pass" | "coach" | "repair" {
+  if (score >= 75) return "pass";
+  if (score >= 50) return "coach";
+  return "repair";
+}
+
+function getUnscoredAttemptAcceptedMessage(nativeLang: NativeLanguage): string {
+  if (nativeLang === "korean") return "채점은 잠시 실패했지만, 말하기 시도는 기록했어요. 계속 진행해도 좋아요.";
+  if (nativeLang === "spanish") return "La evaluación falló por ahora, pero guardamos tu intento hablado. Puedes continuar.";
+  return "Scoring failed for now, but your spoken attempt was saved. You can continue.";
 }
 
 type RecordState = "idle" | "listening" | "processing" | "done";
@@ -698,6 +909,16 @@ type PronunciationAssessResponse = {
 
 export default function SpeakScreen() {
   const insets = useSafeAreaInsets();
+  const params = useLocalSearchParams<{
+    mission?: string | string[];
+    goal?: string | string[];
+    phrase?: string | string[];
+    meaning?: string | string[];
+    speechLang?: string | string[];
+    targetLang?: string | string[];
+    returnDeck?: string | string[];
+    missionId?: string | string[];
+  }>();
   const { t, nativeLanguage, learningLanguage, stats, updateStats } = useLanguage();
   const [xpGain, setXpGain] = useState(0);
   const statsRef = useRef(stats);
@@ -705,6 +926,20 @@ export default function SpeakScreen() {
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const nativeLang = (nativeLanguage ?? "english") as NativeLanguage;
+  const missionParam = routeParam(params.mission);
+  const goalParam = routeParam(params.goal);
+  const phraseParam = routeParam(params.phrase);
+  const meaningParam = routeParam(params.meaning);
+  const speechLangParam = routeParam(params.speechLang);
+  const targetLangParam = routeParam(params.targetLang);
+  const returnDeckParam = routeParam(params.returnDeck);
+  const missionIdParam = routeParam(params.missionId);
+  const isFirstSpeakingMission = missionParam === "first-sentence";
+  const isReviewSentenceMission = missionParam === "review-sentence";
+  const isGuidedSentenceMission = isFirstSpeakingMission || isReviewSentenceMission;
+  const routeGoal = normalizeLearningGoal(goalParam);
+  const routeTargetLang = normalizeLangTab(targetLangParam) ?? langFromSpeechLang(speechLangParam);
+  const routeDeckType = normalizeDeckType(returnDeckParam);
 
   const rudyListeningMsg = nativeLang === "korean"
     ? "루디가 듣고 있어요… 🦊"
@@ -717,12 +952,13 @@ export default function SpeakScreen() {
     : LANG_TABS.filter((tab) => tab.key !== nativeLang);
 
   const [activeLang, setActiveLang] = useState<LangTab>(() => {
+    if (routeTargetLang && routeTargetLang !== nativeLang) return routeTargetLang;
     const ll = learningLanguage as LangTab | null;
     if (ll && ll !== nativeLang) return ll;
     return (visibleTabs[0]?.key ?? "english") as LangTab;
   });
 
-  const [pronLevel, setPronLevel] = useState<Phrase["level"]>("A1");
+  const [, setPronLevel] = useState<Phrase["level"]>("A1");
   const [pronCount, setPronCount] = useState(0);
   const [levelUpShow, setLevelUpShow] = useState(false);
   const [levelUpNewLevel, setLevelUpNewLevel] = useState<Phrase["level"]>("A2");
@@ -733,13 +969,23 @@ export default function SpeakScreen() {
   const [sessionIdx, setSessionIdx] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [weakWords, setWeakWords] = useState<string[]>([]);
+  const [selectedGoal, setSelectedGoal] = useState<LearningGoal | null>(routeGoal);
+  const selectedGoalRef = useRef<LearningGoal | null>(routeGoal);
+  useEffect(() => { selectedGoalRef.current = selectedGoal; }, [selectedGoal]);
+  const [reviewMissionHandoff, setReviewMissionHandoff] = useState<SpeakMissionHandoff | null>(null);
+  const [reviewHandoffReady, setReviewHandoffReady] = useState(!isReviewSentenceMission || !missionIdParam);
+  const [dailySpokenCount, setDailySpokenCount] = useState(0);
+  const dailySpokenCountRef = useRef(0);
+  useEffect(() => { dailySpokenCountRef.current = dailySpokenCount; }, [dailySpokenCount]);
+  const currentPromptSourceRef = useRef("clinic");
 
   const [recordState, setRecordState] = useState<RecordState>("idle");
+  const [spokenAttemptAccepted, setSpokenAttemptAccepted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [accuracyScore, setAccuracyScore] = useState<number | null>(null);
   const [fluencyScore, setFluencyScore] = useState<number | null>(null);
   const [completenessScore, setCompletenessScore] = useState<number | null>(null);
-  const [gptFeedback, setGptFeedback] = useState("");
+  const [, setGptFeedback] = useState("");
   const [recognizedText, setRecognizedText] = useState("");
   const [wordResults, setWordResults] = useState<{ word: string; score: number; errorType: string; phonemes?: { phoneme: string; score: number }[] }[]>([]);
   const [sttError, setSttError] = useState("");
@@ -757,6 +1003,9 @@ export default function SpeakScreen() {
   const audioChunksRef = useRef<Blob[]>([]);
   const autoStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nativeRecordingRef = useRef<Audio.Recording | null>(null);
+  // Bumped whenever the visible prompt/session changes so stale scoring callbacks
+  // cannot award XP or attach feedback to the wrong sentence.
+  const practiceGenerationRef = useRef(0);
   const RECORD_MAX_SEC = 8;
   // Countdown shown to the user while a recording is in progress so they
   // know HOW LONG they have before the 8-second auto-stop kicks in. Without
@@ -789,7 +1038,16 @@ export default function SpeakScreen() {
     }, 1000);
   }, [stopCountdown]);
 
+  const invalidatePracticeAttempt = useCallback(() => {
+    practiceGenerationRef.current += 1;
+  }, []);
+
+  const isCurrentPracticeAttempt = useCallback((generation: number) => {
+    return practiceGenerationRef.current === generation;
+  }, []);
+
   const resetPracticeState = useCallback(() => {
+    invalidatePracticeAttempt();
     if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
     stopCountdown();
     if (mediaRecorderRef.current?.state === "recording") { mediaRecorderRef.current.stop(); }
@@ -799,6 +1057,7 @@ export default function SpeakScreen() {
     }
     setRecordState("idle");
     recordStateRef.current = "idle";
+    setSpokenAttemptAccepted(false);
     setScore(null);
     setAccuracyScore(null);
     setFluencyScore(null);
@@ -811,9 +1070,10 @@ export default function SpeakScreen() {
     pulseLoop.current?.stop();
     Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
     scoreAnim.setValue(0);
-  }, [pulseAnim, scoreAnim]);
+  }, [invalidatePracticeAttempt, pulseAnim, scoreAnim, stopCountdown]);
 
-  const loadSession = useCallback(async (lang: LangTab) => {
+  const loadSession = useCallback(async (lang: LangTab, forceFullSession = false) => {
+    resetPracticeState();
     try {
       const [weakRaw, lastRaw, countRaw, lastWordRaw] = await Promise.all([
         AsyncStorage.getItem(`speak_weak_words_${lang}`),
@@ -831,23 +1091,126 @@ export default function SpeakScreen() {
       setPronLevel(level);
       pronLevelRef.current = level;
       pronCountRef.current = count;
-      const session = buildSession(lang, weak, last, level, lastWord);
+      let spokenCountForMission = dailySpokenCountRef.current;
+      if (isGuidedSentenceMission && !forceFullSession) {
+        const day = await loadTodaySpeakingProgress();
+        spokenCountForMission = day.count;
+        dailySpokenCountRef.current = day.count;
+        setDailySpokenCount(day.count);
+      }
+      if (isReviewSentenceMission && missionIdParam && !reviewHandoffReady && !forceFullSession) {
+        return;
+      }
+      const handoffPhrase = reviewMissionHandoff
+        ? getReviewSentencePhrase(
+          reviewMissionHandoff.phrase,
+          reviewMissionHandoff.meaning,
+          reviewMissionHandoff.speechLang,
+          nativeLang,
+          reviewMissionHandoff.targetLanguage
+        )
+        : null;
+      const reviewPhrase = isReviewSentenceMission && !forceFullSession
+        ? handoffPhrase ?? getReviewSentencePhrase(phraseParam, meaningParam, speechLangParam, nativeLang, lang)
+        : null;
+      const missionPhrase = reviewPhrase ?? (isFirstSpeakingMission && !forceFullSession
+        ? getDailySpeakingMissionPhrase(lang, selectedGoalRef.current, spokenCountForMission, nativeLang)
+        : null);
+      const session = missionPhrase ? [missionPhrase] : buildSession(lang, weak, last, level, lastWord, selectedGoalRef.current, nativeLang);
+      currentPromptSourceRef.current = reviewPhrase
+        ? `review-${missionIdParam || routeDeckType}`
+        : isFirstSpeakingMission && !forceFullSession
+        ? `first-${spokenCountForMission}`
+        : `clinic-${lang}`;
       setSessionWords(session);
       setSessionIdx(0);
       setSessionComplete(false);
       resetPracticeState();
     } catch (e) { console.warn('[Speak] loadSession failed:', e); }
-  }, [resetPracticeState]);
+  }, [isFirstSpeakingMission, isGuidedSentenceMission, isReviewSentenceMission, meaningParam, missionIdParam, nativeLang, phraseParam, resetPracticeState, reviewHandoffReady, reviewMissionHandoff, routeDeckType, speechLangParam]);
 
   useFocusEffect(useCallback(() => {
     loadSession(activeLang);
-  }, [activeLang]));
+    loadTodaySpeakingProgress().then((day) => setDailySpokenCount(day.count));
+  }, [activeLang, loadSession]));
 
   useEffect(() => {
+    if (!isFirstSpeakingMission) return;
+    void trackLearningEvent("first_speaking_screen_seen", {
+      surface: "speak",
+      nativeLanguage: nativeLang,
+      targetLanguage: activeLang,
+      goal: selectedGoal,
+    });
+  }, [activeLang, isFirstSpeakingMission, nativeLang, selectedGoal]);
+
+  useEffect(() => {
+    if (!isReviewSentenceMission) return;
+    void trackLearningEvent("review_sentence_screen_seen", {
+      surface: "speak",
+      nativeLanguage: nativeLang,
+      targetLanguage: activeLang,
+      deckType: routeDeckType,
+    });
+  }, [activeLang, isReviewSentenceMission, nativeLang, routeDeckType]);
+
+  useEffect(() => {
+    if (!isReviewSentenceMission || !missionIdParam) {
+      setReviewMissionHandoff(null);
+      setReviewHandoffReady(true);
+      return;
+    }
+    let cancelled = false;
+    setReviewHandoffReady(false);
+    loadSpeakMissionHandoff(missionIdParam)
+      .then((handoff) => {
+        if (cancelled) return;
+        setReviewMissionHandoff(handoff);
+        if (handoff?.targetLanguage && handoff.targetLanguage !== nativeLang) {
+          setActiveLang(handoff.targetLanguage);
+        }
+        setReviewHandoffReady(true);
+      })
+      .catch((err: unknown) => {
+        console.warn("[Speak] review handoff load failed:", err);
+        if (!cancelled) {
+          setReviewMissionHandoff(null);
+          setReviewHandoffReady(true);
+        }
+      });
+    return () => { cancelled = true; };
+  }, [isReviewSentenceMission, missionIdParam, nativeLang]);
+
+  useEffect(() => {
+    if (!isFirstSpeakingMission) return;
+    if (routeGoal) {
+      selectedGoalRef.current = routeGoal;
+      setSelectedGoal(routeGoal);
+      void loadSession(activeLang);
+      return;
+    }
+    let cancelled = false;
+    loadLearnerProfile()
+      .then((profile) => {
+        if (cancelled) return;
+        const goal = profile.goals[0] ?? null;
+        selectedGoalRef.current = goal;
+        setSelectedGoal(goal);
+        if (goal) void loadSession(activeLang);
+      })
+      .catch((err: unknown) => console.warn("[Speak] learner goal load failed:", err));
+    return () => { cancelled = true; };
+  }, [activeLang, isFirstSpeakingMission, loadSession, routeGoal]);
+
+  useEffect(() => {
+    if (isGuidedSentenceMission && routeTargetLang && routeTargetLang !== nativeLang) {
+      setActiveLang(routeTargetLang);
+      return;
+    }
     if (learningLanguage && learningLanguage !== nativeLang) {
       setActiveLang(learningLanguage as LangTab);
     }
-  }, [learningLanguage]);
+  }, [isGuidedSentenceMission, learningLanguage, nativeLang, routeTargetLang]);
 
   const phrase = sessionWords[sessionIdx];
   const tabInfo = LANG_TABS.find((tab) => tab.key === activeLang)!;
@@ -855,10 +1218,12 @@ export default function SpeakScreen() {
   // Preload TTS audio for the current phrase so the listen button plays instantly
   useEffect(() => {
     if (!phrase) return;
-    preloadPronunciationTTS(phrase.word, phrase.speechLang, getApiUrl());
+    const apiBaseUrl = tryGetApiUrl("pronunciation TTS preload");
+    if (!apiBaseUrl) return;
+    preloadPronunciationTTS(phrase.word, phrase.speechLang, apiBaseUrl);
     // Also preload the next phrase so switching is seamless
     const next = sessionWords[sessionIdx + 1];
-    if (next) preloadPronunciationTTS(next.word, next.speechLang, getApiUrl());
+    if (next) preloadPronunciationTTS(next.word, next.speechLang, apiBaseUrl);
   }, [sessionIdx, phrase?.word, phrase?.speechLang]);
 
   const switchLang = (lang: LangTab) => {
@@ -893,7 +1258,12 @@ export default function SpeakScreen() {
     if (!phrase) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setHasListened(true);
-    playPronunciationTTS(phrase.word, phrase.speechLang, getApiUrl());
+    const apiBaseUrl = tryGetApiUrl("pronunciation TTS play");
+    if (!apiBaseUrl) {
+      setSttError(getVoiceServiceUnavailableMessage(nativeLang));
+      return;
+    }
+    playPronunciationTTS(phrase.word, phrase.speechLang, apiBaseUrl);
   };
 
   const startPulse = () => {
@@ -948,9 +1318,81 @@ export default function SpeakScreen() {
     return scoreVal;
   };
 
+  const recordSpokenAttempt = useCallback(async (
+    scoreVal: number,
+    attemptGeneration: number,
+    assessmentStatus: SpeakingAssessmentStatus
+  ): Promise<boolean> => {
+    try {
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
+      const promptKey = buildSpeakingPromptKey({
+        targetLanguage: activeLang,
+        phrase: phrase?.word ?? "",
+        source: `${currentPromptSourceRef.current}:${sessionIdx}`,
+      });
+      const { day, counted } = await recordSpokenSentence({
+        targetLanguage: activeLang,
+        promptKey,
+        shouldCommit: () => isCurrentPracticeAttempt(attemptGeneration),
+      });
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
+      dailySpokenCountRef.current = day.count;
+      setDailySpokenCount(day.count);
+      if (!counted) return false;
+      if (isFirstSpeakingMission) {
+        void trackLearningEvent("first_speaking_attempt_completed", {
+          surface: "speak",
+          nativeLanguage: nativeLang,
+          targetLanguage: activeLang,
+          scoreBand: assessmentStatus === "scored" ? getScoreBand(scoreVal) : undefined,
+          assessmentStatus,
+          platform: Platform.OS,
+          goal: selectedGoalRef.current,
+          dailySpokenCount: day.count,
+          dailyGoal: SPEAKING_DAILY_GOAL,
+        });
+      } else if (isReviewSentenceMission) {
+        void trackLearningEvent("review_sentence_attempt_completed", {
+          surface: "speak",
+          nativeLanguage: nativeLang,
+          targetLanguage: activeLang,
+          scoreBand: assessmentStatus === "scored" ? getScoreBand(scoreVal) : undefined,
+          assessmentStatus,
+          platform: Platform.OS,
+          deckType: routeDeckType,
+          dailySpokenCount: day.count,
+          dailyGoal: SPEAKING_DAILY_GOAL,
+        });
+      }
+      return true;
+    } catch (err) {
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
+      console.warn("[Speak] spoken sentence progress save failed:", err);
+      return false;
+    }
+  }, [activeLang, isCurrentPracticeAttempt, isFirstSpeakingMission, isReviewSentenceMission, nativeLang, phrase?.word, routeDeckType, sessionIdx]);
+
+  const acceptUnscoredGuidedAttempt = useCallback(async (attemptGeneration: number): Promise<boolean> => {
+    if (!isGuidedSentenceMission || !isCurrentPracticeAttempt(attemptGeneration)) return false;
+    setSpokenAttemptAccepted(true);
+    const counted = await recordSpokenAttempt(0, attemptGeneration, "unscored");
+    if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
+    setScore(null);
+    setAccuracyScore(null);
+    setFluencyScore(null);
+    setCompletenessScore(null);
+    setWordResults([]);
+    setRecognizedText("");
+    setGptFeedback("");
+    setSttError(getUnscoredAttemptAcceptedMessage(nativeLang));
+    return counted;
+  }, [isCurrentPracticeAttempt, isGuidedSentenceMission, nativeLang, recordSpokenAttempt]);
+
   const stopNativeRecording = async () => {
+    const attemptGeneration = practiceGenerationRef.current;
     const rec = nativeRecordingRef.current;
     if (!rec) return;
+    let hasRecordableAudio = false;
     stopPulse();
     stopCountdown();
     setRecordState("processing");
@@ -973,6 +1415,7 @@ export default function SpeakScreen() {
       const base64 = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       // Empty audio guard — show 0% instead of sending to Azure
       if (!base64 || base64.length < 2000) {
         setScore(0);
@@ -981,8 +1424,16 @@ export default function SpeakScreen() {
         recordStateRef.current = "done";
         return;
       }
+      hasRecordableAudio = true;
       const nativeMime = Platform.OS === "ios" ? "audio/wav" : "audio/mp4";
-      const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+      const apiBaseUrl = tryGetApiUrl("native pronunciation assessment");
+      if (!apiBaseUrl) {
+        setScore(0);
+        setSttError(getVoiceServiceUnavailableMessage(nativeLang));
+        await acceptUnscoredGuidedAttempt(attemptGeneration);
+        return;
+      }
+      const apiUrl = new URL("/api/pronunciation-assess", apiBaseUrl).toString();
       const apiRes = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -995,31 +1446,44 @@ export default function SpeakScreen() {
       });
       if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
       const data = await apiRes.json() as PronunciationAssessResponse;
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       const scoreVal = processScoreData(data);
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase?.word ?? ""); }
       else { await removeWeakWord(phrase?.word ?? ""); }
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       if (data.success !== true) return;
-      const xpEarned = scoreVal >= 90 ? 30 : 15;
-      setXpGain(xpEarned);
-      updateStats({ xp: statsRef.current.xp + xpEarned });
-      const newCount = pronCountRef.current + 1;
-      pronCountRef.current = newCount;
-      setPronCount(newCount);
-      await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch((e: unknown) => console.warn('[Speak] pron count save failed:', e));
-      await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase?.word ?? "").catch((e: unknown) => console.warn('[Speak] pron last word save failed:', e));
-      const newLevel = countToPronLevel(newCount);
-      if (newLevel !== pronLevelRef.current) {
-        pronLevelRef.current = newLevel;
-        setPronLevel(newLevel);
-        setLevelUpNewLevel(newLevel);
-        setLevelUpShow(true);
+      setSpokenAttemptAccepted(true);
+      const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return;
+      if (counted) {
+        const xpEarned = scoreVal >= 90 ? 30 : 15;
+        setXpGain(xpEarned);
+        updateStats({ xp: statsRef.current.xp + xpEarned });
+        const newCount = pronCountRef.current + 1;
+        pronCountRef.current = newCount;
+        setPronCount(newCount);
+        await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch((e: unknown) => console.warn('[Speak] pron count save failed:', e));
+        await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase?.word ?? "").catch((e: unknown) => console.warn('[Speak] pron last word save failed:', e));
+        const newLevel = countToPronLevel(newCount);
+        if (newLevel !== pronLevelRef.current) {
+          pronLevelRef.current = newLevel;
+          setPronLevel(newLevel);
+          setLevelUpNewLevel(newLevel);
+          setLevelUpShow(true);
+        }
       }
     } catch (e) {
       console.warn('[Audio] native recording scoring failed:', e);
       // Always restore audio mode so NPC/tutor sounds work after a failed recording
       Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch((e2: unknown) => console.warn('[Audio] audio mode restore failed:', e2));
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
+      if (hasRecordableAudio) {
+        await acceptUnscoredGuidedAttempt(attemptGeneration);
+      }
     } finally {
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       setRecordState("done");
       recordStateRef.current = "done";
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -1028,6 +1492,7 @@ export default function SpeakScreen() {
 
   const handleRecord = () => {
     if (!phrase || recordState === "processing") return;
+    const attemptGeneration = practiceGenerationRef.current;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
     // Second tap while recording → stop early
@@ -1046,6 +1511,7 @@ export default function SpeakScreen() {
       (async () => {
         try {
           const { granted } = await Audio.requestPermissionsAsync();
+          if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           if (!granted) {
             setSttError("마이크 권한을 허용해주세요.\n(설정 → 앱 → Enigma → 마이크)");
             setRecordState("done");
@@ -1071,7 +1537,15 @@ export default function SpeakScreen() {
             web: { mimeType: "audio/webm", bitsPerSecond: 128000 },
           } : Audio.RecordingOptionsPresets.HIGH_QUALITY;
           await recording.prepareToRecordAsync(recOptions);
+          if (!isCurrentPracticeAttempt(attemptGeneration)) {
+            await recording.stopAndUnloadAsync().catch((e: unknown) => console.warn('[Audio] stale recording cleanup failed:', e));
+            return;
+          }
           await recording.startAsync();
+          if (!isCurrentPracticeAttempt(attemptGeneration)) {
+            await recording.stopAndUnloadAsync().catch((e: unknown) => console.warn('[Audio] stale recording stop failed:', e));
+            return;
+          }
           nativeRecordingRef.current = recording;
           setRecordState("listening");
           recordStateRef.current = "listening";
@@ -1106,6 +1580,10 @@ export default function SpeakScreen() {
     }
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      if (!isCurrentPracticeAttempt(attemptGeneration)) {
+        stream.getTracks().forEach((t: any) => t.stop());
+        return;
+      }
       audioChunksRef.current = [];
 
       const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
@@ -1122,6 +1600,7 @@ export default function SpeakScreen() {
 
       recorder.onstop = async () => {
         stream.getTracks().forEach((t: any) => t.stop());
+        if (!isCurrentPracticeAttempt(attemptGeneration)) return;
         stopPulse();
         stopCountdown();
         setRecordState("processing");
@@ -1140,6 +1619,7 @@ export default function SpeakScreen() {
           reader.onerror = reject;
           reader.readAsDataURL(blob);
         });
+        if (!isCurrentPracticeAttempt(attemptGeneration)) return;
 
         // Empty audio guard — show 0% instead of sending to Azure
         if (!base64 || base64.length < 2000) {
@@ -1149,8 +1629,16 @@ export default function SpeakScreen() {
           recordStateRef.current = "done";
           return;
         }
+        const hasRecordableAudio = true;
         try {
-          const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
+          const apiBaseUrl = tryGetApiUrl("web pronunciation assessment");
+          if (!apiBaseUrl) {
+            setScore(0);
+            setSttError(getVoiceServiceUnavailableMessage(nativeLang));
+            await acceptUnscoredGuidedAttempt(attemptGeneration);
+            return;
+          }
+          const apiUrl = new URL("/api/pronunciation-assess", apiBaseUrl).toString();
           const apiRes = await fetch(apiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1163,30 +1651,43 @@ export default function SpeakScreen() {
           });
           if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
           const data = await apiRes.json() as PronunciationAssessResponse;
+          if (!isCurrentPracticeAttempt(attemptGeneration)) return;
 
           const scoreVal = processScoreData(data);
+          if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase.word); }
           else { await removeWeakWord(phrase.word); }
+          if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           if (data.success !== true) return;
-          const xpEarned = scoreVal >= 90 ? 30 : 15;
-          setXpGain(xpEarned);
-          updateStats({ xp: statsRef.current.xp + xpEarned });
-          const newCount = pronCountRef.current + 1;
-          pronCountRef.current = newCount;
-          setPronCount(newCount);
-          await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch((e: unknown) => console.warn('[Speak] pron count save failed:', e));
-          await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase.word).catch((e: unknown) => console.warn('[Speak] pron last word save failed:', e));
-          const newLevel = countToPronLevel(newCount);
-          if (newLevel !== pronLevelRef.current) {
-            pronLevelRef.current = newLevel;
-            setPronLevel(newLevel);
-            setLevelUpNewLevel(newLevel);
-            setLevelUpShow(true);
+          setSpokenAttemptAccepted(true);
+          const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
+          if (!isCurrentPracticeAttempt(attemptGeneration)) return;
+          if (counted) {
+            const xpEarned = scoreVal >= 90 ? 30 : 15;
+            setXpGain(xpEarned);
+            updateStats({ xp: statsRef.current.xp + xpEarned });
+            const newCount = pronCountRef.current + 1;
+            pronCountRef.current = newCount;
+            setPronCount(newCount);
+            await AsyncStorage.setItem(`pron_count_${activeLang}`, String(newCount)).catch((e: unknown) => console.warn('[Speak] pron count save failed:', e));
+            await AsyncStorage.setItem(`pron_last_word_${activeLang}`, phrase.word).catch((e: unknown) => console.warn('[Speak] pron last word save failed:', e));
+            const newLevel = countToPronLevel(newCount);
+            if (newLevel !== pronLevelRef.current) {
+              pronLevelRef.current = newLevel;
+              setPronLevel(newLevel);
+              setLevelUpNewLevel(newLevel);
+              setLevelUpShow(true);
+            }
           }
         } catch (e) {
           console.warn('[Audio] web recording scoring failed:', e);
+          if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
+          if (hasRecordableAudio) {
+            await acceptUnscoredGuidedAttempt(attemptGeneration);
+          }
         } finally {
+          if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           setRecordState("done");
           recordStateRef.current = "done";
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -1253,11 +1754,84 @@ export default function SpeakScreen() {
     resetPracticeState();
   };
 
+  const startNextSpeakingStep = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (isFirstSpeakingMission && dailySpokenCountRef.current < SPEAKING_DAILY_GOAL) {
+      loadSession(activeLang);
+      return;
+    }
+    router.replace("/(tabs)/speak" as any);
+    loadSession(activeLang, true);
+  };
+
+  const applyLearningGoal = useCallback(async (goal: LearningGoal) => {
+    selectedGoalRef.current = goal;
+    setSelectedGoal(goal);
+    await setPrimaryLearningGoal(goal).catch((err: unknown) => console.warn("[Speak] learner goal save failed:", err));
+    void trackLearningEvent("learning_goal_selected", {
+      surface: "speak",
+      nativeLanguage: nativeLang,
+      targetLanguage: activeLang,
+      goal,
+    });
+  }, [activeLang, nativeLang]);
+
   const isRecording = recordState === "listening";
   const isProcessing = recordState === "processing";
-  const isBusy = isRecording || isProcessing;
-  const scoreInfo = score !== null ? getScoreInfo(score, nativeLang) : null;
+  const goalChangeLocked = isRecording || isProcessing;
+  const scoreInfo = score !== null ? getScoreInfo(score, nativeLang, isGuidedSentenceMission ? "first-mission" : "clinic") : null;
   const progressPct = sessionWords.length > 0 ? (sessionIdx / sessionWords.length) * 100 : 0;
+  const firstMissionCopy = isFirstSpeakingMission ? getFirstSpeakingMissionCopy(nativeLang, activeLang, selectedGoal) : null;
+  const reviewMissionCopy = isReviewSentenceMission ? getReviewSentenceMissionCopy(nativeLang) : null;
+  const guidedMissionCopy = firstMissionCopy ?? reviewMissionCopy;
+  const spokenProgressPct = Math.min(100, (dailySpokenCount / SPEAKING_DAILY_GOAL) * 100);
+  const spokenTodayLabel = nativeLang === "korean"
+    ? `오늘 ${dailySpokenCount}/${SPEAKING_DAILY_GOAL}문장 말했어요`
+    : nativeLang === "spanish"
+    ? `Hoy dijiste ${dailySpokenCount}/${SPEAKING_DAILY_GOAL} frases`
+    : `You spoke ${dailySpokenCount}/${SPEAKING_DAILY_GOAL} sentences today`;
+  const headerProgressPct = isFirstSpeakingMission ? spokenProgressPct : progressPct;
+  const headerProgressLabel = isFirstSpeakingMission
+    ? `${dailySpokenCount} / ${SPEAKING_DAILY_GOAL}`
+    : `${sessionIdx + 1} / ${sessionWords.length}`;
+  const navProgressLabel = isFirstSpeakingMission
+    ? `${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)} / ${SPEAKING_DAILY_GOAL}`
+    : `${sessionIdx + 1} / ${sessionWords.length}`;
+  const shouldContinueDailySpeaking = isFirstSpeakingMission && dailySpokenCount < SPEAKING_DAILY_GOAL;
+  const canAdvanceAfterAttempt = recordState === "done" && (!isGuidedSentenceMission || spokenAttemptAccepted);
+  const showAcceptedUnscoredNotice = recordState === "done" && spokenAttemptAccepted && score === null && !!sttError;
+  const continueSpeakingLabel = shouldContinueDailySpeaking
+    ? nativeLang === "korean"
+      ? `다음 문장 말하기 ${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
+      : nativeLang === "spanish"
+      ? `Siguiente frase ${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
+      : `Next sentence ${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
+    : nativeLang === "korean" ? "루디와 계속 말하기" : nativeLang === "spanish" ? "Seguir hablando con Rudy" : "Keep speaking with Rudy";
+
+  const idleRecordHint = hasListened
+    ? (nativeLang === "korean" ? "탭하여 발음 녹음" : nativeLang === "spanish" ? "Toca para grabar" : "Tap to record")
+    : isGuidedSentenceMission
+    ? (nativeLang === "korean"
+        ? "바로 말해도 좋아요. 필요하면 먼저 들어보세요."
+        : nativeLang === "spanish"
+        ? "Puedes hablar ya. Escucha primero si lo necesitas."
+        : "You can speak now. Listen first if you need it.")
+    : (nativeLang === "korean" ? "먼저 듣기를 눌러보세요" : nativeLang === "spanish" ? "Primero toca escuchar" : "Press listen first");
+  const micAccessibilityLabel = isRecording
+    ? (nativeLang === "korean" ? "녹음 중. 탭하여 정지" : nativeLang === "spanish" ? "Grabando. Toca para parar" : "Recording. Tap to stop")
+    : isGuidedSentenceMission
+    ? (nativeLang === "korean" ? "문장 말하기 시작" : nativeLang === "spanish" ? "Empezar a decir la frase" : "Start speaking the sentence")
+    : (nativeLang === "korean" ? "발음 녹음 시작" : nativeLang === "spanish" ? "Iniciar grabación de pronunciación" : "Start recording pronunciation");
+  const lockedNextLabel = isGuidedSentenceMission
+    ? (nativeLang === "korean" ? "먼저 말하기" : nativeLang === "spanish" ? "Habla primero" : "Speak first")
+    : (nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : "Next");
+
+  const returnToReviewCards = () => {
+    router.replace({
+      pathname: "/(tabs)/cards",
+      params: { deck: routeDeckType },
+    } as any);
+  };
 
   // The Phrase database has `meaning` mostly in Korean and `tip` mostly in
   // English. For a Spanish or English-native user, that breaks the trilingual
@@ -1267,8 +1841,10 @@ export default function SpeakScreen() {
   // preferred for Spanish users — that's a no-op for the hook.
   const phraseMeaningRaw = phrase ? ((nativeLang === "spanish" && phrase.meaningEs) ? phrase.meaningEs : phrase.meaning) : "";
   const phraseTipRaw = phrase?.tip ?? "";
+  const phraseContextTipRaw = phrase?.contextTip ?? "";
   const localizedMeaning = useLocalized(phraseMeaningRaw, nativeLang);
   const localizedTip = useLocalized(phraseTipRaw, nativeLang);
+  const localizedContextTip = useLocalized(phraseContextTipRaw, nativeLang);
   // Memoized so CoachingCard's request payload stays referentially stable
   // across unrelated re-renders. Without this, every keystroke / timer tick
   // builds a new array and burns a GPT call.
@@ -1292,15 +1868,41 @@ export default function SpeakScreen() {
     return (
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
         <XPToast amount={xpGain} onDone={() => setXpGain(0)} />
-        <View style={[styles.completeWrap, { paddingBottom: TAB_BAR_HEIGHT + bottomPad }]}>
+        <ScrollView
+          contentContainerStyle={[styles.completeWrap, { paddingBottom: TAB_BAR_HEIGHT + bottomPad }]}
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={styles.completeTrophy}>🏆</Text>
           <Text style={styles.completeTitle}>
-            {nativeLang === "korean" ? "발음 연습\n완료!" : nativeLang === "spanish" ? "¡Práctica de pronunciación\ncompleta!" : "Pronunciation Practice\nComplete!"}
+            {isFirstSpeakingMission
+              ? nativeLang === "korean" ? "첫 실제 문장을\n말했어요!" : nativeLang === "spanish" ? "¡Dijiste tu primera\nfrase real!" : "You said your first\nreal sentence!"
+              : isReviewSentenceMission
+              ? nativeLang === "korean" ? "복습 문장을\n말했어요!" : nativeLang === "spanish" ? "¡Dijiste la frase\nde repaso!" : "You said the\nreview sentence!"
+              : nativeLang === "korean" ? "발음 연습\n완료!" : nativeLang === "spanish" ? "¡Práctica de pronunciación\ncompleta!" : "Pronunciation Practice\nComplete!"}
           </Text>
           <Text style={styles.completeSub}>
-            {nativeLang === "korean" ? `이번 세션에서 ${sessionWords.length}개 단어를 연습했어요.` : nativeLang === "spanish" ? `Practicaste ${sessionWords.length} palabras en esta sesión.` : `You practiced ${sessionWords.length} words this session.`}
+            {isFirstSpeakingMission
+              ? nativeLang === "korean" ? "완벽하지 않아도 괜찮아요. 입 밖으로 낸 순간부터 습득이 시작돼요."
+                : nativeLang === "spanish" ? "No tenía que ser perfecto. La adquisición empieza cuando lo dices en voz alta."
+                : "It did not have to be perfect. Acquisition starts when you say it out loud."
+              : isReviewSentenceMission
+              ? nativeLang === "korean" ? "반복은 눈으로 볼 때보다 입 밖으로 말할 때 더 강해져요."
+                : nativeLang === "spanish" ? "La repetición se vuelve más fuerte cuando la dices en voz alta."
+                : "Repetition gets stronger when it leaves the page and becomes speech."
+              : nativeLang === "korean" ? `이번 세션에서 ${sessionWords.length}개 단어를 연습했어요.` : nativeLang === "spanish" ? `Practicaste ${sessionWords.length} palabras en esta sesión.` : `You practiced ${sessionWords.length} words this session.`}
           </Text>
-          {(() => {
+          <View style={styles.spokenGoalBox}>
+            <View style={styles.spokenGoalTop}>
+              <Text style={styles.spokenGoalText}>{spokenTodayLabel}</Text>
+              <Text style={styles.spokenGoalPill}>
+                {nativeLang === "korean" ? "말하기 목표" : nativeLang === "spanish" ? "Meta oral" : "Speaking goal"}
+              </Text>
+            </View>
+            <View style={styles.spokenGoalTrack}>
+              <View style={[styles.spokenGoalFill, { width: `${spokenProgressPct}%` }]} />
+            </View>
+          </View>
+          {!isGuidedSentenceMission && (() => {
             const prog = pronLevelProgress(pronCount);
             return (
               <View style={styles.pronLevelRow}>
@@ -1319,7 +1921,7 @@ export default function SpeakScreen() {
               </View>
             );
           })()}
-          {weakWords.length > 0 && (
+          {!isGuidedSentenceMission && weakWords.length > 0 && (
             <View style={styles.weakBox}>
               <View style={styles.weakBoxHeader}>
                 <Ionicons name="warning-outline" size={14} color="#EF4444" />
@@ -1332,17 +1934,50 @@ export default function SpeakScreen() {
               ))}
             </View>
           )}
+          {isFirstSpeakingMission ? (
+            <View style={styles.goalPromptBox}>
+              <Text style={styles.goalPromptTitle}>{getGoalQuestion(nativeLang)}</Text>
+              <View style={styles.goalChips}>
+                {getLearningGoalOptions(nativeLang).map((option) => {
+                  const active = selectedGoal === option.key;
+                  return (
+                    <Pressable
+                      key={option.key}
+                      style={({ pressed }) => [
+                        styles.goalChip,
+                        active && styles.goalChipActive,
+                        goalChangeLocked && styles.goalChipDisabled,
+                        pressed && { opacity: 0.82 },
+                      ]}
+                      onPress={() => { void applyLearningGoal(option.key); }}
+                      disabled={goalChangeLocked}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: active, disabled: goalChangeLocked }}
+                    >
+                      <Text style={[styles.goalChipText, active && styles.goalChipTextActive]}>
+                        {option.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+          ) : null}
           <Pressable
             style={({ pressed }) => [styles.newSessionBtn, pressed && { opacity: 0.85 }]}
-            onPress={() => loadSession(activeLang)}
+            onPress={isReviewSentenceMission ? returnToReviewCards : isFirstSpeakingMission ? startNextSpeakingStep : () => loadSession(activeLang)}
           >
             <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} />
-            <Ionicons name="refresh" size={18} color={C.bg1} />
+            <Ionicons name={isGuidedSentenceMission ? "mic" : "refresh"} size={18} color={C.bg1} />
             <Text style={styles.newSessionBtnText}>
-              {nativeLang === "korean" ? "새 세션" : nativeLang === "spanish" ? "Nueva sesión" : "New Session"}
+              {isReviewSentenceMission
+                ? nativeLang === "korean" ? "카드 복습으로 돌아가기" : nativeLang === "spanish" ? "Volver al repaso" : "Back to review"
+                : isFirstSpeakingMission
+                ? continueSpeakingLabel
+                : nativeLang === "korean" ? "새 세션" : nativeLang === "spanish" ? "Nueva sesión" : "New Session"}
             </Text>
           </Pressable>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -1396,14 +2031,11 @@ export default function SpeakScreen() {
         <View style={styles.headerSection}>
           <View style={styles.headerTop}>
             <View style={styles.headerText}>
-              {/* Reframed from generic "speak_title" to "AI 발음 클리닉"
-                  brand surface — the underlying screen is already a
-                  phoneme-level Azure assessment loop, but the title made it
-                  look like a generic speaking drill. */}
+              {/* The screen promise is real spoken acquisition; the score is support, not the headline. */}
               <Text style={styles.title}>
-                {nativeLang === "korean" ? "AI 발음 클리닉"
-                  : nativeLang === "spanish" ? "Clínica de Pronunciación IA"
-                  : "AI Pronunciation Clinic"}
+                {nativeLang === "korean" ? "루디와 말하기"
+                  : nativeLang === "spanish" ? "Habla con Rudy"
+                  : "Speak with Rudy"}
               </Text>
               {/* Pronunciation level row */}
               {(() => {
@@ -1447,13 +2079,23 @@ export default function SpeakScreen() {
             )}
           </View>
 
+          {guidedMissionCopy ? (
+            <View style={styles.firstMissionStrip}>
+              <Ionicons name="chatbubble-ellipses" size={15} color={C.gold} />
+              <View style={styles.firstMissionText}>
+                <Text style={styles.firstMissionTitle}>{guidedMissionCopy.title}</Text>
+                <Text style={styles.firstMissionSub}>{guidedMissionCopy.subtitle}</Text>
+              </View>
+            </View>
+          ) : null}
+
           {/* Session progress bar */}
           <View style={styles.progressRow}>
             <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${progressPct}%`, backgroundColor: tabInfo.color }]} />
+              <View style={[styles.progressFill, { width: `${headerProgressPct}%`, backgroundColor: tabInfo.color }]} />
             </View>
             <Text style={[styles.progressLabel, { color: tabInfo.color }]}>
-              {sessionIdx + 1} / {sessionWords.length}
+              {headerProgressLabel}
             </Text>
           </View>
         </View>
@@ -1495,10 +2137,17 @@ export default function SpeakScreen() {
 
         {/* ── SECTION 3: TIP (12%) ────────────────────────────────────────── */}
         <View style={styles.tipSection}>
-          {phrase.tip && phrase.tip.trim() ? (
+          {(phrase.contextTip || phrase.tip) && (phrase.contextTip || phrase.tip).trim() ? (
             <View style={styles.tipBox}>
-              <Ionicons name="bulb-outline" size={14} color="#F59E0B" />
-              <Text style={styles.tipText} numberOfLines={2}>{localizedTip || phrase.tip}</Text>
+              <Ionicons name={phrase.contextTip ? "map-outline" : "bulb-outline"} size={14} color="#F59E0B" />
+              <View style={styles.tipTextGroup}>
+                {phrase.contextTip ? (
+                  <Text style={styles.contextTipText} numberOfLines={2}>{localizedContextTip || phrase.contextTip}</Text>
+                ) : null}
+                {phrase.tip ? (
+                  <Text style={styles.tipText} numberOfLines={phrase.contextTip ? 1 : 2}>{localizedTip || phrase.tip}</Text>
+                ) : null}
+              </View>
             </View>
           ) : null}
 
@@ -1528,63 +2177,80 @@ export default function SpeakScreen() {
               {score !== null && scoreInfo ? (
                 <View
                   accessibilityLiveRegion="polite"
-                  accessibilityLabel={`${scoreInfo.label}. ${nativeLang === "korean" ? `점수 ${score} / 100` : nativeLang === "spanish" ? `Puntuación ${score} de 100` : `Score ${score} out of 100`}`}
+                  accessibilityLabel={isGuidedSentenceMission
+                    ? scoreInfo.label
+                    : `${scoreInfo.label}. ${nativeLang === "korean" ? `점수 ${score} / 100` : nativeLang === "spanish" ? `Puntuación ${score} de 100` : `Score ${score} out of 100`}`}
                 >
-                  <View style={styles.resultRow}>
-                    <View
-                      style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}
-                      accessible
-                      accessibilityRole="text"
-                      accessibilityLabel={`${score} / 100`}
-                    >
-                      <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
-                      <Text style={styles.scoreDenom}>/100</Text>
+                  {isGuidedSentenceMission ? (
+                    <View style={styles.firstAttemptResult}>
+                      <Ionicons name="chatbubble-ellipses" size={18} color={scoreInfo.color} />
+                      <View style={styles.firstAttemptResultText}>
+                        <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>{scoreInfo.label}</Text>
+                        <Text style={styles.heardText}>
+                          {nativeLang === "korean"
+                            ? "점수보다 중요한 건 오늘 실제로 말한 횟수예요."
+                            : nativeLang === "spanish"
+                            ? "Lo importante hoy no es la nota, sino haberlo dicho."
+                            : "Today, the spoken attempt matters more than the score."}
+                        </Text>
+                      </View>
                     </View>
+                  ) : (
+                    <>
+                      <View style={styles.resultRow}>
+                        <View
+                          style={[styles.scoreCircle, { borderColor: scoreInfo.color }]}
+                          accessible
+                          accessibilityRole="text"
+                          accessibilityLabel={`${score} / 100`}
+                        >
+                          <Text style={[styles.scoreNumber, { color: scoreInfo.color }]}>{score}</Text>
+                          <Text style={styles.scoreDenom}>/100</Text>
+                        </View>
 
-                    <View style={styles.resultRight}>
-                      <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>
-                        {scoreInfo.emoji} {scoreInfo.label}
-                      </Text>
+                        <View style={styles.resultRight}>
+                          <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>
+                            {scoreInfo.emoji ? `${scoreInfo.emoji} ` : ""}{scoreInfo.label}
+                          </Text>
 
-                      <View style={styles.scoreBarTrack}>
-                        <Animated.View
-                          style={[styles.scoreBarFill, {
-                            width: scoreAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] }),
-                            backgroundColor: scoreInfo.color,
-                          }]}
-                        />
+                          <View style={styles.scoreBarTrack}>
+                            <Animated.View
+                              style={[styles.scoreBarFill, {
+                                width: scoreAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] }),
+                                backgroundColor: scoreInfo.color,
+                              }]}
+                            />
+                          </View>
+
+                          {recognizedText ? (
+                            <Text style={styles.heardText}>&quot;{recognizedText}&quot;</Text>
+                          ) : null}
+                        </View>
                       </View>
 
-                      {recognizedText ? (
-                        <Text style={styles.heardText}>&quot;{recognizedText}&quot;</Text>
-                      ) : null}
-                    </View>
-                  </View>
-
-                  {/* Sub-scores row — band colors map to Enigma palette
-                      (C.success / C.gold / C.error) for consistency with
-                      the CoachingCard shadow and the rest of the app. */}
-                  {(accuracyScore !== null || fluencyScore !== null || completenessScore !== null) && (
-                    <View style={styles.subScoreRow}>
-                      {accuracyScore !== null && (
-                        <View style={styles.subScoreBox}>
-                          <Text style={[styles.subScoreNum, { color: accuracyScore >= 75 ? C.success : accuracyScore >= 50 ? C.gold : C.error }]}>{accuracyScore}</Text>
-                          <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "정확도" : nativeLang === "spanish" ? "Precisión" : "Accuracy"}</Text>
+                      {(accuracyScore !== null || fluencyScore !== null || completenessScore !== null) && (
+                        <View style={styles.subScoreRow}>
+                          {accuracyScore !== null && (
+                            <View style={styles.subScoreBox}>
+                              <Text style={[styles.subScoreNum, { color: getGentleScoreColor(accuracyScore) }]}>{accuracyScore}</Text>
+                              <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "정확도" : nativeLang === "spanish" ? "Precisión" : "Accuracy"}</Text>
+                            </View>
+                          )}
+                          {fluencyScore !== null && (
+                            <View style={styles.subScoreBox}>
+                              <Text style={[styles.subScoreNum, { color: getGentleScoreColor(fluencyScore) }]}>{fluencyScore}</Text>
+                              <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "유창성" : nativeLang === "spanish" ? "Fluidez" : "Fluency"}</Text>
+                            </View>
+                          )}
+                          {completenessScore !== null && (
+                            <View style={styles.subScoreBox}>
+                              <Text style={[styles.subScoreNum, { color: getGentleScoreColor(completenessScore) }]}>{completenessScore}</Text>
+                              <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "완성도" : nativeLang === "spanish" ? "Integridad" : "Completeness"}</Text>
+                            </View>
+                          )}
                         </View>
                       )}
-                      {fluencyScore !== null && (
-                        <View style={styles.subScoreBox}>
-                          <Text style={[styles.subScoreNum, { color: fluencyScore >= 75 ? C.success : fluencyScore >= 50 ? C.gold : C.error }]}>{fluencyScore}</Text>
-                          <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "유창성" : nativeLang === "spanish" ? "Fluidez" : "Fluency"}</Text>
-                        </View>
-                      )}
-                      {completenessScore !== null && (
-                        <View style={styles.subScoreBox}>
-                          <Text style={[styles.subScoreNum, { color: completenessScore >= 75 ? C.success : completenessScore >= 50 ? C.gold : C.error }]}>{completenessScore}</Text>
-                          <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "완성도" : nativeLang === "spanish" ? "Integridad" : "Completeness"}</Text>
-                        </View>
-                      )}
-                    </View>
+                    </>
                   )}
 
                   {/* GPT-4o-mini coaching note in the learner's native
@@ -1619,9 +2285,15 @@ export default function SpeakScreen() {
                   />
                 </View>
               ) : (
-                <View style={styles.errorRow}>
-                  <Ionicons name="warning-outline" size={16} color={C.error} />
-                  <Text style={styles.errorText}>{sttError || (nativeLang === "korean" ? "음성 인식 실패. 다시 시도해 주세요." : nativeLang === "spanish" ? "Fallo en reconocimiento de voz." : "Speech recognition failed. Please try again.")}</Text>
+                <View style={showAcceptedUnscoredNotice ? styles.noticeRow : styles.errorRow}>
+                  <Ionicons
+                    name={showAcceptedUnscoredNotice ? "checkmark-circle" : "warning-outline"}
+                    size={16}
+                    color={showAcceptedUnscoredNotice ? C.gold : C.error}
+                  />
+                  <Text style={showAcceptedUnscoredNotice ? styles.noticeText : styles.errorText}>
+                    {sttError || (nativeLang === "korean" ? "음성 인식 실패. 다시 시도해 주세요." : nativeLang === "spanish" ? "Fallo en reconocimiento de voz." : "Speech recognition failed. Please try again.")}
+                  </Text>
                 </View>
               )}
 
@@ -1645,11 +2317,7 @@ export default function SpeakScreen() {
                   disabled={isProcessing}
                   testID="mic-button"
                   accessibilityRole="button"
-                  accessibilityLabel={
-                    isRecording
-                      ? (nativeLang === "korean" ? "녹음 중. 탭하여 정지" : nativeLang === "spanish" ? "Grabando. Toca para parar" : "Recording. Tap to stop")
-                      : (nativeLang === "korean" ? "발음 녹음 시작" : nativeLang === "spanish" ? "Iniciar grabación de pronunciación" : "Start recording pronunciation")
-                  }
+                  accessibilityLabel={micAccessibilityLabel}
                   accessibilityState={{ disabled: isProcessing, busy: isProcessing }}
                 >
                   <LinearGradient
@@ -1674,9 +2342,7 @@ export default function SpeakScreen() {
                       return `Recording… tap to stop ${tail}`;
                     })()
                   : isProcessing ? rudyListeningMsg
-                  : hasListened
-                    ? (nativeLang === "korean" ? "탭하여 발음 녹음" : nativeLang === "spanish" ? "Toca para grabar" : "Tap to record")
-                    : (nativeLang === "korean" ? "먼저 듣기를 눌러보세요" : nativeLang === "spanish" ? "Primero toca escuchar" : "Press listen first")}
+                  : idleRecordHint}
               </Text>
             </View>
           )}
@@ -1697,14 +2363,15 @@ export default function SpeakScreen() {
           </Pressable>
 
           <View style={styles.navProgress}>
-            <Text style={styles.navProgressText}>{sessionIdx + 1} / {sessionWords.length}</Text>
+            <Text style={styles.navProgressText}>{navProgressLabel}</Text>
           </View>
 
-          {recordState === "done" ? (
+          {canAdvanceAfterAttempt ? (
             <Pressable
               style={({ pressed }) => [styles.navBtn, styles.nextBtnActive, { backgroundColor: tabInfo.color }, pressed && { opacity: 0.85 }]}
               onPress={goNextWord}
               testID="next-word-button"
+              accessibilityState={{ disabled: false }}
             >
               <Text style={styles.nextBtnText}>
                 {sessionIdx + 1 >= sessionWords.length
@@ -1716,11 +2383,12 @@ export default function SpeakScreen() {
           ) : (
             <Pressable
               style={({ pressed }) => [styles.navBtn, styles.nextBtnInactive, pressed && { opacity: 0.75 }]}
-              onPress={goNextWord}
+              disabled
               testID="next-button"
+              accessibilityState={{ disabled: true }}
             >
               <Text style={[styles.navBtnText, { color: C.goldDim }]}>
-                {nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : "Next"}
+                {lockedNextLabel}
               </Text>
               <Ionicons name="arrow-forward" size={16} color={C.goldDim} />
             </Pressable>
@@ -1732,6 +2400,8 @@ export default function SpeakScreen() {
   );
 }
 
+const WEB_BORDER_BOX = Platform.OS === "web" ? ({ boxSizing: "border-box" } as any) : {};
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -1741,8 +2411,11 @@ const styles = StyleSheet.create({
 
   screen: {
     flex: 1,
+    width: "100%",
+    maxWidth: "100%",
     paddingHorizontal: 16,
     paddingTop: Platform.OS === "web" ? 8 : 0,
+    ...WEB_BORDER_BOX,
   },
 
   // ── Header (flex 2) ──────────────────────────────────────────────────────
@@ -1760,6 +2433,32 @@ const styles = StyleSheet.create({
   headerText: { flex: 1, gap: 1 },
   title: { fontSize: 20, fontFamily: F.header, color: C.gold, letterSpacing: 1 },
   subtitle: { fontSize: 12, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
+  firstMissionStrip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.26)",
+    backgroundColor: "rgba(201,162,39,0.08)",
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  firstMissionText: { flex: 1 },
+  firstMissionTitle: {
+    fontSize: 11,
+    fontFamily: F.label,
+    color: C.gold,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+  },
+  firstMissionSub: {
+    marginTop: 1,
+    fontSize: 12,
+    fontFamily: F.body,
+    color: C.goldDim,
+    lineHeight: 16,
+  },
   langTabsCompact: { flexDirection: "row", gap: 6, marginLeft: 8 },
   langTabCompact: {
     width: 36, height: 36, borderRadius: 18,
@@ -1779,8 +2478,15 @@ const styles = StyleSheet.create({
   cardSection: {
     flex: 5,
     justifyContent: "center",
+    alignSelf: "stretch",
+    minWidth: 0,
+    ...WEB_BORDER_BOX,
   },
   card: {
+    width: "100%",
+    maxWidth: "100%",
+    alignSelf: "stretch",
+    minWidth: 0,
     backgroundColor: C.parchment,
     borderRadius: 24,
     overflow: "hidden",
@@ -1793,6 +2499,7 @@ const styles = StyleSheet.create({
     elevation: 4,
     borderWidth: 1,
     borderColor: "rgba(201,162,39,0.2)",
+    ...WEB_BORDER_BOX,
   },
   cardTopAccent: { position: "absolute", top: 0, left: 0, right: 0, height: 3 },
   cardTopRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
@@ -1827,19 +2534,32 @@ const styles = StyleSheet.create({
 
   // ── Tip + dots (flex 1.5) ────────────────────────────────────────────────
   tipSection: {
-    flex: 1.5,
+    flex: 1.8,
     justifyContent: "center",
     gap: 8,
+    alignSelf: "stretch",
+    minWidth: 0,
+    ...WEB_BORDER_BOX,
   },
   tipBox: {
     flexDirection: "row", alignItems: "flex-start", gap: 6,
-    backgroundColor: "rgba(201,162,39,0.07)",
+    backgroundColor: "rgba(201,162,39,0.11)",
     borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8,
-    borderWidth: 1, borderColor: "rgba(201,162,39,0.18)",
+    borderWidth: 1, borderColor: "rgba(201,162,39,0.28)",
+    alignSelf: "stretch",
+    minWidth: 0,
+    ...WEB_BORDER_BOX,
   },
   tipText: {
     flex: 1, fontSize: 12, fontFamily: F.body,
-    color: C.textParchment, lineHeight: 17, fontStyle: "italic",
+    color: C.goldDim, lineHeight: 16, fontStyle: "italic",
+  },
+  tipTextGroup: { flex: 1, minWidth: 0, gap: 2 },
+  contextTipText: {
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: "#F8D56B",
+    lineHeight: 16,
   },
   dotsRow: { flexDirection: "row", justifyContent: "center", gap: 5 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: C.goldDark, opacity: 0.3 },
@@ -1865,6 +2585,17 @@ const styles = StyleSheet.create({
 
   resultScroll: { gap: 10, paddingBottom: 4 },
   resultRow: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
+  firstAttemptResult: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+    backgroundColor: "rgba(201,162,39,0.10)",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.24)",
+    padding: 12,
+  },
+  firstAttemptResultText: { flex: 1, gap: 4 },
   scoreCircle: {
     width: 76, height: 76, borderRadius: 38,
     borderWidth: 4, justifyContent: "center", alignItems: "center",
@@ -1902,6 +2633,13 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: "rgba(239,68,68,0.2)",
   },
   errorText: { flex: 1, fontSize: 12, fontFamily: F.body, color: "#EF4444", lineHeight: 18 },
+  noticeRow: {
+    flexDirection: "row", gap: 6, alignItems: "flex-start",
+    backgroundColor: "rgba(201,162,39,0.10)", borderRadius: 10,
+    paddingHorizontal: 12, paddingVertical: 10,
+    borderWidth: 1, borderColor: "rgba(201,162,39,0.24)",
+  },
+  noticeText: { flex: 1, fontSize: 12, fontFamily: F.bodySemi, color: C.gold, lineHeight: 18 },
 
   // ── Navigation (flex 1.5) ────────────────────────────────────────────────
   navSection: {
@@ -1928,7 +2666,7 @@ const styles = StyleSheet.create({
 
   // ── Completion screen ────────────────────────────────────────────────────
   completeWrap: {
-    flex: 1, alignItems: "center", justifyContent: "center",
+    flexGrow: 1, alignItems: "center", justifyContent: "center",
     paddingHorizontal: 28, gap: 18,
   },
   completeTrophy: { fontSize: 64, textAlign: "center" },
@@ -1937,6 +2675,50 @@ const styles = StyleSheet.create({
     textAlign: "center", letterSpacing: 1, lineHeight: 34,
   },
   completeSub: { fontSize: 14, fontFamily: F.body, color: C.goldDim, textAlign: "center", fontStyle: "italic" },
+  spokenGoalBox: {
+    width: "100%",
+    backgroundColor: C.bg2,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.28)",
+    padding: 14,
+    gap: 8,
+  },
+  spokenGoalTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  spokenGoalText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+  },
+  spokenGoalPill: {
+    fontSize: 10,
+    fontFamily: F.label,
+    color: C.bg1,
+    backgroundColor: C.gold,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    overflow: "hidden",
+  },
+  spokenGoalTrack: {
+    height: 7,
+    borderRadius: 4,
+    overflow: "hidden",
+    backgroundColor: "rgba(201,162,39,0.13)",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.18)",
+  },
+  spokenGoalFill: {
+    height: "100%",
+    borderRadius: 4,
+    backgroundColor: C.gold,
+  },
   weakBox: {
     backgroundColor: C.bg2, borderRadius: 14, padding: 14,
     width: "100%", borderWidth: 1, borderColor: "rgba(239,68,68,0.25)", gap: 6,
@@ -1944,6 +2726,50 @@ const styles = StyleSheet.create({
   weakBoxHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
   weakBoxTitle: { fontSize: 12, fontFamily: F.bodySemi, color: "#EF4444" },
   weakWord: { fontSize: 14, fontFamily: F.body, color: C.parchment, paddingLeft: 4 },
+  goalPromptBox: {
+    width: "100%",
+    backgroundColor: C.bg2,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.28)",
+    padding: 14,
+    gap: 10,
+  },
+  goalPromptTitle: {
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+    textAlign: "center",
+  },
+  goalChips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 8,
+  },
+  goalChip: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.border,
+    backgroundColor: "rgba(201,162,39,0.08)",
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+  },
+  goalChipActive: {
+    backgroundColor: C.gold,
+    borderColor: C.gold,
+  },
+  goalChipDisabled: {
+    opacity: 0.48,
+  },
+  goalChipText: {
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.goldDim,
+  },
+  goalChipTextActive: {
+    color: C.bg1,
+  },
   newSessionBtn: {
     flexDirection: "row", alignItems: "center", gap: 8,
     paddingVertical: 14, paddingHorizontal: 36,

@@ -1,12 +1,12 @@
 import { Tabs } from "expo-router";
 import { Platform, StyleSheet, View } from "react-native";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { useLanguage } from "@/context/LanguageContext";
 import { C, F } from "@/constants/theme";
 
 function ClassicTabLayout() {
   const { t } = useLanguage();
-  const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
   return (
@@ -37,50 +37,35 @@ function ClassicTabLayout() {
         name="index"
         options={{
           title: t("home"),
-          tabBarIcon: ({ color, size }) => {
-            const { Ionicons } = require("@expo/vector-icons");
-            return <Ionicons name="home" size={size} color={color} />;
-          },
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="cards"
         options={{
           title: t("cards"),
-          tabBarIcon: ({ color, size }) => {
-            const { Ionicons } = require("@expo/vector-icons");
-            return <Ionicons name="albums" size={size} color={color} />;
-          },
+          tabBarIcon: ({ color, size }) => <Ionicons name="albums" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="story"
         options={{
           title: t("story"),
-          tabBarIcon: ({ color, size }) => {
-            const { Ionicons } = require("@expo/vector-icons");
-            return <Ionicons name="book" size={size} color={color} />;
-          },
+          tabBarIcon: ({ color, size }) => <Ionicons name="book" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
           title: t("chat"),
-          tabBarIcon: ({ color, size }) => {
-            const { Ionicons } = require("@expo/vector-icons");
-            return <Ionicons name="chatbubble" size={size} color={color} />;
-          },
+          tabBarIcon: ({ color, size }) => <Ionicons name="chatbubble" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="speak"
         options={{
           title: t("speak"),
-          tabBarIcon: ({ color, size }) => {
-            const { Ionicons } = require("@expo/vector-icons");
-            return <Ionicons name="mic" size={size} color={color} />;
-          },
+          tabBarIcon: ({ color, size }) => <Ionicons name="mic" size={size} color={color} />,
         }}
       />
     </Tabs>

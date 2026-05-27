@@ -58,11 +58,25 @@ export interface LearnerProfile {
   // Session tracking
   sessionCount: number;
   lastSessionAt: string | null;    // ISO
+  speakingProgress: SpeakingProgress;
 
   // ── Phase 4: Persistent tutor memory ─────────────────────────────────────
   // Per-tutor state — each tutor remembers their own sessions with the learner,
   // so switching tutors correctly resets the relationship tier.
   tutorMemory: Partial<Record<string, TutorMemory>>;  // keyed by tutor.id
+}
+
+export interface SpeakingDayProgress {
+  date: string;                    // YYYY-MM-DD, local device day
+  count: number;
+  byLanguage: Partial<Record<string, number>>;
+  promptKeys?: Record<string, true>;
+  updatedAt: string;
+}
+
+export interface SpeakingProgress {
+  dailyGoal: number;
+  history: Record<string, SpeakingDayProgress>;
 }
 
 /** Relationship tier between learner and a specific tutor. */
@@ -100,6 +114,10 @@ const EMPTY_PROFILE: LearnerProfile = {
   errorPatterns: {},
   sessionCount: 0,
   lastSessionAt: null,
+  speakingProgress: {
+    dailyGoal: 19,
+    history: {},
+  },
   tutorMemory: {},
 };
 
@@ -180,6 +198,15 @@ export async function markDiagnosed(updates: {
     country: nextCountry,
   };
   await saveLearnerProfile(merged);
+}
+
+/** Store the learner's current top motivation without collecting free text. */
+export async function setPrimaryLearningGoal(goal: LearningGoal): Promise<void> {
+  const p = await loadLearnerProfile();
+  await saveLearnerProfile({
+    ...p,
+    goals: [goal, ...(p.goals ?? []).filter((g) => g !== goal)],
+  });
 }
 
 /** Valid CEFR level values — used by the client to validate AI-returned levels. */

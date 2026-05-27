@@ -10,6 +10,7 @@ import {
   Dimensions,
   Animated,
   ScrollView,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,8 +21,12 @@ import { useLanguage, NativeLanguage, getDefaultLearning } from "@/context/Langu
 import { getApiUrl } from "@/lib/query-client";
 import { getDueCards, getDueCount, recordReview } from "@/lib/srsManager";
 import { srsCardsToFlashCards } from "@/lib/srsCardAdapter";
+import { trackLearningEvent } from "@/lib/learningEvents";
+import { saveSpeakMissionHandoff } from "@/lib/speakMissionHandoff";
+import { buildAcquisitionSession, mergeRecentFirst } from "@/lib/acquisitionSession";
 import { XPToast } from "@/components/XPToast";
 import { RippleButton } from "@/components/RippleButton";
+import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
@@ -986,12 +991,52 @@ function getTodayKey() {
 function pickSessionCards(allCards: FlashCard[], count: number, lastSeenWords: string[]): FlashCard[] {
   if (allCards.length === 0) return [];
   const lastSet = new Set(lastSeenWords);
-  const fresh = allCards.filter((c) => !lastSet.has(c.word));
   const recent = allCards.filter((c) => lastSet.has(c.word));
-  const shuffleFresh = [...fresh].sort(() => Math.random() - 0.5);
+  const fresh = allCards.filter((c) => !lastSet.has(c.word));
   const shuffleRecent = [...recent].sort(() => Math.random() - 0.5);
-  const merged = [...shuffleFresh, ...shuffleRecent];
-  return merged.slice(0, Math.min(count, merged.length));
+  const shuffleFresh = [...fresh].sort(() => Math.random() - 0.5);
+  return buildAcquisitionSession({
+    known: shuffleRecent,
+    guessable: shuffleFresh,
+    fallback: [...shuffleRecent, ...shuffleFresh],
+    count: Math.min(count, allCards.length),
+    keyOf: (card) => card.word,
+  });
+}
+
+const SPOKEN_SINGLE_WORDS = new Set([
+  "hello",
+  "hi",
+  "yes",
+  "no",
+  "thanks",
+  "thank you",
+  "sorry",
+  "hola",
+  "si",
+  "sí",
+  "gracias",
+  "perdon",
+  "perdón",
+  "안녕하세요",
+  "네",
+  "아니요",
+  "감사합니다",
+  "고마워요",
+  "죄송합니다",
+]);
+
+function cleanCardUtterance(value: string): string {
+  return value.trim().replace(/^["']+|["']+$/g, "").replace(/\s+/g, " ");
+}
+
+function cardSentenceForSpeaking(card: FlashCard): string | null {
+  const utterance = cleanCardUtterance(card.word);
+  if (!utterance) return null;
+  const normalized = utterance.toLocaleLowerCase();
+  const looksLikePhrase = /[\s?!.,]/.test(utterance) || SPOKEN_SINGLE_WORDS.has(normalized);
+  if (!looksLikePhrase) return null;
+  return utterance;
 }
 
 // "srs" deck = today's due cards from the Leitner-5 SRS engine
@@ -1010,7 +1055,10 @@ export default function CardsScreen() {
   const { deck: deckParam } = useLocalSearchParams<{ deck?: string }>();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const nativeLang = nativeLanguage ?? "english";
-  const lang: NativeLanguage = learningLanguage ?? getDefaultLearning(nativeLang as NativeLanguage);
+  const native = nativeLang as NativeLanguage;
+  const lang: NativeLanguage = (learningLanguage && learningLanguage !== native)
+    ? learningLanguage
+    : getDefaultLearning(native);
 
   // Default deck depends on SRS due count: if anything is due, the SRS deck
   // becomes the user's primary entry; otherwise the legacy beginner deck is
@@ -1035,6 +1083,7 @@ export default function CardsScreen() {
 
   const allCards = deckType === "beginner" ? BEGINNER_CARDS_BY_LANG[lang] : ADVANCED_CARDS[lang];
   const card = sessionCards[sessionIndex] ?? sessionCards[0];
+  const speakPracticeSentence = card ? cardSentenceForSpeaking(card) : null;
   const dailyProgress = Math.min(dailyCount, DAILY_GOAL);
   const progressPct = (dailyProgress / DAILY_GOAL) * 100;
 
@@ -1158,6 +1207,49 @@ export default function CardsScreen() {
     setTimeout(() => setIsSpeaking(false), 1500);
   }, [card]);
 
+  const handleSpeakPractice = useCallback(async (e: any) => {
+    e.stopPropagation?.();
+    if (!card) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const sentence = cardSentenceForSpeaking(card);
+    if (!sentence) return;
+    const meaning = card.meanings[nativeLang as NativeLanguage]
+      || card.word;
+    void trackLearningEvent("review_sentence_cta_pressed", {
+      surface: "cards",
+      nativeLanguage: nativeLang,
+      targetLanguage: lang,
+      deckType,
+    });
+    let missionId: string | null = null;
+    try {
+      missionId = await saveSpeakMissionHandoff({
+        phrase: sentence,
+        meaning,
+        speechLang: card.speechLang,
+        targetLanguage: lang,
+        returnDeck: deckType,
+      });
+    } catch (err) {
+      console.warn("[Cards] speak mission handoff failed:", err);
+      Alert.alert(
+        nativeLang === "korean" ? "잠시 후 다시 시도해 주세요" : nativeLang === "spanish" ? "Inténtalo de nuevo en un momento" : "Please try again in a moment",
+        nativeLang === "korean" ? "말하기 연습을 준비하지 못했어요." : nativeLang === "spanish" ? "No pudimos preparar la práctica oral." : "We could not prepare speaking practice."
+      );
+      return;
+    }
+    if (!missionId) return;
+    router.push({
+      pathname: "/(tabs)/speak",
+      params: {
+        mission: "review-sentence",
+        missionId,
+        targetLang: lang,
+        returnDeck: deckType,
+      },
+    } as any);
+  }, [card, deckType, lang, nativeLang]);
+
   // Reentrancy guard — rapid "Got it" double-taps were doubling XP, both
   // promoting the SRS box (combined with the recordReview write-race) and
   // undercounting dailyCount because newCount = dailyCount + 1 captures a
@@ -1188,7 +1280,13 @@ export default function CardsScreen() {
     AsyncStorage.setItem(todayKey, JSON.stringify({ count: newCount })).catch((e) => console.warn('[Cards] daily count save failed:', e));
 
     const currentWords = sessionCards.map((c) => c.word);
-    AsyncStorage.setItem("cards_last_seen_words", JSON.stringify(currentWords)).catch((e) => console.warn('[Cards] last seen save failed:', e));
+    AsyncStorage.getItem("cards_last_seen_words")
+      .then((raw) => {
+        const previous: string[] = raw ? JSON.parse(raw) : [];
+        const updated = mergeRecentFirst(currentWords, previous, DAILY_GOAL * 6);
+        return AsyncStorage.setItem("cards_last_seen_words", JSON.stringify(updated));
+      })
+      .catch((e) => console.warn('[Cards] last seen save failed:', e));
 
     Animated.timing(slideAnim, { toValue: knew ? -width : width, duration: 230, useNativeDriver: true }).start(() => {
       slideAnim.setValue(knew ? width : -width);
@@ -1401,7 +1499,7 @@ export default function CardsScreen() {
                     end={{ x: 1, y: 0 }}
                   />
                   <View style={styles.cardInner}>
-                    <Text style={styles.cardEmoji}>{card?.emoji}</Text>
+                    <EmojiText style={styles.cardEmoji}>{card?.emoji ?? ""}</EmojiText>
                     <Text style={styles.cardWordFront}>{card?.word}</Text>
                     {card?.pronunciation && (
                       <Text style={styles.cardPronunciation}>/{card.pronunciation}/</Text>
@@ -1443,7 +1541,7 @@ export default function CardsScreen() {
                     end={{ x: 1, y: 1 }}
                   />
                   <View style={styles.cardInnerBack}>
-                    <Text style={styles.cardEmojiBack}>{card?.emoji}</Text>
+                    <EmojiText style={styles.cardEmojiBack}>{card?.emoji ?? ""}</EmojiText>
                     <Text style={styles.cardWordBack}>{card?.word}</Text>
                     <View style={styles.divider} />
                     <Text style={styles.cardMeaning}>{card?.meanings[nativeLang as NativeLanguage]}</Text>
@@ -1466,20 +1564,34 @@ export default function CardsScreen() {
           </View>
 
           {isFlipped && (
-            <Pressable
-              style={({ pressed }) => [styles.listenRowBtn, pressed && { opacity: 0.75 }]}
-              onPress={handleSpeak}
-              hitSlop={12}
-            >
-              <Ionicons
-                name={isSpeaking ? "volume-high" : "volume-medium"}
-                size={16}
-                color={C.parchment}
-              />
-              <Text style={styles.speakerBtnBackText}>
-                {nativeLang === "korean" ? "듣기" : nativeLang === "spanish" ? "Escuchar" : "Listen"}
-              </Text>
-            </Pressable>
+            <View style={styles.listenActionRow}>
+              <Pressable
+                style={({ pressed }) => [styles.listenRowBtn, pressed && { opacity: 0.75 }]}
+                onPress={handleSpeak}
+                hitSlop={12}
+              >
+                <Ionicons
+                  name={isSpeaking ? "volume-high" : "volume-medium"}
+                  size={16}
+                  color={C.parchment}
+                />
+                <Text style={styles.speakerBtnBackText}>
+                  {nativeLang === "korean" ? "듣기" : nativeLang === "spanish" ? "Escuchar" : "Listen"}
+                </Text>
+              </Pressable>
+              {speakPracticeSentence ? (
+              <Pressable
+                style={({ pressed }) => [styles.speakReviewBtn, pressed && { opacity: 0.82 }]}
+                onPress={handleSpeakPractice}
+                hitSlop={12}
+              >
+                <Ionicons name="mic" size={16} color={C.bg1} />
+                <Text style={styles.speakReviewBtnText}>
+                  {nativeLang === "korean" ? "문장 말하기" : nativeLang === "spanish" ? "Decir frase" : "Say sentence"}
+                </Text>
+              </Pressable>
+              ) : null}
+            </View>
           )}
 
           {isFlipped ? (
@@ -1724,14 +1836,35 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    alignSelf: "center",
     backgroundColor: "rgba(201,162,39,0.15)",
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "rgba(201,162,39,0.35)",
+  },
+  listenActionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
     marginVertical: 6,
+    paddingHorizontal: 16,
+  },
+  speakReviewBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    backgroundColor: C.gold,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: 20,
+  },
+  speakReviewBtnText: {
+    fontSize: 13,
+    fontFamily: F.bodySemi,
+    color: C.bg1,
   },
   flipHint: {
     flexDirection: "row",

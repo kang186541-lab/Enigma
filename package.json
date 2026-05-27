@@ -14,6 +14,9 @@
     "db:push": "drizzle-kit push",
     "start": "npx expo start",
     "start:all": "concurrently \"npx expo start\" \"npm run server:dev\"",
+    "verify:quality": "npm run web:build && npm run verify:speaking-core && npm run verify:web-export && npx tsc --noEmit --pretty false && npm run lint",
+    "verify:speaking-core": "tsx scripts/verify-speaking-core.ts",
+    "verify:web-export": "node scripts/verify-web-export.js dist",
     "lint": "npx expo lint",
     "lint:fix": "npx expo lint --fix"
   },

@@ -8,6 +8,7 @@ import {
   Platform,
   Dimensions,
   Animated,
+  type GestureResponderEvent,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -34,6 +35,15 @@ import {
 } from "@/lib/dailyCourseData";
 import { getDueCount } from "@/lib/srsManager";
 import { getTodayNote } from "@/data/culturalNotes";
+import { trackLearningEvent } from "@/lib/learningEvents";
+import { loadLearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
+import { loadTodaySpeakingProgress, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
+import {
+  getFallbackLearningLanguage,
+  getHomeGoalPrompt,
+  getHomeLearningGoalOptions,
+  getTodaySpeakingMission,
+} from "@/lib/homeSpeakingMission";
 
 const { width } = Dimensions.get("window");
 const rudyBadgeImg = require("@/assets/rudy_badge.png");
@@ -62,30 +72,23 @@ function RudyImageWithPlaceholder({ source, style, resizeMode }: { source: any; 
   );
 }
 
-function getGreeting(t: (k: string) => string) {
-  const h = new Date().getHours();
-  if (h < 12) return t("good_morning");
-  if (h < 18) return t("good_afternoon");
-  return t("good_evening");
-}
-
 function getLingoGreeting(lang: NativeLanguage): string {
   const h = new Date().getHours();
   const lines: Record<NativeLanguage, [string, string, string]> = {
     korean:  [
-      "좋은 아침이에요! 오늘도 같이 공부해요! 🦊",
-      "안녕하세요! 오늘 학습 시작할까요? 🦊",
-      "수고했어요! 오늘의 학습을 마무리해요! 🦊",
+      "좋은 아침이에요! 오늘도 한 문장 말해봐요.",
+      "안녕하세요! 오늘 입 밖으로 낼 문장을 골라볼까요?",
+      "수고했어요! 마지막으로 한 문장 더 말해봐요.",
     ],
     english: [
-      "Good morning! Let's study together! 🦊",
-      "Hello! Ready to learn today? 🦊",
-      "Great work! Let's finish today's lesson! 🦊",
+      "Good morning! Say one real sentence today.",
+      "Hello! Ready to speak out loud?",
+      "Great work! Finish with one more sentence.",
     ],
     spanish: [
-      "¡Buenos días! ¡Estudiemos juntos! 🦊",
-      "¡Hola! ¿Listos para aprender hoy? 🦊",
-      "¡Bien hecho! ¡Terminemos la lección! 🦊",
+      "¡Buenos días! Di una frase real hoy.",
+      "¡Hola! ¿Listo para hablar en voz alta?",
+      "¡Buen trabajo! Termina con una frase más.",
     ],
   };
   const [morning, afternoon, evening] = lines[lang] ?? lines.english;
@@ -116,22 +119,22 @@ function getWeekStreakData(streak: number, nativeLang: NativeLanguage) {
 function getStreakText(streak: number, lang: NativeLanguage): string {
   const msgs: Record<NativeLanguage, [string, string, string, string]> = {
     korean:  [
-      "오늘 학습으로 연속 기록을 시작하세요! 💪",
-      `${streak}일 연속! 오늘도 학습하세요! 🔥`,
-      `${streak}일 연속! 멈추지 마세요! 🚀`,
-      `${streak}일 연속! 정말 대단해요! 🏆`,
+      "오늘 한 문장 말하면 연속 기록이 시작돼요.",
+      `${streak}일 연속! 오늘도 한 문장만 입 밖으로 내봐요.`,
+      `${streak}일 연속! 말한 만큼 몸에 남아요.`,
+      `${streak}일 연속! 매일 말한 힘이 쌓이고 있어요.`,
     ],
     english: [
-      "Study today to start your streak! 💪",
-      `${streak}-day streak! Keep going! 🔥`,
-      `${streak}-day streak! You're on fire! 🚀`,
-      `${streak}-day streak! Incredible! 🏆`,
+      "Say one sentence today to start your streak.",
+      `${streak}-day streak! Say one more sentence today.`,
+      `${streak}-day streak! Spoken words stick.`,
+      `${streak}-day streak! Your voice is building the habit.`,
     ],
     spanish: [
-      "¡Estudia hoy para iniciar tu racha! 💪",
-      `¡${streak} días seguidos! ¡Sigue así! 🔥`,
-      `¡${streak} días seguidos! ¡En llamas! 🚀`,
-      `¡${streak} días seguidos! ¡Increíble! 🏆`,
+      "Di una frase hoy para iniciar tu racha.",
+      `¡${streak} días seguidos! Di una frase más hoy.`,
+      `¡${streak} días seguidos! Lo que dices se queda.`,
+      `¡${streak} días seguidos! Tu voz está creando el hábito.`,
     ],
   };
   const m = msgs[lang] ?? msgs.english;
@@ -183,6 +186,8 @@ export default function HomeScreen() {
   const [showLangModal, setShowLangModal] = React.useState(false);
   const [showGuide, setShowGuide] = React.useState(false);
   const [srsDueCount, setSrsDueCount] = React.useState(0);
+  const [primaryGoal, setPrimaryGoal] = React.useState<LearningGoal | null>(null);
+  const [spokenToday, setSpokenToday] = React.useState(0);
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
@@ -202,13 +207,21 @@ export default function HomeScreen() {
   useFocusEffect(React.useCallback(() => {
     loadProgress().then(setDailyProgress);
     getDueCount().then(setSrsDueCount);
+    loadLearnerProfile().then((profile) => setPrimaryGoal(profile.goals[0] ?? null));
+    loadTodaySpeakingProgress().then((day) => setSpokenToday(day.count));
   }, []));
 
   useEffect(() => {
+    if (spokenToday <= 0) {
+      setShowGuide(false);
+      return;
+    }
+    let cancelled = false;
     getNextGuideIndex().then((idx) => {
-      if (idx !== null) setShowGuide(true);
+      if (!cancelled && idx !== null) setShowGuide(true);
     });
-  }, []);
+    return () => { cancelled = true; };
+  }, [spokenToday]);
 
   useEffect(() => {
     if (courseCompleted === false) {
@@ -258,31 +271,71 @@ export default function HomeScreen() {
   const barW = xpAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] });
   const weekData   = getWeekStreakData(stats.streak, nativeLang);
   const streakText = getStreakText(stats.streak, nativeLang);
+  const effectiveLearningLang = ((learningLanguage && learningLanguage !== nativeLang)
+    ? learningLanguage
+    : getFallbackLearningLanguage(nativeLang)) as NativeLanguage;
+  const todaySpeakingMission = getTodaySpeakingMission(nativeLang, effectiveLearningLang, primaryGoal, spokenToday);
+  const displayedSpokenToday = Math.min(spokenToday, SPEAKING_DAILY_GOAL);
+  const spokenProgressPct = Math.min(100, (spokenToday / SPEAKING_DAILY_GOAL) * 100);
+  const spokenProgressLabel = nativeLang === "korean"
+    ? `오늘 ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL}문장 말했어요`
+    : nativeLang === "spanish"
+    ? `Hoy dijiste ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL} frases`
+    : `You spoke ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL} sentences today`;
+
+  useEffect(() => {
+    void trackLearningEvent("first_speaking_cta_seen", {
+      surface: "home",
+      nativeLanguage: nativeLang,
+      targetLanguage: todaySpeakingMission.targetLanguage,
+      goal: todaySpeakingMission.goal,
+      dailyGoalMet: todaySpeakingMission.dailyGoalMet,
+    });
+  }, [nativeLang, todaySpeakingMission.dailyGoalMet, todaySpeakingMission.goal, todaySpeakingMission.targetLanguage]);
+
+  const handleHomeGoalSelect = async (goal: LearningGoal, event?: GestureResponderEvent) => {
+    event?.stopPropagation?.();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setPrimaryGoal(goal);
+    await setPrimaryLearningGoal(goal).catch((err: unknown) => console.warn("[Home] learner goal save failed:", err));
+    void trackLearningEvent("learning_goal_selected", {
+      surface: "home",
+      nativeLanguage: nativeLang,
+      targetLanguage: todaySpeakingMission.targetLanguage,
+      goal,
+    });
+  };
 
   const storyLabel = nativeLang === "korean" ? "스토리 모드" : nativeLang === "spanish" ? "Modo Historia" : "Story Mode";
-  const storyDesc  = nativeLang === "korean" ? "이야기로 자연스럽게 배우기" : nativeLang === "spanish" ? "Aprende con historias inmersivas" : "Learn through immersive stories";
+  const storyDesc  = nativeLang === "korean" ? "이야기 속에서 말하고 풀기" : nativeLang === "spanish" ? "Habla dentro de la historia" : "Speak inside the story";
 
-  const writingLabel = nativeLang === "korean" ? "쓰기 연습" : nativeLang === "spanish" ? "Escritura" : "Writing";
-  const writingDesc  = nativeLang === "korean" ? "번역, 작문, 문장 완성" : nativeLang === "spanish" ? "Traduce, escribe, completa" : "Translate, compose, complete";
-  const grammarLabel = nativeLang === "korean" ? "문법 팁" : nativeLang === "spanish" ? "Gramática" : "Grammar";
-  const grammarDesc  = nativeLang === "korean" ? "핵심 문법 규칙 카드" : nativeLang === "spanish" ? "Tarjetas de reglas gramaticales" : "Key grammar rule cards";
-
-  // "AI 발음 클리닉" reframes the existing PhonemeCoaching + Speak-tab
-  // pipeline (Azure pronunciation-assess + IPA per-phoneme coaching) as a
-  // 뇌새김-recognisable signature surface. The technology was already there
-  // — just buried under a generic "Pronunciation" label. Korean learners
-  // searching for "AI 발음" land on something they can describe to a friend.
-  const pronunciationLabel = nativeLang === "korean" ? "AI 발음 클리닉"
-    : nativeLang === "spanish" ? "Clínica de Pronunciación IA"
-    : "AI Pronunciation Clinic";
-  const pronunciationDesc = nativeLang === "korean" ? "음소 단위 AI 발음 평가"
-    : nativeLang === "spanish" ? "Evaluación fonética con IA"
-    : "Phoneme-level AI coaching";
+  const writingLabel = nativeLang === "korean" ? "내 문장 만들기" : nativeLang === "spanish" ? "Mis frases" : "My Sentences";
+  const writingDesc  = nativeLang === "korean" ? "내가 쓸 말을 문장으로 만들기" : nativeLang === "spanish" ? "Crea frases que usarías" : "Build sentences you would use";
+  // Keep the quick entry aligned with the core promise: speak real sentences
+  // with Rudy first; pronunciation scoring is the feedback layer underneath.
+  const speakLabel = nativeLang === "korean" ? "루디와 말하기"
+    : nativeLang === "spanish" ? "Habla con Rudy"
+    : "Speak with Rudy";
+  const speakDesc = nativeLang === "korean" ? "말하면 Rudy가 바로 다듬어줘요"
+    : nativeLang === "spanish" ? "Habla y Rudy te ayuda al instante"
+    : "Speak, then Rudy shapes it";
 
   const quickItems = [
-    { icon: "albums",      color: C.gold,    label: t("flashcards"),    desc: t("flashcards_desc"),    route: "/(tabs)/cards"  },
-    { icon: "chatbubbles", color: "#7eb8c9", label: t("conversation"),  desc: t("conversation_desc"),  route: "/(tabs)/chat"   },
-    { icon: "mic",         color: "#9b8bb4", label: pronunciationLabel, desc: pronunciationDesc,       route: "/(tabs)/speak"  },
+    {
+      icon: "albums",
+      color: C.gold,
+      label: nativeLang === "korean" ? "다시 만날 문장" : nativeLang === "spanish" ? "Frases para repetir" : "Repeat Sentences",
+      desc: nativeLang === "korean" ? "잊을 때쯤 다시 말해요" : nativeLang === "spanish" ? "Vuelve a decirlas cuando toca" : "Say them again when they are due",
+      route: "/(tabs)/cards",
+    },
+    {
+      icon: "chatbubbles",
+      color: "#7eb8c9",
+      label: nativeLang === "korean" ? "대화하기" : nativeLang === "spanish" ? "Conversar" : "Conversation",
+      desc: nativeLang === "korean" ? "실제로 할 말을 짧게 주고받기" : nativeLang === "spanish" ? "Intercambia frases que usarías" : "Trade short lines you would use",
+      route: "/(tabs)/chat",
+    },
+    { icon: "mic",         color: "#9b8bb4", label: speakLabel,        desc: speakDesc,                route: "/(tabs)/speak"  },
     { icon: "book",        color: "#c97b27", label: storyLabel,         desc: storyDesc,               route: "/(tabs)/story"  },
     { icon: "pencil",      color: "#e8a87c", label: writingLabel,       desc: writingDesc,             route: "/writing-practice" },
   ];
@@ -296,9 +349,9 @@ export default function HomeScreen() {
     { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
   ];
 
-  const missionLabel  = nativeLang === "korean" ? "오늘의 훈련 · 10분" : nativeLang === "spanish" ? "Entrenamiento · 10 min" : "Today's Training · 10 min";
+  const missionLabel  = nativeLang === "korean" ? "오늘의 말하기 · 10분" : nativeLang === "spanish" ? "Hablar hoy · 10 min" : "Today's Speaking · 10 min";
   const npcMissionLabel = nativeLang === "korean" ? "실전 미션" : nativeLang === "spanish" ? "Misión Real" : "Real Mission";
-  const npcMissionDesc  = nativeLang === "korean" ? "NPC와 실전 대화로 레벨업!" : nativeLang === "spanish" ? "¡Habla con NPC en escenarios reales!" : "Practice real-world conversations with NPCs!";
+  const npcMissionDesc  = nativeLang === "korean" ? "NPC와 실제 상황 문장을 주고받아요" : nativeLang === "spanish" ? "Habla con NPC en situaciones reales" : "Speak real situation lines with NPCs";
 
   return (
     <>
@@ -388,6 +441,101 @@ export default function HomeScreen() {
 
       {/* ── SIGN-IN PROMO BANNER (smart-trigger: only when signed out + value earned) */}
       <SignInPromoBanner />
+
+      {/* ── TODAY'S FIRST SPEAKING MISSION ────────────── */}
+      <View style={styles.pad}>
+        <Pressable
+          style={({ pressed }) => [styles.todaySpeechCard, pressed && { opacity: 0.9, transform: [{ scale: 0.99 }] }]}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            void trackLearningEvent("first_speaking_cta_pressed", {
+              surface: "home",
+              nativeLanguage: nativeLang,
+              targetLanguage: todaySpeakingMission.targetLanguage,
+              goal: todaySpeakingMission.goal,
+              dailyGoalMet: todaySpeakingMission.dailyGoalMet,
+            });
+            if (todaySpeakingMission.dailyGoalMet) {
+              router.push("/(tabs)/speak" as any);
+            } else {
+              router.push({
+                pathname: "/(tabs)/speak",
+                params: {
+                  mission: "first-sentence",
+                  goal: todaySpeakingMission.goal ?? "",
+                  targetLang: todaySpeakingMission.targetLanguage,
+                },
+              } as any);
+            }
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={`${todaySpeakingMission.eyebrow}. ${todaySpeakingMission.phrase}. ${todaySpeakingMission.button}`}
+        >
+          <LinearGradient
+            colors={["rgba(201,162,39,0.16)", "rgba(126,184,201,0.10)"]}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.todaySpeechTop}>
+            <View style={styles.todaySpeechIcon}>
+              <Ionicons name={todaySpeakingMission.dailyGoalMet ? "checkmark-circle" : "mic"} size={22} color={C.bg1} />
+            </View>
+            <View style={styles.todaySpeechCopy}>
+              <Text style={styles.todaySpeechEyebrow}>{todaySpeakingMission.eyebrow}</Text>
+              <Text style={styles.todaySpeechTitle}>{todaySpeakingMission.title}</Text>
+            </View>
+          </View>
+
+          <View style={styles.todayPhraseBox}>
+            <Text style={styles.todayPhrase} numberOfLines={1} adjustsFontSizeToFit>
+              {todaySpeakingMission.phrase}
+            </Text>
+            <Text style={styles.todayMeaning}>{todaySpeakingMission.meaning}</Text>
+          </View>
+
+          <Text style={styles.todaySpeechContext}>{todaySpeakingMission.context}</Text>
+          <View style={styles.todayGoalPicker}>
+            <Text style={styles.todayGoalPrompt}>{getHomeGoalPrompt(nativeLang)}</Text>
+            <View style={styles.todayGoalChips}>
+              {getHomeLearningGoalOptions(nativeLang).map((option) => {
+                const active = primaryGoal === option.key;
+                return (
+                  <Pressable
+                    key={option.key}
+                    style={({ pressed }) => [
+                      styles.todayGoalChip,
+                      active && styles.todayGoalChipActive,
+                      pressed && { opacity: 0.82 },
+                    ]}
+                    onPress={(event) => { void handleHomeGoalSelect(option.key, event); }}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    accessibilityLabel={`${getHomeGoalPrompt(nativeLang)}: ${option.label}`}
+                  >
+                    <Text style={[styles.todayGoalChipText, active && styles.todayGoalChipTextActive]}>
+                      {option.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+          <View style={styles.todaySpeechProgress}>
+            <View style={styles.todaySpeechProgressTop}>
+              <Text style={styles.todaySpeechProgressText}>{spokenProgressLabel}</Text>
+              <Text style={styles.todaySpeechProgressGoal}>
+                {nativeLang === "korean" ? "목표 19" : nativeLang === "spanish" ? "Meta 19" : "Goal 19"}
+              </Text>
+            </View>
+            <View style={styles.todaySpeechProgressTrack}>
+              <View style={[styles.todaySpeechProgressFill, { width: `${spokenProgressPct}%` }]} />
+            </View>
+          </View>
+          <View style={styles.todaySpeechButton}>
+            <Text style={styles.todaySpeechButtonText}>{todaySpeakingMission.button}</Text>
+            <Ionicons name="arrow-forward" size={14} color={C.bg1} />
+          </View>
+        </Pressable>
+      </View>
 
       {/* ── STATS ROW ─────────────────────────────────── */}
       <View style={styles.statsRow}>
@@ -832,6 +980,166 @@ const styles = StyleSheet.create({
   },
   xpLabel:   { fontSize: 11, fontFamily: F.body, color: C.goldDim },
   headerBorder: { marginTop: 16, height: 1, backgroundColor: C.gold, opacity: 0.4 },
+
+  /* ─ TODAY SPEAKING MISSION ─ */
+  todaySpeechCard: {
+    marginTop: 14,
+    backgroundColor: C.bg2,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: "rgba(201,162,39,0.42)",
+    padding: 18,
+    overflow: "hidden",
+    shadowColor: C.gold,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+    elevation: 6,
+  },
+  todaySpeechTop: { flexDirection: "row", alignItems: "center", gap: 12 },
+  todaySpeechIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: C.gold,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  todaySpeechCopy: { flex: 1 },
+  todaySpeechEyebrow: {
+    fontSize: 11,
+    fontFamily: F.label,
+    color: C.gold,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  todaySpeechTitle: {
+    marginTop: 3,
+    fontSize: 18,
+    fontFamily: F.header,
+    color: C.parchment,
+    lineHeight: 24,
+  },
+  todayPhraseBox: {
+    marginTop: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.32)",
+    backgroundColor: "rgba(14,10,18,0.42)",
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+  },
+  todayPhrase: {
+    fontSize: 30,
+    fontFamily: F.title,
+    color: C.gold,
+    lineHeight: 38,
+    textAlign: "center",
+  },
+  todayMeaning: {
+    marginTop: 2,
+    fontSize: 13,
+    fontFamily: F.body,
+    color: C.goldDim,
+    textAlign: "center",
+  },
+  todaySpeechContext: {
+    marginTop: 12,
+    fontSize: 13,
+    fontFamily: F.body,
+    color: C.parchmentDark,
+    lineHeight: 19,
+  },
+  todayGoalPicker: {
+    marginTop: 12,
+    gap: 8,
+  },
+  todayGoalPrompt: {
+    fontSize: 11,
+    fontFamily: F.label,
+    color: C.goldDim,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+  },
+  todayGoalChips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 7,
+  },
+  todayGoalChip: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.28)",
+    backgroundColor: "rgba(201,162,39,0.08)",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    minHeight: 30,
+    justifyContent: "center",
+  },
+  todayGoalChipActive: {
+    borderColor: C.gold,
+    backgroundColor: C.gold,
+  },
+  todayGoalChipText: {
+    fontSize: 11,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+  },
+  todayGoalChipTextActive: {
+    color: C.bg1,
+  },
+  todaySpeechProgress: {
+    marginTop: 12,
+    gap: 7,
+  },
+  todaySpeechProgressTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+  },
+  todaySpeechProgressText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+  },
+  todaySpeechProgressGoal: {
+    fontSize: 11,
+    fontFamily: F.label,
+    color: C.goldDim,
+    letterSpacing: 0.5,
+  },
+  todaySpeechProgressTrack: {
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: "rgba(201,162,39,0.14)",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.18)",
+  },
+  todaySpeechProgressFill: {
+    height: "100%",
+    borderRadius: 4,
+    backgroundColor: C.gold,
+  },
+  todaySpeechButton: {
+    marginTop: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 7,
+    backgroundColor: C.gold,
+    borderRadius: 13,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+  },
+  todaySpeechButtonText: {
+    fontSize: 13,
+    fontFamily: F.header,
+    color: C.bg1,
+    letterSpacing: 0.4,
+  },
 
   /* ─ STATS ─ */
   statsRow: {
