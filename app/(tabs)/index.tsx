@@ -78,7 +78,7 @@ function RudyImageWithPlaceholder({ source, style, resizeMode }: { source: any; 
     <View style={[style, { overflow: "hidden", justifyContent: "center", alignItems: "center" }]}>
       {!loaded && (
         <View style={[StyleSheet.absoluteFillObject, { backgroundColor: "rgba(201,162,39,0.15)", justifyContent: "center", alignItems: "center" }]}>
-          <Text style={{ fontSize: 22 }}>🦊</Text>
+          <EmojiText style={{ fontSize: 22 }}>🦊</EmojiText>
         </View>
       )}
       <Animated.Image source={source} style={{ width, height, opacity }} resizeMode={resizeMode ?? "cover"} onLoad={onLoad} />
@@ -176,7 +176,7 @@ function GoldDivider({ label }: { label: string }) {
   return (
     <View style={div.row}>
       <View style={div.line} />
-      <Text style={div.label}>✦ {label} ✦</Text>
+      <EmojiText style={div.label}>✦ {label} ✦</EmojiText>
       <View style={div.line} />
     </View>
   );
@@ -481,7 +481,7 @@ export default function HomeScreen() {
         {/* Level badge + Language change row */}
         <View style={styles.levelRow}>
           <View style={styles.levelBadge}>
-            <Text style={styles.levelEmoji}>{level.emoji}</Text>
+            <EmojiText style={styles.levelEmoji}>{level.emoji}</EmojiText>
             <Text style={styles.levelName}>{getLevelName(level, nativeLang)}</Text>
             <View style={styles.levelDot} />
             <Text style={styles.levelNum}>{t("level")} {level.num}</Text>
@@ -691,11 +691,11 @@ export default function HomeScreen() {
                   <Text style={[styles.dayLabel, d.isToday && styles.dayLabelToday]}>{d.label}</Text>
                   {d.status === "fire" ? (
                     <View style={[styles.dayCircle, styles.dayCircleFire]}>
-                      <Animated.Text style={[styles.dayEmoji, { opacity: d.isToday ? flickerOp : 1 }]}>🔥</Animated.Text>
+                      <Animated.Text style={[styles.dayEmoji, Platform.OS === "web" && styles.webEmojiFont, { opacity: d.isToday ? flickerOp : 1 }]}>🔥</Animated.Text>
                     </View>
                   ) : d.status === "missed" ? (
                     <View style={[styles.dayCircle, styles.dayCircleMissed]}>
-                      <Text style={styles.dayEmojiSmall}>✕</Text>
+                      <EmojiText style={styles.dayEmojiSmall}>✕</EmojiText>
                     </View>
                   ) : (
                     <View style={[styles.dayCircle, styles.dayCircleFuture]} />
@@ -728,7 +728,7 @@ export default function HomeScreen() {
               router.push({ pathname: "/(tabs)/cards", params: { deck: "srs" } } as any);
             }}
           >
-            <Text style={styles.srsBannerEmoji}>🦊</Text>
+            <EmojiText style={styles.srsBannerEmoji}>🦊</EmojiText>
             <View style={styles.srsBannerText}>
               <Text style={styles.srsBannerTitle}>
                 {nativeLang === "korean"
@@ -799,10 +799,10 @@ export default function HomeScreen() {
           <View style={styles.npcMissionContent}>
             <View style={styles.npcMissionTop}>
               <View style={styles.npcMissionEmojis}>
-                <Text style={styles.npcEmoji}>☕</Text>
-                <Text style={styles.npcEmoji}>🏨</Text>
-                <Text style={styles.npcEmoji}>🏥</Text>
-                <Text style={styles.npcEmoji}>💼</Text>
+                <EmojiText style={styles.npcEmoji}>☕</EmojiText>
+                <EmojiText style={styles.npcEmoji}>🏨</EmojiText>
+                <EmojiText style={styles.npcEmoji}>🏥</EmojiText>
+                <EmojiText style={styles.npcEmoji}>💼</EmojiText>
               </View>
               <View style={styles.xpPill}>
                 <Text style={styles.xpPillText}>23 NPCs</Text>
@@ -816,7 +816,7 @@ export default function HomeScreen() {
               <Ionicons name="arrow-forward" size={13} color={C.bg1} />
             </View>
           </View>
-          <Text style={styles.npcMissionBg}>🕵️</Text>
+          <EmojiText style={styles.npcMissionBg}>🕵️</EmojiText>
         </Pressable>
       </View>
 
@@ -851,7 +851,7 @@ export default function HomeScreen() {
             style={({ pressed }) => [styles.featureCard, pressed && { opacity: 0.85 }]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/stats-dashboard" as any); }}
           >
-            <Text style={{ fontSize: 24 }}>📊</Text>
+            <EmojiText style={{ fontSize: 24 }}>📊</EmojiText>
             <Text style={styles.featureLabel}>
               {nativeLang === "korean" ? "학습 통계" : nativeLang === "spanish" ? "Estadísticas" : "Stats"}
             </Text>
@@ -860,7 +860,7 @@ export default function HomeScreen() {
             style={({ pressed }) => [styles.featureCard, pressed && { opacity: 0.85 }]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/achievements" as any); }}
           >
-            <Text style={{ fontSize: 24 }}>🏆</Text>
+            <EmojiText style={{ fontSize: 24 }}>🏆</EmojiText>
             <Text style={styles.featureLabel}>
               {nativeLang === "korean" ? "업적" : nativeLang === "spanish" ? "Logros" : "Achievements"}
             </Text>
@@ -869,7 +869,7 @@ export default function HomeScreen() {
             style={({ pressed }) => [styles.featureCard, pressed && { opacity: 0.85 }]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/leaderboard" as any); }}
           >
-            <Text style={{ fontSize: 24 }}>🥇</Text>
+            <EmojiText style={{ fontSize: 24 }}>🥇</EmojiText>
             <Text style={styles.featureLabel}>
               {nativeLang === "korean" ? "리더보드" : nativeLang === "spanish" ? "Ranking" : "Leaderboard"}
             </Text>
@@ -944,7 +944,7 @@ function CulturalNoteSection({ nativeLang, learningLang }: { nativeLang: string;
       <View style={styles.pad}>
         <View style={styles.cultureCard}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 8 }}>
-            <Text style={{ fontSize: 22 }}>{note.icon}</Text>
+            <EmojiText style={{ fontSize: 22 }}>{note.icon}</EmojiText>
             <Text style={styles.cultureTitle}>{note.title[lc] || note.title.en}</Text>
           </View>
           <Text style={styles.cultureContent} numberOfLines={4}>
@@ -981,7 +981,7 @@ function RudyTrainingCard({
         <View style={styles.dailyContent}>
           <View style={styles.dailyTopRow}>
             <View style={styles.dailyPill}>
-              <Text style={styles.dailyPillText}>🦊</Text>
+              <EmojiText style={styles.dailyPillText}>🦊</EmojiText>
               <Text style={styles.dailyPillLabel}>{trainingLabel}</Text>
             </View>
             <View style={styles.xpPill}>
@@ -990,7 +990,7 @@ function RudyTrainingCard({
           </View>
           <Text style={styles.dailyTitle}>{startLabel}</Text>
         </View>
-        <Text style={styles.dailyBookEmoji}>🦊</Text>
+        <EmojiText style={styles.dailyBookEmoji}>🦊</EmojiText>
       </Pressable>
     );
   }
@@ -1022,7 +1022,7 @@ function RudyTrainingCard({
       <View style={styles.dailyContent}>
         <View style={styles.dailyTopRow}>
           <View style={styles.dailyPill}>
-            <Text style={styles.dailyPillText}>🦊</Text>
+            <EmojiText style={styles.dailyPillText}>🦊</EmojiText>
             <Text style={styles.dailyPillLabel}>{trainingLabel}</Text>
           </View>
           <View style={styles.xpPill}>
@@ -1052,7 +1052,7 @@ function RudyTrainingCard({
           </View>
         )}
       </View>
-      <Text style={styles.dailyBookEmoji}>🦊</Text>
+      <EmojiText style={styles.dailyBookEmoji}>🦊</EmojiText>
     </Pressable>
   );
 }
@@ -1413,6 +1413,7 @@ const styles = StyleSheet.create({
   dayCircleFuture: { backgroundColor: "rgba(100,60,30,0.05)", borderWidth: 1, borderColor: "#c0a060", borderStyle: "dashed" as any },
   dayEmoji:      { fontSize: 18 },
   dayEmojiSmall: { fontSize: 12, color: "#b09060" },
+  webEmojiFont: { fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", system-ui, sans-serif' },
   streakMotivation: {
     backgroundColor: "rgba(139,105,20,0.08)",
     borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9,

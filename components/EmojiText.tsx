@@ -17,8 +17,26 @@ const WEB_EMOJI_STYLE = { fontFamily: WEB_EMOJI_FONT_FAMILY };
 
 interface Props {
   style?: StyleProp<TextStyle>;
-  children: string;
+  children: React.ReactNode;
   numberOfLines?: number;
+}
+
+function splitEmojiParts(value: string, keyPrefix: string): React.ReactNode[] {
+  const parts = value.split(EMOJI_SPLIT_RE).filter(Boolean);
+  if (parts.length <= 1) {
+    if (EMOJI_TEST_RE.test(value)) {
+      return [<Text key={`${keyPrefix}-emoji`} style={WEB_EMOJI_STYLE}>{value}</Text>];
+    }
+    return [value];
+  }
+
+  return parts.map((part, i) =>
+    EMOJI_TEST_RE.test(part) ? (
+      <Text key={`${keyPrefix}-${i}`} style={WEB_EMOJI_STYLE}>{part}</Text>
+    ) : (
+      part
+    )
+  );
 }
 
 export function EmojiText({ style, children, numberOfLines }: Props) {
@@ -26,23 +44,16 @@ export function EmojiText({ style, children, numberOfLines }: Props) {
     return <Text style={style} numberOfLines={numberOfLines}>{children}</Text>;
   }
 
-  const parts = children.split(EMOJI_SPLIT_RE).filter(Boolean);
-  if (parts.length <= 1) {
-    if (EMOJI_TEST_RE.test(children)) {
-      return <Text style={[style, WEB_EMOJI_STYLE]} numberOfLines={numberOfLines}>{children}</Text>;
+  const parts = React.Children.toArray(children).flatMap((child, i) => {
+    if (typeof child === "string" || typeof child === "number") {
+      return splitEmojiParts(String(child), `emoji-${i}`);
     }
-    return <Text style={style} numberOfLines={numberOfLines}>{children}</Text>;
-  }
+    return child;
+  });
 
   return (
     <Text style={style} numberOfLines={numberOfLines}>
-      {parts.map((part, i) =>
-        EMOJI_TEST_RE.test(part) ? (
-          <Text key={i} style={WEB_EMOJI_STYLE}>{part}</Text>
-        ) : (
-          <Text key={i}>{part}</Text>
-        )
-      )}
+      {parts}
     </Text>
   );
 }

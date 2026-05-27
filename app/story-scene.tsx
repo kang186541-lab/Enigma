@@ -38,6 +38,7 @@ import StoryIntroMotionComic from "@/components/story/StoryIntroMotionComic";
 import { hasIntroTimeline } from "@/components/story/intro/timelines";
 import type { ChapterId } from "@/components/story/intro/timelines/types";
 import BossSpellPuzzle, { BossSpellQuestion } from "@/components/story/puzzles/BossSpellPuzzle";
+import { EmojiText } from "@/components/EmojiText";
 
 const rudyStoryImg = require("@/assets/rudy_story.png");
 const ch1BossDoorImg = require("@/assets/story/chapter1_motion_comic/ch1_boss_door.png");
@@ -4731,7 +4732,7 @@ function PuzzleSolvedBadge({ onNext, lang }: { onNext: () => void; lang: string 
   }, []);
   return (
     <Animated.View style={[styles.solvedBadge, { transform: [{ scale }] }]}>
-      <Text style={styles.solvedEmoji}>🔍</Text>
+      <EmojiText style={styles.solvedEmoji}>🔍</EmojiText>
       <Text style={styles.solvedTitle}>{lang === "korean" ? "퍼즐 해결!" : lang === "spanish" ? "¡Puzzle Resuelto!" : "Puzzle Solved!"}</Text>
       <Text style={styles.solvedXp}>+20 XP</Text>
       <Pressable style={styles.solvedBtn} onPress={onNext}>
@@ -4777,7 +4778,7 @@ function WordMatchPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</Text>
+        <EmojiText style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</EmojiText>
         <Text style={styles.puzzleType}>{lang === "korean" ? "단어 매칭" : lang === "spanish" ? "Relacionar palabras" : "Word Matching"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
@@ -4856,7 +4857,7 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</Text>
+        <EmojiText style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</EmojiText>
         <Text style={styles.puzzleType}>{ko ? "빈칸 채우기" : es ? "Completar espacios" : "Fill in the Blank"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
@@ -4904,7 +4905,7 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
           <Pressable style={styles.hintOverlay} onPress={() => setHintVisible(false)}>
             <Pressable style={styles.hintNotebook} onPress={() => {}}>
               <View style={styles.hintNotebookHeader}>
-                <Text style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</Text>
+                <EmojiText style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</EmojiText>
                 <Pressable onPress={() => setHintVisible(false)} style={styles.hintCloseBtn}>
                   <Text style={styles.hintCloseBtnText}>✕</Text>
                 </Pressable>
@@ -4922,12 +4923,12 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
                       </View>
                     ) : isNext ? (
                       <Pressable style={styles.hintLocked} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setHintLevel(i + 1); }}>
-                        <Text style={styles.hintLockedIcon}>🔒</Text>
+                        <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                         <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
                       </Pressable>
                     ) : (
                       <View style={[styles.hintLocked, { opacity: 0.4 }]}>
-                        <Text style={styles.hintLockedIcon}>🔒</Text>
+                        <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                         <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
                       </View>
                     )}
@@ -4987,7 +4988,7 @@ function DialogueChoicePuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</Text>
+        <EmojiText style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</EmojiText>
         <Text style={styles.puzzleType}>{lang === "korean" ? "대화 선택" : lang === "spanish" ? "Elección de diálogo" : "Dialogue Choice"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
@@ -5074,7 +5075,7 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</Text>
+        <EmojiText style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</EmojiText>
         <Text style={styles.puzzleType}>{lang === "korean" ? "문장 만들기" : lang === "spanish" ? "Construir oraciones" : "Sentence Builder"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
@@ -5171,7 +5172,7 @@ function InvestigationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🧩 INVESTIGATION</Text>
+        <EmojiText style={styles.puzzleNum}>🧩 INVESTIGATION</EmojiText>
         <Text style={styles.puzzleType}>{lang === "korean" ? "단서 조사" : lang === "spanish" ? "Investigar pistas" : "Evidence Analysis"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
@@ -5343,7 +5344,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
       return (
         <View style={styles.puzzleBox}>
           <View style={styles.puzzleHeaderRow}>
-            <Text style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : "Decode the Cipher!"}</Text>
+            <EmojiText style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : "Decode the Cipher!"}</EmojiText>
             <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
           </View>
 
@@ -5356,7 +5357,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
 
           {/* Fox dialogue */}
           <View style={styles.cipherLingoRow}>
-            <Text style={styles.cipherLingoEmoji}>🦊</Text>
+            <EmojiText style={styles.cipherLingoEmoji}>🦊</EmojiText>
             <View style={styles.cipherLingoBubble}>
               <Text style={styles.cipherLingoBubbleText}>
                 {ko ? "흠... 뭔가 조금 다른 것 같군요, 파트너." : es ? "Hmm... algo no está bien, compañero." : "Hmm... something's not quite right, partner."}
@@ -5389,7 +5390,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
             <Pressable style={styles.hintOverlay} onPress={() => setShowHintModal(false)}>
               <Pressable style={styles.hintNotebook} onPress={() => {}}>
                 <View style={styles.hintNotebookHeader}>
-                  <Text style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</Text>
+                  <EmojiText style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</EmojiText>
                   <Pressable onPress={() => setShowHintModal(false)} style={styles.hintCloseBtn}>
                     <Text style={styles.hintCloseBtnText}>✕</Text>
                   </Pressable>
@@ -5407,12 +5408,12 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
                         </View>
                       ) : isNext ? (
                         <Pressable style={styles.hintLocked} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setUnlockedHints(i + 1); }}>
-                          <Text style={styles.hintLockedIcon}>🔒</Text>
+                          <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                           <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
                         </Pressable>
                       ) : (
                         <View style={[styles.hintLocked, { opacity: 0.4 }]}>
-                          <Text style={styles.hintLockedIcon}>🔒</Text>
+                          <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                           <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
                         </View>
                       )}
@@ -5431,18 +5432,18 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
     return (
       <View style={styles.puzzleBox}>
         <View style={styles.puzzleHeaderRow}>
-          <Text style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : "Decode the Cipher!"}</Text>
+          <EmojiText style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : "Decode the Cipher!"}</EmojiText>
           <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
         </View>
 
         {/* Success banner */}
         <View style={styles.cipherResultCorrect}>
-          <Text style={styles.cipherResultTitle}>✨ {ko ? "퍼즐 해결!" : es ? "¡Puzzle resuelto!" : "Puzzle Solved!"}</Text>
+          <EmojiText style={styles.cipherResultTitle}>✨ {ko ? "퍼즐 해결!" : es ? "¡Puzzle resuelto!" : "Puzzle Solved!"}</EmojiText>
         </View>
 
         {/* Fox celebration */}
         <View style={styles.cipherLingoRow}>
-          <Text style={styles.cipherLingoEmoji}>🦊</Text>
+          <EmojiText style={styles.cipherLingoEmoji}>🦊</EmojiText>
           <View style={styles.cipherLingoBubble}>
             <Text style={styles.cipherLingoBubbleText}>
               {ko ? "훌륭하군요, 파트너! 암호를 완벽히 해독했어요." : es ? "¡Brillante, compañero! Has descifrado el código perfectamente." : "Brilliant, partner! You've decoded the cipher perfectly."}
@@ -5484,13 +5485,13 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🔐 {lang === "korean" ? "암호를 해독하라!" : lang === "spanish" ? "¡Descifra el código!" : "Decode the Cipher!"}</Text>
+        <EmojiText style={styles.puzzleNum}>🔐 {lang === "korean" ? "암호를 해독하라!" : lang === "spanish" ? "¡Descifra el código!" : "Decode the Cipher!"}</EmojiText>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
 
       {/* Fox bubble */}
       <View style={styles.cipherLingoRow}>
-        <Text style={styles.cipherLingoEmoji}>🦊</Text>
+        <EmojiText style={styles.cipherLingoEmoji}>🦊</EmojiText>
         <View style={styles.cipherLingoBubble}>
           <Text style={styles.cipherLingoBubbleText}>
             {lang === "korean" ? "이 암호를 해독해봐, 파트너!" : lang === "spanish" ? "¡Descifra este código, compañero!" : "Decode this cipher, partner!"}
@@ -5582,14 +5583,14 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
                         setUnlockedHints(i + 1);
                       }}
                     >
-                      <Text style={styles.hintLockedIcon}>🔒</Text>
+                      <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                       <Text style={styles.hintLockedText}>
                         {lang === "korean" ? `힌트 ${i + 1} 열기` : lang === "spanish" ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}
                       </Text>
                     </Pressable>
                   ) : (
                     <View style={[styles.hintLocked, { opacity: 0.4 }]}>
-                      <Text style={styles.hintLockedIcon}>🔒</Text>
+                      <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                       <Text style={styles.hintLockedText}>
                         {lang === "korean" ? `힌트 ${i + 1}` : lang === "spanish" ? `Pista ${i + 1}` : `Hint ${i + 1}`}
                       </Text>
@@ -5686,7 +5687,7 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>✍️ {lang === "korean" ? "단어 입력" : lang === "spanish" ? "Escribe la palabra" : "Word Typing"}</Text>
+        <EmojiText style={styles.puzzleNum}>✍️ {lang === "korean" ? "단어 입력" : lang === "spanish" ? "Escribe la palabra" : "Word Typing"}</EmojiText>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
 
@@ -6064,7 +6065,7 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>✏️ {lang === "korean" ? "쓰기 미션" : lang === "spanish" ? "Misión de escritura" : "Writing Mission"}</Text>
+        <EmojiText style={styles.puzzleNum}>✏️ {lang === "korean" ? "쓰기 미션" : lang === "spanish" ? "Misión de escritura" : "Writing Mission"}</EmojiText>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
@@ -6076,7 +6077,7 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
             : `Type '${displayWord}' in ${learningLang === "spanish" ? "Spanish" : learningLang === "korean" ? "Korean" : "English"}`}
         </Text>
         <Text style={styles.puzzleWordMain}>{displayWord}</Text>
-        {hintText && <Text style={styles.puzzleChooseHint}>💡 {hintText}</Text>}
+        {hintText && <EmojiText style={styles.puzzleChooseHint}>💡 {hintText}</EmojiText>}
       </View>
       <TextInput
         style={[styles.writingInput, confirmed && (isCorrect ? styles.writingInputCorrect : styles.writingInputWrong)]}
@@ -6152,7 +6153,7 @@ function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🔀 {lang === "korean" ? "단어 맞추기" : lang === "spanish" ? "Ordenar letras" : "Word Unscramble"}</Text>
+        <EmojiText style={styles.puzzleNum}>🔀 {lang === "korean" ? "단어 맞추기" : lang === "spanish" ? "Ordenar letras" : "Word Unscramble"}</EmojiText>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
@@ -6218,7 +6219,7 @@ function FallbackPuzzle({ lang, onSolved }: { lang: string; onSolved: () => void
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <Text style={styles.puzzleNum}>🧩 {lang === "korean" ? "퀴즈" : lang === "spanish" ? "Quiz" : "Quick Quiz"}</Text>
+        <EmojiText style={styles.puzzleNum}>🧩 {lang === "korean" ? "퀴즈" : lang === "spanish" ? "Quiz" : "Quick Quiz"}</EmojiText>
       </View>
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordMain}>{q.q}</Text>
@@ -6265,7 +6266,7 @@ function ClueReveal({ clue, lang, onNext }: { clue: SeqClue; lang: string; onNex
   return (
     <View style={styles.clueReveal}>
       <Animated.View style={[styles.clueRevealCard, { transform: [{ scale }] }]}>
-        <Text style={styles.clueRevealBadge}>🔍 {lang === "korean" ? "단서 발견!" : lang === "spanish" ? "¡Pista Descubierta!" : "Clue Discovered!"}</Text>
+        <EmojiText style={styles.clueRevealBadge}>🔍 {lang === "korean" ? "단서 발견!" : lang === "spanish" ? "¡Pista Descubierta!" : "Clue Discovered!"}</EmojiText>
         <Text style={styles.clueSymbol}>{clue.symbol}</Text>
         <Text style={styles.clueRevealTitle}>{title}</Text>
         <Text style={styles.clueRevealDesc}>{desc}</Text>
@@ -6289,7 +6290,7 @@ function CompletionScreen({ story, lang, xpEarned }: { story: Story; lang: strin
   return (
     <ScrollView contentContainerStyle={styles.completionScroll} showsVerticalScrollIndicator={false}>
       <Animated.View style={[styles.completionCard, { transform: [{ scale }] }]}>
-        <Text style={styles.completionEmoji}>🦊</Text>
+        <EmojiText style={styles.completionEmoji}>🦊</EmojiText>
         <Text style={styles.completionTitle}>{lang === "korean" ? "챕터 완료!" : lang === "spanish" ? "¡Capítulo Completado!" : "Chapter Complete!"}</Text>
         <Text style={styles.completionStoryTitle}>{lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : story.title}</Text>
         <View style={styles.xpRewardRow}>
@@ -6747,7 +6748,7 @@ export default function StoryScene() {
                 <>
                   <View style={[styles.avatarOuter, { shadowColor: story.accentColor }]}>
                     <View style={[styles.avatarInner, { backgroundColor: character.avatarBg }]}>
-                      <Text style={styles.avatarEmoji}>{character.emoji}</Text>
+                      <EmojiText style={styles.avatarEmoji}>{character.emoji}</EmojiText>
                     </View>
                     <View style={[styles.avatarRing, { borderColor: story.accentColor }]} />
                   </View>
@@ -6758,7 +6759,7 @@ export default function StoryScene() {
 
             <Pressable style={styles.dialogueBox} onPress={advance}>
               <View style={styles.speakerTag}>
-                <Text style={styles.speakerEmoji}>{character.emoji}</Text>
+                <EmojiText style={styles.speakerEmoji}>{character.emoji}</EmojiText>
                 <Text style={styles.speakerName}>{getCharName(character)}</Text>
               </View>
               <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 160 }}>
@@ -6867,7 +6868,7 @@ export default function StoryScene() {
                   <Pressable style={styles.hintOverlay} onPress={() => setSharedHintVisible(false)}>
                     <Pressable style={styles.hintNotebook} onPress={() => {}}>
                       <View style={styles.hintNotebookHeader}>
-                        <Text style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</Text>
+                        <EmojiText style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</EmojiText>
                         <Pressable onPress={() => setSharedHintVisible(false)} style={styles.hintCloseBtn}>
                           <Text style={styles.hintCloseBtnText}>✕</Text>
                         </Pressable>
@@ -6882,12 +6883,12 @@ export default function StoryScene() {
                             </View>
                           ) : sharedHintLevel === i ? (
                             <Pressable style={styles.hintLocked} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setSharedHintLevel(i + 1); }}>
-                              <Text style={styles.hintLockedIcon}>🔒</Text>
+                              <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                               <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
                             </Pressable>
                           ) : (
                             <View style={[styles.hintLocked, { opacity: 0.4 }]}>
-                              <Text style={styles.hintLockedIcon}>🔒</Text>
+                              <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                               <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
                             </View>
                           )}

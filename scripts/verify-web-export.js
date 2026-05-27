@@ -42,4 +42,19 @@ assert(bundle.includes("first-sentence"), "entry bundle is missing first-sentenc
 assert(bundle.includes("Start speaking"), "entry bundle is missing English onboarding speaking CTA");
 assert(bundle.includes("Empezar a hablar"), "entry bundle is missing Spanish onboarding speaking CTA");
 
+const homeSource = fs.readFileSync(path.join("app", "(tabs)", "index.tsx"), "utf8");
+assert(
+  homeSource.includes("<EmojiText style={styles.levelEmoji}>{level.emoji}</EmojiText>") &&
+    homeSource.includes("<EmojiText style={styles.npcEmoji}>☕</EmojiText>") &&
+    homeSource.includes("<EmojiText style={styles.npcMissionBg}>🕵️</EmojiText>"),
+  "Home should route high-visibility emoji through EmojiText for web rendering"
+);
+
+const storySceneSource = fs.readFileSync(path.join("app", "story-scene.tsx"), "utf8");
+assert(
+  storySceneSource.includes("<EmojiText style={styles.avatarEmoji}>{character.emoji}</EmojiText>") &&
+    storySceneSource.includes("<EmojiText style={styles.speakerEmoji}>{character.emoji}</EmojiText>"),
+  "Story scene fallback character emoji should use EmojiText on web"
+);
+
 console.log(`web export verification passed (${entryMatch[1]})`);
