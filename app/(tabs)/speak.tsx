@@ -537,6 +537,12 @@ function getUnsupportedRecordingMessage(nativeLang: NativeLanguage): string {
   return "This browser doesn't support microphone recording.\nUse a current version of Chrome or Safari.";
 }
 
+function getNoVoiceDetectedMessage(nativeLang: NativeLanguage): string {
+  if (nativeLang === "korean") return "음성이 감지되지 않았어요. 다시 시도해 주세요.";
+  if (nativeLang === "spanish") return "No se detectó voz. Inténtalo de nuevo.";
+  return "No voice detected. Please try again.";
+}
+
 function getContinueWithoutScoreLabel(nativeLang: NativeLanguage): string {
   if (nativeLang === "korean") return "점수 없이 시도 기록";
   if (nativeLang === "spanish") return "Contar sin nota";
@@ -1058,6 +1064,7 @@ export default function SpeakScreen() {
   // cannot award XP or attach feedback to the wrong sentence.
   const practiceGenerationRef = useRef(0);
   const unscoredFallbackAttemptRef = useRef<number | null>(null);
+  const unscoredAcceptingRef = useRef<number | null>(null);
   const RECORD_MAX_SEC = 8;
   // Countdown shown to the user while a recording is in progress so they
   // know HOW LONG they have before the 8-second auto-stop kicks in. Without
@@ -1120,6 +1127,7 @@ export default function SpeakScreen() {
     setSttError("");
     setCanContinueWithoutScore(false);
     unscoredFallbackAttemptRef.current = null;
+    unscoredAcceptingRef.current = null;
     setHasListened(false);
     pulseLoop.current?.stop();
     Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
@@ -1356,6 +1364,7 @@ export default function SpeakScreen() {
           ? "No se detectó voz. Inténtalo de nuevo."
           : "No voice detected. Please try again.");
       setSttError(msg);
+      if (!data.feedback) setSttError(getNoVoiceDetectedMessage(nativeLang));
       return 0;
     }
     setScore(scoreVal);
@@ -1440,20 +1449,33 @@ export default function SpeakScreen() {
 
   const acceptUnscoredGuidedAttempt = useCallback(async (attemptGeneration: number): Promise<boolean> => {
     if (!isGuidedSentenceMission || !isCurrentPracticeAttempt(attemptGeneration)) return false;
-    const counted = await recordSpokenAttempt(0, attemptGeneration, "unscored");
-    if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
-    if (counted) setSpokenAttemptAccepted(true);
-    setCanContinueWithoutScore(false);
-    unscoredFallbackAttemptRef.current = null;
-    setScore(null);
-    setAccuracyScore(null);
-    setFluencyScore(null);
-    setCompletenessScore(null);
-    setWordResults([]);
-    setRecognizedText("");
-    setGptFeedback("");
-    setSttError(getUnscoredAttemptAcceptedMessage(nativeLang));
-    return counted;
+    if (unscoredAcceptingRef.current === attemptGeneration) return false;
+    unscoredAcceptingRef.current = attemptGeneration;
+    try {
+      const counted = await recordSpokenAttempt(0, attemptGeneration, "unscored");
+      if (!isCurrentPracticeAttempt(attemptGeneration)) return false;
+      if (!counted) {
+        unscoredFallbackAttemptRef.current = attemptGeneration;
+        setCanContinueWithoutScore(true);
+        return false;
+      }
+      setSpokenAttemptAccepted(true);
+      setCanContinueWithoutScore(false);
+      unscoredFallbackAttemptRef.current = null;
+      setScore(null);
+      setAccuracyScore(null);
+      setFluencyScore(null);
+      setCompletenessScore(null);
+      setWordResults([]);
+      setRecognizedText("");
+      setGptFeedback("");
+      setSttError(getUnscoredAttemptAcceptedMessage(nativeLang));
+      return true;
+    } finally {
+      if (unscoredAcceptingRef.current === attemptGeneration) {
+        unscoredAcceptingRef.current = null;
+      }
+    }
   }, [isCurrentPracticeAttempt, isGuidedSentenceMission, nativeLang, recordSpokenAttempt]);
 
   const offerContinueWithoutScore = useCallback((attemptGeneration: number) => {
@@ -1527,15 +1549,16 @@ export default function SpeakScreen() {
       if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
       const data = await apiRes.json() as PronunciationAssessResponse;
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
+      if (data.success !== true) {
+        processScoreData(data);
+        offerContinueWithoutScore(attemptGeneration);
+        return;
+      }
       const scoreVal = processScoreData(data);
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase?.word ?? ""); }
       else { await removeWeakWord(phrase?.word ?? ""); }
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
-      if (data.success !== true) {
-        await acceptUnscoredGuidedAttempt(attemptGeneration);
-        return;
-      }
       const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
       if (counted) {
@@ -1753,16 +1776,17 @@ export default function SpeakScreen() {
           if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
           const data = await apiRes.json() as PronunciationAssessResponse;
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
+          if (data.success !== true) {
+            processScoreData(data);
+            offerContinueWithoutScore(attemptGeneration);
+            return;
+          }
 
           const scoreVal = processScoreData(data);
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           if (scoreVal < WEAK_THRESHOLD) { await saveWeakWord(phrase.word); }
           else { await removeWeakWord(phrase.word); }
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
-          if (data.success !== true) {
-            await acceptUnscoredGuidedAttempt(attemptGeneration);
-            return;
-          }
           const counted = await recordSpokenAttempt(scoreVal, attemptGeneration, "scored");
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
           if (counted) {

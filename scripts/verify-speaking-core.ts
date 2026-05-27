@@ -176,9 +176,11 @@ assert.ok(
   "Accepted unscored speech should still award XP so the attempt-over-accuracy philosophy is real"
 );
 assert.ok(
-  speakSource.includes("if (data.success !== true) {\n        await acceptUnscoredGuidedAttempt(attemptGeneration);") &&
-  speakSource.includes("if (data.success !== true) {\n            await acceptUnscoredGuidedAttempt(attemptGeneration);"),
-  "Recordable audio with an unrecognized provider result should still count as an unscored guided attempt"
+  speakSource.includes("if (data.success !== true) {\n        processScoreData(data);\n        offerContinueWithoutScore(attemptGeneration);") &&
+  speakSource.includes("if (data.success !== true) {\n            processScoreData(data);\n            offerContinueWithoutScore(attemptGeneration);") &&
+  !speakSource.includes("if (data.success !== true) {\n        await acceptUnscoredGuidedAttempt(attemptGeneration);") &&
+  !speakSource.includes("if (data.success !== true) {\n            await acceptUnscoredGuidedAttempt(attemptGeneration);"),
+  "Recordable audio with an unrecognized provider result should ask before counting an unscored guided attempt"
 );
 assert.ok(
   speakSource.includes("typeof MediaRecorderCtor !== \"function\"") &&
@@ -194,8 +196,23 @@ assert.ok(
   "Network or server scoring failures should ask before counting an unscored speaking attempt"
 );
 assert.ok(
-  speakSource.includes("if (counted) setSpokenAttemptAccepted(true);"),
+  speakSource.includes("if (!counted) {") &&
+  speakSource.includes("setSpokenAttemptAccepted(true);"),
   "Unscored acceptance should only show as accepted after the guided sentence is actually counted"
+);
+const unscoredAcceptGuardIndex = speakSource.indexOf("if (unscoredAcceptingRef.current === attemptGeneration) return false;");
+const unscoredAcceptSetIndex = speakSource.indexOf("unscoredAcceptingRef.current = attemptGeneration;");
+const unscoredRecordIndex = speakSource.indexOf('const counted = await recordSpokenAttempt(0, attemptGeneration, "unscored");');
+const unscoredCountedGuardIndex = speakSource.indexOf("if (!counted) {", unscoredRecordIndex);
+const unscoredSetAcceptedIndex = speakSource.indexOf("setSpokenAttemptAccepted(true);", unscoredRecordIndex);
+assert.ok(
+  speakSource.includes("const unscoredAcceptingRef = useRef<number | null>(null)") &&
+  unscoredAcceptGuardIndex >= 0 &&
+  unscoredAcceptSetIndex > unscoredAcceptGuardIndex &&
+  unscoredRecordIndex > unscoredAcceptSetIndex &&
+  unscoredCountedGuardIndex > unscoredRecordIndex &&
+  unscoredSetAcceptedIndex > unscoredCountedGuardIndex,
+  "Count-without-score should be reentrancy guarded and must not mark accepted when progress was not counted"
 );
 assert.ok(
   homeSource.includes("getSpeakingCountForLanguage(day, effectiveLearningLang)") &&
