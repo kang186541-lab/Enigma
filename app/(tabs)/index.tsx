@@ -36,8 +36,9 @@ import {
 import { getDueCount } from "@/lib/srsManager";
 import { getTodayNote } from "@/data/culturalNotes";
 import { trackLearningEvent } from "@/lib/learningEvents";
-import { loadLearnerProfile, markBasicCourseCompleted, type LearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
+import { loadCardPractice, loadLearnerProfile, markBasicCourseCompleted, type LearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
 import { getSpeakingCountForLanguage, loadTodaySpeakingProgress, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
+import { localDateString } from "@/lib/progressStorage";
 import {
   getHomeGoalPrompt,
   getHomeLearningGoalOptions,
@@ -46,6 +47,7 @@ import {
 
 const { width } = Dimensions.get("window");
 const rudyBadgeImg = require("@/assets/rudy_badge.png");
+const HOME_CARD_DAILY_GOAL = 10;
 
 const LANG_FLAGS: Record<NativeLanguage, string> = {
   korean: "🇰🇷", english: "🇬🇧", spanish: "🇪🇸",
@@ -213,6 +215,7 @@ export default function HomeScreen() {
   const [srsDueCount, setSrsDueCount] = React.useState(0);
   const [primaryGoal, setPrimaryGoal] = React.useState<LearningGoal | null>(null);
   const [spokenToday, setSpokenToday] = React.useState(0);
+  const [cardReviewToday, setCardReviewToday] = React.useState(0);
   const [lastSessionDate, setLastSessionDate] = React.useState<string | null>(null);
   const [showMorePractice, setShowMorePractice] = React.useState(false);
   const [showMoreTools, setShowMoreTools] = React.useState(false);
@@ -257,6 +260,15 @@ export default function HomeScreen() {
       setPrimaryGoal(profile.goals[0] ?? null);
       void refreshBasicCourseCompleted(profile);
     });
+    loadCardPractice(effectiveLearningLang)
+      .then((practice) => {
+        const today = localDateString();
+        setCardReviewToday(practice?.daily?.[today]?.count ?? 0);
+      })
+      .catch((e) => {
+        console.warn("[Home] Failed to load card practice:", e);
+        setCardReviewToday(0);
+      });
     loadTodaySpeakingProgress().then((day) => setSpokenToday(getSpeakingCountForLanguage(day, effectiveLearningLang)));
     AsyncStorage.getItem("@lingua_last_session_date").then(setLastSessionDate);
   }, [effectiveLearningLang, refreshBasicCourseCompleted]);
@@ -317,6 +329,8 @@ export default function HomeScreen() {
   const streakText = getStreakText(activeStreak, nativeLang);
   const todaySpeakingMission = getTodaySpeakingMission(nativeLang, effectiveLearningLang, primaryGoal, spokenToday);
   const displayedSpokenToday = Math.min(spokenToday, SPEAKING_DAILY_GOAL);
+  const displayedCardReviewToday = Math.min(cardReviewToday, HOME_CARD_DAILY_GOAL);
+  const cardReviewDone = displayedCardReviewToday >= HOME_CARD_DAILY_GOAL;
   const spokenProgressPct = Math.min(100, (spokenToday / SPEAKING_DAILY_GOAL) * 100);
   const spokenProgressLabel = nativeLang === "korean"
     ? `오늘 ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL}문장 말했어요`
@@ -386,7 +400,12 @@ export default function HomeScreen() {
       icon: "albums",
       color: C.gold,
       label: nativeLang === "korean" ? "다시 만날 문장" : nativeLang === "spanish" ? "Frases para repetir" : "Repeat Sentences",
-      desc: nativeLang === "korean" ? "잊을 때쯤 다시 말해요" : nativeLang === "spanish" ? "Vuelve a decirlas cuando toca" : "Say them again when they are due",
+      desc: cardReviewDone
+        ? nativeLang === "korean" ? "오늘 복습 완료" : nativeLang === "spanish" ? "Repaso de hoy completo" : "Today's review complete"
+        : nativeLang === "korean" ? "잊을 때쯤 다시 말해요" : nativeLang === "spanish" ? "Vuelve a decirlas cuando toca" : "Say them again when they are due",
+      meta: cardReviewDone
+        ? nativeLang === "korean" ? "완료" : nativeLang === "spanish" ? "Listo" : "Done"
+        : `${displayedCardReviewToday}/${HOME_CARD_DAILY_GOAL}`,
       route: "/(tabs)/cards",
     },
     {
@@ -881,6 +900,11 @@ export default function HomeScreen() {
                 <Text style={styles.quickLabel}>{item.label}</Text>
                 <Text style={styles.quickDesc}>{item.desc}</Text>
               </View>
+              {"meta" in item && item.meta ? (
+                <View style={styles.quickMetaPill}>
+                  <Text style={styles.quickMetaText}>{item.meta}</Text>
+                </View>
+              ) : null}
               <Ionicons name="chevron-forward" size={14} color={C.goldDark} />
             </Pressable>
           ))}
@@ -1486,6 +1510,17 @@ const styles = StyleSheet.create({
   quickText:     { flex: 1 },
   quickLabel:    { fontSize: 15, fontFamily: F.bodySemi, color: C.parchment, marginBottom: 2 },
   quickDesc:     { fontSize: 12, fontFamily: F.body, color: C.goldDim, fontStyle: "italic" },
+  quickMetaPill: {
+    minWidth: 44,
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.35)",
+    backgroundColor: "rgba(201,162,39,0.1)",
+  },
+  quickMetaText: { fontSize: 11, fontFamily: F.label, color: C.gold },
 
   basicCourseRow: {
     alignItems: "center",

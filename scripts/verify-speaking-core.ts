@@ -298,8 +298,12 @@ assert.ok(
   homeSource.includes('AsyncStorage.getItem("@lingua_last_session_date").then(setLastSessionDate)') &&
   homeSource.includes("const activeStreak = getActiveStreak(stats.streak, lastSessionDate)") &&
   homeSource.includes('"Spoken today"') &&
+  homeSource.includes("loadCardPractice(effectiveLearningLang)") &&
+  homeSource.includes("setCardReviewToday(practice?.daily?.[today]?.count ?? 0)") &&
+  homeSource.includes("const displayedCardReviewToday = Math.min(cardReviewToday, HOME_CARD_DAILY_GOAL)") &&
+  homeSource.includes("quickMetaPill") &&
   !homeSource.includes('value: `${stats.wordsLearned}`'),
-  "Home should display date-accurate active streaks and a live spoken-sentence metric instead of dead Words"
+  "Home should display date-accurate active streaks, live spoken-sentence metrics, and today's card-review progress instead of dead Words"
 );
 assert.ok(
   !speakSource.includes("setSpokenAttemptAccepted(true);\n      const counted = await recordSpokenAttempt") &&
