@@ -25,7 +25,7 @@ interface Props {
   nativeLang: string;
   lc: "ko" | "en" | "es";
   learningLang: string;
-  onComplete: (correctCount: number) => void;
+  onComplete: (spokenAttempts: number) => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   const mediaRecRef  = useRef<any>(null);
   const pulseAnim    = useRef(new Animated.Value(1)).current;
   const pulseLoop    = useRef<Animated.CompositeAnimation | null>(null);
-  const shakeAnim    = useRef(new Animated.Value(0)).current;
+  const spokenAttemptsRef = useRef(0);
 
   const apiBase    = getApiUrl();
   const currentQuiz: FillBlankQuiz | undefined = data.quizzes[quizIdx];
@@ -98,7 +98,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       setSpeakPhase("idle");
       setSpeakScore(null);
     } else {
-      onComplete(correctCount);
+      onComplete(spokenAttemptsRef.current);
     }
   }, [correctCount, currentQuiz, data.quizzes.length, onComplete, quizIdx, screenPhase]);
 
@@ -138,16 +138,6 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     pulseAnim.setValue(1);
   }
 
-  function triggerShake() {
-    Animated.sequence([
-      Animated.timing(shakeAnim, { toValue: 8,  duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: -8, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 6,  duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: -6, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 0,  duration: 50, useNativeDriver: true }),
-    ]).start();
-  }
-
   // ── Submit answer ─────────────────────────────────────────────────────────────
 
   function submitAnswer(choice: string) {
@@ -161,13 +151,12 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       setCorrectCount(c => c + 1);
       setTimeout(() => setQuizPhase("correct"), 200);
     } else {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      triggerShake();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       const wrongMsg = nativeLang === "korean"
-        ? `정답은 "${quiz.answer}"이에요.`
+        ? `거의 왔어요. Rudy는 "${quiz.answer}"로 말해요.`
         : nativeLang === "spanish"
-        ? `La respuesta correcta es "${quiz.answer}".`
-        : `The correct answer is "${quiz.answer}".`;
+        ? `Casi. Rudy lo diría así: "${quiz.answer}".`
+        : `Almost. Rudy would say it this way: "${quiz.answer}".`;
       setWrongFeedback(wrongMsg);
       setTimeout(() => setQuizPhase("wrong"), 200);
     }
@@ -302,6 +291,10 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     return typeof t === "string" && t.trim().length > 0;
   }
 
+  function markSpokenAttempt() {
+    spokenAttemptsRef.current += 1;
+  }
+
   async function submitSpeakAssessment(base64: string, mimeType: string) {
     // Empty audio guard
     if (!isValidAudio(base64)) {
@@ -310,6 +303,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       setSpeakPhase("done");
       return;
     }
+    markSpokenAttempt();
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -359,7 +353,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       setSpeakPhase("idle");
       setSpeakScore(null);
     } else {
-      onComplete(correctCount);
+      onComplete(spokenAttemptsRef.current);
     }
   }
 
@@ -468,7 +462,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       </View>
 
       {/* Prompt with blank */}
-      <Animated.View style={[s.promptCard, { transform: [{ translateX: shakeAnim }] }]}>
+      <Animated.View style={s.promptCard}>
         <Text style={s.promptInstruct}>
           {nativeLang === "korean" ? "빈칸을 채워보세요" : nativeLang === "spanish" ? "Completa el espacio" : "Fill in the blank"}
         </Text>
@@ -708,7 +702,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 8, paddingVertical: 2, alignItems: "center",
   },
   blankCorrect: { borderBottomColor: "#4caf50" },
-  blankWrong:   { borderBottomColor: "#f44336" },
+  blankWrong:   { borderBottomColor: C.goldDim },
   blankInput: {
     fontSize: 18, fontFamily: F.header, color: C.gold,
     minWidth: 60, textAlign: "center",
@@ -716,8 +710,8 @@ const s = StyleSheet.create({
   },
   blankText:        { fontSize: 18, fontFamily: F.header, color: C.gold },
   blankTextCorrect: { color: "#4caf50" },
-  blankTextWrong:   { color: "#f44336" },
-  wrongMsg:    { fontSize: 13, fontFamily: F.body, color: "#f44336", textAlign: "center" },
+  blankTextWrong:   { color: C.goldDim },
+  wrongMsg:    { fontSize: 13, fontFamily: F.body, color: C.goldDim, textAlign: "center" },
   correctRow:  { flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" },
   correctText: { fontSize: 13, fontFamily: F.bodySemi, color: "#4caf50" },
 

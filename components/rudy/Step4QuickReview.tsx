@@ -23,7 +23,7 @@ interface Props {
   nativeLang: string;
   lc: "ko" | "en" | "es";
   learningLang: string;
-  onComplete: (pronScores: number[]) => void;
+  onComplete: (pronScores: number[], spokenAttempts: number) => void;
 }
 
 // ── Helper ────────────────────────────────────────────────────────────────────
@@ -76,6 +76,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   const [selectedOption, setSelected] = useState<string | null>(null);
   const [pronScore, setPronScore]     = useState<number | null>(null);
   const [allScores, setAllScores]     = useState<number[]>([]);
+  const spokenAttemptsRef = useRef(0);
   const [stars, setStars]             = useState(0);
   const [wordScores, setWordScores]   = useState<WordScore[]>([]);
   const [timerRunning, setTimerRunning] = useState(false);
@@ -296,6 +297,10 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     setQPhase("revealed");
   }
 
+  function markSpokenAttempt() {
+    spokenAttemptsRef.current += 1;
+  }
+
   async function stopRecordAndAssess(currentQ: ReviewQuestion) {
     if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
     stopPulse();
@@ -358,6 +363,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       if (skipTimerRef.current) { clearTimeout(skipTimerRef.current); skipTimerRef.current = null; }
       setCanSkipScoring(false); setQPhase("revealed"); return;
     }
+    markSpokenAttempt();
 
     // Show skip button after 5 seconds
     setCanSkipScoring(false);
@@ -450,7 +456,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (qIndex + 1 >= total) {
       setShowComplete(true);
-      setTimeout(() => onComplete(allScores), 1500);
+      setTimeout(() => onComplete(allScores, spokenAttemptsRef.current), 1500);
       return;
     }
     setQIndex((i) => i + 1);
@@ -686,7 +692,7 @@ const s = StyleSheet.create({
   },
   optSelected: { backgroundColor: C.gold, borderColor: C.gold },
   optCorrect:  { backgroundColor: "#4caf50", borderColor: "#4caf50" },
-  optWrong:    { backgroundColor: "#e55757", borderColor: "#e55757" },
+  optWrong:    { backgroundColor: "rgba(201,162,39,0.16)", borderColor: C.goldDim },
   optBtnText:  { fontSize: 14, fontFamily: F.bodySemi, color: C.parchment },
 
   fullSentenceBox: {

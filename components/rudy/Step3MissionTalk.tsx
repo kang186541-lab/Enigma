@@ -117,7 +117,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const [ttsPlaying, setTtsPlaying]   = useState(false);
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [inputText, setInputText]     = useState("");
-  const [totalSentences, setTotalSentences] = useState(0);
+  const [spokenSentences, setSpokenSentences] = useState(0);
   const [grammarNotes, setGrammarNotes]    = useState<string[]>([]);
   const [usedKeyboard, setUsedKeyboard]    = useState(false);
   const [step3Done, setStep3Done] = useState(false);
@@ -129,6 +129,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const autoStopRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
   const doneTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef     = useRef(true);
+  const spokenSentencesRef = useRef(0);
   const audioChunksRef = useRef<Blob[]>([]);
   const mediaRecRef    = useRef<any>(null);
   const soundRef       = useRef<Audio.Sound | null>(null);
@@ -232,7 +233,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       };
 
       if (!mountedRef.current) return { text: json.reply, ok: true };
-      if (json.sentenceCount > 0) setTotalSentences(json.sentenceCount);
       if (json.grammarNote) setGrammarNotes((prev) => [...prev, json.grammarNote]);
       if (json.shouldEnd) {
         if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
@@ -571,6 +571,10 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     try {
       sttFailCount.current = 0;   // reset on successful send
       if (!isVoice) setUsedKeyboard(true);
+      if (isVoice) {
+        spokenSentencesRef.current += 1;
+        setSpokenSentences(spokenSentencesRef.current);
+      }
       const userMsg: ChatMsg = { role: "user", text, isVoice };
       const newMsgs = [...messages, userMsg];
       setMessages(newMsgs);
@@ -745,16 +749,16 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
             <Text style={s.inlineDoneTitle}>{doneMsg}</Text>
             <Text style={s.inlineDoneStat}>
               {nativeLang === "korean"
-                ? `🗣️ 말한 문장: ${totalSentences}문장`
+                ? `🗣️ 말한 문장: ${spokenSentences}문장`
                 : nativeLang === "spanish"
-                ? `🗣️ Frases habladas: ${totalSentences}`
-                : `🗣️ Sentences spoken: ${totalSentences}`}
+                ? `🗣️ Frases habladas: ${spokenSentences}`
+                : `🗣️ Sentences spoken: ${spokenSentences}`}
             </Text>
             <Pressable
               style={({ pressed }) => [s.inlineDoneBtn, pressed && { opacity: 0.82 }]}
               onPress={() => {
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                onComplete(totalSentences, !usedKeyboard, grammarNotes);
+                onComplete(spokenSentencesRef.current, !usedKeyboard, grammarNotes);
               }}
             >
               <Text style={s.inlineDoneBtnText}>
@@ -856,7 +860,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       <View style={s.counterRow}>
         <Ionicons name="chatbubble-outline" size={13} color={C.goldDim} />
         <Text style={s.counterText}>
-          {totalSentences} {nativeLang === "korean" ? "문장 말함" : nativeLang === "spanish" ? "oraciones" : "sentences"}
+          {spokenSentences} {nativeLang === "korean" ? "문장 말함" : nativeLang === "spanish" ? "oraciones" : "sentences"}
         </Text>
       </View>
 

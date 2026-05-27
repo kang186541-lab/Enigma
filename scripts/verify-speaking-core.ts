@@ -28,6 +28,10 @@ const cardsSource = readFileSync("app/(tabs)/cards.tsx", "utf8");
 const basicCourseSource = readFileSync("app/basic-course.tsx", "utf8");
 const dailyLessonSource = readFileSync("app/daily-lesson.tsx", "utf8");
 const languageContextSource = readFileSync("context/LanguageContext.tsx", "utf8");
+const rudyLessonSource = readFileSync("app/rudy-lesson.tsx", "utf8");
+const rudyStep2Source = readFileSync("components/rudy/Step2KeyPoint.tsx", "utf8");
+const rudyStep3Source = readFileSync("components/rudy/Step3MissionTalk.tsx", "utf8");
+const rudyStep4Source = readFileSync("components/rudy/Step4QuickReview.tsx", "utf8");
 
 const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string[]>> = {
   english: {
@@ -231,6 +235,29 @@ assert.ok(
   !languageContextSource.includes("const native = nativeLanguage ?? (isNativeLanguage(storedNative)") &&
   !homeSource.includes('learningLanguage ?? "english"'),
   "Language fallback should use the effective target language, including sequential native/learning changes"
+);
+assert.ok(
+  rudyLessonSource.includes("SPEAKING_DAILY_GOAL") &&
+  rudyLessonSource.includes("recordSpokenSentence") &&
+  rudyLessonSource.includes("sentenceCountRef.current < SPEAKING_DAILY_GOAL") &&
+  !rudyLessonSource.includes("onSentenceSpoken(correct)") &&
+  !rudyLessonSource.includes("missionSentCount") &&
+  !rudyLessonSource.includes("sentenceCount + missionSentCount"),
+  "Rudy Training Camp should use a real spoken-attempt counter and gate completion on the shared daily speaking goal"
+);
+assert.ok(
+  rudyStep2Source.includes("onComplete(spokenAttemptsRef.current)") &&
+  rudyStep3Source.includes("spokenSentencesRef.current") &&
+  rudyStep3Source.includes("onComplete(spokenSentencesRef.current") &&
+  rudyStep4Source.includes("onComplete(allScores, spokenAttemptsRef.current)"),
+  "Rudy steps should report actual spoken attempts, not correct answers or GPT text counters"
+);
+assert.ok(
+  !rudyStep2Source.includes("NotificationFeedbackType.Error") &&
+  !rudyStep2Source.includes("#f44336") &&
+  !rudyStep4Source.includes("#e55757") &&
+  rudyStep2Source.includes("Almost. Rudy would say it this way"),
+  "Rudy correction UI should stay coach-like, not punishment-like"
 );
 assert.ok(
   speakSource.includes("contentContainerStyle={[styles.screenScrollContent") &&

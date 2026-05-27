@@ -30,6 +30,7 @@ import {
   getCompletionMessage, type LearningLangKey,
 } from "@/lib/lessonContent";
 import { addDayPhrases } from "@/lib/srsManager";
+import { buildSpeakingPromptKey, recordSpokenSentence, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 import { Step1ListenRepeat } from "@/components/rudy/Step1ListenRepeat";
 import { Step2KeyPoint } from "@/components/rudy/Step2KeyPoint";
 import { Step3MissionTalk } from "@/components/rudy/Step3MissionTalk";
@@ -61,10 +62,11 @@ export default function RudyLessonScreen() {
   const [phase, setPhase] = useState<Phase>("briefing");
   const [currentStep, setCurrentStep] = useState(0);
   const [sentenceCount, setSentenceCount] = useState(0);
-  const [missionSentCount, setMissionSentCount] = useState(0);
+  const sentenceCountRef = useRef(0);
   const [pronScores, setPronScores] = useState<number[]>([]);
   const [usedVoiceOnly, setUsedVoiceOnly] = useState(true);
   const [grammarNotes, setGrammarNotes] = useState<string[]>([]);
+  const [speakingGoalNudge, setSpeakingGoalNudge] = useState(false);
   const [progress, setProgress] = useState<DailyCourseProgress | null>(null);
   const [briefingMsg] = useState(() => getRandomBriefing(nativeLang));
   // Tracks whether this completion is the FIRST clear of this day —
@@ -90,10 +92,36 @@ export default function RudyLessonScreen() {
     }).start();
   }, [currentStep]);
 
+  const addSentenceCount = React.useCallback((count: number) => {
+    const safeCount = Math.max(0, Number.isFinite(count) ? count : 0);
+    if (safeCount <= 0) return;
+    const startCount = sentenceCountRef.current;
+    sentenceCountRef.current += safeCount;
+    setSentenceCount(sentenceCountRef.current);
+    if (sentenceCountRef.current >= SPEAKING_DAILY_GOAL) setSpeakingGoalNudge(false);
+    void (async () => {
+      for (let offset = 0; offset < safeCount; offset += 1) {
+        const promptKey = buildSpeakingPromptKey({
+          targetLanguage: learnLang,
+          source: "rudy-training",
+          phrase: `${day?.id ?? "unknown"}:${startCount + offset + 1}`,
+        });
+        await recordSpokenSentence({ targetLanguage: learnLang, promptKey }).catch((e: unknown) => {
+          console.warn("[RudyLesson] speaking progress save failed:", e);
+        });
+      }
+    })();
+  }, [day?.id, learnLang]);
+
   // Called when each STEP is completed
   function handleStepComplete() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     if (currentStep + 1 >= TOTAL_STEPS) {
+      if (sentenceCountRef.current < SPEAKING_DAILY_GOAL) {
+        setSpeakingGoalNudge(true);
+        setCurrentStep(2);
+        return;
+      }
       completeMission();
     } else {
       setCurrentStep((s) => s + 1);
@@ -112,7 +140,7 @@ export default function RudyLessonScreen() {
       }
       now.todayCompleted = true;
       now.todayStepsCompleted = { listenRepeat: true, keyPoint: true, missionTalk: true, review: true };
-      const totalSpoken = sentenceCount + missionSentCount;
+      const totalSpoken = sentenceCountRef.current;
       const prevStats = now.stats ?? { totalSentencesSpoken: 0, totalDaysCompleted: 0, averagePronunciationScore: 0, currentStreak: 0 };
       now.stats = {
         ...prevStats,
@@ -179,7 +207,7 @@ export default function RudyLessonScreen() {
   if (phase === "complete") {
     return <CompleteScreen
       day={day} nativeLang={nativeLang} lc={lc}
-      sentenceCount={sentenceCount + missionSentCount}
+      sentenceCount={sentenceCount}
       pronScores={pronScores}
       usedVoiceOnly={usedVoiceOnly}
       grammarNotes={grammarNotes}
@@ -195,14 +223,17 @@ export default function RudyLessonScreen() {
       currentStep={currentStep} totalSteps={TOTAL_STEPS}
       stepLabels={stepLabels} stepAnim={stepAnim}
       sentenceCount={sentenceCount}
-      setSentenceCount={setSentenceCount}
+      speakingGoalNudge={speakingGoalNudge}
+      onSentenceSpoken={addSentenceCount}
       onStepComplete={handleStepComplete}
       onMissionComplete={(cnt, voiceOnly, notes) => {
-        setMissionSentCount(cnt);
         if (!voiceOnly) setUsedVoiceOnly(false);
         setGrammarNotes(notes);
       }}
-      onReviewComplete={(scores) => setPronScores(scores)}
+      onReviewComplete={(scores, spoken) => {
+        addSentenceCount(spoken);
+        setPronScores(scores);
+      }}
       insets={insets}
     />
   );
@@ -281,16 +312,17 @@ const SELF_COMPLETING_STEPS = [0, 1, 2, 3];
 
 function LessonScreen({
   day, nativeLang, lc, learningLang, currentStep, totalSteps, stepLabels, stepAnim,
-  sentenceCount, setSentenceCount, onStepComplete, onMissionComplete, onReviewComplete, insets,
+  sentenceCount, speakingGoalNudge, onSentenceSpoken, onStepComplete, onMissionComplete, onReviewComplete, insets,
 }: {
   day: DayData; nativeLang: string; lc: "ko" | "en" | "es"; learningLang: string;
   currentStep: number; totalSteps: number;
   stepLabels: string[]; stepAnim: Animated.Value;
   sentenceCount: number;
-  setSentenceCount: (n: number) => void;
+  speakingGoalNudge: boolean;
+  onSentenceSpoken: (n: number) => void;
   onStepComplete: () => void;
   onMissionComplete: (cnt: number, voiceOnly: boolean, notes: string[]) => void;
-  onReviewComplete: (scores: number[]) => void;
+  onReviewComplete: (scores: number[], spokenAttempts: number) => void;
   insets: ReturnType<typeof useSafeAreaInsets>;
 }) {
   const [stepDone, setStepDone] = useState(false);
@@ -371,6 +403,17 @@ function LessonScreen({
   const completeStepLabel = nativeLang === "korean" ? "단계 완료 →"
     : nativeLang === "spanish" ? "Completar PASO →"
     : "Complete STEP →";
+  const speakingGoalLabel = nativeLang === "korean"
+    ? `오늘 말하기 ${Math.min(sentenceCount, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
+    : nativeLang === "spanish"
+    ? `Hoy hablaste ${Math.min(sentenceCount, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
+    : `Spoken today ${Math.min(sentenceCount, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`;
+  const speakingGoalProgress = Math.min(1, sentenceCount / SPEAKING_DAILY_GOAL);
+  const speakingGoalNudgeText = nativeLang === "korean"
+    ? `조금만 더요. Rudy와 ${SPEAKING_DAILY_GOAL - sentenceCount}문장만 더 말하면 오늘 훈련이 끝나요.`
+    : nativeLang === "spanish"
+    ? `Un poco más. Di ${SPEAKING_DAILY_GOAL - sentenceCount} frases más con Rudy para terminar hoy.`
+    : `A little more. Say ${SPEAKING_DAILY_GOAL - sentenceCount} more sentences with Rudy to finish today.`;
 
   const selfCompletes = SELF_COMPLETING_STEPS.includes(currentStep);
 
@@ -403,6 +446,18 @@ function LessonScreen({
       {/* Progress bar */}
       <View style={styles.lessonProgressTrack}>
         <Animated.View style={[styles.lessonProgressFill, { width: stepWidth }]} />
+      </View>
+      <View style={styles.speakingGoalWrap}>
+        <View style={styles.speakingGoalTop}>
+          <Ionicons name="mic" size={13} color={C.goldDim} />
+          <Text style={styles.speakingGoalText}>{speakingGoalLabel}</Text>
+        </View>
+        <View style={styles.speakingGoalTrack}>
+          <View style={[styles.speakingGoalFill, { width: `${speakingGoalProgress * 100}%` }]} />
+        </View>
+        {speakingGoalNudge && (
+          <Text style={styles.speakingGoalNudge}>{speakingGoalNudgeText}</Text>
+        )}
       </View>
 
       {/* Step tabs */}
@@ -439,7 +494,7 @@ function LessonScreen({
           learningLang={learningLang}
           stepLabels={stepLabels}
           onStepComplete={handleStepDone}
-          onSentenceSpoken={(n) => setSentenceCount(sentenceCount + n)}
+          onSentenceSpoken={onSentenceSpoken}
           onMissionComplete={onMissionComplete}
           onReviewComplete={onReviewComplete}
         />
@@ -510,7 +565,7 @@ function StepContent({
   stepLabels: string[]; onStepComplete: () => void;
   onSentenceSpoken: (n: number) => void;
   onMissionComplete: (cnt: number, voiceOnly: boolean, notes: string[]) => void;
-  onReviewComplete: (scores: number[]) => void;
+  onReviewComplete: (scores: number[], spokenAttempts: number) => void;
 }) {
   const dayContent = LESSON_CONTENT[day.id];
   const langContent = dayContent?.[learningLang as LearningLangKey];
@@ -566,8 +621,8 @@ function StepContent({
           nativeLang={nativeLang}
           lc={lc}
           learningLang={learningLang}
-          onComplete={(correct) => {
-            onSentenceSpoken(correct);
+          onComplete={(spoken) => {
+            onSentenceSpoken(spoken);
             onStepComplete();
           }}
         />
@@ -629,8 +684,8 @@ function StepContent({
           nativeLang={nativeLang}
           lc={lc}
           learningLang={learningLang}
-          onComplete={(scores) => {
-            onReviewComplete(scores);
+          onComplete={(scores, spokenAttempts) => {
+            onReviewComplete(scores, spokenAttempts);
             onStepComplete();
           }}
         />
@@ -882,6 +937,19 @@ const styles = StyleSheet.create({
     height: 3, backgroundColor: "rgba(201,162,39,0.12)", overflow: "hidden",
   },
   lessonProgressFill: { height: "100%", backgroundColor: C.gold },
+  speakingGoalWrap: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 12,
+    gap: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(201,162,39,0.10)",
+  },
+  speakingGoalTop: { flexDirection: "row", alignItems: "center", gap: 6 },
+  speakingGoalText: { fontSize: 12, fontFamily: F.bodySemi, color: C.goldDim },
+  speakingGoalTrack: { height: 5, borderRadius: 999, backgroundColor: "rgba(201,162,39,0.12)", overflow: "hidden" },
+  speakingGoalFill: { height: "100%", borderRadius: 999, backgroundColor: C.gold },
+  speakingGoalNudge: { fontSize: 12, fontFamily: F.body, color: C.parchment, lineHeight: 17 },
 
   stepTabs: { flexDirection: "row", gap: 6, paddingHorizontal: 16, paddingVertical: 10 },
   stepTab: {
