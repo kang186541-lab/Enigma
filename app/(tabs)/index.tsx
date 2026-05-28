@@ -418,7 +418,11 @@ export default function HomeScreen() {
     { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
   ];
 
-  const missionLabel  = nativeLang === "korean" ? "오늘의 말하기 · 10분" : nativeLang === "spanish" ? "Hablar hoy · 10 min" : "Today's Speaking · 10 min";
+  // Name the Training-Camp divider after the camp itself ("루디의 훈련소"), not
+  // "오늘의 말하기 · 10분" — that collided with the speaking hero above it and
+  // mislabeled the 4-step routine as the daily speaking mission. The "10분"
+  // length cue now lives only inside the camp card (start button / done msg).
+  const missionLabel  = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : "Rudy's Training Camp";
   const npcMissionLabel = nativeLang === "korean" ? "실전 미션" : nativeLang === "spanish" ? "Misión Real" : "Real Mission";
   const npcMissionDesc  = nativeLang === "korean" ? "NPC와 실제 상황 문장을 주고받아요" : nativeLang === "spanish" ? "Habla con NPC en situaciones reales" : "Speak real situation lines with NPCs";
 
@@ -444,9 +448,11 @@ export default function HomeScreen() {
                 size={12}
                 color={syncStatus.status === "error" ? "#f3a0a0" : C.goldDim}
               />
-              <Text style={[styles.syncChipText, syncStatus.status === "error" && styles.syncChipTextError]} numberOfLines={1}>
-                {syncLabel}
-              </Text>
+              {(!user || syncStatus.status === "error") && (
+                <Text style={[styles.syncChipText, syncStatus.status === "error" && styles.syncChipTextError]} numberOfLines={1}>
+                  {syncLabel}
+                </Text>
+              )}
             </View>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -1062,8 +1068,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.bg1 },
 
   /* ─ HEADER ─ */
-  header: { paddingHorizontal: 20, paddingBottom: 22 },
-  headerTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 14 },
+  header: { paddingHorizontal: 20, paddingBottom: 16 },
+  headerTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 },
   greeting: { fontSize: 14, fontFamily: F.body, color: C.goldDim, fontStyle: "italic", marginBottom: 4 },
   headerTitle: { fontSize: 30, fontFamily: F.title, color: C.gold, letterSpacing: 3 },
   syncChip: {
@@ -1087,12 +1093,12 @@ const styles = StyleSheet.create({
   syncChipText: { fontSize: 10, fontFamily: F.bodySemi, color: C.goldDim },
   syncChipTextError: { color: "#f3a0a0" },
   lingoHeader: {
-    width: 72, height: 72, borderRadius: 36,
+    width: 62, height: 62, borderRadius: 31,
     overflow: "hidden",
     borderWidth: 2, borderColor: C.gold,
     marginLeft: 8,
   },
-  levelRow: { marginBottom: 10, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  levelRow: { marginBottom: 7, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   levelBadge: {
     flexDirection: "row", alignItems: "center", gap: 5,
     backgroundColor: "rgba(201,162,39,0.12)",
@@ -1131,7 +1137,7 @@ const styles = StyleSheet.create({
     transform: [{ skewX: "-20deg" }],
   },
   xpLabel:   { fontSize: 11, fontFamily: F.body, color: C.goldDim },
-  headerBorder: { marginTop: 16, height: 1, backgroundColor: C.gold, opacity: 0.4 },
+  headerBorder: { marginTop: 12, height: 1, backgroundColor: C.gold, opacity: 0.4 },
 
   /* ─ TODAY SPEAKING MISSION ─ */
   todaySpeechCard: {

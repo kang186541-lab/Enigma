@@ -2,11 +2,12 @@ import { loadLearnerProfile, saveLearnerProfile, type SpeakingDayProgress, type 
 
 // Daily spoken-sentence target. This is a PRODUCT LEVER, not just copy: it
 // gates `dailyGoalMet`, which un-collapses the home dashboard and lifts
-// "focus mode" (say today's sentences first). Too low and focus mode dies
-// instantly; too high and the dashboard never unlocks for casual users. 7
-// keeps focus mode meaningful (~5-7 min of short lines) and mirrors the
-// 7-day week/streak framing in the UI.
-export const SPEAKING_DAILY_GOAL = 7;
+// "focus mode" (say today's sentences first). It's the "good session" bar,
+// NOT the streak bar (the streak counts from a single sentence). Kept low (5)
+// so a hesitant beginner can clear it on a low-motivation day — an unreachable
+// goal turns focus mode into a wall, not a ramp — and so the number echoes the
+// "Rudy와 5분" brand promise.
+export const SPEAKING_DAILY_GOAL = 5;
 
 function getLocalDateKey(date = new Date()): string {
   const year = date.getFullYear();
