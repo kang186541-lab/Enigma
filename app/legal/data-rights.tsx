@@ -184,7 +184,7 @@ async function downloadExport(): Promise<void> {
   if (Platform.OS === "web") {
     const res = await apiRequest("GET", "/api/me/export");
     const blob = await res.blob();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const w: any = globalThis as any;
     const url = w.URL?.createObjectURL?.(blob);
     if (!url || !w.document) throw new Error("download-unsupported");

@@ -161,7 +161,7 @@ export default function TermsScreen() {
     nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
   const [lc, setLc] = useState<LangKey>(defaultLc);
 
-  const sections: Array<[keyof typeof T, keyof typeof T]> = [
+  const sections: [keyof typeof T, keyof typeof T][] = [
     ["intro_h",        "intro_b"],
     ["account_h",      "account_b"],
     ["age_h",          "age_b"],

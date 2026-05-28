@@ -160,7 +160,7 @@ export default function PrivacyScreen() {
     nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
   const [lc, setLc] = useState<LangKey>(defaultLc);
 
-  const sections: Array<[keyof typeof T, keyof typeof T]> = [
+  const sections: [keyof typeof T, keyof typeof T][] = [
     ["intro_h",        "intro_b"],
     ["controller_h",   "controller_b"],
     ["collect_h",      "collect_b"],

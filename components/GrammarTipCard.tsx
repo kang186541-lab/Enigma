@@ -14,8 +14,8 @@ import { C, F } from "@/constants/theme";
 
 interface GrammarTip {
   pattern: { ko: string; en: string; es: string };
-  examples: Array<{ ko: string; en: string; es: string }>;
-  mistakes?: Array<{ ko: string; en: string; es: string }>;
+  examples: { ko: string; en: string; es: string }[];
+  mistakes?: { ko: string; en: string; es: string }[];
   rudyTip?: { ko: string; en: string; es: string };
 }
 

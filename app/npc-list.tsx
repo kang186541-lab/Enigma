@@ -16,12 +16,12 @@ import { useLanguage } from "@/context/LanguageContext";
 import { NPCS, NPC, NPC_REL_LEVELS, NPC_EMOTIONS, getRelTier, getRelLabel, RelationshipTier, NPC_UNLOCK_CHAPTER, CHAPTER_ID_MAP } from "@/constants/npcs";
 import { C, F } from "@/constants/theme";
 
+// ─── Language Wound Data ──────────────────────────────────────────────────────
+import languageWoundsRaw from "@/data/storyMode/characters.json";
+
 const REL_KEY = "npcRelationships";
 const EMO_KEY = "npcEmotions";
 const STORY_PROGRESS_KEY = "lingo_story_progress";
-
-// ─── Language Wound Data ──────────────────────────────────────────────────────
-import languageWoundsRaw from "@/data/storyMode/characters.json";
 
 interface LanguageWound {
   npcId: string;

@@ -45,8 +45,8 @@ export default function StatsDashboard() {
   const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
   const dayNames = lc === "ko" ? DAYS_KO : lc === "es" ? DAYS_ES : DAYS_EN;
 
-  const [weekData, setWeekData] = useState<Array<{ date: string; totalXP: number }>>([]);
-  const [monthData, setMonthData] = useState<Array<{ date: string; sessions: number }>>([]);
+  const [weekData, setWeekData] = useState<{ date: string; totalXP: number }[]>([]);
+  const [monthData, setMonthData] = useState<{ date: string; sessions: number }[]>([]);
   const [summary, setSummary] = useState({ totalSessions: 0, totalXP: 0, totalTimeMs: 0, skillBreakdown: {} as Record<string, number> });
 
   useEffect(() => {
