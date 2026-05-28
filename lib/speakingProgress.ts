@@ -1,6 +1,12 @@
 import { loadLearnerProfile, saveLearnerProfile, type SpeakingDayProgress, type SpeakingProgress } from "@/lib/learnerProfile";
 
-export const SPEAKING_DAILY_GOAL = 19;
+// Daily spoken-sentence target. This is a PRODUCT LEVER, not just copy: it
+// gates `dailyGoalMet`, which un-collapses the home dashboard and lifts
+// "focus mode" (say today's sentences first). Too low and focus mode dies
+// instantly; too high and the dashboard never unlocks for casual users. 7
+// keeps focus mode meaningful (~5-7 min of short lines) and mirrors the
+// 7-day week/streak framing in the UI.
+export const SPEAKING_DAILY_GOAL = 7;
 
 function getLocalDateKey(date = new Date()): string {
   const year = date.getFullYear();

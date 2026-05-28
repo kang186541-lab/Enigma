@@ -310,7 +310,10 @@ export default function HomeScreen() {
 
   const barW = xpAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] });
   const activeStreak = getActiveStreak(stats.streak, lastSessionDate);
-  const lingoMood = activeStreak === 0 ? "sad" : activeStreak >= 7 ? "excited" : "happy";
+  // Only greet a *lapsed* learner (had a streak/XP, now broken) with the sad
+  // mascot. A brand-new day-one user (no history) should be welcomed warmly.
+  const hasLearningHistory = stats.xp > 0 || !!lastSessionDate;
+  const lingoMood = activeStreak >= 7 ? "excited" : activeStreak > 0 ? "happy" : hasLearningHistory ? "sad" : "happy";
   const weekData   = getWeekStreakData(stats.streak, nativeLang, lastSessionDate);
   const streakText = getStreakText(activeStreak, nativeLang);
   const todaySpeakingMission = getTodaySpeakingMission(nativeLang, effectiveLearningLang, primaryGoal, spokenToday);
@@ -336,8 +339,8 @@ export default function HomeScreen() {
     ? "Primero di tus frases reales de hoy. Después puedes repasar, jugar historia o hablar con NPCs."
     : "Say today's real sentences first. Then review, story, and NPC practice stay one tap away.";
   const moreToolsTitle = showMoreTools
-    ? nativeLang === "korean" ? "추가 연습 접기" : nativeLang === "spanish" ? "Ocultar práctica extra" : "Hide extra practice"
-    : nativeLang === "korean" ? "추가 연습 더 보기" : nativeLang === "spanish" ? "Ver más práctica" : "Show more practice";
+    ? nativeLang === "korean" ? "통계·문화·빠른 연습 접기" : nativeLang === "spanish" ? "Ocultar estadísticas y práctica" : "Hide stats & quick practice"
+    : nativeLang === "korean" ? "통계·문화·빠른 연습 더 보기" : nativeLang === "spanish" ? "Más: estadísticas, cultura y práctica" : "More: stats, culture & quick practice";
   const moreToolsSub = nativeLang === "korean"
     ? "통계, 문화노트, 빠른 학습은 말하기 흐름 뒤에 가볍게 열어요."
     : nativeLang === "spanish"
@@ -464,13 +467,21 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Level badge + Language change row */}
+        {/* Level badge + always-visible streak + Language change row */}
         <View style={styles.levelRow}>
-          <View style={styles.levelBadge}>
-            <EmojiText style={styles.levelEmoji}>{level.emoji}</EmojiText>
-            <Text style={styles.levelName}>{getLevelName(level, nativeLang)}</Text>
-            <View style={styles.levelDot} />
-            <Text style={styles.levelNum}>{t("level")} {level.num}</Text>
+          <View style={styles.levelLeftGroup}>
+            <View style={styles.levelBadge}>
+              <EmojiText style={styles.levelEmoji}>{level.emoji}</EmojiText>
+              <Text style={styles.levelName}>{getLevelName(level, nativeLang)}</Text>
+              <View style={styles.levelDot} />
+              <Text style={styles.levelNum}>{t("level")} {level.num}</Text>
+            </View>
+            {activeStreak > 0 && (
+              <View style={styles.headerStreakChip} accessible accessibilityLabel={streakText}>
+                <EmojiText style={styles.headerStreakEmoji}>🔥</EmojiText>
+                <Text style={styles.headerStreakText}>{activeStreak}</Text>
+              </View>
+            )}
           </View>
           <Pressable
             style={({ pressed }) => [styles.langChip, pressed && { opacity: 0.75 }]}
@@ -489,9 +500,11 @@ export default function HomeScreen() {
         <View style={styles.xpSection}>
           <View style={styles.xpTrack}>
             <Animated.View style={[styles.xpFill, { width: barW }]}>
-              <Animated.View
-                style={[styles.shimmer, { transform: [{ translateX: shimmerX }] }]}
-              />
+              {level.num < 5 && (
+                <Animated.View
+                  style={[styles.shimmer, { transform: [{ translateX: shimmerX }] }]}
+                />
+              )}
             </Animated.View>
           </View>
           <Text style={styles.xpLabel}>
@@ -593,7 +606,7 @@ export default function HomeScreen() {
             <View style={styles.todaySpeechProgressTop}>
               <Text style={styles.todaySpeechProgressText}>{spokenProgressLabel}</Text>
               <Text style={styles.todaySpeechProgressGoal}>
-                {nativeLang === "korean" ? "목표 19" : nativeLang === "spanish" ? "Meta 19" : "Goal 19"}
+                {nativeLang === "korean" ? `목표 ${SPEAKING_DAILY_GOAL}` : nativeLang === "spanish" ? `Meta ${SPEAKING_DAILY_GOAL}` : `Goal ${SPEAKING_DAILY_GOAL}`}
               </Text>
             </View>
             <View style={styles.todaySpeechProgressTrack}>
@@ -818,7 +831,7 @@ export default function HomeScreen() {
           accessibilityLabel={moreToolsTitle}
         >
           <View style={styles.morePracticeGateIcon}>
-            <Ionicons name={showMoreTools ? "chevron-up" : "chevron-down"} size={18} color={C.gold} />
+            <Ionicons name="stats-chart" size={17} color={C.gold} />
           </View>
           <View style={styles.morePracticeGateText}>
             <Text style={styles.morePracticeGateTitle}>{moreToolsTitle}</Text>
@@ -1090,6 +1103,15 @@ const styles = StyleSheet.create({
   levelName:  { fontSize: 13, fontFamily: F.bodySemi, color: C.gold },
   levelDot:   { width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.goldDark },
   levelNum:   { fontSize: 12, fontFamily: F.body, color: C.goldDim },
+  levelLeftGroup: { flexDirection: "row", alignItems: "center", gap: 8, flexShrink: 1 },
+  headerStreakChip: {
+    flexDirection: "row", alignItems: "center", gap: 3,
+    backgroundColor: "rgba(201,162,39,0.12)",
+    borderWidth: 1, borderColor: C.border,
+    paddingHorizontal: 9, paddingVertical: 5, borderRadius: 20,
+  },
+  headerStreakEmoji: { fontSize: 12 },
+  headerStreakText: { fontSize: 12, fontFamily: F.bodySemi, color: C.gold },
   langChip: {
     flexDirection: "row", alignItems: "center", gap: 6,
     backgroundColor: "rgba(201,162,39,0.08)",
@@ -1411,17 +1433,17 @@ const styles = StyleSheet.create({
   dailyCard: {
     backgroundColor: C.bg2,
     borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: C.gold,
+    borderWidth: 1,
+    borderColor: C.border,
     padding: 22,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     shadowColor: C.gold,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 3,
   },
   dailyContent: { flex: 1, gap: 12 },
   dailyTopRow:  { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -1459,17 +1481,17 @@ const styles = StyleSheet.create({
   npcMissionCard: {
     backgroundColor: C.bg2,
     borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: "rgba(201,162,39,0.5)",
+    borderWidth: 1,
+    borderColor: C.border,
     padding: 20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     shadowColor: "#c9a227",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 3,
   },
   npcMissionContent: { flex: 1, gap: 10 },
   npcMissionTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
