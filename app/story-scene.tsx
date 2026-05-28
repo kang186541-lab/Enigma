@@ -1094,7 +1094,9 @@ const STORIES: Record<string, Story> = {
      * CEFR A1-A2 — late beginner. User has completed Day 1-18.
      * NPC dialogue should be roughly HALF nativeLang and HALF targetLang.
      * The learned expressions from Day 1-18 appear in English; the rest is native.
-     * TODO: Add textKoMix/textEsMix to key NPC dialogue lines for this chapter.
+     * textKoMix/textEsMix are authored on every NPC dialogue line at a ~50/50
+     * split: native sentence frame with learned English expressions and salient
+     * content words surfaced inline. Narration (isNarration) stays 100% native.
      */
     chapterMeta: {
       cefrLevel: "A1",
@@ -1107,9 +1109,9 @@ const STORIES: Record<string, Story> = {
         "I need ___", "Do you speak ___?", "How do you say ___?",
       ],
       languageNote:
-        "Ch2 dialogue should be ~50% native language / ~50% English (targetLang). " +
-        "Current textKo/textEs are 100% translated — textKoMix/textEsMix not yet added. " +
-        "The 50/50 split should use knownExpressions from Day 1-18.",
+        "Ch2 dialogue is ~50% native language / ~50% English (targetLang). " +
+        "textKoMix/textEsMix surface knownExpressions from Day 1-18 plus key " +
+        "content words inside a native frame; narration stays 100% native.",
     },
     characters: [
       {
@@ -1169,21 +1171,27 @@ const STORIES: Record<string, Story> = {
         charId: "isabel",
         text: "Are you the fox detective? You're late. Also, you're shorter than I expected.",
         textKo: "당신이 여우 탐정이야? 늦었어. 그리고 생각보다 키가 작네.",
+        textKoMix: "당신이 the fox detective야? You're late. 그리고 생각보다 키가 작네.",
         textEs: "¿Eres el detective zorro? Llegas tarde. Además, eres más bajito de lo que esperaba.",
+        textEsMix: "¿Eres the fox detective? You're late. Además, eres más bajito de lo que esperaba.",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "I'm average height, thank you very much. You must be Isabel. Carlos's colleague, the one who called Eleanor.",
         textKo: "평균 신장이거든, 정말 감사해요. 당신이 이사벨이겠지. 카를로스의 동료, 엘리너한테 연락한 사람.",
+        textKoMix: "평균 신장이거든, thank you very much. You must be Isabel. 카를로스의 colleague, Eleanor한테 연락한 사람.",
         textEs: "Soy de estatura promedio, muchas gracias. Debes ser Isabel. La colega de Carlos, la que llamó a Eleanor.",
+        textEsMix: "Soy de estatura promedio, thank you very much. You must be Isabel. La colleague de Carlos, la que llamó a Eleanor.",
       },
       {
         kind: "scene",
         charId: "isabel",
         text: "Eleanor said you were funny. She was wrong. Listen, detective. Carlos disappeared three nights ago from the Prado. He was restoring a medieval fresco. I got his call at ten o'clock. He was screaming.",
         textKo: "엘리너가 재밌는 사람이라고 했는데. 틀렸네. 들어, 탐정. 카를로스가 3일 전에 프라도에서 사라졌어. 중세 프레스코화를 복원하고 있었어. 밤 10시에 전화가 왔어. 소리를 지르고 있었어.",
+        textKoMix: "Eleanor가 재밌는 사람이라고 했는데. She was wrong. Listen, detective. 카를로스가 3일 전에 Prado에서 disappeared. 중세 fresco를 복원하고 있었어. 밤 10시에 전화가 왔어. He was screaming.",
         textEs: "Eleanor dijo que eras gracioso. Se equivocó. Escucha, detective. Carlos desapareció hace tres noches del Prado. Estaba restaurando un fresco medieval. Me llamó a las diez. Estaba gritando.",
+        textEsMix: "Eleanor dijo que eras gracioso. She was wrong. Listen, detective. Carlos disappeared hace tres noches del Prado. Estaba restaurando un fresco medieval. Me llamó a las diez. He was screaming.",
         idiomRef: "idiom_isabel_1",
       },
       {
@@ -1191,7 +1199,9 @@ const STORIES: Record<string, Story> = {
         charId: "isabel",
         text: "Simple words. Not in Spanish. Not in English. Things like 'Hello! Help! Where is the door? Please! Sorry!', basic phrases, like a textbook. In a language I didn't recognize. Over and over. Then the line went dead.",
         textKo: "간단한 단어들. 스페인어가 아니었어. 영어도 아니고. '안녕하세요! 도와주세요! 문이 어디예요? 제발! 죄송합니다!', 교과서 같은 기초 표현을. 내가 모르는 언어로. 계속 반복하다가, 전화가 끊겼어.",
+        textKoMix: "간단한 단어들. 스페인어가 아니었어. 영어도 아니고. 'Hello! Help! Where is the door? Please! Sorry!', 교과서 같은 basic phrases. 내가 모르는 언어로. 계속 반복하다가, 전화가 끊겼어.",
         textEs: "Palabras simples. No en español. Tampoco en inglés. Cosas como '¡Hola! ¡Ayuda! ¿Dónde está la puerta? ¡Por favor! ¡Perdón!', frases básicas, como de libro. En un idioma que no reconocí. Una y otra vez. Luego se cortó la línea.",
+        textEsMix: "Palabras simples. No en español. Tampoco en inglés. Cosas como 'Hello! Help! Where is the door? Please! Sorry!', basic phrases, como de libro. En un idioma que no reconocí. Una y otra vez. Luego se cortó la línea.",
       },
       {
         kind: "scene",
@@ -1284,21 +1294,27 @@ const STORIES: Record<string, Story> = {
         charId: "carlos",
         text: "*shown in a memory flashback* Isabella... escúchame. El lenguaje es poder. They took my words. If you find this... follow the ∆LX. Find the truth. *memory fades*",
         textKo: "*기억 회상 속에서 보인다* 이사벨라... 들어줘. 언어는 힘이야. 그들이 내 말들을 빼앗아 갔어. 이걸 찾으면... ∆LX를 따라가. 진실을 찾아. *기억이 사라진다*",
+        textKoMix: "*기억 회상 속에서 보인다* Isabella... 들어줘. 언어는 power야. They took my words. 이걸 찾으면... follow the ∆LX. Find the truth. *기억이 사라진다*",
         textEs: "*se muestra en un flashback de memoria* Isabella... escúchame. El lenguaje es poder. Tomaron mis palabras. Si encuentras esto... sigue el ∆LX. Encuentra la verdad. *la memoria se desvanece*",
+        textEsMix: "*se muestra en un flashback de memoria* Isabella... escúchame. El lenguaje es power. They took my words. Si encuentras esto... follow the ∆LX. Find the truth. *la memoria se desvanece*",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "He wasn't speaking a foreign language, Isabel. He was speaking in the only language he had left. Something stripped away his Spanish, his English, everything, and left him with nothing but Day One vocabulary. Someone did this to him on purpose.",
         textKo: "이사벨, 그가 외국어를 말한 게 아니야. 그에게 남은 유일한 언어를 말한 거야. 무언가가 그의 스페인어, 영어, 전부를 벗겨갔어, 그리고 1일차 기초 단어만 남겨놓은 거야. 누군가가 의도적으로 이걸 한 거야.",
+        textKoMix: "Isabel, 그가 a foreign language를 말한 게 아니야. 그에게 남은 the only language를 말한 거야. 무언가가 그의 Spanish, English, 전부를 벗겨갔어, 그리고 Day One vocabulary만 남겨놓은 거야. Someone did this on purpose.",
         textEs: "No estaba hablando un idioma extranjero, Isabel. Estaba hablando en el único idioma que le quedaba. Algo le quitó su español, su inglés, todo, y le dejó solo con vocabulario del Día Uno. Alguien le hizo esto a propósito.",
+        textEsMix: "No estaba hablando a foreign language, Isabel. Estaba hablando en the only language que le quedaba. Algo le quitó su Spanish, su English, todo, y le dejó solo con Day One vocabulary. Someone did this on purpose.",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "A week ago I would have said that's impossible. But a week ago I didn't know about magic stones that protect language, or a man who says 'thank you' after stealing them. Take me to the Prado. Now.",
         textKo: "일주일 전이었으면 불가능하다고 했을 거야. 하지만 일주일 전에는 언어를 보호하는 마법석이나, 수호석을 훔치고 '감사합니다'라고 말하는 남자에 대해 몰랐으니까. 프라도로 데려다줘. 지금.",
+        textKoMix: "일주일 전이었으면 that's impossible라고 했을 거야. 하지만 일주일 전에는 language를 보호하는 magic stones나, 그걸 훔치고 'thank you'라고 말하는 남자에 대해 몰랐으니까. Take me to the Prado. 지금.",
         textEs: "Hace una semana habría dicho que es imposible. Pero hace una semana no sabía sobre piedras mágicas que protegen el lenguaje, ni sobre un hombre que dice 'gracias' después de robarlas. Llévame al Prado. Ahora.",
+        textEsMix: "Hace una semana habría dicho that's impossible. Pero hace una semana no sabía sobre magic stones que protegen el language, ni sobre un hombre que dice 'thank you' después de robarlas. Take me to the Prado. Ahora.",
       },
       // ── Scene 2: Don Miguel's Market ──────────────────────────────────────
       {
@@ -1314,7 +1330,9 @@ const STORIES: Record<string, Story> = {
         charId: "miguel",
         text: "Isabel! And this must be the famous detective. Welcome! Please, sit. Are you hungry? Of course you're hungry, you're in Madrid! Nobody leaves my stall hungry. That's my one rule.",
         textKo: "이사벨! 이분이 유명한 탐정이로구나. 환영해! 자, 앉아. 배고프지? 당연히 배고프겠지, 마드리드에 왔으니까! 아무도 내 가판대에서 배고프게 보내지 않아. 그게 내 유일한 규칙이야.",
+        textKoMix: "Isabel! 이분이 the famous detective이로구나. Welcome! Please, 앉아. Are you hungry? 당연히 배고프겠지, you're in Madrid! 아무도 내 가판대에서 배고프게 보내지 않아. That's my one rule.",
         textEs: "¡Isabel! Y este debe ser el famoso detective. ¡Bienvenido! Por favor, siéntate. ¿Tienes hambre? ¡Claro que tienes hambre, estás en Madrid! Nadie se va de mi puesto con hambre. Esa es mi única regla.",
+        textEsMix: "¡Isabel! Y este debe ser the famous detective. Welcome! Please, siéntate. Are you hungry? ¡Claro que sí, you're in Madrid! Nadie se va de mi puesto con hambre. That's my one rule.",
       },
       {
         kind: "scene",
@@ -1390,7 +1408,9 @@ const STORIES: Record<string, Story> = {
         charId: "miguel",
         text: "First, you eat. Then, we talk. In Spain, a conversation without food is like a song without music. Tell me what you want, detective. In my market, you must ask properly.",
         textKo: "먼저 먹어. 그다음 얘기해. 스페인에서 음식 없는 대화는 음악 없는 노래야. 뭘 원하는지 말해봐, 탐정. 내 시장에서는 제대로 주문해야 해.",
+        textKoMix: "First, you eat. Then, we talk. 스페인에서 food 없는 conversation은 music 없는 노래야. 뭘 원하는지 말해봐, detective. 내 market에서는 제대로 주문해야 해.",
         textEs: "Primero, comes. Luego, hablamos. En España, una conversación sin comida es como una canción sin música. Dime qué quieres, detective. En mi mercado, hay que pedir como es debido.",
+        textEsMix: "First, you eat. Then, we talk. En España, una conversación sin food es como una canción sin music. Dime qué quieres, detective. En mi market, hay que pedir como es debido.",
       },
       {
         kind: "puzzle",
@@ -1416,14 +1436,18 @@ const STORIES: Record<string, Story> = {
         charId: "miguel",
         text: "Ha! Not bad, detective. Your accent is terrible but your manners are good. Now... you want to know about Carlos. I'll tell you. But first, I need to tell you something that scares me.",
         textKo: "하! 나쁘지 않아, 탐정. 억양은 끔찍하지만 예절은 좋아. 자... 카를로스에 대해 알고 싶은 거지. 말해줄게. 하지만 먼저, 나를 무섭게 하는 것을 말해야 해.",
+        textKoMix: "하! Not bad, detective. Your accent은 terrible하지만 예절은 좋아. 자... 카를로스에 대해 알고 싶은 거지. I'll tell you. 하지만 먼저, 나를 무섭게 하는 것을 말해야 해.",
         textEs: "¡Ja! Nada mal, detective. Tu acento es terrible pero tus modales son buenos. Ahora... quieres saber de Carlos. Te diré. Pero primero, necesito contarte algo que me asusta.",
+        textEsMix: "¡Ja! Not bad, detective. Your accent es terrible pero tus modales son buenos. Ahora... quieres saber de Carlos. I'll tell you. Pero primero, necesito contarte algo que me asusta.",
       },
       {
         kind: "scene",
         charId: "miguel",
         text: "Yesterday, I forgot how to say 'friend' in Spanish. My own language. Forty years in this market and yesterday, the word just wasn't there. Like someone pulled it out of my head. My neighbor María forgot 'bread.' Eduardo forgot 'open.' As we say, 'No hay mal que por bien no venga.' But I'm struggling to find the silver in this one.",
         textKo: "어제, '친구'라는 단어를 스페인어로 잊어버렸어. 내 모국어를. 40년간 이 시장을 운영했는데 어제, 단어가 그냥 없었어. 누가 머릿속에서 뽑아간 것처럼. 이웃 마리아도 '빵'을 잊었어. 에두아르도는 '열다'를 잊어서 자기 가게를 못 열었어. 우리가 말하듯이, '비 온 뒤에 땅이 굳는다'지만, 이번에는 좋은 점을 찾기 힘들어.",
+        textKoMix: "어제, 'friend'라는 word를 Spanish로 잊어버렸어. My own language를. 40년간 이 market에 있었는데 어제, 그 word가 그냥 없었어. 누가 머릿속에서 뽑아간 것처럼. 이웃 María도 'bread'를 잊었어. Eduardo는 'open'을 잊었어. 우리가 말하듯이, 'No hay mal que por bien no venga'지만, 이번에는 좋은 점을 찾기 힘들어.",
         textEs: "Ayer, olvidé cómo decir 'amigo' en español. Mi propio idioma. Cuarenta años en este mercado y ayer, la palabra simplemente no estaba. Como si alguien la arrancara de mi cabeza. Mi vecina María olvidó 'pan.' Eduardo olvidó 'abrir.' Como decimos, 'No hay mal que por bien no venga.' Pero me cuesta encontrar el bien en esto.",
+        textEsMix: "Ayer, olvidé cómo decir 'friend' en español. My own language. Cuarenta años en este market y ayer, the word simplemente no estaba. Como si alguien la arrancara de mi cabeza. Mi vecina María olvidó 'bread.' Eduardo olvidó 'open.' Como decimos, 'No hay mal que por bien no venga.' Pero me cuesta encontrar el bien en esto.",
         idiomRef: "idiom_miguel_1",
       },
       {
@@ -1439,14 +1463,18 @@ const STORIES: Record<string, Story> = {
         charId: "lingo",
         text: "Don Miguel. The man who took Carlos. Did he come through this market? Tall, black coat, speaks perfect everything?",
         textKo: "돈 미겔. 카를로스를 데려간 남자. 이 시장을 지나간 적 있어요? 키 크고, 검은 코트, 모든 언어를 완벽하게 하는?",
+        textKoMix: "Don Miguel. 카를로스를 데려간 남자. Did he come through this market? 키 크고, black coat, 모든 language를 완벽하게 하는?",
         textEs: "Don Miguel. El hombre que se llevó a Carlos. ¿Pasó por este mercado? ¿Alto, abrigo negro, habla todo perfectamente?",
+        textEsMix: "Don Miguel. El hombre que se llevó a Carlos. Did he come through este market? Alto, black coat, ¿habla todo perfectamente?",
       },
       {
         kind: "scene",
         charId: "miguel",
         text: "He comes every morning. Orders coffee. Pays exactly. Says 'Thank you, good morning' in perfect Spanish. He was here today, detective. Two hours ago. He sat right where you're sitting now.",
         textKo: "매일 아침 와. 커피를 주문해. 정확하게 지불하고. 완벽한 스페인어로 '감사합니다, 좋은 아침이에요'라고 말해. 오늘도 왔어, 탐정. 두 시간 전에. 지금 네가 앉은 바로 그 자리에 앉았어.",
+        textKoMix: "He comes every morning. coffee를 주문해. 정확하게 지불하고. 완벽한 Spanish로 'Thank you, good morning'이라고 말해. He was here today, detective. 두 시간 전에. 지금 네가 앉은 바로 그 자리에 앉았어.",
         textEs: "Viene cada mañana. Pide café. Paga exacto. Dice 'Gracias, buenos días' en español perfecto. Estuvo aquí hoy, detective. Hace dos horas. Se sentó exactamente donde tú estás sentado ahora.",
+        textEsMix: "He comes every morning. Pide café. Paga exacto. Dice 'Thank you, good morning' en español perfecto. He was here today, detective. Hace dos horas. Se sentó exactamente donde tú estás sentado ahora.",
       },
       // ── Scene 3: Retiro Park — Face to Face ───────────────────────────────
       {
@@ -1470,35 +1498,45 @@ const STORIES: Record<string, Story> = {
         charId: "mr_black",
         text: "Good afternoon, detective. Please, sit. You are looking for Carlos. He is safe. For now.",
         textKo: "안녕하세요, 탐정. 앉아 계세요. 카를로스를 찾고 있죠. 안전해요. 지금은요.",
+        textKoMix: "Good afternoon, detective. Please, sit. You are looking for Carlos. 그는 safe해요. 지금은요.",
         textEs: "Buenas tardes, detective. Por favor, siéntese. Busca a Carlos. Está a salvo. Por ahora.",
+        textEsMix: "Good afternoon, detective. Please, sit. You are looking for Carlos. Está safe. Por ahora.",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "Where is he?",
         textKo: "어디에 있어요?",
+        textKoMix: "Where is he?",
         textEs: "¿Dónde está?",
+        textEsMix: "Where is he?",
       },
       {
         kind: "scene",
         charId: "mr_black",
         text: "Number three, Calle del Prado. Third floor. The door is open. I don't lock doors, detective. You already know that about me.",
         textKo: "칼레 델 프라도 3번지. 3층. 문은 열려 있어요. 저는 문을 잠그지 않아요, 탐정. 이미 아시잖아요.",
+        textKoMix: "Calle del Prado 3번지. Third floor. The door is open. 저는 문을 잠그지 않아요, detective. You already know that.",
         textEs: "Número tres, Calle del Prado. Tercer piso. La puerta está abierta. Yo no cierro puertas, detective. Eso ya lo sabe de mí.",
+        textEsMix: "Número tres, Calle del Prado. Third floor. The door is open. Yo no cierro puertas, detective. You already know that.",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "Why are you telling me this? Why not just disappear?",
         textKo: "왜 말해주는 거예요? 그냥 사라지면 되잖아요.",
+        textKoMix: "Why are you telling me this? 그냥 disappear하면 되잖아요.",
         textEs: "¿Por qué me dices esto? ¿Por qué no simplemente desaparecer?",
+        textEsMix: "Why are you telling me this? ¿Por qué no simplemente disappear?",
       },
       {
         kind: "scene",
         charId: "mr_black",
         text: "Because Carlos will tell you about the device. And then you will understand. Seven thousand languages. Seven thousand walls between people. I am not the villain of this story, detective. I am the editor. Goodbye.",
         textKo: "카를로스가 장치에 대해 말해줄 거니까요. 그러면 이해하게 될 거예요. 7천 개의 언어. 7천 개의 벽. 저는 이 이야기의 악당이 아니에요, 탐정. 편집자예요. 안녕히 계세요.",
+        textKoMix: "Carlos가 the device에 대해 말해줄 거니까요. 그러면 you will understand. Seven thousand languages. 7천 개의 walls. 저는 the villain이 아니에요, detective. I am the editor. Goodbye.",
         textEs: "Porque Carlos le contará sobre el dispositivo. Y entonces entenderá. Siete mil idiomas. Siete mil muros entre personas. No soy el villano de esta historia, detective. Soy el editor. Adiós.",
+        textEsMix: "Porque Carlos le contará sobre the device. Y entonces you will understand. Seven thousand languages. Siete mil walls. No soy the villain, detective. I am the editor. Goodbye.",
       },
       {
         kind: "scene",
@@ -1610,21 +1648,27 @@ const STORIES: Record<string, Story> = {
         charId: "lingo",
         text: "Carlos? Can you hear me? My name is Rudy. I'm a friend of Isabel. I'm here to help.",
         textKo: "카를로스? 들려? 내 이름은 루디야. 이사벨의 친구야. 도와주러 왔어.",
+        textKoMix: "Carlos? Can you hear me? My name is Rudy. Isabel의 친구야. I'm here to help.",
         textEs: "¿Carlos? ¿Me oyes? Me llamo Rudy. Soy amigo de Isabel. Estoy aquí para ayudarte.",
+        textEsMix: "¿Carlos? Can you hear me? My name is Rudy. Soy amigo de Isabel. I'm here to help.",
       },
       {
         kind: "scene",
         charId: "carlos",
         text: "Hello... yes... I... the word. I can't... 'Recordar.' Remember. It came back. But others didn't. 'Window.' What's 'window'? I used to know. I used to know everything.",
         textKo: "안녕... 네... 나... 그 단어. 못... 'Recordar.' 기억하다. 돌아왔어. 근데 다른 건 안 돌아왔어. '창문.' '창문'이 뭐야? 알고 있었는데. 전부 알고 있었는데.",
+        textKoMix: "Hello... yes... 나... the word. 못... 'Recordar.' Remember. 돌아왔어. 근데 others는 안 돌아왔어. 'Window.' What's 'window'? 알고 있었는데. 전부 알고 있었는데.",
         textEs: "Hola... sí... yo... la palabra. No puedo... 'Recordar.' Recordar. Volvió. Pero otras no. 'Ventana.' ¿Qué es 'ventana'? Lo sabía. Lo sabía todo.",
+        textEsMix: "Hello... yes... yo... the word. No puedo... 'Recordar.' Remember. Volvió. Pero otras no. 'Window.' ¿Qué es 'window'? Lo sabía. Lo sabía todo.",
       },
       {
         kind: "scene",
         charId: "carlos",
         text: "The machine... it erases. Languages. From your head. I found it hidden in the wall at the Prado. When I touched it, I heard every language I know start to dissolve. Like sugar in water. One word at a time. Until all I had left was... 'Hello. Help. Where is the door.'",
         textKo: "기계가... 지워. 언어를. 머릿속에서. 프라도 벽 안에 숨겨진 걸 발견했어. 만졌더니, 내가 아는 모든 언어가 녹기 시작하는 게 들렸어. 설탕이 물에 녹듯이. 한 단어씩. 남은 건... '안녕하세요. 도와주세요. 문이 어디예요.'뿐이었어.",
+        textKoMix: "The machine가... 지워. Languages를. 머릿속에서. Prado 벽 안에 숨겨진 걸 발견했어. 만졌더니, 내가 아는 every language가 dissolve하기 시작하는 게 들렸어. 설탕이 물에 녹듯이. one word at a time. 남은 건... 'Hello. Help. Where is the door.'뿐이었어.",
         textEs: "La máquina... borra. Idiomas. De tu cabeza. La encontré escondida en la pared del Prado. Cuando la toqué, escuché cómo cada idioma que conozco empezaba a disolverse. Como azúcar en agua. Una palabra a la vez. Hasta que todo lo que me quedaba era... 'Hola. Ayuda. ¿Dónde está la puerta?'",
+        textEsMix: "The machine... borra. Languages. De tu cabeza. La encontré escondida en la pared del Prado. Cuando la toqué, escuché cómo every language que conozco empezaba a dissolve. Como azúcar en agua. One word at a time. Hasta que todo lo que me quedaba era... 'Hello. Help. Where is the door.'",
       },
       {
         kind: "scene",
@@ -1710,21 +1754,27 @@ const STORIES: Record<string, Story> = {
         charId: "carlos",
         text: "'Ventana.' Window. I remember! Some words are coming back. 'Gracias.' Thank you. I have that one too.",
         textKo: "'창문.' Window. 기억나! 몇몇 단어가 돌아오고 있어. 'Gracias.' 감사합니다. 그것도 있어.",
+        textKoMix: "'Ventana.' Window. I remember! Some words가 돌아오고 있어. 'Gracias.' Thank you. 그것도 있어.",
         textEs: "'Ventana.' Ventana. ¡Recuerdo! Algunas palabras vuelven. 'Gracias.' Gracias. Esa también la tengo.",
+        textEsMix: "'Ventana.' Window. I remember! Some words vuelven. 'Gracias.' Thank you. Esa también la tengo.",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "The Madrid stone, do you know where it is?",
         textKo: "마드리드 수호석, 어디 있는지 알아?",
+        textKoMix: "The Madrid stone, where is it 알아?",
         textEs: "¿La piedra de Madrid, sabes dónde está?",
+        textEsMix: "The Madrid stone, ¿sabes where is it?",
       },
       {
         kind: "scene",
         charId: "carlos",
         text: "Under the machine. There's a compartment. The stone was powering it. He used the Madrid stone to run the prototype.",
         textKo: "기계 아래에. 칸이 있어. 수호석이 동력원이었어. 시제품을 가동하는 데 마드리드 수호석을 사용한 거야.",
+        textKoMix: "Under the machine. 칸이 있어. The stone이 동력원이었어. prototype을 가동하는 데 the Madrid stone을 사용한 거야.",
         textEs: "Debajo de la máquina. Hay un compartimento. La piedra la alimentaba. Usó la piedra de Madrid para hacer funcionar el prototipo.",
+        textEsMix: "Under the machine. Hay un compartimento. The stone la alimentaba. Usó the Madrid stone para hacer funcionar el prototype.",
       },
       {
         kind: "scene",
@@ -1749,14 +1799,18 @@ const STORIES: Record<string, Story> = {
         charId: "lingo",
         text: "He took it. While I was inside saving Carlos, he walked in and took the stone. He told me where Carlos was so I'd be busy while he stole it. He played me. He played me and I walked right into it.",
         textKo: "가져갔어. 내가 안에서 카를로스를 구하는 동안 들어와서 수호석을 가져갔어. 내가 바쁘게 만들려고 카를로스 위치를 알려준 거야. 나를 이용했어. 이용당하면서 나는 그대로 걸어 들어갔고.",
+        textKoMix: "He took it. 내가 안에서 Carlos를 구하는 동안 들어와서 the stone을 가져갔어. 내가 busy하게 만들려고 Carlos 위치를 알려준 거야. He played me. 이용당하면서 나는 그대로 걸어 들어갔고.",
         textEs: "Se la llevó. Mientras yo salvaba a Carlos, entró y se llevó la piedra. Me dijo dónde estaba Carlos para que estuviera ocupado mientras la robaba. Me engañó. Me engañó y yo caí directo.",
+        textEsMix: "He took it. Mientras yo salvaba a Carlos, entró y se llevó the stone. Me dijo dónde estaba Carlos para que estuviera busy mientras la robaba. He played me. Me engañó y yo caí directo.",
       },
       {
         kind: "scene",
         charId: "isabel",
         text: "You saved Carlos. That matters more than a stone. Seoul is next? Then go for it. We'll hold Madrid.",
         textKo: "카를로스를 구했잖아. 그게 수호석보다 중요해. 서울이 다음이라고? 그럼 해봐. 마드리드는 우리가 지킬게.",
+        textKoMix: "You saved Carlos. 그게 a stone보다 중요해. Seoul is next? 그럼 go for it. Madrid는 우리가 지킬게.",
         textEs: "Salvaste a Carlos. Eso importa más que una piedra. ¿Seúl es el siguiente? Pues ¡dale! Nosotros cuidamos Madrid.",
+        textEsMix: "You saved Carlos. Eso importa más que a stone. ¿Seoul is next? Pues go for it. Nosotros cuidamos Madrid.",
       },
       {
         kind: "scene",
@@ -1781,9 +1835,9 @@ const STORIES: Record<string, Story> = {
     /* ── Language Ratio: 70% targetLang / 30% nativeLang ──────────────────────
      * CEFR A2 — elementary. User has completed Day 1-30.
      * NPC dialogue should be MOSTLY targetLang with some nativeLang scaffolding.
-     * The current 100% English text is closer to correct for this chapter;
-     * ideally ~30% of the non-learned content would be in nativeLang.
-     * TODO: Add textKoMix/textEsMix to key NPC dialogue lines for this chapter.
+     * textKoMix/textEsMix are authored on every NPC dialogue line: mostly English
+     * (targetLang) with the native language kept only for the hardest vocabulary
+     * and the emotional/plot beats. Narration (isNarration) stays 100% native.
      */
     chapterMeta: {
       cefrLevel: "A2",
@@ -1800,9 +1854,9 @@ const STORIES: Record<string, Story> = {
         "What does ___ mean?", "Speak slowly please", "I'm learning ___",
       ],
       languageNote:
-        "Ch3 dialogue should be ~70% English (targetLang) / ~30% native. " +
-        "Current textKo/textEs are 100% translated — textKoMix/textEsMix not yet added. " +
-        "At this level learners can follow most dialogue in the target language.",
+        "Ch3 dialogue is ~70% English (targetLang) / ~30% native. " +
+        "textKoMix/textEsMix lead in English and keep native only for harder " +
+        "phrases and emotional beats; narration stays 100% native.",
     },
     characters: [
       {
@@ -1862,7 +1916,9 @@ const STORIES: Record<string, Story> = {
         charId: "lingo",
         text: "Alright, partner. Confidence level: historically low. Phone is dead. Charger is in Madrid because apparently I pack like a disaster. I need to find Sujin, she is a linguist, Eleanor's contact in Seoul. But first I need to survive this airport using nothing but the Korean we learned in the last thirty days. No pressure.",
         textKo: "좋아, 파트너. 자신감 레벨: 역대 최저. 핸드폰이 죽었어. 충전기는 마드리드에 있어, 왜냐면 나는 재앙처럼 짐을 싸니까. 수진을 찾아야 해, 엘리너의 서울 연락책인 언어학자야. 하지만 먼저 지난 30일 동안 배운 한국어만으로 이 공항에서 살아남아야 해. 부담 없지.",
+        textKoMix: "Alright, partner. Confidence level: historically low. Phone is dead. Charger is in Madrid 왜냐면 나는 재앙처럼 짐을 싸니까. I need to find Sujin, she is a linguist, Eleanor's contact in Seoul. But first I need to survive this airport 지난 30일 동안 배운 한국어만으로. No pressure.",
         textEs: "Bien, compañero. Nivel de confianza: históricamente bajo. El teléfono está muerto. El cargador está en Madrid porque aparentemente empaco como un desastre. Necesito encontrar a Sujin, es lingüista, el contacto de Eleanor en Seúl. Pero primero necesito sobrevivir en este aeropuerto usando solo el coreano que aprendimos en los últimos treinta días. Sin presión.",
+        textEsMix: "Alright, partner. Confidence level: historically low. Phone is dead. Charger is in Madrid porque aparentemente empaco como un desastre. I need to find Sujin, she is a linguist, Eleanor's contact in Seoul. But first I need to survive this airport con solo el coreano que aprendimos en los últimos treinta días. No pressure.",
       },
       {
         kind: "scene",
@@ -1957,21 +2013,27 @@ const STORIES: Record<string, Story> = {
         charId: "minho",
         text: "Bro. BRO. Did you just say '주세요' like '주세용'? That is SO not how you say it. I am dying. You sound like a robot that learned Korean from a microwave manual. I am Minho. Sujin told me to come get you. She is busy at the lab.",
         textKo: "야. 야야. 방금 '주세요'를 '주세용'이라고 했어? 그렇게 말하는 거 아닌데. 죽겠다 진짜. 전자레인지 설명서로 한국어 배운 로봇 같아. 나 민호. 수진 누나가 데리러 오라고 했어. 누나는 연구실에서 바빠.",
+        textKoMix: "Bro. BRO. 방금 '주세요'를 '주세용'이라고 했어? That is SO not how you say it. 죽겠다 진짜. You sound like a robot that learned Korean from a microwave manual. I am Minho. Sujin told me to come get you. 누나는 연구실에서 바빠.",
         textEs: "Tío. TÍO. ¿Acabas de decir '주세요' como '주세용'? ¡Así NO se dice! Me muero. Suenas como un robot que aprendió coreano de un manual de microondas. Soy Minho. Sujin me dijo que viniera a buscarte. Ella está ocupada en el laboratorio.",
+        textEsMix: "Bro. BRO. ¿Acabas de decir '주세요' como '주세용'? That is SO not how you say it. Me muero. You sound like a robot that learned Korean from a microwave manual. I am Minho. Sujin told me to come get you. Ella está ocupada en el laboratorio.",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "Great. My pronunciation is so bad that a stranger is having a medical event. You must be Minho, Sujin's friend?",
         textKo: "좋아. 내 발음이 너무 안 좋아서 모르는 사람이 의료 사태를 겪고 있어. 민호지, 수진의 친구?",
+        textKoMix: "Great. My pronunciation is so bad 모르는 사람이 의료 사태를 겪고 있어. You must be Minho, Sujin's friend?",
         textEs: "Genial. Mi pronunciación es tan mala que un desconocido está teniendo una emergencia médica. ¿Debes ser Minho, el amigo de Sujin?",
+        textEsMix: "Great. My pronunciation is so bad que un desconocido está teniendo una emergencia médica. You must be Minho, Sujin's friend?",
       },
       {
         kind: "scene",
         charId: "minho",
         text: "Friend? Nah, I am her little brother's best friend. Basically family. OK listen, your Korean needs emergency surgery. Let me teach you how to actually say things so people don't run away from you. First rule: in Korea, you MUST greet people right. Watch.",
         textKo: "친구? 아니, 수진 누나 남동생 절친이야. 거의 가족. 자 들어봐, 네 한국어는 응급 수술이 필요해. 사람들이 도망 안 가게 제대로 말하는 법 알려줄게. 첫 번째 규칙: 한국에서는 반드시 인사를 제대로 해야 해. 봐봐.",
+        textKoMix: "Friend? Nah, I am her little brother's best friend. Basically family. OK listen, your Korean needs emergency surgery. 사람들이 도망 안 가게 제대로 말하는 법 알려줄게. First rule: 한국에서는 반드시 인사를 제대로 해야 해. Watch.",
         textEs: "¿Amigo? No, soy el mejor amigo de su hermano menor. Básicamente familia. OK escucha, tu coreano necesita cirugía de emergencia. Déjame enseñarte cómo decir las cosas para que la gente no huya de ti. Primera regla: en Corea, DEBES saludar correctamente. Mira.",
+        textEsMix: "Friend? Nah, I am her little brother's best friend. Basically family. OK listen, your Korean needs emergency surgery. Déjame enseñarte cómo decir las cosas para que la gente no huya de ti. First rule: en Corea, DEBES saludar correctamente. Watch.",
       },
       {
         kind: "scene",
@@ -2047,7 +2109,9 @@ const STORIES: Record<string, Story> = {
         charId: "minho",
         text: "Not bad! Not bad at all! OK your accent is still like a cat in a washing machine but the WORDS are right. That is what matters. Sujin is going to be impressed. Maybe. Probably not. But I am!",
         textKo: "나쁘지 않아! 전혀 나쁘지 않아! 억양은 아직 세탁기에 들어간 고양이 같지만 단어는 맞아. 그게 중요한 거야. 수진 누나가 감동할 거야. 아마. 아닐 수도. 근데 나는 감동했어!",
+        textKoMix: "Not bad! Not bad at all! OK your accent is still like a cat in a washing machine but the WORDS are right. That is what matters. Sujin is going to be impressed. 아마. 아닐 수도. But I am!",
         textEs: "¡Nada mal! ¡Nada mal para nada! OK tu acento sigue siendo como un gato en una lavadora pero las PALABRAS están bien. Eso es lo que importa. Sujin va a estar impresionada. Quizá. Probablemente no. ¡Pero yo sí!",
+        textEsMix: "Not bad! Not bad at all! OK your accent is still like a cat in a washing machine but the WORDS are right. That is what matters. Sujin is going to be impressed. Quizá. Probablemente no. But I am!",
         idiomRef: "idiom_minho_1",
       },
       {
@@ -2074,7 +2138,9 @@ const STORIES: Record<string, Story> = {
         charId: "youngsook",
         text: "Minho, who is this skinny foreigner? He looks like he hasn't eaten in three countries. Sit down. I will feed you first. In Korea, we don't talk to hungry people. A conversation without rice is like a map without streets.",
         textKo: "민호야, 이 마른 외국인은 누구니? 세 나라를 거치면서 밥을 안 먹은 것 같은데. 앉아. 먼저 밥을 먹여줄게. 한국에서는 배고픈 사람과 대화하지 않아. 밥 없는 대화는 지도 없는 길 같단다.",
+        textKoMix: "Minho야, who is this skinny foreigner? 세 나라를 거치면서 밥을 안 먹은 것 같은데. Sit down. I will feed you first. 한국에서는 배고픈 사람과 대화하지 않아. A conversation without rice is like a map without streets.",
         textEs: "Minho, ¿quién es este extranjero flaco? Parece que no ha comido en tres países. Siéntate. Te daré de comer primero. En Corea, no hablamos con gente hambrienta. Una conversación sin arroz es como un mapa sin calles.",
+        textEsMix: "Minho, who is this skinny foreigner? Parece que no ha comido en tres países. Sit down. I will feed you first. En Corea, no hablamos con gente hambrienta. A conversation without rice is like a map without streets.",
         idiomRef: "idiom_youngsook_1",
       },
       {
@@ -2082,14 +2148,18 @@ const STORIES: Record<string, Story> = {
         charId: "minho",
         text: "Grandma, this is Rudy. The fox detective. He is here to find the Guardian Stone. But first, Grandma, make him the bibimbap. He NEEDS it. Trust me.",
         textKo: "할머니, 이 사람 루디예요. 여우 탐정. 수호석 찾으러 왔어요. 근데 먼저, 할머니, 비빔밥 해주세요. 이 사람한테 필요해요. 진짜로.",
+        textKoMix: "할머니, this is Rudy. The fox detective. He is here to find the Guardian Stone. But first, 할머니, make him the 비빔밥. He NEEDS it. Trust me.",
         textEs: "Abuela, este es Rudy. El detective zorro. Está aquí para encontrar la Piedra Guardiana. Pero primero, Abuela, hazle el bibimbap. Lo NECESITA. Créeme.",
+        textEsMix: "Abuela, this is Rudy. The fox detective. He is here to find the Guardian Stone. But first, Abuela, hazle el bibimbap. He NEEDS it. Trust me.",
       },
       {
         kind: "scene",
         charId: "youngsook",
         text: "A detective who cannot speak Korean is like a spoon that cannot hold soup. But we can fix that. Eat. Then I teach. Every dish has a story, and every story has words you need.",
         textKo: "한국어 못 하는 탐정은 국을 못 담는 숟가락 같단다. 하지만 고칠 수 있어. 먹어. 그다음 가르쳐줄게. 모든 음식에는 이야기가 있고, 모든 이야기에는 네가 필요한 단어가 있단다.",
+        textKoMix: "A detective who cannot speak Korean is like a spoon that cannot hold soup. But we can fix that. Eat. 그다음 가르쳐줄게. Every dish has a story, 모든 이야기에는 네가 필요한 단어가 있단다.",
         textEs: "Un detective que no puede hablar coreano es como una cuchara que no puede sostener sopa. Pero podemos arreglarlo. Come. Luego enseño. Cada plato tiene una historia, y cada historia tiene palabras que necesitas.",
+        textEsMix: "A detective who cannot speak Korean is like a spoon that cannot hold soup. But we can fix that. Eat. Luego enseño. Every dish has a story, y cada historia tiene palabras que necesitas.",
       },
       {
         kind: "scene",
@@ -2142,28 +2212,36 @@ const STORIES: Record<string, Story> = {
         charId: "sujin",
         text: "You are late. Eleanor said you were coming yesterday. Also, she said you were smart. The pronunciation Minho described suggests otherwise. Sit down. We have work to do.",
         textKo: "늦었어요. 엘리너가 어제 온다고 했어요. 그리고, 똑똑하다고 했는데. 민호가 설명한 발음으로는 아닌 것 같아요. 앉으세요. 할 일이 있어요.",
+        textKoMix: "You are late. Eleanor said you were coming yesterday. Also, she said you were smart. 민호가 설명한 발음으로는 아닌 것 같아요. Sit down. We have work to do.",
         textEs: "Llegas tarde. Eleanor dijo que venías ayer. Además, dijo que eras inteligente. La pronunciación que Minho describió sugiere lo contrario. Siéntate. Tenemos trabajo que hacer.",
+        textEsMix: "You are late. Eleanor said you were coming yesterday. Also, she said you were smart. La pronunciación que Minho describió sugiere lo contrario. Sit down. We have work to do.",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "Nice to meet you too, Sujin. Eleanor speaks highly of you. She said you are the best linguist in Seoul, possibly the best she has ever trained.",
         textKo: "나도 만나서 반가워요, 수진. 엘리너가 높이 평가하더라고요. 서울 최고의 언어학자라고, 아마 자기가 가르친 사람 중 최고라고.",
+        textKoMix: "Nice to meet you too, Sujin. Eleanor speaks highly of you. She said you are the best linguist in Seoul, 아마 자기가 가르친 사람 중 최고라고.",
         textEs: "Encantado de conocerte también, Sujin. Eleanor habla muy bien de ti. Dijo que eres la mejor lingüista de Seúl, posiblemente la mejor que ha formado.",
+        textEsMix: "Nice to meet you too, Sujin. Eleanor speaks highly of you. She said you are the best linguist in Seoul, posiblemente la mejor que ha formado.",
       },
       {
         kind: "scene",
         charId: "sujin",
         text: "The Seoul Guardian Stone is in danger. Mr. Black has been seen near Namsan Tower three times this week. He is not hiding. He is studying the tower. The stone is hidden inside. Only someone who reads the Korean inscriptions can find it. That is why Eleanor sent you to me.",
         textKo: "서울 수호석이 위험해요. 미스터 블랙이 이번 주에 남산타워 근처에서 세 번 목격됐어요. 숨지 않아요. 타워를 연구하고 있어요. 수호석은 안에 숨겨져 있어요. 한국어 비문을 읽을 수 있는 사람만 찾을 수 있어요. 그래서 엘리너가 저한테 보낸 거예요.",
+        textKoMix: "The Seoul Guardian Stone is in danger. Mr. Black has been seen near Namsan Tower three times this week. He is not hiding. He is studying the tower. The stone is hidden inside. 한국어 비문을 읽을 수 있는 사람만 찾을 수 있어요. That is why Eleanor sent you to me.",
         textEs: "La Piedra Guardiana de Seúl está en peligro. Mr. Black ha sido visto cerca de la Torre Namsan tres veces esta semana. No se esconde. Está estudiando la torre. La piedra está oculta dentro. Solo alguien que lea las inscripciones coreanas puede encontrarla. Por eso Eleanor te envió a mí.",
+        textEsMix: "The Seoul Guardian Stone is in danger. Mr. Black has been seen near Namsan Tower three times this week. He is not hiding. He is studying the tower. The stone is hidden inside. Solo alguien que lea las inscripciones coreanas puede encontrarla. That is why Eleanor sent you to me.",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "So let me get this straight. I need to read Korean inscriptions, inscriptions that have been there for centuries, using vocabulary I learned in the last thirty days. Partner, this is either the bravest or the stupidest thing we have ever done.",
         textKo: "그러니까 정리하면. 수백 년 된 한국어 비문을, 지난 30일 동안 배운 어휘로 읽어야 한다고. 파트너, 이건 우리가 해본 것 중 가장 용감하거나 가장 멍청한 거야.",
+        textKoMix: "So let me get this straight. I need to read Korean inscriptions, 수백 년 된 비문을, 지난 30일 동안 배운 어휘로. Partner, this is either the bravest or the stupidest thing we have ever done.",
         textEs: "A ver si lo entiendo. Necesito leer inscripciones en coreano, inscripciones que han estado ahí durante siglos, usando vocabulario que aprendí en los últimos treinta días. Compañero, esto es lo más valiente o lo más estúpido que hemos hecho.",
+        textEsMix: "So let me get this straight. I need to read Korean inscriptions, inscripciones que han estado ahí durante siglos, con vocabulario que aprendí en los últimos treinta días. Partner, this is either the bravest or the stupidest thing we have ever done.",
       },
       {
         kind: "puzzle",
@@ -2234,21 +2312,27 @@ const STORIES: Record<string, Story> = {
         charId: "mr_black",
         text: "Good evening, detective. Hello. You found the door. I am impressed. You are learning fast. But the stone is not here. I have it. Thank you for showing me where it was.",
         textKo: "안녕하세요, 탐정. 문을 찾았군요. 감동이에요. 빨리 배우시네요. 하지만 수호석은 여기 없어요. 제가 갖고 있어요. 어디에 있는지 알려줘서 감사합니다.",
+        textKoMix: "Good evening, detective. Hello. You found the door. I am impressed. You are learning fast. But the stone is not here. I have it. 어디에 있는지 알려줘서 thank you.",
         textEs: "Buenas noches, detective. Hola. Encontraste la puerta. Estoy impresionado. Estás aprendiendo rápido. Pero la piedra no está aquí. La tengo yo. Gracias por mostrarme dónde estaba.",
+        textEsMix: "Good evening, detective. Hello. You found the door. I am impressed. You are learning fast. But the stone is not here. I have it. Thank you por mostrarme dónde estaba.",
       },
       {
         kind: "scene",
         charId: "sujin",
         text: "You used us. You knew we would find the inscription before you could read it yourself. Your Korean is not good enough to read the old script, so you waited for someone who could.",
         textKo: "우리를 이용했군요. 당신이 직접 읽기 전에 우리가 비문을 찾을 줄 알았던 거예요. 당신의 한국어 실력으로는 옛 문체를 읽을 수 없으니까, 읽을 수 있는 사람을 기다린 거예요.",
+        textKoMix: "You used us. You knew we would find the inscription before you could read it yourself. 당신의 한국어 실력으로는 옛 문체를 읽을 수 없으니까, so you waited for someone who could.",
         textEs: "Nos usaste. Sabías que encontraríamos la inscripción antes de que pudieras leerla tú mismo. Tu coreano no es suficiente para leer la escritura antigua, así que esperaste a alguien que pudiera.",
+        textEsMix: "You used us. You knew we would find the inscription before you could read it yourself. Tu coreano no es suficiente para leer la escritura antigua, so you waited for someone who could.",
       },
       {
         kind: "scene",
         charId: "mr_black",
         text: "You are correct. Goodbye, Seoul. *leaves a folded note on the railing and walks into the elevator*",
         textKo: "맞아요. 안녕히 계세요, 서울. *난간에 접힌 메모를 두고 엘리베이터로 걸어간다*",
+        textKoMix: "You are correct. Goodbye, Seoul. *난간에 접힌 note를 두고 엘리베이터로 걸어간다*",
         textEs: "Tienes razón. Adiós, Seúl. *deja una nota doblada en la barandilla y camina hacia el ascensor*",
+        textEsMix: "You are correct. Goodbye, Seoul. *deja una note doblada en la barandilla y camina hacia el ascensor*",
       },
       {
         kind: "scene",
@@ -2311,28 +2395,36 @@ const STORIES: Record<string, Story> = {
         charId: "lingo",
         text: "...'잘했어요.' Well done. '다음은 카이로예요.' Next is Cairo. '언어는 문이에요.' Language is a door. '저는 열쇠를 갖고 있어요.' I have the key. *long pause* Partner. I just read that. In Korean. Thirty days ago I could barely say hello. And I just read a threat written by the most dangerous man alive. I hate that I understood every word. But also... I kind of love it.",
         textKo: "...'잘했어요.' 잘했다고. '다음은 카이로예요.' 다음은 카이로. '언어는 문이에요.' 언어는 문이래. '저는 열쇠를 갖고 있어요.' 열쇠를 갖고 있대. *긴 침묵* 파트너. 방금 그걸 읽었어. 한국어로. 30일 전에는 안녕하세요도 겨우 했는데. 그리고 지금 세상에서 가장 위험한 남자가 쓴 협박을 읽었어. 한 마디도 빠짐없이 이해했다는 게 너무 싫어. 하지만 동시에... 좀 좋기도 해.",
+        textKoMix: "...'잘했어요.' Well done. '다음은 카이로예요.' Next is Cairo. '언어는 문이에요.' Language is a door. '저는 열쇠를 갖고 있어요.' I have the key. *긴 침묵* Partner. I just read that. In Korean. 30일 전에는 안녕하세요도 겨우 했는데. 한 마디도 빠짐없이 이해했다는 게 너무 싫어. 하지만 동시에... 좀 좋기도 해.",
         textEs: "...'잘했어요.' Bien hecho. '다음은 카이로예요.' El siguiente es El Cairo. '언어는 문이에요.' El lenguaje es una puerta. '저는 열쇠를 갖고 있어요.' Tengo la llave. *una larga pausa* Compañero. Acabo de leer eso. En coreano. Hace treinta días apenas podía decir hola. Y acabo de leer una amenaza escrita por el hombre más peligroso del mundo. Odio haber entendido cada palabra. Pero también... me encanta un poco.",
+        textEsMix: "...'잘했어요.' Well done. '다음은 카이로예요.' Next is Cairo. '언어는 문이에요.' Language is a door. '저는 열쇠를 갖고 있어요.' I have the key. *una larga pausa* Partner. I just read that. In Korean. Hace treinta días apenas podía decir hola. Odio haber entendido cada palabra. Pero también... me encanta un poco.",
       },
       {
         kind: "scene",
         charId: "minho",
         text: "Bro. You just READ that?! Without help?! OK I take it back, you are not a microwave-manual robot. You are actually kind of impressive. Sujin, did you see that?!",
         textKo: "야. 방금 그거 읽었어?! 도움 없이?! 나 아까 한 말 취소. 전자레인지 설명서 로봇 아니야. 솔직히 좀 대단해. 수진 누나, 봤어?!",
+        textKoMix: "Bro. You just READ that?! Without help?! OK I take it back, you are not a microwave-manual robot. 솔직히 좀 대단해. Sujin, did you see that?!",
         textEs: "¡Tío! ¿¡Acabas de LEER eso?! ¿¡Sin ayuda?! OK retiro lo dicho, no eres un robot de manual de microondas. En realidad eres bastante impresionante. ¡Sujin, ¿viste eso?!",
+        textEsMix: "Bro. You just READ that?! Without help?! OK I take it back, you are not a microwave-manual robot. En realidad eres bastante impresionante. Sujin, did you see that?!",
       },
       {
         kind: "scene",
         charId: "sujin",
         text: "I saw it. *small smile, the first one* Eleanor was right about you after all. Cairo. We need to warn our contacts there. Mr. Black has the Seoul stone. But he showed us something important: his Korean is not perfect. He needed US to find the inscription. That is his weakness.",
         textKo: "봤어. *작은 미소, 처음으로* 결국 엘리너가 맞았네요. 카이로. 거기 연락책에 알려야 해요. 미스터 블랙이 서울 수호석을 가져갔지만, 중요한 걸 보여줬어요: 그의 한국어는 완벽하지 않아요. 비문을 찾으려면 우리가 필요했어요. 그게 약점이에요.",
+        textKoMix: "I saw it. *작은 미소, 처음으로* Eleanor was right about you after all. Cairo. We need to warn our contacts there. Mr. Black has the Seoul stone. But he showed us something important: 그의 한국어는 완벽하지 않아요. He needed US to find the inscription. That is his weakness.",
         textEs: "Lo vi. *pequeña sonrisa, la primera* Eleanor tenía razón sobre ti después de todo. El Cairo. Necesitamos avisar a nuestros contactos allí. Mr. Black tiene la piedra de Seúl. Pero nos mostró algo importante: su coreano no es perfecto. Nos necesitó para encontrar la inscripción. Esa es su debilidad.",
+        textEsMix: "I saw it. *pequeña sonrisa, la primera* Eleanor was right about you after all. Cairo. We need to warn our contacts there. Mr. Black has the Seoul stone. But he showed us something important: su coreano no es perfecto. He needed US to find the inscription. That is his weakness.",
       },
       {
         kind: "scene",
         charId: "youngsook",
         text: "*arrives with a container of food* For the plane. You cannot chase a villain on an empty stomach. Remember what I taught you, fox boy. Every word you learned at my table. Those are your weapons now.",
         textKo: "*음식 용기를 들고 도착하며* 비행기에서 먹어. 빈 속으로 악당을 쫓을 수는 없단다. 내가 가르친 것 기억해, 여우 도련님. 내 밥상에서 배운 모든 단어. 그게 이제 네 무기야.",
+        textKoMix: "*음식 용기를 들고 도착하며* For the plane. You cannot chase a villain on an empty stomach. 내가 가르친 것 기억해, fox boy. Every word you learned at my table. 그게 이제 네 무기야.",
         textEs: "*llega con un recipiente de comida* Para el avión. No puedes perseguir a un villano con el estómago vacío. Recuerda lo que te enseñé, chico zorro. Cada palabra que aprendiste en mi mesa. Esas son tus armas ahora.",
+        textEsMix: "*llega con un recipiente de comida* For the plane. You cannot chase a villain on an empty stomach. Recuerda lo que te enseñé, fox boy. Every word you learned at my table. Esas son tus armas ahora.",
       },
       {
         kind: "scene",
@@ -2358,8 +2450,9 @@ const STORIES: Record<string, Story> = {
      * CEFR A2-B1 — pre-intermediate. User has completed Day 1-48.
      * NPC dialogue should be ALMOST entirely targetLang with minimal native
      * scaffolding only for complex plot exposition or emotional beats.
-     * The current 100% English text is very close to the intended ratio.
-     * TODO: Optionally add textKoMix/textEsMix with ~15% native scaffolding.
+     * textKoMix/textEsMix are authored on every NPC dialogue line at ~85%
+     * English: native language is reserved for the single hardest or most
+     * emotional clause per line. Narration (isNarration) stays 100% native.
      */
     chapterMeta: {
       cefrLevel: "B1",
@@ -2382,9 +2475,9 @@ const STORIES: Record<string, Story> = {
         "What do you recommend?", "It depends on ___", "I'm looking for ___",
       ],
       languageNote:
-        "Ch4 dialogue should be ~85% English (targetLang) / ~15% native. " +
-        "The current 100% English textKo/textEs translations are close to correct. " +
-        "At this level learners handle most communication independently.",
+        "Ch4 dialogue is ~85% English (targetLang) / ~15% native. " +
+        "textKoMix/textEsMix keep native only for the hardest/most emotional " +
+        "clause per line. At this level learners handle most communication independently.",
     },
     characters: [
       { id: "lingo",    emoji: "🦊",  name: "Detective Rudy",  nameKo: "루디 탐정",    side: "left",  avatarBg: "#2c1810", isLingo: true },
@@ -2407,14 +2500,18 @@ const STORIES: Record<string, Story> = {
         charId: "lingo",
         text: "Mr. Black erased my phrasebook. Before I even landed. He's not just ahead of me. He's arranging the board before I sit down. Fine. I survived London with no clues, Madrid without the stone, Seoul with no phone. Cairo with no phrasebook? Just another Tuesday.",
         textKo: "미스터 블랙이 내 회화집을 지웠어. 내가 도착하기도 전에. 단순히 앞서가는 게 아니야. 내가 앉기도 전에 판을 짜고 있어. 좋아. 런던에선 단서 없이, 마드리드에선 수호석 없이, 서울에선 핸드폰 없이 살아남았어. 카이로에서 회화집 없이? 그냥 또 하나의 화요일이야.",
+        textKoMix: "Mr. Black erased my phrasebook. Before I even landed. He's not just ahead of me. He's arranging the board before I sit down. Fine. I survived London with no clues, Madrid without the stone, Seoul with no phone. Cairo with no phrasebook? 그냥 또 하나의 화요일이야.",
         textEs: "Mr. Black borró mi libro de frases. Antes de que aterrizara. No solo va por delante. Está armando el tablero antes de que me siente. Bien. Sobreviví Londres sin pistas, Madrid sin la piedra, Seúl sin teléfono. ¿El Cairo sin libro de frases? Solo otro martes.",
+        textEsMix: "Mr. Black erased my phrasebook. Before I even landed. He's not just ahead of me. He's arranging the board before I sit down. Fine. I survived London with no clues, Madrid without the stone, Seoul with no phone. Cairo with no phrasebook? Solo otro martes.",
       },
       {
         kind: "scene",
         charId: "amira",
         text: "You're Rudy. The fox detective. Sujin told me about you. Three cities. Zero stones recovered. Forgive me if I'm not impressed. Before I trust you with anything. Prove you can actually communicate. Name these objects in three languages.",
         textKo: "루디지. 여우 탐정. 수진이 말해줬어. 세 도시. 되찾은 수호석 제로. 감동 안 받은 거 이해해줘. 뭔가를 믿기 전에. 실제로 소통할 수 있는지 증명해봐. 이 물건들의 이름을 세 개 언어로 말해봐.",
+        textKoMix: "You're Rudy. The fox detective. Sujin told me about you. Three cities. Zero stones recovered. Forgive me if I'm not impressed. 뭔가를 믿기 전에. Prove you can actually communicate. Name these objects in three languages.",
         textEs: "Eres Rudy. El detective zorro. Sujin me habló de ti. Tres ciudades. Cero piedras recuperadas. Perdóname si no estoy impresionada. Antes de confiarte cualquier cosa. Demuestra que puedes comunicarte. Di el nombre de estos objetos en tres idiomas.",
+        textEsMix: "You're Rudy. The fox detective. Sujin told me about you. Three cities. Zero stones recovered. Forgive me if I'm not impressed. Antes de confiarte cualquier cosa. Prove you can actually communicate. Name these objects in three languages.",
       },
       {
         kind: "puzzle",
@@ -2467,14 +2564,18 @@ const STORIES: Record<string, Story> = {
         charId: "amira",
         text: "Not bad. Not perfect, but not bad. You know more than Sujin warned me. Come. My cousin Hassan is at the souk. He talks too much, knows too much, and cannot keep a secret to save his life. He's exactly what we need.",
         textKo: "나쁘지 않아. 완벽하지는 않지만 나쁘지 않아. 수진이 경고한 것보다 많이 알고 있네. 가자. 사촌 하산이 수크에 있어. 말이 너무 많고, 아는 게 너무 많고, 비밀을 절대 못 지켜. 정확히 우리에게 필요한 사람이야.",
+        textKoMix: "Not bad. Not perfect, but not bad. You know more than Sujin warned me. Come. My cousin Hassan is at the souk. He talks too much, knows too much, 비밀을 절대 못 지켜. He's exactly what we need.",
         textEs: "Nada mal. No perfecto, pero nada mal. Sabes más de lo que Sujin me advirtió. Ven. Mi primo Hassan está en el zoco. Habla demasiado, sabe demasiado, y no puede guardar un secreto ni para salvar su vida. Es exactamente lo que necesitamos.",
+        textEsMix: "Not bad. Not perfect, but not bad. You know more than Sujin warned me. Come. My cousin Hassan is at the souk. He talks too much, knows too much, y no puede guardar un secreto ni para salvar su vida. He's exactly what we need.",
       },
       {
         kind: "scene",
         charId: "hassan",
         text: "*gestures expansively at his stall* Welcome! Welcome! You want spices? Silk? Information about a man in a black coat who was here yesterday asking about the old excavation site? I tell you everything! Very reasonable price!",
         textKo: "*가판대를 향해 활짝 손짓하며* 어서 오세요! 어서 오세요! 향신료 원해요? 비단? 어제 오래된 발굴 현장에 대해 묻고 다닌 검은 코트 남자에 대한 정보? 다 말해줄게요! 아주 합리적인 가격에!",
+        textKoMix: "*가판대를 향해 활짝 손짓하며* Welcome! Welcome! You want spices? Silk? Information about a man in a black coat 어제 오래된 발굴 현장에 대해 묻고 다닌? I tell you everything! Very reasonable price!",
         textEs: "*gesticula ampliamente hacia su puesto* ¡Bienvenido! ¡Bienvenido! ¿Quieres especias? ¿Seda? ¿Información sobre un hombre de abrigo negro que estuvo aquí ayer preguntando sobre el viejo sitio de excavación? ¡Te cuento todo! ¡Precio muy razonable!",
+        textEsMix: "*gesticula ampliamente hacia su puesto* Welcome! Welcome! You want spices? Silk? Information about a man in a black coat que estuvo aquí ayer preguntando sobre el viejo sitio de excavación? I tell you everything! Very reasonable price!",
       },
       {
         kind: "puzzle",
@@ -2518,7 +2619,9 @@ const STORIES: Record<string, Story> = {
         charId: "amira",
         text: "My family has protected the Cairo stone for four generations. My grandmother hid it at Saqqara during the war. My mother guarded it. I study it. And then... someone else came first. A woman. With a book of literary quotes and very tired eyes.",
         textKo: "우리 가족은 4대에 걸쳐 카이로 수호석을 지켜왔어. 할머니가 전쟁 중에 사카라에 숨겼어. 어머니가 지켰어. 나는 연구해. 그리고... 다른 누군가가 먼저 왔어. 한 여자. 문학 인용구가 가득한 책을 들고 피곤한 눈을 한.",
+        textKoMix: "My family has protected the Cairo stone for four generations. 할머니가 전쟁 중에 Saqqara에 숨겼어. My mother guarded it. I study it. And then... someone else came first. A woman. With a book of literary quotes and very tired eyes.",
         textEs: "Mi familia ha protegido la piedra de El Cairo por cuatro generaciones. Mi abuela la escondió en Saqqara durante la guerra. Mi madre la guardó. Yo la estudio. Y luego... alguien más llegó primero. Una mujer. Con un libro lleno de citas literarias y ojos muy cansados.",
+        textEsMix: "My family has protected the Cairo stone for four generations. Mi abuela la escondió en Saqqara durante la guerra. My mother guarded it. I study it. And then... someone else came first. A woman. With a book of literary quotes and very tired eyes.",
       },
       {
         kind: "puzzle",
@@ -2544,7 +2647,9 @@ const STORIES: Record<string, Story> = {
         charId: "penny",
         text: "*steps from shadow behind a pillar* Hello, detective. You look surprised. You shouldn't be. I've been following you since London. I helped build the Universal Code. I thought it would create understanding between people. *voice breaks* I was wrong. And I need to make it right.",
         textKo: "*기둥 뒤 그늘에서 나서며* 안녕하세요, 탐정님. 놀란 것 같네요. 그러지 마세요. 런던부터 계속 따라다녔어요. 저는 유니버설 코드를 만드는 걸 도왔어요. 사람들 사이에 이해를 만들 줄 알았어요. *목소리가 갈라지며* 틀렸어요. 그리고 바로잡아야 해요.",
+        textKoMix: "*기둥 뒤 그늘에서 나서며* Hello, detective. You look surprised. You shouldn't be. I've been following you since London. I helped build the Universal Code. 사람들 사이에 이해를 만들 줄 알았어요. *목소리가 갈라지며* I was wrong. And I need to make it right.",
         textEs: "*sale de las sombras detrás de un pilar* Hola, detective. Parece sorprendido. No debería. Lo he seguido desde Londres. Ayudé a construir el Código Universal. Pensé que crearía entendimiento entre las personas. *la voz se quiebra* Estaba equivocada. Y necesito arreglarlo.",
+        textEsMix: "*sale de las sombras detrás de un pilar* Hello, detective. You look surprised. You shouldn't be. I've been following you since London. I helped build the Universal Code. Pensé que crearía entendimiento entre las personas. *la voz se quiebra* I was wrong. And I need to make it right.",
         idiomRef: "idiom_penny_1",
       },
       {
@@ -2600,21 +2705,27 @@ const STORIES: Record<string, Story> = {
         charId: "mr_black",
         text: "*steps out of shadow* Put it down, Detective. I just want you to understand something first. My mother spoke Welsh. Beautiful language. I was twelve when she died. In the hospital, the nurses didn't speak it. The doctors didn't speak it. She died asking for water in a language no one there understood. 'Dŵr. Dŵr.' *pause* Do you know what that means?",
         textKo: "*그늘에서 나서며* 내려놓아요, 탐정님. 먼저 한 가지를 이해해줬으면 해요. 제 어머니는 웨일스어를 했어요. 아름다운 언어. 제가 열두 살 때 돌아가셨어요. 병원에서 간호사들은 웨일스어를 몰랐어요. 의사들도 몰랐어요. 어머니는 아무도 이해 못 하는 언어로 물을 달라고 하다 돌아가셨어요. 'Dŵr. Dŵr.' *침묵* 그게 무슨 뜻인지 알아요?",
+        textKoMix: "*그늘에서 나서며* Put it down, Detective. I just want you to understand something first. My mother spoke Welsh. Beautiful language. I was twelve when she died. In the hospital, the nurses didn't speak it. The doctors didn't speak it. 어머니는 아무도 이해 못 하는 언어로 물을 달라고 하다 돌아가셨어요. 'Dŵr. Dŵr.' *침묵* Do you know what that means?",
         textEs: "*sale de las sombras* Bájala, detective. Solo quiero que entiendas algo primero. Mi madre hablaba galés. Un idioma hermoso. Tenía doce años cuando murió. En el hospital, las enfermeras no lo hablaban. Los médicos tampoco. Murió pidiendo agua en un idioma que nadie allí entendía. 'Dŵr. Dŵr.' *pausa* ¿Sabe lo que significa?",
+        textEsMix: "*sale de las sombras* Put it down, Detective. I just want you to understand something first. My mother spoke Welsh. Beautiful language. I was twelve when she died. In the hospital, the nurses didn't speak it. The doctors didn't speak it. Murió pidiendo agua en un idioma que nadie allí entendía. 'Dŵr. Dŵr.' *pausa* Do you know what that means?",
       },
       {
         kind: "scene",
         charId: "lingo",
         text: "Water. It means water. *quietly* And you're going to erase every language on Earth. Because no one spoke your mother's.",
         textKo: "물이요. 물이라는 뜻이에요. *조용히* 그리고 당신은 지구상의 모든 언어를 지우려 해요. 아무도 당신 어머니의 언어를 몰랐기 때문에.",
+        textKoMix: "Water. It means water. *조용히* And you're going to erase every language on Earth. 아무도 당신 어머니의 언어를 몰랐기 때문에.",
         textEs: "Agua. Significa agua. *en voz baja* Y vas a borrar todos los idiomas de la Tierra. Porque nadie hablaba el de tu madre.",
+        textEsMix: "Water. It means water. *en voz baja* And you're going to erase every language on Earth. Porque nadie hablaba el de tu madre.",
       },
       {
         kind: "scene",
         charId: "mr_black",
         text: "I'm going to give everyone THE SAME language. No one will ever die alone again. Unable to say what they need. No more Carlos screaming 'help' in a room where no one understands. One language. Universal. Perfect.",
         textKo: "모든 사람에게 같은 언어를 줄 거예요. 더 이상 아무도 혼자 죽지 않아도 돼요. 필요한 걸 말하지 못해서. 카를로스처럼 '도와주세요'를 외치다가 아무도 못 알아듣는 방에서 죽지 않아도 돼요. 하나의 언어. 유니버설. 완벽해.",
+        textKoMix: "I'm going to give everyone THE SAME language. No one will ever die alone again. Unable to say what they need. 카를로스처럼 'help'를 외치다가 아무도 못 알아듣는 방에서 죽지 않아도 돼요. One language. Universal. Perfect.",
         textEs: "Voy a darle a todo el mundo EL MISMO idioma. Nadie volverá a morir solo. Sin poder decir lo que necesita. No más Carlos gritando 'ayuda' en una habitación donde nadie entiende. Un idioma. Universal. Perfecto.",
+        textEsMix: "I'm going to give everyone THE SAME language. No one will ever die alone again. Unable to say what they need. No más Carlos gritando 'help' en una habitación donde nadie entiende. One language. Universal. Perfect.",
         idiomRef: "idiom_black_1",
       },
       {
@@ -2651,14 +2762,18 @@ const STORIES: Record<string, Story> = {
         charId: "lingo",
         text: "Your mother's language didn't need to be erased. It needed to be learned. By one more person. By the nurse. By the doctor. That's what language does. It spreads, it survives, it connects. Your solution kills the disease by killing the patient.",
         textKo: "어머니의 언어는 지워질 필요가 없었어요. 더 많은 사람들이 배웠어야 했어요. 간호사가. 의사가. 그게 언어가 하는 일이에요. 퍼지고, 살아남고, 연결해요. 당신의 해결책은 환자를 죽여서 병을 치료하는 거예요.",
+        textKoMix: "Your mother's language didn't need to be erased. It needed to be learned. By one more person. By the nurse. By the doctor. That's what language does. It spreads, it survives, it connects. 당신의 해결책은 환자를 죽여서 병을 치료하는 거예요.",
         textEs: "El idioma de tu madre no necesitaba ser borrado. Necesitaba ser aprendido. Por una persona más. Por la enfermera. Por el médico. Eso es lo que hace el idioma. Se expande, sobrevive, conecta. Tu solución mata a la paciente para curar la enfermedad.",
+        textEsMix: "Your mother's language didn't need to be erased. It needed to be learned. By one more person. By the nurse. By the doctor. That's what language does. It spreads, it survives, it connects. Tu solución mata a la paciente para curar la enfermedad.",
       },
       {
         kind: "scene",
         charId: "mr_black",
         text: "*takes the stone* I understand your argument, Detective. It's... not wrong. But I've been building this for thirty years. *vanishes into the dark* Four city stones. Three foundation stones. Seven locks. The clock has already started.",
         textKo: "*수호석을 집어들며* 당신의 논리는 이해해요, 탐정님. 틀리지 않아요. 하지만 30년 동안 이걸 만들어왔어요. *어둠 속으로 사라지며* 5개예요. 5개를 갖고 있어요. 당신에겐 두 번의 기회가 남아 있어요. 시계는 이미 돌아가고 있어요.",
+        textKoMix: "*the stone을 집어들며* I understand your argument, Detective. It's... not wrong. 하지만 30년 동안 이걸 만들어왔어요. *어둠 속으로 사라지며* 5개를 갖고 있어요. 당신에겐 두 번의 기회가 남아 있어요. The clock has already started.",
         textEs: "*toma la piedra* Entiendo tu argumento, detective. No está... equivocado. Pero he estado construyendo esto durante treinta años. *desaparece en la oscuridad* Cuatro piedras de ciudad. Tres piedras de cimiento. Siete candados. El reloj ya ha empezado.",
+        textEsMix: "*toma the stone* I understand your argument, Detective. It's... not wrong. Pero he estado construyendo esto durante treinta años. *desaparece en la oscuridad* Four city stones. Three foundation stones. Seven locks. The clock has already started.",
       },
       {
         kind: "clue",
@@ -2675,7 +2790,9 @@ const STORIES: Record<string, Story> = {
         charId: "penny",
         text: "There is one place he can be stopped. Where the Universal Code was first designed. The Babel Tower, coordinates that only the four city stones can reveal. The final three are already there, buried in the foundation. But Rudy... you cannot go alone. You need everyone. Every language you've collected. Everyone who helped you.",
         textKo: "그를 막을 수 있는 장소가 하나 있어요. 유니버설 코드가 처음 설계된 곳. 바벨 타워, 7개의 수호석이 합쳐져야만 드러나는 좌표. 하지만 루디... 혼자 갈 수 없어요. 모든 사람이 필요해요. 당신이 모은 모든 언어. 당신을 도운 모든 사람.",
+        textKoMix: "There is one place he can be stopped. Where the Universal Code was first designed. The Babel Tower, 7개의 수호석이 합쳐져야만 드러나는 좌표. But Rudy... you cannot go alone. You need everyone. Every language you've collected. Everyone who helped you.",
         textEs: "Hay un lugar donde se le puede detener. Donde el Código Universal fue diseñado por primera vez. La Torre de Babel, coordenadas que solo las cuatro piedras de ciudad pueden revelar. Las últimas tres ya están allí, enterradas en los cimientos. Pero Rudy... no puedes ir solo. Necesitas a todos. Cada idioma que has recopilado. A todos los que te ayudaron.",
+        textEsMix: "There is one place he can be stopped. Where the Universal Code was first designed. The Babel Tower, coordinates that only the four city stones can reveal. The final three are already there, buried in the foundation. But Rudy... you cannot go alone. You need everyone. Every language you've collected. A todos los que te ayudaron.",
       },
     ],
   },

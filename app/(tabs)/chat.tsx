@@ -110,6 +110,9 @@ function TutorCard({ tutor, onPress, nativeLang }: { tutor: Tutor; onPress: () =
           source={TUTOR_IMAGES[tutor.id]}
           style={styles.avatarImg}
           resizeMode="cover"
+          accessible={false}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
         />
         <View style={styles.flagBadge}>
           <Text style={styles.flagText}>{tutor.flag}</Text>
@@ -135,6 +138,8 @@ function TutorCard({ tutor, onPress, nativeLang }: { tutor: Tutor; onPress: () =
             pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] },
           ]}
           onPress={onPress}
+          accessibilityRole="button"
+          accessibilityLabel={`${tutor.name}, ${START_LABELS[nativeLang]}`}
         >
           <Text style={[styles.startBtnText, { color: langColor }]}>
             {START_LABELS[nativeLang]}

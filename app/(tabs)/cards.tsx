@@ -1390,6 +1390,11 @@ export default function CardsScreen() {
           <Pressable
             style={[styles.deckTab, deckType === "srs" && styles.deckTabActive]}
             onPress={() => switchDeck("srs")}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: deckType === "srs" }}
+            accessibilityLabel={
+              nativeLang === "korean" ? `복습 ${srsDueCount}` : nativeLang === "spanish" ? `Repaso ${srsDueCount}` : `Review ${srsDueCount}`
+            }
           >
             {deckType === "srs" && (
               <LinearGradient colors={[C.gold, C.goldDark]} style={[StyleSheet.absoluteFill, { borderRadius: 14 }]} />
@@ -1401,6 +1406,11 @@ export default function CardsScreen() {
           <Pressable
             style={[styles.deckTab, deckType === "beginner" && styles.deckTabActive]}
             onPress={() => switchDeck("beginner")}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: deckType === "beginner" }}
+            accessibilityLabel={
+              nativeLang === "korean" ? "초급" : nativeLang === "spanish" ? "Principiante" : "Beginner"
+            }
           >
             {deckType === "beginner" && (
               <LinearGradient colors={[C.gold, C.goldDark]} style={[StyleSheet.absoluteFill, { borderRadius: 14 }]} />
@@ -1412,6 +1422,11 @@ export default function CardsScreen() {
           <Pressable
             style={[styles.deckTab, deckType === "advanced" && styles.deckTabActive]}
             onPress={() => switchDeck("advanced")}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: deckType === "advanced" }}
+            accessibilityLabel={
+              nativeLang === "korean" ? "고급" : nativeLang === "spanish" ? "Avanzado" : "Advanced"
+            }
           >
             {deckType === "advanced" && (
               <LinearGradient colors={[C.gold, C.goldDark]} style={[StyleSheet.absoluteFill, { borderRadius: 14 }]} />
@@ -1554,7 +1569,19 @@ export default function CardsScreen() {
                 { transform: [{ translateX: slideAnim }, { scale: scaleAnim }] },
               ]}
             >
-              <Pressable onPress={handleFlip} style={styles.cardPressable}>
+              <Pressable
+                onPress={handleFlip}
+                style={styles.cardPressable}
+                accessibilityRole="button"
+                accessibilityState={{ expanded: isFlipped }}
+                accessibilityLabel={
+                  nativeLang === "korean"
+                    ? "플래시카드, 탭하여 뒤집기"
+                    : nativeLang === "spanish"
+                    ? "Tarjeta, toca para girar"
+                    : "Flashcard, tap to flip"
+                }
+              >
                 <Animated.View
                   style={[
                     styles.card,
@@ -1578,6 +1605,14 @@ export default function CardsScreen() {
                       style={({ pressed }) => [styles.speakerBtn, pressed && { opacity: 0.75 }]}
                       onPress={handleSpeak}
                       hitSlop={12}
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        nativeLang === "korean"
+                          ? "발음 듣기"
+                          : nativeLang === "spanish"
+                          ? "Escuchar pronunciación"
+                          : "Hear pronunciation"
+                      }
                     >
                       <LinearGradient
                         colors={isSpeaking ? [C.goldDark, C.bg2] : [C.gold, C.goldDark]}
@@ -1639,6 +1674,14 @@ export default function CardsScreen() {
                 style={({ pressed }) => [styles.listenRowBtn, pressed && { opacity: 0.75 }]}
                 onPress={handleSpeak}
                 hitSlop={12}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  nativeLang === "korean"
+                    ? "발음 듣기"
+                    : nativeLang === "spanish"
+                    ? "Escuchar pronunciación"
+                    : "Hear pronunciation"
+                }
               >
                 <Ionicons
                   name={isSpeaking ? "volume-high" : "volume-medium"}
@@ -1666,30 +1709,60 @@ export default function CardsScreen() {
 
           {isFlipped ? (
             <View style={styles.actionRow}>
-              <RippleButton
-                style={[styles.actionBtn, styles.againBtn]}
-                onPress={() => advanceCard(false)}
-                rippleColor="rgba(255,152,0,0.35)"
+              {/* RippleButton doesn't forward a11y props, so the semantic
+                  button node lives on a wrapping View. The label spells out
+                  the meaning so SR users don't depend on the emoji or the
+                  orange/green colour alone. */}
+              <View
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={
+                  nativeLang === "korean"
+                    ? "다시, 더 연습할게요"
+                    : nativeLang === "spanish"
+                    ? "Otra vez, necesito más práctica"
+                    : "Again, I need more practice"
+                }
+                style={styles.actionBtnWrap}
               >
-                <View style={styles.actionBtnInner}>
-                  <Text style={styles.againBtnEmoji}>😅</Text>
-                  <Text style={[styles.actionLabel, { color: C.gold }]}>
-                    {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : "Again"}
-                  </Text>
-                </View>
-              </RippleButton>
-              <RippleButton
-                style={[styles.actionBtn, styles.gotItBtn]}
-                onPress={() => advanceCard(true)}
-                rippleColor="rgba(76,175,80,0.35)"
+                <RippleButton
+                  style={[styles.actionBtn, styles.againBtn]}
+                  onPress={() => advanceCard(false)}
+                  rippleColor="rgba(255,152,0,0.35)"
+                >
+                  <View style={styles.actionBtnInner}>
+                    <Text style={styles.againBtnEmoji}>😅</Text>
+                    <Text style={[styles.actionLabel, { color: C.gold }]}>
+                      {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : "Again"}
+                    </Text>
+                  </View>
+                </RippleButton>
+              </View>
+              <View
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={
+                  nativeLang === "korean"
+                    ? "알아요, 이 단어를 알고 있어요"
+                    : nativeLang === "spanish"
+                    ? "Lo sé, conozco esta palabra"
+                    : "Got it, I know this word"
+                }
+                style={styles.actionBtnWrap}
               >
-                <View style={styles.actionBtnInner}>
-                  <Text style={styles.gotItBtnEmoji}>✅</Text>
-                  <Text style={[styles.actionLabel, { color: "#5a9" }]}>
-                    {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : "Got it!"}
-                  </Text>
-                </View>
-              </RippleButton>
+                <RippleButton
+                  style={[styles.actionBtn, styles.gotItBtn]}
+                  onPress={() => advanceCard(true)}
+                  rippleColor="rgba(76,175,80,0.35)"
+                >
+                  <View style={styles.actionBtnInner}>
+                    <Text style={styles.gotItBtnEmoji}>✅</Text>
+                    <Text style={[styles.actionLabel, { color: "#5a9" }]}>
+                      {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : "Got it!"}
+                    </Text>
+                  </View>
+                </RippleButton>
+              </View>
             </View>
           ) : (
             <View style={styles.flipPromptRow}>
@@ -2020,6 +2093,9 @@ const styles = StyleSheet.create({
     gap: 14,
     paddingHorizontal: 20,
     paddingTop: 12,
+  },
+  actionBtnWrap: {
+    flex: 1,
   },
   actionBtn: {
     flex: 1,
