@@ -20,7 +20,7 @@ import { useLanguage, getLevel, getLevelProgress, getLevelName, getEffectiveLear
 import { RudyMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
 import { LanguageChangeModal } from "@/components/LanguageChangeModal";
-import { RudyGuideModal, getNextGuideIndex } from "@/components/RudyGuideModal";
+import { RudyGuideModal, getNextGuideIndex, migrateGuideIfStale } from "@/components/RudyGuideModal";
 import { EmojiText } from "@/components/EmojiText";
 import { SignInPromoBanner } from "@/components/SignInPromoBanner";
 import { useAuth } from "@/context/AuthContext";
@@ -272,7 +272,7 @@ export default function HomeScreen() {
       return;
     }
     let cancelled = false;
-    getNextGuideIndex().then((idx) => {
+    migrateGuideIfStale().then(() => getNextGuideIndex()).then((idx) => {
       if (!cancelled && idx !== null) setShowGuide(true);
     });
     return () => { cancelled = true; };

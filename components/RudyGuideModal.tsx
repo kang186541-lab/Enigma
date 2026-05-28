@@ -63,6 +63,25 @@ export async function markGuideComplete(): Promise<void> {
   await AsyncStorage.setItem(GUIDE_LAST_SHOWN_KEY, todayKey());
 }
 
+export async function resetGuideForDrip(): Promise<void> {
+  await AsyncStorage.removeItem(GUIDE_KEY);
+  await AsyncStorage.removeItem(GUIDE_LAST_SHOWN_KEY);
+}
+
+// One-time migration: users who saw the old all-at-once onboarding dump were
+// stamped at the old max (8) via markGuideComplete and would never see the
+// drip. Resume them at the first NEW card (index 8) instead of replaying 1-7.
+export async function migrateGuideIfStale(): Promise<void> {
+  const MIGRATION_KEY = "rudy_guide_drip_v2";
+  if (await AsyncStorage.getItem(MIGRATION_KEY)) return;
+  const raw = await AsyncStorage.getItem(GUIDE_KEY);
+  const idx = raw ? parseInt(raw, 10) : 0;
+  if (idx >= 8 && idx < GUIDE_CARDS.length) {
+    await AsyncStorage.setItem(GUIDE_KEY, "8");
+  }
+  await AsyncStorage.setItem(MIGRATION_KEY, "1");
+}
+
 export function RudyGuideModal({
   visible,
   lang,

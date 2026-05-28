@@ -24,6 +24,7 @@ const goals: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship
 const onboardingSource = readFileSync("app/onboarding.tsx", "utf8");
 const speakSource = readFileSync("app/(tabs)/speak.tsx", "utf8");
 const homeSource = readFileSync("app/(tabs)/index.tsx", "utf8");
+const guideModalSource = readFileSync("components/RudyGuideModal.tsx", "utf8");
 const cardsSource = readFileSync("app/(tabs)/cards.tsx", "utf8");
 const achievementsSource = readFileSync("app/achievements.tsx", "utf8");
 const basicCourseSource = readFileSync("app/basic-course.tsx", "utf8");
@@ -127,35 +128,24 @@ function collectDayOneToSixText(lang: LearningLangKey): string {
   return normalizeContentText(lines.join(" "));
 }
 
-assert.equal(RUDY_GUIDE_CARDS.length, 8, "Rudy's Language Guide should stay at the 8 philosophy cards from replit.md");
+assert.ok(RUDY_GUIDE_CARDS.length >= 13, "Rudy's Language Guide should restore the full daily-drip set (>=13 cards)");
+const guideTitlesKo = RUDY_GUIDE_CARDS.map((card) => card.title.korean);
 assert.deepEqual(
-  RUDY_GUIDE_CARDS.map((card) => card.title.korean),
-  [
-    "언어는 공부가 아니야",
-    "불편해져야 배울 수 있어",
-    "하루 10분이면 충분해",
-    "틀려도 일단 말해!",
-    "네가 쓸 말부터 배워",
-    "좋아하는 걸로 배워봐",
-    "습관을 만들어봐",
-    "자, 이제 시작하자!",
-  ],
-  "Rudy's Language Guide titles should match the locked philosophy order"
+  guideTitlesKo.slice(0, 7),
+  ["언어는 공부가 아니야","불편해져야 배울 수 있어","하루 10분이면 충분해","틀려도 일단 말해!","네가 쓸 말부터 배워","좋아하는 걸로 배워봐","습관을 만들어봐"],
+  "Rudy's Language Guide should keep the locked philosophy cards first"
 );
+assert.equal(guideTitlesKo[guideTitlesKo.length - 1], "자, 이제 시작하자!", "Rudy's guide closer should stay last");
 
 assert.ok(
-  onboardingSource.includes("Rudy's 8-card language philosophy"),
-  "Onboarding should show Rudy's 8-card philosophy before the first speaking mission"
+  !onboardingSource.includes("markGuideComplete") &&
+  !onboardingSource.includes("RUDY_GUIDE_CARDS") &&
+  onboardingSource.includes("resetGuideForDrip"),
+  "Onboarding should not dump the guide cards; it should reset the drip so the philosophy appears one card per day on home"
 );
 assert.ok(
-  onboardingSource.includes("RUDY_GUIDE_CARDS") && onboardingSource.includes("markGuideComplete"),
-  "Onboarding should render all guide cards and mark them complete after first-launch onboarding"
-);
-assert.ok(
-  onboardingSource.includes("style={({ pressed }) => [styles.guideCard, pressed && styles.guideCardPress]}") &&
-  onboardingSource.includes("guideFinalHint") &&
   onboardingSource.includes("setupCtaLabel"),
-  "Onboarding should keep Rudy's guide intact while reducing friction before the first spoken sentence"
+  "Onboarding should keep a single setup CTA before the first spoken sentence"
 );
 assert.ok(
   onboardingSource.includes('mission: "first-sentence"') && onboardingSource.includes("goal: goalSel"),
@@ -169,33 +159,39 @@ assert.ok(
   "Onboarding should preview the actual goal-personalized first sentence before routing into Speak"
 );
 const onboardingSetupNextIndex = onboardingSource.indexOf("const handleSetupNext = () =>");
-const onboardingSetupToGuideIndex = onboardingSource.indexOf("setStep(3);", onboardingSetupNextIndex);
-const onboardingGuideNextIndex = onboardingSource.indexOf("const handleGuideNext = async () =>");
-const onboardingGuideStartIndex = onboardingSource.indexOf("await handleStartSpeaking();", onboardingGuideNextIndex);
+const onboardingSetupStartIndex = onboardingSource.indexOf("handleStartSpeaking()", onboardingSetupNextIndex);
 const onboardingStartSpeakingIndex = onboardingSource.indexOf("const handleStartSpeaking = async () =>");
 const onboardingSetNativeIndex = onboardingSource.indexOf("await setNativeLanguage(nativeSel);", onboardingStartSpeakingIndex);
 const onboardingSetGoalIndex = onboardingSource.indexOf("await setPrimaryLearningGoal(goalSel)", onboardingStartSpeakingIndex);
-const onboardingMarkGuideIndex = onboardingSource.indexOf("await markGuideComplete()", onboardingStartSpeakingIndex);
+const onboardingResetDripIndex = onboardingSource.indexOf("resetGuideForDrip()", onboardingStartSpeakingIndex);
 assert.ok(
-  !onboardingSource.includes("setGoalSel((goal) => goal ?? getHomeLearningGoalOptions(uiLang)[0]?.key ?? \"travel\")") &&
+  !onboardingSource.includes("setStep(3)") &&
   onboardingSource.includes("if (!learnSel) return;") &&
-  onboardingSource.includes("continueToGuideCta") &&
   onboardingSource.includes("goalWaiting") &&
   onboardingSource.includes('missionIndex: "0"') &&
   onboardingSource.includes('accessibilityState={{ selected: sel }}') &&
-  onboardingSetupToGuideIndex > onboardingSetupNextIndex &&
-  onboardingGuideStartIndex > onboardingGuideNextIndex &&
-  onboardingStartSpeakingIndex > onboardingGuideNextIndex &&
+  onboardingSetupStartIndex > onboardingSetupNextIndex &&
   onboardingSetNativeIndex > onboardingStartSpeakingIndex &&
   onboardingSetGoalIndex > onboardingSetNativeIndex &&
-  onboardingMarkGuideIndex > onboardingSetGoalIndex,
-  "Onboarding should require a conscious goal choice, preview the first sentence, then show Rudy's guide as the pre-flight before starting speech"
+  onboardingResetDripIndex > onboardingSetGoalIndex,
+  "Onboarding should go straight from setup to the first spoken sentence and start the daily guide drip (no all-at-once guide dump)"
 );
 assert.ok(
   !onboardingSource.includes("the first sentence you just chose") &&
   !onboardingSource.includes("방금 고른 첫 문장") &&
   !onboardingSource.includes("primera frase que acabas de elegir"),
   "Onboarding copy should say Rudy prepared the first sentence, not that the learner manually chose it"
+);
+assert.ok(
+  guideModalSource.includes("GUIDE_LAST_SHOWN_KEY") &&
+  guideModalSource.includes("lastShown === todayKey()") &&
+  guideModalSource.includes("export async function resetGuideForDrip") &&
+  guideModalSource.includes("export async function migrateGuideIfStale"),
+  "RudyGuideModal should keep the once-per-day drip throttle plus drip reset + stale migration"
+);
+assert.ok(
+  homeSource.includes("migrateGuideIfStale"),
+  "Home should run the guide drip migration before computing the next card"
 );
 assert.ok(
   speakSource.includes("missionIndex?: string | string[]") &&

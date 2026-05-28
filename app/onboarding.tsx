@@ -15,13 +15,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
 import { Ionicons } from "@expo/vector-icons";
-import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
-import { markGuideComplete } from "@/components/RudyGuideModal";
+import { resetGuideForDrip } from "@/components/RudyGuideModal";
 import { trackLearningEvent } from "@/lib/learningEvents";
 import { getHomeGoalPrompt, getHomeLearningGoalOptions } from "@/lib/homeSpeakingMission";
 import { setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
-import { RUDY_GUIDE_CARDS } from "@/lib/rudyGuideCards";
 import { getDailySpeakingMissionPhrase, type DailySpeakingLanguage } from "@/lib/dailySpeakingMissions";
 
 const rudySplashImg = require("@/assets/rudy_splash.png");
@@ -47,7 +45,7 @@ function RudySplashPlaceholder() {
   );
 }
 
-type Step = 1 | 2 | 3;
+type Step = 1 | 2;
 
 const ALL_LANGS: { id: NativeLanguage; badge: string; nameMap: Record<NativeLanguage, string> }[] = [
   { id: "korean",  badge: "KO", nameMap: { korean: "한국어",    english: "Korean",  spanish: "Coreano" } },
@@ -88,7 +86,7 @@ const UI: Record<NativeLanguage, {
     setupGoalLabel: "실제로 쓸 상황",
     chooseLanguageCta: "배울 언어 선택",
     chooseGoalCta: "상황 선택",
-    continueToGuideCta: "Rudy 가이드 보기",
+    continueToGuideCta: "첫 문장 말하기",
     cta1: "다음", cta2: "말하기 시작", back: "뒤로",
   },
   english: {
@@ -110,7 +108,7 @@ const UI: Record<NativeLanguage, {
     setupGoalLabel: "Real-use situation",
     chooseLanguageCta: "Choose a language",
     chooseGoalCta: "Choose a situation",
-    continueToGuideCta: "Continue to Rudy's guide",
+    continueToGuideCta: "Say your first sentence",
     cta1: "Next", cta2: "Start speaking", back: "Back",
   },
   spanish: {
@@ -132,7 +130,7 @@ const UI: Record<NativeLanguage, {
     setupGoalLabel: "Situación real",
     chooseLanguageCta: "Elige un idioma",
     chooseGoalCta: "Elige una situación",
-    continueToGuideCta: "Continuar con Rudy",
+    continueToGuideCta: "Di tu primera frase",
     cta1: "Siguiente", cta2: "Empezar a hablar", back: "Atrás",
   },
 };
@@ -145,15 +143,12 @@ export default function OnboardingScreen() {
   const [nativeSel, setNativeSel] = useState<NativeLanguage | null>(null);
   const [learnSel,  setLearnSel]  = useState<NativeLanguage | null>(null);
   const [goalSel,   setGoalSel]   = useState<LearningGoal | null>(null);
-  const [guideIdx,  setGuideIdx]  = useState(0);
   const [loading,   setLoading]   = useState(false);
   const submittingRef = useRef(false);
 
   const uiLang: NativeLanguage = nativeSel ?? "english";
   const ui = UI[uiLang];
   const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel);
-  const guideCard = RUDY_GUIDE_CARDS[guideIdx] ?? RUDY_GUIDE_CARDS[0];
-  const isLastGuideCard = guideIdx >= RUDY_GUIDE_CARDS.length - 1;
   const setupCtaLabel = !learnSel ? ui.chooseLanguageCta : !goalSel ? ui.chooseGoalCta : ui.continueToGuideCta;
   const firstSpeakingPreview = learnSel && goalSel
     ? getDailySpeakingMissionPhrase(learnSel as DailySpeakingLanguage, goalSel, 0)
@@ -165,7 +160,7 @@ export default function OnboardingScreen() {
 
   const handleNativePick = (lang: NativeLanguage) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setNativeSel(lang); setLearnSel(null); setGoalSel(null); setGuideIdx(0);
+    setNativeSel(lang); setLearnSel(null); setGoalSel(null);
   };
 
   const handleLearnPick = (lang: NativeLanguage) => {
@@ -192,21 +187,9 @@ export default function OnboardingScreen() {
     }
   };
 
-  const handleGuideNext = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (!isLastGuideCard) {
-      setGuideIdx((idx) => Math.min(idx + 1, RUDY_GUIDE_CARDS.length - 1));
-      return;
-    }
-    await handleStartSpeaking();
-  };
-
   const handleBack = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (step === 3) {
-      setGuideIdx(0);
-      setStep(2);
-    } else if (step === 2) {
+    if (step === 2) {
       setStep(1);
     } else {
       setStep(1); setLearnSel(null); setGoalSel(null);
@@ -216,8 +199,7 @@ export default function OnboardingScreen() {
   const handleSetupNext = () => {
     if (!nativeSel || !learnSel || !goalSel) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setGuideIdx(0);
-    setStep(3);
+    void handleStartSpeaking();
   };
 
   // Final guide card: lock in the language picks and start with one spoken sentence.
@@ -233,8 +215,8 @@ export default function OnboardingScreen() {
       await setPrimaryLearningGoal(goalSel).catch((err: unknown) => {
         console.warn("[Onboarding] learner goal save failed:", err);
       });
-      await markGuideComplete().catch((err: unknown) => {
-        console.warn("[Onboarding] guide completion save failed:", err);
+      await resetGuideForDrip().catch((err: unknown) => {
+        console.warn("[Onboarding] guide drip reset failed:", err);
       });
       await trackLearningEvent("onboarding_first_speaking_started", {
         surface: "onboarding",
@@ -286,7 +268,6 @@ export default function OnboardingScreen() {
         <View style={styles.dots}>
           <View style={[styles.dot, step === 1 && styles.dotActive]} />
           <View style={[styles.dot, step === 2 && styles.dotActive]} />
-          <View style={[styles.dot, step === 3 && styles.dotActive]} />
         </View>
 
         {/* ── STEP 1 ── */}
@@ -333,59 +314,6 @@ export default function OnboardingScreen() {
               >
                 <Text style={styles.ctaText}>{ui.cta1}</Text>
                 <Ionicons name="arrow-forward" size={20} color={C.bg1} />
-              </Pressable>
-            </View>
-          </>
-        )}
-
-        {/* ── STEP 3: Rudy's 8-card language philosophy ── */}
-        {step === 3 && (
-          <>
-            <View style={styles.textBlock}>
-              <Text style={styles.eyebrow}>{ui.guideEyebrow}</Text>
-              <Text style={styles.title}>{guideCard.title[uiLang] ?? guideCard.title.english}</Text>
-              <Text style={styles.subtitle}>
-                {guideIdx + 1} / {RUDY_GUIDE_CARDS.length}
-              </Text>
-            </View>
-
-            <Pressable
-              style={({ pressed }) => [styles.guideCard, pressed && styles.guideCardPress]}
-              onPress={handleGuideNext}
-              accessibilityRole="button"
-              accessibilityLabel={isLastGuideCard ? ui.guideStart : ui.guideNext}
-            >
-              <View style={styles.guideEmojiWrap}>
-                <EmojiText style={styles.guideEmoji}>{guideCard.emoji}</EmojiText>
-              </View>
-              <Text style={styles.guideBody}>
-                {guideCard.body[uiLang] ?? guideCard.body.english}
-              </Text>
-              {isLastGuideCard ? (
-                <Text style={styles.guideNextHint}>{ui.guideFinalHint}</Text>
-              ) : null}
-              <View style={styles.guideTrack}>
-                <View
-                  style={[
-                    styles.guideFill,
-                    { width: `${((guideIdx + 1) / RUDY_GUIDE_CARDS.length) * 100}%` },
-                  ]}
-                />
-              </View>
-            </Pressable>
-
-            <View style={styles.bottom}>
-              <Pressable style={styles.backBtn} onPress={handleBack}>
-                <Ionicons name="chevron-back" size={18} color={C.gold} />
-                <Text style={styles.backText}>{ui.back}</Text>
-              </Pressable>
-              <Pressable
-                style={({ pressed }) => [styles.cta, styles.ctaFlex, pressed && styles.ctaPress]}
-                onPress={handleGuideNext}
-                accessibilityRole="button"
-              >
-                <Text style={styles.ctaText}>{isLastGuideCard ? ui.guideStart : ui.guideNext}</Text>
-                <Ionicons name={isLastGuideCard ? "sparkles" : "arrow-forward"} size={18} color={C.bg1} />
               </Pressable>
             </View>
           </>
@@ -553,14 +481,6 @@ const styles = StyleSheet.create({
     fontSize: 15, fontFamily: F.body, color: C.goldDim,
     textAlign: "center", lineHeight: 22, fontStyle: "italic",
   },
-  eyebrow: {
-    marginBottom: 8,
-    fontSize: 12,
-    fontFamily: F.label,
-    color: C.goldDim,
-    letterSpacing: 1,
-    textTransform: "uppercase",
-  },
   cards: { width: "100%", maxWidth: 520, alignSelf: "center", paddingHorizontal: 24, gap: 14 },
   card: {
     flexDirection: "row", alignItems: "center",
@@ -594,61 +514,6 @@ const styles = StyleSheet.create({
     width: 28, height: 28, borderRadius: 14,
     backgroundColor: C.gold,
     justifyContent: "center", alignItems: "center",
-  },
-  guideCard: {
-    marginHorizontal: 24,
-    padding: 22,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: C.gold,
-    backgroundColor: C.bg2,
-    alignItems: "center",
-    shadowColor: C.gold,
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
-  },
-  guideCardPress: { transform: [{ scale: 0.99 }], opacity: 0.94 },
-  guideEmojiWrap: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: "rgba(201,162,39,0.15)",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  guideEmoji: { fontSize: 34 },
-  guideBody: {
-    fontSize: 15,
-    fontFamily: F.body,
-    color: C.parchment,
-    textAlign: "center",
-    lineHeight: 24,
-    marginBottom: 18,
-  },
-  guideNextHint: {
-    marginBottom: 14,
-    fontSize: 12,
-    fontFamily: F.bodySemi,
-    color: C.gold,
-    textAlign: "center",
-    lineHeight: 18,
-  },
-  guideTrack: {
-    width: "100%",
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: "rgba(201,162,39,0.18)",
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(201,162,39,0.20)",
-  },
-  guideFill: {
-    height: "100%",
-    borderRadius: 4,
-    backgroundColor: C.gold,
   },
   setupChecklist: {
     marginHorizontal: 24,
