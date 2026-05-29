@@ -12,9 +12,13 @@ const LANG_META: Record<NativeLanguage, { flag: string; ko: string; en: string; 
   korean:  { flag: "🇰🇷", ko: "한국어",    en: "Korean",  es: "Coreano" },
   english: { flag: "🇬🇧", ko: "영어",      en: "English", es: "Inglés"  },
   spanish: { flag: "🇪🇸", ko: "스페인어",  en: "Español", es: "Español" },
+  indonesian: { flag: "🇮🇩", ko: "인도네시아어", en: "Indonesian", es: "Indonesio" },
 };
 
-const ALL_LANGS: NativeLanguage[] = ["korean", "english", "spanish"];
+// Native picker shows all four languages; the learning picker excludes
+// indonesian (it's a native/UI language only in Phase 1, not a learning target).
+const ALL_LANGS: NativeLanguage[] = ["korean", "english", "spanish", "indonesian"];
+const LEARNING_LANGS: NativeLanguage[] = ALL_LANGS.filter((l) => l !== "indonesian");
 
 function getLangName(lang: NativeLanguage, nativeLang: NativeLanguage): string {
   const m = LANG_META[lang];
@@ -25,13 +29,13 @@ function getLangName(lang: NativeLanguage, nativeLang: NativeLanguage): string {
 
 function getLabel(key: string, nativeLang: NativeLanguage): string {
   const labels: Record<string, Record<NativeLanguage, string>> = {
-    title:        { korean: "🌍 학습 설정 변경",              english: "🌍 Change Language Settings",    spanish: "🌍 Cambiar configuración de idioma" },
-    nativeSec:    { korean: "모국어:",                        english: "Native language:",               spanish: "Idioma nativo:" },
-    learnSec:     { korean: "학습 언어:",                     english: "Learning language:",             spanish: "Idioma de aprendizaje:" },
-    warning:      { korean: "⚠️ 언어를 변경하면 퀴즈 내용이 새 언어로 바뀝니다. XP·레벨·진행률은 유지됩니다.", english: "⚠️ Changing languages will update quiz content to the new language. XP, levels, and progress are kept.", spanish: "⚠️ Cambiar idiomas actualizará el contenido del cuestionario. El XP, niveles y progreso se mantienen." },
-    conflict:     { korean: "모국어와 학습 언어는 달라야 해요 🙅", english: "Native and learning languages must be different 🙅", spanish: "Los idiomas nativo y de aprendizaje deben ser diferentes 🙅" },
-    cancel:       { korean: "취소",                           english: "Cancel",                        spanish: "Cancelar" },
-    confirm:      { korean: "변경하기",                       english: "Change Language",               spanish: "Cambiar idioma" },
+    title:        { korean: "🌍 학습 설정 변경",              english: "🌍 Change Language Settings",    spanish: "🌍 Cambiar configuración de idioma", indonesian: "🌍 Ubah Pengaturan Bahasa" },
+    nativeSec:    { korean: "모국어:",                        english: "Native language:",               spanish: "Idioma nativo:", indonesian: "Bahasa ibu:" },
+    learnSec:     { korean: "학습 언어:",                     english: "Learning language:",             spanish: "Idioma de aprendizaje:", indonesian: "Bahasa yang dipelajari:" },
+    warning:      { korean: "⚠️ 언어를 변경하면 퀴즈 내용이 새 언어로 바뀝니다. XP·레벨·진행률은 유지됩니다.", english: "⚠️ Changing languages will update quiz content to the new language. XP, levels, and progress are kept.", spanish: "⚠️ Cambiar idiomas actualizará el contenido del cuestionario. El XP, niveles y progreso se mantienen.", indonesian: "⚠️ Mengubah bahasa akan memperbarui konten kuis ke bahasa baru. XP, level, dan progres tetap tersimpan." },
+    conflict:     { korean: "모국어와 학습 언어는 달라야 해요 🙅", english: "Native and learning languages must be different 🙅", spanish: "Los idiomas nativo y de aprendizaje deben ser diferentes 🙅", indonesian: "Bahasa ibu dan bahasa yang dipelajari harus berbeda 🙅" },
+    cancel:       { korean: "취소",                           english: "Cancel",                        spanish: "Cancelar", indonesian: "Batal" },
+    confirm:      { korean: "변경하기",                       english: "Change Language",               spanish: "Cambiar idioma", indonesian: "Ubah Bahasa" },
   };
   return labels[key]?.[nativeLang] ?? labels[key]?.english ?? key;
 }
@@ -83,9 +87,10 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelNative(lang);
     setConflict(lang === selLearn);
-    // Auto-fix learning language if conflict
+    // Auto-fix learning language if conflict (never auto-pick indonesian — it
+    // is not a learning target).
     if (lang === selLearn) {
-      const fallback = ALL_LANGS.find((l) => l !== lang) ?? "english";
+      const fallback = LEARNING_LANGS.find((l) => l !== lang) ?? "english";
       setSelLearn(fallback);
       setConflict(false);
     }
@@ -141,9 +146,9 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
             </Pressable>
           ))}
 
-          {/* Learning language */}
+          {/* Learning language — indonesian excluded (Phase 1 native-only) */}
           <Text style={[s.sectionLabel, { marginTop: 18 }]}>{getLabel("learnSec", nativeLang)}</Text>
-          {ALL_LANGS.filter((l) => l !== selNative).map((lang) => (
+          {LEARNING_LANGS.filter((l) => l !== selNative).map((lang) => (
             <Pressable
               key={lang}
               style={({ pressed }) => [s.langCard, selLearn === lang && s.langCardSelected, pressed && { opacity: 0.85 }]}

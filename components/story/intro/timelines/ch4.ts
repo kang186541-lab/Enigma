@@ -107,6 +107,7 @@ export const ch4Timeline: IntroTimeline = {
       korean: "기록이 모래처럼 사라지는 도시.",
       english: "The city where records turn to sand.",
       spanish: "La ciudad donde los registros se vuelven arena.",
+      indonesian: "Kota tempat catatan berubah menjadi pasir.",
     },
     startLabel: "Start Cairo Record",
   },

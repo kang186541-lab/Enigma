@@ -102,6 +102,7 @@ export const ch3Timeline: IntroTimeline = {
       korean: "문장의 순서가 무너지는 도시.",
       english: "The city where sentence order begins to fall.",
       spanish: "La ciudad donde empieza a caer el orden de las frases.",
+      indonesian: "Kota tempat urutan kalimat mulai runtuh.",
     },
     startLabel: "Start Seoul Order",
   },

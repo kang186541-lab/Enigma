@@ -268,7 +268,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
 
   // ── Translate Rudy's message ──────────────────────────────────────────────────
 
-  const NATIVE_LANG_LABEL: Record<string, string> = { korean: "Korean", english: "English", spanish: "Spanish" };
+  const NATIVE_LANG_LABEL: Record<string, string> = { korean: "Korean", english: "English", spanish: "Spanish", indonesian: "Indonesian" };
 
   async function fetchTranslation(text: string): Promise<string> {
     try {

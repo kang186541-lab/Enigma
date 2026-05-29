@@ -28,34 +28,41 @@ import { C, F } from "@/constants/theme";
 import { useLanguage } from "@/context/LanguageContext";
 import { updateGoals, type MotivationKey } from "@/lib/learnerProfile";
 
-type LangKey = "korean" | "english" | "spanish";
+type LangKey = "korean" | "english" | "spanish" | "indonesian";
 
 interface OptionCopy {
   key: MotivationKey;
   korean: string;
   english: string;
   spanish: string;
+  indonesian: string;
 }
 
 const OPTIONS: readonly OptionCopy[] = [
   { key: "drama",      korean: "K-pop / K-drama / 콘텐츠",
                        english: "K-pop / K-drama / content",
-                       spanish: "K-pop / K-drama / contenido" },
+                       spanish: "K-pop / K-drama / contenido",
+                       indonesian: "K-pop / K-drama / konten" },
   { key: "travel",     korean: "여행",
                        english: "Travel",
-                       spanish: "Viajes" },
+                       spanish: "Viajes",
+                       indonesian: "Jalan-jalan" },
   { key: "friendship", korean: "친구 / 연애 / 가족",
                        english: "Friends / dating / family",
-                       spanish: "Amigos / pareja / familia" },
+                       spanish: "Amigos / pareja / familia",
+                       indonesian: "Teman / pasangan / keluarga" },
   { key: "work_study", korean: "일 / 학교",
                        english: "Work / school",
-                       spanish: "Trabajo / estudios" },
+                       spanish: "Trabajo / estudios",
+                       indonesian: "Kerja / sekolah" },
   { key: "curious",    korean: "그냥 관심 있어요",
                        english: "Just curious",
-                       spanish: "Solo curiosidad" },
+                       spanish: "Solo curiosidad",
+                       indonesian: "Sekadar penasaran" },
   { key: "other",      korean: "기타",
                        english: "Other",
-                       spanish: "Otro" },
+                       spanish: "Otro",
+                       indonesian: "Lainnya" },
 ] as const;
 
 // Question template — the {lang} slot is filled with the learner's target
@@ -64,24 +71,28 @@ const QUESTION_TEMPLATE: Record<LangKey, string> = {
   korean:  "왜 {lang}를 배우고 있나요?",
   english: "Why are you learning {lang}?",
   spanish: "¿Por qué estás aprendiendo {lang}?",
+  indonesian: "Kenapa kamu belajar {lang}?",
 };
 
 const LANGUAGE_LABEL: Record<LangKey, Record<LangKey, string>> = {
-  korean:  { korean: "한국어",  english: "영어",    spanish: "스페인어" },
-  english: { korean: "Korean",  english: "English", spanish: "Spanish" },
-  spanish: { korean: "coreano", english: "inglés",  spanish: "español" },
+  korean:  { korean: "한국어",  english: "영어",    spanish: "스페인어", indonesian: "인도네시아어" },
+  english: { korean: "Korean",  english: "English", spanish: "Spanish", indonesian: "Indonesian" },
+  spanish: { korean: "coreano", english: "inglés",  spanish: "español", indonesian: "indonesio" },
+  indonesian: { korean: "bahasa Korea", english: "bahasa Inggris", spanish: "bahasa Spanyol", indonesian: "bahasa Indonesia" },
 };
 
 const SKIP_LABEL: Record<LangKey, string> = {
   korean:  "건너뛰기",
   english: "Skip",
   spanish: "Omitir",
+  indonesian: "Lewati",
 };
 
 const HEADER_LABEL: Record<LangKey, string> = {
   korean:  "한 가지만 여쭤볼게요",
   english: "One quick question",
   spanish: "Una pregunta rápida",
+  indonesian: "Satu pertanyaan singkat",
 };
 
 function fillTemplate(template: string, slot: string): string {

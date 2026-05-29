@@ -100,6 +100,7 @@ export const ch5Timeline: IntroTimeline = {
       korean: "모든 언어가 마지막 문 앞에 모입니다.",
       english: "Every restored word gathers at the final door.",
       spanish: "Cada palabra restaurada llega a la última puerta.",
+      indonesian: "Setiap kata yang dipulihkan berkumpul di pintu terakhir.",
     },
     startLabel: "Start Babel Tower",
   },

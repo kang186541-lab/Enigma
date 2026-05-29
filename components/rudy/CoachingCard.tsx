@@ -27,7 +27,10 @@ import { registerGlobalSound, registerGlobalWebAudio } from "@/lib/ttsManager";
 
 const rudyBadge = require("@/assets/rudy_badge.png");
 
-type NativeLang = "korean" | "english" | "spanish";
+// Indonesian is a native/UI language (Phase 1). The copy helpers below
+// (L / fallbackText) default any non-korean/non-spanish value to the English
+// branch, so indonesian transparently falls back to English coach copy.
+type NativeLang = "korean" | "english" | "spanish" | "indonesian";
 
 interface CoachRequest {
   word: string;

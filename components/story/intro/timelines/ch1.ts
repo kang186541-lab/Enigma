@@ -96,6 +96,7 @@ export const ch1Timeline: IntroTimeline = {
       korean: "단어가 무너지는 첫 밤.",
       english: "The first night the words begin to fall.",
       spanish: "La primera noche en que las palabras empiezan a caer.",
+      indonesian: "Malam pertama saat kata-kata mulai berjatuhan.",
     },
     startLabel: "Start London Cipher",
   },

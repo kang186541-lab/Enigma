@@ -21,7 +21,7 @@ export type ErrorFallbackProps = {
 
 // Inline copy so we don't need the React tree (LanguageContext may be broken
 // when this component renders). Falls back to English.
-type Lang = "korean" | "english" | "spanish";
+type Lang = "korean" | "english" | "spanish" | "indonesian";
 const FALLBACK_COPY: Record<Lang, {
   title: string;
   message: string;
@@ -58,6 +58,15 @@ const FALLBACK_COPY: Record<Lang, {
     copied: "Copiado",
     close: "Cerrar",
   },
+  indonesian: {
+    title: "Terjadi kesalahan",
+    message: "Silakan muat ulang aplikasi untuk melanjutkan.",
+    restart: "Coba Lagi",
+    details: "Detail Error",
+    copy: "Salin",
+    copied: "Tersalin",
+    close: "Tutup",
+  },
 };
 
 export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
@@ -84,7 +93,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   const [lang, setLang] = useState<Lang>("english");
   useEffect(() => {
     AsyncStorage.getItem("@lingua_language").then((v) => {
-      if (v === "korean" || v === "spanish" || v === "english") setLang(v);
+      if (v === "korean" || v === "spanish" || v === "english" || v === "indonesian") setLang(v);
     }).catch(() => {});
   }, []);
   const t = FALLBACK_COPY[lang];

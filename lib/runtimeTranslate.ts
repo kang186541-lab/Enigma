@@ -12,7 +12,10 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getApiUrl } from "@/lib/query-client";
 
-type Lang = "korean" | "english" | "spanish";
+// Includes indonesian (native/UI language, Phase 1). detectLang never returns
+// indonesian (latin text sniffs as english), so an Indonesian-native user gets
+// the source text sent to /api/translate with targetLanguage: "indonesian".
+type Lang = "korean" | "english" | "spanish" | "indonesian";
 
 const CACHE_PREFIX = "@rt_translate_v1:";
 

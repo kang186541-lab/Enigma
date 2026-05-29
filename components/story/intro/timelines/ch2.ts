@@ -99,6 +99,7 @@ export const ch2Timeline: IntroTimeline = {
       korean: "색이 사라지는 축제.",
       english: "The festival where color disappears.",
       spanish: "El festival donde desaparece el color.",
+      indonesian: "Festival tempat warna menghilang.",
     },
     startLabel: "Start Madrid Festival",
   },

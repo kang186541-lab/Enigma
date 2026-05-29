@@ -29,7 +29,9 @@ const STREAK_THRESHOLD = 3;
 
 type Copy = { title: string; cta: string };
 function pickCopy(
-  lang: "korean" | "english" | "spanish" | null,
+  // Accepts indonesian (Phase 1 native/UI language). It has no bespoke banner
+  // copy yet, so it falls back to the English variant below.
+  lang: "korean" | "english" | "spanish" | "indonesian" | null,
   xp: number,
   streak: number,
 ): Copy {
@@ -46,7 +48,7 @@ function pickCopy(
           cta: "Guardar progreso",
         };
   }
-  if (lang === "english") {
+  if (lang === "english" || lang === "indonesian") {
     return useStreak
       ? {
           title: `🦊 ${streak}-day streak! Save it so you don't lose it on a new device →`,

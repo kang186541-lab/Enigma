@@ -1035,16 +1035,24 @@ export default function BasicCourseScreen() {
       "¡Aprende cada letra, escucha la pronunciación y trázala tú mismo!",
       "Vuelve cuando quieras reforzar letras y sonidos.",
     ],
+    indonesian: [
+      "🦊 Selamat datang di Kursus Dasar Rudy!",
+      "Kursus dasar dimulai dari alfabet.",
+      "Pelajari setiap huruf, dengarkan pelafalannya, dan tuliskan sendiri!",
+      "Kembalilah kapan saja saat ingin memperkuat huruf dan bunyinya.",
+    ],
   };
   const introLines = introText[native] ?? introText.english;
-  const startLabel = native === "korean" ? "기초 과정 시작하기" : native === "spanish" ? "Comenzar el curso" : "Start Basic Course";
-  const skipLabel  = native === "korean" ? "건너뛰기" : native === "spanish" ? "Omitir" : "Skip";
+  const startLabel = native === "korean" ? "기초 과정 시작하기" : native === "spanish" ? "Comenzar el curso" : native === "indonesian" ? "Mulai Kursus Dasar" : "Start Basic Course";
+  const skipLabel  = native === "korean" ? "건너뛰기" : native === "spanish" ? "Omitir" : native === "indonesian" ? "Lewati" : "Skip";
   const skipNote   = native === "korean"
     ? "(이미 알파벳을 알고 있다면 건너뛰어도 됩니다)"
     : native === "spanish"
       ? "(Puedes omitirlo si ya conoces el alfabeto)"
+      : native === "indonesian"
+      ? "(Bisa dilewati jika kamu sudah tahu alfabetnya)"
       : "(You can skip if you already know the alphabet)";
-  const courseTitle = native === "korean" ? "기초 과정" : native === "spanish" ? "Curso Básico" : "Basic Course";
+  const courseTitle = native === "korean" ? "기초 과정" : native === "spanish" ? "Curso Básico" : native === "indonesian" ? "Kursus Dasar" : "Basic Course";
 
   /* ── REVIEW MENU SCREEN ── */
   if (showReviewMenu) {
@@ -1053,23 +1061,23 @@ export default function BasicCourseScreen() {
       {
         section: "write",
         icon: "✏️",
-        title: native === "korean" ? "알파벳 쓰기" : native === "spanish" ? "Escritura" : "Writing",
-        desc:  native === "korean" ? "글자를 보고 직접 써보기" : native === "spanish" ? "Trazar las letras" : "Trace the letters",
-        sub:   `${charCount}${native === "korean" ? "개" : native === "spanish" ? " letras" : " letters"}`,
+        title: native === "korean" ? "알파벳 쓰기" : native === "spanish" ? "Escritura" : native === "indonesian" ? "Menulis" : "Writing",
+        desc:  native === "korean" ? "글자를 보고 직접 써보기" : native === "spanish" ? "Trazar las letras" : native === "indonesian" ? "Telusuri huruf" : "Trace the letters",
+        sub:   `${charCount}${native === "korean" ? "개" : native === "spanish" ? " letras" : native === "indonesian" ? " huruf" : " letters"}`,
       },
       {
         section: "listen",
         icon: "🔊",
-        title: native === "korean" ? "알파벳 듣기" : native === "spanish" ? "Escuchar Alfabeto" : "Listen to Alphabet",
-        desc:  native === "korean" ? "글자 발음을 듣고 확인하기" : native === "spanish" ? "Escucha la pronunciación de las letras" : "Listen to letter pronunciations",
-        sub:   `${charCount}${native === "korean" ? "개" : native === "spanish" ? " letras" : " letters"}`,
+        title: native === "korean" ? "알파벳 듣기" : native === "spanish" ? "Escuchar Alfabeto" : native === "indonesian" ? "Dengarkan Alfabet" : "Listen to Alphabet",
+        desc:  native === "korean" ? "글자 발음을 듣고 확인하기" : native === "spanish" ? "Escucha la pronunciación de las letras" : native === "indonesian" ? "Dengarkan pelafalan huruf" : "Listen to letter pronunciations",
+        sub:   `${charCount}${native === "korean" ? "개" : native === "spanish" ? " letras" : native === "indonesian" ? " huruf" : " letters"}`,
       },
       {
         section: "speak",
         icon: "🎤",
-        title: native === "korean" ? "발음 연습" : native === "spanish" ? "Pronunciación" : "Speaking",
-        desc:  native === "korean" ? "듣고 따라 말하기" : native === "spanish" ? "Escucha y repite" : "Listen & speak aloud",
-        sub:   `${course.greetings.length}${native === "korean" ? "개" : native === "spanish" ? " frases" : " phrases"}`,
+        title: native === "korean" ? "발음 연습" : native === "spanish" ? "Pronunciación" : native === "indonesian" ? "Berbicara" : "Speaking",
+        desc:  native === "korean" ? "듣고 따라 말하기" : native === "spanish" ? "Escucha y repite" : native === "indonesian" ? "Dengarkan & ucapkan" : "Listen & speak aloud",
+        sub:   `${course.greetings.length}${native === "korean" ? "개" : native === "spanish" ? " frases" : native === "indonesian" ? " frasa" : " phrases"}`,
       },
       {
         section: "full",

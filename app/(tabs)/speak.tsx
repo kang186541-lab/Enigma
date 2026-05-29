@@ -43,6 +43,7 @@ import {
   getDailySpeakingMissionPhrase as getSharedDailySpeakingMissionPhrase,
   getDailySpeakingSentenceLoop,
   type DailySpeakingPhrase,
+  type DailySpeakingLanguage,
 } from "@/lib/dailySpeakingMissions";
 
 const TAB_BAR_HEIGHT = 49;
@@ -575,7 +576,10 @@ function tryGetApiUrl(scope: string): string | null {
 
 function getScoreInfo(
   score: number,
-  nativeLang: "korean" | "english" | "spanish" = "english",
+  // Accepts the full native-language set. Indonesian (Phase 1 native/UI) is not
+  // given bespoke score copy — every branch below defaults non-korean/spanish
+  // to the English labels, so indonesian transparently uses English.
+  nativeLang: NativeLanguage = "english",
   mode: "clinic" | "first-mission" = "clinic"
 ): { label: string; color: string; emoji: string } {
   if (mode === "first-mission") {
@@ -719,7 +723,10 @@ function dailyPhraseToSpeakPhrase(phrase: DailySpeakingPhrase, nativeLang: Nativ
   return {
     word: phrase.phrase,
     ipa: phrase.ipa,
-    meaning: phrase.meanings[nativeLang],
+    // The learning target is never indonesian (Phase 1), but the NATIVE user
+    // can be — meanings only carry 3 langs, so cast the key and fall back to
+    // English so an Indonesian-native still sees a meaning.
+    meaning: phrase.meanings[nativeLang as DailySpeakingLanguage] ?? phrase.meanings.english,
     meaningEs: phrase.meanings.spanish,
     level: phrase.level,
     speechLang: phrase.speechLang,
@@ -864,15 +871,16 @@ function getFirstSpeakingMissionCopy(nativeLang: NativeLanguage, targetLang: Lan
     korean: { korean: "한국어", english: "영어", spanish: "스페인어" },
     english: { korean: "Korean", english: "English", spanish: "Spanish" },
     spanish: { korean: "coreano", english: "inglés", spanish: "español" },
+    indonesian: { korean: "Korea", english: "Inggris", spanish: "Spanyol" },
   };
   const goalLabel: Partial<Record<LearningGoal, Record<NativeLanguage, string>>> = {
-    travel: { korean: "여행에서 쓸", english: "travel", spanish: "de viaje" },
-    work: { korean: "일에서 쓸", english: "work", spanish: "de trabajo" },
-    study: { korean: "학교에서 쓸", english: "school", spanish: "de estudios" },
-    hobby: { korean: "좋아하는 것에 대해 말할", english: "things you love", spanish: "sobre lo que te gusta" },
-    relationship: { korean: "사람들과 가까워질", english: "friends", spanish: "para amistades" },
-    exam: { korean: "시험에서 쓸", english: "exam", spanish: "de examen" },
-    unknown: { korean: "기본", english: "starter", spanish: "básica" },
+    travel: { korean: "여행에서 쓸", english: "travel", spanish: "de viaje", indonesian: "untuk perjalanan" },
+    work: { korean: "일에서 쓸", english: "work", spanish: "de trabajo", indonesian: "untuk kerja" },
+    study: { korean: "학교에서 쓸", english: "school", spanish: "de estudios", indonesian: "untuk sekolah" },
+    hobby: { korean: "좋아하는 것에 대해 말할", english: "things you love", spanish: "sobre lo que te gusta", indonesian: "tentang hal yang kamu sukai" },
+    relationship: { korean: "사람들과 가까워질", english: "friends", spanish: "para amistades", indonesian: "untuk pertemanan" },
+    exam: { korean: "시험에서 쓸", english: "exam", spanish: "de examen", indonesian: "untuk ujian" },
+    unknown: { korean: "기본", english: "starter", spanish: "básica", indonesian: "dasar" },
   };
   const label = goal ? goalLabel[goal]?.[nativeLang] : null;
   return {

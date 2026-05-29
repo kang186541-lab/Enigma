@@ -1,5 +1,5 @@
 import type { NativeLanguage } from "@/context/LanguageContext";
-import { getDailySpeakingMissionPhrase } from "@/lib/dailySpeakingMissions";
+import { getDailySpeakingMissionPhrase, type DailySpeakingLanguage } from "@/lib/dailySpeakingMissions";
 import type { LearningGoal } from "@/lib/learnerProfile";
 import { SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 
@@ -23,13 +23,13 @@ export function getFallbackLearningLanguage(nativeLang: NativeLanguage): NativeL
 function getGoalLabel(goal: LearningGoal | null, lang: NativeLanguage): string | null {
   if (!goal) return null;
   const labels: Record<LearningGoal, Record<NativeLanguage, string>> = {
-    travel: { korean: "여행", english: "travel", spanish: "viajes" },
-    work: { korean: "일", english: "work", spanish: "trabajo" },
-    study: { korean: "학교", english: "school", spanish: "estudios" },
-    hobby: { korean: "좋아하는 콘텐츠", english: "things you love", spanish: "lo que te gusta" },
-    relationship: { korean: "친구와 관계", english: "friends and relationships", spanish: "amistades y relaciones" },
-    exam: { korean: "시험", english: "exams", spanish: "exámenes" },
-    unknown: { korean: "일상", english: "daily life", spanish: "vida diaria" },
+    travel: { korean: "여행", english: "travel", spanish: "viajes", indonesian: "perjalanan" },
+    work: { korean: "일", english: "work", spanish: "trabajo", indonesian: "pekerjaan" },
+    study: { korean: "학교", english: "school", spanish: "estudios", indonesian: "sekolah" },
+    hobby: { korean: "좋아하는 콘텐츠", english: "things you love", spanish: "lo que te gusta", indonesian: "hal yang kamu suka" },
+    relationship: { korean: "친구와 관계", english: "friends and relationships", spanish: "amistades y relaciones", indonesian: "teman dan hubungan" },
+    exam: { korean: "시험", english: "exams", spanish: "exámenes", indonesian: "ujian" },
+    unknown: { korean: "일상", english: "daily life", spanish: "vida diaria", indonesian: "kehidupan sehari-hari" },
   };
   return labels[goal]?.[lang] ?? null;
 }
@@ -57,14 +57,19 @@ export function getTodaySpeakingMission(
   goal: LearningGoal | null,
   spokenCount: number,
 ): HomeSpeakingMission {
-  const missionPhrase = getDailySpeakingMissionPhrase(learningLang, goal, spokenCount);
+  // Learning target is never indonesian in Phase 1 — cast the key for the
+  // 3-language mission lookup.
+  const missionPhrase = getDailySpeakingMissionPhrase(learningLang as DailySpeakingLanguage, goal, spokenCount);
   const phrase = missionPhrase?.phrase ?? (learningLang === "korean" ? "안녕하세요" : learningLang === "spanish" ? "Hola" : "Hello");
-  const meaning = missionPhrase?.meanings[nativeLang] ?? phrase;
+  // nativeLang CAN be indonesian; meanings only carry 3 langs, so cast + fall
+  // back through English to the phrase itself.
+  const meaning = missionPhrase?.meanings[nativeLang as DailySpeakingLanguage] ?? missionPhrase?.meanings.english ?? phrase;
   const dailyGoalMet = spokenCount >= SPEAKING_DAILY_GOAL;
   const targetName: Record<NativeLanguage, Record<NativeLanguage, string>> = {
-    korean: { korean: "한국어", english: "영어", spanish: "스페인어" },
-    english: { korean: "Korean", english: "English", spanish: "Spanish" },
-    spanish: { korean: "coreano", english: "inglés", spanish: "español" },
+    korean: { korean: "한국어", english: "영어", spanish: "스페인어", indonesian: "인도네시아어" },
+    english: { korean: "Korean", english: "English", spanish: "Spanish", indonesian: "Indonesian" },
+    spanish: { korean: "coreano", english: "inglés", spanish: "español", indonesian: "indonesio" },
+    indonesian: { korean: "bahasa Korea", english: "bahasa Inggris", spanish: "bahasa Spanyol", indonesian: "bahasa Indonesia" },
   };
   const goalLabel = getGoalLabel(goal, nativeLang);
 

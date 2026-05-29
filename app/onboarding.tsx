@@ -20,7 +20,7 @@ import { resetGuideForDrip } from "@/components/RudyGuideModal";
 import { trackLearningEvent } from "@/lib/learningEvents";
 import { getHomeGoalPrompt, getHomeLearningGoalOptions } from "@/lib/homeSpeakingMission";
 import { setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
-import { getDailySpeakingMissionPhrase, type DailySpeakingLanguage } from "@/lib/dailySpeakingMissions";
+import { getDailySpeakingMissionPhrase, type DailySpeakingLanguage, type DailySpeakingPhrase } from "@/lib/dailySpeakingMissions";
 
 const rudySplashImg = require("@/assets/rudy_splash.png");
 const { width: SCREEN_W } = Dimensions.get("window");
@@ -48,9 +48,10 @@ function RudySplashPlaceholder() {
 type Step = 1 | 2;
 
 const ALL_LANGS: { id: NativeLanguage; badge: string; nameMap: Record<NativeLanguage, string> }[] = [
-  { id: "korean",  badge: "KO", nameMap: { korean: "한국어",    english: "Korean",  spanish: "Coreano" } },
-  { id: "english", badge: "EN", nameMap: { korean: "영어",      english: "English", spanish: "Inglés"  } },
-  { id: "spanish", badge: "ES", nameMap: { korean: "스페인어",  english: "Spanish", spanish: "Español" } },
+  { id: "korean",  badge: "KO", nameMap: { korean: "한국어",    english: "Korean",  spanish: "Coreano", indonesian: "Korea" } },
+  { id: "english", badge: "EN", nameMap: { korean: "영어",      english: "English", spanish: "Inglés", indonesian: "Inggris"  } },
+  { id: "spanish", badge: "ES", nameMap: { korean: "스페인어",  english: "Spanish", spanish: "Español", indonesian: "Spanyol" } },
+  { id: "indonesian", badge: "ID", nameMap: { korean: "인도네시아어", english: "Indonesian", spanish: "Indonesio", indonesian: "Indonesia" } },
 ];
 
 const UI: Record<NativeLanguage, {
@@ -133,6 +134,28 @@ const UI: Record<NativeLanguage, {
     continueToGuideCta: "Di tu primera frase",
     cta1: "Siguiente", cta2: "Empezar a hablar", back: "Atrás",
   },
+  indonesian: {
+    step1Title: "Bahasa ibu?",
+    step1Sub:   "Pilih bahasa yang kamu pakai sehari-hari",
+    guideEyebrow: "Panduan Bahasa Rudy",
+    guideNext: "Kartu berikutnya",
+    guideStart: "Ayo mulai",
+    guideFinalHint: "Selanjutnya: ucapkan kalimat pertama yang Rudy siapkan untukmu.",
+    step2Title: "Bahasa apa yang ingin kamu pelajari?",
+    step2Sub:   "Pilih bahasa yang ingin kamu kuasai",
+    firstSpeechTitle: "Selanjutnya: ucapkan satu kalimat nyata",
+    firstSpeechSub: "Salah itu wajar. Rudy menghitung usaha bicaramu sebelum nilainya.",
+    goalPrompt: "Pertama, pilih di mana kamu akan benar-benar memakainya",
+    firstSentenceLabel: "Kalimat pertama",
+    firstSentenceWaiting: "Pilih bahasa dan situasi, lalu Rudy akan menampilkan kalimat pertama yang akan kamu ucapkan.",
+    goalWaiting: "Pilih bahasa yang dipelajari dulu, lalu pilih situasi nyatanya.",
+    setupLanguageLabel: "Bahasa yang dipelajari",
+    setupGoalLabel: "Situasi nyata",
+    chooseLanguageCta: "Pilih bahasa",
+    chooseGoalCta: "Pilih situasi",
+    continueToGuideCta: "Ucapkan kalimat pertamamu",
+    cta1: "Lanjut", cta2: "Mulai bicara", back: "Kembali",
+  },
 };
 
 export default function OnboardingScreen() {
@@ -148,12 +171,19 @@ export default function OnboardingScreen() {
 
   const uiLang: NativeLanguage = nativeSel ?? "english";
   const ui = UI[uiLang];
-  const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel);
+  // Step 1 (native picker) shows all four languages. The LEARNING list excludes
+  // indonesian — it's a native/UI language only in Phase 1, not a learning target.
+  const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel && l.id !== "indonesian");
   const setupCtaLabel = !learnSel ? ui.chooseLanguageCta : !goalSel ? ui.chooseGoalCta : ui.continueToGuideCta;
-  const firstSpeakingPreview = learnSel && goalSel
+  // The learning target is never indonesian (Phase 1), so cast the lookup key.
+  // We widen the preview's `meanings` to the full native set via the cast below
+  // so the native-keyed read on the next line type-checks even though the
+  // underlying data only carries the 3 learning languages — an Indonesian
+  // native simply gets `undefined` here and falls back to English.
+  const firstSpeakingPreview = (learnSel && goalSel
     ? getDailySpeakingMissionPhrase(learnSel as DailySpeakingLanguage, goalSel, 0)
-    : null;
-  const firstSpeakingMeaning = firstSpeakingPreview?.meanings[uiLang] ?? null;
+    : null) as (Omit<DailySpeakingPhrase, "meanings"> & { meanings: Record<NativeLanguage, string> }) | null;
+  const firstSpeakingMeaning = firstSpeakingPreview?.meanings[uiLang] ?? firstSpeakingPreview?.meanings.english ?? null;
 
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Math.max((Platform.OS === "web" ? 34 : insets.bottom) + 16, 34);

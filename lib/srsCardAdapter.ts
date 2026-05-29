@@ -41,6 +41,7 @@ const LEARNING_TO_BCP47: Record<NativeLanguage, string> = {
   korean: "ko-KR",
   english: "en-US",
   spanish: "es-ES",
+  indonesian: "id-ID",
 };
 
 /** Default emoji for SRS phrases that didn't carry one. The book glyph is
@@ -67,6 +68,7 @@ export function srsCardToFlashCard(
     korean: meaning,
     english: meaning,
     spanish: meaning,
+    indonesian: meaning,
   };
   meanings[nativeLang] = meaning;
 
@@ -74,6 +76,7 @@ export function srsCardToFlashCard(
     korean: "",
     english: "",
     spanish: "",
+    indonesian: "",
   };
 
   return {

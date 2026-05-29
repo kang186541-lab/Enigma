@@ -27,7 +27,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { Analytics } from "@/lib/analytics";
 
-export type NativeLanguage = "korean" | "english" | "spanish";
+export type NativeLanguage = "korean" | "english" | "spanish" | "indonesian";
 
 export interface Level {
   num: number;
@@ -35,21 +35,23 @@ export interface Level {
   name: string;
   nameEn: string;
   nameEs: string;
+  nameId: string;
   minXP: number;
   maxXP: number;
 }
 
 export const LEVELS: Level[] = [
-  { num: 1, emoji: "🌱", name: "입문자",  nameEn: "Beginner",      nameEs: "Principiante",  minXP: 0,    maxXP: 100  },
-  { num: 2, emoji: "📚", name: "초보자",  nameEn: "Novice",        nameEs: "Novato",        minXP: 101,  maxXP: 300  },
-  { num: 3, emoji: "⭐", name: "중급자",  nameEn: "Intermediate",  nameEs: "Intermedio",    minXP: 301,  maxXP: 600  },
-  { num: 4, emoji: "🔥", name: "고급자",  nameEn: "Advanced",      nameEs: "Avanzado",      minXP: 601,  maxXP: 1000 },
-  { num: 5, emoji: "👑", name: "마스터",  nameEn: "Master",        nameEs: "Maestro",       minXP: 1001, maxXP: Infinity },
+  { num: 1, emoji: "🌱", name: "입문자",  nameEn: "Beginner",      nameEs: "Principiante",  nameId: "Pemula",    minXP: 0,    maxXP: 100  },
+  { num: 2, emoji: "📚", name: "초보자",  nameEn: "Novice",        nameEs: "Novato",        nameId: "Novis",     minXP: 101,  maxXP: 300  },
+  { num: 3, emoji: "⭐", name: "중급자",  nameEn: "Intermediate",  nameEs: "Intermedio",    nameId: "Menengah",  minXP: 301,  maxXP: 600  },
+  { num: 4, emoji: "🔥", name: "고급자",  nameEn: "Advanced",      nameEs: "Avanzado",      nameId: "Mahir",     minXP: 601,  maxXP: 1000 },
+  { num: 5, emoji: "👑", name: "마스터",  nameEn: "Master",        nameEs: "Maestro",       nameId: "Master",    minXP: 1001, maxXP: Infinity },
 ];
 
 export function getLevelName(level: Level, lang: NativeLanguage): string {
   if (lang === "english") return level.nameEn;
   if (lang === "spanish") return level.nameEs;
+  if (lang === "indonesian") return level.nameId;
   return level.name;
 }
 
@@ -277,6 +279,62 @@ const translations: Record<NativeLanguage, Record<string, string>> = {
     chat_pick_tutor: "Elige tu tutor",
     chat_pick_sub: "💬 ¡Habla libremente con tu tutor!",
   },
+  indonesian: {
+    select_language: "Pilih Bahasamu",
+    subtitle: "Pilih bahasa ibumu untuk menyesuaikan pengalamanmu",
+    korean: "Korea",
+    english: "Inggris",
+    spanish: "Spanyol",
+    continue: "Lanjut",
+    home: "Beranda",
+    cards: "Kartu",
+    chat: "Tutor",
+    story: "Cerita",
+    speak: "Bicara",
+    good_morning: "Selamat pagi!",
+    good_afternoon: "Selamat siang!",
+    good_evening: "Selamat malam!",
+    streak: "Hari Beruntun",
+    words: "Kata",
+    accuracy: "Akurasi",
+    xp: "Poin XP",
+    daily_lesson: "Pelajaran Hari Ini",
+    daily_desc: "Kuasai 10 kata dan frasa baru",
+    start_lesson: "Mulai Pelajaran",
+    quick_practice: "Latihan Cepat",
+    flashcards: "Kartu Belajar",
+    flashcards_desc: "Ulas kosakata dengan kartu interaktif",
+    conversation: "Percakapan",
+    conversation_desc: "Latih dialog dunia nyata",
+    pronunciation: "Pelafalan",
+    pronunciation_desc: "Sempurnakan aksenmu",
+    continue_learning: "Lanjut Belajar",
+    flip_card: "Ketuk untuk membalik",
+    next: "Berikutnya",
+    know_it: "Aku tahu!",
+    study_more: "Belajar lagi",
+    well_done: "Bagus sekali!",
+    practice_speaking: "Latihan Bicara",
+    tap_to_speak: "Ketuk untuk bicara",
+    listening: "Mendengarkan...",
+    type_message: "Ketik pesan...",
+    send: "Kirim",
+    ai_greeting: "Halo! Aku tutor bahasa AI-mu. Apa yang ingin kamu latih hari ini?",
+    your_progress: "Progresmu",
+    level: "Level",
+    beginner: "Pemula",
+    card_deck: "Tumpukan Kartu Hari Ini",
+    cards_remaining: "kartu tersisa",
+    speak_title: "Latihan Pelafalan",
+    speak_subtitle: "Dengar, ulangi, dan sempurnakan aksenmu",
+    listen: "Dengar",
+    record: "Rekam",
+    try_again: "Coba Lagi",
+    great_job: "Kerja bagus!",
+    score: "Skor",
+    chat_pick_tutor: "Pilih Tutormu",
+    chat_pick_sub: "💬 Mengobrol bebas dengan tutormu!",
+  },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -300,7 +358,7 @@ const KNOWN_WORDS_KEY = "@lingua_known_words";
 const MOTIVATION_SURVEY_SEEN_KEY = "@lingua_motivation_survey_seen_v1";
 
 function isNativeLanguage(value: unknown): value is NativeLanguage {
-  return value === "korean" || value === "english" || value === "spanish";
+  return value === "korean" || value === "english" || value === "spanish" || value === "indonesian";
 }
 
 function mergeStoryProgress(local: StoryProgressBlob | null, remote: unknown): StoryProgressBlob {

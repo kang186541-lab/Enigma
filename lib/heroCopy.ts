@@ -51,11 +51,13 @@ function genericFallback(native: LangCode, learning: LangCode): HeroCopy {
     korean: "안녕하세요",
     english: "Hello",
     spanish: "Hola",
+    indonesian: "Halo",
   };
   const fallbackMeaning: Record<LangCode, Record<LangCode, string>> = {
-    korean: { korean: "안녕하세요", english: "Hello", spanish: "Hola" },
-    english: { korean: "안녕하세요", english: "Hello", spanish: "Hola" },
-    spanish: { korean: "안녕하세요", english: "Hello", spanish: "Hola" },
+    korean: { korean: "안녕하세요", english: "Hello", spanish: "Hola", indonesian: "Halo" },
+    english: { korean: "안녕하세요", english: "Hello", spanish: "Hola", indonesian: "Halo" },
+    spanish: { korean: "안녕하세요", english: "Hello", spanish: "Hola", indonesian: "Halo" },
+    indonesian: { korean: "안녕하세요", english: "Hello", spanish: "Hola", indonesian: "Halo" },
   };
   if (native === "korean") {
     return {
@@ -75,6 +77,16 @@ function genericFallback(native: LangCode, learning: LangCode): HeroCopy {
       promiseSub: "Elige una frase real para decir hoy.",
       firstSentence: fallbackFirstSentence[learning],
       firstSentenceMeaning: fallbackMeaning.spanish[learning],
+    };
+  }
+  if (native === "indonesian") {
+    return {
+      tagline: "Ucapkan kalimat pertamamu bersama Rudy dalam 5 menit.",
+      cta: "Mulai bicara",
+      promiseTitle: "Kalimat pertamamu bersama Rudy dalam 5 menit",
+      promiseSub: "Pilih satu kalimat nyata untuk diucapkan hari ini.",
+      firstSentence: fallbackFirstSentence[learning],
+      firstSentenceMeaning: fallbackMeaning.indonesian[learning],
     };
   }
   // english native (default)
@@ -110,6 +122,16 @@ function selfLearnPlaceholder(native: LangCode): HeroCopy {
       promiseSub: "Rudy te guía a tu primera frase en 5 minutos.",
       firstSentence: "",
       firstSentenceMeaning: "Primero elige un idioma para aprender.",
+    };
+  }
+  if (native === "indonesian") {
+    return {
+      tagline: "Pilih bahasa agar Rudy membawamu ke kalimat pertamamu.",
+      cta: "Pilih bahasa",
+      promiseTitle: "Pilih dulu bahasa yang ingin dipelajari",
+      promiseSub: "Rudy akan membawamu ke kalimat pertama dalam 5 menit.",
+      firstSentence: "",
+      firstSentenceMeaning: "Pilih dulu bahasa yang ingin dipelajari.",
     };
   }
   // english native

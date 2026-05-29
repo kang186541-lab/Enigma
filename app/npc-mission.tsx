@@ -36,30 +36,30 @@ const EMO_KEY  = "npcEmotions";
 
 const NPC_OPENING: Record<string, Record<string, string>> = {
   // ── Story NPCs (real-world scenarios) ──────────────────────────────────
-  penny:     { english: "Hi there! ☕ Welcome to the cafe. What can I get you today?", korean: "안녕하세요! ☕ 카페에 오신 걸 환영해요. 오늘 뭘 드릴까요?", spanish: "¡Hola! ☕ Bienvenido al café. ¿Qué te pongo hoy?" },
-  miguel:    { english: "Welcome, friend! 🍽️ Take a seat. Our special today is amazing!", korean: "어서오세요, 친구! 🍽️ 앉으세요. 오늘의 특선이 끝내줘요!", spanish: "¡Bienvenido, amigo! 🍽️ Siéntate. ¡El especial de hoy está increíble!" },
-  tom:       { english: "Hey! 🚕 Where to? I know every shortcut in this city.", korean: "안녕하세요! 🚕 어디로 갈까요? 이 도시 지름길은 다 알아요.", spanish: "¡Hola! 🚕 ¿Adónde vamos? Conozco todos los atajos de la ciudad." },
-  hassan:    { english: "Welcome! ✈️ First time flying? Don't worry, I'll help you out!", korean: "어서오세요! ✈️ 비행기 처음이에요? 걱정 마세요, 도와드릴게요!", spanish: "¡Bienvenido! ✈️ ¿Primera vez volando? ¡No te preocupes, te ayudo!" },
-  eleanor:   { english: "Good evening. 🏨 Welcome to our hotel. May I see your reservation?", korean: "안녕하세요. 🏨 저희 호텔에 오신 것을 환영합니다. 예약 확인 부탁드릴게요.", spanish: "Buenas noches. 🏨 Bienvenido a nuestro hotel. ¿Puedo ver su reserva?" },
-  sujin:     { english: "Hello, please come in. 🏥 What seems to be the problem today?", korean: "안녕하세요, 들어오세요. 🏥 오늘 어디가 불편하세요?", spanish: "Hola, pase por favor. 🏥 ¿Qué le ocurre hoy?" },
-  minho:     { english: "Yo! 📱 Looking for a new plan? I got the best deals right here.", korean: "안녕하세요! 📱 요금제 바꾸려고요? 여기 좋은 거 있어요.", spanish: "¡Ey! 📱 ¿Buscas un plan nuevo? Tengo las mejores ofertas aquí." },
-  youngsook: { english: "Oh, come in dear! 🛒 Looking for something? I know where everything is!", korean: "어서 와, 얘야! 🛒 뭐 찾아? 할머니가 다 알려줄게!", spanish: "¡Pasa, cariño! 🛒 ¿Buscas algo? ¡Sé dónde está todo!" },
-  isabel:    { english: "Hi! 🛍️ Oh, that would look amazing on you! Let me help.", korean: "안녕! 🛍️ 어머, 그거 완전 잘 어울릴 것 같아! 내가 도와줄게.", spanish: "¡Hola! 🛍️ ¡Eso te quedaría genial! Déjame ayudarte." },
-  carlos:    { english: "Hey. 🍺 Grab a seat. What are you drinking tonight?", korean: "안녕. 🍺 앉아. 오늘 밤 뭐 마실 거야?", spanish: "Oye. 🍺 Siéntate. ¿Qué tomas esta noche?" },
-  amira:     { english: "Good morning. 🏦 How can I help you today? Please have your ID ready.", korean: "안녕하세요. 🏦 오늘 어떤 업무로 오셨나요? 신분증 준비해 주세요.", spanish: "Buenos días. 🏦 ¿En qué puedo ayudarle? Tenga su identificación lista." },
+  penny:     { english: "Hi there! ☕ Welcome to the cafe. What can I get you today?", korean: "안녕하세요! ☕ 카페에 오신 걸 환영해요. 오늘 뭘 드릴까요?", spanish: "¡Hola! ☕ Bienvenido al café. ¿Qué te pongo hoy?", indonesian: "Halo! ☕ Selamat datang di kafe. Mau pesan apa hari ini?" },
+  miguel:    { english: "Welcome, friend! 🍽️ Take a seat. Our special today is amazing!", korean: "어서오세요, 친구! 🍽️ 앉으세요. 오늘의 특선이 끝내줘요!", spanish: "¡Bienvenido, amigo! 🍽️ Siéntate. ¡El especial de hoy está increíble!", indonesian: "Selamat datang, kawan! 🍽️ Silakan duduk. Menu spesial kami hari ini luar biasa!" },
+  tom:       { english: "Hey! 🚕 Where to? I know every shortcut in this city.", korean: "안녕하세요! 🚕 어디로 갈까요? 이 도시 지름길은 다 알아요.", spanish: "¡Hola! 🚕 ¿Adónde vamos? Conozco todos los atajos de la ciudad.", indonesian: "Halo! 🚕 Mau ke mana? Saya hafal semua jalan pintas di kota ini." },
+  hassan:    { english: "Welcome! ✈️ First time flying? Don't worry, I'll help you out!", korean: "어서오세요! ✈️ 비행기 처음이에요? 걱정 마세요, 도와드릴게요!", spanish: "¡Bienvenido! ✈️ ¿Primera vez volando? ¡No te preocupes, te ayudo!", indonesian: "Selamat datang! ✈️ Pertama kali naik pesawat? Tenang, saya bantu!" },
+  eleanor:   { english: "Good evening. 🏨 Welcome to our hotel. May I see your reservation?", korean: "안녕하세요. 🏨 저희 호텔에 오신 것을 환영합니다. 예약 확인 부탁드릴게요.", spanish: "Buenas noches. 🏨 Bienvenido a nuestro hotel. ¿Puedo ver su reserva?", indonesian: "Selamat malam. 🏨 Selamat datang di hotel kami. Boleh saya lihat reservasi Anda?" },
+  sujin:     { english: "Hello, please come in. 🏥 What seems to be the problem today?", korean: "안녕하세요, 들어오세요. 🏥 오늘 어디가 불편하세요?", spanish: "Hola, pase por favor. 🏥 ¿Qué le ocurre hoy?", indonesian: "Halo, silakan masuk. 🏥 Ada keluhan apa hari ini?" },
+  minho:     { english: "Yo! 📱 Looking for a new plan? I got the best deals right here.", korean: "안녕하세요! 📱 요금제 바꾸려고요? 여기 좋은 거 있어요.", spanish: "¡Ey! 📱 ¿Buscas un plan nuevo? Tengo las mejores ofertas aquí.", indonesian: "Halo! 📱 Cari paket baru? Saya punya penawaran terbaik di sini." },
+  youngsook: { english: "Oh, come in dear! 🛒 Looking for something? I know where everything is!", korean: "어서 와, 얘야! 🛒 뭐 찾아? 할머니가 다 알려줄게!", spanish: "¡Pasa, cariño! 🛒 ¿Buscas algo? ¡Sé dónde está todo!", indonesian: "Mari masuk, Nak! 🛒 Cari sesuatu? Nenek tahu semua letaknya!" },
+  isabel:    { english: "Hi! 🛍️ Oh, that would look amazing on you! Let me help.", korean: "안녕! 🛍️ 어머, 그거 완전 잘 어울릴 것 같아! 내가 도와줄게.", spanish: "¡Hola! 🛍️ ¡Eso te quedaría genial! Déjame ayudarte.", indonesian: "Hai! 🛍️ Wah, itu pasti bagus banget di kamu! Sini aku bantu." },
+  carlos:    { english: "Hey. 🍺 Grab a seat. What are you drinking tonight?", korean: "안녕. 🍺 앉아. 오늘 밤 뭐 마실 거야?", spanish: "Oye. 🍺 Siéntate. ¿Qué tomas esta noche?", indonesian: "Hei. 🍺 Duduk dulu. Mau minum apa malam ini?" },
+  amira:     { english: "Good morning. 🏦 How can I help you today? Please have your ID ready.", korean: "안녕하세요. 🏦 오늘 어떤 업무로 오셨나요? 신분증 준비해 주세요.", spanish: "Buenos días. 🏦 ¿En qué puedo ayudarle? Tenga su identificación lista.", indonesian: "Selamat pagi. 🏦 Ada yang bisa saya bantu hari ini? Mohon siapkan kartu identitas Anda." },
   // ── Real-world NPCs ───────────────────────────────────────────────────
-  ryan:      { english: "Hi, welcome! 🍔 What can I get for you? We've got a combo deal today.", korean: "어서오세요! 🍔 뭘로 드릴까요? 오늘 콤보 할인 중이에요.", spanish: "¡Hola, bienvenido! 🍔 ¿Qué le sirvo? Hoy tenemos oferta de combo." },
-  nari:      { english: "Excuse me... 🚇 Oh, you need help? Which station are you looking for?", korean: "저기요... 🚇 아, 도움 필요해요? 어디 역 찾으세요?", spanish: "Disculpa... 🚇 Ah, ¿necesitas ayuda? ¿Qué estación buscas?" },
-  derek:     { english: "*sigh* 🔧 Yeah? What's broken now?", korean: "*한숨* 🔧 네? 이번엔 뭐가 고장났어요?", spanish: "*suspiro* 🔧 ¿Sí? ¿Qué se ha roto ahora?" },
-  mei:       { english: "Hello! 💊 What can I help you with today? Any allergies I should know about?", korean: "안녕하세요! 💊 오늘 어떤 약을 찾으세요? 알레르기 있으신 거 있나요?", spanish: "¡Hola! 💊 ¿En qué puedo ayudarle? ¿Tiene alguna alergia que deba saber?" },
-  juno:      { english: "Hey! 🛵 I'm at the building. Which floor? Hurry, I've got more deliveries!", korean: "저기요! 🛵 건물 앞인데요. 몇 층이에요? 빨리요, 배달 더 있어서!", spanish: "¡Oye! 🛵 Estoy en el edificio. ¿Qué piso? ¡Rápido, tengo más entregas!" },
-  gloria:    { english: "Hello. 🔄 Do you have your receipt? What seems to be the issue?", korean: "안녕하세요. 🔄 영수증 가져오셨나요? 어떤 문제가 있으신가요?", spanish: "Hola. 🔄 ¿Tiene el recibo? ¿Cuál es el problema?" },
-  stan:      { english: "Next, please. 📦 Sending or picking up?", korean: "다음 분요. 📦 보내실 건가요, 찾으실 건가요?", spanish: "Siguiente, por favor. 📦 ¿Envía o recoge?" },
-  hana:      { english: "Oh hi! 💬 I don't think we've met! Where are you from?", korean: "어머 안녕! 💬 처음 뵙는 것 같은데! 어디서 오셨어요?", spanish: "¡Oh, hola! 💬 ¡Creo que no nos conocemos! ¿De dónde eres?" },
-  vincent:   { english: "Welcome! 🏠 I've got the perfect place for you. Let me show you around.", korean: "어서오세요! 🏠 딱 맞는 곳이 있어요. 한번 둘러보시죠.", spanish: "¡Bienvenido! 🏠 Tengo el lugar perfecto para usted. Permítame mostrárselo." },
-  claire:    { english: "Good morning. 💼 Please, have a seat. Tell me about yourself.", korean: "안녕하세요. 💼 앉으세요. 자기소개 부탁드릴게요.", spanish: "Buenos días. 💼 Por favor, siéntese. Hábleme de usted." },
-  officer_kwon: { english: "Number 47. 🏛️ Come forward. Documents, please.", korean: "47번님. 🏛️ 이쪽으로 오세요. 서류 주세요.", spanish: "Número 47. 🏛️ Acérquese. Documentos, por favor." },
-  luca:      { english: "Hey, come on in! 💇 So what are we doing today? Something bold?", korean: "어서 와요! 💇 오늘 어떻게 해드릴까요? 과감하게 가볼까요?", spanish: "¡Pasa, pasa! 💇 ¿Qué hacemos hoy? ¿Algo atrevido?" },
+  ryan:      { english: "Hi, welcome! 🍔 What can I get for you? We've got a combo deal today.", korean: "어서오세요! 🍔 뭘로 드릴까요? 오늘 콤보 할인 중이에요.", spanish: "¡Hola, bienvenido! 🍔 ¿Qué le sirvo? Hoy tenemos oferta de combo.", indonesian: "Halo, selamat datang! 🍔 Mau pesan apa? Hari ini ada promo paket combo." },
+  nari:      { english: "Excuse me... 🚇 Oh, you need help? Which station are you looking for?", korean: "저기요... 🚇 아, 도움 필요해요? 어디 역 찾으세요?", spanish: "Disculpa... 🚇 Ah, ¿necesitas ayuda? ¿Qué estación buscas?", indonesian: "Permisi... 🚇 Oh, butuh bantuan? Lagi cari stasiun apa?" },
+  derek:     { english: "*sigh* 🔧 Yeah? What's broken now?", korean: "*한숨* 🔧 네? 이번엔 뭐가 고장났어요?", spanish: "*suspiro* 🔧 ¿Sí? ¿Qué se ha roto ahora?", indonesian: "*menghela napas* 🔧 Ya? Sekarang apa lagi yang rusak?" },
+  mei:       { english: "Hello! 💊 What can I help you with today? Any allergies I should know about?", korean: "안녕하세요! 💊 오늘 어떤 약을 찾으세요? 알레르기 있으신 거 있나요?", spanish: "¡Hola! 💊 ¿En qué puedo ayudarle? ¿Tiene alguna alergia que deba saber?", indonesian: "Halo! 💊 Ada yang bisa saya bantu hari ini? Apakah Anda punya alergi yang perlu saya tahu?" },
+  juno:      { english: "Hey! 🛵 I'm at the building. Which floor? Hurry, I've got more deliveries!", korean: "저기요! 🛵 건물 앞인데요. 몇 층이에요? 빨리요, 배달 더 있어서!", spanish: "¡Oye! 🛵 Estoy en el edificio. ¿Qué piso? ¡Rápido, tengo más entregas!", indonesian: "Halo! 🛵 Saya sudah di gedungnya. Lantai berapa? Cepat ya, masih banyak antaran!" },
+  gloria:    { english: "Hello. 🔄 Do you have your receipt? What seems to be the issue?", korean: "안녕하세요. 🔄 영수증 가져오셨나요? 어떤 문제가 있으신가요?", spanish: "Hola. 🔄 ¿Tiene el recibo? ¿Cuál es el problema?", indonesian: "Halo. 🔄 Apakah Anda membawa struknya? Ada masalah apa?" },
+  stan:      { english: "Next, please. 📦 Sending or picking up?", korean: "다음 분요. 📦 보내실 건가요, 찾으실 건가요?", spanish: "Siguiente, por favor. 📦 ¿Envía o recoge?", indonesian: "Berikutnya, silakan. 📦 Mau mengirim atau mengambil?" },
+  hana:      { english: "Oh hi! 💬 I don't think we've met! Where are you from?", korean: "어머 안녕! 💬 처음 뵙는 것 같은데! 어디서 오셨어요?", spanish: "¡Oh, hola! 💬 ¡Creo que no nos conocemos! ¿De dónde eres?", indonesian: "Oh, hai! 💬 Sepertinya kita belum pernah bertemu! Kamu dari mana?" },
+  vincent:   { english: "Welcome! 🏠 I've got the perfect place for you. Let me show you around.", korean: "어서오세요! 🏠 딱 맞는 곳이 있어요. 한번 둘러보시죠.", spanish: "¡Bienvenido! 🏠 Tengo el lugar perfecto para usted. Permítame mostrárselo.", indonesian: "Selamat datang! 🏠 Saya punya tempat yang pas untuk Anda. Mari saya tunjukkan." },
+  claire:    { english: "Good morning. 💼 Please, have a seat. Tell me about yourself.", korean: "안녕하세요. 💼 앉으세요. 자기소개 부탁드릴게요.", spanish: "Buenos días. 💼 Por favor, siéntese. Hábleme de usted.", indonesian: "Selamat pagi. 💼 Silakan duduk. Ceritakan tentang diri Anda." },
+  officer_kwon: { english: "Number 47. 🏛️ Come forward. Documents, please.", korean: "47번님. 🏛️ 이쪽으로 오세요. 서류 주세요.", spanish: "Número 47. 🏛️ Acérquese. Documentos, por favor.", indonesian: "Nomor 47. 🏛️ Silakan maju. Dokumennya, mohon." },
+  luca:      { english: "Hey, come on in! 💇 So what are we doing today? Something bold?", korean: "어서 와요! 💇 오늘 어떻게 해드릴까요? 과감하게 가볼까요?", spanish: "¡Pasa, pasa! 💇 ¿Qué hacemos hoy? ¿Algo atrevido?", indonesian: "Hai, silakan masuk! 💇 Hari ini mau diapakan? Sesuatu yang berani?" },
 };
 
 interface NpcMessage {
@@ -720,7 +720,7 @@ export default function NpcMissionScreen() {
     setFetchingTranslSet(prev => new Set(prev).add(id));
     setMsgTranslVisible(prev => new Set(prev).add(id));
     try {
-      const langLabel: Record<string, string> = { english: "English", korean: "Korean", spanish: "Spanish" };
+      const langLabel: Record<string, string> = { english: "English", korean: "Korean", spanish: "Spanish", indonesian: "Indonesian" };
       const res = await fetch(new URL("/api/translate", getApiUrl()).toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },

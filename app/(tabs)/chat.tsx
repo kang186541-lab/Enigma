@@ -24,7 +24,7 @@ const LANG_COLORS: Record<TutorLanguage, string> = {
   korean:  "#9b8bb4",
 };
 
-type NLang = "korean" | "english" | "spanish";
+type NLang = "korean" | "english" | "spanish" | "indonesian";
 
 // ── Trilingual metadata for each tutor (keyed by tutor.id) ───────────────────
 const TUTOR_I18N: Record<string, {
@@ -32,70 +32,77 @@ const TUTOR_I18N: Record<string, {
   personality: Record<NLang, string>;
 }> = {
   eleanor: {
-    region: { korean: "영국 영어", english: "British English", spanish: "Inglés Británico" },
+    region: { korean: "영국 영어", english: "British English", spanish: "Inglés Británico", indonesian: "Bahasa Inggris Britania" },
     personality: {
       korean: "박물관 큐레이터. 격식 있고 예리하며 정확함. 런던 챕터의 루디 멘토.",
       english: "Museum curator. Formal, sharp-witted, and precise. Rudy's mentor from the London chapter.",
       spanish: "Curadora del museo. Formal, perspicaz y precisa. Mentora de Rudy del capítulo de Londres.",
+      indonesian: "Kurator museum. Formal, cerdas, dan teliti. Mentor Rudy dari bab London.",
     },
   },
   tom_tutor: {
-    region: { korean: "캐주얼 영어", english: "Casual English", spanish: "Inglés Casual" },
+    region: { korean: "캐주얼 영어", english: "Casual English", spanish: "Inglés Casual", indonesian: "Bahasa Inggris Santai" },
     personality: {
       korean: "박물관 경비원. 캐주얼하고 거리 감각이 있으며 장난치기 좋아함. 런던 챕터의 친구.",
       english: "Museum guard. Casual, streetwise, loves banter. Your buddy from the London chapter.",
       spanish: "Guardia del museo. Casual, astuto y bromista. Tu amigo del capítulo de Londres.",
+      indonesian: "Penjaga museum. Santai, paham jalanan, suka bercanda. Temanmu dari bab London.",
     },
   },
   isabel: {
-    region: { korean: "스페인 스페인어", english: "Spain Spanish", spanish: "Español de España" },
+    region: { korean: "스페인 스페인어", english: "Spain Spanish", spanish: "Español de España", indonesian: "Bahasa Spanyol Spanyol" },
     personality: {
       korean: "대담하고 열정적. 드라마틱한 표현으로 생생한 카스테야노를 가르침. 마드리드 챕터.",
       english: "Bold and passionate. Teaches vivid Castellano with dramatic flair. From the Madrid chapter.",
       spanish: "Audaz y apasionada. Enseña un castellano vivo con dramatismo. Del capítulo de Madrid.",
+      indonesian: "Berani dan penuh semangat. Mengajarkan Castellano yang hidup dengan gaya dramatis. Dari bab Madrid.",
     },
   },
   miguel: {
-    region: { korean: "라틴 아메리카 스페인어", english: "Latin American Spanish", spanish: "Español Latinoamericano" },
+    region: { korean: "라틴 아메리카 스페인어", english: "Latin American Spanish", spanish: "Español Latinoamericano", indonesian: "Bahasa Spanyol Amerika Latin" },
     personality: {
       korean: "따뜻하고 지혜로우며 속담이 풍부. 음식과 인생의 지혜로 가르침. 마드리드 챕터.",
       english: "Warm, wise, full of proverbs. Teaches through food and life wisdom. From the Madrid chapter.",
       spanish: "Cálido, sabio, lleno de refranes. Enseña con comida y sabiduría. Del capítulo de Madrid.",
+      indonesian: "Hangat, bijaksana, penuh peribahasa. Mengajar lewat makanan dan kebijaksanaan hidup. Dari bab Madrid.",
     },
   },
   sujin: {
-    region: { korean: "서울 한국어", english: "Seoul Korean", spanish: "Coreano de Seúl" },
+    region: { korean: "서울 한국어", english: "Seoul Korean", spanish: "Coreano de Seúl", indonesian: "Bahasa Korea Seoul" },
     personality: {
       korean: "대학 언어학자. 격식 있고 학구적이며 어원학에 열정적. 서울 챕터.",
       english: "University linguist. Formal, academic, fascinated by etymology. From the Seoul chapter.",
       spanish: "Lingüista universitaria. Formal, académica, apasionada por la etimología. Del capítulo de Seúl.",
+      indonesian: "Ahli bahasa universitas. Formal, akademis, terpesona oleh etimologi. Dari bab Seoul.",
     },
   },
   minho_tutor: {
-    region: { korean: "MZ 한국어", english: "MZ Korean", spanish: "Coreano MZ" },
+    region: { korean: "MZ 한국어", english: "MZ Korean", spanish: "Coreano MZ", indonesian: "Bahasa Korea Gen MZ" },
     personality: {
       korean: "홍대 스트리머. MZ 세대 은어와 인터넷 문화. 캐주얼하고 트렌디. 서울 챕터.",
       english: "Hongdae streamer. MZ generation slang and internet culture. Casual and trendy. From the Seoul chapter.",
       spanish: "Streamer de Hongdae. Argot MZ y cultura de internet. Casual y moderno. Del capítulo de Seúl.",
+      indonesian: "Streamer Hongdae. Bahasa gaul generasi MZ dan budaya internet. Santai dan kekinian. Dari bab Seoul.",
     },
   },
 };
 
 const GROUP_LABELS: Record<TutorLanguage, Record<NLang, string>> = {
-  english: { korean: "영어", english: "English", spanish: "Inglés" },
-  spanish: { korean: "스페인어", english: "Spanish", spanish: "Español" },
-  korean:  { korean: "한국어", english: "Korean", spanish: "Coreano" },
+  english: { korean: "영어", english: "English", spanish: "Inglés", indonesian: "Inggris" },
+  spanish: { korean: "스페인어", english: "Spanish", spanish: "Español", indonesian: "Spanyol" },
+  korean:  { korean: "한국어", english: "Korean", spanish: "Coreano", indonesian: "Korea" },
 };
 
 const STYLE_LABELS: Record<"formal" | "casual", Record<NLang, string>> = {
-  formal: { korean: "격식", english: "Formal", spanish: "Formal" },
-  casual: { korean: "캐주얼", english: "Casual", spanish: "Casual" },
+  formal: { korean: "격식", english: "Formal", spanish: "Formal", indonesian: "Formal" },
+  casual: { korean: "캐주얼", english: "Casual", spanish: "Casual", indonesian: "Santai" },
 };
 
 const START_LABELS: Record<NLang, string> = {
   korean: "채팅 시작",
   english: "Start Chat",
   spanish: "Iniciar",
+  indonesian: "Mulai Obrolan",
 };
 
 function TutorCard({ tutor, onPress, nativeLang }: { tutor: Tutor; onPress: () => void; nativeLang: NLang }) {

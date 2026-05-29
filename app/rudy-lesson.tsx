@@ -375,6 +375,11 @@ function LessonScreen({
       "¡Perfecto! Bien entendido 🧠",
       "¡Asombroso! ¡Hablaste de verdad! 🎤",
     ],
+    indonesian: [
+      "Kerja bagus! Pendengaranmu makin terbuka 👂",
+      "Sempurna! Kamu menangkap poin-poin pentingnya 🧠",
+      "Luar biasa! Kamu benar-benar bicara! 🎤",
+    ],
     english: [
       "Great job! Your ears are opening up 👂",
       "Perfect! You got the key points 🧠",
@@ -388,6 +393,7 @@ function LessonScreen({
   const NEXT_STEP_LABELS: Record<string, string[]> = {
     korean: [`${stepLabels[1]}로 →`, `${stepLabels[2]}로 →`, `${stepLabels[3]}으로 →`],
     spanish: [`A ${stepLabels[1]} →`, `A ${stepLabels[2]} →`, `A ${stepLabels[3]} →`],
+    indonesian: [`Ke ${stepLabels[1]} →`, `Ke ${stepLabels[2]} →`, `Ke ${stepLabels[3]} →`],
     english: [`To ${stepLabels[1]} →`, `To ${stepLabels[2]} →`, `To ${stepLabels[3]} →`],
   };
 

@@ -94,10 +94,10 @@ export default function NpcListScreen() {
     if (!ch) return "";
     const chNum = ch.replace("ch", "");
     const chNames: Record<string, Record<string, string>> = {
-      "1": { korean: "Ch1 런던", spanish: "Ch1 Londres", english: "Ch1 London" },
-      "2": { korean: "Ch2 마드리드", spanish: "Ch2 Madrid", english: "Ch2 Madrid" },
-      "3": { korean: "Ch3 서울", spanish: "Ch3 Seúl", english: "Ch3 Seoul" },
-      "4": { korean: "Ch4 카이로", spanish: "Ch4 El Cairo", english: "Ch4 Cairo" },
+      "1": { korean: "Ch1 런던", spanish: "Ch1 Londres", english: "Ch1 London", indonesian: "Ch1 London" },
+      "2": { korean: "Ch2 마드리드", spanish: "Ch2 Madrid", english: "Ch2 Madrid", indonesian: "Ch2 Madrid" },
+      "3": { korean: "Ch3 서울", spanish: "Ch3 Seúl", english: "Ch3 Seoul", indonesian: "Ch3 Seoul" },
+      "4": { korean: "Ch4 카이로", spanish: "Ch4 El Cairo", english: "Ch4 Cairo", indonesian: "Ch4 Kairo" },
     };
     const chName = chNames[chNum]?.[native] ?? `Ch${chNum}`;
     return native === "korean"

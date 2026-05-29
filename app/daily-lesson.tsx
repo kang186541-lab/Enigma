@@ -78,16 +78,25 @@ const LANGUAGE_LABEL: Record<NativeLanguage, Record<NativeLanguage, string>> = {
     korean: "한국어",
     english: "영어",
     spanish: "스페인어",
+    indonesian: "인도네시아어",
   },
   english: {
     korean: "Korean",
     english: "English",
     spanish: "Spanish",
+    indonesian: "Indonesian",
   },
   spanish: {
     korean: "coreano",
     english: "inglés",
     spanish: "español",
+    indonesian: "indonesio",
+  },
+  indonesian: {
+    korean: "Korea",
+    english: "Inggris",
+    spanish: "Spanyol",
+    indonesian: "Indonesia",
   },
 };
 
@@ -138,6 +147,20 @@ function copy(nativeLang: NativeLanguage, learnLang: NativeLanguage) {
       start: "Hablar con Rudy",
       course: "Ver mapa",
       back: "Volver",
+    };
+  }
+  if (nativeLang === "indonesian") {
+    return {
+      eyebrow: "Bicara hari ini",
+      title: `Satu kalimat ${target} bersama Rudy`,
+      subtitle: "Sebelum kartu kata, ucapkan satu kalimat berguna dengan lantang.",
+      topic: "Topik latihan",
+      phraseLabel: "Kalimat pertama hari ini",
+      progress: "Diucapkan hari ini",
+      completed: "Latihan hari ini selesai",
+      start: "Mulai bicara dengan Rudy",
+      course: "Lihat peta kursus",
+      back: "Kembali",
     };
   }
   return {

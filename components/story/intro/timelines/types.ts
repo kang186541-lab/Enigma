@@ -1,7 +1,11 @@
 import type { ImageSourcePropType } from "react-native";
+// Re-export the canonical, widened NativeLanguage (4 langs incl. indonesian)
+// so the `subtitle` triples can carry Indonesian UI copy. Previously this was
+// a stale local 3-lang alias.
+import type { NativeLanguage } from "@/context/LanguageContext";
 
 export type ChapterId = "london" | "madrid" | "seoul" | "cairo" | "babel";
-export type NativeLanguage = "korean" | "english" | "spanish";
+export type { NativeLanguage };
 export type MotionPreset = "push" | "pull" | "drift-left" | "drift-right";
 export type CueKey =
   | "ring"

@@ -9,6 +9,7 @@ export const LANG_FLAGS: Record<NativeLanguage, string> = {
   korean: "🇰🇷",
   english: "🇬🇧",
   spanish: "🇪🇸",
+  indonesian: "🇮🇩",
 };
 
 /** Flag emoji for a native language. */

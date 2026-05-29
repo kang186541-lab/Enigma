@@ -89,6 +89,11 @@ function getLingoGreeting(lang: NativeLanguage): string {
       "¡Hola! ¿Listo para hablar en voz alta?",
       "¡Buen trabajo! Termina con una frase más.",
     ],
+    indonesian: [
+      "Selamat pagi! Ucapkan satu kalimat nyata hari ini.",
+      "Halo! Siap berbicara dengan lantang?",
+      "Kerja bagus! Tutup dengan satu kalimat lagi.",
+    ],
   };
   const [morning, afternoon, evening] = lines[lang] ?? lines.english;
   if (h < 12) return morning;
@@ -104,6 +109,7 @@ function getWeekStreakData(streak: number, nativeLang: NativeLanguage, lastSessi
     korean:  ["월", "화", "수", "목", "금", "토", "일"],
     english: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     spanish: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+    indonesian: ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"],
   };
   const labels = dayLabels[nativeLang] ?? dayLabels.english;
   return labels.map((label, i) => {
@@ -141,6 +147,12 @@ function getStreakText(streak: number, lang: NativeLanguage): string {
       `¡${streak} días seguidos! Di una frase más hoy.`,
       `¡${streak} días seguidos! Lo que dices se queda.`,
       `¡${streak} días seguidos! Tu voz está creando el hábito.`,
+    ],
+    indonesian: [
+      "Ucapkan satu kalimat hari ini untuk memulai hari beruntunmu.",
+      `${streak} hari beruntun! Ucapkan satu kalimat lagi hari ini.`,
+      `${streak} hari beruntun! Kata yang diucapkan akan melekat.`,
+      `${streak} hari beruntun! Suaramu sedang membentuk kebiasaan.`,
     ],
   };
   const m = msgs[lang] ?? msgs.english;
@@ -926,7 +938,7 @@ export default function HomeScreen() {
 
     <LevelUpModal
       visible={!!pendingLevelUp}
-      level={pendingLevelUp ?? { num: 2, emoji: "📚", name: "초보자", nameEn: "Novice", nameEs: "Novato", minXP: 101, maxXP: 300 }}
+      level={pendingLevelUp ?? { num: 2, emoji: "📚", name: "초보자", nameEn: "Novice", nameEs: "Novato", nameId: "Novis", minXP: 101, maxXP: 300 }}
       lang={nativeLang}
       onClose={clearLevelUp}
     />

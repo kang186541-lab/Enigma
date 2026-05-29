@@ -84,6 +84,7 @@ const SPEED_OPTIONS: { label: string; value: number }[] = [
 const LANG_NAMES: Record<string, string> = {
   english: "English",
   spanish: "Spanish",
+  indonesian: "Indonesian",
   korean: "Korean",
 };
 

@@ -1907,7 +1907,7 @@ Student's ${learnName} answer: ${userAnswer}`;
   }
 
   const LANG_DISPLAY: Record<string, string> = {
-    english: "English", spanish: "Spanish", korean: "Korean",
+    english: "English", spanish: "Spanish", korean: "Korean", indonesian: "Indonesian",
   };
 
   app.post("/api/npc-chat", async (req: Request, res: Response) => {
@@ -2032,7 +2032,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       }
 
       const LANG_FULL: Record<string, string> = {
-        english: "English", spanish: "Spanish", korean: "Korean",
+        english: "English", spanish: "Spanish", korean: "Korean", indonesian: "Indonesian",
         "en-US": "English", "es-ES": "Spanish", "ko-KR": "Korean",
       };
       const langName = LANG_FULL[targetLang] ?? "English";
@@ -2120,7 +2120,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       }
 
       const langLabel: Record<string, string> = {
-        english: "English", korean: "Korean", spanish: "Spanish",
+        english: "English", korean: "Korean", spanish: "Spanish", indonesian: "Indonesian",
       };
       const tl = langLabel[targetLanguage] ?? targetLanguage;
       const nl = langLabel[nativeLanguage] ?? nativeLanguage;
@@ -2188,7 +2188,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       if (!imageBase64) return res.status(400).json({ error: "Missing imageBase64" });
 
       const langLabel: Record<string, string> = {
-        english: "English", korean: "Korean", spanish: "Spanish",
+        english: "English", korean: "Korean", spanish: "Spanish", indonesian: "Indonesian",
       };
       const langName = langLabel[lang] ?? "English";
 

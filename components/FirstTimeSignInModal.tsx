@@ -24,7 +24,7 @@ import { getHeroCopy } from "@/lib/heroCopy";
 
 const SEEN_KEY = "@lingua_signin_modal_seen_v1";
 
-type LangKey = "korean" | "english" | "spanish";
+type LangKey = "korean" | "english" | "spanish" | "indonesian";
 
 const COPY: Record<LangKey, {
   title: string;
@@ -76,6 +76,19 @@ const COPY: Record<LangKey, {
     skip: "Quizás más tarde",
     errorPrefix: "Error",
     or: "o",
+  },
+  indonesian: {
+    title: "Fitur penyimpan progresmu sudah tiba 🦊",
+    body: (xp, streak) =>
+      `Kamu punya ${xp} XP dan ${streak} hari beruntun. Masuk sekali supaya semuanya tetap aman saat ganti ponsel atau instal ulang.`,
+    google: "Masuk dengan Google",
+    emailLabel: "Email",
+    emailPlaceholder: "kamu@contoh.com",
+    emailCta: "Kirimi aku tautan ajaib",
+    emailSent: "Cek emailmu dan klik tautannya",
+    skip: "Nanti saja",
+    errorPrefix: "Error",
+    or: "atau",
   },
 };
 
