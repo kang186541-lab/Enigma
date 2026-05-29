@@ -126,6 +126,36 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
         ],
       },
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Saya punya dua anjing dan tiga kucing di rumah.", speechLang: "id-ID", meaning: { ko: "집에 강아지 두 마리, 고양이 세 마리가 있어요.", en: "I have two dogs and three cats at home.", es: "Tengo dos perros y tres gatos en casa." } },
+        { text: "Ada lima belas orang di antrean. Banyak sekali!", speechLang: "id-ID", meaning: { ko: "줄에 열다섯 명이 있어요. 정말 많다!", en: "There are fifteen people in line. That's a lot!", es: "Hay quince personas en la fila. ¡Son muchas!" } },
+        { text: "Dua puluh, tiga puluh, empat puluh, lima puluh, enam puluh, tujuh puluh, delapan puluh, sembilan puluh, seratus.", speechLang: "id-ID", meaning: { ko: "20, 30, 40, 50, 60, 70, 80, 90, 100.", en: "Tens: twenty to one hundred.", es: "Decenas: veinte a cien." } },
+        { text: "Berapa umur Anda? Saya berumur dua puluh lima tahun.", speechLang: "id-ID", meaning: { ko: "몇 살이에요? 저는 스물다섯 살이에요.", en: "How old are you? I'm twenty-five years old.", es: "¿Cuántos años tienes? Tengo veinticinco años." }, recallRound: true },
+        { text: "Ini lima belas dolar.", speechLang: "id-ID", meaning: { ko: "15달러입니다.", en: "That's fifteen dollars, please.", es: "Son quince dólares, por favor." }, recallRound: true },
+        { text: "Sekarang jam setengah empat.", speechLang: "id-ID", meaning: { ko: "세 시 삼십 분이에요.", en: "It's three thirty.", es: "Son las tres y treinta." } },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Berapa umur Anda? → Saya berumur ___ tahun. / 인도네시아어 숫자는 규칙적이에요! 11-19는 'belas'(sebelas, dua belas...), 십 단위는 'puluh'(dua puluh=20), 100은 'seratus'.", en: "Pattern: Berapa umur Anda? → Saya berumur ___ tahun. Indonesian numbers are wonderfully regular! 11-19 use 'belas' (sebelas, dua belas...), tens use 'puluh' (dua puluh=20), and 100 is 'seratus'.", es: "Patrón: Berapa umur Anda? → Saya berumur ___ tahun. ¡Los números indonesios son muy regulares! 11-19 usan 'belas' (sebelas, dua belas...), las decenas usan 'puluh' (dua puluh=20), y 100 es 'seratus'." },
+          examples: { ko: "Berapa umur Anda? Saya berumur dua puluh lima tahun. (몇 살이에요? 25살이에요.)\nIni lima belas dolar. (15달러입니다.)\nAda tiga puluh siswa di kelas saya. (우리 반에 학생이 30명이에요.)", en: "Berapa umur Anda? Saya berumur dua puluh lima tahun. (Asking and telling age.)\nIni lima belas dolar. (Using numbers for prices.)\nAda tiga puluh siswa di kelas saya. (Counting people with numbers.)", es: "Berapa umur Anda? Saya berumur dua puluh lima tahun. (Preguntando y diciendo la edad.)\nIni lima belas dolar. (Usando números para precios.)\nAda tiga puluh siswa di kelas saya. (Contando personas.)" },
+          mistakes: { ko: "❌ Saya berumur dua puluh lima.\n✅ Saya berumur dua puluh lima tahun. ('tahun'(살/년)을 꼭 붙여야 해요!)\n\n❌ lima puluh (50) ↔ lima belas (15)\n✅ lima belas=15, lima puluh=50 (belas와 puluh를 헷갈리지 마세요!)", en: "❌ Saya berumur dua puluh lima.\n✅ Saya berumur dua puluh lima tahun. (Don't forget 'tahun' (years) at the end!)\n\n❌ Mixing lima belas (15) and lima puluh (50)\n✅ lima belas=15, lima puluh=50 (belas=teen, puluh=ty — don't swap them!)", es: "❌ Saya berumur dua puluh lima.\n✅ Saya berumur dua puluh lima tahun. (No olvides 'tahun' (años) al final.)\n\n❌ Confundir lima belas (15) y lima puluh (50)\n✅ lima belas=15, lima puluh=50 (belas=teen, puluh=ty — ¡no los cambies!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 인도네시아어 숫자는 레고 블록 같아! 'belas'(11-19)랑 'puluh'(십 단위)만 알면 100까지 조립 완성. 영어보다 훨씬 규칙적이야~", en: "Detective Rudy's tip: Indonesian numbers are like Lego blocks! Learn 'belas' (11-19) and 'puluh' (tens) and you can build everything up to 100. Far more regular than English!", es: "Consejo del detective Rudy: ¡Los números indonesios son como bloques de Lego! Aprende 'belas' (11-19) y 'puluh' (decenas) y puedes construir todo hasta 100. ¡Mucho más regular que el inglés!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Berapa ___ Anda?", answer: "umur", options: ["umur", "nama", "kota"], fullSentence: "Berapa umur Anda?", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" } },
+          { type: "select", promptWithBlank: "Saya berumur dua puluh lima ___.", answer: "tahun", options: ["tahun", "hari", "jam"], fullSentence: "Saya berumur dua puluh lima tahun.", fullSentenceMeaning: { ko: "저는 스물다섯 살이에요.", en: "I'm twenty-five years old.", es: "Tengo veinticinco años." } },
+          { type: "select", promptWithBlank: "Sepuluh, ___, dua belas, tiga belas...", answer: "sebelas", options: ["sebelas", "sepuluh satu", "satu belas"], fullSentence: "Sepuluh, sebelas, dua belas, tiga belas.", fullSentenceMeaning: { ko: "10, 11, 12, 13.", en: "Ten, eleven, twelve, thirteen.", es: "Diez, once, doce, trece." } },
+          { type: "fill_blank", promptWithBlank: "Ini ___ dolar.", answer: "lima belas", options: ["lima belas", "lima puluh", "empat belas"], fullSentence: "Ini lima belas dolar.", fullSentenceMeaning: { ko: "15달러입니다.", en: "Fifteen dollars.", es: "Quince dólares." } },
+          { type: "input", promptWithBlank: "Dua puluh, tiga puluh, empat puluh, ___ puluh.", answer: "lima", fullSentence: "Dua puluh, tiga puluh, empat puluh, lima puluh.", fullSentenceMeaning: { ko: "20, 30, 40, 50.", en: "Twenty, thirty, forty, fifty.", es: "Veinte, treinta, cuarenta, cincuenta." } },
+          { type: "listening", audioText: "Ini lima belas dolar.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Ini lima belas dolar.", "Berapa umur Anda?", "Sekarang jam setengah empat.", "Ini seratus dolar."], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 
   // ─────────────── Day 8: Days of the Week ───────────────────────────────────
@@ -211,6 +241,34 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
           { type: "select", promptWithBlank: "수요일___ 봐요!", answer: "에", options: ["에", "은", "이"], fullSentence: "수요일에 봐요!", fullSentenceMeaning: { ko: "수요일에 봐요!", en: "See you on Wednesday!", es: "¡Te veo el miércoles!" } },
           { type: "input", promptWithBlank: "오늘은 ___이에요.", answer: "월요일", fullSentence: "오늘은 월요일이에요.", fullSentenceMeaning: { ko: "오늘은 월요일이에요.", en: "Today is Monday.", es: "Hoy es lunes." } },
           { type: "listening", audioText: "이번 주말에 뭐 해?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["이번 주말에 뭐 해?", "오늘은 월요일이에요.", "월요일부터 금요일까지 일해요.", "수요일에 봐요!"], correct: 0, audioOnly: true },
+        ],
+      },
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Hari ini hari apa?", speechLang: "id-ID", meaning: { ko: "오늘 무슨 요일이에요?", en: "What day is it today?", es: "¿Qué día es hoy?" } },
+        { text: "Hari ini hari Senin.", speechLang: "id-ID", meaning: { ko: "오늘은 월요일이에요.", en: "Today is Monday.", es: "Hoy es lunes." } },
+        { text: "Saya bekerja dari Senin sampai Jumat.", speechLang: "id-ID", meaning: { ko: "월요일부터 금요일까지 일해요.", en: "I work from Monday to Friday.", es: "Trabajo de lunes a viernes." } },
+        { text: "Apa rencana Anda akhir pekan ini?", speechLang: "id-ID", meaning: { ko: "이번 주말에 뭐 해?", en: "What are you doing this weekend?", es: "¿Qué haces este fin de semana?" }, recallRound: true },
+        { text: "Sampai jumpa hari Rabu!", speechLang: "id-ID", meaning: { ko: "수요일에 봐요!", en: "See you on Wednesday!", es: "¡Te veo el miércoles!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Hari ini hari apa? → Hari ini hari ___. / 요일 앞에 항상 'hari'(날)를 붙여요: hari Senin(월요일). 범위: 'dari A sampai B'. 요일: Senin~Minggu.", en: "Pattern: Hari ini hari apa? → Hari ini hari ___. Always put 'hari' (day) before the weekday: hari Senin (Monday). Range: 'dari A sampai B'. Days: Senin to Minggu.", es: "Patrón: Hari ini hari apa? → Hari ini hari ___. Siempre pon 'hari' (día) antes del día: hari Senin (lunes). Rango: 'dari A sampai B'. Días: Senin a Minggu." },
+          examples: { ko: "Hari ini hari apa? Hari ini hari Senin. (오늘 무슨 요일? 월요일이에요.)\nSaya bekerja dari Senin sampai Jumat. (월요일부터 금요일까지 일해요.)\nSampai jumpa hari Rabu! (수요일에 봐요!)", en: "Hari ini hari apa? Hari ini hari Senin. (Asking about the day.)\nSaya bekerja dari Senin sampai Jumat. (Describing your work week.)\nSampai jumpa hari Rabu! (Making plans for a specific day.)", es: "Hari ini hari apa? Hari ini hari Senin. (Preguntando por el día.)\nSaya bekerja dari Senin sampai Jumat. (Describiendo la semana laboral.)\nSampai jumpa hari Rabu! (Haciendo planes para un día.)" },
+          mistakes: { ko: "❌ Hari ini Senin. (틀린 건 아니지만)\n✅ Hari ini hari Senin. (요일 앞에 'hari'를 붙이면 더 자연스러워요!)\n\n❌ dari Senin ke Jumat.\n✅ dari Senin sampai Jumat. (범위는 'sampai'를 써요, 'ke'가 아니에요!)", en: "❌ Hari ini Senin. (understandable, but...)\n✅ Hari ini hari Senin. (Put 'hari' before the day — it sounds more natural!)\n\n❌ dari Senin ke Jumat.\n✅ dari Senin sampai Jumat. (For a range, use 'sampai', not 'ke'!)", es: "❌ Hari ini Senin. (se entiende, pero...)\n✅ Hari ini hari Senin. (Pon 'hari' antes del día — ¡suena más natural!)\n\n❌ dari Senin ke Jumat.\n✅ dari Senin sampai Jumat. (Para un rango, usa 'sampai', no 'ke'.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 인도네시아어 요일엔 항상 'hari'가 따라다녀! hari Senin, hari Selasa... 마치 '요일'이라는 꼬리표 같아. 이 단서만 기억하면 끝!", en: "Detective Rudy's tip: In Indonesian, 'hari' (day) follows the weekday everywhere! Hari Senin, hari Selasa... it's like a little tag. Spot this clue and you're set!", es: "Consejo del detective Rudy: ¡En indonesio, 'hari' (día) acompaña al día de la semana en todas partes! Hari Senin, hari Selasa... es como una etiqueta. ¡Detecta esta pista y listo!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Hari ini hari ___?", answer: "apa", options: ["apa", "mana", "siapa"], fullSentence: "Hari ini hari apa?", fullSentenceMeaning: { ko: "오늘 무슨 요일이에요?", en: "What day is it today?", es: "¿Qué día es hoy?" } },
+          { type: "select", promptWithBlank: "Saya bekerja ___ Senin sampai Jumat.", answer: "dari", options: ["dari", "di", "ke"], fullSentence: "Saya bekerja dari Senin sampai Jumat.", fullSentenceMeaning: { ko: "월요일부터 금요일까지 일해요.", en: "I work from Monday to Friday.", es: "Trabajo de lunes a viernes." } },
+          { type: "select", promptWithBlank: "Sampai ___ hari Rabu!", answer: "jumpa", options: ["jumpa", "nanti", "besok"], fullSentence: "Sampai jumpa hari Rabu!", fullSentenceMeaning: { ko: "수요일에 봐요!", en: "See you on Wednesday!", es: "¡Te veo el miércoles!" } },
+          { type: "input", promptWithBlank: "Hari ini hari ___.", answer: "Senin", fullSentence: "Hari ini hari Senin.", fullSentenceMeaning: { ko: "오늘은 월요일이에요.", en: "Today is Monday.", es: "Hoy es lunes." } },
+          { type: "listening", audioText: "Apa rencana Anda akhir pekan ini?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Apa rencana Anda akhir pekan ini?", "Hari ini hari Senin.", "Saya bekerja dari Senin sampai Jumat.", "Sampai jumpa hari Rabu!"], correct: 0, audioOnly: true },
         ],
       },
     },
@@ -315,6 +373,39 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Sekarang jam berapa?", speechLang: "id-ID", meaning: { ko: "지금 몇 시예요?", en: "What time is it?", es: "¿Qué hora es?" } },
+        { text: "Sekarang jam tiga.", speechLang: "id-ID", meaning: { ko: "세 시예요.", en: "It's three o'clock.", es: "Son las tres." } },
+        { text: "Sekarang jam setengah delapan.", speechLang: "id-ID", meaning: { ko: "일곱 시 반이에요.", en: "It's half past seven.", es: "Son las siete y media." } },
+        { text: "Rapatnya jam sepuluh pagi.", speechLang: "id-ID", meaning: { ko: "회의는 아침 열 시예요.", en: "The meeting is at ten in the morning.", es: "La reunión es a las diez de la mañana." }, recallRound: true },
+        { text: "Saya bangun jam tujuh setiap hari.", speechLang: "id-ID", meaning: { ko: "매일 일곱 시에 일어나요.", en: "I wake up at seven every day.", es: "Me despierto a las siete todos los días." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Sekarang jam berapa? → Sekarang jam ___. / 'jam'은 '시'를 뜻해요. 30분: 'jam setengah ___'인데 주의! 다음 시간을 써요 (jam setengah delapan = 7시 반). 시간 표현에 따로 전치사가 필요 없어요.", en: "Pattern: Sekarang jam berapa? → Sekarang jam ___. 'jam' means 'o'clock'. Half hour is tricky: 'jam setengah ___' uses the NEXT hour (jam setengah delapan = half to eight = 7:30!). No extra preposition needed for times.", es: "Patrón: Sekarang jam berapa? → Sekarang jam ___. 'jam' significa 'hora'. La media hora es complicada: 'jam setengah ___' usa la hora SIGUIENTE (jam setengah delapan = 7:30). No se necesita preposición extra para las horas." },
+          examples: { ko: "Sekarang jam berapa? Sekarang jam tiga. (몇 시? 세 시예요.)\nSekarang jam setengah delapan. (7시 반이에요.)\nRapatnya jam sepuluh pagi. (회의는 오전 10시예요.)", en: "Sekarang jam berapa? Sekarang jam tiga. (Asking and telling the time.)\nSekarang jam setengah delapan. (Saying it's 7:30.)\nRapatnya jam sepuluh pagi. (Specifying a morning appointment.)", es: "Sekarang jam berapa? Sekarang jam tiga. (Preguntando y diciendo la hora.)\nSekarang jam setengah delapan. (Son las 7:30.)\nRapatnya jam sepuluh pagi. (Especificando una cita por la mañana.)" },
+          mistakes: { ko: "❌ jam setengah tujuh (= 6시 반!)\n✅ jam setengah delapan (= 7시 반! '반'은 다음 시간 기준이에요)\n\n❌ Sekarang adalah jam tiga.\n✅ Sekarang jam tiga. (시간 말할 때 'adalah'는 필요 없어요!)", en: "❌ jam setengah tujuh (= 6:30, not 7:30!)\n✅ jam setengah delapan (= 7:30! 'setengah' counts toward the NEXT hour)\n\n❌ Sekarang adalah jam tiga.\n✅ Sekarang jam tiga. (No 'adalah' needed when telling time!)", es: "❌ jam setengah tujuh (= 6:30, ¡no 7:30!)\n✅ jam setengah delapan (= 7:30! 'setengah' cuenta hacia la hora SIGUIENTE)\n\n❌ Sekarang adalah jam tiga.\n✅ Sekarang jam tiga. (¡No se necesita 'adalah' para la hora!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 인도네시아어 '반(setengah)'은 함정이야! 'setengah delapan'은 8시 반이 아니라 7시 반! '8시로 가는 절반'이라는 뜻이거든. 이 단서 꼭 기억해~", en: "Detective Rudy's tip: Indonesian 'setengah' (half) is a trap! 'setengah delapan' isn't 8:30 — it's 7:30! It means 'halfway TO eight'. Crack this clue and you'll never be late!", es: "Consejo del detective Rudy: ¡El 'setengah' (medio) indonesio es una trampa! 'setengah delapan' no es 8:30 — ¡es 7:30! Significa 'a medio camino HACIA las ocho'. ¡Descifra esta pista y nunca llegarás tarde!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Sekarang jam ___?", answer: "berapa", options: ["berapa", "apa", "mana"], fullSentence: "Sekarang jam berapa?", fullSentenceMeaning: { ko: "지금 몇 시예요?", en: "What time is it?", es: "¿Qué hora es?" } },
+          { type: "select", promptWithBlank: "Sekarang ___ tiga.", answer: "jam", options: ["jam", "hari", "tahun"], fullSentence: "Sekarang jam tiga.", fullSentenceMeaning: { ko: "세 시예요.", en: "It's three o'clock.", es: "Son las tres." } },
+          { type: "select", promptWithBlank: "Rapatnya jam sepuluh ___.", answer: "pagi", options: ["pagi", "malam", "tahun"], fullSentence: "Rapatnya jam sepuluh pagi.", fullSentenceMeaning: { ko: "회의는 열 시예요.", en: "The meeting is at ten.", es: "La reunión es a las diez." } },
+          { type: "input", promptWithBlank: "Sekarang jam ___ delapan.", answer: "setengah", fullSentence: "Sekarang jam setengah delapan.", fullSentenceMeaning: { ko: "일곱 시 반이에요.", en: "It's half past seven.", es: "Son las siete y media." } },
+          { type: "input", promptWithBlank: "Saya bangun jam tujuh setiap ___.", answer: "hari", fullSentence: "Saya bangun jam tujuh setiap hari.", fullSentenceMeaning: { ko: "매일 일곱 시에 일어나요.", en: "I wake up at seven every day.", es: "Me despierto a las siete todos los días." } },
+          { type: "listening", audioText: "Rapatnya jam sepuluh pagi.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Rapatnya jam sepuluh pagi.", "Sekarang jam berapa?", "Saya bangun jam tujuh.", "Sekarang jam setengah delapan."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Thank you.", es: "Gracias.", ko: "감사합니다." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 10: Talking About Weather ─────────────────────────────
@@ -408,6 +499,38 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
           { type: "select", promptWithBlank: "밖이 ___요.", answer: "추워", options: ["추워", "추운", "춥게"], fullSentence: "밖이 추워요.", fullSentenceMeaning: { ko: "밖이 추워요.", en: "It's cold outside.", es: "Hace frío afuera." } },
           { type: "input", promptWithBlank: "더운 날씨를 ___해요.", answer: "좋아", fullSentence: "더운 날씨를 좋아해요.", fullSentenceMeaning: { ko: "더운 날씨를 좋아해요.", en: "I like hot weather.", es: "Me gusta el clima caliente." } },
           { type: "listening", audioText: "밖이 추워요. 재킷 가져가세요!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["밖이 추워요. 재킷 가져가세요!", "오늘 비가 와요.", "맑고 따뜻해요.", "더운 날씨를 좋아해요."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Where is the bathroom?", es: "¿Dónde está el baño?", ko: "화장실이 어디에요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Help! Please help me.", es: "¡Ayuda! Por favor, ayúdeme.", ko: "도와주세요! 제발 도와주세요." }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Bagaimana cuaca hari ini?", speechLang: "id-ID", meaning: { ko: "오늘 날씨 어때요?", en: "How's the weather today?", es: "¿Cómo está el clima hoy?" } },
+        { text: "Cuacanya cerah dan hangat.", speechLang: "id-ID", meaning: { ko: "맑고 따뜻해요.", en: "It's sunny and warm.", es: "Está soleado y cálido." } },
+        { text: "Hari ini hujan.", speechLang: "id-ID", meaning: { ko: "오늘 비가 와요.", en: "It's raining today.", es: "Hoy está lloviendo." } },
+        { text: "Di luar dingin. Bawa jaket!", speechLang: "id-ID", meaning: { ko: "밖이 추워요. 재킷 가져가세요!", en: "It's cold outside. Bring a jacket!", es: "Hace frío afuera. ¡Trae una chaqueta!" }, recallRound: true },
+        { text: "Saya suka cuaca panas.", speechLang: "id-ID", meaning: { ko: "더운 날씨를 좋아해요.", en: "I like hot weather.", es: "Me gusta el clima caliente." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Bagaimana cuaca hari ini? → Cuacanya ___. / 'cuaca'는 '날씨'. 상태: cerah(맑음), berawan(흐림), hujan(비), dingin(추움), panas(더움), hangat(따뜻함). 인도네시아어는 동사 변화가 없어서 형용사를 그대로 써요!", en: "Pattern: Bagaimana cuaca hari ini? → Cuacanya ___. 'cuaca' means 'weather'. Conditions: cerah(sunny), berawan(cloudy), hujan(rain), dingin(cold), panas(hot), hangat(warm). Indonesian has no verb conjugation — just use the adjective directly!", es: "Patrón: Bagaimana cuaca hari ini? → Cuacanya ___. 'cuaca' significa 'clima'. Condiciones: cerah(soleado), berawan(nublado), hujan(lluvia), dingin(frío), panas(caliente), hangat(cálido). ¡El indonesio no conjuga verbos — solo usa el adjetivo directamente!" },
+          examples: { ko: "Bagaimana cuaca hari ini? Cuacanya cerah dan hangat. (오늘 날씨 어때? 맑고 따뜻해.)\nHari ini hujan. (오늘 비가 와요.)\nDi luar dingin. Bawa jaket! (밖이 추워요. 재킷 가져가!)", en: "Bagaimana cuaca hari ini? Cuacanya cerah dan hangat. (Asking about and describing weather.)\nHari ini hujan. (Describing ongoing weather.)\nDi luar dingin. Bawa jaket! (Giving weather-based advice.)", es: "Bagaimana cuaca hari ini? Cuacanya cerah dan hangat. (Preguntando y describiendo el clima.)\nHari ini hujan. (Describiendo clima en curso.)\nDi luar dingin. Bawa jaket! (Dando consejo basado en el clima.)" },
+          mistakes: { ko: "❌ Hari ini sedang hujan adalah.\n✅ Hari ini hujan. (날씨는 단순하게! 'adalah'나 추가 동사가 필요 없어요)\n\n❌ Cuacanya panasnya.\n✅ Cuacanya panas. (형용사를 그대로 써요, 변형하지 마세요!)", en: "❌ Hari ini sedang hujan adalah.\n✅ Hari ini hujan. (Keep weather simple — no 'adalah' or extra verbs needed!)\n\n❌ Cuacanya panasnya.\n✅ Cuacanya panas. (Use the adjective as-is — don't add endings!)", es: "❌ Hari ini sedang hujan adalah.\n✅ Hari ini hujan. (¡Mantén el clima simple — sin 'adalah' ni verbos extra!)\n\n❌ Cuacanya panasnya.\n✅ Cuacanya panas. (Usa el adjetivo tal cual — ¡no agregues terminaciones!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 인도네시아어 날씨는 세상에서 제일 쉬워! 'hujan'(비) 한 단어면 '비가 온다'가 끝. 동사 변화도, be동사도 없어. 형용사만 툭 던지면 돼~", en: "Detective Rudy's tip: Indonesian weather might be the easiest in the world! Just 'hujan' (rain) means 'it's raining' — done. No verb changes, no 'to be'. Just drop the adjective and you're solved!", es: "Consejo del detective Rudy: ¡El clima indonesio quizás sea el más fácil del mundo! Solo 'hujan' (lluvia) significa 'está lloviendo' — listo. Sin cambios de verbo, sin 'ser'. ¡Solo suelta el adjetivo y caso resuelto!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Bagaimana ___ hari ini?", answer: "cuaca", options: ["cuaca", "hari", "jam"], fullSentence: "Bagaimana cuaca hari ini?", fullSentenceMeaning: { ko: "오늘 날씨 어때요?", en: "How's the weather today?", es: "¿Cómo está el clima hoy?" } },
+          { type: "select", promptWithBlank: "Cuacanya cerah dan ___.", answer: "hangat", options: ["hangat", "hari", "pagi"], fullSentence: "Cuacanya cerah dan hangat.", fullSentenceMeaning: { ko: "맑고 따뜻해요.", en: "It's sunny and warm.", es: "Está soleado y cálido." } },
+          { type: "select", promptWithBlank: "Hari ini ___.", answer: "hujan", options: ["hujan", "cuaca", "jam"], fullSentence: "Hari ini hujan.", fullSentenceMeaning: { ko: "오늘 비가 와요.", en: "It's raining today.", es: "Hoy está lloviendo." } },
+          { type: "input", promptWithBlank: "Di luar ___. Bawa jaket!", answer: "dingin", fullSentence: "Di luar dingin. Bawa jaket!", fullSentenceMeaning: { ko: "밖이 추워요. 재킷 가져가세요!", en: "It's cold outside. Bring a jacket!", es: "Hace frío afuera. ¡Trae una chaqueta!" } },
+          { type: "listening", audioText: "Hari ini hujan.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Hari ini hujan.", "Cuacanya cerah dan hangat.", "Saya suka cuaca panas.", "Di luar dingin."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -518,6 +641,39 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Do you speak English?", es: "¿Habla inglés?", ko: "영어 하세요?" }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Ini warna apa?", speechLang: "id-ID", meaning: { ko: "이건 무슨 색이에요?", en: "What colour is this?", es: "¿De qué color es esto?" } },
+        { text: "Ini merah. Saya suka biru.", speechLang: "id-ID", meaning: { ko: "빨간색이에요. 저는 파란색을 좋아해요.", en: "It's red. I like blue.", es: "Es rojo. Me gusta el azul." } },
+        { text: "Apakah ada ukuran yang lebih besar?", speechLang: "id-ID", meaning: { ko: "이거 더 큰 사이즈 있어요?", en: "Do you have this in a bigger size?", es: "¿Tiene esto en una talla más grande?" } },
+        { text: "Ini terlalu kecil. Saya butuh yang lebih besar.", speechLang: "id-ID", meaning: { ko: "이건 너무 작아요. 더 큰 거 필요해요.", en: "This is too small. I need a larger one.", es: "Esto es muy pequeño. Necesito uno más grande." }, recallRound: true },
+        { text: "Saya ambil yang hitam.", speechLang: "id-ID", meaning: { ko: "검은색 걸로 할게요.", en: "I'll take the black one, please.", es: "Me llevo el negro, por favor." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Ini warna apa? → Ini ___. / 색상: merah(빨강), biru(파랑), hijau(초록), hitam(검정), putih(흰색), kuning(노랑). 비교급: 'lebih + 형용사'(lebih besar=더 큰). 'terlalu'=너무. 쇼핑: 'Saya ambil yang ___.'", en: "Pattern: Ini warna apa? → Ini ___. Colours: merah(red), biru(blue), hijau(green), hitam(black), putih(white), kuning(yellow). Comparative: 'lebih + adjective' (lebih besar=bigger). 'terlalu'=too. Shopping: 'Saya ambil yang ___.'", es: "Patrón: Ini warna apa? → Ini ___. Colores: merah(rojo), biru(azul), hijau(verde), hitam(negro), putih(blanco), kuning(amarillo). Comparativo: 'lebih + adjetivo' (lebih besar=más grande). 'terlalu'=demasiado. Compras: 'Saya ambil yang ___.'" },
+          examples: { ko: "Ini warna apa? Ini merah. (이건 무슨 색? 빨간색이에요.)\nApakah ada ukuran yang lebih besar? (더 큰 사이즈 있어요?)\nSaya ambil yang hitam. (검은색 걸로 할게요.)", en: "Ini warna apa? Ini merah. (Asking about colour.)\nApakah ada ukuran yang lebih besar? (Requesting a larger size.)\nSaya ambil yang hitam. (Making a purchase decision.)", es: "Ini warna apa? Ini merah. (Preguntando por el color.)\nApakah ada ukuran yang lebih besar? (Pidiendo una talla más grande.)\nSaya ambil yang hitam. (Tomando una decisión de compra.)" },
+          mistakes: { ko: "❌ Saya butuh yang besar lebih.\n✅ Saya butuh yang lebih besar. ('lebih'가 형용사 앞에 와요! 'more big'이 아니라 lebih besar)\n\n❌ Saya ambil hitam yang.\n✅ Saya ambil yang hitam. ('yang'이 색상 앞에 와요!)", en: "❌ Saya butuh yang besar lebih.\n✅ Saya butuh yang lebih besar. ('lebih' goes BEFORE the adjective — lebih besar, not besar lebih!)\n\n❌ Saya ambil hitam yang.\n✅ Saya ambil yang hitam. ('yang' goes before the colour!)", es: "❌ Saya butuh yang besar lebih.\n✅ Saya butuh yang lebih besar. ('lebih' va ANTES del adjetivo — lebih besar, no besar lebih!)\n\n❌ Saya ambil hitam yang.\n✅ Saya ambil yang hitam. ('yang' va antes del color.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 쇼핑할 땐 'Saya ambil yang ___'만 기억해! '나 이거(저) 가질게'라는 뜻이야. yang hitam, yang biru... 색깔만 넣으면 끝! 비교는 'lebih'(더)면 만사 OK~", en: "Detective Rudy's tip: For shopping, just remember 'Saya ambil yang ___' — 'I'll take the ___ one.' Yang hitam, yang biru... just add a colour! And for comparing, 'lebih' (more) solves it all!", es: "Consejo del detective Rudy: Para comprar, solo recuerda 'Saya ambil yang ___' — 'Me llevo el ___.' Yang hitam, yang biru... ¡solo agrega un color! Y para comparar, '¡lebih' (más) lo resuelve todo!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Ini ___ apa?", answer: "warna", options: ["warna", "ukuran", "jenis"], fullSentence: "Ini warna apa?", fullSentenceMeaning: { ko: "이건 무슨 색이에요?", en: "What colour is this?", es: "¿De qué color es esto?" } },
+          { type: "select", promptWithBlank: "Ini ___ kecil.", answer: "terlalu", options: ["terlalu", "lebih", "sangat"], fullSentence: "Ini terlalu kecil.", fullSentenceMeaning: { ko: "이건 너무 작아요.", en: "This is too small.", es: "Esto es muy pequeño." } },
+          { type: "select", promptWithBlank: "Apakah ada ukuran yang ___ besar?", answer: "lebih", options: ["lebih", "terlalu", "banyak"], fullSentence: "Apakah ada ukuran yang lebih besar?", fullSentenceMeaning: { ko: "이거 더 큰 사이즈 있어요?", en: "Do you have this in a bigger size?", es: "¿Tiene esto en una talla más grande?" } },
+          { type: "input", promptWithBlank: "Saya ambil yang ___.", answer: "hitam", fullSentence: "Saya ambil yang hitam.", fullSentenceMeaning: { ko: "검은색 걸로 할게요.", en: "I'll take the black one.", es: "Me llevo el negro." } },
+          { type: "input", promptWithBlank: "Saya suka ___.", answer: "biru", fullSentence: "Saya suka biru.", fullSentenceMeaning: { ko: "파란색을 좋아해요.", en: "I like blue.", es: "Me gusta el azul." } },
+          { type: "listening", audioText: "Saya ambil yang hitam.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Saya ambil yang hitam.", "Ini terlalu kecil. Saya butuh yang lebih besar.", "Apakah ada ukuran yang lebih besar?", "Ini warna apa?"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Can you say that again, please?", es: "¿Puede repetirlo, por favor?", ko: "다시 한번 말해 주시겠어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Do you speak English?", es: "¿Habla inglés?", ko: "영어 하세요?" }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 12: Unit 2 Review ─────────────────────────────────────
@@ -609,6 +765,35 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
         ],
       },
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Saya berumur dua puluh lima tahun. Nomor telepon saya 010-1234-5678.", speechLang: "id-ID", meaning: { ko: "저는 스물다섯 살이에요. 전화번호는 010-1234-5678이에요.", en: "I'm twenty-five years old. My phone number is 010-1234-5678.", es: "Tengo veinticinco años. Mi número es 010-1234-5678." } },
+        { text: "Hari ini hari Jumat. Sampai jumpa hari Senin!", speechLang: "id-ID", meaning: { ko: "오늘은 금요일이에요. 월요일에 봐요!", en: "Today is Friday. See you on Monday!", es: "Hoy es viernes. ¡Te veo el lunes!" } },
+        { text: "Sekarang jam setengah empat. Rapatnya jam empat.", speechLang: "id-ID", meaning: { ko: "세 시 반이에요. 회의는 네 시예요.", en: "It's half past three. The meeting is at four.", es: "Son las tres y media. La reunión es a las cuatro." } },
+        { text: "Hari ini hujan. Dingin. Bawa jaket!", speechLang: "id-ID", meaning: { ko: "오늘 비가 와요. 추워요. 재킷 가져가세요!", en: "It's raining today. It's cold. Bring a jacket!", es: "Hoy llueve. Hace frío. ¡Trae una chaqueta!" }, recallRound: true },
+        { text: "Saya suka yang biru. Apakah ada ukuran yang lebih besar?", speechLang: "id-ID", meaning: { ko: "파란색이 좋아요. 더 큰 사이즈 있어요?", en: "I like the blue one. Do you have a bigger size?", es: "Me gusta el azul. ¿Tiene una talla más grande?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Unit 2 인도네시아어 총복습! 숫자/나이(Berapa umur Anda?), 요일(Hari ini hari apa?), 시간(Sekarang jam berapa?), 날씨(Bagaimana cuaca?), 색상/크기(Ini warna apa? Ukuran?).", en: "Pattern: Unit 2 Indonesian review! Numbers/age (Berapa umur Anda?), days (Hari ini hari apa?), time (Sekarang jam berapa?), weather (Bagaimana cuaca?), colours/sizes (Ini warna apa? Ukuran?).", es: "Patrón: Repaso completo de Unidad 2 en indonesio. Números/edad (Berapa umur Anda?), días (Hari ini hari apa?), hora (Sekarang jam berapa?), clima (Bagaimana cuaca?), colores/tallas (Ini warna apa?)." },
+          examples: { ko: "Saya berumur dua puluh lima tahun. Hari ini hari Jumat. (나이+요일 연결)\nSekarang jam setengah empat. Hari ini hujan. (시간+날씨 연결)\nSaya suka yang biru. Apakah ada ukuran yang lebih besar? (색상+크기 연결)", en: "Saya berumur dua puluh lima tahun. Hari ini hari Jumat. (Connecting age + day.)\nSekarang jam setengah empat. Hari ini hujan. (Connecting time + weather.)\nSaya suka yang biru. Apakah ada ukuran yang lebih besar? (Connecting colour + size.)", es: "Saya berumur dua puluh lima tahun. Hari ini hari Jumat. (Conectando edad + día.)\nSekarang jam setengah empat. Hari ini hujan. (Conectando hora + clima.)\nSaya suka yang biru. Apakah ada ukuran yang lebih besar? (Conectando color + talla.)" },
+          mistakes: { ko: "❌ Saya berumur dua puluh lima. (tahun 빠짐)\n✅ Saya berumur dua puluh lima tahun.\n\n❌ jam setengah empat (= 3시 반!) ↔ jam empat (4시)\n✅ setengah empat=3:30, empat=4:00 ('setengah'는 다음 시간 기준!)", en: "❌ Saya berumur dua puluh lima. (missing 'tahun')\n✅ Saya berumur dua puluh lima tahun.\n\n❌ Confusing jam setengah empat (3:30!) with jam empat (4:00)\n✅ setengah empat=3:30, empat=4:00 ('setengah' counts toward the NEXT hour!)", es: "❌ Saya berumur dua puluh lima. (falta 'tahun')\n✅ Saya berumur dua puluh lima tahun.\n\n❌ Confundir jam setengah empat (¡3:30!) con jam empat (4:00)\n✅ setengah empat=3:30, empat=4:00 ('setengah' cuenta hacia la hora SIGUIENTE.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 인도네시아어 핵심 정리! 숫자는 belas/puluh 블록, 요일은 'hari'+요일, 시간은 'setengah'=다음 시간 절반, 날씨는 형용사만, 비교는 'lebih'. 이 단서들이면 Unit 2 완벽 클리어!", en: "Detective Rudy's tip: Indonesian cheat sheet! Numbers = belas/puluh blocks, days = 'hari' + weekday, time = 'setengah' is half to the NEXT hour, weather = just the adjective, compare = 'lebih'. These clues solve Unit 2!", es: "Consejo del detective Rudy: Resumen del indonesio. Números = bloques belas/puluh, días = 'hari' + día, hora = 'setengah' es medio hacia la SIGUIENTE hora, clima = solo el adjetivo, comparar = 'lebih'. ¡Estas pistas resuelven la Unidad 2!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Berapa ___ Anda?", answer: "umur", options: ["umur", "nama", "kota"], fullSentence: "Berapa umur Anda?", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" } },
+          { type: "select", promptWithBlank: "Sekarang jam ___?", answer: "berapa", options: ["berapa", "apa", "mana"], fullSentence: "Sekarang jam berapa?", fullSentenceMeaning: { ko: "지금 몇 시예요?", en: "What time is it?", es: "¿Qué hora es?" } },
+          { type: "input", promptWithBlank: "Bagaimana ___ hari ini?", answer: "cuaca", fullSentence: "Bagaimana cuaca hari ini?", fullSentenceMeaning: { ko: "오늘 날씨 어때요?", en: "How's the weather?", es: "¿Cómo está el clima?" } },
+          { type: "input", promptWithBlank: "Hari ini hari ___?", answer: "apa", fullSentence: "Hari ini hari apa?", fullSentenceMeaning: { ko: "오늘 무슨 요일이에요?", en: "What day is it?", es: "¿Qué día es hoy?" } },
+          { type: "input", promptWithBlank: "Apakah ada ukuran yang lebih ___?", answer: "besar", fullSentence: "Apakah ada ukuran yang lebih besar?", fullSentenceMeaning: { ko: "이거 더 큰 사이즈 있어요?", en: "Do you have a bigger size?", es: "¿Tiene una talla más grande?" } },
+          { type: "listening", audioText: "Saya suka yang biru. Apakah ada ukuran yang lebih besar?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Saya suka yang biru. Apakah ada ukuran yang lebih besar?", "Hari ini hujan. Dingin.", "Sekarang jam berapa?", "Berapa umur Anda?"], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 };
 
@@ -622,36 +807,42 @@ export const MISSION_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKe
     english: { situation: { ko: "박물관 입구에서 새 동료의 연락처를 교환하고 있습니다. 숫자와 나이에 대해 이야기해보세요!", en: "Exchanging contact info with a new colleague at the museum entrance. Talk about numbers and age!", es: "Intercambiando información de contacto con un colega nuevo. ¡Habla de números y edad!" }, gptPrompt: "You are Rudy exchanging contact information with your partner at the museum. Simple A1 {targetLang}. Practice: 1) ask their age 2) share your age 3) exchange phone numbers (spell out each digit) 4) count items together (how many paintings, how many rooms). Keep very simple. Celebrate when they get numbers right.", speechLang: "en-GB", suggestedAnswers: ["I'm twenty-five years old.", "My phone number is ___.", "How old are you?", "One, two, three...", "There are five paintings."] },
     spanish: { situation: { ko: "박물관 입구에서 새 동료의 연락처를 교환하고 있습니다.", en: "Exchanging contact info at the museum.", es: "Intercambiando información de contacto." }, gptPrompt: "You are Rudy exchanging contact information with your partner. Simple A1 {targetLang}. Practice: 1) ask their age 2) exchange phone numbers 3) count items together. Keep very simple.", speechLang: "es-ES", suggestedAnswers: ["Tengo veinticinco años.", "Mi número de teléfono es ___.", "¿Cuántos años tienes?", "Uno, dos, tres...", "Hay cinco cuadros."] },
     korean: { situation: { ko: "박물관 입구에서 새 동료의 연락처를 교환하고 있습니다.", en: "Exchanging contact info at the museum.", es: "Intercambiando información de contacto." }, gptPrompt: "You are Rudy exchanging contact information with your partner. Simple A1 {targetLang}. Practice: 1) ask their age 2) exchange phone numbers 3) count items together. Keep very simple.", speechLang: "ko-KR", suggestedAnswers: ["저는 스물다섯 살이에요.", "제 전화번호는 ___이에요.", "몇 살이에요?", "하나, 둘, 셋...", "그림이 다섯 개 있어요."] },
+    indonesian: { situation: { ko: "박물관 입구에서 새 동료의 연락처를 교환하고 있습니다.", en: "Exchanging contact info at the museum.", es: "Intercambiando información de contacto." }, gptPrompt: "You are Rudy exchanging contact information with your partner. Simple A1 {targetLang}. Practice: 1) ask their age ('Berapa umur Anda?') 2) exchange phone numbers (spell out each digit: nol, satu, dua...) 3) count items together. Keep very simple.", speechLang: "id-ID", suggestedAnswers: ["Saya berumur dua puluh lima tahun.", "Nomor telepon saya ___.", "Berapa umur Anda?", "Satu, dua, tiga...", "Ada lima lukisan."] },
   },
 
   day_8: {
     english: { situation: { ko: "루디와 한 주의 일정을 계획하고 있습니다. 요일에 대해 이야기해보세요!", en: "Planning the week's schedule with Rudy. Talk about days of the week!", es: "Planificando la semana con Rudy. ¡Habla de los días!" }, gptPrompt: "You are Rudy planning the week with your partner at the museum. Simple A1 {targetLang}. Practice: 1) asking what day it is 2) talking about work schedule (Monday to Friday) 3) making plans for the weekend 4) setting a meeting day. Keep very simple.", speechLang: "en-GB", suggestedAnswers: ["Today is Monday.", "I work from Monday to Friday.", "What are you doing this weekend?", "See you on Wednesday!", "What day is it today?"] },
     spanish: { situation: { ko: "루디와 한 주의 일정을 계획하고 있습니다.", en: "Planning the week with Rudy.", es: "Planificando la semana con Rudy." }, gptPrompt: "You are Rudy planning the week with your partner. Simple A1 {targetLang}. Practice: days of the week, work schedule, weekend plans, setting meeting days. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["Hoy es lunes.", "Trabajo de lunes a viernes.", "¿Qué haces este fin de semana?", "¡Te veo el miércoles!", "¿Qué día es hoy?"] },
     korean: { situation: { ko: "루디와 한 주의 일정을 계획하고 있습니다.", en: "Planning the week with Rudy.", es: "Planificando la semana con Rudy." }, gptPrompt: "You are Rudy planning the week with your partner. Simple A1 {targetLang}. Practice: days, schedule, weekend plans, meeting days. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["오늘은 월요일이에요.", "월요일부터 금요일까지 일해요.", "이번 주말에 뭐 해?", "수요일에 봐요!", "오늘 무슨 요일이에요?"] },
+    indonesian: { situation: { ko: "루디와 한 주의 일정을 계획하고 있습니다.", en: "Planning the week with Rudy.", es: "Planificando la semana con Rudy." }, gptPrompt: "You are Rudy planning the week with your partner. Simple A1 {targetLang}. Practice: days of the week (hari Senin, Selasa...), work schedule (dari Senin sampai Jumat), weekend plans, setting meeting days. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Hari ini hari Senin.", "Saya bekerja dari Senin sampai Jumat.", "Apa rencana Anda akhir pekan ini?", "Sampai jumpa hari Rabu!", "Hari ini hari apa?"] },
   },
 
   day_9: {
     english: { situation: { ko: "박물관에서 투어 시간을 확인하고 일정을 조율하고 있습니다. 시간 표현을 연습해보세요!", en: "Checking tour times at the museum and coordinating schedules. Practice telling time!", es: "Verificando horarios de tours. ¡Practica decir la hora!" }, gptPrompt: "You are Rudy at the museum information desk coordinating tour times with your partner. Simple A1 {targetLang}. Practice: 1) asking what time it is 2) saying tour times (at two o'clock, at half past three) 3) talking about daily routine (wake up at 7, eat lunch at 12). Keep very simple.", speechLang: "en-GB", suggestedAnswers: ["What time is it?", "It's three o'clock.", "The tour is at half past two.", "I wake up at seven.", "The museum closes at five."] },
     spanish: { situation: { ko: "박물관에서 투어 시간을 확인하고 있습니다.", en: "Checking tour times at the museum.", es: "Verificando horarios de tours en el museo." }, gptPrompt: "You are Rudy at the museum coordinating tour times. Simple A1 {targetLang}. Practice: asking time, saying tour times, daily routine. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["¿Qué hora es?", "Son las tres.", "El tour es a las dos y media.", "Me despierto a las siete.", "El museo cierra a las cinco."] },
     korean: { situation: { ko: "박물관에서 투어 시간을 확인하고 있습니다.", en: "Checking tour times at the museum.", es: "Verificando horarios de tours." }, gptPrompt: "You are Rudy at the museum coordinating tour times. Simple A1 {targetLang}. Practice: asking time, tour times, daily routine. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["지금 몇 시예요?", "세 시예요.", "투어는 두 시 반이에요.", "일곱 시에 일어나요.", "박물관은 다섯 시에 닫아요."] },
+    indonesian: { situation: { ko: "박물관에서 투어 시간을 확인하고 있습니다.", en: "Checking tour times at the museum.", es: "Verificando horarios de tours." }, gptPrompt: "You are Rudy at the museum coordinating tour times. Simple A1 {targetLang}. Practice: asking time ('Sekarang jam berapa?'), tour times (jam dua, jam setengah tiga), daily routine. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Sekarang jam berapa?", "Sekarang jam tiga.", "Turnya jam setengah tiga.", "Saya bangun jam tujuh.", "Museum tutup jam lima."] },
   },
 
   day_10: {
     english: { situation: { ko: "루디와 함께 야외 조사를 나가기 전에 날씨를 확인하고 있습니다!", en: "Checking the weather before heading out for an outdoor investigation with Rudy!", es: "Verificando el clima antes de salir a investigar con Rudy." }, gptPrompt: "You are Rudy planning an outdoor investigation with your partner. Simple A1 {targetLang}. Practice: 1) asking about weather 2) describing weather (sunny, rainy, cold, hot) 3) deciding what to wear or bring 4) expressing weather preferences. Keep very simple and fun.", speechLang: "en-GB", suggestedAnswers: ["How's the weather today?", "It's sunny and warm.", "It's raining! Bring an umbrella.", "It's cold outside.", "I like hot weather."] },
     spanish: { situation: { ko: "야외 조사 전에 날씨를 확인하고 있습니다.", en: "Checking weather before outdoor investigation.", es: "Verificando el clima antes de investigar." }, gptPrompt: "You are Rudy planning an outdoor investigation. Simple A1 {targetLang}. Practice: weather questions, descriptions, clothing, preferences. Keep simple and fun.", speechLang: "es-ES", suggestedAnswers: ["¿Cómo está el clima hoy?", "Está soleado y cálido.", "¡Está lloviendo! Trae un paraguas.", "Hace frío afuera.", "Me gusta el clima caliente."] },
     korean: { situation: { ko: "야외 조사 전에 날씨를 확인하고 있습니다.", en: "Checking weather before investigation.", es: "Verificando el clima." }, gptPrompt: "You are Rudy planning an outdoor investigation. Simple A1 {targetLang}. Practice: weather, clothing, preferences. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["오늘 날씨 어때요?", "맑고 따뜻해요.", "비가 와요! 우산 가져가세요.", "밖이 추워요.", "더운 날씨를 좋아해요."] },
+    indonesian: { situation: { ko: "야외 조사 전에 날씨를 확인하고 있습니다.", en: "Checking weather before investigation.", es: "Verificando el clima." }, gptPrompt: "You are Rudy planning an outdoor investigation. Simple A1 {targetLang}. Practice: weather (cerah, hujan, dingin, panas), clothing, preferences. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Bagaimana cuaca hari ini?", "Cuacanya cerah dan hangat.", "Hujan! Bawa payung.", "Di luar dingin.", "Saya suka cuaca panas."] },
   },
 
   day_11: {
     english: { situation: { ko: "박물관 기념품 가게에서 선물을 고르고 있습니다. 색상과 크기에 대해 이야기해보세요!", en: "Shopping for souvenirs at the museum gift shop. Talk about colours and sizes!", es: "Comprando recuerdos en la tienda del museo. ¡Habla de colores y tallas!" }, gptPrompt: "You are Rudy at the museum gift shop helping your partner choose souvenirs. Simple A1 {targetLang}. Practice: 1) asking about colours 2) expressing colour preferences 3) asking about sizes 4) saying 'too small/big' 5) choosing an item. Make it feel like real shopping. Keep very simple.", speechLang: "en-GB", suggestedAnswers: ["What colour is this?", "I like blue.", "Do you have a bigger size?", "This is too small.", "I'll take the black one, please.", "How much is this?"] },
     spanish: { situation: { ko: "박물관 기념품 가게에서 선물을 고르고 있습니다.", en: "Shopping at the museum gift shop.", es: "Comprando en la tienda del museo." }, gptPrompt: "You are Rudy at the gift shop helping choose souvenirs. Simple A1 {targetLang}. Practice: colours, preferences, sizes, choosing items. Make it feel like real shopping.", speechLang: "es-ES", suggestedAnswers: ["¿De qué color es esto?", "Me gusta el azul.", "¿Tiene una talla más grande?", "Esto es muy pequeño.", "Me llevo el negro, por favor.", "¿Cuánto cuesta esto?"] },
     korean: { situation: { ko: "박물관 기념품 가게에서 선물을 고르고 있습니다.", en: "Shopping at the museum gift shop.", es: "Comprando en la tienda." }, gptPrompt: "You are Rudy at the gift shop helping choose souvenirs. Simple A1 {targetLang}. Practice: colours, sizes, choosing items. Make it like real shopping.", speechLang: "ko-KR", suggestedAnswers: ["이건 무슨 색이에요?", "파란색을 좋아해요.", "더 큰 사이즈 있어요?", "이건 너무 작아요.", "검은색 걸로 할게요.", "이거 얼마예요?"] },
+    indonesian: { situation: { ko: "박물관 기념품 가게에서 선물을 고르고 있습니다.", en: "Shopping at the museum gift shop.", es: "Comprando en la tienda." }, gptPrompt: "You are Rudy at the gift shop helping choose souvenirs. Simple A1 {targetLang}. Practice: colours (merah, biru, hitam), sizes (lebih besar, terlalu kecil), choosing items ('Saya ambil yang ___'). Make it like real shopping.", speechLang: "id-ID", suggestedAnswers: ["Ini warna apa?", "Saya suka biru.", "Apakah ada ukuran yang lebih besar?", "Ini terlalu kecil.", "Saya ambil yang hitam.", "Berapa harganya ini?"] },
   },
 
   day_12: {
     english: { situation: { ko: "박물관 주간 마무리 파티에서 이번 주에 배운 모든 표현을 사용해보세요! 숫자, 요일, 시간, 날씨, 색상까지!", en: "End-of-week party at the museum! Use ALL expressions: numbers, days, time, weather, colours!", es: "¡Fiesta de fin de semana en el museo! Usa TODO: números, días, hora, clima, colores." }, gptPrompt: "You are Rudy hosting an end-of-week gathering at the museum. Test ALL of Unit 2 in a natural A1 {targetLang} conversation. Cover: 1) numbers and age 2) days of the week and scheduling 3) telling time 4) weather talk 5) colours and sizes (at the snack/gift table). Also reinforce Unit 1 survival phrases naturally (How are you? Where is the bathroom?). Create 2-3 mini-scenarios to test everything. Be encouraging but thorough.", speechLang: "en-GB", suggestedAnswers: ["I'm twenty-five years old.", "Today is Friday!", "It's half past three.", "It's sunny and warm today.", "I like the blue one.", "How much is this?", "Where is the bathroom?"] },
     spanish: { situation: { ko: "박물관 주간 마무리 파티입니다!", en: "End-of-week party! Use everything!", es: "¡Fiesta de fin de semana! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting an end-of-week gathering. Test ALL of Unit 2 in A1 {targetLang}: numbers/age, days, time, weather, colours/sizes. Also reinforce Unit 1. Create 2-3 mini-scenarios. Be encouraging.", speechLang: "es-ES", suggestedAnswers: ["Tengo veinticinco años.", "¡Hoy es viernes!", "Son las tres y media.", "Está soleado y cálido.", "Me gusta el azul.", "¿Cuánto cuesta esto?", "¿Dónde está el baño?"] },
     korean: { situation: { ko: "박물관 주간 마무리 파티입니다! 이번 주 배운 모든 표현을 사용해보세요!", en: "End-of-week party! Use everything!", es: "¡Fiesta! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting an end-of-week gathering. Test ALL of Unit 2 in A1 {targetLang}: numbers/age, days, time, weather, colours/sizes. Also reinforce Unit 1. Create 2-3 mini-scenarios. Be encouraging.", speechLang: "ko-KR", suggestedAnswers: ["저는 스물다섯 살이에요.", "오늘은 금요일이에요!", "세 시 반이에요.", "맑고 따뜻해요.", "파란색이 좋아요.", "이거 얼마예요?", "화장실이 어디예요?"] },
+    indonesian: { situation: { ko: "박물관 주간 마무리 파티입니다! 이번 주 배운 모든 표현을 사용해보세요!", en: "End-of-week party! Use everything!", es: "¡Fiesta! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting an end-of-week gathering. Test ALL of Unit 2 in A1 {targetLang}: numbers/age, days, time, weather, colours/sizes. Also reinforce Unit 1 survival phrases naturally (Apa kabar? Di mana toilet?). Create 2-3 mini-scenarios. Be encouraging.", speechLang: "id-ID", suggestedAnswers: ["Saya berumur dua puluh lima tahun.", "Hari ini hari Jumat!", "Sekarang jam setengah empat.", "Cuacanya cerah dan hangat.", "Saya suka yang biru.", "Berapa harganya ini?", "Di mana toilet?"] },
   },
 };
 
@@ -683,6 +874,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "몇 ___이에요?", answer: "살", options: ["살", "개", "번"], fullSentence: "몇 살이에요?", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" } },
       { type: "speak", sentence: "저는 스물다섯 살이에요.", speechLang: "ko-KR", meaning: { ko: "저는 스물다섯 살이에요.", en: "I'm 25 years old.", es: "Tengo 25 años." } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Maaf, saya tidak mengerti. Bisa tolong ulangi?", speechLang: "id-ID", meaning: { ko: "이해를 못 했어요. 다시 한번 말해주세요.", en: "Sorry, I don't understand. Can you say that again?", es: "No entiendo. ¿Puede repetir?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "___ harganya ini?", answer: "Berapa", options: ["Berapa", "Apa", "Mana"], fullSentence: "Berapa harganya ini?", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Saya punya dua anjing dan tiga kucing di rumah.", speechLang: "id-ID", meaning: { ko: "집에 강아지 두 마리, 고양이 세 마리가 있어요.", en: "I have two dogs and three cats at home.", es: "Tengo dos perros y tres gatos en casa." } },
+      { type: "fill_blank", promptWithBlank: "Berapa ___ Anda?", answer: "umur", options: ["umur", "nama", "kota"], fullSentence: "Berapa umur Anda?", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" } },
+      { type: "speak", sentence: "Saya berumur dua puluh lima tahun.", speechLang: "id-ID", meaning: { ko: "저는 스물다섯 살이에요.", en: "I'm 25 years old.", es: "Tengo 25 años." } },
+    ],
   },
 
   day_8: {
@@ -706,6 +904,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "오늘은 월요일이에요. 금요일에 봐요!", speechLang: "ko-KR", meaning: { ko: "오늘은 월요일. 금요일에 봐요!", en: "Today is Monday. See you Friday!", es: "Hoy es lunes. ¡Nos vemos el viernes!" } },
       { type: "fill_blank", promptWithBlank: "월요일___ 금요일까지 일해요.", answer: "부터", options: ["부터", "에서", "에"], fullSentence: "월요일부터 금요일까지 일해요.", fullSentenceMeaning: { ko: "월~금 일해요.", en: "I work Mon-Fri.", es: "Trabajo lunes a viernes." } },
       { type: "speak", sentence: "이번 주말에 뭐 해?", speechLang: "ko-KR", meaning: { ko: "이번 주말에 뭐 해?", en: "What are you doing this weekend?", es: "¿Qué haces este fin de semana?" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Saya berumur dua puluh lima tahun.", speechLang: "id-ID", meaning: { ko: "저는 스물다섯 살이에요.", en: "I'm 25.", es: "Tengo 25 años." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Berapa ___ Anda?", answer: "umur", options: ["umur", "nama", "kota"], fullSentence: "Berapa umur Anda?", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Hari ini hari Senin. Sampai jumpa hari Jumat!", speechLang: "id-ID", meaning: { ko: "오늘은 월요일. 금요일에 봐요!", en: "Today is Monday. See you Friday!", es: "Hoy es lunes. ¡Nos vemos el viernes!" } },
+      { type: "fill_blank", promptWithBlank: "Saya bekerja ___ Senin sampai Jumat.", answer: "dari", options: ["dari", "di", "ke"], fullSentence: "Saya bekerja dari Senin sampai Jumat.", fullSentenceMeaning: { ko: "월~금 일해요.", en: "I work Mon-Fri.", es: "Trabajo lunes a viernes." } },
+      { type: "speak", sentence: "Apa rencana Anda akhir pekan ini?", speechLang: "id-ID", meaning: { ko: "이번 주말에 뭐 해?", en: "What are you doing this weekend?", es: "¿Qué haces este fin de semana?" } },
     ],
   },
 
@@ -731,6 +936,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "일곱 시 ___이에요.", answer: "반", options: ["반", "절", "중"], fullSentence: "일곱 시 반이에요.", fullSentenceMeaning: { ko: "일곱 시 반이에요.", en: "It's 7:30.", es: "Son las 7 y media." } },
       { type: "speak", sentence: "매일 일곱 시에 일어나요.", speechLang: "ko-KR", meaning: { ko: "매일 일곱 시에 일어나요.", en: "I wake up at 7.", es: "Me despierto a las 7." } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Hari ini hari Rabu. Sampai jumpa hari Jumat!", speechLang: "id-ID", meaning: { ko: "오늘은 수요일. 금요일에 봐요!", en: "Wednesday. See you Friday!", es: "Miércoles. ¡Nos vemos el viernes!" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Hari ini hari ___?", answer: "apa", options: ["apa", "mana", "siapa"], fullSentence: "Hari ini hari apa?", fullSentenceMeaning: { ko: "오늘 무슨 요일?", en: "What day?", es: "¿Qué día?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Sekarang jam berapa? Sekarang jam tiga.", speechLang: "id-ID", meaning: { ko: "몇 시예요? 세 시예요.", en: "What time? 3 o'clock.", es: "¿Qué hora? Las tres." } },
+      { type: "fill_blank", promptWithBlank: "Sekarang jam ___ delapan.", answer: "setengah", options: ["setengah", "lebih", "kurang"], fullSentence: "Sekarang jam setengah delapan.", fullSentenceMeaning: { ko: "일곱 시 반이에요.", en: "It's 7:30.", es: "Son las 7 y media." } },
+      { type: "speak", sentence: "Saya bangun jam tujuh setiap hari.", speechLang: "id-ID", meaning: { ko: "매일 일곱 시에 일어나요.", en: "I wake up at 7.", es: "Me despierto a las 7." } },
+    ],
   },
 
   day_10: {
@@ -754,6 +966,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "오늘 맑고 따뜻해요.", speechLang: "ko-KR", meaning: { ko: "맑고 따뜻해요.", en: "Sunny and warm.", es: "Soleado y cálido." } },
       { type: "fill_blank", promptWithBlank: "오늘 비가 ___.", answer: "와요", options: ["와요", "가요", "해요"], fullSentence: "오늘 비가 와요.", fullSentenceMeaning: { ko: "비가 와요.", en: "It's raining.", es: "Está lloviendo." } },
       { type: "speak", sentence: "밖이 추워요. 재킷 가져가세요!", speechLang: "ko-KR", meaning: { ko: "밖이 추워요. 재킷!", en: "Cold outside. Jacket!", es: "Frío afuera. ¡Chaqueta!" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Sekarang jam tiga. Rapatnya jam empat.", speechLang: "id-ID", meaning: { ko: "세 시. 회의는 네 시.", en: "It's 3. Meeting at 4.", es: "Las 3. Reunión a las 4." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Sekarang jam ___?", answer: "berapa", options: ["berapa", "apa", "mana"], fullSentence: "Sekarang jam berapa?", fullSentenceMeaning: { ko: "몇 시예요?", en: "What time?", es: "¿Qué hora?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Cuacanya cerah dan hangat hari ini.", speechLang: "id-ID", meaning: { ko: "오늘 맑고 따뜻해요.", en: "Sunny and warm.", es: "Soleado y cálido." } },
+      { type: "fill_blank", promptWithBlank: "Hari ini ___.", answer: "hujan", options: ["hujan", "cuaca", "jam"], fullSentence: "Hari ini hujan.", fullSentenceMeaning: { ko: "비가 와요.", en: "It's raining.", es: "Está lloviendo." } },
+      { type: "speak", sentence: "Di luar dingin. Bawa jaket!", speechLang: "id-ID", meaning: { ko: "밖이 추워요. 재킷!", en: "Cold outside. Jacket!", es: "Frío afuera. ¡Chaqueta!" } },
     ],
   },
 
@@ -779,6 +998,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "이건 너무 ___요.", answer: "작아", options: ["작아", "크", "많아"], fullSentence: "이건 너무 작아요.", fullSentenceMeaning: { ko: "너무 작아요.", en: "Too small.", es: "Muy pequeño." } },
       { type: "speak", sentence: "검은색 걸로 할게요.", speechLang: "ko-KR", meaning: { ko: "검은색 걸로.", en: "I'll take the black one.", es: "Me llevo el negro." } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Cuacanya cerah. Saya suka cuaca panas.", speechLang: "id-ID", meaning: { ko: "맑아요. 더운 날씨 좋아해요.", en: "Sunny. I like hot weather.", es: "Soleado. Me gusta el clima caliente." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Bagaimana ___ hari ini?", answer: "cuaca", options: ["cuaca", "hari", "jam"], fullSentence: "Bagaimana cuaca hari ini?", fullSentenceMeaning: { ko: "날씨 어때요?", en: "How's the weather?", es: "¿Cómo está el clima?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Ini warna apa? Saya suka biru.", speechLang: "id-ID", meaning: { ko: "무슨 색? 파란색 좋아요.", en: "What colour? I like blue.", es: "¿Qué color? Me gusta azul." } },
+      { type: "fill_blank", promptWithBlank: "Ini ___ kecil.", answer: "terlalu", options: ["terlalu", "lebih", "sangat"], fullSentence: "Ini terlalu kecil.", fullSentenceMeaning: { ko: "너무 작아요.", en: "Too small.", es: "Muy pequeño." } },
+      { type: "speak", sentence: "Saya ambil yang hitam.", speechLang: "id-ID", meaning: { ko: "검은색 걸로.", en: "I'll take the black one.", es: "Me llevo el negro." } },
+    ],
   },
 
   day_12: {
@@ -802,6 +1028,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "세 시 반이에요. 회의는 네 시예요.", speechLang: "ko-KR", meaning: { ko: "세 시 반. 회의 네 시.", en: "3:30. Meeting 4.", es: "3:30. Reunión 4." } },
       { type: "speak", sentence: "오늘 비가 와요. 추워요. 재킷 가져가세요!", speechLang: "ko-KR", meaning: { ko: "비 와요. 추워요. 재킷!", en: "Rain. Cold. Jacket!", es: "Lluvia. Frío. ¡Chaqueta!" } },
       { type: "speak", sentence: "파란색이 좋아요. 더 큰 사이즈 있어요? 이거 얼마예요?", speechLang: "ko-KR", meaning: { ko: "파란색 좋아요. 큰 사이즈? 얼마?", en: "Like blue. Bigger? How much?", es: "Azul. ¿Más grande? ¿Cuánto?" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Saya berumur dua puluh lima tahun. Berapa umur Anda?", speechLang: "id-ID", meaning: { ko: "스물다섯 살이에요. 당신은?", en: "I'm 25. You?", es: "Tengo 25. ¿Y tú?" } },
+      { type: "speak", sentence: "Hari ini hari Jumat. Saya bekerja dari Senin sampai Jumat.", speechLang: "id-ID", meaning: { ko: "금요일. 월~금 일해요.", en: "Friday. Mon-Fri work.", es: "Viernes. Lunes a viernes." } },
+      { type: "speak", sentence: "Sekarang jam setengah empat. Rapatnya jam empat.", speechLang: "id-ID", meaning: { ko: "세 시 반. 회의 네 시.", en: "3:30. Meeting 4.", es: "3:30. Reunión 4." } },
+      { type: "speak", sentence: "Hari ini hujan. Dingin. Bawa jaket!", speechLang: "id-ID", meaning: { ko: "비 와요. 추워요. 재킷!", en: "Rain. Cold. Jacket!", es: "Lluvia. Frío. ¡Chaqueta!" } },
+      { type: "speak", sentence: "Saya suka yang biru. Apakah ada ukuran yang lebih besar? Berapa harganya ini?", speechLang: "id-ID", meaning: { ko: "파란색 좋아요. 큰 사이즈? 얼마?", en: "Like blue. Bigger? How much?", es: "Azul. ¿Más grande? ¿Cuánto?" } },
     ],
   },
 };

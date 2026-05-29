@@ -170,6 +170,8 @@ interface Character {
   emoji: string;
   name: string;
   nameKo?: string;
+  /** Indonesian (id-ID) character name. Falls back to `name` when absent. */
+  nameId?: string;
   side: "left" | "right";
   avatarBg: string;
   isLingo?: boolean;
@@ -180,6 +182,8 @@ interface Tri {
   en: string;
   ko: string;
   es: string;
+  /** Optional Indonesian (id-ID). Falls back to `en` when absent. */
+  id?: string;
 }
 
 /* Puzzle types */
@@ -299,7 +303,10 @@ interface PuzzleHints {
 
 function resolveHint(h: HintTri, uiLang: string, learningLang: string): string {
   const src: Tri = h.byLearning?.[learningLang] ?? h;
-  return uiLang === "korean" ? src.ko : uiLang === "spanish" ? src.es : src.en;
+  return uiLang === "korean" ? src.ko
+    : uiLang === "spanish" ? src.es
+    : uiLang === "indonesian" ? (src.id ?? src.en)
+    : src.en;
 }
 
 /* ── Language ratio metadata ──────────────────────────────────────────────────
@@ -337,10 +344,14 @@ type SeqScene = {
   text: string;
   textKo?: string;
   textEs?: string;
+  /** Indonesian (id-ID) full translation. Falls back to `text` (English) when absent. */
+  textId?: string;
   /** Mixed-language Korean: mostly Korean with learned English expressions inline */
   textKoMix?: string;
   /** Mixed-language Spanish: mostly Spanish with learned English expressions inline */
   textEsMix?: string;
+  /** Mixed-language Indonesian: mostly Indonesian with learned English expressions inline */
+  textIdMix?: string;
   isNarration?: boolean;
   /** Reference to an entry in IDIOM_COLLECTION — links this dialogue to a targetLang-adaptive idiom */
   idiomRef?: string;
@@ -351,9 +362,13 @@ type SeqClue = {
   titleEn: string;
   titleKo: string;
   titleEs: string;
+  /** Indonesian (id-ID) clue title. Falls back to `titleEn` when absent. */
+  titleId?: string;
   descEn: string;
   descKo: string;
   descEs: string;
+  /** Indonesian (id-ID) clue description. Falls back to `descEn` when absent. */
+  descId?: string;
 };
 type TPRSMeta = {
   tprsStage?: 1 | 2 | 3 | 4;
@@ -377,6 +392,8 @@ interface Story {
   title: string;
   titleKo: string;
   titleEs: string;
+  /** Indonesian (id-ID) chapter title. Falls back to `title` (English) when absent. */
+  titleId?: string;
   gradient: readonly [string, string, string];
   accentColor: string;
   /** Language ratio metadata for progressive immersion */
@@ -400,6 +417,7 @@ function shuffle<T>(arr: T[]): T[] {
 function tri(t: Tri, lang: string) {
   if (lang === "korean") return t.ko;
   if (lang === "spanish") return t.es;
+  if (lang === "indonesian") return t.id ?? t.en;
   return t.en;
 }
 
@@ -442,6 +460,11 @@ const IDIOM_COLLECTION: Record<string, {
         expression: "대박 나라!",
         meaning: { en: "Break a leg!", es: "¡Buena suerte!" },
         literal: { en: "Hit the jackpot!", es: "¡Que te salga un gran éxito!" },
+      },
+      id: {
+        expression: "Semoga sukses!",
+        meaning: { en: "Break a leg!", ko: "행운을 빌어!", es: "¡Buena suerte!" },
+        literal: { en: "May you succeed!", ko: "성공하길 바라!" },
       },
     },
   },
@@ -592,6 +615,7 @@ const STORIES: Record<string, Story> = {
     title: "The London Cipher",
     titleKo: "런던의 암호",
     titleEs: "El Cifrado de Londres",
+    titleId: "Sandi London",
     gradient: ["#1a0a05", "#2c1810", "#1a0a05"],
     accentColor: C.gold,
     nextChapterId: "madrid",
@@ -677,6 +701,7 @@ const STORIES: Record<string, Story> = {
         text: "(The last frame of the CCTV still burns in your mind: the black coat, the stolen light, the word Detective written for you. Rudy hovers beside your phone, newly named and still shedding tiny sparks. The museum in the footage is close. Too close.)",
         textKo: "(CCTV의 마지막 장면이 아직 머릿속에 남아 있다. 검은 코트, 훔쳐간 빛, 그리고 너를 향한 Detective라는 단어. 방금 이름을 되찾은 루디가 핸드폰 옆에 떠 있고, 아직 작은 불꽃들이 흩어진다. 영상 속 박물관은 가깝다. 너무 가깝다.)",
         textEs: "(El último fotograma del CCTV sigue ardiendo en tu mente: el abrigo negro, la luz robada, la palabra Detective escrita para ti. Rudy flota junto a tu teléfono, recién nombrado, todavía soltando pequeñas chispas. El museo del video está cerca. Demasiado cerca.)",
+        textId: "(Bingkai terakhir CCTV itu masih membekas di benakmu: mantel hitam, cahaya yang dicuri, dan kata Detective yang ditulis untukmu. Rudy melayang di samping ponselmu, baru saja menemukan namanya dan masih memercikkan bunga api kecil. Museum dalam rekaman itu dekat. Terlalu dekat.)",
       },
       // ── Scene 2: The Museum Entrance ──────────────────────────────────────
       {
@@ -686,6 +711,7 @@ const STORIES: Record<string, Story> = {
         text: "(4:30 AM. The British Museum. Police tape flutters in the cold wind. The building is dark except for emergency lights. A young security guard stands at the entrance, arms crossed, jaw clenched. He looks like he's been awake for twelve hours and angry for all of them.)",
         textKo: "(새벽 4시 30분. 대영박물관. 차가운 바람에 경찰 테이프가 펄럭인다. 비상등 외에는 건물이 어둡다. 젊은 경비원이 입구에 서 있다. 팔짱을 끼고, 이를 악물고. 12시간째 깨어 있으면서 내내 화가 나 있는 것 같다.)",
         textEs: "(4:30 AM. El Museo Británico. La cinta policial ondea con el viento frío. El edificio está oscuro excepto por las luces de emergencia. Un joven guardia de seguridad está en la entrada, brazos cruzados, mandíbula apretada. Parece que lleva doce horas despierto y enfadado durante todas ellas.)",
+        textId: "(Pukul 04.30 pagi. British Museum. Garis polisi berkibar diterpa angin dingin. Gedung itu gelap kecuali lampu darurat. Seorang penjaga keamanan muda berdiri di pintu masuk, tangan terlipat, rahang mengeras. Ia tampak seperti sudah terjaga dua belas jam dan marah sepanjang waktu itu.)",
       },
       {
         kind: "scene",
@@ -695,6 +721,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "야. 박물관 닫았어, 알겠지? No visitors, no exceptions. 여왕 사촌이래도 상관없어. 오늘 밤엔 아무도 못 지나가. My name is Tom. 그래서 넌 누구야?",
         textEs: "Oye. El museo está cerrado, ¿vale? Escena del crimen. No visitantes, no prensa, sin excepciones. Me da igual si eres primo de la Reina, nadie pasa esta noche. ¿Así que quién eres?",
         textEsMix: "Oye. El museo está cerrado, ¿vale? No visitors, no exceptions. Me da igual si eres primo de la Reina, nadie pasa esta noche. My name is Tom. ¿Así que quién eres?",
+        textId: "Hei. Museum tutup, paham? Ini tempat kejahatan. Tidak ada pengunjung, tidak ada pers, tidak ada pengecualian. Aku tak peduli kalau kau sepupu Ratu, malam ini tak ada yang bisa lewat. Jadi, siapa kau?",
+        textIdMix: "Hei. Museum tutup, paham? No visitors, no exceptions. Aku tak peduli kalau kau sepupu Ratu, malam ini tak ada yang bisa lewat. My name is Tom. Jadi, kau siapa?",
       },
       {
         kind: "scene",
@@ -703,6 +731,7 @@ const STORIES: Record<string, Story> = {
         text: "(Psst. Partner, before we talk to Tom, let's review some key words first. Greetings, introductions, basic phrases. If we know the vocabulary, the conversation will go smoothly.)",
         textKo: "(쉿. 파트너, 톰에게 말하기 전에 먼저 핵심 단어들을 복습하자. 인사, 자기소개, 기초 표현들. 어휘를 알면 대화가 수월할 거야.)",
         textEs: "(Psst. Compañero, antes de hablar con Tom, repasemos algunas palabras clave primero. Saludos, presentaciones, frases básicas. Si conocemos el vocabulario, la conversación será más fácil.)",
+        textId: "(Psst. Partner, sebelum kita bicara dengan Tom, mari kita ulang beberapa kata penting dulu. Sapaan, perkenalan, frasa dasar. Kalau kita tahu kosakatanya, percakapannya akan lancar.)",
       },
       {
         kind: "puzzle",
@@ -717,64 +746,64 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Hello", "Help me", "Thank you", "Goodbye"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            word: { en: "Hello", ko: "안녕하세요", es: "Hola" },
-            meaning: { en: "a greeting when you meet someone", ko: "누군가를 만날 때 하는 인사", es: "un saludo cuando conoces a alguien" },
+            word: { en: "Hello", ko: "안녕하세요", es: "Hola", id: "Halo" },
+            meaning: { en: "a greeting when you meet someone", ko: "누군가를 만날 때 하는 인사", es: "un saludo cuando conoces a alguien", id: "sapaan saat bertemu seseorang" },
             wrong: [
-              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse" },
-              { en: "an apology for a mistake", ko: "실수에 대한 사과", es: "una disculpa por un error" },
-              { en: "a request for help", ko: "도움 요청", es: "una petición de ayuda" },
+              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi" },
+              { en: "an apology for a mistake", ko: "실수에 대한 사과", es: "una disculpa por un error", id: "permintaan maaf atas kesalahan" },
+              { en: "a request for help", ko: "도움 요청", es: "una petición de ayuda", id: "permintaan bantuan" },
             ],
           },
           {
-            word: { en: "Help me", ko: "도와주세요", es: "Ayúdame" },
-            meaning: { en: "asking someone to help you", ko: "누군가에게 도움을 요청하는 표현", es: "pedirle ayuda a alguien" },
+            word: { en: "Help me", ko: "도와주세요", es: "Ayúdame", id: "Tolong saya" },
+            meaning: { en: "asking someone to help you", ko: "누군가에게 도움을 요청하는 표현", es: "pedirle ayuda a alguien", id: "meminta seseorang membantumu" },
             wrong: [
-              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse" },
-              { en: "an expression of thanks", ko: "감사 표현", es: "una expresión de agradecimiento" },
-              { en: "asking for directions", ko: "길을 묻는 것", es: "pedir direcciones" },
+              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi" },
+              { en: "an expression of thanks", ko: "감사 표현", es: "una expresión de agradecimiento", id: "ungkapan terima kasih" },
+              { en: "asking for directions", ko: "길을 묻는 것", es: "pedir direcciones", id: "menanyakan arah jalan" },
             ],
           },
           {
-            word: { en: "Where is...?", ko: "어디에 있어요...?", es: "¿Dónde está...?" },
-            meaning: { en: "asking about a location or place", ko: "장소나 위치를 묻는 표현", es: "preguntar sobre un lugar o ubicación" },
+            word: { en: "Where is...?", ko: "어디에 있어요...?", es: "¿Dónde está...?", id: "Di mana...?" },
+            meaning: { en: "asking about a location or place", ko: "장소나 위치를 묻는 표현", es: "preguntar sobre un lugar o ubicación", id: "menanyakan lokasi atau tempat" },
             wrong: [
-              { en: "asking about someone's name", ko: "누군가의 이름을 묻는 것", es: "preguntar el nombre de alguien" },
-              { en: "asking about the time", ko: "시간을 묻는 것", es: "preguntar la hora" },
-              { en: "asking about someone's job", ko: "직업을 묻는 것", es: "preguntar el trabajo de alguien" },
+              { en: "asking about someone's name", ko: "누군가의 이름을 묻는 것", es: "preguntar el nombre de alguien", id: "menanyakan nama seseorang" },
+              { en: "asking about the time", ko: "시간을 묻는 것", es: "preguntar la hora", id: "menanyakan waktu" },
+              { en: "asking about someone's job", ko: "직업을 묻는 것", es: "preguntar el trabajo de alguien", id: "menanyakan pekerjaan seseorang" },
             ],
           },
           {
-            word: { en: "My name is...", ko: "제 이름은...입니다", es: "Mi nombre es..." },
-            meaning: { en: "telling someone your name", ko: "자기 이름을 말하는 표현", es: "decirle tu nombre a alguien" },
+            word: { en: "My name is...", ko: "제 이름은...입니다", es: "Mi nombre es...", id: "Nama saya..." },
+            meaning: { en: "telling someone your name", ko: "자기 이름을 말하는 표현", es: "decirle tu nombre a alguien", id: "memberi tahu seseorang namamu" },
             wrong: [
-              { en: "saying where you live", ko: "사는 곳을 말하는 것", es: "decir dónde vives" },
-              { en: "asking how someone is feeling", ko: "누군가의 기분을 묻는 것", es: "preguntar cómo se siente alguien" },
-              { en: "saying thank you", ko: "감사하다고 말하는 것", es: "dar las gracias" },
+              { en: "saying where you live", ko: "사는 곳을 말하는 것", es: "decir dónde vives", id: "mengatakan tempat tinggalmu" },
+              { en: "asking how someone is feeling", ko: "누군가의 기분을 묻는 것", es: "preguntar cómo se siente alguien", id: "menanyakan perasaan seseorang" },
+              { en: "saying thank you", ko: "감사하다고 말하는 것", es: "dar las gracias", id: "mengucapkan terima kasih" },
             ],
           },
           {
-            word: { en: "Thank you", ko: "감사합니다", es: "Gracias" },
-            meaning: { en: "thanking someone for help", ko: "도움을 준 사람에게 감사하는 표현", es: "dar las gracias por la ayuda" },
+            word: { en: "Thank you", ko: "감사합니다", es: "Gracias", id: "Terima kasih" },
+            meaning: { en: "thanking someone for help", ko: "도움을 준 사람에게 감사하는 표현", es: "dar las gracias por la ayuda", id: "berterima kasih kepada seseorang atas bantuannya" },
             wrong: [
-              { en: "asking where something is", ko: "어디 있는지 묻는 것", es: "preguntar dónde está algo" },
-              { en: "telling someone your name", ko: "자기 이름을 말하는 것", es: "decir tu nombre" },
-              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse" },
+              { en: "asking where something is", ko: "어디 있는지 묻는 것", es: "preguntar dónde está algo", id: "menanyakan letak sesuatu" },
+              { en: "telling someone your name", ko: "자기 이름을 말하는 것", es: "decir tu nombre", id: "menyebutkan namamu" },
+              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi" },
             ],
           },
           {
-            word: { en: "Goodbye", ko: "안녕히 계세요", es: "Adiós" },
-            meaning: { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse" },
+            word: { en: "Goodbye", ko: "안녕히 계세요", es: "Adiós", id: "Selamat tinggal" },
+            meaning: { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi" },
             wrong: [
-              { en: "a greeting when arriving", ko: "도착할 때 하는 인사", es: "un saludo al llegar" },
-              { en: "asking for help", ko: "도움을 요청하는 것", es: "pedir ayuda" },
-              { en: "an expression of thanks", ko: "감사 표현", es: "una expresión de agradecimiento" },
+              { en: "a greeting when arriving", ko: "도착할 때 하는 인사", es: "un saludo al llegar", id: "sapaan saat tiba" },
+              { en: "asking for help", ko: "도움을 요청하는 것", es: "pedir ayuda", id: "meminta bantuan" },
+              { en: "an expression of thanks", ko: "감사 표현", es: "una expresión de agradecimiento", id: "ungkapan terima kasih" },
             ],
           },
         ],
         hints: {
-          h1: { ko: "프롤로그와 입구에서 이미 본 말들이야 — 인사, 도움 요청, 위치, 이름, 감사, 작별", en: "These are words from the prologue and the museum gate — greeting, help, location, name, thanks, farewell", es: "Son palabras del prólogo y la entrada del museo — saludo, ayuda, lugar, nombre, gracias, despedida" },
-          h2: { ko: "Tom에게 말하려면 먼저 자신을 밝히고, 왜 왔는지 말해야 해", en: "To talk to Tom, first show who you are and why you came", es: "Para hablar con Tom, primero muestra quién eres y por qué viniste" },
-          h3: { ko: "Hello=인사 / Help me=도움 요청 / Where is=장소 질문 / My name is=이름 / Thank you=감사 / Goodbye=작별", en: "Hello=greeting / Help me=requesting help / Where is=location question / My name is=name / Thank you=thanks / Goodbye=farewell", es: "Hola=saludo / Ayúdame=pedir ayuda / Dónde está=lugar / Mi nombre es=nombre / Gracias=gracias / Adiós=despedida" },
+          h1: { ko: "프롤로그와 입구에서 이미 본 말들이야 — 인사, 도움 요청, 위치, 이름, 감사, 작별", en: "These are words from the prologue and the museum gate — greeting, help, location, name, thanks, farewell", es: "Son palabras del prólogo y la entrada del museo — saludo, ayuda, lugar, nombre, gracias, despedida", id: "Ini kata-kata dari prolog dan gerbang museum — sapaan, bantuan, lokasi, nama, terima kasih, perpisahan" },
+          h2: { ko: "Tom에게 말하려면 먼저 자신을 밝히고, 왜 왔는지 말해야 해", en: "To talk to Tom, first show who you are and why you came", es: "Para hablar con Tom, primero muestra quién eres y por qué viniste", id: "Untuk bicara dengan Tom, tunjukkan dulu siapa kamu dan mengapa kamu datang" },
+          h3: { ko: "Hello=인사 / Help me=도움 요청 / Where is=장소 질문 / My name is=이름 / Thank you=감사 / Goodbye=작별", en: "Hello=greeting / Help me=requesting help / Where is=location question / My name is=name / Thank you=thanks / Goodbye=farewell", es: "Hola=saludo / Ayúdame=pedir ayuda / Dónde está=lugar / Mi nombre es=nombre / Gracias=gracias / Adiós=despedida", id: "Hello=sapaan / Help me=meminta bantuan / Where is=pertanyaan lokasi / My name is=nama / Thank you=terima kasih / Goodbye=perpisahan" },
         },
       },
       {
@@ -784,6 +813,7 @@ const STORIES: Record<string, Story> = {
         text: "(Good. Now you know the key words. Time to use them with Tom. He's not going to let us in unless we answer his questions. Pick the right responses, show him we belong here.)",
         textKo: "(좋아. 이제 핵심 단어들을 알았지. 톰에게 써먹을 차례야. 질문에 대답하지 않으면 안 들여보내줄 거야. 올바른 대답을 골라. 우리가 여기 있을 이유가 있다는 걸 보여줘.)",
         textEs: "(Bien. Ahora conoces las palabras clave. Es hora de usarlas con Tom. No nos dejará pasar a menos que respondamos sus preguntas. Elige las respuestas correctas, demuestra que pertenecemos aquí.)",
+        textId: "(Bagus. Sekarang kamu tahu kata-kata kuncinya. Saatnya memakainya dengan Tom. Dia tidak akan membiarkan kita masuk kecuali kita menjawab pertanyaannya. Pilih jawaban yang tepat, tunjukkan bahwa tempat kita di sini.)",
       },
       {
         kind: "puzzle",
@@ -798,37 +828,37 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Hello", "My name is ___", "Help me", "Thank you", "Goodbye"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            prompt: { en: "Tom asks: 'Who are you?' How do you greet him?", ko: "톰이 묻는다: '넌 누구야?' 어떻게 인사할까?", es: "Tom pregunta: '¿Quién eres?' ¿Cómo lo saludas?" },
-            context: { en: "You need to make a good first impression on the guard.", ko: "경비원에게 좋은 첫인상을 남겨야 한다.", es: "Necesitas causar una buena primera impresión al guardia." },
-            answer: { en: "Hello! My name is...", ko: "안녕하세요! 제 이름은...입니다.", es: "¡Hola! Mi nombre es..." },
+            prompt: { en: "Tom asks: 'Who are you?' How do you greet him?", ko: "톰이 묻는다: '넌 누구야?' 어떻게 인사할까?", es: "Tom pregunta: '¿Quién eres?' ¿Cómo lo saludas?", id: "Tom bertanya: 'Siapa kamu?' Bagaimana kamu menyapanya?" },
+            context: { en: "You need to make a good first impression on the guard.", ko: "경비원에게 좋은 첫인상을 남겨야 한다.", es: "Necesitas causar una buena primera impresión al guardia.", id: "Kamu harus memberi kesan pertama yang baik pada penjaga itu." },
+            answer: { en: "Hello! My name is...", ko: "안녕하세요! 제 이름은...입니다.", es: "¡Hola! Mi nombre es...", id: "Halo! Nama saya..." },
             wrong: [
-              { en: "Goodbye! I don't understand!", ko: "안녕히 계세요! 이해 못 해요!", es: "¡Adiós! ¡No entiendo!" },
-              { en: "Sorry! Where is the exit?", ko: "죄송합니다! 출구가 어디예요?", es: "¡Perdón! ¿Dónde está la salida?" },
+              { en: "Goodbye! I don't understand!", ko: "안녕히 계세요! 이해 못 해요!", es: "¡Adiós! ¡No entiendo!", id: "Selamat tinggal! Saya tidak mengerti!" },
+              { en: "Sorry! Where is the exit?", ko: "죄송합니다! 출구가 어디예요?", es: "¡Perdón! ¿Dónde está la salida?", id: "Maaf! Di mana pintu keluar?" },
             ],
           },
           {
-            prompt: { en: "Tom asks: 'Why are you here?'", ko: "톰이 묻는다: '왜 여기 온 거야?'", es: "Tom pregunta: '¿Por qué estás aquí?'" },
-            context: { en: "You need to connect your words to the case.", ko: "네 말이 사건과 연결되어 있다는 걸 보여줘야 한다.", es: "Necesitas conectar tus palabras con el caso." },
-            answer: { en: "I am here to help. Where is Dr. Ellis?", ko: "도우러 왔습니다. 엘리스 박사는 어디에 있나요?", es: "Estoy aquí para ayudar. ¿Dónde está la Dra. Ellis?" },
+            prompt: { en: "Tom asks: 'Why are you here?'", ko: "톰이 묻는다: '왜 여기 온 거야?'", es: "Tom pregunta: '¿Por qué estás aquí?'", id: "Tom bertanya: 'Mengapa kamu di sini?'" },
+            context: { en: "You need to connect your words to the case.", ko: "네 말이 사건과 연결되어 있다는 걸 보여줘야 한다.", es: "Necesitas conectar tus palabras con el caso.", id: "Kamu harus menghubungkan kata-katamu dengan kasus ini." },
+            answer: { en: "I am here to help. Where is Dr. Ellis?", ko: "도우러 왔습니다. 엘리스 박사는 어디에 있나요?", es: "Estoy aquí para ayudar. ¿Dónde está la Dra. Ellis?", id: "Saya di sini untuk membantu. Di mana Dr. Ellis?" },
             wrong: [
-              { en: "I'm fine, thank you. How are you?", ko: "잘 지내요, 감사합니다. 어떻게 지내세요?", es: "Estoy bien, gracias. ¿Cómo estás?" },
-              { en: "Goodbye! See you tomorrow!", ko: "안녕히 계세요! 내일 봐요!", es: "¡Adiós! ¡Nos vemos mañana!" },
+              { en: "I'm fine, thank you. How are you?", ko: "잘 지내요, 감사합니다. 어떻게 지내세요?", es: "Estoy bien, gracias. ¿Cómo estás?", id: "Saya baik, terima kasih. Apa kabar?" },
+              { en: "Goodbye! See you tomorrow!", ko: "안녕히 계세요! 내일 봐요!", es: "¡Adiós! ¡Nos vemos mañana!", id: "Selamat tinggal! Sampai jumpa besok!" },
             ],
           },
           {
-            prompt: { en: "Tom sighs: 'Fine. If I let you in, what do you say?'", ko: "톰이 한숨 쉰다: '좋아. 들여보내주면 뭐라고 해야 하지?'", es: "Tom suspira: 'Bien. Si te dejo entrar, ¿qué dices?'" },
-            context: { en: "Use the polite word that proves you understand the favor.", ko: "도움을 받았다는 걸 아는 예의 바른 표현을 써야 한다.", es: "Usa la palabra cortés que demuestra que entiendes el favor." },
-            answer: { en: "Thank you. Goodbye later, Tom.", ko: "감사합니다. 작별 인사는 나중에 할게요, 톰.", es: "Gracias. Adiós más tarde, Tom." },
+            prompt: { en: "Tom sighs: 'Fine. If I let you in, what do you say?'", ko: "톰이 한숨 쉰다: '좋아. 들여보내주면 뭐라고 해야 하지?'", es: "Tom suspira: 'Bien. Si te dejo entrar, ¿qué dices?'", id: "Tom mendesah: 'Baiklah. Kalau aku biarkan kau masuk, apa yang kau ucapkan?'" },
+            context: { en: "Use the polite word that proves you understand the favor.", ko: "도움을 받았다는 걸 아는 예의 바른 표현을 써야 한다.", es: "Usa la palabra cortés que demuestra que entiendes el favor.", id: "Gunakan ungkapan sopan yang menunjukkan kamu memahami bantuan itu." },
+            answer: { en: "Thank you. Goodbye later, Tom.", ko: "감사합니다. 작별 인사는 나중에 할게요, 톰.", es: "Gracias. Adiós más tarde, Tom.", id: "Terima kasih. Selamat tinggal nanti, Tom." },
             wrong: [
-              { en: "I am a tourist. Where is the gift shop?", ko: "저는 관광객이에요. 기념품 가게가 어디예요?", es: "Soy turista. ¿Dónde está la tienda de regalos?" },
-              { en: "I don't understand. Please help.", ko: "이해 못 해요. 도와주세요.", es: "No entiendo. Por favor ayuda." },
+              { en: "I am a tourist. Where is the gift shop?", ko: "저는 관광객이에요. 기념품 가게가 어디예요?", es: "Soy turista. ¿Dónde está la tienda de regalos?", id: "Saya turis. Di mana toko suvenir?" },
+              { en: "I don't understand. Please help.", ko: "이해 못 해요. 도와주세요.", es: "No entiendo. Por favor ayuda.", id: "Saya tidak mengerti. Tolong saya." },
             ],
           },
         ],
         hints: {
-          h1: { ko: "Tom에게는 세 가지가 필요해 — 인사, 이름, 도우러 온 이유", en: "Tom needs three things — a greeting, your name, and why you came to help", es: "Tom necesita tres cosas — saludo, nombre y por qué viniste a ayudar" },
-          h2: { ko: "Hello로 시작하고, My name is로 밝히고, Help/Where is로 사건에 연결해", en: "Start with Hello, use My name is, then connect it to Help and Where is", es: "Empieza con Hola, usa Mi nombre es, y conéctalo con ayuda y dónde está" },
-          h3: { ko: "Q1: Hello + My name is / Q2: Help + Where is / Q3: Thank you + Goodbye", en: "Q1: Hello + My name is / Q2: Help + Where is / Q3: Thank you + Goodbye", es: "P1: Hola + Mi nombre es / P2: ayuda + dónde está / P3: Gracias + Adiós" },
+          h1: { ko: "Tom에게는 세 가지가 필요해 — 인사, 이름, 도우러 온 이유", en: "Tom needs three things — a greeting, your name, and why you came to help", es: "Tom necesita tres cosas — saludo, nombre y por qué viniste a ayudar", id: "Tom butuh tiga hal — sapaan, namamu, dan alasan kamu datang membantu" },
+          h2: { ko: "Hello로 시작하고, My name is로 밝히고, Help/Where is로 사건에 연결해", en: "Start with Hello, use My name is, then connect it to Help and Where is", es: "Empieza con Hola, usa Mi nombre es, y conéctalo con ayuda y dónde está", id: "Mulai dengan Hello, gunakan My name is, lalu hubungkan dengan Help dan Where is" },
+          h3: { ko: "Q1: Hello + My name is / Q2: Help + Where is / Q3: Thank you + Goodbye", en: "Q1: Hello + My name is / Q2: Help + Where is / Q3: Thank you + Goodbye", es: "P1: Hola + Mi nombre es / P2: ayuda + dónde está / P3: Gracias + Adiós", id: "S1: Hello + My name is / S2: Help + Where is / S3: Thank you + Goodbye" },
         },
       },
       {
@@ -839,6 +869,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "흠. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 못 만들거든. 너희? Not bad. 전혀. 들어가, 그럼. Goodbye는 아직 아니야. Break a leg, mate!",
         textEs: "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoría de los que aparecen a las 4 AM ni pueden armar una frase. ¿Ustedes? Nada mal. Nada mal. Pasen, entonces. Break a leg, mate!",
         textEsMix: "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoría que aparecen a las 4 AM ni pueden armar una frase. ¿Ustedes? Not bad. Nada mal. Pasen, entonces. Goodbye todavía no. Break a leg, mate!",
+        textId: "Hmm. Baiklah kalau begitu. Jujur, aku tak menyangka. Kebanyakan orang yang muncul jam 4 pagi bahkan tak bisa merangkai satu kalimat. Kalian? Lumayan. Lumayan sekali. Masuklah kalau begitu. Break a leg, mate!",
+        textIdMix: "Hmm. Jujur, aku tak menyangka. Kebanyakan orang yang muncul jam 4 pagi bahkan tak bisa merangkai kalimat. Kalian? Not bad. Sama sekali tidak. Masuklah. Goodbye belum dulu. Break a leg, mate!",
         idiomRef: "idiom_tom_1",
       },
       {
@@ -847,9 +879,11 @@ const STORIES: Record<string, Story> = {
         titleEn: "Investigation Notes: Good Luck Around the World",
         titleKo: "수사 노트: 세계의 행운 표현",
         titleEs: "Notas de Investigación: Buena Suerte en el Mundo",
+        titleId: "Catatan Investigasi: Ucapan Semoga Beruntung di Seluruh Dunia",
         descEn: "Tom said 'Break a leg!', a British theatre superstition. Saying 'good luck' directly is considered bad luck, so actors say the opposite instead. Every culture has its own way to wish someone well without saying it directly. Language is full of these hidden meanings.",
         descKo: "톰이 'Break a leg!'이라고 했어, 영국 극장의 미신이야. '행운을 빌어'라고 직접 말하면 불운하다고 여겨서, 배우들은 반대로 말해. 모든 문화에는 직접 말하지 않고 행운을 비는 고유한 표현이 있어. 언어에는 이런 숨겨진 의미가 가득해.",
         descEs: "Tom dijo 'Break a leg!', una superstición del teatro británico. Decir 'buena suerte' directamente se considera mala suerte, así que los actores dicen lo contrario. Cada cultura tiene su propia forma de desear suerte sin decirlo directamente. El lenguaje está lleno de estos significados ocultos.",
+        descId: "Tom berkata 'Break a leg!', sebuah takhayul teater Inggris. Mengucapkan 'semoga beruntung' secara langsung dianggap membawa sial, jadi para aktor justru mengatakan kebalikannya. Setiap budaya punya caranya sendiri untuk mendoakan seseorang tanpa mengatakannya secara langsung. Bahasa penuh dengan makna tersembunyi seperti ini.",
       },
       // ── Scene 3: The Empty Case ───────────────────────────────────────────
       {
@@ -859,6 +893,7 @@ const STORIES: Record<string, Story> = {
         text: "(Inside the museum. Emergency lights cast long shadows across the marble floor. In the Ancient Languages wing, a glass case stands open without a single crack. The London Stone is gone. Not smashed. Not stolen by force. Gone as if the word that held it here had been erased.)",
         textKo: "(박물관 내부. 비상등이 대리석 바닥 위로 긴 그림자를 드리운다. 고대 언어관 한가운데, 유리 진열장이 금 하나 없이 열려 있다. London Stone이 사라졌다. 부서진 것도 아니고, 억지로 훔친 것도 아니다. 그것을 이곳에 붙잡아 두던 단어가 지워진 것처럼 사라졌다.)",
         textEs: "(Dentro del museo. Las luces de emergencia proyectan sombras largas sobre el mármol. En el ala de Lenguas Antiguas, una vitrina está abierta sin una sola grieta. La London Stone desapareció. No rota. No robada por la fuerza. Desaparecida como si hubieran borrado la palabra que la mantenía allí.)",
+        textId: "(Di dalam museum. Lampu darurat melemparkan bayangan panjang di lantai marmer. Di sayap Bahasa Kuno, sebuah lemari kaca terbuka tanpa satu retakan pun. London Stone hilang. Tidak pecah. Tidak dicuri dengan paksa. Lenyap seakan kata yang menahannya di sini telah dihapus.)",
       },
       {
         kind: "scene",
@@ -868,6 +903,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "와주셨군요. 저는 Eleanor Vale, 엘리스 박사의 후배 큐레이터예요. 박사님은 missing이에요. 카페 영상이 마지막이에요. 설명은 없고, 단 한 단어만 남았죠. FIND.",
         textEs: "Viniste. Bien. Soy Eleanor Vale, curadora asistente de la Dra. Ellis. O... lo era. Ella desapareció. El video del café es la última imagen confirmada. Sin cuerpo, sin rescate, sin explicación limpia. Solo una palabra: FIND.",
         textEsMix: "Viniste. Soy Eleanor Vale, curadora asistente de la Dra. Ellis. Ella está missing. El video del café es lo último. No hay explicación. Solo una palabra: FIND.",
+        textId: "Kamu datang. Bagus. Saya Eleanor Vale, kurator asisten Dr. Ellis. Atau... dulu begitu. Dia hilang. Rekaman kafe itu citra terakhir yang terkonfirmasi. Tidak ada jasad, tidak ada tebusan, tidak ada penjelasan yang jelas. Hanya satu kata: FIND.",
+        textIdMix: "Kamu datang. Saya Eleanor Vale, kurator asisten Dr. Ellis. Dia missing. Rekaman kafe itu yang terakhir. Tidak ada penjelasan, hanya satu kata: FIND.",
       },
       {
         kind: "scene",
@@ -877,6 +914,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "검은 코트의 남자는 진열장을 부수지 않았어요. 진열장에게 말했어요. 그래서 무서워요. 이건 language가 따라서는 안 될 사람의 명령을 따른 거예요.",
         textEs: "El hombre del abrigo negro no rompió la vitrina. Le habló. Eso es lo que me asusta. Las cerraduras se abren. El vidrio se corta. Pero esto... fue el lenguaje obedeciendo a alguien a quien jamás debió obedecer.",
         textEsMix: "El hombre del abrigo negro no rompió la vitrina. Le habló. Eso me asusta. El language obedeció a alguien que jamás debía obedecer.",
+        textId: "Pria bermantel hitam itu tidak memecahkan lemari kaca. Dia berbicara kepadanya. Itulah yang membuat saya ngeri. Kunci bisa dibobol. Kaca bisa dipotong. Tapi ini? Ini adalah bahasa yang menuruti seseorang yang seharusnya tak pernah ia turuti.",
+        textIdMix: "Pria bermantel hitam itu tidak memecahkan lemari kaca. Dia berbicara kepadanya. Itu yang membuat saya ngeri. Ini adalah language yang menuruti seseorang yang seharusnya tak pernah ia turuti.",
       },
       {
         kind: "scene",
@@ -886,6 +925,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "파트너, Ellis의 마지막 단어와 이어져. FIND. 박사님은 시신을 찾으라는 게 아니야. 돌이 저항하며 남긴 clue를 찾으라는 거야.",
         textEs: "Compañero, esto conecta con la última palabra de Ellis. FIND. No pidió que encontráramos su cuerpo. Pidió que encontráramos lo que la piedra resistió. Debe quedar una pista en esta sala.",
         textEsMix: "Compañero, esto conecta con la última palabra de Ellis. FIND. No buscaba un cuerpo; buscaba una clue que la piedra dejó al resistir.",
+        textId: "Partner, ini berkaitan dengan kata terakhir Ellis. FIND. Dia tidak meminta kita menemukan jasadnya. Dia meminta kita menemukan apa yang ditolak oleh batu itu. Pasti ada petunjuk yang tertinggal di ruangan ini.",
+        textIdMix: "Partner, ini berkaitan dengan kata terakhir Ellis. FIND. Dia bukan meminta kita menemukan jasad; dia meminta kita menemukan clue yang ditinggalkan batu itu saat melawan.",
       },
       // ── Scene 4: The First Clue Hunt ─────────────────────────────────────
       {
@@ -896,6 +937,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "남겨진 건 세 가지예요. card, gold dust, 그리고 Ellis의 오래된 note. 그중 하나에는 아직 sentence가 남아 있어요.",
         textEs: "Quedaron tres cosas. Una carta, una mancha de polvo dorado y una nota antigua que Ellis escondió bajo la vitrina. Una de ellas todavía contiene una frase. Si elegimos mal primero, el sello podría cerrarse sobre ella.",
         textEsMix: "Quedaron tres cosas. Una card, gold dust y una note antigua de Ellis. Una todavía tiene una sentence.",
+        textId: "Ada tiga hal yang tertinggal. Sebuah kartu, noda debu emas, dan catatan tua yang Ellis sembunyikan di bawah lemari. Salah satunya masih memuat sebuah kalimat. Jika kita memilih petunjuk yang salah lebih dulu, segel itu bisa menutup di sekelilingnya.",
+        textIdMix: "Ada tiga hal yang tertinggal. Sebuah card, gold dust, dan note tua milik Ellis. Salah satunya masih memuat sebuah sentence.",
       },
       {
         kind: "puzzle",
@@ -910,19 +953,19 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Where is ___?", "Help me"], reviewInDailyCourse: true, reviewDays: 2 },
         questions: [
           {
-            prompt: { en: "Which clue answers Dr. Ellis's final word: FIND?", ko: "엘리스 박사의 마지막 단어 FIND에 답하는 단서는 무엇일까?", es: "¿Qué pista responde a la última palabra de Ellis: FIND?" },
+            prompt: { en: "Which clue answers Dr. Ellis's final word: FIND?", ko: "엘리스 박사의 마지막 단어 FIND에 답하는 단서는 무엇일까?", es: "¿Qué pista responde a la última palabra de Ellis: FIND?", id: "Petunjuk mana yang menjawab kata terakhir Dr. Ellis: FIND?" },
             clues: [
-              { en: "The Madrid card: a taunt pointing to the next city.", ko: "마드리드 카드: 다음 도시를 가리키는 도발.", es: "La carta de Madrid: una provocación que señala la siguiente ciudad." },
-              { en: "The gold dust: a shard of the London Stone resisting the theft.", ko: "금빛 먼지: 도난에 저항한 London Stone의 파편.", es: "El polvo dorado: un fragmento de la London Stone resistiendo el robo." },
-              { en: "Ellis's hidden note: 'Hello. Help me. Where is the door?'", ko: "엘리스의 숨겨진 메모: 'Hello. Help me. Where is the door?'", es: "La nota oculta de Ellis: 'Hello. Help me. Where is the door?'" },
+              { en: "The Madrid card: a taunt pointing to the next city.", ko: "마드리드 카드: 다음 도시를 가리키는 도발.", es: "La carta de Madrid: una provocación que señala la siguiente ciudad.", id: "Kartu Madrid: ejekan yang menunjuk ke kota berikutnya." },
+              { en: "The gold dust: a shard of the London Stone resisting the theft.", ko: "금빛 먼지: 도난에 저항한 London Stone의 파편.", es: "El polvo dorado: un fragmento de la London Stone resistiendo el robo.", id: "Debu emas: pecahan London Stone yang melawan pencurian." },
+              { en: "Ellis's hidden note: 'Hello. Help me. Where is the door?'", ko: "엘리스의 숨겨진 메모: 'Hello. Help me. Where is the door?'", es: "La nota oculta de Ellis: 'Hello. Help me. Where is the door?'", id: "Catatan tersembunyi Ellis: 'Hello. Help me. Where is the door?'" },
             ],
             answerIdx: 2,
           },
         ],
         hints: {
-          h1: { ko: "FIND는 장소 단서가 아니라 문장 단서를 찾으라는 말이었어", en: "FIND was not asking for a place first, but for a sentence clue", es: "FIND no pedía primero un lugar, sino una pista de frase" },
-          h2: { ko: "Boss Spell에 필요한 말이 남아 있는 단서를 골라", en: "Choose the clue that still has the words needed for the Boss Spell", es: "Elige la pista que aún tiene las palabras para el Boss Spell" },
-          h3: { ko: "문장이 적힌 메모가 정답이야", en: "The note with the sentence is the answer", es: "La nota con la frase es la respuesta" },
+          h1: { ko: "FIND는 장소 단서가 아니라 문장 단서를 찾으라는 말이었어", en: "FIND was not asking for a place first, but for a sentence clue", es: "FIND no pedía primero un lugar, sino una pista de frase", id: "FIND bukan meminta tempat lebih dulu, melainkan petunjuk berupa kalimat" },
+          h2: { ko: "Boss Spell에 필요한 말이 남아 있는 단서를 골라", en: "Choose the clue that still has the words needed for the Boss Spell", es: "Elige la pista que aún tiene las palabras para el Boss Spell", id: "Pilih petunjuk yang masih memuat kata-kata untuk Boss Spell" },
+          h3: { ko: "문장이 적힌 메모가 정답이야", en: "The note with the sentence is the answer", es: "La nota con la frase es la respuesta", id: "Catatan berisi kalimat itulah jawabannya" },
         },
       },
       // ── Scene 5: The Sealed Door ──────────────────────────────────────────
@@ -933,6 +976,7 @@ const STORIES: Record<string, Story> = {
         text: "(The hidden note is older than the theft. Ellis wrote it in the margin of a museum map, as if she had prepared for this exact night. When Rudy reads the sentence aloud, a service door behind the empty case answers with a thin line of gold.)",
         textKo: "(숨겨진 메모는 도난 사건보다 오래되어 보인다. 엘리스 박사가 박물관 지도 가장자리에 적어둔 것이다. 마치 오늘 밤을 준비해둔 것처럼. 루디가 그 문장을 읽자, 빈 진열장 뒤의 직원용 문이 가느다란 금빛으로 응답한다.)",
         textEs: "(La nota oculta parece más antigua que el robo. Ellis la escribió en el margen de un mapa del museo, como si hubiera preparado esta noche exacta. Cuando Rudy lee la frase, una puerta de servicio detrás de la vitrina vacía responde con una fina línea dorada.)",
+        textId: "(Catatan tersembunyi itu lebih tua daripada pencuriannya. Ellis menulisnya di tepi peta museum, seakan ia telah bersiap untuk malam ini. Saat Rudy membaca kalimat itu lantang, sebuah pintu servis di belakang lemari kosong menjawab dengan garis tipis berwarna emas.)",
       },
       {
         kind: "scene",
@@ -942,6 +986,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "저 문에는 열쇠구멍이 없어요. Ellis는 저걸 verbal lock이라고 불렀죠. need, direction, name이 들어간 sentence가 필요해요.",
         textEs: "Esa puerta no tiene cerradura. Ellis la llamaba un verbal lock. Solo se abre cuando alguien le da una frase con necesidad, dirección y nombre. Un poco dramático, sí. Ella siempre era así.",
         textEsMix: "Esa puerta no tiene llave. Ellis la llamaba verbal lock. Necesita una sentence con need, direction y name.",
+        textId: "Pintu itu tidak punya lubang kunci. Ellis menyebutnya verbal lock. Ia hanya terbuka saat seorang penutur memberinya sebuah kalimat dengan kebutuhan, arah, dan sebuah nama. Sedikit dramatis, ya. Beliau memang selalu begitu.",
+        textIdMix: "Pintu itu tidak punya lubang kunci. Ellis menyebutnya verbal lock. Ia butuh sebuah sentence dengan need, direction, dan name.",
       },
       {
         kind: "clue",
@@ -949,9 +995,11 @@ const STORIES: Record<string, Story> = {
         titleEn: "Investigation Notes: The Verbal Lock",
         titleKo: "수사 노트: 말의 자물쇠",
         titleEs: "Notas de Investigación: La Cerradura Verbal",
+        titleId: "Catatan Investigasi: Kunci Verbal",
         descEn: "Ellis prepared a lock that accepts a beginner sentence. It does not need rare vocabulary. It needs honest intent: greet the world, ask for help, ask where Ellis is. In Enigma, simple words are not weak words. They are first spells.",
         descKo: "엘리스는 초보자 문장을 받아들이는 자물쇠를 준비해두었다. 어려운 어휘는 필요 없다. 필요한 건 진심이다. 세계에 인사하고, 도움을 청하고, 엘리스가 어디 있는지 묻는 것. Enigma에서 쉬운 단어는 약한 단어가 아니다. 첫 주문이다.",
         descEs: "Ellis preparó una cerradura que acepta una frase de principiante. No necesita vocabulario raro. Necesita intención honesta: saludar al mundo, pedir ayuda, preguntar dónde está Ellis. En Enigma, las palabras simples no son débiles. Son los primeros hechizos.",
+        descId: "Ellis menyiapkan kunci yang menerima kalimat tingkat pemula. Ia tak butuh kosakata langka. Ia butuh niat yang tulus: menyapa dunia, meminta bantuan, menanyakan di mana Ellis. Di Enigma, kata-kata sederhana bukanlah kata-kata yang lemah. Itu adalah mantra pertama.",
       },
       {
         kind: "scene",
@@ -961,6 +1009,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "이거야. 어려운 주문이 아니야. beginner spell. 우리는 이미 조각을 가지고 있어. Hello. Help me. Where is Dr. Ellis? 순서대로 맞춰줘.",
         textEs: "Esto es. No un hechizo raro. Un hechizo de principiante. Ya tenemos las piezas: Hello. Help me. Where is Dr. Ellis? Ponlas en orden, compañero. Haz que la puerta te escuche.",
         textEsMix: "Esto es. No es difícil. Un beginner spell. Ya tenemos las piezas: Hello. Help me. Where is Dr. Ellis? Ponlas en orden.",
+        textId: "Ini dia. Bukan mantra langka. Mantra pemula. Kita sudah punya potongannya: Hello. Help me. Where is Dr. Ellis? Susun secara berurutan, partner. Biarkan pintu itu mendengarmu.",
+        textIdMix: "Ini dia. Bukan mantra sulit. beginner spell. Kita sudah punya potongannya: Hello. Help me. Where is Dr. Ellis? Susun secara berurutan.",
       },
       {
         kind: "puzzle",
@@ -986,41 +1036,47 @@ const STORIES: Record<string, Story> = {
               en: "Place each word-piece on the door.",
               ko: "말 조각을 문 위에 순서대로 올려놓으세요.",
               es: "Coloca cada pieza de palabra en la puerta.",
+              id: "Letakkan setiap potongan kata pada pintu.",
             },
             hints: {
               h1: {
                 ko: "순서가 중요해요. 문장은 인사로 시작해야 해요.",
                 en: "The order matters. The sentence should begin with a greeting.",
                 es: "El orden importa. La frase debe empezar con un saludo.",
+                id: "Urutannya penting. Kalimat harus dimulai dengan sapaan.",
               },
               h2: {
                 ko: "첫 조각은 Hello예요. 그다음은 도움이 필요하다는 말이에요.",
                 en: "The first piece is Hello. The next piece asks for help.",
                 es: "La primera pieza es Hello. La siguiente pide ayuda.",
+                id: "Potongan pertama adalah Hello. Potongan berikutnya meminta bantuan.",
               },
               h3: {
                 ko: "정답 문장: Hello. Help me. Where is Dr. Ellis?",
                 en: "Answer sentence: Hello. Help me. Where is Dr. Ellis?",
                 es: "Frase correcta: Hello. Help me. Where is Dr. Ellis?",
+                id: "Kalimat jawaban: Hello. Help me. Where is Dr. Ellis?",
               },
             },
             storyReason: {
               en: "Open the sealed door to reach the stone shard.",
               ko: "봉인된 문을 열어 돌의 파편에 닿으세요.",
               es: "Abre la puerta sellada para alcanzar el fragmento de piedra.",
+              id: "Buka pintu tersegel untuk mencapai pecahan batu itu.",
             },
             storyConsequence: {
               en: "The stone fragment falls into Rudy's light.",
               ko: "돌의 파편이 루디의 빛 속으로 떨어집니다.",
               es: "El fragmento de piedra cae dentro de la luz de Rudy.",
+              id: "Pecahan batu itu jatuh ke dalam cahaya Rudy.",
             },
             doorImage: ch1BossDoorImg,
           },
         ],
         hints: {
-          h1: { ko: "Boss Spell은 네 조각이야 — 인사, 도움 요청, 위치 질문, 이름", en: "The Boss Spell has four pieces — greeting, help, location question, name", es: "El Boss Spell tiene cuatro piezas — saludo, ayuda, pregunta de lugar, nombre" },
-          h2: { ko: "Hello → Help me → Where is → Dr. Ellis", en: "Hello → Help me → Where is → Dr. Ellis", es: "Hola → Ayúdame → Dónde está → Dra. Ellis" },
-          h3: { ko: "정답 문장: Hello. Help me. Where is Dr. Ellis?", en: "Answer sentence: Hello. Help me. Where is Dr. Ellis?", es: "Frase correcta: Hello. Help me. Where is Dr. Ellis?" },
+          h1: { ko: "Boss Spell은 네 조각이야 — 인사, 도움 요청, 위치 질문, 이름", en: "The Boss Spell has four pieces — greeting, help, location question, name", es: "El Boss Spell tiene cuatro piezas — saludo, ayuda, pregunta de lugar, nombre", id: "Boss Spell punya empat potongan — sapaan, bantuan, pertanyaan lokasi, nama" },
+          h2: { ko: "Hello → Help me → Where is → Dr. Ellis", en: "Hello → Help me → Where is → Dr. Ellis", es: "Hola → Ayúdame → Dónde está → Dra. Ellis", id: "Hello → Help me → Where is → Dr. Ellis" },
+          h3: { ko: "정답 문장: Hello. Help me. Where is Dr. Ellis?", en: "Answer sentence: Hello. Help me. Where is Dr. Ellis?", es: "Frase correcta: Hello. Help me. Where is Dr. Ellis?", id: "Kalimat jawaban: Hello. Help me. Where is Dr. Ellis?" },
         },
       },
       {
@@ -1031,6 +1087,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "해냈어. sentence가 버텼어. 문이 네 말을 들었어. 저건 stone 자체가 아니야. shard야. London Stone이 넘겨주길 거부한 조각.",
         textEs: "Lo lograste. La frase sostuvo. La puerta te oyó. Mira, compañero... esa luz no es la piedra misma. Es un fragmento. Una pequeña parte que la London Stone se negó a entregarle.",
         textEsMix: "Lo lograste. La sentence sostuvo. La puerta te oyó. Esa luz no es la stone completa. Es un shard que la London Stone no quiso entregarle.",
+        textId: "Kamu berhasil. Kalimatnya bertahan. Pintu itu mendengarmu. Lihat, partner... cahaya itu bukan batunya sendiri. Itu sebuah pecahan. Sepotong kecil yang ditolak London Stone untuk diberikan padanya.",
+        textIdMix: "Kamu berhasil. sentence-nya bertahan. Pintu itu mendengarmu. Cahaya itu bukan stone utuh. Itu sebuah shard yang ditolak London Stone untuk diberikan padanya.",
       },
       {
         kind: "scene",
@@ -1040,6 +1098,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "Thank you. 진심이에요. Ellis가 이걸 남겼다면 첫 sentence를 말할 만큼 용감한 beginner에게 남긴 거예요. 하지만 B라고 서명한 사람이 일부러 남긴 게 있어요.",
         textEs: "Gracias. De verdad. Si Ellis dejó esto para alguien, lo dejó para un principiante lo bastante valiente como para decir la primera frase. Pero la figura que firma como B dejó algo a propósito. Tom lo encontró bajo la vitrina.",
         textEsMix: "Thank you. De verdad. Ellis dejó esto para un beginner valiente. Pero la figura que firma como B también dejó algo a propósito.",
+        textId: "Terima kasih. Sungguh. Jika Ellis meninggalkan ini untuk seseorang, ia meninggalkannya untuk seorang pemula yang cukup berani mengucapkan kalimat pertama. Tapi sosok yang menandatangani sebagai B sengaja meninggalkan satu hal. Tom menemukannya di bawah lemari.",
+        textIdMix: "Thank you. Sungguh. Ellis meninggalkan ini untuk seorang beginner yang berani. Tapi sosok yang menandatangani sebagai B sengaja meninggalkan sesuatu.",
       },
       {
         kind: "clue",
@@ -1047,9 +1107,11 @@ const STORIES: Record<string, Story> = {
         titleEn: "Investigation Notes: The Madrid Card",
         titleKo: "수사 노트: 마드리드 카드",
         titleEs: "Notas de Investigación: La Carta de Madrid",
+        titleId: "Catatan Investigasi: Kartu Madrid",
         descEn: "A black playing card marked MADRID. Unlike the shard, this was left deliberately. The B signature is not hiding the next city. It is inviting pursuit. Why would someone stealing language want a beginner detective to follow?",
         descKo: "MADRID라고 적힌 검은 카드. 파편과 달리, 이건 의도적으로 남겨졌다. B라는 서명은 다음 도시를 숨기지 않는다. 추격을 초대하고 있다. 언어를 훔치는 누군가가 왜 초보 탐정이 따라오길 바랄까?",
         descEs: "Una carta negra marcada MADRID. A diferencia del fragmento, esto fue dejado deliberadamente. La firma B no oculta la siguiente ciudad. Invita a la persecución. ¿Por qué alguien que roba lenguaje querría que un detective principiante lo siguiera?",
+        descId: "Sebuah kartu remi hitam bertanda MADRID. Berbeda dengan pecahan tadi, ini ditinggalkan dengan sengaja. Tanda tangan B tidak menyembunyikan kota berikutnya. Ia justru mengundang pengejaran. Mengapa seseorang yang mencuri bahasa ingin seorang detektif pemula mengikutinya?",
       },
       // ── Scene 6: London Close ─────────────────────────────────────────────
       {
@@ -1060,6 +1122,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "Goodbye, Detective. 끝이라는 뜻이 아니라 약속이에요. Ellis를 찾아주세요. 왜 beginner를 위한 lock을 만들었는지도요. Madrid가 다음 단서예요.",
         textEs: "Goodbye, Detective. Y lo digo como una promesa, no como un final. Encuentra a Ellis. Descubre por qué construyó una cerradura para principiantes. Madrid es donde B quiere que mires después.",
         textEsMix: "Goodbye, Detective. Lo digo como promesa, no como final. Encuentra a Ellis. Descubre por qué hizo un lock para beginners. Madrid es la siguiente pista.",
+        textId: "Goodbye, Detective. Dan saya memaksudkannya sebagai janji, bukan akhir. Temukan Ellis. Cari tahu mengapa ia membuat kunci untuk para pemula. Madrid adalah tempat yang B ingin kamu selidiki berikutnya.",
+        textIdMix: "Goodbye, Detective. Saya memaksudkannya sebagai janji, bukan akhir. Temukan Ellis. Cari tahu mengapa ia membuat lock untuk para beginner. Madrid adalah petunjuk berikutnya.",
       },
       {
         kind: "scene",
@@ -1069,6 +1133,8 @@ const STORIES: Record<string, Story> = {
         textKoMix: "일곱 개의 돌은 아직 proof가 아니라 rumor야. 지금 있는 건 shard 하나, missing doctor 한 명, city name 하나. Partner... Thank you. 첫 spell이 통했어.",
         textEs: "Las siete piedras aún son un rumor, no una prueba. Bien. Los rumores se pueden investigar. Por ahora tenemos un fragmento, una doctora desaparecida y el nombre de una ciudad. Compañero... Thank you. Nuestro primer hechizo funcionó.",
         textEsMix: "Las siete piedras aún son rumor, no proof. Tenemos un shard, una doctora missing y un city name. Compañero... Thank you. Nuestro primer spell funcionó.",
+        textId: "Tujuh batu itu masih rumor, bukan bukti. Bagus. Rumor bisa diselidiki. Untuk sekarang kita punya satu pecahan, satu dokter yang hilang, dan satu nama kota. Partner... Thank you. Mantra pertama kita berhasil.",
+        textIdMix: "Tujuh batu itu masih rumor, bukan proof. Sekarang kita punya satu shard, satu missing doctor, satu city name. Partner... Thank you. spell pertama kita berhasil.",
       },
       {
         kind: "scene",
@@ -1077,6 +1143,7 @@ const STORIES: Record<string, Story> = {
         text: "(Next Chapter: The Madrid Disappearance. People are losing their words.)",
         textKo: "(다음 챕터: 마드리드의 실종. 사람들이 말을 잃고 있다.)",
         textEs: "(Siguiente Capítulo: La Desaparición de Madrid. La gente está perdiendo sus palabras.)",
+        textId: "(Bab Berikutnya: Hilangnya Madrid. Orang-orang mulai kehilangan kata-kata mereka.)",
       },
     ],
   },
@@ -6377,8 +6444,8 @@ function ClueReveal({ clue, lang, onNext }: { clue: SeqClue; lang: string; onNex
     ).start();
   }, []);
 
-  const title = lang === "korean" ? clue.titleKo : lang === "spanish" ? clue.titleEs : clue.titleEn;
-  const desc = lang === "korean" ? clue.descKo : lang === "spanish" ? clue.descEs : clue.descEn;
+  const title = lang === "korean" ? clue.titleKo : lang === "spanish" ? clue.titleEs : lang === "indonesian" ? (clue.titleId ?? clue.titleEn) : clue.titleEn;
+  const desc = lang === "korean" ? clue.descKo : lang === "spanish" ? clue.descEs : lang === "indonesian" ? (clue.descId ?? clue.descEn) : clue.descEn;
 
   return (
     <View style={styles.clueReveal}>
@@ -6409,7 +6476,7 @@ function CompletionScreen({ story, lang, xpEarned }: { story: Story; lang: strin
       <Animated.View style={[styles.completionCard, { transform: [{ scale }] }]}>
         <EmojiText style={styles.completionEmoji}>🦊</EmojiText>
         <Text style={styles.completionTitle}>{lang === "korean" ? "챕터 완료!" : lang === "spanish" ? "¡Capítulo Completado!" : "Chapter Complete!"}</Text>
-        <Text style={styles.completionStoryTitle}>{lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : story.title}</Text>
+        <Text style={styles.completionStoryTitle}>{lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : lang === "indonesian" ? (story.titleId ?? story.title) : story.title}</Text>
         <View style={styles.xpRewardRow}>
           <Ionicons name="flash" size={22} color={C.bg1} />
           <Text style={styles.xpRewardNum}>+{xpEarned} XP</Text>
@@ -6629,7 +6696,7 @@ export default function StoryScene() {
     if (currentItem?.kind === "scene" && currentItem.idiomRef) {
       const idiomEntry = IDIOM_COLLECTION[currentItem.idiomRef];
       if (idiomEntry) {
-        const tl = learningLang === "korean" ? "ko" : learningLang === "spanish" ? "es" : "en";
+        const tl = learningLang === "korean" ? "ko" : learningLang === "spanish" ? "es" : learningLang === "indonesian" ? "id" : "en";
         const idiomData = idiomEntry.idiom[tl] ?? idiomEntry.idiom["en"];
         if (idiomData?.expression) {
           const chapter = story.id === "london" ? "ch1" : story.id === "madrid" ? "ch2" : story.id === "seoul" ? "ch3" : story.id === "cairo" ? "ch4" : "ch5";
@@ -6740,15 +6807,20 @@ export default function StoryScene() {
       if (!it.isNarration && it.textEsMix) return it.textEsMix;
       if (it.textEs) return it.textEs;
     }
+    if (lang === "indonesian") {
+      if (!it.isNarration && it.textIdMix) return it.textIdMix;
+      if (it.textId) return it.textId;
+    }
     return it.text;
   }
 
   function getCharName(char: (typeof story.characters)[0]) {
     if (lang === "korean" && char.nameKo) return char.nameKo;
+    if (lang === "indonesian" && char.nameId) return char.nameId;
     return char.name;
   }
 
-  const titleLabel = lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : story.title;
+  const titleLabel = lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : lang === "indonesian" ? (story.titleId ?? story.title) : story.title;
 
   if (introSupported && introStatus === "checking") {
     return (

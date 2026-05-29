@@ -125,6 +125,35 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
         ],
       },
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Saya suka pizza dan pasta.", speechLang: "id-ID", meaning: { ko: "저는 피자와 파스타를 좋아해요.", en: "I like pizza and pasta.", es: "Me gusta la pizza y la pasta." } },
+        { text: "Kamu suka makanan apa?", speechLang: "id-ID", meaning: { ko: "어떤 음식을 좋아하세요?", en: "What food do you like?", es: "¿Qué comida te gusta?" } },
+        { text: "Saya sangat suka makanan Korea.", speechLang: "id-ID", meaning: { ko: "한국 음식을 정말 좋아해요.", en: "I love Korean food.", es: "Me encanta la comida coreana." } },
+        { text: "Saya tidak suka makanan pedas.", speechLang: "id-ID", meaning: { ko: "매운 음식을 안 좋아해요.", en: "I don't like spicy food.", es: "No me gusta la comida picante." }, recallRound: true },
+        { text: "Apakah kamu lapar?", speechLang: "id-ID", meaning: { ko: "배고프세요?", en: "Are you hungry?", es: "¿Tienes hambre?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Saya suka ___ (좋아해요) / Saya sangat suka ___ (정말 좋아해요) / Saya tidak suka ___ (안 좋아해요). 질문: Kamu suka makanan apa? 'suka'는 '좋아하다', 'tidak'은 부정, 'sangat'은 '아주'예요.", en: "Pattern: Saya suka ___ (I like) / Saya sangat suka ___ (I love, literally 'I very much like') / Saya tidak suka ___ (I don't like). Question: Kamu suka makanan apa? 'suka' = like, 'tidak' = not, 'sangat' = very.", es: "Patrón: Saya suka ___ (me gusta) / Saya sangat suka ___ (me encanta) / Saya tidak suka ___ (no me gusta). Pregunta: Kamu suka makanan apa? 'suka' = gustar, 'tidak' = no, 'sangat' = muy." },
+          examples: { ko: "Saya suka ayam dan nasi. (치킨이랑 밥을 좋아해요.)\nSaya sangat suka makanan Italia. (이탈리아 음식을 정말 좋아해요.)\nSaya tidak suka kopi pahit. (쓴 커피를 안 좋아해요.)", en: "Saya suka ayam dan nasi. (I like chicken and rice.)\nSaya sangat suka makanan Italia. (I love Italian food.)\nSaya tidak suka kopi pahit. (I don't like bitter coffee.)", es: "Saya suka ayam dan nasi. (Me gusta el pollo y el arroz.)\nSaya sangat suka makanan Italia. (Me encanta la comida italiana.)\nSaya tidak suka kopi pahit. (No me gusta el café amargo.)" },
+          mistakes: { ko: "❌ Saya suka makan pizza.\n✅ Saya suka pizza. (suka 뒤에 바로 음식 이름! '먹다(makan)'를 넣을 필요 없어요.)\n\n❌ Saya no suka pedas.\n✅ Saya tidak suka makanan pedas. (부정은 'no'가 아니라 'tidak'이에요!)", en: "❌ Saya suka makan pizza.\n✅ Saya suka pizza. (Put the food right after 'suka' — no need to add 'makan' (eat)!)\n\n❌ Saya no suka pedas.\n✅ Saya tidak suka makanan pedas. (Use 'tidak' for 'not', never the English/Spanish 'no'!)", es: "❌ Saya suka makan pizza.\n✅ Saya suka pizza. (Pon la comida justo después de 'suka' — no agregues 'makan' (comer).)\n\n❌ Saya no suka pedas.\n✅ Saya tidak suka makanan pedas. (Usa 'tidak' para 'no', nunca 'no' como en español.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 잠입 수사의 기본은 대화를 이끄는 거야! 'Kamu suka makanan apa?'로 먼저 물어보고, 답이 오면 'Saya juga!'(저도요!) 하면 금방 친해질 수 있어~", en: "Detective Rudy's tip: The key to going undercover? Ask 'Kamu suka makanan apa?' first — everyone loves talking food! When they answer, say 'Saya juga!' (Me too!) for instant rapport.", es: "Consejo del detective Rudy: ¿La clave para ir encubierto? Pregunta 'Kamu suka makanan apa?' primero — ¡a todos les gusta hablar de comida! Cuando respondan, di 'Saya juga!' (¡Yo también!)." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Saya ___ pizza dan pasta.", answer: "suka", options: ["suka", "mau", "makan"], fullSentence: "Saya suka pizza dan pasta.", fullSentenceMeaning: { ko: "저는 피자와 파스타를 좋아해요.", en: "I like pizza and pasta.", es: "Me gusta la pizza y la pasta." } },
+          { type: "select", promptWithBlank: "Kamu suka makanan ___?", answer: "apa", options: ["apa", "siapa", "mana"], fullSentence: "Kamu suka makanan apa?", fullSentenceMeaning: { ko: "어떤 음식을 좋아하세요?", en: "What food do you like?", es: "¿Qué comida te gusta?" } },
+          { type: "select", promptWithBlank: "Saya tidak suka makanan ___.", answer: "pedas", options: ["pedas", "panas", "cepat"], fullSentence: "Saya tidak suka makanan pedas.", fullSentenceMeaning: { ko: "매운 음식을 안 좋아해요.", en: "I don't like spicy food.", es: "No me gusta la comida picante." } },
+          { type: "input", promptWithBlank: "Apakah kamu ___?", answer: "lapar", fullSentence: "Apakah kamu lapar?", fullSentenceMeaning: { ko: "배고프세요?", en: "Are you hungry?", es: "¿Tienes hambre?" } },
+          { type: "input", promptWithBlank: "Saya ___ suka makanan Korea.", answer: "sangat", fullSentence: "Saya sangat suka makanan Korea.", fullSentenceMeaning: { ko: "한국 음식을 정말 좋아해요.", en: "I love Korean food.", es: "Me encanta la comida coreana." } },
+          { type: "listening", audioText: "Apakah kamu lapar?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Apakah kamu lapar?", "Saya sangat suka makanan Korea.", "Saya tidak suka makanan pedas.", "Kamu suka makanan apa?"], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 
   // ─────────────── Day 14: Ordering at a Restaurant ────────────────────────
@@ -221,6 +250,39 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "___ 좀 주세요.", answer: "물", fullSentence: "물 좀 주세요.", fullSentenceMeaning: { ko: "물 좀 주세요.", en: "Water, please.", es: "Agua, por favor." } },
           { type: "input", promptWithBlank: "여기서 드실 건가요, ___인가요?", answer: "포장", fullSentence: "여기서 드실 건가요, 포장인가요?", fullSentenceMeaning: { ko: "여기서 드실 건가요, 포장인가요?", en: "For here or to go?", es: "¿Para aquí o para llevar?" } },
           { type: "listening", audioText: "여기서 드실 건가요, 포장인가요?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["여기서 드실 건가요, 포장인가요?", "치킨으로 할게요.", "메뉴판 좀 주시겠어요?", "커피 한 잔 주세요."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Hello, my name is ___.", es: "Hola, me llamo ___.", ko: "안녕하세요, 제 이름은 ___이에요." }, fromDay: 4, context: { ko: "자기소개 복습", en: "Self-introduction review", es: "Repaso de presentación" } },
+        { sentence: { en: "Nice to meet you.", es: "Mucho gusto.", ko: "만나서 반가워요." }, fromDay: 4, context: { ko: "자기소개 복습", en: "Self-introduction review", es: "Repaso de presentación" } },
+      ],
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Boleh saya minta menu?", speechLang: "id-ID", meaning: { ko: "메뉴판 좀 주시겠어요?", en: "Can I have the menu, please?", es: "¿Puedo ver el menú, por favor?" } },
+        { text: "Saya mau kopi, tolong.", speechLang: "id-ID", meaning: { ko: "커피 한 잔 주세요.", en: "I'd like a coffee, please.", es: "Quiero un café, por favor." } },
+        { text: "Boleh saya minta air?", speechLang: "id-ID", meaning: { ko: "물 좀 주세요.", en: "Can I have water, please?", es: "¿Puedo tener agua, por favor?" } },
+        { text: "Saya pesan ayam, tolong.", speechLang: "id-ID", meaning: { ko: "치킨으로 할게요.", en: "I'll have the chicken, please.", es: "Voy a pedir el pollo, por favor." }, recallRound: true },
+        { text: "Makan di sini atau bawa pulang?", speechLang: "id-ID", meaning: { ko: "여기서 드실 건가요, 가져가실 건가요?", en: "For here or to go?", es: "¿Para aquí o para llevar?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Saya mau ___ (주세요) / Boleh saya minta ___? (~좀 주시겠어요?) / Saya pesan ___ (~으로 할게요). 끝에 'tolong'(부탁해요)을 붙이면 더 공손해요! 메뉴 요청: Boleh saya minta menu?", en: "Pattern: Saya mau ___ (I'd like) / Boleh saya minta ___? (Can I have ___?) / Saya pesan ___ (I'll order). Add 'tolong' (please) at the end to be polite! Menu request: Boleh saya minta menu?", es: "Patrón: Saya mau ___ (quiero) / Boleh saya minta ___? (¿Puedo pedir ___?) / Saya pesan ___ (voy a pedir). ¡Agrega 'tolong' (por favor) al final para ser cortés! Menú: Boleh saya minta menu?" },
+          examples: { ko: "Saya mau steak dan salad, tolong. (스테이크랑 샐러드 주세요.)\nBoleh saya minta jus jeruk? (오렌지 주스 주시겠어요?)\nSaya pesan pasta, tolong. (파스타로 할게요.)", en: "Saya mau steak dan salad, tolong. (I'd like a steak and a salad, please.)\nBoleh saya minta jus jeruk? (Can I have orange juice, please?)\nSaya pesan pasta, tolong. (I'll have the pasta, please.)", es: "Saya mau steak dan salad, tolong. (Quiero un bistec y una ensalada, por favor.)\nBoleh saya minta jus jeruk? (¿Puedo tener jugo de naranja, por favor?)\nSaya pesan pasta, tolong. (Voy a pedir la pasta, por favor.)" },
+          mistakes: { ko: "❌ Beri saya menu!\n✅ Boleh saya minta menu? (명령형 'Beri'(줘) 대신 'Boleh saya minta?'(주시겠어요?)가 공손해요!)\n\n❌ Saya mau kopi mau.\n✅ Saya mau kopi, tolong. ('mau'를 두 번 쓰지 마세요! 끝에는 'tolong'을 붙여요.)", en: "❌ Beri saya menu!\n✅ Boleh saya minta menu? (Use the polite 'Boleh saya minta?' (May I have?) instead of the command 'Beri' (give)!)\n\n❌ Saya mau kopi mau.\n✅ Saya mau kopi, tolong. (Don't repeat 'mau'! End with 'tolong' to be polite.)", es: "❌ Beri saya menu!\n✅ Boleh saya minta menu? (Usa el cortés 'Boleh saya minta?' (¿Puedo pedir?) en vez del mandato 'Beri' (dame).)\n\n❌ Saya mau kopi mau.\n✅ Saya mau kopi, tolong. (¡No repitas 'mau'! Termina con 'tolong' para ser cortés.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 잠입 수사할 때 'tolong'만 붙이면 어디서든 환영받아! 'Boleh saya minta ___?'는 '~좀 주시겠어요?'라는 만능 주문 표현이야. 의심받을 일 없지~", en: "Detective Rudy's tip: Going undercover? Just add 'tolong' and you're welcome anywhere! 'Boleh saya minta ___?' is your all-purpose polite order — no one suspects a thing.", es: "Consejo del detective Rudy: ¿Vas encubierto? ¡Solo agrega 'tolong' y serás bienvenido! 'Boleh saya minta ___?' es tu pedido cortés todoterreno — nadie sospechará." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Boleh saya minta ___?", answer: "menu", options: ["menu", "makanan", "meja"], fullSentence: "Boleh saya minta menu?", fullSentenceMeaning: { ko: "메뉴판 좀 주시겠어요?", en: "Can I have the menu, please?", es: "¿Puedo ver el menú, por favor?" } },
+          { type: "select", promptWithBlank: "Saya ___ kopi, tolong.", answer: "mau", options: ["mau", "ada", "pergi"], fullSentence: "Saya mau kopi, tolong.", fullSentenceMeaning: { ko: "커피 한 잔 주세요.", en: "I'd like a coffee, please.", es: "Quiero un café, por favor." } },
+          { type: "select", promptWithBlank: "Makan di sini atau bawa ___?", answer: "pulang", options: ["pulang", "pergi", "keluar"], fullSentence: "Makan di sini atau bawa pulang?", fullSentenceMeaning: { ko: "여기서 드실 건가요, 가져가실 건가요?", en: "For here or to go?", es: "¿Para aquí o para llevar?" } },
+          { type: "input", promptWithBlank: "Saya ___ ayam, tolong.", answer: "pesan", fullSentence: "Saya pesan ayam, tolong.", fullSentenceMeaning: { ko: "치킨으로 할게요.", en: "I'll have the chicken, please.", es: "Voy a pedir el pollo, por favor." } },
+          { type: "input", promptWithBlank: "Boleh saya minta ___?", answer: "air", fullSentence: "Boleh saya minta air?", fullSentenceMeaning: { ko: "물 좀 주세요.", en: "Can I have water, please?", es: "¿Puedo tener agua, por favor?" } },
+          { type: "listening", audioText: "Makan di sini atau bawa pulang?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Makan di sini atau bawa pulang?", "Saya pesan ayam, tolong.", "Boleh saya minta menu?", "Saya mau kopi, tolong."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -331,6 +393,39 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Can you say that again, please?", es: "¿Puede repetirlo, por favor?", ko: "다시 한번 말해 주시겠어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Ini berapa harganya?", speechLang: "id-ID", meaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" } },
+        { text: "Harganya sepuluh dolar.", speechLang: "id-ID", meaning: { ko: "10달러예요.", en: "It's ten dollars.", es: "Son diez dólares." } },
+        { text: "Itu terlalu mahal!", speechLang: "id-ID", meaning: { ko: "너무 비싸요!", en: "That's too expensive!", es: "¡Eso es muy caro!" } },
+        { text: "Boleh saya bayar dengan kartu?", speechLang: "id-ID", meaning: { ko: "카드로 결제할 수 있어요?", en: "Can I pay by card?", es: "¿Puedo pagar con tarjeta?" }, recallRound: true },
+        { text: "Minta bonnya, tolong.", speechLang: "id-ID", meaning: { ko: "계산서 주세요.", en: "The bill, please.", es: "La cuenta, por favor." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: ___ berapa harganya? (얼마예요?) → Harganya ___ (가격은 ~예요). 비쌀 때: Itu terlalu mahal! 결제: Boleh saya bayar dengan kartu? / Minta bonnya, tolong.", en: "Pattern: ___ berapa harganya? (How much?) → Harganya ___ (The price is ___). Too pricey: Itu terlalu mahal! Paying: Boleh saya bayar dengan kartu? / Minta bonnya, tolong.", es: "Patrón: ___ berapa harganya? (¿Cuánto cuesta?) → Harganya ___ (El precio es ___). Caro: Itu terlalu mahal! Pagar: Boleh saya bayar dengan kartu? / Minta bonnya, tolong." },
+          examples: { ko: "Sup ini berapa harganya? Harganya delapan dolar. (이 수프 얼마예요? 8달러예요.)\nPizza besar berapa harganya? Harganya lima belas dolar. (큰 피자 얼마예요? 15달러예요.)\nBoleh saya bayar dengan kartu? Tentu! (카드로 돼요? 물론이죠!)", en: "Sup ini berapa harganya? Harganya delapan dolar. (How much is this soup? It's eight dollars.)\nPizza besar berapa harganya? Harganya lima belas dolar. (How much is a large pizza? Fifteen dollars.)\nBoleh saya bayar dengan kartu? Tentu! (Can I pay by card? Of course!)", es: "Sup ini berapa harganya? Harganya delapan dolar. (¿Cuánto cuesta esta sopa? Ocho dólares.)\nPizza besar berapa harganya? Harganya lima belas dolar. (¿Una pizza grande? Quince dólares.)\nBoleh saya bayar dengan kartu? Tentu! (¿Puedo pagar con tarjeta? ¡Claro!)" },
+          mistakes: { ko: "❌ Ini berapa mahal?\n✅ Ini berapa harganya? (가격을 물을 때는 'berapa harganya'(얼마)! 'mahal'은 '비싼'이라는 뜻이에요.)\n\n❌ Saya bayar kartu.\n✅ Boleh saya bayar dengan kartu? ('카드로'는 'dengan kartu'! 'dengan'(~로)을 빼먹지 마세요.)", en: "❌ Ini berapa mahal?\n✅ Ini berapa harganya? (Ask price with 'berapa harganya' (how much) — 'mahal' means 'expensive'!)\n\n❌ Saya bayar kartu.\n✅ Boleh saya bayar dengan kartu? ('By card' is 'dengan kartu' — don't drop 'dengan' (with/by)!)", es: "❌ Ini berapa mahal?\n✅ Ini berapa harganya? (Pregunta el precio con 'berapa harganya' — '¡mahal' significa 'caro'!)\n\n❌ Saya bayar kartu.\n✅ Boleh saya bayar dengan kartu? ('Con tarjeta' es 'dengan kartu' — ¡no omitas 'dengan' (con)!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 'berapa harganya?'가 핵심 단서야! 가격 답을 들을 때는 Unit 2에서 배운 숫자가 중요하니까 복습해둬. 인도네시아에서는 흥정도 가능하니 'terlalu mahal!'도 알아두면 좋아~", en: "Detective Rudy's tip: 'berapa harganya?' is the key clue! Listen for Unit 2 numbers in the answer. In Indonesia you can often haggle, so 'terlalu mahal!' (too expensive!) is handy evidence!", es: "Consejo del detective Rudy: '¡berapa harganya?' es la pista clave! Escucha los números de la Unidad 2. En Indonesia se puede regatear, así que 'terlalu mahal!' es muy útil." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Ini berapa ___?", answer: "harganya", options: ["harganya", "mahal", "uang"], fullSentence: "Ini berapa harganya?", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" } },
+          { type: "select", promptWithBlank: "Itu terlalu ___!", answer: "mahal", options: ["mahal", "murah", "besar"], fullSentence: "Itu terlalu mahal!", fullSentenceMeaning: { ko: "너무 비싸요!", en: "That's too expensive!", es: "¡Eso es muy caro!" } },
+          { type: "select", promptWithBlank: "Boleh saya bayar ___ kartu?", answer: "dengan", options: ["dengan", "di", "untuk"], fullSentence: "Boleh saya bayar dengan kartu?", fullSentenceMeaning: { ko: "카드로 결제할 수 있어요?", en: "Can I pay by card?", es: "¿Puedo pagar con tarjeta?" } },
+          { type: "input", promptWithBlank: "Minta ___, tolong.", answer: "bonnya", fullSentence: "Minta bonnya, tolong.", fullSentenceMeaning: { ko: "계산서 주세요.", en: "The bill, please.", es: "La cuenta, por favor." } },
+          { type: "input", promptWithBlank: "Harganya ___ dolar.", answer: "sepuluh", fullSentence: "Harganya sepuluh dolar.", fullSentenceMeaning: { ko: "10달러예요.", en: "It's ten dollars.", es: "Son diez dólares." } },
+          { type: "listening", audioText: "Minta bonnya, tolong.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Minta bonnya, tolong.", "Boleh saya bayar dengan kartu?", "Ini berapa harganya?", "Itu terlalu mahal!"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again, please?", es: "¿Puede repetirlo, por favor?", ko: "다시 한번 말해 주시겠어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 16: Expressing Food Feelings ────────────────────────
@@ -427,6 +522,39 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "___ 맛있어요.", answer: "정말", fullSentence: "정말 맛있어요.", fullSentenceMeaning: { ko: "정말 맛있어요.", en: "It's really good.", es: "Está muy bueno." } },
           { type: "input", promptWithBlank: "너무 ___요.", answer: "달아", fullSentence: "너무 달아요.", fullSentenceMeaning: { ko: "너무 달아요.", en: "Too sweet.", es: "Muy dulce." } },
           { type: "listening", audioText: "배불러요. 감사합니다!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["배불러요. 감사합니다!", "너무 달아요.", "이거 맛있어요!", "너무 짜요."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Where is the exit?", es: "¿Dónde está la salida?", ko: "출구가 어디에요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Excuse me.", es: "Disculpe.", ko: "실례합니다." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Ini enak sekali!", speechLang: "id-ID", meaning: { ko: "이거 맛있어요!", en: "This is delicious!", es: "¡Esto está delicioso!" } },
+        { text: "Ini sangat enak.", speechLang: "id-ID", meaning: { ko: "정말 맛있어요.", en: "It's very good.", es: "Está muy bueno." } },
+        { text: "Ini terlalu asin.", speechLang: "id-ID", meaning: { ko: "너무 짜요.", en: "It's too salty.", es: "Está muy salado." } },
+        { text: "Ini terlalu manis.", speechLang: "id-ID", meaning: { ko: "너무 달아요.", en: "It's too sweet.", es: "Está muy dulce." }, recallRound: true },
+        { text: "Saya kenyang. Terima kasih!", speechLang: "id-ID", meaning: { ko: "배불러요. 감사합니다!", en: "I'm full. Thank you!", es: "Estoy lleno. ¡Gracias!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Ini enak! (맛있어요!) / Ini terlalu ___ (너무 ~해요). 긍정: enak, sangat enak. 부정: terlalu asin(짜다), terlalu manis(달다), terlalu pedas(맵다). 다 먹으면: Saya kenyang.", en: "Pattern: Ini enak! (It's delicious!) / Ini terlalu ___ (It's too ___). Positive: enak, sangat enak. Negative: terlalu asin (salty), terlalu manis (sweet), terlalu pedas (spicy). Finished: Saya kenyang.", es: "Patrón: Ini enak! (¡Está delicioso!) / Ini terlalu ___ (Está muy ___). Positivo: enak, sangat enak. Negativo: terlalu asin (salado), terlalu manis (dulce), terlalu pedas (picante). Lleno: Saya kenyang." },
+          examples: { ko: "Ini enak sekali! Saya suka! (이거 정말 맛있어요! 좋아요!)\nIni terlalu pedas buat saya. (저한테는 너무 매워요.)\nSaya kenyang. Tadi enak sekali! (배불러요. 정말 맛있었어요!)", en: "Ini enak sekali! Saya suka! (This is so delicious! I like it!)\nIni terlalu pedas buat saya. (It's too spicy for me.)\nSaya kenyang. Tadi enak sekali! (I'm full. That was so good!)", es: "Ini enak sekali! Saya suka! (¡Esto está delicioso! ¡Me gusta!)\nIni terlalu pedas buat saya. (Es muy picante para mí.)\nSaya kenyang. Tadi enak sekali! (Estoy lleno. ¡Estuvo muy bueno!)" },
+          mistakes: { ko: "❌ Saya enak.\n✅ Ini enak. (음식이 맛있다고 할 때는 'Ini'(이것)! 'Saya enak'은 내가 맛있다는 이상한 뜻이 돼요.)\n\n❌ Saya penuh.\n✅ Saya kenyang. (배부르다는 'kenyang'! 'penuh'는 물건이 가득 찼다는 뜻이에요.)", en: "❌ Saya enak.\n✅ Ini enak. (For tasty food, use 'Ini' (this) — 'Saya enak' awkwardly means 'I am tasty'!)\n\n❌ Saya penuh.\n✅ Saya kenyang. ('Full (from food)' is 'kenyang' — 'penuh' means a container is full!)", es: "❌ Saya enak.\n✅ Ini enak. (Para comida rica usa 'Ini' (esto) — '¡Saya enak' significa 'yo soy rico'!)\n\n❌ Saya penuh.\n✅ Saya kenyang. ('Lleno (de comida)' es 'kenyang' — '¡penuh' es un recipiente lleno!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 'enak'은 맛있을 때 쓰는 마법의 단어야! 강조하려면 'enak sekali'(아주 맛있어요)나 'sangat enak'을 써. 'terlalu'(너무)는 맛이 과할 때 쓰는 단서지~", en: "Detective Rudy's tip: 'enak' is the magic word for tasty! To emphasize, say 'enak sekali' or 'sangat enak' (very delicious). 'terlalu' (too) is your clue for an overdone taste!", es: "Consejo del detective Rudy: '¡enak' es la palabra mágica para 'rico'! Para enfatizar, di 'enak sekali' o 'sangat enak'. 'terlalu' (demasiado) es tu pista para un sabor excesivo." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Ini ___ sekali!", answer: "enak", options: ["enak", "lapar", "haus"], fullSentence: "Ini enak sekali!", fullSentenceMeaning: { ko: "이거 맛있어요!", en: "This is delicious!", es: "¡Esto está delicioso!" } },
+          { type: "select", promptWithBlank: "Ini terlalu ___.", answer: "asin", options: ["asin", "garam", "asam"], fullSentence: "Ini terlalu asin.", fullSentenceMeaning: { ko: "너무 짜요.", en: "It's too salty.", es: "Está muy salado." } },
+          { type: "select", promptWithBlank: "Saya ___. Terima kasih!", answer: "kenyang", options: ["kenyang", "lapar", "enak"], fullSentence: "Saya kenyang. Terima kasih!", fullSentenceMeaning: { ko: "배불러요. 감사합니다!", en: "I'm full. Thank you!", es: "Estoy lleno. ¡Gracias!" } },
+          { type: "input", promptWithBlank: "Ini ___ enak.", answer: "sangat", fullSentence: "Ini sangat enak.", fullSentenceMeaning: { ko: "정말 맛있어요.", en: "It's very good.", es: "Está muy bueno." } },
+          { type: "input", promptWithBlank: "Ini terlalu ___.", answer: "manis", fullSentence: "Ini terlalu manis.", fullSentenceMeaning: { ko: "너무 달아요.", en: "It's too sweet.", es: "Está muy dulce." } },
+          { type: "listening", audioText: "Saya kenyang. Terima kasih!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Saya kenyang. Terima kasih!", "Ini terlalu manis.", "Ini enak sekali!", "Ini terlalu asin."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -537,6 +665,39 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Help! Please help me.", es: "¡Ayuda! Por favor, ayúdeme.", ko: "도와주세요! 제발 도와주세요." }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Saya merekomendasikan steak.", speechLang: "id-ID", meaning: { ko: "스테이크를 추천해요.", en: "I recommend the steak.", es: "Recomiendo el bistec." } },
+        { text: "Kamu harus coba supnya.", speechLang: "id-ID", meaning: { ko: "수프를 한번 드셔보세요.", en: "You should try the soup.", es: "Deberías probar la sopa." } },
+        { text: "Apa yang kamu rekomendasikan?", speechLang: "id-ID", meaning: { ko: "뭘 추천하세요?", en: "What do you recommend?", es: "¿Qué recomiendas?" } },
+        { text: "Saladnya sangat segar.", speechLang: "id-ID", meaning: { ko: "샐러드가 아주 신선해요.", en: "The salad is very fresh.", es: "La ensalada está muy fresca." }, recallRound: true },
+        { text: "Ayo makan bersama!", speechLang: "id-ID", meaning: { ko: "같이 먹어요!", en: "Let's eat together!", es: "¡Comamos juntos!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Saya merekomendasikan ___ (추천해요) / Kamu harus coba ___ (한번 드셔보세요) / Apa yang kamu rekomendasikan? (뭘 추천하세요?). 추천: merekomendasikan, 제안: kamu harus coba(꼭 해봐).", en: "Pattern: Saya merekomendasikan ___ (I recommend) / Kamu harus coba ___ (You should try) / Apa yang kamu rekomendasikan? (What do you recommend?). Recommend: merekomendasikan. Encourage: kamu harus coba.", es: "Patrón: Saya merekomendasikan ___ (recomiendo) / Kamu harus coba ___ (deberías probar) / Apa yang kamu rekomendasikan? (¿Qué recomiendas?). Recomendar: merekomendasikan. Animar: kamu harus coba." },
+          examples: { ko: "Saya merekomendasikan ikan bakar. Enak sekali! (생선구이를 추천해요. 대박 맛있어요!)\nKamu harus coba kue cokelatnya. (초콜릿 케이크를 한번 드셔보세요.)\nApa yang kamu rekomendasikan untuk pencuci mulut? (디저트 뭘 추천하세요?)", en: "Saya merekomendasikan ikan bakar. Enak sekali! (I recommend the grilled fish. So delicious!)\nKamu harus coba kue cokelatnya. (You should try the chocolate cake.)\nApa yang kamu rekomendasikan untuk pencuci mulut? (What do you recommend for dessert?)", es: "Saya merekomendasikan ikan bakar. Enak sekali! (Recomiendo el pescado a la parrilla. ¡Muy rico!)\nKamu harus coba kue cokelatnya. (Deberías probar el pastel de chocolate.)\nApa yang kamu rekomendasikan untuk pencuci mulut? (¿Qué recomiendas de postre?)" },
+          mistakes: { ko: "❌ Kamu harus untuk coba supnya.\n✅ Kamu harus coba supnya. ('harus'(해야 한다) 뒤에 'untuk' 없이 바로 동사가 와요!)\n\n❌ Saya rekomendasi steak.\n✅ Saya merekomendasikan steak. (동사는 'merekomendasikan'! 'rekomendasi'는 명사예요.)", en: "❌ Kamu harus untuk coba supnya.\n✅ Kamu harus coba supnya. (After 'harus' (must), the verb comes directly — no 'untuk'!)\n\n❌ Saya rekomendasi steak.\n✅ Saya merekomendasikan steak. (The verb is 'merekomendasikan' — 'rekomendasi' is the noun!)", es: "❌ Kamu harus untuk coba supnya.\n✅ Kamu harus coba supnya. (Tras 'harus' (deber), el verbo va directo — ¡sin 'untuk'!)\n\n❌ Saya rekomendasi steak.\n✅ Saya merekomendasikan steak. (El verbo es 'merekomendasikan' — '¡rekomendasi' es el sustantivo!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 잠입 수사 중 친해지고 싶을 때 음식 추천이 최고야! 'Kamu harus coba ___!'(꼭 드셔보세요!)라고 하면 상대방이 좋아하고 대화가 자연스럽게 이어져~", en: "Detective Rudy's tip: Want to build trust undercover? Recommend food! 'Kamu harus coba ___!' (You should try this!) makes people light up and keeps the conversation flowing.", es: "Consejo del detective Rudy: ¿Quieres ganar confianza encubierto? ¡Recomienda comida! 'Kamu harus coba ___!' hace sonreír y mantiene la conversación." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Saya ___ steak.", answer: "merekomendasikan", options: ["merekomendasikan", "suka", "mau"], fullSentence: "Saya merekomendasikan steak.", fullSentenceMeaning: { ko: "스테이크를 추천해요.", en: "I recommend the steak.", es: "Recomiendo el bistec." } },
+          { type: "select", promptWithBlank: "Kamu harus ___ supnya.", answer: "coba", options: ["coba", "makan", "ada"], fullSentence: "Kamu harus coba supnya.", fullSentenceMeaning: { ko: "수프를 한번 드셔보세요.", en: "You should try the soup.", es: "Deberías probar la sopa." } },
+          { type: "select", promptWithBlank: "Apa yang kamu ___?", answer: "rekomendasikan", options: ["rekomendasikan", "mau", "suka"], fullSentence: "Apa yang kamu rekomendasikan?", fullSentenceMeaning: { ko: "뭘 추천하세요?", en: "What do you recommend?", es: "¿Qué recomiendas?" } },
+          { type: "input", promptWithBlank: "Saladnya sangat ___.", answer: "segar", fullSentence: "Saladnya sangat segar.", fullSentenceMeaning: { ko: "샐러드가 아주 신선해요.", en: "The salad is very fresh.", es: "La ensalada está muy fresca." } },
+          { type: "input", promptWithBlank: "Ayo makan ___!", answer: "bersama", fullSentence: "Ayo makan bersama!", fullSentenceMeaning: { ko: "같이 먹어요!", en: "Let's eat together!", es: "¡Comamos juntos!" } },
+          { type: "listening", audioText: "Ayo makan bersama!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Ayo makan bersama!", "Saladnya sangat segar.", "Saya merekomendasikan steak.", "Apa yang kamu rekomendasikan?"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Do you speak English?", es: "¿Habla inglés?", ko: "영어 하세요?" }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Help! Please help me.", es: "¡Ayuda! Por favor, ayúdeme.", ko: "도와주세요! 제발 도와주세요." }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 18: Unit 3 Review ───────────────────────────────────
@@ -628,6 +789,35 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
         ],
       },
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Saya suka pizza. Kamu suka makanan apa?", speechLang: "id-ID", meaning: { ko: "저는 피자를 좋아해요. 어떤 음식을 좋아하세요?", en: "I like pizza. What food do you like?", es: "Me gusta la pizza. ¿Qué comida te gusta?" } },
+        { text: "Saya mau kopi dan ayam, tolong.", speechLang: "id-ID", meaning: { ko: "커피 한 잔이랑 치킨 주세요.", en: "I'd like a coffee and the chicken, please.", es: "Quiero un café y el pollo, por favor." } },
+        { text: "Berapa harga bonnya? Boleh saya bayar dengan kartu?", speechLang: "id-ID", meaning: { ko: "계산이 얼마예요? 카드로 결제할 수 있어요?", en: "How much is the bill? Can I pay by card?", es: "¿Cuánto es la cuenta? ¿Puedo pagar con tarjeta?" } },
+        { text: "Ini enak sekali! Saya merekomendasikannya.", speechLang: "id-ID", meaning: { ko: "이거 맛있어요! 추천해요.", en: "This is delicious! I recommend it.", es: "¡Está delicioso! Lo recomiendo." }, recallRound: true },
+        { text: "Saya kenyang. Terima kasih, sampai jumpa!", speechLang: "id-ID", meaning: { ko: "배불러요. 감사합니다, 안녕히 계세요!", en: "I'm full. Thank you, goodbye!", es: "Estoy lleno. ¡Gracias, adiós!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "Unit 3 총정리! 좋아하는 음식: Saya suka/sangat suka ___. 주문: Saya mau ___, tolong. 가격: Berapa harganya? 맛: Ini enak! / Ini terlalu asin. 추천: Saya merekomendasikan ___.", en: "Unit 3 Review! Likes: Saya suka/sangat suka ___. Order: Saya mau ___, tolong. Price: Berapa harganya? Taste: Ini enak! / Ini terlalu asin. Recommend: Saya merekomendasikan ___.", es: "Repaso Unidad 3! Gustar: Saya suka/sangat suka ___. Pedir: Saya mau ___, tolong. Precio: Berapa harganya? Sabor: Ini enak! / Ini terlalu asin. Recomendar: Saya merekomendasikan ___." },
+          examples: { ko: "Saya mau pizza, tolong. Berapa harganya? (피자 주세요. 얼마예요?)\nIni enak sekali! Saya merekomendasikannya. (맛있어요! 추천해요.)\nSaya kenyang. Boleh saya bayar dengan kartu? Terima kasih! (배불러요. 카드로 돼요? 감사합니다!)", en: "Saya mau pizza, tolong. Berapa harganya? (I'd like a pizza, please. How much is it?)\nIni enak sekali! Saya merekomendasikannya. (This is delicious! I recommend it.)\nSaya kenyang. Boleh saya bayar dengan kartu? Terima kasih! (I'm full. Can I pay by card? Thank you!)", es: "Saya mau pizza, tolong. Berapa harganya? (Quiero una pizza, por favor. ¿Cuánto cuesta?)\nIni enak sekali! Saya merekomendasikannya. (¡Está delicioso! Lo recomiendo.)\nSaya kenyang. Boleh saya bayar dengan kartu? Terima kasih! (Estoy lleno. ¿Puedo pagar con tarjeta? ¡Gracias!)" },
+          mistakes: { ko: "❌ Saya suka makan pizza. Ini berapa mahal?\n✅ Saya suka pizza. Ini berapa harganya? (suka 뒤에 바로 음식! 가격은 'berapa harganya'!)\n\n❌ Saya enak. Saya penuh.\n✅ Ini enak. Saya kenyang. (음식은 'Ini enak', 배부른 건 'Saya kenyang'!)", en: "❌ Saya suka makan pizza. Ini berapa mahal?\n✅ Saya suka pizza. Ini berapa harganya? (Food right after 'suka'; price is 'berapa harganya'!)\n\n❌ Saya enak. Saya penuh.\n✅ Ini enak. Saya kenyang. (Food = 'Ini enak', full = 'Saya kenyang'!)", es: "❌ Saya suka makan pizza. Ini berapa mahal?\n✅ Saya suka pizza. Ini berapa harganya? (Comida tras 'suka'; precio es 'berapa harganya'.)\n\n❌ Saya enak. Saya penuh.\n✅ Ini enak. Saya kenyang. (Comida = 'Ini enak', lleno = 'Saya kenyang'.)" },
+          rudyTip: { ko: "탐정 루디의 팁: Unit 3 완료! 이제 인도네시아어로 식당에서 주문부터 결제까지 혼자 할 수 있어. suka, tolong, berapa harganya, enak — 다 마스터했지? 잠입 수사 대성공! 다음 유닛에서 또 만나~", en: "Detective Rudy's tip: Unit 3 complete! You can now order, taste, recommend, and pay — all in Indonesian. suka, tolong, berapa harganya, enak — all mastered! Undercover mission success! Next case awaits!", es: "Consejo del detective Rudy: ¡Unidad 3 completada! Ahora puedes pedir, probar, recomendar y pagar en indonesio. suka, tolong, berapa harganya, enak — ¡todo dominado! ¡Misión exitosa!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Saya ___ kopi, tolong.", answer: "mau", options: ["mau", "ada", "pergi"], fullSentence: "Saya mau kopi, tolong.", fullSentenceMeaning: { ko: "커피 한 잔 주세요.", en: "I'd like a coffee.", es: "Quiero un café." } },
+          { type: "select", promptWithBlank: "Ini ___ sekali!", answer: "enak", options: ["enak", "lapar", "mahal"], fullSentence: "Ini enak sekali!", fullSentenceMeaning: { ko: "맛있어요!", en: "Delicious!", es: "¡Delicioso!" } },
+          { type: "select", promptWithBlank: "Saya ___ steak.", answer: "merekomendasikan", options: ["merekomendasikan", "pesan", "makan"], fullSentence: "Saya merekomendasikan steak.", fullSentenceMeaning: { ko: "스테이크를 추천해요.", en: "I recommend the steak.", es: "Recomiendo el bistec." } },
+          { type: "input", promptWithBlank: "Ini berapa ___?", answer: "harganya", fullSentence: "Ini berapa harganya?", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta?" } },
+          { type: "input", promptWithBlank: "Saya ___. Terima kasih!", answer: "kenyang", fullSentence: "Saya kenyang. Terima kasih!", fullSentenceMeaning: { ko: "배불러요. 감사합니다!", en: "I'm full. Thanks!", es: "Estoy lleno. ¡Gracias!" } },
+          { type: "listening", audioText: "Saya kenyang. Terima kasih, sampai jumpa!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Saya kenyang. Terima kasih, sampai jumpa!", "Ini enak sekali! Saya merekomendasikannya.", "Berapa harga bonnya?", "Saya mau kopi, tolong."], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 };
 
@@ -641,36 +831,42 @@ export const MISSION_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKe
     english: { situation: { ko: "탐정 루디가 작전을 시작합니다! 용의자가 자주 가는 식당에 잠입 수사를 나섰어요. 음식을 좋아하는 척 하면서 정보를 모아야 해요!", en: "Detective Rudy's mission begins! You're going undercover at a restaurant to gather intel on a suspect. Talk about food preferences while staying in character!", es: "¡La misión del detective Rudy comienza! Vas encubierto a un restaurante para recopilar información sobre un sospechoso. ¡Habla de comida mientras mantienes tu cobertura!" }, gptPrompt: "You are Rudy the detective fox, and your partner is going undercover at a suspect's favourite restaurant to gather intel. Stay in detective/mystery framing throughout. Simple A1 {targetLang}. Practice: 1) asking what food they like (as cover conversation) 2) sharing food favourites to blend in 3) asking if they're hungry 4) talking about food you don't like. If they struggle, remind them to say 'I don't understand' (from Unit 1). Keep very simple and fun.", speechLang: "en-GB", suggestedAnswers: ["I like pizza.", "What food do you like?", "I love Korean food.", "I don't like spicy food.", "Are you hungry?", "Yes, I'm very hungry!"] },
     spanish: { situation: { ko: "탐정 루디와 함께 용의자 식당에 잠입! 음식 이야기로 위장하면서 정보를 모으세요.", en: "Undercover at the suspect's restaurant with Detective Rudy! Use food talk as your cover.", es: "¡Encubierto en el restaurante del sospechoso con el detective Rudy! Usa la charla sobre comida como cobertura." }, gptPrompt: "You are Rudy the detective fox, and your partner is going undercover at a suspect's restaurant to gather intel. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: food preferences, asking about hunger, likes/dislikes as cover conversation. Remind them to use 'No entiendo' if stuck. Keep simple and fun.", speechLang: "es-ES", suggestedAnswers: ["Me gusta la pizza.", "¿Qué comida te gusta?", "Me encanta la comida coreana.", "No me gusta la comida picante.", "¿Tienes hambre?", "¡Sí, mucha hambre!"] },
     korean: { situation: { ko: "탐정 루디와 함께 용의자가 자주 가는 식당에 잠입 수사! 음식 이야기로 위장하면서 정보를 수집하세요!", en: "Undercover at the suspect's favourite restaurant with Detective Rudy! Gather intel while talking food.", es: "¡Encubierto en el restaurante favorito del sospechoso con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox, and your partner is going undercover at a suspect's favourite restaurant to gather intel. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: food preferences, asking about hunger, likes/dislikes. Remind them to use '이해를 못 했어요' if stuck. Keep simple and fun.", speechLang: "ko-KR", suggestedAnswers: ["피자를 좋아해요.", "어떤 음식을 좋아하세요?", "한국 음식을 정말 좋아해요.", "매운 음식을 안 좋아해요.", "배고프세요?", "네, 정말 배고파요!"] },
+    indonesian: { situation: { ko: "탐정 루디와 함께 용의자가 자주 가는 식당에 잠입 수사! 음식 이야기로 위장하면서 정보를 수집하세요!", en: "Undercover at the suspect's favourite restaurant with Detective Rudy! Gather intel while talking food.", es: "¡Encubierto en el restaurante favorito del sospechoso con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox, and your partner is going undercover at a suspect's favourite restaurant to gather intel. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: food preferences ('Saya suka ___'), asking what they like ('Kamu suka makanan apa?'), asking about hunger ('Apakah kamu lapar?'), and dislikes ('Saya tidak suka ___') as cover conversation. Remind them to use 'Saya tidak mengerti' if stuck. Keep simple and fun.", speechLang: "id-ID", suggestedAnswers: ["Saya suka pizza.", "Kamu suka makanan apa?", "Saya sangat suka makanan Korea.", "Saya tidak suka makanan pedas.", "Apakah kamu lapar?", "Ya, saya sangat lapar!"] },
   },
 
   day_14: {
     english: { situation: { ko: "탐정 루디의 다음 임무: 용의자가 단골로 가는 카페를 미행해야 해요! 주문을 하면서 용의자를 관찰하세요.", en: "Detective Rudy's next mission: shadow a suspect at their usual café! Order food and drinks while keeping an eye on the target.", es: "¡La siguiente misión del detective Rudy: seguir a un sospechoso en su café habitual! Pide comida y bebida mientras vigilas al objetivo." }, gptPrompt: "You are Rudy the detective fox, and your partner is shadowing a suspect at their usual café. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: 1) asking for the menu as cover 2) ordering food and drinks ('I'd like ___', 'Can I have ___') 3) 'For here or to go?' — choosing to stay to keep watching 4) confirming the order. If they forget 'please', gently remind them. Keep very simple.", speechLang: "en-GB", suggestedAnswers: ["Can I have the menu, please?", "I'd like a coffee, please.", "I'll have the chicken.", "Can I have water, please?", "For here, please.", "Thank you!"] },
     spanish: { situation: { ko: "용의자의 단골 카페를 미행 중! 주문을 하면서 감시를 계속하세요.", en: "Shadowing the suspect at their usual café! Keep your cover by ordering.", es: "¡Siguiendo al sospechoso en su café habitual! Mantén tu cobertura pidiendo." }, gptPrompt: "You are Rudy the detective fox. Your partner is shadowing a suspect at their usual café. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: asking for menu, ordering food/drinks, 'para aquí o para llevar?' (staying to keep watch), confirm order. Remind them of 'por favor'. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["¿Puedo ver el menú, por favor?", "Quiero un café, por favor.", "Voy a pedir el pollo.", "¿Puedo tener agua, por favor?", "Para aquí, por favor.", "¡Gracias!"] },
     korean: { situation: { ko: "탐정 루디와 함께 용의자의 단골 카페를 미행! 주문하면서 자연스럽게 위장하세요.", en: "Shadowing the suspect at their usual café with Detective Rudy! Order to blend in.", es: "¡Siguiendo al sospechoso en su café habitual con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox. Your partner is shadowing a suspect at their usual café. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: asking for menu, ordering food/drinks, for here or takeout (staying to keep watch), confirm order. Remind them of '주세요'. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["메뉴판 좀 주시겠어요?", "커피 한 잔 주세요.", "치킨으로 할게요.", "물 좀 주세요.", "여기서 먹을게요.", "감사합니다!"] },
+    indonesian: { situation: { ko: "탐정 루디와 함께 용의자의 단골 카페를 미행! 주문하면서 자연스럽게 위장하세요.", en: "Shadowing the suspect at their usual café with Detective Rudy! Order to blend in.", es: "¡Siguiendo al sospechoso en su café habitual con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox. Your partner is shadowing a suspect at their usual café. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: asking for the menu as cover ('Boleh saya minta menu?'), ordering food and drinks ('Saya mau ___, tolong', 'Boleh saya minta ___?'), 'Makan di sini atau bawa pulang?' (choosing to stay and keep watch), and confirming the order. If they forget 'tolong', gently remind them. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Boleh saya minta menu?", "Saya mau kopi, tolong.", "Saya pesan ayam, tolong.", "Boleh saya minta air?", "Makan di sini, tolong.", "Terima kasih!"] },
   },
 
   day_15: {
     english: { situation: { ko: "식사를 마치고 계산할 시간입니다. 가격을 확인하고 결제해보세요! Unit 2에서 배운 숫자도 활용하세요.", en: "Time to pay after your meal. Check prices and pay! Use numbers from Unit 2.", es: "Hora de pagar. ¡Revisa precios y paga! Usa números de la Unidad 2." }, gptPrompt: "You are Rudy helping your partner pay at the restaurant. Simple A1 {targetLang}. Practice: 1) asking 'How much is this?' for items 2) understanding prices using numbers from Unit 2 3) saying 'That's too expensive!' 4) asking to pay by card 5) asking for the bill. Mix in previous vocabulary naturally (numbers, 'thank you'). Keep very simple.", speechLang: "en-GB", suggestedAnswers: ["How much is this?", "It's ten dollars.", "That's too expensive!", "Can I pay by card?", "The bill, please.", "Thank you!"] },
     spanish: { situation: { ko: "식사 후 계산할 시간입니다. 숫자도 활용하세요!", en: "Time to pay. Use numbers too!", es: "Hora de pagar. ¡Usa números!" }, gptPrompt: "You are Rudy helping your partner pay at the restaurant. Simple A1 {targetLang}. Practice: asking prices, understanding amounts (numbers from Unit 2), saying too expensive, paying by card, asking for the bill. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["¿Cuánto cuesta esto?", "Son diez dólares.", "¡Muy caro!", "¿Puedo pagar con tarjeta?", "La cuenta, por favor.", "¡Gracias!"] },
     korean: { situation: { ko: "식사 후 계산할 시간입니다. Unit 2 숫자도 활용하세요!", en: "Time to pay. Use numbers!", es: "Hora de pagar. ¡Números!" }, gptPrompt: "You are Rudy helping your partner pay at the restaurant. Simple A1 {targetLang}. Practice: asking prices, understanding amounts, saying expensive, paying by card, asking for the bill. Use numbers from Unit 2. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["이거 얼마예요?", "만 원이에요.", "너무 비싸요!", "카드로 결제할 수 있어요?", "계산서 주세요.", "감사합니다!"] },
+    indonesian: { situation: { ko: "식사 후 계산할 시간입니다. Unit 2 숫자도 활용하세요!", en: "Time to pay. Use numbers!", es: "Hora de pagar. ¡Números!" }, gptPrompt: "You are Rudy helping your partner pay at the restaurant. Simple A1 {targetLang}. Practice: asking 'Ini berapa harganya?' for items, understanding prices using numbers from Unit 2, saying 'Itu terlalu mahal!', asking 'Boleh saya bayar dengan kartu?', and asking for the bill ('Minta bonnya, tolong'). Mix in previous vocabulary naturally (numbers, 'terima kasih'). Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Ini berapa harganya?", "Harganya sepuluh dolar.", "Itu terlalu mahal!", "Boleh saya bayar dengan kartu?", "Minta bonnya, tolong.", "Terima kasih!"] },
   },
 
   day_16: {
     english: { situation: { ko: "음식을 받았습니다! 맛을 표현해보세요. 루디에게 맛이 어떤지 이야기해주세요.", en: "The food has arrived! Express how it tastes. Tell Rudy what you think!", es: "¡Llegó la comida! Expresa el sabor. ¡Dile a Rudy qué piensas!" }, gptPrompt: "You are Rudy eating with your partner at the restaurant. Simple A1 {targetLang}. Practice: 1) asking how the food tastes 2) saying 'delicious', 'very good' 3) complaining 'too salty', 'too sweet' 4) saying 'I'm full' at the end. Also naturally use 'Thank you' from Unit 1. Try different foods so they can practise multiple taste words. Keep very simple and fun.", speechLang: "en-GB", suggestedAnswers: ["This is delicious!", "It's very good.", "It's too salty.", "It's too sweet.", "I'm full. Thank you!", "Can you say that again?"] },
     spanish: { situation: { ko: "음식이 도착했습니다! 맛을 표현해보세요.", en: "Food has arrived! Express the taste.", es: "¡Llegó la comida! Expresa el sabor." }, gptPrompt: "You are Rudy eating with your partner. Simple A1 {targetLang}. Practice: taste expressions (delicious, good, salty, sweet), saying I'm full, using Gracias. Try different foods. Keep simple and fun.", speechLang: "es-ES", suggestedAnswers: ["¡Esto está delicioso!", "Está muy bueno.", "Está muy salado.", "Está muy dulce.", "Estoy lleno. ¡Gracias!", "¿Puede repetir eso?"] },
     korean: { situation: { ko: "음식이 도착했어요! 맛을 표현해보세요.", en: "Food is here! Express the taste.", es: "¡Llegó la comida!" }, gptPrompt: "You are Rudy eating with your partner. Simple A1 {targetLang}. Practice: taste expressions (맛있어요, 짜요, 달아요), 배불러요, 감사합니다. Try different foods. Keep simple and fun.", speechLang: "ko-KR", suggestedAnswers: ["이거 맛있어요!", "정말 맛있어요.", "너무 짜요.", "너무 달아요.", "배불러요. 감사합니다!", "다시 한번 말해 주시겠어요?"] },
+    indonesian: { situation: { ko: "음식이 도착했어요! 맛을 표현해보세요.", en: "Food is here! Express the taste.", es: "¡Llegó la comida!" }, gptPrompt: "You are Rudy eating with your partner. Simple A1 {targetLang}. Practice: taste expressions ('Ini enak!', 'Ini terlalu asin', 'Ini terlalu manis'), saying 'Saya kenyang' at the end, and 'Terima kasih'. Try different foods so they can practise multiple taste words. Keep simple and fun.", speechLang: "id-ID", suggestedAnswers: ["Ini enak sekali!", "Ini sangat enak.", "Ini terlalu asin.", "Ini terlalu manis.", "Saya kenyang. Terima kasih!", "Bisa tolong ulangi?"] },
   },
 
   day_17: {
     english: { situation: { ko: "루디가 새로운 동료를 식당에 데려왔습니다. 좋아하는 음식을 추천해주세요!", en: "Rudy brought a new colleague to the restaurant. Recommend your favourite dishes!", es: "Rudy trajo un nuevo colega. ¡Recomienda tus platos favoritos!" }, gptPrompt: "You are Rudy at the restaurant with your partner and a new colleague. Simple A1 {targetLang}. Practice: 1) recommending dishes ('I recommend ___', 'You should try ___') 2) asking what they recommend 3) describing food ('fresh', 'delicious') 4) suggesting to eat together. Also reinforce ordering from Day 14 and taste from Day 16 naturally. Keep very simple and encouraging.", speechLang: "en-GB", suggestedAnswers: ["I recommend the steak.", "You should try the soup.", "What do you recommend?", "The salad is very fresh.", "Let's eat together!", "This is delicious!"] },
     spanish: { situation: { ko: "루디가 새 동료를 식당에 데려왔습니다. 추천해주세요!", en: "Rudy brought a new colleague. Recommend dishes!", es: "Rudy trajo un colega nuevo. ¡Recomienda!" }, gptPrompt: "You are Rudy at the restaurant with your partner and a new colleague. Simple A1 {targetLang}. Practice: recommending, asking recommendations, describing food, suggesting to eat together. Reinforce ordering and taste. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["Recomiendo el bistec.", "Deberías probar la sopa.", "¿Qué recomiendas?", "La ensalada está muy fresca.", "¡Comamos juntos!", "¡Está delicioso!"] },
     korean: { situation: { ko: "루디가 새 동료를 데려왔어요. 맛있는 음식을 추천해주세요!", en: "New colleague! Recommend dishes!", es: "¡Nuevo colega! ¡Recomienda!" }, gptPrompt: "You are Rudy at the restaurant with your partner and a new colleague. Simple A1 {targetLang}. Practice: recommending, asking recommendations, describing food, eating together. Reinforce ordering and taste. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["스테이크를 추천해요.", "수프를 한번 드셔보세요.", "뭘 추천하세요?", "샐러드가 아주 신선해요.", "같이 먹어요!", "이거 맛있어요!"] },
+    indonesian: { situation: { ko: "루디가 새 동료를 데려왔어요. 맛있는 음식을 추천해주세요!", en: "New colleague! Recommend dishes!", es: "¡Nuevo colega! ¡Recomienda!" }, gptPrompt: "You are Rudy at the restaurant with your partner and a new colleague. Simple A1 {targetLang}. Practice: recommending dishes ('Saya merekomendasikan ___', 'Kamu harus coba ___'), asking 'Apa yang kamu rekomendasikan?', describing food ('segar', 'enak'), and suggesting to eat together ('Ayo makan bersama!'). Reinforce ordering and taste naturally. Keep simple and encouraging.", speechLang: "id-ID", suggestedAnswers: ["Saya merekomendasikan steak.", "Kamu harus coba supnya.", "Apa yang kamu rekomendasikan?", "Saladnya sangat segar.", "Ayo makan bersama!", "Ini enak sekali!"] },
   },
 
   day_18: {
     english: { situation: { ko: "박물관 팀 저녁 모임에서 이번 주에 배운 모든 음식 표현을 활용하세요! Unit 1-2의 인사, 숫자, 시간도 자연스럽게 섞어보세요!", en: "Museum team dinner! Use ALL food expressions from this week, plus greetings, numbers, and time from Units 1-2!", es: "¡Cena del equipo del museo! ¡Usa TODAS las expresiones de comida más saludos, números y hora!" }, gptPrompt: "You are Rudy hosting a team dinner at a restaurant near the museum. Test ALL of Unit 3 in natural A1 {targetLang} conversation. Cover: 1) talking about food preferences 2) ordering food and drinks 3) asking about prices and paying 4) expressing taste (delicious, salty, sweet) 5) recommending dishes. Also reinforce Unit 1 (greetings, introductions, 'I don't understand') and Unit 2 (numbers for prices, time for reservation). Create 2-3 mini-scenarios: arriving at restaurant, ordering, paying. Be encouraging but thorough.", speechLang: "en-GB", suggestedAnswers: ["I like pizza. What food do you like?", "I'd like a coffee, please.", "How much is this?", "This is delicious!", "I recommend the steak.", "I'm full. Thank you, goodbye!"] },
     spanish: { situation: { ko: "박물관 팀 저녁 모임입니다!", en: "Museum team dinner! Use everything!", es: "¡Cena del equipo! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting a team dinner. Test ALL of Unit 3 in A1 {targetLang}: food preferences, ordering, prices/paying, taste, recommendations. Also reinforce Units 1-2 (greetings, numbers, time). Create 2-3 mini-scenarios. Be encouraging.", speechLang: "es-ES", suggestedAnswers: ["Me gusta la pizza. ¿Qué te gusta?", "Quiero un café, por favor.", "¿Cuánto cuesta esto?", "¡Está delicioso!", "Recomiendo el bistec.", "Estoy lleno. ¡Gracias, adiós!"] },
     korean: { situation: { ko: "박물관 팀 저녁 모임입니다! 이번 주 배운 모든 표현을 활용하세요!", en: "Team dinner! Use everything!", es: "¡Cena! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting a team dinner. Test ALL of Unit 3 in A1 {targetLang}: food preferences, ordering, prices/paying, taste, recommendations. Also reinforce Units 1-2 (greetings, numbers, time). Create 2-3 mini-scenarios. Be encouraging.", speechLang: "ko-KR", suggestedAnswers: ["피자를 좋아해요. 뭘 좋아하세요?", "커피 한 잔 주세요.", "이거 얼마예요?", "이거 맛있어요!", "스테이크를 추천해요.", "배불러요. 감사합니다, 안녕히 계세요!"] },
+    indonesian: { situation: { ko: "박물관 팀 저녁 모임입니다! 이번 주 배운 모든 표현을 활용하세요!", en: "Team dinner! Use everything!", es: "¡Cena! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting a team dinner at a restaurant near the museum. Test ALL of Unit 3 in natural A1 {targetLang}: food preferences ('Saya suka ___'), ordering food and drinks ('Saya mau ___, tolong'), asking prices and paying ('Berapa harganya?', 'Boleh saya bayar dengan kartu?'), expressing taste ('Ini enak!', 'Ini terlalu asin'), and recommending dishes ('Saya merekomendasikan ___'). Also reinforce Unit 1 (greetings, introductions, 'Saya tidak mengerti') and Unit 2 (numbers for prices, time for a reservation). Create 2-3 mini-scenarios: arriving, ordering, paying. Be encouraging but thorough.", speechLang: "id-ID", suggestedAnswers: ["Saya suka pizza. Kamu suka makanan apa?", "Saya mau kopi, tolong.", "Ini berapa harganya?", "Ini enak sekali!", "Saya merekomendasikan steak.", "Saya kenyang. Terima kasih, sampai jumpa!"] },
   },
 };
 
@@ -702,6 +898,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "어떤 ___을 좋아하세요?", answer: "음식", options: ["음식", "사람", "날씨"], fullSentence: "어떤 음식을 좋아하세요?", fullSentenceMeaning: { ko: "어떤 음식?", en: "What food?", es: "¿Qué comida?" } },
       { type: "speak", sentence: "배고프세요? 한국 음식을 정말 좋아해요!", speechLang: "ko-KR", meaning: { ko: "배고프세요? 한국 음식!", en: "Hungry? I love Korean food!", es: "¿Hambre? ¡Comida coreana!" } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Saya suka yang biru. Ada ukuran lebih besar?", speechLang: "id-ID", meaning: { ko: "파란색 좋아요. 큰 사이즈?", en: "I like blue. Bigger?", es: "Me gusta azul. ¿Más grande?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Ini berapa ___?", answer: "harganya", options: ["harganya", "mahal", "uang"], fullSentence: "Ini berapa harganya?", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much?", es: "¿Cuánto?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Saya suka pizza dan pasta.", speechLang: "id-ID", meaning: { ko: "피자와 파스타를 좋아해요.", en: "I like pizza and pasta.", es: "Me gusta pizza y pasta." } },
+      { type: "fill_blank", promptWithBlank: "Kamu suka makanan ___?", answer: "apa", options: ["apa", "siapa", "mana"], fullSentence: "Kamu suka makanan apa?", fullSentenceMeaning: { ko: "어떤 음식?", en: "What food?", es: "¿Qué comida?" } },
+      { type: "speak", sentence: "Apakah kamu lapar? Saya sangat suka makanan Korea!", speechLang: "id-ID", meaning: { ko: "배고프세요? 한국 음식!", en: "Hungry? I love Korean food!", es: "¿Hambre? ¡Comida coreana!" } },
+    ],
   },
 
   day_14: {
@@ -725,6 +928,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "메뉴판 좀 주시겠어요?", speechLang: "ko-KR", meaning: { ko: "메뉴판 주세요.", en: "Menu, please.", es: "¿El menú?" } },
       { type: "fill_blank", promptWithBlank: "커피 한 잔 ___.", answer: "주세요", options: ["주세요", "하세요", "가세요"], fullSentence: "커피 한 잔 주세요.", fullSentenceMeaning: { ko: "커피 주세요.", en: "Coffee, please.", es: "Café, por favor." } },
       { type: "speak", sentence: "치킨으로 할게요. 여기서 먹을게요.", speechLang: "ko-KR", meaning: { ko: "치킨으로. 여기서.", en: "Chicken. For here.", es: "Pollo. Aquí." } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Saya suka pizza. Kamu suka makanan apa?", speechLang: "id-ID", meaning: { ko: "피자 좋아해요. 뭘?", en: "I like pizza. You?", es: "Me gusta pizza. ¿Y tú?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Apakah kamu ___?", answer: "lapar", options: ["lapar", "haus", "kenyang"], fullSentence: "Apakah kamu lapar?", fullSentenceMeaning: { ko: "배고프세요?", en: "Hungry?", es: "¿Hambre?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Boleh saya minta menu?", speechLang: "id-ID", meaning: { ko: "메뉴판 주세요.", en: "Menu, please.", es: "¿El menú?" } },
+      { type: "fill_blank", promptWithBlank: "Saya ___ kopi, tolong.", answer: "mau", options: ["mau", "ada", "pergi"], fullSentence: "Saya mau kopi, tolong.", fullSentenceMeaning: { ko: "커피 주세요.", en: "A coffee, please.", es: "Un café, por favor." } },
+      { type: "speak", sentence: "Saya pesan ayam, tolong. Makan di sini.", speechLang: "id-ID", meaning: { ko: "치킨으로. 여기서.", en: "Chicken. For here.", es: "Pollo. Aquí." } },
     ],
   },
 
@@ -756,6 +966,15 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "죄송해요, 이해가 안 돼요.", speechLang: "ko-KR", meaning: { ko: "죄송해요, 이해가 안 돼요.", en: "Sorry, I don't understand.", es: "Lo siento, no entiendo." }, isYesterdayReview: true },
       { type: "speak", sentence: "다시 한 번 말해 주세요.", speechLang: "ko-KR", meaning: { ko: "다시 한 번 말해 주세요.", en: "Can you say that again, please?", es: "¿Puede repetirlo, por favor?" }, isYesterdayReview: true },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Saya mau kopi dan ayam, tolong.", speechLang: "id-ID", meaning: { ko: "커피랑 치킨 주세요.", en: "Coffee and chicken, please.", es: "Café y pollo, por favor." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Makan di sini atau bawa ___?", answer: "pulang", options: ["pulang", "pergi", "keluar"], fullSentence: "Makan di sini atau bawa pulang?", fullSentenceMeaning: { ko: "여기서? 포장?", en: "Here or to go?", es: "¿Aquí o para llevar?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Ini berapa harganya? Itu terlalu mahal!", speechLang: "id-ID", meaning: { ko: "얼마? 비싸요!", en: "How much? Expensive!", es: "¿Cuánto? ¡Caro!" } },
+      { type: "fill_blank", promptWithBlank: "Boleh saya ___ dengan kartu?", answer: "bayar", options: ["bayar", "minta", "ada"], fullSentence: "Boleh saya bayar dengan kartu?", fullSentenceMeaning: { ko: "카드로요?", en: "Card?", es: "¿Tarjeta?" } },
+      { type: "speak", sentence: "Minta bonnya, tolong. Terima kasih!", speechLang: "id-ID", meaning: { ko: "계산서요. 감사!", en: "Bill. Thanks!", es: "Cuenta. ¡Gracias!" } },
+      { type: "speak", sentence: "Maaf, saya tidak mengerti.", speechLang: "id-ID", meaning: { ko: "죄송해요, 이해가 안 돼요.", en: "Sorry, I don't understand.", es: "Lo siento, no entiendo." }, isYesterdayReview: true },
+      { type: "speak", sentence: "Bisa tolong ulangi?", speechLang: "id-ID", meaning: { ko: "다시 한 번 말해 주세요.", en: "Can you say that again, please?", es: "¿Puede repetirlo, por favor?" }, isYesterdayReview: true },
+    ],
   },
 
   day_16: {
@@ -779,6 +998,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "이거 맛있어요! 정말 맛있어요.", speechLang: "ko-KR", meaning: { ko: "맛있어요! 정말!", en: "Delicious! Really!", es: "¡Delicioso! ¡De verdad!" } },
       { type: "fill_blank", promptWithBlank: "너무 ___요.", answer: "짜", options: ["짜", "싸", "달아"], fullSentence: "너무 짜요.", fullSentenceMeaning: { ko: "너무 짜요.", en: "Too salty.", es: "Muy salado." } },
       { type: "speak", sentence: "배불러요. 감사합니다!", speechLang: "ko-KR", meaning: { ko: "배불러요. 감사!", en: "Full. Thanks!", es: "Lleno. ¡Gracias!" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Ini berapa harganya? Harganya sepuluh dolar.", speechLang: "id-ID", meaning: { ko: "얼마예요? 10달러.", en: "How much? Ten dollars.", es: "¿Cuánto? Diez dólares." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Minta ___, tolong.", answer: "bonnya", options: ["bonnya", "menunya", "airnya"], fullSentence: "Minta bonnya, tolong.", fullSentenceMeaning: { ko: "계산서 주세요.", en: "The bill, please.", es: "La cuenta, por favor." }, isYesterdayReview: true },
+      { type: "speak", sentence: "Ini enak sekali! Ini sangat enak.", speechLang: "id-ID", meaning: { ko: "맛있어요! 정말 맛있어요.", en: "Delicious! Very good.", es: "¡Delicioso! Muy bueno." } },
+      { type: "fill_blank", promptWithBlank: "Ini terlalu ___.", answer: "asin", options: ["asin", "garam", "pedas"], fullSentence: "Ini terlalu asin.", fullSentenceMeaning: { ko: "너무 짜요.", en: "Too salty.", es: "Muy salado." } },
+      { type: "speak", sentence: "Saya kenyang. Terima kasih!", speechLang: "id-ID", meaning: { ko: "배불러요. 감사!", en: "Full. Thanks!", es: "Lleno. ¡Gracias!" } },
     ],
   },
 
@@ -804,6 +1030,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "뭘 ___하세요?", answer: "추천", options: ["추천", "주문", "좋아"], fullSentence: "뭘 추천하세요?", fullSentenceMeaning: { ko: "뭘 추천하세요?", en: "What do you recommend?", es: "¿Qué recomiendas?" } },
       { type: "speak", sentence: "샐러드가 신선해요. 같이 먹어요!", speechLang: "ko-KR", meaning: { ko: "샐러드 신선. 같이!", en: "Salad fresh. Let's eat!", es: "Ensalada fresca. ¡Comamos!" } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Ini enak sekali! Ini sangat enak.", speechLang: "id-ID", meaning: { ko: "맛있어요! 정말 좋아요.", en: "Delicious! Very good.", es: "¡Delicioso! Muy bueno." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Saya ___. Terima kasih!", answer: "kenyang", options: ["kenyang", "lapar", "enak"], fullSentence: "Saya kenyang. Terima kasih!", fullSentenceMeaning: { ko: "배불러요. 감사합니다!", en: "I'm full. Thanks!", es: "Estoy lleno. ¡Gracias!" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Saya merekomendasikan steak. Kamu harus coba.", speechLang: "id-ID", meaning: { ko: "스테이크 추천. 드셔보세요.", en: "I recommend the steak. Try it.", es: "Recomiendo el bistec. Pruébalo." } },
+      { type: "fill_blank", promptWithBlank: "Apa yang kamu ___?", answer: "rekomendasikan", options: ["rekomendasikan", "mau", "suka"], fullSentence: "Apa yang kamu rekomendasikan?", fullSentenceMeaning: { ko: "뭘 추천하세요?", en: "What do you recommend?", es: "¿Qué recomiendas?" } },
+      { type: "speak", sentence: "Saladnya segar. Ayo makan bersama!", speechLang: "id-ID", meaning: { ko: "샐러드 신선. 같이!", en: "Salad fresh. Let's eat!", es: "Ensalada fresca. ¡Comamos!" } },
+    ],
   },
 
   day_18: {
@@ -827,6 +1060,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "이거 맛있어요! 스테이크를 추천해요.", speechLang: "ko-KR", meaning: { ko: "맛있어요! 스테이크 추천.", en: "Delicious! Steak.", es: "¡Delicioso! Bistec." } },
       { type: "speak", sentence: "수프를 드셔보세요. 샐러드가 아주 신선해요.", speechLang: "ko-KR", meaning: { ko: "수프요. 샐러드 신선.", en: "Try soup. Salad is fresh.", es: "Sopa. Ensalada fresca." } },
       { type: "speak", sentence: "배불러요. 감사합니다! 안녕히 계세요, 내일 봐요!", speechLang: "ko-KR", meaning: { ko: "배불러요. 감사! 내일 봐요!", en: "Full. Thanks! See you!", es: "Lleno. ¡Gracias! ¡Hasta mañana!" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Saya suka pizza. Saya mau kopi, tolong.", speechLang: "id-ID", meaning: { ko: "피자 좋아해요. 커피 한 잔 주세요.", en: "I like pizza. Coffee, please.", es: "Me gusta pizza. Café, por favor." } },
+      { type: "speak", sentence: "Ini berapa harganya? Boleh saya bayar dengan kartu?", speechLang: "id-ID", meaning: { ko: "이거 얼마예요? 카드로요?", en: "How much? Card?", es: "¿Cuánto? ¿Tarjeta?" } },
+      { type: "speak", sentence: "Ini enak sekali! Saya merekomendasikan steak.", speechLang: "id-ID", meaning: { ko: "맛있어요! 스테이크 추천해요.", en: "Delicious! I recommend steak.", es: "¡Delicioso! Recomiendo bistec." } },
+      { type: "speak", sentence: "Kamu harus coba supnya. Saladnya sangat segar.", speechLang: "id-ID", meaning: { ko: "수프 드셔보세요. 샐러드가 신선해요.", en: "Try the soup. Salad is fresh.", es: "Prueba la sopa. Ensalada fresca." } },
+      { type: "speak", sentence: "Saya kenyang. Terima kasih! Sampai jumpa besok!", speechLang: "id-ID", meaning: { ko: "배불러요. 감사합니다! 내일 봐요!", en: "Full. Thanks! See you tomorrow!", es: "Lleno. ¡Gracias! ¡Hasta mañana!" } },
     ],
   },
 };

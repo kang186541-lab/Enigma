@@ -134,6 +134,39 @@ export const LESSON_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Di mana stasiun kereta bawah tanah?", speechLang: "id-ID", meaning: { ko: "지하철역이 어디에 있나요?", en: "Where is the subway station?", es: "¿Dónde está la estación de metro?" } },
+        { text: "Kafenya dekat museum.", speechLang: "id-ID", meaning: { ko: "카페가 박물관 근처에 있어요.", en: "The cafe is near the museum.", es: "El café está cerca del museo." } },
+        { text: "Apakah ada apotek di dekat sini?", speechLang: "id-ID", meaning: { ko: "근처에 약국이 있나요?", en: "Is there a pharmacy nearby?", es: "¿Hay una farmacia cerca?" } },
+        { text: "Berapa jauh dari sini?", speechLang: "id-ID", meaning: { ko: "얼마나 멀어요?", en: "How far is it?", es: "¿A qué distancia está?" }, recallRound: true },
+        { text: "Sekitar lima menit jalan kaki.", speechLang: "id-ID", meaning: { ko: "걸어서 5분 정도예요.", en: "It's about five minutes on foot.", es: "Está a unos cinco minutos a pie." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "장소 찾기: 'Di mana ___?' / 존재 확인: 'Apakah ada ___ di dekat sini?' / 거리: 'Berapa jauh?' → 'Sekitar ___ menit jalan kaki'", en: "'Di mana ___?' → location / 'Apakah ada ___ di dekat sini?' → existence nearby / 'Berapa jauh?' → distance / 'Sekitar ___ menit jalan kaki' → answer (literally 'about ___ minutes foot-walking')", es: "'Di mana ___?' → ubicación / 'Apakah ada ___ di dekat sini?' → existencia cercana / 'Berapa jauh?' → distancia / 'Sekitar ___ menit jalan kaki' → respuesta" },
+          examples: { ko: "Di mana rumah sakit terdekat? (가장 가까운 병원이 어디예요?)\nApakah ada minimarket di dekat sini? (근처에 편의점 있나요?)\nSekitar lima belas menit naik bus. (버스로 15분 정도예요.)", en: "Di mana rumah sakit terdekat? (Where is the nearest hospital?)\nApakah ada minimarket di dekat sini? (Is there a convenience store nearby?)\nSekitar lima belas menit naik bus. (About fifteen minutes by bus.)", es: "Di mana rumah sakit terdekat? (¿Dónde está el hospital más cercano?)\nApakah ada minimarket di dekat sini? (¿Hay una tienda cerca?)\nSekitar lima belas menit naik bus. (Unos quince minutos en autobús.)" },
+          mistakes: { ko: "❌ Di mana di stasiun?\n✅ Di mana stasiun? ('di mana' 자체가 '어디에'라서 뒤에 'di'를 또 붙이지 마세요!)\n\n❌ Sekitar lima menit dengan kaki.\n✅ Sekitar lima menit jalan kaki. ('jalan kaki'가 '걸어서'예요, 'dengan kaki'가 아니에요!)", en: "❌ Di mana di stasiun?\n✅ Di mana stasiun? ('Di mana' already means 'where at' — don't add another 'di'!)\n\n❌ Sekitar lima menit dengan kaki.\n✅ Sekitar lima menit jalan kaki. ('Jalan kaki' is the set phrase for 'on foot'!)", es: "❌ Di mana di stasiun?\n✅ Di mana stasiun? ('Di mana' ya significa 'dónde', no añadas otro 'di'.)\n\n❌ Sekitar lima menit dengan kaki.\n✅ Sekitar lima menit jalan kaki. ('Jalan kaki' es la frase para 'a pie'.)" },
+          rudyTip: { ko: "낯선 도시에서 길 찾기의 핵심은 세 문장이야! 'Di mana?' (어디?), 'Apakah ada?' (있나요?), 'Berapa jauh?' (얼마나 멀어요?) — 이 세 개면 어디든 갈 수 있어!", en: "Three phrases to survive any city: 'Di mana?' (where?), 'Apakah ada?' (is there?), 'Berapa jauh?' (how far?). Master these and you'll never be stuck!", es: "Tres frases para sobrevivir en cualquier ciudad: 'Di mana?' (¿dónde?), 'Apakah ada?' (¿hay?), 'Berapa jauh?' (¿qué tan lejos?). ¡Con estas tres nunca estarás perdido!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "___ stasiun kereta bawah tanah?", answer: "Di mana", options: ["Di mana", "Apa", "Bagaimana"], fullSentence: "Di mana stasiun kereta bawah tanah?", fullSentenceMeaning: { ko: "지하철역이 어디에 있나요?", en: "Where is the subway station?", es: "¿Dónde está la estación de metro?" } },
+          { type: "select", promptWithBlank: "Apakah ada apotek di ___ sini?", answer: "dekat", options: ["dekat", "jauh", "sana"], fullSentence: "Apakah ada apotek di dekat sini?", fullSentenceMeaning: { ko: "근처에 약국이 있나요?", en: "Is there a pharmacy nearby?", es: "¿Hay una farmacia cerca?" } },
+          { type: "select", promptWithBlank: "Kafenya ___ museum.", answer: "dekat", options: ["dekat", "dalam", "atas"], fullSentence: "Kafenya dekat museum.", fullSentenceMeaning: { ko: "카페가 박물관 근처에 있어요.", en: "The cafe is near the museum.", es: "El café está cerca del museo." } },
+          { type: "input", promptWithBlank: "Berapa ___ dari sini?", answer: "jauh", fullSentence: "Berapa jauh dari sini?", fullSentenceMeaning: { ko: "얼마나 멀어요?", en: "How far is it?", es: "¿A qué distancia está?" } },
+          { type: "input", promptWithBlank: "Sekitar lima menit jalan ___.", answer: "kaki", fullSentence: "Sekitar lima menit jalan kaki.", fullSentenceMeaning: { ko: "걸어서 5분 정도예요.", en: "It's about five minutes on foot.", es: "Está a unos cinco minutos a pie." } },
+          { type: "listening", audioText: "Sekitar lima menit jalan kaki.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Sekitar lima menit jalan kaki.", "Berapa jauh dari sini?", "Di mana stasiun kereta bawah tanah?", "Apakah ada apotek di dekat sini?"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 20: Basic Directions ──────────────────────────────────
@@ -230,6 +263,39 @@ export const LESSON_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "___쪽으로 돌아요.", answer: "오른", fullSentence: "오른쪽으로 돌아요.", fullSentenceMeaning: { ko: "오른쪽으로 돌아요.", en: "Turn right.", es: "Gira a la derecha." } },
           { type: "input", promptWithBlank: "오른쪽 ___ 번째 길로 가세요.", answer: "첫", fullSentence: "오른쪽 첫 번째 길로 가세요.", fullSentenceMeaning: { ko: "오른쪽 첫 번째 길로 가세요.", en: "Take the first street on the right.", es: "Primera calle a la derecha." } },
           { type: "listening", audioText: "오른쪽 첫 번째 길로 가세요.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["오른쪽 첫 번째 길로 가세요.", "왼쪽에 있어요.", "오른쪽으로 돌아요.", "직진하세요."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Belok kiri.", speechLang: "id-ID", meaning: { ko: "왼쪽으로 돌아요.", en: "Turn left.", es: "Gira a la izquierda." } },
+        { text: "Belok kanan.", speechLang: "id-ID", meaning: { ko: "오른쪽으로 돌아요.", en: "Turn right.", es: "Gira a la derecha." } },
+        { text: "Jalan lurus terus.", speechLang: "id-ID", meaning: { ko: "직진하세요.", en: "Go straight ahead.", es: "Sigue todo recto." } },
+        { text: "Ada di sebelah kiri Anda.", speechLang: "id-ID", meaning: { ko: "왼쪽에 있어요.", en: "It's on your left.", es: "Está a tu izquierda." }, recallRound: true },
+        { text: "Ambil jalan pertama di sebelah kanan.", speechLang: "id-ID", meaning: { ko: "오른쪽 첫 번째 길로 가세요.", en: "Take the first street on the right.", es: "Toma la primera calle a la derecha." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "방향 전환: 'Belok kiri/kanan' / 직진: 'Jalan lurus terus' / 위치: 'Ada di sebelah kiri/kanan' / 길 안내: 'Ambil jalan pertama/kedua di sebelah ___'", en: "'Belok kiri/kanan' → turn left/right / 'Jalan lurus terus' → go straight ahead / 'Ada di sebelah kiri/kanan' → it's on your left/right / 'Ambil jalan pertama di sebelah ___' → take the first street", es: "'Belok kiri/kanan' → girar / 'Jalan lurus terus' → seguir recto / 'Ada di sebelah kiri/kanan' → posición / 'Ambil jalan pertama di sebelah ___' → navegación específica" },
+          examples: { ko: "Belok kanan di lampu merah. (신호등에서 오른쪽으로 도세요.)\nJalan lurus terus dua blok. (두 블록 직진하세요.)\nBanknya ada di sebelah kiri Anda. (은행은 왼쪽에 있어요.)", en: "Belok kanan di lampu merah. (Turn right at the traffic light.)\nJalan lurus terus dua blok. (Go straight ahead for two blocks.)\nBanknya ada di sebelah kiri Anda. (The bank is on your left.)", es: "Belok kanan di lampu merah. (Gira a la derecha en el semáforo.)\nJalan lurus terus dua blok. (Sigue recto dos cuadras.)\nBanknya ada di sebelah kiri Anda. (El banco está a tu izquierda.)" },
+          mistakes: { ko: "❌ Belok ke kiri.\n✅ Belok kiri. ('belok' 다음에 바로 kiri/kanan — 'ke' 필요 없어요!)\n\n❌ Ada di kiri Anda.\n✅ Ada di sebelah kiri Anda. ('sebelah'을 넣으면 '~쪽'이 더 분명해져요)", en: "❌ Belok ke kiri.\n✅ Belok kiri. (No 'ke' needed — just 'Belok kiri/kanan'!)\n\n❌ Jalan lurus saja terus.\n✅ Jalan lurus terus. (Keep it simple — 'lurus terus' is the natural phrase!)", es: "❌ Belok ke kiri.\n✅ Belok kiri. (Sin 'ke' — solo 'Belok kiri/kanan'.)\n\n❌ Ada di kiri Anda.\n✅ Ada di sebelah kiri Anda. (Con 'sebelah' suena más natural para 'al lado/lado'.)" },
+          rudyTip: { ko: "인도네시아어 길 안내는 심플해! Belok + 방향, Jalan lurus terus, Ada di sebelah + 방향. 이 세 조합이면 누구든 안내할 수 있어!", en: "Indonesian directions are super simple! Belok + direction, Jalan lurus terus, Ada di sebelah + side. Mix these three and you can guide anyone anywhere!", es: "Las direcciones en indonesio son simples: Belok + dirección, Jalan lurus terus, Ada di sebelah + lado. ¡Con estas tres combinaciones puedes guiar a cualquiera!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Belok ___.", answer: "kiri", options: ["kiri", "atas", "bawah"], fullSentence: "Belok kiri.", fullSentenceMeaning: { ko: "왼쪽으로 돌아요.", en: "Turn left.", es: "Gira a la izquierda." } },
+          { type: "select", promptWithBlank: "Jalan ___ terus.", answer: "lurus", options: ["lurus", "kanan", "cepat"], fullSentence: "Jalan lurus terus.", fullSentenceMeaning: { ko: "직진하세요.", en: "Go straight ahead.", es: "Sigue todo recto." } },
+          { type: "select", promptWithBlank: "Ada di sebelah ___ Anda.", answer: "kanan", options: ["kanan", "atas", "belakang"], fullSentence: "Ada di sebelah kanan Anda.", fullSentenceMeaning: { ko: "오른쪽에 있어요.", en: "It's on your right.", es: "Está a tu derecha." } },
+          { type: "input", promptWithBlank: "Belok ___.", answer: "kanan", fullSentence: "Belok kanan.", fullSentenceMeaning: { ko: "오른쪽으로 돌아요.", en: "Turn right.", es: "Gira a la derecha." } },
+          { type: "input", promptWithBlank: "Ambil jalan ___ di sebelah kanan.", answer: "pertama", fullSentence: "Ambil jalan pertama di sebelah kanan.", fullSentenceMeaning: { ko: "오른쪽 첫 번째 길로 가세요.", en: "Take the first street on the right.", es: "Toma la primera calle a la derecha." } },
+          { type: "listening", audioText: "Ambil jalan pertama di sebelah kanan.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Ambil jalan pertama di sebelah kanan.", "Ada di sebelah kiri Anda.", "Belok kanan.", "Jalan lurus terus."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -340,6 +406,39 @@ export const LESSON_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Seberangi jembatan.", speechLang: "id-ID", meaning: { ko: "다리를 건너세요.", en: "Cross the bridge.", es: "Cruza el puente." } },
+        { text: "Tempatnya di sebelah minimarket.", speechLang: "id-ID", meaning: { ko: "편의점 옆에 있어요.", en: "It's next to the convenience store.", es: "Está al lado de la tienda." } },
+        { text: "Anda sudah melewatinya — kembali lagi.", speechLang: "id-ID", meaning: { ko: "지나쳤어요 — 돌아가세요.", en: "You passed it — go back.", es: "Lo pasaste — vuelve atrás." } },
+        { text: "Di persimpangan, belok kanan.", speechLang: "id-ID", meaning: { ko: "교차로에서 오른쪽으로 도세요.", en: "At the intersection, turn right.", es: "En el cruce, gira a la derecha." }, recallRound: true },
+        { text: "Keluar dari pintu keluar tiga di stasiun.", speechLang: "id-ID", meaning: { ko: "지하철 3번 출구로 나오세요.", en: "Take exit three from the subway.", es: "Toma la salida tres del metro." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "건너기: 'Seberangi ___' / 옆: 'di sebelah ___' / 되돌아가기: 'kembali lagi' / 교차로: 'Di persimpangan, belok ___' / 출구: 'Keluar dari pintu keluar ___'", en: "'Seberangi ___' → cross / 'di sebelah ___' → next to / 'kembali lagi' → go back / 'Di persimpangan, belok ___' → at the intersection / 'Keluar dari pintu keluar ___' → take exit number", es: "'Seberangi ___' → cruzar / 'di sebelah ___' → al lado de / 'kembali lagi' → volver / 'Di persimpangan, belok ___' → en el cruce / 'Keluar dari pintu keluar ___' → tomar la salida" },
+          examples: { ko: "Seberangi jalan di zebra cross. (횡단보도에서 길을 건너세요.)\nRestorannya di sebelah bank. (식당은 은행 옆에 있어요.)\nKeluar dari pintu keluar lima di stasiun. (지하철 5번 출구로 나오세요.)", en: "Seberangi jalan di zebra cross. (Cross the street at the crosswalk.)\nRestorannya di sebelah bank. (The restaurant is next to the bank.)\nKeluar dari pintu keluar lima di stasiun. (Take exit five from the subway.)", es: "Seberangi jalan di zebra cross. (Cruza en el paso de peatones.)\nRestorannya di sebelah bank. (El restaurante está al lado del banco.)\nKeluar dari pintu keluar lima di stasiun. (Toma la salida cinco del metro.)" },
+          mistakes: { ko: "❌ Seberangi di jembatan.\n✅ Seberangi jembatan. ('seberangi' 자체가 '건너다'라서 'di' 안 써도 돼요!)\n\n❌ Tempatnya sebelah minimarket.\n✅ Tempatnya di sebelah minimarket. ('di sebelah'가 한 세트예요, 'di'를 빼면 안 돼요!)", en: "❌ Seberangi di jembatan.\n✅ Seberangi jembatan. ('Seberangi' already means 'cross over' — no 'di' needed!)\n\n❌ Tempatnya sebelah minimarket.\n✅ Tempatnya di sebelah minimarket. ('Di sebelah' is a fixed phrase — don't drop 'di'!)", es: "❌ Seberangi di jembatan.\n✅ Seberangi jembatan. ('Seberangi' ya significa cruzar, no necesitas 'di'.)\n\n❌ Tempatnya sebelah minimarket.\n✅ Tempatnya di sebelah minimarket. ('Di sebelah' es una frase fija, no quites 'di'.)" },
+          rudyTip: { ko: "고급 길 안내의 비밀은 랜드마크야! 'Seberangi jembatan', 'di sebelah bank' — 건물을 기준점으로 쓰면 훨씬 정확한 안내가 돼!", en: "The secret to advanced directions? Landmarks! 'Seberangi jembatan', 'di sebelah bank' — using buildings as reference points makes directions crystal clear!", es: "El secreto de las direcciones avanzadas son los puntos de referencia. 'Seberangi jembatan', 'di sebelah bank' — usar edificios como referencia hace las direcciones mucho más claras." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "___ jembatan.", answer: "Seberangi", options: ["Seberangi", "Belok", "Ambil"], fullSentence: "Seberangi jembatan.", fullSentenceMeaning: { ko: "다리를 건너세요.", en: "Cross the bridge.", es: "Cruza el puente." } },
+          { type: "select", promptWithBlank: "Tempatnya di ___ minimarket.", answer: "sebelah", options: ["sebelah", "dekat", "depan"], fullSentence: "Tempatnya di sebelah minimarket.", fullSentenceMeaning: { ko: "편의점 옆에 있어요.", en: "It's next to the convenience store.", es: "Está al lado de la tienda." } },
+          { type: "select", promptWithBlank: "Anda sudah melewatinya — ___ lagi.", answer: "kembali", options: ["kembali", "maju", "naik"], fullSentence: "Anda sudah melewatinya — kembali lagi.", fullSentenceMeaning: { ko: "지나쳤어요 — 돌아가세요.", en: "You passed it — go back.", es: "Lo pasaste — vuelve atrás." } },
+          { type: "input", promptWithBlank: "Di ___, belok kanan.", answer: "persimpangan", fullSentence: "Di persimpangan, belok kanan.", fullSentenceMeaning: { ko: "교차로에서 오른쪽으로.", en: "At the intersection, turn right.", es: "En el cruce, gira a la derecha." } },
+          { type: "input", promptWithBlank: "Keluar dari pintu ___ tiga di stasiun.", answer: "keluar", fullSentence: "Keluar dari pintu keluar tiga di stasiun.", fullSentenceMeaning: { ko: "지하철 3번 출구로 나오세요.", en: "Take exit three from the subway.", es: "Toma la salida tres del metro." } },
+          { type: "listening", audioText: "Keluar dari pintu keluar tiga di stasiun.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Keluar dari pintu keluar tiga di stasiun.", "Di persimpangan, belok kanan.", "Seberangi jembatan.", "Tempatnya di sebelah minimarket."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 22: Transportation ────────────────────────────────────
@@ -436,6 +535,39 @@ export const LESSON_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "시내___지 얼마예요?", answer: "까", fullSentence: "시내까지 얼마예요?", fullSentenceMeaning: { ko: "시내까지 얼마예요?", en: "How much to the center?", es: "¿Cuánto al centro?" } },
           { type: "input", promptWithBlank: "서울역 ___ 한 장 주세요.", answer: "표", fullSentence: "서울역 표 한 장 주세요.", fullSentenceMeaning: { ko: "서울역 표 한 장.", en: "One ticket to Seoul Station.", es: "Un billete a Seúl." } },
           { type: "listening", audioText: "이 버스 박물관에 가나요?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["이 버스 박물관에 가나요?", "서울역 표 한 장 주세요.", "공항으로 가주세요.", "시내까지 얼마예요?"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Bisakah saya memesan taksi?", speechLang: "id-ID", meaning: { ko: "택시 불러주세요.", en: "Can I get a taxi, please?", es: "¿Me puede llamar un taxi?" } },
+        { text: "Ke bandara, tolong.", speechLang: "id-ID", meaning: { ko: "공항으로 가주세요.", en: "To the airport, please.", es: "Al aeropuerto, por favor." } },
+        { text: "Berapa ongkos ke pusat kota?", speechLang: "id-ID", meaning: { ko: "시내까지 얼마예요?", en: "How much to the city center?", es: "¿Cuánto cuesta ir al centro?" } },
+        { text: "Satu tiket ke Stasiun Seoul, tolong.", speechLang: "id-ID", meaning: { ko: "서울역 표 한 장 주세요.", en: "One ticket to Seoul Station, please.", es: "Un billete para la Estación Central, por favor." }, recallRound: true },
+        { text: "Apakah bus ini ke museum?", speechLang: "id-ID", meaning: { ko: "이 버스 박물관에 가나요?", en: "Does this bus go to the museum?", es: "¿Este autobús va al museo?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "택시: 'Bisakah saya memesan taksi?' / 목적지: 'Ke ___, tolong.' / 가격: 'Berapa ongkos ke ___?' / 표: 'Satu tiket ke ___, tolong.' / 버스 확인: 'Apakah bus ini ke ___?'", en: "'Bisakah saya memesan taksi?' → request / 'Ke ___, tolong.' → destination (literally 'to ___, please') / 'Berapa ongkos ke ___?' → fare / 'Satu tiket ke ___' → buy ticket / 'Apakah bus ini ke ___?' → confirm route", es: "'Bisakah saya memesan taksi?' → pedir taxi / 'Ke ___, tolong.' → destino / 'Berapa ongkos ke ___?' → precio / 'Satu tiket ke ___' → comprar billete / 'Apakah bus ini ke ___?' → confirmar ruta" },
+          examples: { ko: "Bisakah saya memesan taksi ke pusat kota? (시내까지 택시 불러주세요.)\nBerapa ongkos ke stasiun? (역까지 얼마예요?)\nApakah bus ini ke bandara? (이 버스 공항에 가나요?)", en: "Bisakah saya memesan taksi ke pusat kota? (Can I get a taxi to downtown?)\nBerapa ongkos ke stasiun? (How much to the station?)\nApakah bus ini ke bandara? (Does this bus go to the airport?)", es: "Bisakah saya memesan taksi ke pusat kota? (¿Me puede conseguir un taxi al centro?)\nBerapa ongkos ke stasiun? (¿Cuánto cuesta ir a la estación?)\nApakah bus ini ke bandara? (¿Este autobús va al aeropuerto?)" },
+          mistakes: { ko: "❌ Di bandara, tolong.\n✅ Ke bandara, tolong. (목적지는 'ke'(~로)를 써요, 'di'(~에)가 아니에요!)\n\n❌ Apakah ini bus ke museum?\n✅ Apakah bus ini ke museum? (인도네시아어는 명사가 먼저! 'bus ini' = '이 버스')", en: "❌ Di bandara, tolong.\n✅ Ke bandara, tolong. (Use 'ke' (to) for destination, not 'di' (at)!)\n\n❌ Apakah ini bus ke museum?\n✅ Apakah bus ini ke museum? (Noun comes first — 'bus ini' = 'this bus'!)", es: "❌ Di bandara, tolong.\n✅ Ke bandara, tolong. (Usa 'ke' (a/hacia) para destino, no 'di' (en).)\n\n❌ Apakah ini bus ke museum?\n✅ Apakah bus ini ke museum? (El sustantivo va primero: 'bus ini' = 'este autobús'.)" },
+          rudyTip: { ko: "교통수단 인도네시아어의 핵심은 'ke'야! Ke bandara, ke stasiun — 목적지 앞에 항상 'ke'를 붙이면 어디든 갈 수 있어. 택시든 버스든 기차든!", en: "The magic word for Indonesian transport is 'ke'! Ke bandara, ke stasiun — just put 'ke' before your destination and you're good to go, whether it's a taxi, bus, or train!", es: "La palabra mágica del transporte en indonesio es 'ke'. Ke bandara, ke stasiun — solo pon 'ke' antes del destino y listo, ya sea taxi, autobús o tren." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Bisakah saya ___ taksi?", answer: "memesan", options: ["memesan", "pergi", "naik"], fullSentence: "Bisakah saya memesan taksi?", fullSentenceMeaning: { ko: "택시 불러주세요.", en: "Can I get a taxi?", es: "¿Un taxi, por favor?" } },
+          { type: "select", promptWithBlank: "___ bandara, tolong.", answer: "Ke", options: ["Ke", "Di", "Dari"], fullSentence: "Ke bandara, tolong.", fullSentenceMeaning: { ko: "공항으로 가주세요.", en: "To the airport, please.", es: "Al aeropuerto, por favor." } },
+          { type: "select", promptWithBlank: "Apakah bus ini ___ museum?", answer: "ke", options: ["ke", "di", "dari"], fullSentence: "Apakah bus ini ke museum?", fullSentenceMeaning: { ko: "이 버스 박물관에 가나요?", en: "Does this bus go to the museum?", es: "¿Va al museo este bus?" } },
+          { type: "input", promptWithBlank: "Berapa ___ ke pusat kota?", answer: "ongkos", fullSentence: "Berapa ongkos ke pusat kota?", fullSentenceMeaning: { ko: "시내까지 얼마예요?", en: "How much to the center?", es: "¿Cuánto al centro?" } },
+          { type: "input", promptWithBlank: "Satu ___ ke Stasiun Seoul, tolong.", answer: "tiket", fullSentence: "Satu tiket ke Stasiun Seoul, tolong.", fullSentenceMeaning: { ko: "서울역 표 한 장 주세요.", en: "One ticket to Seoul Station.", es: "Un billete a la Estación Central." } },
+          { type: "listening", audioText: "Apakah bus ini ke museum?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Apakah bus ini ke museum?", "Satu tiket ke Stasiun Seoul, tolong.", "Ke bandara, tolong.", "Berapa ongkos ke pusat kota?"], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -546,6 +678,39 @@ export const LESSON_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Permisi, saya tersesat.", speechLang: "id-ID", meaning: { ko: "실례합니다, 길을 잃었어요.", en: "Excuse me, I'm lost.", es: "Perdone, estoy perdido." } },
+        { text: "Bisakah Anda tunjukkan di peta?", speechLang: "id-ID", meaning: { ko: "지도에서 보여주실 수 있나요?", en: "Can you show me on the map?", es: "¿Me puede señalar en el mapa?" } },
+        { text: "Saya tidak tahu daerah ini.", speechLang: "id-ID", meaning: { ko: "이 동네를 잘 몰라요.", en: "I don't know this area.", es: "No conozco esta zona." } },
+        { text: "Ke arah mana stasiun kereta?", speechLang: "id-ID", meaning: { ko: "기차역이 어느 쪽인가요?", en: "Which way is the train station?", es: "¿Por dónde está la estación?" }, recallRound: true },
+        { text: "Apakah ini jalan yang benar ke museum?", speechLang: "id-ID", meaning: { ko: "박물관 가는 길이 맞나요?", en: "Is this the right way to the museum?", es: "¿Voy bien para el museo?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "길 잃음: 'Permisi, saya tersesat.' / 지도: 'Bisakah Anda tunjukkan di peta?' / 방향: 'Ke arah mana ___?' / 확인: 'Apakah ini jalan yang benar ke ___?'", en: "'Permisi, saya tersesat.' → announce / 'Bisakah Anda tunjukkan di peta?' → ask for visual help / 'Ke arah mana ___?' → which way / 'Apakah ini jalan yang benar ke ___?' → confirm path", es: "'Permisi, saya tersesat.' → anunciar / 'Bisakah Anda tunjukkan di peta?' → pedir ayuda visual / 'Ke arah mana ___?' → qué dirección / 'Apakah ini jalan yang benar ke ___?' → confirmar camino" },
+          examples: { ko: "Permisi, saya tersesat. Di mana hotelnya? (실례합니다, 길을 잃었어요. 호텔이 어디예요?)\nBisakah Anda tunjukkan di peta? Saya tidak tahu daerah ini. (지도에서 보여주세요. 이 동네를 몰라요.)\nApakah ini jalan yang benar ke taman? (공원 가는 길이 맞나요?)", en: "Permisi, saya tersesat. Di mana hotelnya? (Excuse me, I'm lost. Where is the hotel?)\nBisakah Anda tunjukkan di peta? (Can you show me on the map?)\nApakah ini jalan yang benar ke taman? (Is this the right way to the park?)", es: "Permisi, saya tersesat. Di mana hotelnya? (Disculpe, estoy perdido. ¿Dónde está el hotel?)\nBisakah Anda tunjukkan di peta? (¿Me puede señalar en el mapa?)\nApakah ini jalan yang benar ke taman? (¿Voy bien para el parque?)" },
+          mistakes: { ko: "❌ Saya tersesat tidak tahu.\n✅ Saya tersesat. ('tersesat' 하나로 '길을 잃다'가 완성돼요!)\n\n❌ Ke mana arah stasiun?\n✅ Ke arah mana stasiun? ('ke arah mana'가 '어느 쪽으로'라는 올바른 어순이에요!)", en: "❌ Saya tersesat tidak tahu.\n✅ Saya tersesat. ('Tersesat' alone fully means 'I'm lost'!)\n\n❌ Ke mana arah stasiun?\n✅ Ke arah mana stasiun? ('Ke arah mana' is the correct order for 'which way to'!)", es: "❌ Saya tersesat tidak tahu.\n✅ Saya tersesat. ('Tersesat' por sí solo significa 'estoy perdido'.)\n\n❌ Ke mana arah stasiun?\n✅ Ke arah mana stasiun? ('Ke arah mana' es el orden correcto para 'hacia qué dirección'.)" },
+          rudyTip: { ko: "낯선 곳에서 당황하지 마! 'Permisi, saya tersesat' 이 한 마디면 사람들이 도와줄 거야. 웃으면서 말하면 효과 두 배!", en: "Don't panic in a strange place! 'Permisi, saya tersesat' — this one sentence will get people helping you. Say it with a smile and the help doubles!", es: "No entres en pánico en un lugar extraño. 'Permisi, saya tersesat' hará que la gente te ayude. Dilo con una sonrisa y la ayuda se duplica." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Permisi, saya ___.", answer: "tersesat", options: ["tersesat", "terlambat", "lelah"], fullSentence: "Permisi, saya tersesat.", fullSentenceMeaning: { ko: "실례합니다, 길을 잃었어요.", en: "Excuse me, I'm lost.", es: "Perdone, estoy perdido." } },
+          { type: "select", promptWithBlank: "Bisakah Anda ___ di peta?", answer: "tunjukkan", options: ["tunjukkan", "katakan", "berikan"], fullSentence: "Bisakah Anda tunjukkan di peta?", fullSentenceMeaning: { ko: "지도에서 보여주실 수 있나요?", en: "Can you show me on the map?", es: "¿Me puede señalar en el mapa?" } },
+          { type: "select", promptWithBlank: "Ke arah ___ stasiun kereta?", answer: "mana", options: ["mana", "apa", "siapa"], fullSentence: "Ke arah mana stasiun kereta?", fullSentenceMeaning: { ko: "기차역이 어느 쪽인가요?", en: "Which way is the station?", es: "¿Por dónde está la estación?" } },
+          { type: "input", promptWithBlank: "Saya tidak ___ daerah ini.", answer: "tahu", fullSentence: "Saya tidak tahu daerah ini.", fullSentenceMeaning: { ko: "이 동네를 잘 몰라요.", en: "I don't know this area.", es: "No conozco esta zona." } },
+          { type: "input", promptWithBlank: "Apakah ini jalan yang ___ ke museum?", answer: "benar", fullSentence: "Apakah ini jalan yang benar ke museum?", fullSentenceMeaning: { ko: "박물관 가는 길이 맞나요?", en: "Is this the right way?", es: "¿Voy bien para el museo?" } },
+          { type: "listening", audioText: "Apakah ini jalan yang benar ke museum?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Apakah ini jalan yang benar ke museum?", "Ke arah mana stasiun kereta?", "Bisakah Anda tunjukkan di peta?", "Permisi, saya tersesat."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 24: Unit 4 Review ─────────────────────────────────────
@@ -649,6 +814,39 @@ export const LESSON_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Di mana stasiun? Belok kiri dan jalan lurus terus.", speechLang: "id-ID", meaning: { ko: "지하철 어디예요? 왼쪽으로 돌아서 직진하세요.", en: "Where is the subway? Turn left and go straight.", es: "¿Dónde está el metro? Gira a la izquierda y sigue recto." } },
+        { text: "Permisi, saya tersesat. Bisa bantu saya?", speechLang: "id-ID", meaning: { ko: "실례합니다, 길을 잃었어요. 도와주시겠어요?", en: "Excuse me, I'm lost. Can you help me?", es: "Perdone, estoy perdido. ¿Me puede ayudar?" } },
+        { text: "Satu tiket ke bandara, tolong. Berapa?", speechLang: "id-ID", meaning: { ko: "공항행 표 한 장 주세요. 얼마예요?", en: "One ticket to the airport, please. How much?", es: "Un billete al aeropuerto. ¿Cuánto?" } },
+        { text: "Seberangi jembatan dan ada di sebelah kanan Anda.", speechLang: "id-ID", meaning: { ko: "다리를 건너면 오른쪽에 있어요.", en: "Cross the bridge and it's on your right.", es: "Cruza el puente y está a tu derecha." }, recallRound: true },
+        { text: "Apakah ada apotek di dekat sini? Sekitar sepuluh menit jalan kaki.", speechLang: "id-ID", meaning: { ko: "근처에 약국 있나요? 걸어서 10분 정도예요.", en: "Is there a pharmacy nearby? About ten minutes on foot.", es: "¿Hay farmacia cerca? Unos diez minutos a pie." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "장소: 'Di mana ___?' / 방향: 'Belok kiri/kanan, Jalan lurus terus' / 고급 방향: 'Seberangi ___, di sebelah ___' / 교통: 'Satu tiket ke ___' / 도움: 'Permisi, saya tersesat'", en: "Places: 'Di mana ___?' / Directions: 'Belok, Jalan lurus terus' / Advanced: 'Seberangi, di sebelah' / Transport: 'Satu tiket ke ___' / Help: 'Permisi, saya tersesat'", es: "Lugares: 'Di mana ___?' / Direcciones: 'Belok, Jalan lurus terus' / Avanzado: 'Seberangi, di sebelah' / Transporte: 'Satu tiket ke ___' / Ayuda: 'Permisi, saya tersesat'" },
+          examples: { ko: "Di mana stasiun? Belok kiri dan jalan lurus terus. (지하철 어디예요? 왼쪽으로 돌아서 직진하세요.)\nSatu tiket ke bandara, tolong. Berapa? (공항행 표 한 장 주세요. 얼마예요?)\nPermisi, saya tersesat. Bisa bantu saya? (실례합니다, 길을 잃었어요. 도와주시겠어요?)", en: "Di mana stasiun? Belok kiri dan jalan lurus terus. (Combining place-finding with directions.)\nSatu tiket ke bandara, tolong. Berapa? (Buying a ticket and asking the price.)\nPermisi, saya tersesat. Bisa bantu saya? (Asking for help when you're lost.)", es: "Di mana stasiun? Belok kiri dan jalan lurus terus. (¿Dónde está el metro? Gira y sigue recto.)\nSatu tiket ke bandara, tolong. Berapa? (Un billete al aeropuerto. ¿Cuánto?)\nPermisi, saya tersesat. Bisa bantu saya? (Perdone, estoy perdido. ¿Me ayuda?)" },
+          mistakes: { ko: "❌ Di mana di stasiun?\n✅ Di mana stasiun? ('di mana' 뒤에 'di' 또 붙이지 마세요!)\n\n❌ Belok ke kiri.\n✅ Belok kiri. ('belok' 다음에 바로 방향 — 'ke' 필요 없어요!)", en: "❌ Di mana di stasiun?\n✅ Di mana stasiun? (No extra 'di' after 'Di mana'!)\n\n❌ Belok ke kiri.\n✅ Belok kiri. (Direction right after 'belok' — no 'ke' needed!)", es: "❌ Di mana di stasiun?\n✅ Di mana stasiun? (Sin 'di' extra después de 'Di mana'.)\n\n❌ Belok ke kiri.\n✅ Belok kiri. (Dirección justo después de 'belok', sin 'ke'.)" },
+          rudyTip: { ko: "이번 주 인도네시아어를 정리하면 딱 다섯 가지야: 장소 찾기(Di mana), 방향 묻기(Belok), 고급 안내(Seberangi/di sebelah), 교통수단(tiket ke), 도움 요청(tersesat). 이 다섯 개를 조합하면 어떤 도시에서든 살아남을 수 있어!", en: "This whole week boils down to five skills in Indonesian: finding places (Di mana), directions (Belok), advanced navigation (Seberangi/di sebelah), transport (tiket ke), and asking for help (tersesat). Combine these five and you can survive any city!", es: "Toda esta semana se resume en cinco habilidades en indonesio: encontrar lugares (Di mana), direcciones (Belok), navegación avanzada (Seberangi/di sebelah), transporte (tiket ke) y pedir ayuda (tersesat). ¡Combínalas y sobrevivirás en cualquier ciudad!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Belok kiri dan jalan ___ terus.", answer: "lurus", options: ["lurus", "kembali", "atas"], fullSentence: "Belok kiri dan jalan lurus terus.", fullSentenceMeaning: { ko: "왼쪽으로 돌아서 직진.", en: "Turn left and go straight.", es: "Gira a la izquierda y sigue recto." } },
+          { type: "select", promptWithBlank: "Permisi, saya ___.", answer: "tersesat", options: ["tersesat", "baik", "lapar"], fullSentence: "Permisi, saya tersesat.", fullSentenceMeaning: { ko: "실례합니다, 길을 잃었어요.", en: "Excuse me, I'm lost.", es: "Perdone, estoy perdido." } },
+          { type: "select", promptWithBlank: "Satu ___ ke bandara.", answer: "tiket", options: ["tiket", "taksi", "bus"], fullSentence: "Satu tiket ke bandara.", fullSentenceMeaning: { ko: "공항행 표 한 장.", en: "One ticket to the airport.", es: "Un billete al aeropuerto." } },
+          { type: "input", promptWithBlank: "___ jembatan.", answer: "Seberangi", fullSentence: "Seberangi jembatan.", fullSentenceMeaning: { ko: "다리를 건너세요.", en: "Cross the bridge.", es: "Cruza el puente." } },
+          { type: "input", promptWithBlank: "Apakah ada apotek di ___ sini?", answer: "dekat", fullSentence: "Apakah ada apotek di dekat sini?", fullSentenceMeaning: { ko: "근처에 약국 있나요?", en: "Pharmacy nearby?", es: "¿Farmacia cerca?" } },
+          { type: "listening", audioText: "Apakah ada apotek di dekat sini? Sekitar sepuluh menit jalan kaki.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Apakah ada apotek di dekat sini? Sekitar sepuluh menit jalan kaki.", "Seberangi jembatan dan ada di sebelah kanan Anda.", "Permisi, saya tersesat.", "Satu tiket ke bandara, tolong."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 };
 
@@ -662,24 +860,28 @@ export const MISSION_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKe
     english: { situation: { ko: "루디 탐정이 정보원이 남긴 암호 지시를 따라 블랙 씨의 은신처를 찾아야 합니다! 장소를 물어가며 목적지를 찾으세요.", en: "Detective Rudy must follow coded directions left by an informant to reach Mr. Black's hideout! Ask about locations to find your way.", es: "¡El detective Rudy debe seguir las instrucciones en clave dejadas por un informante para llegar al escondite del Sr. Black! Pregunta sobre lugares para encontrar el camino." }, gptPrompt: "You are a friendly local playing the role of an informant who left coded directions for Detective Rudy (the user). They must find Mr. Black's hideout by asking about locations. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: 1) they ask where a place is 2) tell them it's near/far 3) mention nearby landmarks (subway station, cafe, museum) 4) tell them walking time. If they struggle, remind them about 'I don't understand' from Unit 1. Keep very simple.", speechLang: "en-GB", suggestedAnswers: ["Where is the hideout?", "Is it far?", "Is there a subway station nearby?", "How far is it?", "It's near the museum, right?", "Thank you!"] },
     spanish: { situation: { ko: "루디 탐정이 정보원의 암호 지시를 따라 블랙 씨의 은신처를 찾아야 합니다!", en: "Detective Rudy follows coded directions to Mr. Black's hideout!", es: "¡El detective Rudy sigue las instrucciones en clave para llegar al escondite del Sr. Black!" }, gptPrompt: "You are a local informant helping Detective Rudy find Mr. Black's hideout. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: asking where places are, near/far, landmarks, walking time. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["¿Dónde está el escondite?", "¿Está lejos?", "¿Hay una estación de metro cerca?", "¿A qué distancia está?", "Está cerca del museo, ¿verdad?", "¡Gracias!"] },
     korean: { situation: { ko: "탐정 루디가 정보원이 남긴 암호 지시를 따라 블랙 씨의 은신처를 찾아야 해요!", en: "Detective Rudy follows coded directions to Mr. Black's hideout!", es: "¡Detective Rudy sigue las instrucciones al escondite del Sr. Black!" }, gptPrompt: "You are a local informant helping Detective Rudy find Mr. Black's hideout. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: asking where places are, near/far, landmarks, walking time. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["은신처가 어디에 있나요?", "멀어요?", "근처에 지하철역이 있나요?", "얼마나 멀어요?", "박물관 근처 맞나요?", "감사합니다!"] },
+    indonesian: { situation: { ko: "탐정 루디가 정보원이 남긴 암호 지시를 따라 블랙 씨의 은신처를 찾아야 해요!", en: "Detective Rudy follows coded directions to Mr. Black's hideout!", es: "¡Detective Rudy sigue las instrucciones al escondite del Sr. Black!" }, gptPrompt: "You are a local informant helping Detective Rudy find Mr. Black's hideout. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: asking where places are ('Di mana ___?'), near/far ('dekat/jauh'), landmarks (stasiun, kafe, museum), and walking time ('berapa menit jalan kaki'). Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Di mana tempat persembunyiannya?", "Apakah jauh?", "Apakah ada stasiun di dekat sini?", "Berapa jauh dari sini?", "Dekat museum, kan?", "Terima kasih!"] },
   },
 
   day_20: {
     english: { situation: { ko: "루디 탐정의 서울 연락원이 블랙 씨의 아지트로 가는 길을 알려주고 있습니다. 2분 안에 이해해야 합니다!", en: "Detective Rudy's Seoul contact is giving directions to Mr. Black's lair. He has 2 minutes to understand!", es: "El contacto de Seúl del detective Rudy da las instrucciones para llegar al refugio del Sr. Black. ¡Tiene 2 minutos!" }, gptPrompt: "You are Detective Rudy's Seoul contact giving directions to Mr. Black's lair. Detective/mystery framing throughout. Simple A1 {targetLang}. Give step-by-step directions using: turn left, turn right, go straight, it's on your left/right. Ask the user to repeat directions back to you. If they get confused, simplify. Keep urgent but friendly.", speechLang: "en-GB", suggestedAnswers: ["Turn left?", "Go straight ahead.", "It's on the right?", "Turn right at the corner.", "I understand!", "Can you say that again?"] },
     spanish: { situation: { ko: "서울 연락원이 블랙 씨의 아지트로 가는 길을 알려줍니다. 빨리 이해해야 해요!", en: "Seoul contact gives directions to Mr. Black's lair. Quick!", es: "El contacto da instrucciones para el refugio del Sr. Black. ¡Rápido!" }, gptPrompt: "You are Detective Rudy's Seoul contact giving directions to Mr. Black's lair. Detective/mystery framing throughout. Simple A1 {targetLang}. Use: gira a la izquierda/derecha, sigue recto, está a tu izquierda/derecha. Ask user to repeat back. Keep urgent but friendly.", speechLang: "es-ES", suggestedAnswers: ["¿Giro a la izquierda?", "Sigo todo recto.", "¿Está a la derecha?", "Giro a la derecha en la esquina.", "¡Entiendo!", "¿Puede repetir?"] },
     korean: { situation: { ko: "탐정 루디의 서울 연락원이 블랙 씨의 아지트로 가는 길을 알려줘요. 빨리 이해해야 해요!", en: "Seoul contact gives directions to Mr. Black's lair. Hurry!", es: "Contacto de Seúl dando instrucciones al refugio del Sr. Black." }, gptPrompt: "You are Detective Rudy's Seoul contact giving directions to Mr. Black's lair. Detective/mystery framing throughout. Simple A1 {targetLang}. Use: 왼쪽/오른쪽으로 돌아요, 직진하세요, 왼쪽/오른쪽에 있어요. Ask user to repeat back. Keep urgent but friendly.", speechLang: "ko-KR", suggestedAnswers: ["왼쪽으로 돌아요?", "직진하세요.", "오른쪽에 있어요?", "모퉁이에서 오른쪽으로요?", "알겠어요!", "다시 한번 말해 주시겠어요?"] },
+    indonesian: { situation: { ko: "탐정 루디의 서울 연락원이 블랙 씨의 아지트로 가는 길을 알려줘요. 빨리 이해해야 해요!", en: "Seoul contact gives directions to Mr. Black's lair. Hurry!", es: "Contacto de Seúl dando instrucciones al refugio del Sr. Black." }, gptPrompt: "You are Detective Rudy's Seoul contact giving directions to Mr. Black's lair. Detective/mystery framing throughout. Simple A1 {targetLang}. Use: 'Belok kiri/kanan', 'Jalan lurus terus', 'Ada di sebelah kiri/kanan'. Ask the user to repeat the directions back to you. Keep urgent but friendly.", speechLang: "id-ID", suggestedAnswers: ["Belok kiri?", "Jalan lurus terus.", "Ada di sebelah kanan?", "Belok kanan di pertigaan?", "Saya mengerti!", "Bisa tolong ulangi?"] },
   },
 
   day_21: {
     english: { situation: { ko: "루디 탐정이 명동에서 용의자를 미행하다가 길을 잃었습니다. 시간이 없어요!", en: "Detective Rudy lost a suspect in Myeongdong and got lost himself. Time is running out!", es: "El detective Rudy perdió a un sospechoso en Myeongdong y se perdió él mismo. ¡Se acaba el tiempo!" }, gptPrompt: "You are a helpful stranger in Myeongdong, Seoul. Detective Rudy (the user) is lost after chasing a suspect. Detective/mystery framing throughout. Simple A1 {targetLang}. Give complex directions: cross the bridge, next to a store, they passed it, at the intersection, take subway exit. Be patient but create mild urgency. If they say 'I don't understand', simplify.", speechLang: "en-GB", suggestedAnswers: ["I'm lost!", "Cross the bridge?", "It's next to the store?", "I passed it?", "Take exit 3?", "Thank you so much!"] },
     spanish: { situation: { ko: "루디 탐정이 명동에서 용의자를 추적하다 길을 잃었어요!", en: "Detective Rudy lost a suspect and got lost in Myeongdong!", es: "¡El detective Rudy perdió un sospechoso y se perdió en Myeongdong!" }, gptPrompt: "You are a helpful stranger in Myeongdong. Detective Rudy (the user) is lost after chasing a suspect. Detective/mystery framing throughout. Simple A1 {targetLang}. Give directions using: cruza, al lado de, lo pasaste, en el cruce, salida del metro. Be patient. If they say 'No entiendo', simplify.", speechLang: "es-ES", suggestedAnswers: ["¡Estoy perdido!", "¿Cruzo el puente?", "¿Al lado de la tienda?", "¿Lo pasé?", "¿Salida 3?", "¡Muchas gracias!"] },
     korean: { situation: { ko: "탐정 루디가 명동에서 용의자를 추적하다 길을 잃었어요. 시간이 없어요!", en: "Detective Rudy lost a suspect and got lost in Myeongdong! No time!", es: "¡Detective Rudy perdido en Myeongdong tras perder al sospechoso!" }, gptPrompt: "You are a helpful stranger in Myeongdong. Detective Rudy (the user) is lost after chasing a suspect. Detective/mystery framing throughout. Simple A1 {targetLang}. Use: 건너세요, 옆에, 지나쳤어요, 교차로에서, 출구로. Be patient. If they say '이해를 못 했어요', simplify.", speechLang: "ko-KR", suggestedAnswers: ["길을 잃었어요!", "다리를 건너요?", "편의점 옆이요?", "지나쳤어요?", "3번 출구요?", "정말 감사합니다!"] },
+    indonesian: { situation: { ko: "탐정 루디가 명동에서 용의자를 추적하다 길을 잃었어요. 시간이 없어요!", en: "Detective Rudy lost a suspect and got lost in Myeongdong! No time!", es: "¡Detective Rudy perdido en Myeongdong tras perder al sospechoso!" }, gptPrompt: "You are a helpful stranger in Myeongdong. Detective Rudy (the user) is lost after chasing a suspect. Detective/mystery framing throughout. Simple A1 {targetLang}. Give directions using: 'Seberangi jembatan', 'di sebelah toko', 'Anda sudah melewatinya', 'di persimpangan', 'pintu keluar'. Be patient. If they say 'Saya tidak mengerti', simplify.", speechLang: "id-ID", suggestedAnswers: ["Saya tersesat!", "Seberangi jembatan?", "Di sebelah minimarket?", "Saya sudah melewatinya?", "Pintu keluar tiga?", "Terima kasih banyak!"] },
   },
 
   day_22: {
     english: { situation: { ko: "카이로 공항입니다. 루디 탐정이 용의자를 따라잡으려면 빨리 시내로 가야 합니다!", en: "Cairo Airport. Detective Rudy must get downtown fast to catch a suspect!", es: "Aeropuerto de El Cairo. ¡El detective Rudy debe llegar al centro rápido para atrapar a un sospechoso!" }, gptPrompt: "You are a taxi driver at Cairo airport. Detective Rudy (the user) needs to get downtown quickly to catch a suspect. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: 1) getting a taxi 2) saying destination 3) asking price 4) then switch to a ticket booth for bus/train tickets. Create two mini-scenarios: taxi first, then public transport. Mix in numbers from Unit 2 for prices.", speechLang: "en-GB", suggestedAnswers: ["Can I get a taxi?", "To the city center, please.", "How much?", "That's too expensive!", "One ticket, please.", "Does this bus go downtown?"] },
     spanish: { situation: { ko: "카이로 공항에서 용의자를 잡으러 빨리 시내로 가야 해요!", en: "Cairo Airport. Catch the suspect downtown, fast!", es: "Aeropuerto de El Cairo. ¡Atrapa al sospechoso en el centro, rápido!" }, gptPrompt: "You are a taxi driver at Cairo airport. Detective Rudy (the user) needs downtown quickly to catch a suspect. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: taxi, destination, price, then bus/train tickets. Mix in numbers for prices.", speechLang: "es-ES", suggestedAnswers: ["¿Un taxi, por favor?", "Al centro, por favor.", "¿Cuánto cuesta?", "¡Muy caro!", "Un billete, por favor.", "¿Este autobús va al centro?"] },
     korean: { situation: { ko: "카이로 공항! 탐정 루디가 용의자를 잡으러 빨리 시내로 가야 해요!", en: "Cairo Airport! Detective Rudy must get downtown to catch the suspect!", es: "¡Aeropuerto! ¡Detective Rudy al centro a por el sospechoso!" }, gptPrompt: "You are a taxi driver at Cairo airport. Detective Rudy (the user) needs downtown quickly to catch a suspect. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: 택시, destination, price, then 표 for bus/train. Mix numbers.", speechLang: "ko-KR", suggestedAnswers: ["택시 불러주세요.", "시내로 가주세요.", "얼마예요?", "너무 비싸요!", "표 한 장 주세요.", "이 버스 시내에 가나요?"] },
+    indonesian: { situation: { ko: "카이로 공항! 탐정 루디가 용의자를 잡으러 빨리 시내로 가야 해요!", en: "Cairo Airport! Detective Rudy must get downtown to catch the suspect!", es: "¡Aeropuerto! ¡Detective Rudy al centro a por el sospechoso!" }, gptPrompt: "You are a taxi driver at Cairo airport. Detective Rudy (the user) needs downtown quickly to catch a suspect. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: getting a taksi ('Bisakah saya memesan taksi?'), destination ('Ke ___, tolong'), price ('Berapa ongkos?'), then switch to a ticket booth for 'tiket' (bus/train). Mix in numbers for prices.", speechLang: "id-ID", suggestedAnswers: ["Bisakah saya memesan taksi?", "Ke pusat kota, tolong.", "Berapa ongkosnya?", "Terlalu mahal!", "Satu tiket, tolong.", "Apakah bus ini ke pusat kota?"] },
   },
 
   day_23: {

@@ -134,6 +134,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Nice to meet you.", es: "Encantado de conocerle.", ko: "만나서 반가워요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Ini keluarga saya.", speechLang: "id-ID", meaning: { ko: "이것은 제 가족이에요.", en: "This is my family.", es: "Esta es mi familia." } },
+        { text: "Saya punya dua saudara laki-laki dan satu saudara perempuan.", speechLang: "id-ID", meaning: { ko: "저는 형제 둘과 자매 하나가 있어요.", en: "I have two brothers and one sister.", es: "Tengo dos hermanos y una hermana." } },
+        { text: "Ibu saya seorang guru.", speechLang: "id-ID", meaning: { ko: "어머니는 선생님.", en: "My mother is a teacher.", es: "Mi madre es profesora." } },
+        { text: "Ayah saya bekerja di rumah sakit.", speechLang: "id-ID", meaning: { ko: "아버지는 병원에서 일해요.", en: "My father works at a hospital.", es: "Mi padre trabaja en un hospital." }, recallRound: true },
+        { text: "Apakah Anda punya anak?", speechLang: "id-ID", meaning: { ko: "자녀가 있으세요?", en: "Do you have any children?", es: "¿Tienes hijos?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "가족 소개: 'Ini ___ saya' / 가족 수: 'Saya punya ___' / 직업: '___ saya seorang ___' 또는 'bekerja di ___'", en: "'Ini ___ saya' → introduce family / 'Saya punya ___' → count / '___ saya seorang ___' or 'bekerja di ___' → jobs", es: "'Ini ___ saya' → presentar familia / 'Saya punya ___' → contar / '___ saya seorang ___' o 'bekerja di ___' → trabajos" },
+          examples: { ko: "Ini ibu saya. / Saya punya satu saudara perempuan dan dua saudara laki-laki. / Ayah saya bekerja di bank.", en: "Ini ibu saya. / Saya punya satu saudara perempuan dan dua saudara laki-laki. / Ayah saya bekerja di bank.", es: "Ini ibu saya. / Saya punya satu saudara perempuan dan dua saudara laki-laki. / Ayah saya bekerja di bank." },
+          mistakes: { ko: "❌ Ini saya keluarga.\n✅ Ini keluarga saya.\n\n❌ Ibu saya guru adalah.\n✅ Ibu saya seorang guru.", en: "❌ Ini saya keluarga.\n✅ Ini keluarga saya. (possessor 'saya' comes after the noun)\n\n❌ Ibu saya adalah guru. (too formal/stiff)\n✅ Ibu saya seorang guru. ('seorang' is the natural classifier)", es: "❌ Ini saya keluarga.\n✅ Ini keluarga saya. (el posesivo 'saya' va después del sustantivo)\n\n❌ Ibu saya adalah guru.\n✅ Ibu saya seorang guru. ('seorang' es el clasificador natural)" },
+          rudyTip: { ko: "인도네시아어는 '소유자'가 명사 뒤에 와! '제 가족'은 'keluarga saya' (가족+제). 직업 앞에는 'seorang'을 붙이면 자연스러워~", en: "In Indonesian the owner comes AFTER the noun! 'My family' = 'keluarga saya' (family-my). Add 'seorang' before a job and it sounds just right!", es: "¡En indonesio el poseedor va DESPUÉS del sustantivo! 'Mi familia' = 'keluarga saya'. Pon 'seorang' antes del trabajo y suena natural." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Ini ___ saya.", answer: "keluarga", options: ["keluarga", "teman", "rumah"], fullSentence: "Ini keluarga saya.", fullSentenceMeaning: { ko: "이것은 제 가족.", en: "This is my family.", es: "Esta es mi familia." } },
+          { type: "select", promptWithBlank: "Saya punya dua ___ dan satu saudara perempuan.", answer: "saudara laki-laki", options: ["saudara laki-laki", "teman", "guru"], fullSentence: "Saya punya dua saudara laki-laki dan satu saudara perempuan.", fullSentenceMeaning: { ko: "형제 둘, 자매 하나.", en: "Two brothers, one sister.", es: "Dos hermanos, una hermana." } },
+          { type: "select", promptWithBlank: "Ibu saya seorang ___.", answer: "guru", options: ["guru", "pelajar", "dokter"], fullSentence: "Ibu saya seorang guru.", fullSentenceMeaning: { ko: "어머니는 선생님.", en: "My mother is a teacher.", es: "Mi madre es profesora." } },
+          { type: "input", promptWithBlank: "Ayah saya ___ di rumah sakit.", answer: "bekerja", fullSentence: "Ayah saya bekerja di rumah sakit.", fullSentenceMeaning: { ko: "아버지는 병원에서 일해요.", en: "Father works at hospital.", es: "Padre trabaja en hospital." } },
+          { type: "input", promptWithBlank: "Apakah Anda punya ___?", answer: "anak", fullSentence: "Apakah Anda punya anak?", fullSentenceMeaning: { ko: "자녀가 있으세요?", en: "Do you have children?", es: "¿Tienes hijos?" } },
+          { type: "listening", audioText: "Apakah Anda punya anak?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Apakah Anda punya anak?", "Ini keluarga saya.", "Saya punya dua saudara laki-laki dan satu saudara perempuan.", "Ibu saya seorang guru."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "My name is Rudy.", es: "Mi nombre es Rudy.", ko: "제 이름은 루디예요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Nice to meet you.", es: "Encantado de conocerle.", ko: "만나서 반가워요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 26: Describing People ───────────────────────────────
@@ -230,6 +263,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "___ 쓴 남자가 선생님이에요.", answer: "안경", fullSentence: "안경 쓴 남자가 선생님이에요.", fullSentenceMeaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is teacher.", es: "Hombre con gafas, profesor." } },
           { type: "input", promptWithBlank: "그녀는 키가 크고 ___가 길어요.", answer: "머리", fullSentence: "그녀는 키가 크고 머리가 길어요.", fullSentenceMeaning: { ko: "그녀는 키가 크고 머리가 길어요.", en: "She is very tall and has long hair.", es: "Ella es muy alta y tiene el pelo largo." } },
           { type: "listening", audioText: "그녀는 키가 크고 머리가 길어요.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["그녀는 키가 크고 머리가 길어요.", "그는 파란색 재킷을 입고 있어요.", "제 친구는 매우 친절해요.", "안경 쓴 남자가 제 선생님이에요."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "That's fifteen dollars, please.", es: "Son quince dólares, por favor.", ko: "15달러예요." }, fromDay: 6, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "How much does it cost?", es: "¿Cuánto cuesta?", ko: "얼마예요?" }, fromDay: 6, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Dia tinggi dan berambut panjang.", speechLang: "id-ID", meaning: { ko: "그녀는 키가 크고 머리카락이 길어요.", en: "She is tall and has long hair.", es: "Ella es alta y tiene el pelo largo." } },
+        { text: "Dia memakai jaket biru.", speechLang: "id-ID", meaning: { ko: "그는 파란색 재킷을 입고 있어요.", en: "He is wearing a blue jacket.", es: "Él lleva una chaqueta azul." } },
+        { text: "Teman saya sangat baik.", speechLang: "id-ID", meaning: { ko: "제 친구는 매우 친절해요.", en: "My friend is very kind.", es: "Mi amigo es muy amable." } },
+        { text: "Pria berkacamata itu guru saya.", speechLang: "id-ID", meaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is my teacher.", es: "Hombre con gafas es mi profesor." }, recallRound: true },
+        { text: "Dia sangat tinggi dan berambut panjang.", speechLang: "id-ID", meaning: { ko: "그녀는 키가 크고 머리가 길어요.", en: "She is very tall and has long hair.", es: "Ella es muy alta y tiene el pelo largo." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "외모: 'Dia tinggi/pendek' / 옷: 'memakai ___' / 특징: 'pria/wanita ber___ itu' / 성격: 'sangat ___'", en: "'Dia tinggi/pendek' → appearance / 'memakai ___' → clothes / 'pria/wanita ber___ itu' → identifying features / 'sangat ___' → personality", es: "'Dia tinggi/pendek' → apariencia / 'memakai ___' → ropa / 'pria/wanita ber___ itu' → rasgos / 'sangat ___' → personalidad" },
+          examples: { ko: "Dia tinggi dan berambut cokelat. / Dia memakai kemeja merah. / Wanita bertopi itu teman saya.", en: "Dia tinggi dan berambut cokelat. / Dia memakai kemeja merah. / Wanita bertopi itu teman saya.", es: "Dia tinggi dan berambut cokelat. / Dia memakai kemeja merah. / Wanita bertopi itu teman saya." },
+          mistakes: { ko: "❌ Dia memakai jaket biru tinggi.\n✅ Dia tinggi dan memakai jaket biru.\n\n❌ Dia adalah rambut panjang.\n✅ Dia berambut panjang.", en: "❌ Dia adalah rambut panjang.\n✅ Dia berambut panjang. (use the ber- prefix, not 'adalah')\n\n❌ Pria kacamata itu.\n✅ Pria berkacamata itu. ('ber-' = 'with/wearing')", es: "❌ Dia adalah rambut panjang.\n✅ Dia berambut panjang. (usa el prefijo ber-, no 'adalah')\n\n❌ Pria kacamata itu.\n✅ Pria berkacamata itu. ('ber-' = 'con/que lleva')" },
+          rudyTip: { ko: "인도네시아어 묘사의 마법 접두사 'ber-'! 'berambut'(머리카락이 있는), 'berkacamata'(안경 쓴) — 명사 앞에 ber-만 붙이면 '~를 가진/쓴'이 돼!", en: "Indonesian's magic prefix is 'ber-'! 'berambut' (having hair), 'berkacamata' (wearing glasses) — just add ber- to a noun for 'with/wearing'!", es: "El prefijo mágico es 'ber-': 'berambut' (con cabello), 'berkacamata' (con gafas). Solo añade ber- a un sustantivo para decir 'con/que lleva'." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Dia tinggi dan ber___ panjang.", answer: "rambut", options: ["rambut", "mata", "tangan"], fullSentence: "Dia tinggi dan berambut panjang.", fullSentenceMeaning: { ko: "키 크고 머리 길어요.", en: "Tall with long hair.", es: "Alta con pelo largo." } },
+          { type: "select", promptWithBlank: "Dia ___ jaket biru.", answer: "memakai", options: ["memakai", "punya", "membuat"], fullSentence: "Dia memakai jaket biru.", fullSentenceMeaning: { ko: "파란 재킷 입고 있어요.", en: "Wearing a blue jacket.", es: "Lleva chaqueta azul." } },
+          { type: "select", promptWithBlank: "Teman saya sangat ___.", answer: "baik", options: ["baik", "tinggi", "biru"], fullSentence: "Teman saya sangat baik.", fullSentenceMeaning: { ko: "친구는 매우 친절해요.", en: "My friend is very kind.", es: "Mi amigo es muy amable." } },
+          { type: "input", promptWithBlank: "Pria ber___ itu guru saya.", answer: "kacamata", fullSentence: "Pria berkacamata itu guru saya.", fullSentenceMeaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is teacher.", es: "Hombre con gafas es profesor." } },
+          { type: "input", promptWithBlank: "Dia sangat ___ dan berambut panjang.", answer: "tinggi", fullSentence: "Dia sangat tinggi dan berambut panjang.", fullSentenceMeaning: { ko: "그녀는 키가 크고 머리가 길어요.", en: "She is very tall and has long hair.", es: "Ella es muy alta y tiene el pelo largo." } },
+          { type: "listening", audioText: "Dia sangat tinggi dan berambut panjang.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Dia sangat tinggi dan berambut panjang.", "Dia memakai jaket biru.", "Teman saya sangat baik.", "Pria berkacamata itu guru saya."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -340,6 +406,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Are you hungry?", es: "¿Tienes hambre?", ko: "배고프세요?" }, fromDay: 11, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Apa yang Anda suka lakukan di waktu luang?", speechLang: "id-ID", meaning: { ko: "여가 시간에 뭘 좋아하세요?", en: "What do you like to do in your free time?", es: "¿Qué te gusta hacer en tu tiempo libre?" } },
+        { text: "Saya suka membaca buku dan menonton film.", speechLang: "id-ID", meaning: { ko: "저는 책 읽기와 영화 보기를 좋아해요.", en: "I like reading books and watching movies.", es: "Me gusta leer libros y ver películas." } },
+        { text: "Apakah Anda berolahraga?", speechLang: "id-ID", meaning: { ko: "스포츠를 하세요?", en: "Do you play any sports?", es: "¿Practicas algún deporte?" } },
+        { text: "Saya bermain sepak bola setiap akhir pekan.", speechLang: "id-ID", meaning: { ko: "매주 주말 축구해요.", en: "I play football every weekend.", es: "Juego al fútbol cada fin de semana." }, recallRound: true },
+        { text: "Hobi saya memasak.", speechLang: "id-ID", meaning: { ko: "취미는 요리.", en: "My hobby is cooking.", es: "Mi hobby es cocinar." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "취미 질문: 'Apa yang Anda suka lakukan?' / 대답: 'Saya suka + 동사' / 스포츠: 'Saya bermain ___' / 취미: 'Hobi saya ___'", en: "'Apa yang Anda suka lakukan?' → ask hobbies / 'Saya suka + verb' → answer / 'Saya bermain ___' → sports / 'Hobi saya ___' → hobbies", es: "'Apa yang Anda suka lakukan?' → preguntar hobbies / 'Saya suka + verbo' → responder / 'Saya bermain ___' → deportes / 'Hobi saya ___' → hobbies" },
+          examples: { ko: "Saya suka berenang di musim panas. / Saya bermain tenis pada hari Sabtu. / Hobi saya menggambar.", en: "Saya suka berenang di musim panas. / Saya bermain tenis pada hari Sabtu. / Hobi saya menggambar.", es: "Saya suka berenang di musim panas. / Saya bermain tenis pada hari Sabtu. / Hobi saya menggambar." },
+          mistakes: { ko: "❌ Saya suka berenang berenang.\n✅ Saya suka berenang.\n\n❌ Saya bermain memasak.\n✅ Hobi saya memasak.", en: "❌ Saya suka untuk berenang. (don't add 'untuk' here)\n✅ Saya suka berenang. (verb goes straight after 'suka')\n\n❌ Saya bermain memasak.\n✅ Hobi saya memasak. ('bermain' is for sports/games, not cooking)", es: "❌ Saya suka untuk berenang.\n✅ Saya suka berenang. (el verbo va justo después de 'suka')\n\n❌ Saya bermain memasak.\n✅ Hobi saya memasak. ('bermain' es para deportes, no cocinar)" },
+          rudyTip: { ko: "'Saya suka' 뒤에는 바로 동사! 'suka membaca'(읽기 좋아해), 'suka menonton'(보기 좋아해). 운동은 'bermain', 취미는 'Hobi saya'로 말해~", en: "After 'Saya suka', the verb comes straight in: 'suka membaca' (like reading), 'suka menonton' (like watching). Use 'bermain' for sports, 'Hobi saya' for hobbies!", es: "Después de 'Saya suka' va el verbo directo: 'suka membaca', 'suka menonton'. Usa 'bermain' para deportes y 'Hobi saya' para hobbies." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Apa yang Anda suka ___ di waktu luang?", answer: "lakukan", options: ["lakukan", "pergi", "buat"], fullSentence: "Apa yang Anda suka lakukan di waktu luang?", fullSentenceMeaning: { ko: "여가에 뭘 좋아하세요?", en: "What do you like to do?", es: "¿Qué te gusta hacer?" } },
+          { type: "select", promptWithBlank: "Saya suka ___ buku.", answer: "membaca", options: ["membaca", "bermain", "memakai"], fullSentence: "Saya suka membaca buku.", fullSentenceMeaning: { ko: "책 읽기를 좋아해요.", en: "I like reading books.", es: "Me gusta leer libros." } },
+          { type: "select", promptWithBlank: "Saya ___ sepak bola setiap akhir pekan.", answer: "bermain", options: ["bermain", "membaca", "memasak"], fullSentence: "Saya bermain sepak bola setiap akhir pekan.", fullSentenceMeaning: { ko: "매주 주말 축구해요.", en: "I play football every weekend.", es: "Juego al fútbol cada fin de semana." } },
+          { type: "input", promptWithBlank: "Apakah Anda ber___?", answer: "olahraga", fullSentence: "Apakah Anda berolahraga?", fullSentenceMeaning: { ko: "스포츠 하세요?", en: "Do you play sports?", es: "¿Practicas deportes?" } },
+          { type: "input", promptWithBlank: "___ saya memasak.", answer: "Hobi", fullSentence: "Hobi saya memasak.", fullSentenceMeaning: { ko: "취미는 요리.", en: "My hobby is cooking.", es: "Mi hobby es cocinar." } },
+          { type: "listening", audioText: "Hobi saya memasak.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Hobi saya memasak.", "Apa yang Anda suka lakukan di waktu luang?", "Saya suka membaca buku dan menonton film.", "Apakah Anda berolahraga?"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "I would like to order, please.", es: "Quisiera pedir, por favor.", ko: "주문할게요." }, fromDay: 11, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Are you hungry?", es: "¿Tienes hambre?", ko: "배고프세요?" }, fromDay: 11, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 28: Feelings & Emotions ─────────────────────────────
@@ -436,6 +535,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "괜찮아요? ___되어 보여요.", answer: "걱정", fullSentence: "괜찮아요? 걱정되어 보여요.", fullSentenceMeaning: { ko: "괜찮아? 걱정돼 보여.", en: "OK? Look worried.", es: "¿Bien? Preocupado." } },
           { type: "input", promptWithBlank: "여행이 너무 ___요!", answer: "기대돼", fullSentence: "여행이 너무 기대돼요!", fullSentenceMeaning: { ko: "여행이 기대돼!", en: "So excited about the trip!", es: "¡Emocionado por el viaje!" } },
           { type: "listening", audioText: "여행이 너무 기대돼요!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["여행이 너무 기대돼요!", "오늘 기분이 어떠세요?", "오늘 매우 행복해요.", "하루 종일 일해서 피곤해요."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Where is the subway station?", es: "¿Dónde está la estación de metro?", ko: "지하철역이 어디에 있나요?" }, fromDay: 19, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "How far is it?", es: "¿A qué distancia está?", ko: "얼마나 멀어요?" }, fromDay: 19, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Bagaimana perasaan Anda hari ini?", speechLang: "id-ID", meaning: { ko: "오늘 기분이 어떠세요?", en: "How are you feeling today?", es: "¿Cómo te sientes hoy?" } },
+        { text: "Saya sangat senang hari ini.", speechLang: "id-ID", meaning: { ko: "오늘 매우 행복해요.", en: "I am very happy today.", es: "Estoy muy feliz hoy." } },
+        { text: "Saya lelah karena bekerja seharian.", speechLang: "id-ID", meaning: { ko: "하루 종일 일해서 피곤해요.", en: "I am tired because I worked all day.", es: "Estoy cansado porque trabajé todo el día." } },
+        { text: "Apakah Anda baik-baik saja? Anda terlihat khawatir.", speechLang: "id-ID", meaning: { ko: "괜찮아요? 걱정돼 보여요.", en: "Are you okay? You look worried.", es: "¿Estás bien? Pareces preocupado." }, recallRound: true },
+        { text: "Saya senang sekali soal perjalanan ini!", speechLang: "id-ID", meaning: { ko: "여행이 기대돼요!", en: "I am excited about the trip!", es: "¡Estoy emocionado por el viaje!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "감정 질문: 'Bagaimana perasaan Anda?' / 대답: 'Saya ___' / 이유: 'karena ___' / 상대 감정: 'Anda terlihat ___'", en: "'Bagaimana perasaan Anda?' → ask feelings / 'Saya ___' → express feelings / 'karena ___' → give reason / 'Anda terlihat ___' → observe others", es: "'Bagaimana perasaan Anda?' → preguntar sentimientos / 'Saya ___' → expresar / 'karena ___' → razón / 'Anda terlihat ___' → observar" },
+          examples: { ko: "Saya lelah karena kurang tidur. / Anda terlihat senang hari ini! / Saya senang soal pesta itu.", en: "Saya lelah karena kurang tidur. / Anda terlihat senang hari ini! / Saya senang soal pesta itu.", es: "Saya lelah karena kurang tidur. / Anda terlihat senang hari ini! / Saya senang soal pesta itu." },
+          mistakes: { ko: "❌ Saya adalah senang.\n✅ Saya senang.\n\n❌ Saya lelah karena karena bekerja.\n✅ Saya lelah karena bekerja.", en: "❌ Saya adalah senang.\n✅ Saya senang. (no 'adalah' before adjectives/feelings)\n\n❌ Saya lelah sebab karena bekerja.\n✅ Saya lelah karena bekerja. ('karena' alone = 'because')", es: "❌ Saya adalah senang.\n✅ Saya senang. (sin 'adalah' antes de adjetivos)\n\n❌ Saya lelah sebab karena bekerja.\n✅ Saya lelah karena bekerja. ('karena' solo = 'porque')" },
+          rudyTip: { ko: "감정 말할 때는 'adalah' 빼고 바로! 'Saya senang'(행복해), 'Saya lelah'(피곤해). 이유는 'karena' 하나면 끝! 'lelah karena bekerja'(일해서 피곤해)~", en: "For feelings, drop 'adalah' and go straight in! 'Saya senang' (happy), 'Saya lelah' (tired). One word 'karena' gives the reason: 'lelah karena bekerja' (tired because I worked)!", es: "Para sentimientos, quita 'adalah' y ve directo: 'Saya senang', 'Saya lelah'. Una palabra, 'karena', da la razón: 'lelah karena bekerja'." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Bagaimana ___ Anda hari ini?", answer: "perasaan", options: ["perasaan", "cuaca", "nama"], fullSentence: "Bagaimana perasaan Anda hari ini?", fullSentenceMeaning: { ko: "오늘 기분 어때?", en: "How are you feeling?", es: "¿Cómo te sientes?" } },
+          { type: "select", promptWithBlank: "Saya sangat ___ hari ini.", answer: "senang", options: ["senang", "tinggi", "biru"], fullSentence: "Saya sangat senang hari ini.", fullSentenceMeaning: { ko: "오늘 매우 행복해요.", en: "I am very happy.", es: "Estoy muy feliz." } },
+          { type: "select", promptWithBlank: "Saya lelah ___ bekerja seharian.", answer: "karena", options: ["karena", "tetapi", "dan"], fullSentence: "Saya lelah karena bekerja seharian.", fullSentenceMeaning: { ko: "일해서 피곤해요.", en: "Tired because I worked.", es: "Cansado porque trabajé." } },
+          { type: "input", promptWithBlank: "Apakah Anda baik-baik saja? Anda terlihat ___.", answer: "khawatir", fullSentence: "Apakah Anda baik-baik saja? Anda terlihat khawatir.", fullSentenceMeaning: { ko: "괜찮아요? 걱정돼 보여요.", en: "OK? You look worried.", es: "¿Bien? Pareces preocupado." } },
+          { type: "input", promptWithBlank: "Saya ___ sekali soal perjalanan ini!", answer: "senang", fullSentence: "Saya senang sekali soal perjalanan ini!", fullSentenceMeaning: { ko: "여행이 기대돼요!", en: "Excited about the trip!", es: "¡Emocionado por el viaje!" } },
+          { type: "listening", audioText: "Saya senang sekali soal perjalanan ini!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Saya senang sekali soal perjalanan ini!", "Bagaimana perasaan Anda hari ini?", "Saya sangat senang hari ini.", "Saya lelah karena bekerja seharian."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -546,6 +678,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Apakah Anda ada waktu akhir pekan ini?", speechLang: "id-ID", meaning: { ko: "이번 주말에 시간 있어요?", en: "Are you free this weekend?", es: "¿Estás libre este fin de semana?" } },
+        { text: "Mari bertemu di kafe jam tiga.", speechLang: "id-ID", meaning: { ko: "3시에 카페에서 만나요.", en: "Let's meet at the cafe at three o'clock.", es: "Encontrémonos en el café a las tres." } },
+        { text: "Apakah Anda mau pergi ke bioskop?", speechLang: "id-ID", meaning: { ko: "영화관에 갈래요?", en: "Would you like to go to the cinema?", es: "¿Te gustaría ir al cine?" } },
+        { text: "Maaf, saya tidak bisa. Saya ada acara.", speechLang: "id-ID", meaning: { ko: "미안, 안 돼요. 약속 있어요.", en: "Sorry, I can't. I have plans.", es: "Lo siento, no puedo. Tengo planes." }, recallRound: true },
+        { text: "Kedengarannya bagus! Sampai jumpa di sana.", speechLang: "id-ID", meaning: { ko: "좋아요! 거기서 봐요.", en: "That sounds great! See you there.", es: "¡Suena genial! Nos vemos allí." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "시간 확인: 'Apakah Anda ada waktu ___?' / 제안: 'Mari ___' 또는 'Apakah Anda mau ___?' / 거절: 'Maaf, saya tidak bisa' / 수락: 'Kedengarannya bagus!'", en: "'Apakah Anda ada waktu ___?' → check availability / 'Mari ___' or 'Apakah Anda mau ___?' → suggest / 'Maaf, saya tidak bisa' → decline / 'Kedengarannya bagus!' → accept", es: "'Apakah Anda ada waktu ___?' → disponibilidad / 'Mari ___' o 'Apakah Anda mau ___?' → sugerir / 'Maaf, saya tidak bisa' → rechazar / 'Kedengarannya bagus!' → aceptar" },
+          examples: { ko: "Apakah Anda ada waktu hari Sabtu? / Mari pergi ke taman bersama. / Apakah Anda mau makan siang?", en: "Apakah Anda ada waktu hari Sabtu? / Mari pergi ke taman bersama. / Apakah Anda mau makan siang?", es: "Apakah Anda ada waktu hari Sabtu? / Mari pergi ke taman bersama. / Apakah Anda mau makan siang?" },
+          mistakes: { ko: "❌ Mari untuk bertemu di kafe.\n✅ Mari bertemu di kafe.\n\n❌ Apakah Anda mau ke bioskop pergi?\n✅ Apakah Anda mau pergi ke bioskop?", en: "❌ Mari untuk bertemu di kafe.\n✅ Mari bertemu di kafe. (no 'untuk' after 'Mari')\n\n❌ Apakah Anda mau ke bioskop pergi?\n✅ Apakah Anda mau pergi ke bioskop? (verb 'pergi' comes before the place)", es: "❌ Mari untuk bertemu di kafe.\n✅ Mari bertemu di kafe. (sin 'untuk' después de 'Mari')\n\n❌ Apakah Anda mau ke bioskop pergi?\n✅ Apakah Anda mau pergi ke bioskop? (el verbo 'pergi' va antes del lugar)" },
+          rudyTip: { ko: "약속 잡기 3단계! 1) 'ada waktu?'(시간 있어?) 2) 'Mari ___!'(~하자!) 3) OK면 'Kedengarannya bagus!', 안 되면 'Maaf, saya tidak bisa'. 'Mari'는 '~하자'라는 권유 표현이야~", en: "Three steps to plans! 1) 'ada waktu?' (free?) 2) 'Mari ___!' (let's ___!) 3) Yes = 'Kedengarannya bagus!', no = 'Maaf, saya tidak bisa'. 'Mari' is the friendly 'let's'!", es: "¡Tres pasos! 1) 'ada waktu?' (¿libre?) 2) 'Mari ___!' (¡vamos a ___!) 3) Sí = 'Kedengarannya bagus!', no = 'Maaf, saya tidak bisa'. 'Mari' es el 'vamos a' amistoso." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Apakah Anda ada ___ akhir pekan ini?", answer: "waktu", options: ["waktu", "uang", "makanan"], fullSentence: "Apakah Anda ada waktu akhir pekan ini?", fullSentenceMeaning: { ko: "이번 주말 시간 있어?", en: "Free this weekend?", es: "¿Libre este fin de semana?" } },
+          { type: "select", promptWithBlank: "___ bertemu di kafe.", answer: "Mari", options: ["Mari", "Saya", "Anda"], fullSentence: "Mari bertemu di kafe.", fullSentenceMeaning: { ko: "카페에서 만나요.", en: "Let's meet at the cafe.", es: "Encontrémonos en el café." } },
+          { type: "select", promptWithBlank: "Apakah Anda mau ___ ke bioskop?", answer: "pergi", options: ["pergi", "makan", "tidur"], fullSentence: "Apakah Anda mau pergi ke bioskop?", fullSentenceMeaning: { ko: "영화관에 갈래요?", en: "Like to go to the cinema?", es: "¿Ir al cine?" } },
+          { type: "input", promptWithBlank: "Maaf, saya tidak ___. Saya ada acara.", answer: "bisa", fullSentence: "Maaf, saya tidak bisa. Saya ada acara.", fullSentenceMeaning: { ko: "미안, 안 돼. 약속 있어.", en: "Sorry, can't. Have plans.", es: "Lo siento, no puedo." } },
+          { type: "input", promptWithBlank: "___ bagus! Sampai jumpa di sana.", answer: "Kedengarannya", fullSentence: "Kedengarannya bagus! Sampai jumpa di sana.", fullSentenceMeaning: { ko: "좋아! 거기서 봐.", en: "Sounds great! See you.", es: "¡Genial! Nos vemos." } },
+          { type: "listening", audioText: "Kedengarannya bagus! Sampai jumpa di sana.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Kedengarannya bagus! Sampai jumpa di sana.", "Apakah Anda ada waktu akhir pekan ini?", "Mari bertemu di kafe jam tiga.", "Apakah Anda mau pergi ke bioskop?"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 30: Final Review + A1 Celebration ───────────────────
@@ -649,6 +814,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Where is the bathroom? I'm lost!", es: "¿Dónde está el baño? ¡Estoy perdido!", ko: "화장실이 어디에 있나요? 길을 잃었어요!" }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Halo, nama saya Rudy. Saya berasal dari Korea.", speechLang: "id-ID", meaning: { ko: "안녕, 이름은 루디. 한국 출신.", en: "Hello, I'm Rudy. From Korea.", es: "Hola, soy Rudy. De Corea." } },
+        { text: "Saya punya dua saudara laki-laki. Ibu saya seorang guru.", speechLang: "id-ID", meaning: { ko: "형제 둘. 어머니는 선생님.", en: "Two brothers. Mother is teacher.", es: "Dos hermanos. Madre profesora." } },
+        { text: "Saya senang karena sudah menyelesaikan semua pelajaran!", speechLang: "id-ID", meaning: { ko: "수업 끝내서 행복!", en: "Happy I finished lessons!", es: "¡Feliz por terminar!" } },
+        { text: "Apakah Anda ada waktu besok? Mari rayakan!", speechLang: "id-ID", meaning: { ko: "내일 시간 있어? 축하!", en: "Free tomorrow? Let's celebrate!", es: "¿Libre mañana? ¡Felicidades!" }, recallRound: true },
+        { text: "Terima kasih untuk semuanya. Sampai jumpa lagi!", speechLang: "id-ID", meaning: { ko: "모든 것에 감사. 다음에!", en: "Thanks for everything. See you!", es: "Gracias por todo. ¡Nos vemos!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "A1 종합 복습: 자기소개 + 가족 + 묘사 + 취미 + 감정 + 약속 — 30일 인도네시아어 패턴 총정리!", en: "A1 Full Review: introductions + family + descriptions + hobbies + feelings + plans — all 30 days of Indonesian patterns!", es: "Repaso A1: presentaciones + familia + descripciones + hobbies + sentimientos + planes — todos los patrones de 30 días de indonesio." },
+          examples: { ko: "Nama saya Rudy. Saya punya dua saudara laki-laki. / Saya senang karena selesai! / Apakah Anda ada waktu besok? Mari rayakan!", en: "Nama saya Rudy. Saya punya dua saudara laki-laki. / Saya senang karena selesai! / Apakah Anda ada waktu besok? Mari rayakan!", es: "Nama saya Rudy. Saya punya dua saudara laki-laki. / Saya senang karena selesai! / Apakah Anda ada waktu besok? Mari rayakan!" },
+          mistakes: { ko: "❌ Saya adalah punya dua saudara.\n✅ Saya punya dua saudara.\n\n❌ Saya senang sebab selesai karena.\n✅ Saya senang karena selesai.", en: "❌ Saya adalah punya dua saudara.\n✅ Saya punya dua saudara. (no 'adalah' before the verb 'punya')\n\n❌ Nama Rudy saya.\n✅ Nama saya Rudy. (possessor 'saya' goes right after 'nama')", es: "❌ Saya adalah punya dua saudara.\n✅ Saya punya dua saudara. (sin 'adalah' antes del verbo 'punya')\n\n❌ Nama Rudy saya.\n✅ Nama saya Rudy. (el posesivo 'saya' va justo después de 'nama')" },
+          rudyTip: { ko: "30일 인도네시아어 완주! 소유어 뒤로 ('keluarga saya'), 접두사 ber-/me-, 'karena'로 이유 — 이게 인도네시아어의 기둥이야. 계속 말하면 더 쉬워져!", en: "30 days of Indonesian done! Owner-after-noun ('keluarga saya'), the ber-/me- prefixes, 'karena' for reasons — these are the pillars. Keep talking and it gets easier!", es: "30 días de indonesio. Poseedor después del sustantivo ('keluarga saya'), prefijos ber-/me-, 'karena' para razones: esos son los pilares. Sigue hablando y será más fácil." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "___ saya Rudy.", answer: "Nama", options: ["Nama", "Punya", "Saya"], fullSentence: "Nama saya Rudy.", fullSentenceMeaning: { ko: "이름은 루디.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
+          { type: "select", promptWithBlank: "Saya ___ karena selesai!", answer: "senang", options: ["senang", "lelah", "khawatir"], fullSentence: "Saya senang karena selesai!", fullSentenceMeaning: { ko: "끝내서 행복!", en: "Happy because finished!", es: "¡Feliz porque terminé!" } },
+          { type: "select", promptWithBlank: "Apakah Anda ada ___ besok?", answer: "waktu", options: ["waktu", "uang", "makanan"], fullSentence: "Apakah Anda ada waktu besok?", fullSentenceMeaning: { ko: "내일 시간 있어?", en: "Free tomorrow?", es: "¿Libre mañana?" } },
+          { type: "input", promptWithBlank: "Terima kasih untuk ___.", answer: "semuanya", fullSentence: "Terima kasih untuk semuanya.", fullSentenceMeaning: { ko: "모든 것에 감사.", en: "Thanks for everything.", es: "Gracias por todo." } },
+          { type: "input", promptWithBlank: "Sampai jumpa ___!", answer: "lagi", fullSentence: "Sampai jumpa lagi!", fullSentenceMeaning: { ko: "다음에 봐요!", en: "See you again!", es: "¡Hasta la próxima!" } },
+          { type: "listening", audioText: "Terima kasih untuk semuanya. Sampai jumpa lagi!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Terima kasih untuk semuanya. Sampai jumpa lagi!", "Halo, nama saya Rudy. Saya berasal dari Korea.", "Saya punya dua saudara laki-laki. Ibu saya seorang guru.", "Apakah Anda ada waktu besok? Mari rayakan!"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Hello, nice to meet you.", es: "Hola, encantado de conocerle.", ko: "안녕하세요, 만나서 반가워요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Where is the bathroom? I'm lost!", es: "¿Dónde está el baño? ¡Estoy perdido!", ko: "화장실이 어디에 있나요? 길을 잃었어요!" }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 };
 
@@ -662,36 +860,42 @@ export const MISSION_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKe
     english: { situation: { ko: "바벨탑에서 루디가 다른 요원의 가족에 대해 물어야 합니다. 신뢰를 쌓으세요!", en: "At Babel Tower, Rudy must ask about another agent's family to build trust!", es: "En la Torre de Babel, Rudy debe preguntar sobre la familia de otro agente." }, gptPrompt: "You are a fellow agent at Babel Tower. The user needs to build trust by talking about family. Simple A1 {targetLang}. Practice: introducing family members, asking about family, sharing jobs. Be friendly and share your own family details. Mix in greetings from Unit 1.", speechLang: "en-GB", suggestedAnswers: ["This is my family.", "I have two brothers.", "My mother is a teacher.", "Do you have children?", "What does your father do?", "Nice to meet your family!"] },
     spanish: { situation: { ko: "바벨탑에서 다른 요원의 가족을 알아야 해요!", en: "Babel Tower: learn about the agent's family!", es: "Torre de Babel: conoce a la familia del agente." }, gptPrompt: "You are a fellow agent at Babel Tower. Build trust through family talk. Simple A1 {targetLang}. Practice: introducing family, jobs, numbers. Be friendly.", speechLang: "es-ES", suggestedAnswers: ["Esta es mi familia.", "Tengo dos hermanos.", "Mi madre es profesora.", "¿Tienes hijos?", "¿Qué hace tu padre?", "¡Encantado de conocer a tu familia!"] },
     korean: { situation: { ko: "바벨탑에서 다른 요원과 가족 이야기를 하며 신뢰를 쌓으세요!", en: "Babel Tower: build trust through family talk!", es: "Torre de Babel: confianza a través de familia." }, gptPrompt: "You are a fellow agent at Babel Tower. Build trust through family talk. Simple A1 {targetLang}. Practice: 가족, 직업, 숫자. Be friendly.", speechLang: "ko-KR", suggestedAnswers: ["이것은 제 가족이에요.", "형이 둘 있어요.", "어머니는 선생님이에요.", "자녀가 있으세요?", "아버지는 뭘 하세요?", "가족을 만나서 반가워요!"] },
+    indonesian: { situation: { ko: "바벨탑에서 다른 요원과 가족 이야기를 하며 신뢰를 쌓으세요!", en: "Babel Tower: build trust through family talk!", es: "Torre de Babel: confianza a través de familia." }, gptPrompt: "You are a fellow agent at Babel Tower. Build trust through family talk. Simple A1 {targetLang}. Practice: introducing family (keluarga), jobs (pekerjaan), numbers. Share your own family. Be friendly.", speechLang: "id-ID", suggestedAnswers: ["Ini keluarga saya.", "Saya punya dua saudara laki-laki.", "Ibu saya seorang guru.", "Apakah Anda punya anak?", "Apa pekerjaan ayah Anda?", "Senang berkenalan dengan keluarga Anda!"] },
   },
 
   day_26: {
     english: { situation: { ko: "루디가 용의자를 묘사해야 합니다. 정확하게 설명하세요!", en: "Rudy must describe a suspect accurately. Be precise!", es: "Rudy debe describir un sospechoso con precisión." }, gptPrompt: "You are Rudy's handler. Show the user a suspect description and ask them to describe the person back to you in simple A1 {targetLang}. Practice: height, hair, clothes, glasses, age. Ask follow-up questions like 'What is he wearing?' and 'How old does she look?'. Correct gently if descriptions are wrong.", speechLang: "en-GB", suggestedAnswers: ["She is tall.", "He has long hair.", "She is wearing a blue jacket.", "The man with glasses.", "He looks young.", "She is about thirty."] },
     spanish: { situation: { ko: "용의자를 묘사해야 해요! 정확하게!", en: "Describe the suspect precisely!", es: "¡Describe al sospechoso con precisión!" }, gptPrompt: "You are Rudy's handler. User must describe a suspect in A1 {targetLang}. Practice: height, hair, clothes, glasses, age. Ask follow-ups. Correct gently.", speechLang: "es-ES", suggestedAnswers: ["Ella es alta.", "Tiene el pelo largo.", "Lleva una chaqueta azul.", "El hombre con gafas.", "Parece joven.", "Tiene unos treinta años."] },
     korean: { situation: { ko: "용의자를 정확하게 묘사해야 해요!", en: "Describe the suspect!", es: "¡Describe al sospechoso!" }, gptPrompt: "You are Rudy's handler. User must describe a suspect in A1 {targetLang}. Practice: 키, 머리, 옷, 안경, 나이. Ask follow-ups. Correct gently.", speechLang: "ko-KR", suggestedAnswers: ["키가 커요.", "머리가 길어요.", "파란 재킷을 입고 있어요.", "안경 쓴 남자예요.", "어려 보여요.", "서른 살 정도예요."] },
+    indonesian: { situation: { ko: "용의자를 정확하게 묘사해야 해요!", en: "Describe the suspect!", es: "¡Describe al sospechoso!" }, gptPrompt: "You are Rudy's handler. User must describe a suspect in A1 {targetLang}. Practice: height (tinggi), hair (rambut), clothes (memakai), glasses (kacamata), age (usia). Ask follow-ups. Correct gently.", speechLang: "id-ID", suggestedAnswers: ["Dia tinggi.", "Dia berambut panjang.", "Dia memakai jaket biru.", "Pria berkacamata itu.", "Dia terlihat muda.", "Usianya sekitar tiga puluh tahun."] },
   },
 
   day_27: {
     english: { situation: { ko: "바벨탑 파티에서 루디가 새 친구를 사귀어야 합니다. 취미에 대해 이야기하세요!", en: "At the Babel Tower party, Rudy must make friends by talking about hobbies!", es: "En la fiesta de Babel, Rudy hace amigos hablando de hobbies." }, gptPrompt: "You are a friendly guest at a Babel Tower party. The user is trying to make friends. Simple A1 {targetLang}. Talk about hobbies, sports, free time. Ask what they like to do, share your hobbies. Be enthusiastic and find common interests. Mix in food vocabulary from Unit 3 (cooking hobby).", speechLang: "en-GB", suggestedAnswers: ["What do you like to do?", "I like reading books.", "Do you play sports?", "I play football.", "My hobby is cooking.", "That sounds fun!"] },
     spanish: { situation: { ko: "바벨탑 파티에서 취미로 친구를 사귀세요!", en: "Babel party: make friends through hobbies!", es: "Fiesta Babel: amigos por hobbies." }, gptPrompt: "You are a friendly guest at a Babel Tower party. Simple A1 {targetLang}. Talk about hobbies, sports, free time. Find common interests. Mix in food from Unit 3.", speechLang: "es-ES", suggestedAnswers: ["¿Qué te gusta hacer?", "Me gusta leer.", "¿Practicas algún deporte?", "Juego al fútbol.", "Mi hobby es cocinar.", "¡Suena divertido!"] },
     korean: { situation: { ko: "바벨탑 파티에서 취미로 친구를 사귀세요!", en: "Babel party: hobbies and friends!", es: "Fiesta Babel: hobbies y amigos." }, gptPrompt: "You are a friendly guest at Babel Tower party. Simple A1 {targetLang}. 취미, 운동, 여가. Find common interests. Mix in 음식 from Unit 3.", speechLang: "ko-KR", suggestedAnswers: ["뭘 좋아하세요?", "책 읽기를 좋아해요.", "운동을 하세요?", "축구를 해요.", "제 취미는 요리예요.", "재미있겠어요!"] },
+    indonesian: { situation: { ko: "바벨탑 파티에서 취미로 친구를 사귀세요!", en: "Babel party: hobbies and friends!", es: "Fiesta Babel: hobbies y amigos." }, gptPrompt: "You are a friendly guest at Babel Tower party. Simple A1 {targetLang}. Talk about hobbies (hobi), sports (olahraga), free time (waktu luang). Find common interests. Mix in food (makanan) from Unit 3.", speechLang: "id-ID", suggestedAnswers: ["Apa yang Anda suka lakukan?", "Saya suka membaca buku.", "Apakah Anda berolahraga?", "Saya bermain sepak bola.", "Hobi saya memasak.", "Kedengarannya seru!"] },
   },
 
   day_28: {
     english: { situation: { ko: "루디의 팀원이 힘들어하고 있습니다. 감정을 물어보고 격려하세요!", en: "Rudy's teammate is struggling. Ask about feelings and encourage them!", es: "El compañero de Rudy sufre. Pregunta cómo se siente y anímalo." }, gptPrompt: "You are Rudy's teammate who is feeling down after a tough mission. The user should ask how you're feeling, understand your emotions, and encourage you. Simple A1 {targetLang}. Express: tired, worried, then gradually become happier as the user cheers you up. Practice all emotion vocabulary. End on a positive note.", speechLang: "en-GB", suggestedAnswers: ["How are you feeling?", "Are you okay?", "You look tired.", "Don't worry!", "I am excited about tomorrow!", "That sounds great!"] },
     spanish: { situation: { ko: "팀원이 힘들어해요. 격려하세요!", en: "Teammate is down. Encourage them!", es: "Compañero desanimado. ¡Anímalo!" }, gptPrompt: "You are a teammate feeling down. Simple A1 {targetLang}. User asks about feelings and encourages. Express: tired, worried, then happier. End positive.", speechLang: "es-ES", suggestedAnswers: ["¿Cómo te sientes?", "¿Estás bien?", "Pareces cansado.", "¡No te preocupes!", "¡Estoy emocionado por mañana!", "¡Suena genial!"] },
     korean: { situation: { ko: "팀원이 힘들어하고 있어요. 감정을 물어보고 격려하세요!", en: "Teammate struggling. Ask and encourage!", es: "Compañero mal. ¡Pregunta y anima!" }, gptPrompt: "You are a teammate feeling down. Simple A1 {targetLang}. User asks about feelings and encourages. Express: 피곤, 걱정, then 행복. End positive.", speechLang: "ko-KR", suggestedAnswers: ["기분이 어때요?", "괜찮아요?", "피곤해 보여요.", "걱정 마세요!", "내일이 기대돼요!", "좋아요!"] },
+    indonesian: { situation: { ko: "팀원이 힘들어하고 있어요. 감정을 물어보고 격려하세요!", en: "Teammate struggling. Ask and encourage!", es: "Compañero mal. ¡Pregunta y anima!" }, gptPrompt: "You are a teammate feeling down. Simple A1 {targetLang}. User asks about feelings and encourages. Express: tired (lelah), worried (khawatir), then happy (senang). End positive.", speechLang: "id-ID", suggestedAnswers: ["Bagaimana perasaan Anda?", "Apakah Anda baik-baik saja?", "Anda terlihat lelah.", "Jangan khawatir!", "Saya senang sekali soal besok!", "Kedengarannya bagus!"] },
   },
 
   day_29: {
     english: { situation: { ko: "미션 성공! 루디가 팀원들과 축하 파티를 계획합니다!", en: "Mission success! Rudy plans a celebration party with teammates!", es: "¡Misión cumplida! Rudy planea una fiesta de celebración." }, gptPrompt: "You are Rudy's teammate planning a celebration. Simple A1 {targetLang}. Practice: asking if free, suggesting activities (cinema, restaurant, cafe), agreeing/declining, setting time and place. Mix in vocabulary from ALL previous units: food (Unit 3), places (Unit 4), feelings (Unit 5). Create a fun, multi-turn planning conversation.", speechLang: "en-GB", suggestedAnswers: ["Are you free this weekend?", "Let's meet at the cafe.", "Would you like to go to the cinema?", "That sounds great!", "Sorry, I can't.", "See you at three o'clock!"] },
     spanish: { situation: { ko: "미션 성공! 축하 파티를 계획하세요!", en: "Mission success! Plan the party!", es: "¡Misión cumplida! ¡Planea la fiesta!" }, gptPrompt: "You are Rudy's teammate planning a celebration. Simple A1 {targetLang}. Practice: free, suggest activities, agree/decline, time/place. Mix ALL units. Fun conversation.", speechLang: "es-ES", suggestedAnswers: ["¿Estás libre este fin de semana?", "Encontrémonos en el café.", "¿Te gustaría ir al cine?", "¡Suena genial!", "Lo siento, no puedo.", "¡Nos vemos a las tres!"] },
     korean: { situation: { ko: "미션 성공! 팀원들과 축하 파티를 계획하세요!", en: "Mission success! Plan the party!", es: "¡Misión! ¡Planea la fiesta!" }, gptPrompt: "You are Rudy's teammate planning a celebration. Simple A1 {targetLang}. Practice: 시간, activities, agree/decline, 장소. Mix ALL units. Fun conversation.", speechLang: "ko-KR", suggestedAnswers: ["이번 주말에 시간 있어요?", "카페에서 만나요.", "영화관에 갈래요?", "좋아요!", "미안해요, 안 돼요.", "3시에 봐요!"] },
+    indonesian: { situation: { ko: "미션 성공! 팀원들과 축하 파티를 계획하세요!", en: "Mission success! Plan the party!", es: "¡Misión! ¡Planea la fiesta!" }, gptPrompt: "You are Rudy's teammate planning a celebration. Simple A1 {targetLang}. Practice: time (waktu), activities, agree/decline, place (tempat). Mix ALL units. Fun conversation.", speechLang: "id-ID", suggestedAnswers: ["Apakah Anda ada waktu akhir pekan ini?", "Mari bertemu di kafe.", "Apakah Anda mau pergi ke bioskop?", "Kedengarannya bagus!", "Maaf, saya tidak bisa.", "Sampai jumpa jam tiga!"] },
   },
 
   day_30: {
     english: { situation: { ko: "A1 과정의 마지막 미션! 루디가 모든 것을 종합해서 자기소개부터 약속 잡기까지 해야 합니다!", en: "Final A1 mission! Rudy must combine EVERYTHING: introductions to making plans!", es: "¡Misión final A1! Rudy combina TODO: presentaciones hasta hacer planes." }, gptPrompt: "You are the final mission coordinator at Babel Tower. This is the A1 graduation test. Simple A1 {targetLang}. Test the user on ALL 30 days of vocabulary in a natural conversation: 1) They introduce themselves and family 2) Describe someone 3) Talk about hobbies 4) Express feelings 5) Make plans to meet again. Be encouraging and celebrate their progress. This should feel like a victory lap, not a test. End with congratulations on completing A1!", speechLang: "en-GB", suggestedAnswers: ["Hello, my name is Rudy.", "I have two brothers.", "I am happy today!", "My hobby is cooking.", "Are you free tomorrow?", "Thank you for everything!"] },
     spanish: { situation: { ko: "A1 마지막 미션! 모든 것을 종합하세요!", en: "Final A1 mission! Combine everything!", es: "¡Misión final A1! ¡Combina todo!" }, gptPrompt: "You are the final mission coordinator. A1 graduation test. Simple A1 {targetLang}. Test ALL 30 days naturally: intro, family, describe, hobbies, feelings, plans. Celebrate! Victory lap.", speechLang: "es-ES", suggestedAnswers: ["Hola, me llamo Rudy.", "Tengo dos hermanos.", "¡Estoy feliz hoy!", "Mi hobby es cocinar.", "¿Estás libre mañana?", "¡Gracias por todo!"] },
     korean: { situation: { ko: "A1 마지막 미션! 30일 동안 배운 모든 것을 사용하세요!", en: "Final A1 mission! Use everything!", es: "¡Misión final! ¡Usa todo!" }, gptPrompt: "You are the final mission coordinator. A1 graduation. Simple A1 {targetLang}. Test ALL 30 days: 자기소개, 가족, 묘사, 취미, 감정, 약속. Celebrate! Victory lap.", speechLang: "ko-KR", suggestedAnswers: ["안녕하세요, 루디예요.", "형이 둘 있어요.", "오늘 행복해요!", "취미는 요리예요.", "내일 시간 있어요?", "모든 것에 감사해요!"] },
+    indonesian: { situation: { ko: "A1 마지막 미션! 30일 동안 배운 모든 것을 사용하세요!", en: "Final A1 mission! Use everything!", es: "¡Misión final! ¡Usa todo!" }, gptPrompt: "You are the final mission coordinator. A1 graduation. Simple A1 {targetLang}. Test ALL 30 days: introductions (perkenalan), family (keluarga), describing (deskripsi), hobbies (hobi), feelings (perasaan), plans (rencana). Celebrate! Victory lap.", speechLang: "id-ID", suggestedAnswers: ["Halo, nama saya Rudy.", "Saya punya dua saudara laki-laki.", "Saya senang hari ini!", "Hobi saya memasak.", "Apakah Anda ada waktu besok?", "Terima kasih untuk semuanya!"] },
   },
 };
 
@@ -723,6 +927,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "어머니는 ___이에요.", answer: "선생님", options: ["선생님", "형", "아이"], fullSentence: "어머니는 선생님이에요.", fullSentenceMeaning: { ko: "어머니는 선생님.", en: "Mother is teacher.", es: "Madre profesora." } },
       { type: "speak", sentence: "자녀가 있으세요?", speechLang: "ko-KR", meaning: { ko: "자녀 있으세요?", en: "Have children?", es: "¿Hijos?" } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Permisi, saya tersesat. Bisakah Anda tunjukkan di peta?", speechLang: "id-ID", meaning: { ko: "길 잃었어요. 지도에서 보여주세요.", en: "Lost. Show me on the map?", es: "Perdido. ¿Mapa?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Keluar dari pintu keluar ___ di stasiun.", answer: "tiga", options: ["tiga", "kiri", "jauh"], fullSentence: "Keluar dari pintu keluar tiga di stasiun.", fullSentenceMeaning: { ko: "지하철 3번 출구.", en: "Subway exit three.", es: "Metro salida tres." }, isYesterdayReview: true },
+      { type: "speak", sentence: "Ini keluarga saya. Saya punya dua saudara laki-laki.", speechLang: "id-ID", meaning: { ko: "제 가족이에요. 형제가 둘.", en: "My family. Two brothers.", es: "Mi familia. Dos hermanos." } },
+      { type: "fill_blank", promptWithBlank: "Ibu saya seorang ___.", answer: "guru", options: ["guru", "saudara", "anak"], fullSentence: "Ibu saya seorang guru.", fullSentenceMeaning: { ko: "어머니는 선생님.", en: "Mother is a teacher.", es: "Madre es profesora." } },
+      { type: "speak", sentence: "Apakah Anda punya anak?", speechLang: "id-ID", meaning: { ko: "자녀가 있으세요?", en: "Have children?", es: "¿Tienes hijos?" } },
+    ],
   },
 
   day_26: {
@@ -746,6 +957,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "키가 크고 머리가 길어요.", speechLang: "ko-KR", meaning: { ko: "키 크고 머리 길어요.", en: "Tall, long hair.", es: "Alta, pelo largo." } },
       { type: "fill_blank", promptWithBlank: "파란색 재킷을 ___ 있어요.", answer: "입고", options: ["입고", "먹고", "읽고"], fullSentence: "파란색 재킷을 입고 있어요.", fullSentenceMeaning: { ko: "파란 재킷 입고 있어요.", en: "Wearing blue jacket.", es: "Lleva chaqueta azul." } },
       { type: "speak", sentence: "안경 쓴 남자가 선생님이에요.", speechLang: "ko-KR", meaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is teacher.", es: "Hombre con gafas, profesor." } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Ini keluarga saya. Ayah saya bekerja di rumah sakit.", speechLang: "id-ID", meaning: { ko: "제 가족. 아버지는 병원에서 일해요.", en: "My family. Father works at hospital.", es: "Mi familia. Padre trabaja en hospital." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Saya punya dua ___ dan satu saudara perempuan.", answer: "saudara laki-laki", options: ["saudara laki-laki", "ibu", "guru"], fullSentence: "Saya punya dua saudara laki-laki dan satu saudara perempuan.", fullSentenceMeaning: { ko: "형제 둘, 자매 하나.", en: "Two brothers, one sister.", es: "Dos hermanos, una hermana." }, isYesterdayReview: true },
+      { type: "speak", sentence: "Dia tinggi dan berambut panjang.", speechLang: "id-ID", meaning: { ko: "키 크고 머리 길어요.", en: "Tall, long hair.", es: "Alta, pelo largo." } },
+      { type: "fill_blank", promptWithBlank: "Dia ___ jaket biru.", answer: "memakai", options: ["memakai", "makan", "membaca"], fullSentence: "Dia memakai jaket biru.", fullSentenceMeaning: { ko: "파란 재킷 입고 있어요.", en: "Wearing blue jacket.", es: "Lleva chaqueta azul." } },
+      { type: "speak", sentence: "Pria berkacamata itu guru saya.", speechLang: "id-ID", meaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is teacher.", es: "Hombre con gafas es profesor." } },
     ],
   },
 
@@ -777,6 +995,15 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "화장실이 어디에요?", speechLang: "ko-KR", meaning: { ko: "화장실이 어디에요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" }, isYesterdayReview: true },
       { type: "speak", sentence: "이거 얼마예요?", speechLang: "ko-KR", meaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" }, isYesterdayReview: true },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Dia tinggi dan berambut panjang. Dia memakai jaket biru.", speechLang: "id-ID", meaning: { ko: "키 크고 머리 길어요. 파란 재킷.", en: "Tall, long hair. Blue jacket.", es: "Alta, pelo largo. Chaqueta azul." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Pria ber___ itu guru saya.", answer: "kacamata", options: ["kacamata", "rambut", "jaket"], fullSentence: "Pria berkacamata itu guru saya.", fullSentenceMeaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses, teacher.", es: "Hombre con gafas, profesor." }, isYesterdayReview: true },
+      { type: "speak", sentence: "Saya suka membaca buku dan menonton film.", speechLang: "id-ID", meaning: { ko: "책 읽기와 영화 보기를 좋아해요.", en: "Like reading and movies.", es: "Leer y ver películas." } },
+      { type: "fill_blank", promptWithBlank: "Saya ___ sepak bola setiap akhir pekan.", answer: "bermain", options: ["bermain", "membaca", "memasak"], fullSentence: "Saya bermain sepak bola setiap akhir pekan.", fullSentenceMeaning: { ko: "매주 주말 축구.", en: "Football every weekend.", es: "Fútbol cada fin de semana." } },
+      { type: "speak", sentence: "Hobi saya memasak. Apa yang Anda suka lakukan?", speechLang: "id-ID", meaning: { ko: "취미는 요리. 뭘 좋아해요?", en: "Hobby: cooking. What do you like?", es: "Hobby: cocinar. ¿Qué te gusta?" } },
+      { type: "speak", sentence: "Di mana toilet?", speechLang: "id-ID", meaning: { ko: "화장실이 어디에요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Berapa harganya ini?", speechLang: "id-ID", meaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" }, isYesterdayReview: true },
+    ],
   },
 
   day_28: {
@@ -800,6 +1027,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "오늘 매우 행복해요. 여행이 기대돼요!", speechLang: "ko-KR", meaning: { ko: "오늘 행복. 여행 기대!", en: "Happy. Excited about trip!", es: "Feliz. ¡Emocionado!" } },
       { type: "fill_blank", promptWithBlank: "일___서 피곤해요.", answer: "해", options: ["해", "하", "한"], fullSentence: "일해서 피곤해요.", fullSentenceMeaning: { ko: "일해서 피곤.", en: "Tired from work.", es: "Cansado de trabajar." } },
       { type: "speak", sentence: "괜찮아요? 걱정되어 보여요.", speechLang: "ko-KR", meaning: { ko: "괜찮아? 걱정돼 보여.", en: "OK? Worried?", es: "¿Bien? ¿Preocupado?" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Saya suka membaca buku. Hobi saya memasak.", speechLang: "id-ID", meaning: { ko: "책 읽기 좋아해요. 취미는 요리.", en: "Like reading. Hobby: cooking.", es: "Leer. Hobby: cocinar." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Apakah Anda ber___?", answer: "olahraga", options: ["olahraga", "buku", "makanan"], fullSentence: "Apakah Anda berolahraga?", fullSentenceMeaning: { ko: "스포츠 하세요?", en: "Play sports?", es: "¿Practicas deporte?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Saya sangat senang hari ini. Saya senang sekali soal perjalanan ini!", speechLang: "id-ID", meaning: { ko: "오늘 행복해요. 여행이 기대돼!", en: "Happy today. Excited about trip!", es: "Feliz hoy. ¡Emocionado por el viaje!" } },
+      { type: "fill_blank", promptWithBlank: "Saya lelah ___ bekerja seharian.", answer: "karena", options: ["karena", "tetapi", "dan"], fullSentence: "Saya lelah karena bekerja seharian.", fullSentenceMeaning: { ko: "일해서 피곤해요.", en: "Tired because worked.", es: "Cansado porque trabajé." } },
+      { type: "speak", sentence: "Apakah Anda baik-baik saja? Anda terlihat khawatir.", speechLang: "id-ID", meaning: { ko: "괜찮아요? 걱정돼 보여요.", en: "OK? Look worried.", es: "¿Bien? Preocupado." } },
     ],
   },
 
@@ -825,6 +1059,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "영화관에 ___요?", answer: "갈래", options: ["갈래", "먹을래", "할래"], fullSentence: "영화관에 갈래요?", fullSentenceMeaning: { ko: "영화관 갈래?", en: "Cinema?", es: "¿Cine?" } },
       { type: "speak", sentence: "좋아요! 3시에 봐요.", speechLang: "ko-KR", meaning: { ko: "좋아! 3시에.", en: "Great! At three.", es: "¡Genial! A las tres." } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Saya senang hari ini! Saya senang sekali soal akhir pekan.", speechLang: "id-ID", meaning: { ko: "오늘 행복! 주말이 기대돼.", en: "Happy! Excited for weekend.", es: "¡Feliz! ¡Emocionado por el fin de semana!" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Apakah Anda baik-baik saja? Anda terlihat ___.", answer: "khawatir", options: ["khawatir", "senang", "tinggi"], fullSentence: "Apakah Anda baik-baik saja? Anda terlihat khawatir.", fullSentenceMeaning: { ko: "괜찮아? 걱정돼 보여.", en: "OK? Worried?", es: "¿Bien? ¿Preocupado?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Apakah Anda ada waktu akhir pekan ini? Mari bertemu di kafe.", speechLang: "id-ID", meaning: { ko: "주말에 시간 있어? 카페에서 만나요.", en: "Free? Meet at cafe.", es: "¿Libre? Café." } },
+      { type: "fill_blank", promptWithBlank: "Apakah Anda mau ___ ke bioskop?", answer: "pergi", options: ["pergi", "makan", "tidur"], fullSentence: "Apakah Anda mau pergi ke bioskop?", fullSentenceMeaning: { ko: "영화관 갈래요?", en: "Cinema?", es: "¿Cine?" } },
+      { type: "speak", sentence: "Kedengarannya bagus! Sampai jumpa jam tiga.", speechLang: "id-ID", meaning: { ko: "좋아요! 3시에 봐요.", en: "Great! See you at three.", es: "¡Genial! A las tres." } },
+    ],
   },
 
   day_30: {
@@ -848,6 +1089,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "안녕하세요, 루디예요. 한국에서 왔어요. 형이 둘 있어요.", speechLang: "ko-KR", meaning: { ko: "안녕, 루디. 한국. 형 둘.", en: "Hi, Rudy. Korea. Two brothers.", es: "Hola, Rudy. Corea. Dos hermanos." } },
       { type: "fill_blank", promptWithBlank: "수업을 끝내서 ___요!", answer: "행복해", options: ["행복해", "피곤해", "걱정돼"], fullSentence: "수업을 끝내서 행복해요!", fullSentenceMeaning: { ko: "끝내서 행복!", en: "Happy, finished!", es: "¡Feliz, terminé!" } },
       { type: "speak", sentence: "모든 것에 감사해요. 다음에 봐요!", speechLang: "ko-KR", meaning: { ko: "감사. 다음에!", en: "Thanks! See you!", es: "¡Gracias! ¡Nos vemos!" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Apakah Anda ada waktu? Mari bertemu di kafe jam tiga.", speechLang: "id-ID", meaning: { ko: "시간 있어? 3시에 카페.", en: "Free? Cafe at three.", es: "¿Libre? Café a las tres." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Maaf, saya tidak ___. Saya ada acara.", answer: "bisa", options: ["bisa", "mau", "pergi"], fullSentence: "Maaf, saya tidak bisa. Saya ada acara.", fullSentenceMeaning: { ko: "미안, 안 돼. 약속 있어.", en: "Sorry, can't. Plans.", es: "Lo siento, no puedo." }, isYesterdayReview: true },
+      { type: "speak", sentence: "Halo, nama saya Rudy. Saya berasal dari Korea. Saya punya dua saudara laki-laki.", speechLang: "id-ID", meaning: { ko: "안녕, 루디예요. 한국. 형제 둘.", en: "Hi, Rudy. Korea. Two brothers.", es: "Hola, Rudy. Corea. Dos hermanos." } },
+      { type: "fill_blank", promptWithBlank: "Saya ___ karena sudah menyelesaikan semua pelajaran!", answer: "senang", options: ["senang", "lelah", "khawatir"], fullSentence: "Saya senang karena sudah menyelesaikan semua pelajaran!", fullSentenceMeaning: { ko: "수업 다 끝내서 행복!", en: "Happy, finished lessons!", es: "¡Feliz, terminé lecciones!" } },
+      { type: "speak", sentence: "Terima kasih untuk semuanya. Sampai jumpa lagi!", speechLang: "id-ID", meaning: { ko: "모든 것에 감사. 다음에!", en: "Thanks! See you!", es: "¡Gracias! ¡Nos vemos!" } },
     ],
   },
 };

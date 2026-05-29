@@ -20,6 +20,8 @@ type Tri = {
   en: string;
   ko: string;
   es: string;
+  /** Optional Indonesian (id-ID). Falls back to `en` when absent. */
+  id?: string;
 };
 
 type BossSpellHint = {
@@ -59,6 +61,7 @@ const CUE_ASSETS = {
 function tri(value: Tri, lang: string): string {
   if (lang === "korean") return value.ko;
   if (lang === "spanish") return value.es;
+  if (lang === "indonesian") return value.id ?? value.en;
   return value.en;
 }
 
