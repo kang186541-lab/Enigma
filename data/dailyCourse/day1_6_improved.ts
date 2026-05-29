@@ -117,6 +117,34 @@ export const LESSON_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
         ],
       },
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Halo, nama saya Rudy.", speechLang: "id-ID", meaning: { ko: "안녕하세요, 제 이름은 루디예요.", en: "Hello, my name is Rudy.", es: "Hola, me llamo Rudy." } },
+        { text: "Senang bertemu dengan Anda.", speechLang: "id-ID", meaning: { ko: "만나서 반갑습니다.", en: "Nice to meet you.", es: "Mucho gusto." } },
+        { text: "Anda berasal dari mana?", speechLang: "id-ID", meaning: { ko: "어디에서 오셨어요?", en: "Where are you from?", es: "¿De dónde eres?" } },
+        { text: "Terima kasih.", speechLang: "id-ID", meaning: { ko: "감사합니다.", en: "Thank you.", es: "Gracias." }, recallRound: false },
+        { text: "Maaf, saya tidak mengerti.", speechLang: "id-ID", meaning: { ko: "미안해요, 이해를 못 했어요.", en: "Sorry, I don't understand.", es: "Lo siento, no entiendo." }, recallRound: false },
+        { text: "Tolong! Tolong bantu saya.", speechLang: "id-ID", meaning: { ko: "도와주세요! 도움이 필요해요.", en: "Help! Please help me.", es: "¡Ayuda! Por favor, ayúdame." } },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: false,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "인도네시아어로 자기소개할 때는 'Nama saya ___'(제 이름은 ___예요)라고 해요. 'nama'는 '이름', 'saya'는 '저/제'라는 뜻이에요. 처음 만나면 'Senang bertemu'(반갑습니다), 못 알아들으면 'Saya tidak mengerti', 위급할 때는 'Tolong!'(도와주세요)만 기억하세요!", en: "To introduce yourself in Indonesian, say 'Nama saya ___' — literally 'name my ___'. (Indonesian puts the possessor after the noun!) When you meet someone, say 'Senang bertemu'. Lost in the conversation? 'Saya tidak mengerti' is your lifeline. Emergency? Just shout 'Tolong!' — it means both 'help' and 'please'.", es: "Para presentarte en indonesio, di 'Nama saya ___' — literalmente 'nombre mi ___'. Al conocer a alguien, di 'Senang bertemu'. ¿No entiendes? 'Saya tidak mengerti' te salva. ¿Emergencia? Grita '¡Tolong!' — significa 'ayuda' y 'por favor'." },
+          examples: { ko: "Nama saya Rudy. (제 이름은 루디예요.)\nSenang bertemu dengan Anda. (만나서 반갑습니다.)\nSaya tidak mengerti. (이해를 못 했어요.)", en: "Nama saya Rudy. (My name is Rudy.)\nSenang bertemu dengan Anda. (Nice to meet you.)\nTolong! Tolong bantu saya. (Help! Please help me.)", es: "Nama saya Rudy. (Me llamo Rudy.)\nSenang bertemu dengan Anda. (Mucho gusto.)\n¡Tolong! (¡Ayuda!)" },
+          mistakes: { ko: "❌ Saya nama Rudy.\n✅ Nama saya Rudy. (인도네시아어는 명사가 먼저! '이름 나의' 순서예요)\n❌ Saya tidak mengerti tidak.\n✅ Saya tidak mengerti. ('tidak'이 이미 부정이에요)", en: "❌ Saya nama Rudy.\n✅ Nama saya Rudy. (Noun comes first in Indonesian — 'name my', not 'my name'!)\n❌ Saya no mengerti.\n✅ Saya tidak mengerti. (Use 'tidak' for verbs, not 'no')", es: "❌ Saya nama Rudy.\n✅ Nama saya Rudy. (El sustantivo va primero: 'nombre mi')\n❌ Saya no mengerti.\n✅ Saya tidak mengerti. (Usa 'tidak' con verbos, no 'no')" },
+          rudyTip: { ko: "'Nama saya ___'만 외워도 절반은 성공! 'Tolong'은 '도와주세요'랑 '~해 주세요' 둘 다 되니까 진짜 만능이야~", en: "Just remember 'Nama saya ___' and you're halfway there! And 'Tolong' is magic — it means both 'help!' and 'please', so you'll use it everywhere.", es: "Solo recuerda 'Nama saya ___' y ya tienes la mitad. Y 'Tolong' es mágico: significa '¡ayuda!' y 'por favor'." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "___ saya Rudy.", answer: "Nama", options: ["Nama", "Saya", "Orang"], fullSentence: "Nama saya Rudy.", fullSentenceMeaning: { ko: "제 이름은 루디예요.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
+          { type: "select", promptWithBlank: "___ bertemu dengan Anda.", answer: "Senang", options: ["Senang", "Sedih", "Cepat"], fullSentence: "Senang bertemu dengan Anda.", fullSentenceMeaning: { ko: "만나서 반갑습니다.", en: "Nice to meet you.", es: "Mucho gusto." } },
+          { type: "select", promptWithBlank: "Maaf, saya tidak ___.", answer: "mengerti", options: ["mengerti", "tahu", "bisa"], fullSentence: "Maaf, saya tidak mengerti.", fullSentenceMeaning: { ko: "미안해요, 이해를 못 했어요.", en: "Sorry, I don't understand.", es: "Lo siento, no entiendo." } },
+          { type: "input", promptWithBlank: "Terima ___.", answer: "kasih", fullSentence: "Terima kasih.", fullSentenceMeaning: { ko: "감사합니다.", en: "Thank you.", es: "Gracias." } },
+          { type: "listening", audioText: "Halo, nama saya Rudy.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Halo, nama saya Rudy.", "Senang bertemu dengan Anda.", "Anda berasal dari mana?", "Terima kasih."], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 
   // ─────────────── Day 2: Where You're From + Yes/No + Repeat ────────────────
@@ -205,6 +233,34 @@ export const LESSON_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
         ],
       },
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Saya berasal dari Korea.", speechLang: "id-ID", meaning: { ko: "저는 한국에서 왔어요.", en: "I'm from Korea.", es: "Soy de Corea." } },
+        { text: "Saya tinggal di Seoul.", speechLang: "id-ID", meaning: { ko: "서울에 살고 있어요.", en: "I live in Seoul.", es: "Vivo en Seúl." } },
+        { text: "Bagaimana kota Anda?", speechLang: "id-ID", meaning: { ko: "당신의 도시는 어때요?", en: "What's your city like?", es: "¿Cómo es tu ciudad?" } },
+        { text: "Ya, saya mengerti. Terima kasih!", speechLang: "id-ID", meaning: { ko: "네, 이해했어요. 감사합니다!", en: "Yes, I understand. Thank you!", es: "Sí, entiendo. ¡Gracias!" } },
+        { text: "Bisa tolong ulangi?", speechLang: "id-ID", meaning: { ko: "다시 한번 말해 주시겠어요?", en: "Can you say that again, please?", es: "¿Puede repetir eso, por favor?" }, recallRound: false },
+        { text: "Bisa bicara lebih pelan?", speechLang: "id-ID", meaning: { ko: "더 천천히 말해 주세요?", en: "Can you speak more slowly, please?", es: "¿Puede hablar más despacio?" }, recallRound: false },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: false,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "출신을 말할 때 'Saya berasal dari ___'(저는 ___에서 왔어요)라고 해요. 'berasal dari'가 '~출신이다'예요. 사는 곳은 'Saya tinggal di ___'. 못 알아들으면 'Bisa tolong ulangi?'(다시 말해 주시겠어요?), 너무 빠르면 'Bisa bicara lebih pelan?'(더 천천히요?)라고 하세요!", en: "To say where you're from, use 'Saya berasal dari ___' (I come from ___). For where you live now: 'Saya tinggal di ___'. Two absolute lifesavers: 'Bisa tolong ulangi?' (Can you repeat that?) and 'Bisa bicara lebih pelan?' (Can you speak more slowly?). 'Bisa' just means 'can' — super handy for polite requests.", es: "Para decir de dónde eres, usa 'Saya berasal dari ___'. Para dónde vives ahora: 'Saya tinggal di ___'. Dos frases salvavidas: 'Bisa tolong ulangi?' (¿Puede repetir?) y 'Bisa bicara lebih pelan?' (¿Más despacio?). 'Bisa' significa 'poder'." },
+          examples: { ko: "Saya berasal dari Korea. (저는 한국에서 왔어요.)\nSaya tinggal di Seoul. (서울에 살고 있어요.)\nBisa bicara lebih pelan? (더 천천히 말해 주세요.)", en: "Saya berasal dari Korea. (I'm from Korea.)\nSaya tinggal di Seoul. (I live in Seoul.)\nBisa tolong ulangi? (Can you say that again, please?)", es: "Saya berasal dari Korea. (Soy de Corea.)\nSaya tinggal di Seoul. (Vivo en Seúl.)\nBisa tolong ulangi? (¿Puede repetir eso?)" },
+          mistakes: { ko: "❌ Saya berasal di Korea.\n✅ Saya berasal dari Korea. (출신은 'dari'예요, 'di'가 아니에요!)\n❌ Saya tinggal dari Seoul.\n✅ Saya tinggal di Seoul. (사는 곳은 'di'예요!)", en: "❌ Saya berasal di Korea.\n✅ Saya berasal dari Korea. (Origin uses 'dari' = from, not 'di'!)\n❌ Saya tinggal dari Seoul.\n✅ Saya tinggal di Seoul. (Living somewhere uses 'di' = at/in!)", es: "❌ Saya berasal di Korea.\n✅ Saya berasal dari Korea. (El origen lleva 'dari' = de, no 'di')\n❌ Saya tinggal dari Seoul.\n✅ Saya tinggal di Seoul. (Donde vives lleva 'di' = en)" },
+          rudyTip: { ko: "'dari'는 '~에서/부터'(출신), 'di'는 '~에서/에'(위치)! 이 두 개만 구분하면 인도네시아어 장소 표현이 확 쉬워져~", en: "Here's the trick: 'dari' = from (origin), 'di' = at/in (location). Master these two little words and Indonesian place phrases click instantly!", es: "El truco: 'dari' = de (origen), 'di' = en (ubicación). Domina estas dos palabritas y las frases de lugar fluyen." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Saya berasal ___ Korea.", answer: "dari", options: ["dari", "di", "ke"], fullSentence: "Saya berasal dari Korea.", fullSentenceMeaning: { ko: "저는 한국에서 왔어요.", en: "I'm from Korea.", es: "Soy de Corea." } },
+          { type: "select", promptWithBlank: "Saya ___ di Seoul.", answer: "tinggal", options: ["tinggal", "berasal", "pergi"], fullSentence: "Saya tinggal di Seoul.", fullSentenceMeaning: { ko: "서울에 살고 있어요.", en: "I live in Seoul.", es: "Vivo en Seúl." } },
+          { type: "select", promptWithBlank: "Bisa tolong ___?", answer: "ulangi", options: ["ulangi", "bicara", "pergi"], fullSentence: "Bisa tolong ulangi?", fullSentenceMeaning: { ko: "다시 한번 말해 주시겠어요?", en: "Can you say that again, please?", es: "¿Puede repetir eso, por favor?" } },
+          { type: "input", promptWithBlank: "Saya berasal ___ Korea.", answer: "dari", fullSentence: "Saya berasal dari Korea.", fullSentenceMeaning: { ko: "저는 한국에서 왔어요.", en: "I'm from Korea.", es: "Soy de Corea." } },
+          { type: "listening", audioText: "Bisa bicara lebih pelan?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Bisa bicara lebih pelan?", "Bisa tolong ulangi?", "Saya berasal dari Korea.", "Ya. / Tidak."], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 
   // ─────────────── Day 3: Jobs + Do you speak ___? ───────────────────────────
@@ -290,6 +346,34 @@ export const LESSON_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
           { type: "input", promptWithBlank: "___이요.", answer: "조금", fullSentence: "조금이요.", fullSentenceMeaning: { ko: "조금이요.", en: "A little bit.", es: "Un poquito." } },
           { type: "input", promptWithBlank: "무슨 ___ 하세요?", answer: "일", fullSentence: "무슨 일 하세요?", fullSentenceMeaning: { ko: "무슨 일 하세요?", en: "What do you do?", es: "¿A qué te dedicas?" } },
           { type: "listening", audioText: "한국어 할 줄 아세요? 조금이요.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["한국어 할 줄 아세요? 조금이요.", "무슨 일 하세요?", "저는 학생이에요.", "저는 회사에 다녀요."], correct: 0, audioOnly: true },
+        ],
+      },
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Apa pekerjaan Anda?", speechLang: "id-ID", meaning: { ko: "무슨 일 하세요?", en: "What do you do?", es: "¿A qué te dedicas?" } },
+        { text: "Saya seorang pelajar.", speechLang: "id-ID", meaning: { ko: "저는 학생이에요.", en: "I'm a student.", es: "Soy estudiante." } },
+        { text: "Saya bekerja di sebuah perusahaan.", speechLang: "id-ID", meaning: { ko: "저는 회사에 다녀요.", en: "I work at a company.", es: "Trabajo en una empresa." } },
+        { text: "Apakah kamu bisa bahasa Inggris?", speechLang: "id-ID", meaning: { ko: "영어 할 줄 아세요?", en: "Do you speak English?", es: "¿Hablas inglés?" }, recallRound: false },
+        { text: "Sedikit saja.", speechLang: "id-ID", meaning: { ko: "조금이요.", en: "A little bit.", es: "Un poquito." }, recallRound: false },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: false,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "직업을 말할 때 'Saya seorang ___'(저는 ___예요)라고 해요. 'seorang'은 사람을 셀 때 쓰는 말이에요. 일하는 곳은 'Saya bekerja di ___'. 상대방에게 언어를 물을 때 'Apakah kamu bisa bahasa ___?'라고 하고, 대답은 'Sedikit saja'(조금이요)라고 하면 돼요.", en: "For jobs, say 'Saya seorang ___' (I'm a ___). 'Seorang' is a counter word for people. For your workplace: 'Saya bekerja di ___'. To ask about languages: 'Apakah kamu bisa bahasa ___?' Answer with 'Sedikit saja' (just a little). 'Bisa' literally means 'can', so it's 'Can you do English language?'", es: "Para trabajos, di 'Saya seorang ___' (Soy ___). 'Seorang' cuenta personas. Para tu trabajo: 'Saya bekerja di ___'. Para preguntar idiomas: 'Apakah kamu bisa bahasa ___?' Responde con 'Sedikit saja' (solo un poco)." },
+          examples: { ko: "Saya seorang pelajar. (저는 학생이에요.)\nSaya bekerja di sebuah perusahaan. (저는 회사에 다녀요.)\nApakah kamu bisa bahasa Inggris? — Sedikit saja. (영어 하세요? — 조금이요.)", en: "Saya seorang pelajar. (I'm a student.)\nSaya bekerja di sebuah perusahaan. (I work at a company.)\nApakah kamu bisa bahasa Inggris? — Sedikit saja. (Do you speak English? — A little bit.)", es: "Saya seorang pelajar. (Soy estudiante.)\nSaya bekerja di sebuah perusahaan. (Trabajo en una empresa.)\nApakah kamu bisa bahasa Inggris? — Sedikit saja. (¿Hablas inglés? — Un poquito.)" },
+          mistakes: { ko: "❌ Saya bekerja di Inggris bahasa.\n✅ Apakah kamu bisa bahasa Inggris? ('bahasa' 다음에 언어 이름! 'bahasa Inggris' 순서예요)\n❌ Saya pelajar seorang.\n✅ Saya seorang pelajar. ('seorang'이 직업 앞에 와요!)", en: "❌ Apakah kamu bisa Inggris bahasa?\n✅ Apakah kamu bisa bahasa Inggris? (Language name comes after 'bahasa' — 'bahasa Inggris')\n❌ Saya pelajar seorang.\n✅ Saya seorang pelajar. ('Seorang' goes before the job!)", es: "❌ Apakah kamu bisa Inggris bahasa?\n✅ Apakah kamu bisa bahasa Inggris? (El idioma va después de 'bahasa')\n❌ Saya pelajar seorang.\n✅ Saya seorang pelajar. ('Seorang' va antes del trabajo)" },
+          rudyTip: { ko: "'Apakah kamu bisa bahasa Inggris?'는 여행할 때 진짜 유용해! 'Sedikit saja'(조금이요)라고 겸손하게 대답하면 상대가 쉽게 말해줘~", en: "'Apakah kamu bisa bahasa Inggris?' is super useful when traveling! Answer 'Sedikit saja' (just a little) and people will slow down for you.", es: "'Apakah kamu bisa bahasa Inggris?' es muy útil al viajar. Responde 'Sedikit saja' y la gente hablará más lento." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Saya ___ pelajar.", answer: "seorang", options: ["seorang", "sebuah", "sedikit"], fullSentence: "Saya seorang pelajar.", fullSentenceMeaning: { ko: "저는 학생이에요.", en: "I'm a student.", es: "Soy estudiante." } },
+          { type: "select", promptWithBlank: "Saya ___ di sebuah perusahaan.", answer: "bekerja", options: ["bekerja", "tinggal", "berasal"], fullSentence: "Saya bekerja di sebuah perusahaan.", fullSentenceMeaning: { ko: "저는 회사에 다녀요.", en: "I work at a company.", es: "Trabajo en una empresa." } },
+          { type: "select", promptWithBlank: "Apakah kamu bisa ___ Inggris?", answer: "bahasa", options: ["bahasa", "kata", "suara"], fullSentence: "Apakah kamu bisa bahasa Inggris?", fullSentenceMeaning: { ko: "영어 할 줄 아세요?", en: "Do you speak English?", es: "¿Hablas inglés?" } },
+          { type: "input", promptWithBlank: "Sedikit ___.", answer: "saja", fullSentence: "Sedikit saja.", fullSentenceMeaning: { ko: "조금이요.", en: "A little bit.", es: "Un poquito." } },
+          { type: "input", promptWithBlank: "Apa ___ Anda?", answer: "pekerjaan", fullSentence: "Apa pekerjaan Anda?", fullSentenceMeaning: { ko: "무슨 일 하세요?", en: "What do you do?", es: "¿A qué te dedicas?" } },
+          { type: "listening", audioText: "Apakah kamu bisa bahasa Inggris? Sedikit saja.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Apakah kamu bisa bahasa Inggris? Sedikit saja.", "Apa pekerjaan Anda?", "Saya seorang pelajar.", "Saya bekerja di sebuah perusahaan."], correct: 0, audioOnly: true },
         ],
       },
     },
@@ -384,6 +468,35 @@ export const LESSON_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
         ],
       },
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Selamat tinggal! Sampai jumpa nanti.", speechLang: "id-ID", meaning: { ko: "안녕히 가세요! 다음에 봐요.", en: "Goodbye! See you later.", es: "¡Adiós! Hasta luego." } },
+        { text: "Hati-hati!", speechLang: "id-ID", meaning: { ko: "잘 가요!", en: "Take care!", es: "¡Cuídate!" } },
+        { text: "Senang bertemu dengan Anda tadi.", speechLang: "id-ID", meaning: { ko: "만나서 반가웠어요.", en: "It was nice meeting you.", es: "Fue un placer conocerte." } },
+        { text: "Di mana toilet?", speechLang: "id-ID", meaning: { ko: "화장실이 어디예요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" }, recallRound: true },
+        { text: "Permisi, di mana pintu keluar?", speechLang: "id-ID", meaning: { ko: "실례합니다, 출구가 어디예요?", en: "Excuse me, where is the exit?", es: "Disculpe, ¿dónde está la salida?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 1,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "작별 인사는 'Selamat tinggal'(떠나는 사람이 남는 사람에게)과 'Sampai jumpa'(다음에 봐요)가 있어요. '잘 가요/조심히 가요'는 'Hati-hati'. 장소를 물을 때 'Di mana ___?'를 쓰고, 앞에 'Permisi'(실례합니다)를 붙이면 훨씬 공손해져요!", en: "Indonesian farewells: 'Selamat tinggal' (said by the one leaving) and 'Sampai jumpa' (see you / see you later). 'Hati-hati' means 'take care / be careful'. To ask for places, use 'Di mana ___?' and start with 'Permisi' (excuse me) — it instantly makes you sound polite.", es: "Despedidas en indonesio: 'Selamat tinggal' (lo dice quien se va) y 'Sampai jumpa' (hasta luego). 'Hati-hati' significa 'cuídate'. Para lugares: 'Di mana ___?' Empieza con 'Permisi' (disculpe) para sonar educado." },
+          examples: { ko: "Selamat tinggal! Sampai jumpa nanti. (안녕히 가세요! 다음에 봐요.)\nDi mana toilet? (화장실이 어디예요?)\nPermisi, di mana pintu keluar? (실례합니다, 출구가 어디예요?)", en: "Selamat tinggal! Sampai jumpa nanti. (Goodbye! See you later.)\nDi mana toilet? (Where is the bathroom?)\nPermisi, di mana pintu keluar? (Excuse me, where is the exit?)", es: "Selamat tinggal! Sampai jumpa nanti. (¡Adiós! Hasta luego.)\nDi mana toilet? (¿Dónde está el baño?)\nPermisi, di mana pintu keluar? (Disculpe, ¿dónde está la salida?)" },
+          mistakes: { ko: "❌ Mana toilet?\n✅ Di mana toilet? ('di'를 빼먹지 마세요!)\n❌ Selamat tinggal를 남는 사람이 쓰기\n✅ 떠나는 사람이 'Selamat tinggal', 남는 사람은 'Selamat jalan'을 써요!", en: "❌ Mana toilet?\n✅ Di mana toilet? (Don't drop 'di'!)\n❌ Using 'Selamat tinggal' when you're the one staying\n✅ The person leaving says 'Selamat tinggal'; the one staying says 'Selamat jalan'!", es: "❌ Mana toilet?\n✅ Di mana toilet? (No omitas 'di')\n❌ Usar 'Selamat tinggal' si te quedas\n✅ Quien se va dice 'Selamat tinggal'; quien se queda dice 'Selamat jalan'." },
+          rudyTip: { ko: "'Permisi, di mana ___?'는 여행할 때 제일 많이 쓰는 문장이야! 이 패턴만 외우면 어디서든 길을 찾을 수 있어~", en: "'Permisi, di mana ___?' is THE travel phrase. Master this one pattern and you can find anything, anywhere in Indonesia!", es: "'Permisi, di mana ___?' es LA frase de viaje. Domina este patrón y encontrarás todo en Indonesia." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Selamat ___! Sampai jumpa nanti.", answer: "tinggal", options: ["tinggal", "pagi", "makan"], fullSentence: "Selamat tinggal! Sampai jumpa nanti.", fullSentenceMeaning: { ko: "안녕히 가세요! 다음에 봐요.", en: "Goodbye! See you later.", es: "¡Adiós! Hasta luego." } },
+          { type: "select", promptWithBlank: "Senang ___ dengan Anda tadi.", answer: "bertemu", options: ["bertemu", "tinggal", "makan"], fullSentence: "Senang bertemu dengan Anda tadi.", fullSentenceMeaning: { ko: "만나서 반가웠어요.", en: "It was nice meeting you.", es: "Fue un placer conocerte." } },
+          { type: "select", promptWithBlank: "___ mana toilet?", answer: "Di", options: ["Di", "Ke", "Dari"], fullSentence: "Di mana toilet?", fullSentenceMeaning: { ko: "화장실이 어디예요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" } },
+          { type: "input", promptWithBlank: "___, di mana pintu keluar?", answer: "Permisi", fullSentence: "Permisi, di mana pintu keluar?", fullSentenceMeaning: { ko: "실례합니다, 출구가 어디예요?", en: "Excuse me, where is the exit?", es: "Disculpe, ¿dónde está la salida?" } },
+          { type: "input", promptWithBlank: "___-hati!", answer: "Hati", fullSentence: "Hati-hati!", fullSentenceMeaning: { ko: "잘 가요!", en: "Take care!", es: "¡Cuídate!" } },
+          { type: "listening", audioText: "Permisi, di mana pintu keluar?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Permisi, di mana pintu keluar?", "Di mana toilet?", "Selamat tinggal! Sampai jumpa nanti.", "Hati-hati!"], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 
   // ─────────────── Day 5: How Are You + How much / Help ─────────────────────
@@ -472,6 +585,35 @@ export const LESSON_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
           { type: "input", promptWithBlank: "괜찮아요, ___은요?", answer: "당신", fullSentence: "괜찮아요, 당신은요?", fullSentenceMeaning: { ko: "괜찮아요, 당신은요?", en: "Not bad, how about you?", es: "No está mal, ¿y tú?" } },
           { type: "input", promptWithBlank: "___이 필요해요.", answer: "도움", fullSentence: "도움이 필요해요.", fullSentenceMeaning: { ko: "도움이 필요해요.", en: "I need help.", es: "Necesito ayuda." } },
           { type: "listening", audioText: "이거 얼마예요?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["이거 얼마예요?", "오늘 어떻게 지내요?", "도와주세요! 도움이 필요해요.", "괜찮아요, 당신은요?"], correct: 0, audioOnly: true },
+        ],
+      },
+    },
+    indonesian: {
+      step1Sentences: [
+        { text: "Apa kabar hari ini?", speechLang: "id-ID", meaning: { ko: "오늘 어떻게 지내요?", en: "How are you today?", es: "¿Cómo estás hoy?" } },
+        { text: "Saya baik-baik saja, terima kasih.", speechLang: "id-ID", meaning: { ko: "잘 지내요, 감사합니다.", en: "I'm fine, thank you.", es: "Estoy bien, gracias." } },
+        { text: "Lumayan, bagaimana dengan Anda?", speechLang: "id-ID", meaning: { ko: "괜찮아요, 당신은요?", en: "Not bad, how about you?", es: "No está mal, ¿y tú?" } },
+        { text: "Berapa harganya ini?", speechLang: "id-ID", meaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" }, recallRound: true },
+        { text: "Tolong! Saya butuh bantuan.", speechLang: "id-ID", meaning: { ko: "도와주세요! 도움이 필요해요.", en: "Help! I need help, please.", es: "¡Ayuda! Necesito ayuda, por favor." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 1,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "'Apa kabar?'(어떻게 지내요?)에 'Saya baik-baik saja'(잘 지내요), 'Lumayan'(그저 그래요) 등으로 대답할 수 있어요. 물건 가격은 'Berapa harganya?'(얼마예요?), 위험할 때는 'Tolong!'(도와주세요!)이라고 하세요. 'butuh bantuan'은 '도움이 필요하다'예요!", en: "When asked 'Apa kabar?' (How are you?), reply with 'Saya baik-baik saja' (I'm fine), 'Lumayan' (not bad / so-so). For prices, ask 'Berapa harganya?' (literally 'how much is its price?'). Emergency: 'Tolong!' (Help!). 'Butuh bantuan' means 'need help'.", es: "Cuando pregunten 'Apa kabar?' (¿Cómo estás?), responde 'Saya baik-baik saja' (Estoy bien), 'Lumayan' (regular). Precios: 'Berapa harganya?' Emergencia: '¡Tolong!' (¡Ayuda!). 'Butuh bantuan' = necesitar ayuda." },
+          examples: { ko: "Apa kabar? — Saya baik-baik saja! (어떻게 지내요? — 잘 지내요!)\nBerapa harganya ini? — Lima puluh ribu. (이거 얼마예요? — 5만 루피아예요.)\nTolong! Saya butuh bantuan. (도와주세요! 도움이 필요해요.)", en: "Apa kabar? — Saya baik-baik saja! (How are you? — I'm fine!)\nBerapa harganya ini? (How much is this? — point and ask!)\nTolong! Saya butuh bantuan. (Help! I need help.)", es: "Apa kabar? — Saya baik-baik saja! (¿Cómo estás? — ¡Estoy bien!)\nBerapa harganya ini? (¿Cuánto cuesta esto?)\nTolong! Saya butuh bantuan. (¡Ayuda! Necesito ayuda.)" },
+          mistakes: { ko: "❌ Berapa ini?\n✅ Berapa harganya ini? ('harganya'(그 가격)를 넣어야 자연스러워요!)\n❌ Saya baik. (틀린 건 아니지만)\n✅ Saya baik-baik saja. (반복형이 더 자연스러워요)", en: "❌ Berapa ini?\n✅ Berapa harganya ini? (Add 'harganya' = its price to sound natural!)\n❌ Saya baik. (Not wrong, but bare)\n✅ Saya baik-baik saja. (The doubled form sounds more natural)", es: "❌ Berapa ini?\n✅ Berapa harganya ini? (Agrega 'harganya' = su precio)\n❌ Saya baik.\n✅ Saya baik-baik saja. (La forma duplicada suena más natural)" },
+          rudyTip: { ko: "'Berapa harganya?'는 시장이나 쇼핑할 때 진짜 많이 써! 물건 가리키면서 말하면 돼서 쉬워~ 인도네시아 시장에서는 흥정도 잊지 마!", en: "'Berapa harganya?' is THE shopping phrase in Indonesia! Just point and ask. Bonus tip: at markets, this opens the door to friendly bargaining!", es: "'Berapa harganya?' es LA frase de compras en Indonesia. Solo señala y pregunta. ¡En los mercados abre la puerta al regateo!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "Apa ___ hari ini?", answer: "kabar", options: ["kabar", "nama", "harga"], fullSentence: "Apa kabar hari ini?", fullSentenceMeaning: { ko: "오늘 어떻게 지내요?", en: "How are you today?", es: "¿Cómo estás hoy?" } },
+          { type: "select", promptWithBlank: "Saya ___ saja, terima kasih.", answer: "baik-baik", options: ["baik-baik", "lumayan", "sedikit"], fullSentence: "Saya baik-baik saja, terima kasih.", fullSentenceMeaning: { ko: "잘 지내요, 감사합니다.", en: "I'm fine, thank you.", es: "Estoy bien, gracias." } },
+          { type: "select", promptWithBlank: "Berapa ___ ini?", answer: "harganya", options: ["harganya", "kabar", "nama"], fullSentence: "Berapa harganya ini?", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" } },
+          { type: "input", promptWithBlank: "Lumayan, bagaimana dengan ___?", answer: "Anda", fullSentence: "Lumayan, bagaimana dengan Anda?", fullSentenceMeaning: { ko: "괜찮아요, 당신은요?", en: "Not bad, how about you?", es: "No está mal, ¿y tú?" } },
+          { type: "input", promptWithBlank: "Saya butuh ___.", answer: "bantuan", fullSentence: "Saya butuh bantuan.", fullSentenceMeaning: { ko: "도움이 필요해요.", en: "I need help.", es: "Necesito ayuda." } },
+          { type: "listening", audioText: "Berapa harganya ini?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Berapa harganya ini?", "Apa kabar hari ini?", "Tolong! Saya butuh bantuan.", "Lumayan, bagaimana dengan Anda?"], correct: 0, audioOnly: true },
         ],
       },
     },
@@ -566,6 +708,35 @@ export const LESSON_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
         ],
       },
     },
+    indonesian: {
+      step1Sentences: [
+        { text: "Halo, nama saya Rudy. Senang bertemu dengan Anda.", speechLang: "id-ID", meaning: { ko: "안녕하세요, 제 이름은 루디예요. 만나서 반갑습니다.", en: "Hello, my name is Rudy. Nice to meet you.", es: "Hola, me llamo Rudy. Mucho gusto." } },
+        { text: "Saya berasal dari London. Saya bekerja sebagai detektif.", speechLang: "id-ID", meaning: { ko: "저는 런던에서 왔어요. 탐정으로 일해요.", en: "I'm from London. I work as a detective.", es: "Soy de Londres. Trabajo como detective." } },
+        { text: "Apa kabar? Saya baik-baik saja, terima kasih! Sampai jumpa nanti!", speechLang: "id-ID", meaning: { ko: "어떻게 지내세요? 잘 지내요, 감사합니다! 다음에 봐요!", en: "How are you? I'm great, thanks! See you later!", es: "¿Cómo estás? ¡Estoy genial, gracias! ¡Hasta luego!" } },
+        { text: "Maaf, saya tidak mengerti. Bisa tolong ulangi?", speechLang: "id-ID", meaning: { ko: "미안해요, 이해를 못 했어요. 다시 한번 말해 주시겠어요?", en: "Sorry, I don't understand. Can you say that again?", es: "Lo siento, no entiendo. ¿Puede repetir eso?" }, recallRound: true },
+        { text: "Permisi, di mana toilet? Berapa harganya ini?", speechLang: "id-ID", meaning: { ko: "실례합니다, 화장실이 어디예요? 이거 얼마예요?", en: "Excuse me, where is the bathroom? How much is this?", es: "Disculpe, ¿dónde está el baño? ¿Cuánto cuesta esto?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 1,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "이번 주 인도네시아어를 총정리해요! 자기소개(Nama saya / Saya berasal dari / Saya seorang ___), 인사(Apa kabar? / Selamat tinggal / Sampai jumpa), 생존 표현(Saya tidak mengerti / Di mana ___? / Berapa harganya? / Tolong!)을 자연스럽게 이어서 말해보세요!", en: "Let's review all the Indonesian! Introductions (Nama saya / Saya berasal dari / Saya seorang ___), greetings (Apa kabar? / Selamat tinggal / Sampai jumpa), and survival phrases (Saya tidak mengerti / Di mana ___? / Berapa harganya? / Tolong!). Time to connect them all!", es: "Repasemos todo el indonesio. Presentaciones (Nama saya / Saya berasal dari / Saya seorang ___), saludos (Apa kabar? / Selamat tinggal / Sampai jumpa) y frases de supervivencia (Saya tidak mengerti / Di mana ___? / Berapa harganya? / Tolong!). Conectemos todo." },
+          examples: { ko: "Halo, nama saya Rudy. Saya berasal dari Korea. (자기소개 콤보!)\nApa kabar? — Saya baik-baik saja! Sampai jumpa! (인사 + 작별 콤보!)\nPermisi, di mana toilet? Berapa harganya ini? (생존 콤보!)", en: "Halo, nama saya Rudy. Saya berasal dari Korea. (Introduction combo!)\nApa kabar? — Saya baik-baik saja! Sampai jumpa! (Greeting + farewell combo!)\nMaaf, saya tidak mengerti. Bisa tolong ulangi? (Survival combo!)", es: "Halo, nama saya Rudy. Saya berasal dari Korea. (Combo de presentación.)\nApa kabar? — Saya baik-baik saja! Sampai jumpa! (Combo de saludo + despedida.)\nMaaf, saya tidak mengerti. Bisa tolong ulangi? (Combo de supervivencia.)" },
+          mistakes: { ko: "❌ 문장을 따로따로만 외우기\n✅ 실제 대화처럼 문장을 연결해서 말해보세요! 자기소개→안부→질문→작별 흐름으로!", en: "❌ Only memorizing isolated phrases\n✅ Connect them like a real conversation! Introduction, greeting, questions, goodbye — practice the whole flow.", es: "❌ Solo memorizar frases aisladas\n✅ Conéctalas como una conversación real. Presentación, saludo, preguntas, despedida: practica todo el flujo." },
+          rudyTip: { ko: "이번 주에 배운 것만으로도 인도네시아어로 기본 대화가 가능해! 자기소개부터 작별까지 한 세트로 연습해보자~ 넌 이미 잘하고 있어!", en: "With just this week's Indonesian, you can hold a basic conversation! From hello to goodbye — that's real progress. You're doing amazing!", es: "Solo con el indonesio de esta semana puedes tener una conversación básica. Desde hola hasta adiós: eso es progreso real. ¡Increíble!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "___ saya Rudy.", answer: "Nama", options: ["Nama", "Saya", "Orang"], fullSentence: "Nama saya Rudy.", fullSentenceMeaning: { ko: "제 이름은 루디예요.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
+          { type: "select", promptWithBlank: "Apa ___ hari ini?", answer: "kabar", options: ["kabar", "nama", "harga"], fullSentence: "Apa kabar hari ini?", fullSentenceMeaning: { ko: "오늘 어떻게 지내요?", en: "How are you today?", es: "¿Cómo estás hoy?" } },
+          { type: "input", promptWithBlank: "Maaf, saya tidak ___.", answer: "mengerti", fullSentence: "Maaf, saya tidak mengerti.", fullSentenceMeaning: { ko: "미안해요, 이해를 못 했어요.", en: "Sorry, I don't understand.", es: "Lo siento, no entiendo." } },
+          { type: "input", promptWithBlank: "Di mana ___?", answer: "toilet", fullSentence: "Di mana toilet?", fullSentenceMeaning: { ko: "화장실이 어디예요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" } },
+          { type: "input", promptWithBlank: "Berapa ___ ini?", answer: "harganya", fullSentence: "Berapa harganya ini?", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" } },
+          { type: "listening", audioText: "Maaf, saya tidak mengerti. Bisa tolong ulangi?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Maaf, saya tidak mengerti. Bisa tolong ulangi?", "Berapa harganya ini?", "Di mana toilet?", "Nama saya Rudy."], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 };
 
@@ -579,36 +750,42 @@ export const MISSION_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLan
     english: { situation: { ko: "루디가 런던 박물관에서 새 동료를 만났습니다. 인사하고 자기소개를 해보세요!", en: "Rudy meets a new colleague at the London museum. Greet and introduce yourself!", es: "Rudy conoce a un nuevo colega en el museo de Londres. ¡Saluda y preséntate!" }, gptPrompt: "You are Rudy the fox detective meeting a new partner at the London museum. Have a simple A1-level introduction conversation in {targetLang}. Guide through: 1) greeting 2) asking name 3) asking where they're from 4) saying nice to meet you. At some point, say something slightly unclear so the user can practice 'I don't understand' or 'Can you say that again?'. If they use these phrases, praise them. Also end with 'Thank you, nice to meet you!' to reinforce thank you. Keep sentences very short. After 5-6 exchanges, say goodbye warmly.", speechLang: "en-GB", suggestedAnswers: ["Hello!", "My name is ___.", "I'm from ___.", "Nice to meet you too!", "Sorry, I don't understand.", "Thank you!"] },
     spanish: { situation: { ko: "루디가 런던 박물관에서 새 동료를 만났습니다. 인사하고 자기소개를 해보세요!", en: "Rudy meets a new colleague at the London museum. Greet and introduce yourself!", es: "Rudy conoce a un nuevo colega en el museo. ¡Saluda y preséntate!" }, gptPrompt: "You are Rudy the fox detective meeting a new partner at the London museum. Have a simple A1-level introduction conversation in {targetLang}. Guide through: 1) greeting 2) asking name 3) asking where they're from 4) saying nice to meet you. At some point, say something slightly unclear so the user can practice 'No entiendo' or '¿Puede repetir eso?'. If they use these phrases, praise them. End with 'Gracias, mucho gusto!' to reinforce gracias. Keep sentences very short.", speechLang: "es-ES", suggestedAnswers: ["¡Hola!", "Me llamo ___.", "Soy de ___.", "¡Mucho gusto!", "No entiendo.", "¡Gracias!"] },
     korean: { situation: { ko: "루디가 런던 박물관에서 새 동료를 만났습니다. 인사하고 자기소개를 해보세요!", en: "Rudy meets a new colleague at the London museum. Greet and introduce yourself!", es: "Rudy conoce a un nuevo colega. ¡Saluda y preséntate!" }, gptPrompt: "You are Rudy the fox detective meeting a new partner at the London museum. Have a simple A1-level introduction conversation in {targetLang}. Guide through: 1) greeting 2) asking name 3) asking where they're from 4) saying nice to meet you. At some point, say something slightly unclear so the user can practice '이해를 못 했어요' or '다시 한번 말해 주시겠어요?'. If they use these phrases, praise them. End with '감사합니다, 만나서 반가워요!' to reinforce 감사합니다. Keep sentences very short.", speechLang: "ko-KR", suggestedAnswers: ["안녕하세요!", "제 이름은 ___이에요.", "저는 ___에서 왔어요.", "만나서 반가워요!", "이해를 못 했어요.", "감사합니다!"] },
+    indonesian: { situation: { ko: "루디가 런던 박물관에서 새 동료를 만났습니다. 인사하고 자기소개를 해보세요!", en: "Rudy meets a new colleague at the London museum. Greet and introduce yourself!", es: "Rudy conoce a un nuevo colega. ¡Saluda y preséntate!" }, gptPrompt: "You are Rudy the fox detective meeting a new partner at the London museum. Have a simple A1-level introduction conversation in {targetLang}. Guide through: 1) greeting 2) asking name 3) asking where they're from 4) saying nice to meet you. At some point, say something slightly unclear so the user can practice 'Saya tidak mengerti' or 'Bisa tolong ulangi?'. If they use these phrases, praise them. End with 'Terima kasih, senang bertemu dengan Anda!' to reinforce terima kasih. Keep sentences very short.", speechLang: "id-ID", suggestedAnswers: ["Halo!", "Nama saya ___.", "Saya berasal dari ___.", "Senang bertemu dengan Anda!", "Saya tidak mengerti.", "Terima kasih!"] },
   },
 
   day_2: {
     english: { situation: { ko: "루디가 다른 나라에서 온 동료들과 이야기하고 있습니다. 출신과 사는 곳에 대해 대화해보세요!", en: "Rudy is chatting with colleagues from different countries. Talk about where you're from!", es: "Rudy habla con colegas de diferentes países. ¡Habla sobre tu origen!" }, gptPrompt: "You are Rudy chatting with your new partner about where you're both from. Simple A1 conversation in {targetLang}. Ask about: 1) their country 2) their city 3) what it's like there 4) if they like it. Share that you're from London. At one point, speak slightly fast so the user can practice 'Can you say that again?' If they do, slow down and repeat. Reinforce yes/no practice. Keep it simple and encouraging.", speechLang: "en-GB", suggestedAnswers: ["I'm from Korea.", "I live in Seoul.", "Yes!", "No.", "Can you say that again, please?", "It's a big city."] },
     spanish: { situation: { ko: "루디가 다른 나라에서 온 동료들과 이야기하고 있습니다.", en: "Rudy is chatting with colleagues from different countries.", es: "Rudy habla con colegas de diferentes países." }, gptPrompt: "You are Rudy chatting with your new partner about where you're both from. Simple A1 conversation in {targetLang}. Ask about: 1) their country 2) their city 3) what it's like there 4) if they like it. At one point, speak slightly fast so the user can practice '¿Puede repetir eso?' Reinforce sí/no practice. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["Soy de Corea.", "Vivo en Seúl.", "¡Sí!", "No.", "¿Puede repetir eso, por favor?", "Es una ciudad grande."] },
     korean: { situation: { ko: "루디가 다른 나라에서 온 동료들과 이야기하고 있습니다.", en: "Rudy is chatting with colleagues from different countries.", es: "Rudy habla con colegas de diferentes países." }, gptPrompt: "You are Rudy chatting with your new partner about where you're both from. Simple A1 conversation in {targetLang}. Ask about: 1) their country 2) their city 3) what it's like there 4) if they like it. At one point, speak slightly fast so the user can practice '다시 한번 말해 주시겠어요?' Reinforce 네/아니요 practice. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["저는 한국에서 왔어요.", "서울에 살아요.", "네!", "아니요.", "다시 한번 말해 주시겠어요?", "큰 도시예요."] },
+    indonesian: { situation: { ko: "루디가 다른 나라에서 온 동료들과 이야기하고 있습니다.", en: "Rudy is chatting with colleagues from different countries.", es: "Rudy habla con colegas de diferentes países." }, gptPrompt: "You are Rudy chatting with your new partner about where you're both from. Simple A1 conversation in {targetLang}. Ask about: 1) their country 2) their city 3) what it's like there 4) if they like it. At one point, speak slightly fast so the user can practice 'Bisa tolong ulangi?' or 'Bisa bicara lebih pelan?' Reinforce ya/tidak practice. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Saya berasal dari Korea.", "Saya tinggal di Seoul.", "Ya!", "Tidak.", "Bisa tolong ulangi?", "Ini kota besar."] },
   },
 
   day_3: {
     english: { situation: { ko: "박물관에서 여러 직업의 사람들을 만나고 있습니다. 직업과 언어에 대해 이야기해보세요!", en: "Meeting people with different jobs at the museum. Talk about jobs and languages!", es: "Conociendo personas con diferentes trabajos. ¡Habla de trabajos e idiomas!" }, gptPrompt: "You are Rudy at a museum event meeting your new partner. Talk about jobs in simple A1 {targetLang}. Ask about: 1) what they do 2) where they work 3) if they like their job 4) what languages they speak. Practice 'Do you speak ___?' and 'A little bit.' Share your job as detective. Keep very simple.", speechLang: "en-GB", suggestedAnswers: ["I'm a student.", "I work at a school.", "Do you speak English?", "A little bit.", "That's interesting!", "Yes, I like it."] },
     spanish: { situation: { ko: "박물관에서 여러 직업의 사람들을 만나고 있습니다.", en: "Meeting people with different jobs at the museum.", es: "Conociendo personas con diferentes trabajos en el museo." }, gptPrompt: "You are Rudy at a museum event meeting your new partner. Talk about jobs in simple A1 {targetLang}. Ask about: 1) what they do 2) where they work 3) what languages they speak. Practice '¿Hablas ___?' and 'Un poquito.' Keep very simple.", speechLang: "es-ES", suggestedAnswers: ["Soy estudiante.", "Trabajo en una escuela.", "¿Hablas español?", "Un poquito.", "¡Qué interesante!", "Sí, me gusta."] },
     korean: { situation: { ko: "박물관에서 여러 직업의 사람들을 만나고 있습니다.", en: "Meeting people with different jobs at the museum.", es: "Conociendo personas con diferentes trabajos." }, gptPrompt: "You are Rudy at a museum event meeting your new partner. Talk about jobs in simple A1 {targetLang}. Ask about: 1) what they do 2) where they work 3) what languages they speak. Practice '___할 줄 아세요?' and '조금이요.' Keep very simple.", speechLang: "ko-KR", suggestedAnswers: ["저는 학생이에요.", "학교에서 일해요.", "한국어 할 줄 아세요?", "조금이요.", "재미있네요!", "네, 좋아해요."] },
+    indonesian: { situation: { ko: "박물관에서 여러 직업의 사람들을 만나고 있습니다.", en: "Meeting people with different jobs at the museum.", es: "Conociendo personas con diferentes trabajos." }, gptPrompt: "You are Rudy at a museum event meeting your new partner. Talk about jobs in simple A1 {targetLang}. Ask about: 1) what they do 2) where they work 3) what languages they speak. Practice 'Apakah kamu bisa bahasa ___?' and 'Sedikit saja.' Keep very simple.", speechLang: "id-ID", suggestedAnswers: ["Saya seorang pelajar.", "Saya bekerja di sekolah.", "Apakah kamu bisa bahasa Inggris?", "Sedikit saja.", "Menarik sekali!", "Ya, saya suka."] },
   },
 
   day_4: {
     english: { situation: { ko: "루디가 런던 도심에서 용의자를 미행하고 있습니다. 출구와 화장실 위치를 파악해야 해요!", en: "Rudy is tailing a suspect through London. He needs to know where the exits and bathrooms are to stay on the trail!", es: "Rudy sigue a un sospechoso por Londres. ¡Necesita conocer las salidas y los baños para no perderlo!" }, gptPrompt: "You are Rudy's field partner helping him tail a suspect through a busy London building. Simple A1 {targetLang}. Practice: 1) Rudy needs to say goodbye quickly to a bystander without blowing his cover 2) ask 'Where is the exit?' and 'Where is the bathroom?' naturally as cover — he needs to know the layout 3) end with quick goodbyes as the suspect moves. The vocabulary is identical — only the detective framing makes it exciting. Keep very simple and tense.", speechLang: "en-GB", suggestedAnswers: ["Excuse me, where is the exit?", "Where is the bathroom?", "Take care! See you later!", "Goodbye — I have to go!", "It was nice meeting you.", "See you tomorrow!"] },
     spanish: { situation: { ko: "루디가 런던 도심에서 용의자를 미행하고 있습니다. 위치를 파악해야 해요!", en: "Rudy is tailing a suspect through London. He needs to know the exits!", es: "Rudy sigue a un sospechoso. ¡Necesita conocer las salidas para no perderlo!" }, gptPrompt: "You are Rudy's field partner. He is tailing a suspect and needs the building layout. Simple A1 {targetLang}. Practice: 1) quick goodbye without blowing cover 2) ask '¿Dónde está la salida?' and '¿Dónde está el baño?' as cover 3) urgent quick farewells as the suspect moves. Keep very simple and tense.", speechLang: "es-ES", suggestedAnswers: ["Disculpe, ¿dónde está la salida?", "¿Dónde está el baño?", "¡Cuídate! ¡Hasta luego!", "¡Adiós, tengo que irme!", "Fue un placer conocerte.", "¡Hasta mañana!"] },
     korean: { situation: { ko: "루디가 런던 도심에서 용의자를 미행하고 있습니다. 위치를 파악해야 해요!", en: "Rudy is tailing a suspect. He needs to know the exits!", es: "Rudy sigue a un sospechoso. ¡Necesita las salidas!" }, gptPrompt: "You are Rudy's field partner. He is tailing a suspect and needs the building layout. Simple A1 {targetLang}. Practice: 1) quick goodbye without blowing cover 2) ask '출구가 어디예요?' and '화장실이 어디예요?' as cover 3) urgent quick farewells as the suspect moves. Keep very simple and tense.", speechLang: "ko-KR", suggestedAnswers: ["실례합니다, 출구가 어디예요?", "화장실이 어디예요?", "잘 가요! 다음에 봐요!", "안녕히 가세요, 가야 해요!", "만나서 반가웠어요.", "내일 봐요!"] },
+    indonesian: { situation: { ko: "루디가 런던 도심에서 용의자를 미행하고 있습니다. 위치를 파악해야 해요!", en: "Rudy is tailing a suspect. He needs to know the exits!", es: "Rudy sigue a un sospechoso. ¡Necesita las salidas!" }, gptPrompt: "You are Rudy's field partner. He is tailing a suspect and needs the building layout. Simple A1 {targetLang}. Practice: 1) quick goodbye without blowing cover 2) ask 'Di mana pintu keluar?' and 'Di mana toilet?' as cover 3) urgent quick farewells as the suspect moves. Keep very simple and tense.", speechLang: "id-ID", suggestedAnswers: ["Permisi, di mana pintu keluar?", "Di mana toilet?", "Hati-hati! Sampai jumpa nanti!", "Selamat tinggal, saya harus pergi!", "Senang bertemu dengan Anda tadi.", "Sampai jumpa besok!"] },
   },
 
   day_5: {
     english: { situation: { ko: "루디가 수사에 필요한 물품을 구매해야 합니다. 가게에서 가격을 확인하고 동료와 안부도 나눠요!", en: "Rudy needs to buy supplies for the investigation. Check prices at the shop and greet a fellow agent!", es: "Rudy necesita comprar suministros para la investigación. ¡Verifica precios en la tienda y saluda a un agente!" }, gptPrompt: "You are a fellow agent Rudy meets while buying investigation supplies at a London shop. Simple A1 {targetLang}. Practice: 1) morning greeting — asking how they are 2) Rudy is buying disguise supplies, ask 'How much is this?' for items 3) if confused about a price, practice 'I don't understand' 4) if something is wrong, use 'Help, please!'. The detective framing makes every 'How much?' transaction feel meaningful. Keep very simple.", speechLang: "en-GB", suggestedAnswers: ["I'm great, thanks!", "Not bad, and you?", "How much is this?", "I don't understand.", "Help, please!", "That's expensive!"] },
     spanish: { situation: { ko: "루디가 수사 물품을 구매하면서 동료 요원과 안부를 나눕니다.", en: "Rudy buys investigation supplies and greets a fellow agent.", es: "Rudy compra suministros de investigación y saluda a un agente." }, gptPrompt: "You are a fellow agent Rudy meets while buying investigation supplies. Simple A1 {targetLang}. Practice: 1) morning greeting 2) buying supplies — ask '¿Cuánto cuesta esto?' for items 3) if confused, practice 'No entiendo' 4) use '¡Ayuda!' if something goes wrong. Detective framing makes the shopping feel real. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["¡Estoy genial, gracias!", "No está mal, ¿y tú?", "¿Cuánto cuesta esto?", "No entiendo.", "¡Ayuda, por favor!", "¡Eso es caro!"] },
     korean: { situation: { ko: "루디가 수사 물품을 구매하면서 동료 요원과 안부를 나눕니다.", en: "Rudy buys investigation supplies and greets a fellow agent.", es: "Rudy compra suministros y saluda a un agente." }, gptPrompt: "You are a fellow agent Rudy meets while buying investigation supplies. Simple A1 {targetLang}. Practice: 1) morning greeting 2) buying supplies — ask '이거 얼마예요?' for items 3) if confused, practice '이해를 못 했어요' 4) use '도와주세요!' if something goes wrong. Detective framing makes it real. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["잘 지내요, 감사해요!", "괜찮아요, 당신은요?", "이거 얼마예요?", "이해를 못 했어요.", "도와주세요!", "비싸요!"] },
+    indonesian: { situation: { ko: "루디가 수사 물품을 구매하면서 동료 요원과 안부를 나눕니다.", en: "Rudy buys investigation supplies and greets a fellow agent.", es: "Rudy compra suministros y saluda a un agente." }, gptPrompt: "You are a fellow agent Rudy meets while buying investigation supplies. Simple A1 {targetLang}. Practice: 1) morning greeting 2) buying supplies — ask 'Berapa harganya ini?' for items 3) if confused, practice 'Saya tidak mengerti' 4) use 'Tolong!' if something goes wrong. Detective framing makes it real. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Saya baik-baik saja, terima kasih!", "Lumayan, bagaimana dengan Anda?", "Berapa harganya ini?", "Saya tidak mengerti.", "Tolong, bantu saya!", "Ini mahal!"] },
   },
 
   day_6: {
     english: { situation: { ko: "박물관 환영 파티에서 새로운 사람들을 여러 명 만나는 상황입니다. 이번 주에 배운 모든 표현을 활용하세요!", en: "Welcome party at the museum! Meet several new people and use EVERYTHING you've learned this week!", es: "¡Fiesta de bienvenida en el museo! ¡Usa TODO lo aprendido esta semana!" }, gptPrompt: "You are Rudy hosting a welcome party at the museum. Test ALL of Unit 1 in a natural A1 {targetLang} conversation. Cover: greeting, self-introduction (name, origin, job), asking how they are, asking 'Do you speak ___?', AND survival phrases ('Where is the bathroom?', 'How much is this?' at the snack table, 'I don't understand', 'Can you say that again?'). Introduce 2-3 different 'guests'. This is a review day so test everything but be encouraging.", speechLang: "en-GB", suggestedAnswers: ["Hello! My name is ___.", "I'm from ___.", "Do you speak English?", "Where is the bathroom?", "How much is this?", "Sorry, I don't understand.", "Goodbye! See you later!"] },
     spanish: { situation: { ko: "박물관 환영 파티에서 새로운 사람들을 여러 명 만나는 상황입니다.", en: "Welcome party at the museum! Use everything you've learned!", es: "¡Fiesta de bienvenida! ¡Usa todo lo aprendido!" }, gptPrompt: "You are Rudy hosting a welcome party at the museum. Test ALL of Unit 1 in a natural A1 {targetLang} conversation. Cover: greeting, self-introduction, asking how they are, '¿Hablas ___?', AND survival phrases ('¿Dónde está el baño?', '¿Cuánto cuesta esto?', 'No entiendo', '¿Puede repetir eso?'). Introduce 2-3 different 'guests'. Be encouraging.", speechLang: "es-ES", suggestedAnswers: ["¡Hola! Me llamo ___.", "Soy de ___.", "¿Hablas español?", "¿Dónde está el baño?", "¿Cuánto cuesta esto?", "No entiendo.", "¡Adiós! ¡Hasta luego!"] },
     korean: { situation: { ko: "박물관 환영 파티에서 새로운 사람들을 여러 명 만나는 상황입니다. 배운 모든 표현을 활용하세요!", en: "Welcome party at the museum! Use everything!", es: "¡Fiesta de bienvenida! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting a welcome party at the museum. Test ALL of Unit 1 in a natural A1 {targetLang} conversation. Cover: greeting, self-introduction, asking how they are, '___할 줄 아세요?', AND survival phrases ('화장실이 어디예요?', '이거 얼마예요?', '이해를 못 했어요', '다시 한번 말해 주시겠어요?'). Introduce 2-3 different 'guests'. Be encouraging.", speechLang: "ko-KR", suggestedAnswers: ["안녕하세요! 제 이름은 ___이에요.", "___에서 왔어요.", "한국어 할 줄 아세요?", "화장실이 어디예요?", "이거 얼마예요?", "이해를 못 했어요.", "안녕히 가세요! 다음에 봐요!"] },
+    indonesian: { situation: { ko: "박물관 환영 파티에서 새로운 사람들을 여러 명 만나는 상황입니다. 배운 모든 표현을 활용하세요!", en: "Welcome party at the museum! Use everything!", es: "¡Fiesta de bienvenida! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting a welcome party at the museum. Test ALL of Unit 1 in a natural A1 {targetLang} conversation. Cover: greeting, self-introduction, asking how they are, 'Apakah kamu bisa bahasa ___?', AND survival phrases ('Di mana toilet?', 'Berapa harganya ini?', 'Saya tidak mengerti', 'Bisa tolong ulangi?'). Introduce 2-3 different 'guests'. Be encouraging.", speechLang: "id-ID", suggestedAnswers: ["Halo! Nama saya ___.", "Saya berasal dari ___.", "Apakah kamu bisa bahasa Inggris?", "Di mana toilet?", "Berapa harganya ini?", "Saya tidak mengerti.", "Selamat tinggal! Sampai jumpa nanti!"] },
   },
 };
 
@@ -640,6 +817,13 @@ export const REVIEW_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
       { type: "fill_blank", promptWithBlank: "어디에서 ___어요?", answer: "오셨", options: ["오셨", "갔", "있"], fullSentence: "어디에서 오셨어요?", fullSentenceMeaning: { ko: "어디에서 오셨어요?", en: "Where are you from?", es: "¿De dónde eres?" } },
       { type: "speak", sentence: "감사합니다. 만나서 반갑습니다.", speechLang: "ko-KR", meaning: { ko: "감사합니다. 만나서 반갑습니다.", en: "Thank you. Nice to meet you.", es: "Gracias. Mucho gusto." } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Halo, senang bertemu dengan Anda.", speechLang: "id-ID", meaning: { ko: "안녕하세요, 만나서 반갑습니다.", en: "Hello, nice to meet you.", es: "Hola, mucho gusto." } },
+      { type: "fill_blank", promptWithBlank: "___ saya Rudy.", answer: "Nama", options: ["Nama", "Saya", "Orang"], fullSentence: "Nama saya Rudy.", fullSentenceMeaning: { ko: "제 이름은 루디예요.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
+      { type: "speak", sentence: "Maaf, saya tidak mengerti.", speechLang: "id-ID", meaning: { ko: "미안해요, 이해를 못 했어요.", en: "Sorry, I don't understand.", es: "Lo siento, no entiendo." } },
+      { type: "fill_blank", promptWithBlank: "Anda berasal dari ___?", answer: "mana", options: ["mana", "apa", "siapa"], fullSentence: "Anda berasal dari mana?", fullSentenceMeaning: { ko: "어디에서 오셨어요?", en: "Where are you from?", es: "¿De dónde eres?" } },
+      { type: "speak", sentence: "Terima kasih. Senang bertemu dengan Anda.", speechLang: "id-ID", meaning: { ko: "감사합니다. 만나서 반갑습니다.", en: "Thank you. Nice to meet you.", es: "Gracias. Mucho gusto." } },
+    ],
   },
 
   day_2: {
@@ -663,6 +847,13 @@ export const REVIEW_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
       { type: "speak", sentence: "저는 한국에서 왔어요. 서울에 살아요.", speechLang: "ko-KR", meaning: { ko: "저는 한국에서 왔어요. 서울에 살아요.", en: "I'm from Korea. I live in Seoul.", es: "Soy de Corea. Vivo en Seúl." } },
       { type: "fill_blank", promptWithBlank: "다시 한번 ___ 주시겠어요?", answer: "말해", options: ["말해", "해", "가"], fullSentence: "다시 한번 말해 주시겠어요?", fullSentenceMeaning: { ko: "다시 한번 말해 주시겠어요?", en: "Can you say that again, please?", es: "¿Puede repetir eso, por favor?" } },
       { type: "speak", sentence: "다시 한번 말해 주시겠어요?", speechLang: "ko-KR", meaning: { ko: "다시 한번 말해 주시겠어요?", en: "Can you say that again, please?", es: "¿Puede repetir eso, por favor?" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Halo, nama saya Rudy.", speechLang: "id-ID", meaning: { ko: "안녕하세요, 제 이름은 루디예요.", en: "Hello, my name is Rudy.", es: "Hola, me llamo Rudy." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Maaf, saya tidak ___.", answer: "mengerti", options: ["mengerti", "tahu", "bisa"], fullSentence: "Maaf, saya tidak mengerti.", fullSentenceMeaning: { ko: "미안해요, 이해를 못 했어요.", en: "Sorry, I don't understand.", es: "Lo siento, no entiendo." }, isYesterdayReview: true },
+      { type: "speak", sentence: "Saya berasal dari Korea. Saya tinggal di Seoul.", speechLang: "id-ID", meaning: { ko: "저는 한국에서 왔어요. 서울에 살아요.", en: "I'm from Korea. I live in Seoul.", es: "Soy de Corea. Vivo en Seúl." } },
+      { type: "fill_blank", promptWithBlank: "Bisa tolong ___?", answer: "ulangi", options: ["ulangi", "bicara", "pergi"], fullSentence: "Bisa tolong ulangi?", fullSentenceMeaning: { ko: "다시 한번 말해 주시겠어요?", en: "Can you say that again, please?", es: "¿Puede repetir eso, por favor?" } },
+      { type: "speak", sentence: "Bisa tolong ulangi?", speechLang: "id-ID", meaning: { ko: "다시 한번 말해 주시겠어요?", en: "Can you say that again, please?", es: "¿Puede repetir eso, por favor?" } },
     ],
   },
 
@@ -688,6 +879,13 @@ export const REVIEW_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
       { type: "fill_blank", promptWithBlank: "한국어 할 ___ 아세요?", answer: "줄", options: ["줄", "것", "수"], fullSentence: "한국어 할 줄 아세요?", fullSentenceMeaning: { ko: "한국어 할 줄 아세요?", en: "Do you speak Korean?", es: "¿Hablas coreano?" } },
       { type: "speak", sentence: "한국어 할 줄 아세요? 조금이요.", speechLang: "ko-KR", meaning: { ko: "한국어 할 줄 아세요? 조금이요.", en: "Do you speak Korean? A little bit.", es: "¿Hablas coreano? Un poquito." } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Saya berasal dari Korea. Saya tinggal di Seoul.", speechLang: "id-ID", meaning: { ko: "저는 한국에서 왔어요. 서울에 살아요.", en: "I'm from Korea. I live in Seoul.", es: "Soy de Corea. Vivo en Seúl." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Bisa tolong ___?", answer: "ulangi", options: ["ulangi", "bicara", "pergi"], fullSentence: "Bisa tolong ulangi?", fullSentenceMeaning: { ko: "다시 한번 말해 주시겠어요?", en: "Can you say that again?", es: "¿Puede repetir eso?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Saya seorang pelajar. Saya bekerja di sekolah.", speechLang: "id-ID", meaning: { ko: "저는 학생이에요. 학교에서 일해요.", en: "I'm a student. I work at a school.", es: "Soy estudiante. Trabajo en una escuela." } },
+      { type: "fill_blank", promptWithBlank: "Apakah kamu bisa ___ Inggris?", answer: "bahasa", options: ["bahasa", "kata", "suara"], fullSentence: "Apakah kamu bisa bahasa Inggris?", fullSentenceMeaning: { ko: "영어 할 줄 아세요?", en: "Do you speak English?", es: "¿Hablas inglés?" } },
+      { type: "speak", sentence: "Apakah kamu bisa bahasa Inggris? Sedikit saja.", speechLang: "id-ID", meaning: { ko: "영어 할 줄 아세요? 조금이요.", en: "Do you speak English? A little bit.", es: "¿Hablas inglés? Un poquito." } },
+    ],
   },
 
   day_4: {
@@ -711,6 +909,13 @@ export const REVIEW_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
       { type: "speak", sentence: "안녕히 가세요! 다음에 봐요! 잘 가요!", speechLang: "ko-KR", meaning: { ko: "안녕히 가세요! 다음에 봐요! 잘 가요!", en: "Goodbye! See you later! Take care!", es: "¡Adiós! ¡Hasta luego! ¡Cuídate!" } },
       { type: "fill_blank", promptWithBlank: "화장실이 ___예요?", answer: "어디", options: ["어디", "뭐", "어떻게"], fullSentence: "화장실이 어디예요?", fullSentenceMeaning: { ko: "화장실이 어디예요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" } },
       { type: "speak", sentence: "실례합니다, 출구가 어디예요?", speechLang: "ko-KR", meaning: { ko: "실례합니다, 출구가 어디예요?", en: "Excuse me, where is the exit?", es: "Disculpe, ¿dónde está la salida?" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Saya seorang pelajar. Apakah kamu bisa bahasa Inggris?", speechLang: "id-ID", meaning: { ko: "저는 학생이에요. 영어 할 줄 아세요?", en: "I'm a student. Do you speak English?", es: "Soy estudiante. ¿Hablas inglés?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Apa ___ Anda?", answer: "pekerjaan", options: ["pekerjaan", "kabar", "nama"], fullSentence: "Apa pekerjaan Anda?", fullSentenceMeaning: { ko: "무슨 일 하세요?", en: "What do you do?", es: "¿A qué te dedicas?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Selamat tinggal! Sampai jumpa nanti! Hati-hati!", speechLang: "id-ID", meaning: { ko: "안녕히 가세요! 다음에 봐요! 잘 가요!", en: "Goodbye! See you later! Take care!", es: "¡Adiós! ¡Hasta luego! ¡Cuídate!" } },
+      { type: "fill_blank", promptWithBlank: "___ mana toilet?", answer: "Di", options: ["Di", "Ke", "Dari"], fullSentence: "Di mana toilet?", fullSentenceMeaning: { ko: "화장실이 어디예요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" } },
+      { type: "speak", sentence: "Permisi, di mana pintu keluar?", speechLang: "id-ID", meaning: { ko: "실례합니다, 출구가 어디예요?", en: "Excuse me, where is the exit?", es: "Disculpe, ¿dónde está la salida?" } },
     ],
   },
 
@@ -736,6 +941,13 @@ export const REVIEW_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
       { type: "fill_blank", promptWithBlank: "이거 ___예요?", answer: "얼마", options: ["얼마", "뭐", "어디"], fullSentence: "이거 얼마예요?", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" } },
       { type: "speak", sentence: "도와주세요! 도움이 필요해요.", speechLang: "ko-KR", meaning: { ko: "도와주세요! 도움이 필요해요.", en: "Help! I need help, please.", es: "¡Ayuda! Necesito ayuda, por favor." } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Selamat tinggal! Hati-hati! Di mana pintu keluar?", speechLang: "id-ID", meaning: { ko: "안녕히 가세요! 잘 가요! 출구가 어디예요?", en: "Goodbye! Take care! Where is the exit?", es: "¡Adiós! ¡Cuídate! ¿Dónde está la salida?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Sampai jumpa ___!", answer: "nanti", options: ["nanti", "besok", "pagi"], fullSentence: "Sampai jumpa nanti!", fullSentenceMeaning: { ko: "다음에 봐요!", en: "See you later!", es: "¡Hasta luego!" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Saya baik-baik saja, terima kasih. Bagaimana dengan Anda?", speechLang: "id-ID", meaning: { ko: "잘 지내요, 감사합니다. 당신은요?", en: "I'm fine, thank you. And you?", es: "Estoy bien, gracias. ¿Y tú?" } },
+      { type: "fill_blank", promptWithBlank: "Berapa ___ ini?", answer: "harganya", options: ["harganya", "kabar", "nama"], fullSentence: "Berapa harganya ini?", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" } },
+      { type: "speak", sentence: "Tolong! Saya butuh bantuan.", speechLang: "id-ID", meaning: { ko: "도와주세요! 도움이 필요해요.", en: "Help! I need help, please.", es: "¡Ayuda! Necesito ayuda, por favor." } },
+    ],
   },
 
   day_6: {
@@ -759,6 +971,13 @@ export const REVIEW_CONTENT_IMPROVED: Record<string, Partial<Record<LearningLang
       { type: "speak", sentence: "죄송해요, 이해를 못 했어요. 다시 한번 말해 주시겠어요?", speechLang: "ko-KR", meaning: { ko: "죄송해요, 이해를 못 했어요. 다시 한번 말해 주시겠어요?", en: "Sorry, I don't understand. Can you say that again?", es: "Lo siento, no entiendo. ¿Puede repetir eso?" } },
       { type: "speak", sentence: "화장실이 어디예요? 이거 얼마예요?", speechLang: "ko-KR", meaning: { ko: "화장실이 어디예요? 이거 얼마예요?", en: "Where is the bathroom? How much is this?", es: "¿Dónde está el baño? ¿Cuánto cuesta esto?" } },
       { type: "speak", sentence: "안녕히 가세요! 잘 가요! 내일 봐요!", speechLang: "ko-KR", meaning: { ko: "안녕히 가세요! 잘 가요! 내일 봐요!", en: "Goodbye! Take care! See you tomorrow!", es: "¡Adiós! ¡Cuídate! ¡Hasta mañana!" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Halo, nama saya Rudy. Senang bertemu dengan Anda.", speechLang: "id-ID", meaning: { ko: "안녕하세요, 제 이름은 루디예요. 반갑습니다.", en: "Hello, my name is Rudy. Nice to meet you.", es: "Hola, me llamo Rudy. Mucho gusto." } },
+      { type: "speak", sentence: "Saya berasal dari Korea. Saya tinggal di Seoul.", speechLang: "id-ID", meaning: { ko: "한국에서 왔어요. 서울에 살아요.", en: "I'm from Korea. I live in Seoul.", es: "Soy de Corea. Vivo en Seúl." } },
+      { type: "speak", sentence: "Maaf, saya tidak mengerti. Bisa tolong ulangi?", speechLang: "id-ID", meaning: { ko: "미안해요, 이해를 못 했어요. 다시 한번 말해 주시겠어요?", en: "Sorry, I don't understand. Can you say that again?", es: "Lo siento, no entiendo. ¿Puede repetir eso?" } },
+      { type: "speak", sentence: "Di mana toilet? Berapa harganya ini?", speechLang: "id-ID", meaning: { ko: "화장실이 어디예요? 이거 얼마예요?", en: "Where is the bathroom? How much is this?", es: "¿Dónde está el baño? ¿Cuánto cuesta esto?" } },
+      { type: "speak", sentence: "Selamat tinggal! Hati-hati! Sampai jumpa besok!", speechLang: "id-ID", meaning: { ko: "안녕히 가세요! 잘 가요! 내일 봐요!", en: "Goodbye! Take care! See you tomorrow!", es: "¡Adiós! ¡Cuídate! ¡Hasta mañana!" } },
     ],
   },
 };

@@ -45,9 +45,209 @@ interface FlashCard {
 }
 
 const BEGINNER_CARDS_BY_LANG: Record<NativeLanguage, FlashCard[]> = {
-  // Indonesian is a native/UI language only (Phase 1) — never a learning
-  // target, so it never renders cards. Empty array satisfies the type.
-  indonesian: [],
+  /* ── INDONESIAN (user is learning Indonesian) ──────────── */
+  indonesian: [
+    /* ── A1 Beginner ── */
+    { word: "Halo", emoji: "👋", pronunciation: "HA-lo",
+      meanings: { korean: "인도네시아어에서 가장 흔한 인사말이에요.", english: "Hello — the most common greeting in Indonesian.", spanish: "Hola — el saludo más común en indonesio.", indonesian: "Halo — sapaan yang paling umum dalam bahasa Indonesia." },
+      example: "Halo, apa kabar?",
+      exampleTranslation: { korean: "안녕하세요, 잘 지내세요?", english: "Hello, how are you?", spanish: "Hola, ¿cómo estás?", indonesian: "Halo, apa kabar?" }, speechLang: "id-ID" },
+
+    { word: "Terima kasih", emoji: "🙏", pronunciation: "te-REE-ma KA-sih",
+      meanings: { korean: "감사를 표현할 때 사용하는 말이에요.", english: "Thank you — used to express gratitude.", spanish: "Gracias — se usa para expresar agradecimiento.", indonesian: "Terima kasih — dipakai untuk menyatakan rasa syukur." },
+      example: "Terima kasih banyak atas bantuanmu.",
+      exampleTranslation: { korean: "도와주셔서 정말 감사합니다.", english: "Thank you so much for your help.", spanish: "Muchas gracias por tu ayuda.", indonesian: "Terima kasih banyak atas bantuanmu." }, speechLang: "id-ID" },
+
+    { word: "Tolong", emoji: "🤝", pronunciation: "TO-long",
+      meanings: { korean: "정중하게 부탁하거나 도움을 청할 때 쓰는 말이에요.", english: "Please / Help — used to make a polite request or ask for help.", spanish: "Por favor / Ayuda — para pedir algo con cortesía o pedir ayuda.", indonesian: "Tolong — dipakai untuk meminta sesuatu dengan sopan atau minta bantuan." },
+      example: "Tolong bantu saya membawa tas ini.",
+      exampleTranslation: { korean: "이 가방 드는 것 좀 도와주세요.", english: "Please help me carry this bag.", spanish: "Por favor, ayúdame a llevar esta bolsa.", indonesian: "Tolong bantu saya membawa tas ini." }, speechLang: "id-ID" },
+
+    { word: "Maaf", emoji: "🙇", pronunciation: "MA-af",
+      meanings: { korean: "사과하거나 실례를 구할 때 사용하는 말이에요.", english: "Sorry / Excuse me — used to apologize or get attention politely.", spanish: "Perdón / Disculpa — para disculparse o llamar la atención con cortesía.", indonesian: "Maaf — dipakai untuk meminta maaf atau meminta perhatian dengan sopan." },
+      example: "Maaf, saya terlambat hari ini.",
+      exampleTranslation: { korean: "죄송해요, 오늘 늦었어요.", english: "Sorry, I am late today.", spanish: "Perdón, hoy llego tarde.", indonesian: "Maaf, saya terlambat hari ini." }, speechLang: "id-ID" },
+
+    { word: "Selamat pagi", emoji: "☀️", pronunciation: "se-LA-mat PA-gi",
+      meanings: { korean: "활기찬 인도네시아어 아침 인사예요.", english: "Good morning — a cheerful morning greeting in Indonesian.", spanish: "Buenos días — un alegre saludo matutino en indonesio.", indonesian: "Selamat pagi — sapaan pagi yang ceria dalam bahasa Indonesia." },
+      example: "Selamat pagi! Apakah kamu tidur nyenyak?",
+      exampleTranslation: { korean: "좋은 아침이에요! 잘 잤어요?", english: "Good morning! Did you sleep well?", spanish: "¡Buenos días! ¿Dormiste bien?", indonesian: "Selamat pagi! Apakah kamu tidur nyenyak?" }, speechLang: "id-ID" },
+
+    { word: "Selamat malam", emoji: "🌙", pronunciation: "se-LA-mat MA-lam",
+      meanings: { korean: "저녁이나 밤에 하는 인도네시아어 인사예요.", english: "Good evening / Good night — an Indonesian greeting used at night.", spanish: "Buenas noches — un saludo indonesio que se usa por la noche.", indonesian: "Selamat malam — sapaan dalam bahasa Indonesia yang dipakai pada malam hari." },
+      example: "Selamat malam, sampai jumpa besok.",
+      exampleTranslation: { korean: "안녕히 주무세요, 내일 봐요.", english: "Good night, see you tomorrow.", spanish: "Buenas noches, hasta mañana.", indonesian: "Selamat malam, sampai jumpa besok." }, speechLang: "id-ID" },
+
+    { word: "Ya", emoji: "✅", pronunciation: "YA",
+      meanings: { korean: "긍정이나 동의를 나타내는 '네'라는 말이에요.", english: "Yes — used to agree or confirm something.", spanish: "Sí — para estar de acuerdo o confirmar algo.", indonesian: "Ya — dipakai untuk menyetujui atau membenarkan sesuatu." },
+      example: "Ya, saya mau ikut denganmu.",
+      exampleTranslation: { korean: "네, 당신과 함께 갈게요.", english: "Yes, I want to come with you.", spanish: "Sí, quiero ir contigo.", indonesian: "Ya, saya mau ikut denganmu." }, speechLang: "id-ID" },
+
+    { word: "Tidak", emoji: "🚫", pronunciation: "TEE-dak",
+      meanings: { korean: "부정이나 거절을 나타내는 '아니요'라는 말이에요.", english: "No / Not — used to refuse or negate something.", spanish: "No — para rechazar o negar algo.", indonesian: "Tidak — dipakai untuk menolak atau menyangkal sesuatu." },
+      example: "Tidak, saya tidak suka kopi.",
+      exampleTranslation: { korean: "아니요, 저는 커피를 좋아하지 않아요.", english: "No, I do not like coffee.", spanish: "No, no me gusta el café.", indonesian: "Tidak, saya tidak suka kopi." }, speechLang: "id-ID" },
+
+    { word: "Air", emoji: "💧", pronunciation: "A-ir",
+      meanings: { korean: "모든 생명체에 필수적인 맑은 액체예요.", english: "Water — the clear liquid essential for all life.", spanish: "Agua — el líquido transparente esencial para toda la vida.", indonesian: "Air — cairan bening yang penting bagi semua kehidupan." },
+      example: "Tolong berikan saya segelas air.",
+      exampleTranslation: { korean: "물 한 잔 주세요.", english: "Please give me a glass of water.", spanish: "Por favor, dame un vaso de agua.", indonesian: "Tolong berikan saya segelas air." }, speechLang: "id-ID" },
+
+    { word: "Makan", emoji: "🍴", pronunciation: "MA-kan",
+      meanings: { korean: "음식을 씹고 삼키는 행동이에요.", english: "To eat — the action of chewing and swallowing food.", spanish: "Comer — la acción de masticar e ingerir alimentos.", indonesian: "Makan — tindakan mengunyah dan menelan makanan." },
+      example: "Saya suka makan nasi goreng.",
+      exampleTranslation: { korean: "저는 나시고렝 먹는 것을 좋아해요.", english: "I like to eat fried rice.", spanish: "Me gusta comer arroz frito.", indonesian: "Saya suka makan nasi goreng." }, speechLang: "id-ID" },
+
+    { word: "Minum", emoji: "🥤", pronunciation: "MEE-num",
+      meanings: { korean: "액체를 마시는 행동이에요.", english: "To drink — to take a liquid into your mouth.", spanish: "Beber — llevar un líquido a la boca.", indonesian: "Minum — memasukkan cairan ke dalam mulut." },
+      example: "Penting untuk minum air setiap hari.",
+      exampleTranslation: { korean: "매일 물을 마시는 것은 중요해요.", english: "It is important to drink water every day.", spanish: "Es importante beber agua todos los días.", indonesian: "Penting untuk minum air setiap hari." }, speechLang: "id-ID" },
+
+    { word: "Nasi", emoji: "🍚", pronunciation: "NA-si",
+      meanings: { korean: "인도네시아 사람들의 주식인 밥이에요.", english: "Rice — the staple food of Indonesian people.", spanish: "Arroz — el alimento básico del pueblo indonesio.", indonesian: "Nasi — makanan pokok masyarakat Indonesia." },
+      example: "Setiap hari kami makan nasi putih.",
+      exampleTranslation: { korean: "우리는 매일 흰쌀밥을 먹어요.", english: "Every day we eat white rice.", spanish: "Cada día comemos arroz blanco.", indonesian: "Setiap hari kami makan nasi putih." }, speechLang: "id-ID" },
+
+    { word: "Rumah", emoji: "🏠", pronunciation: "ROO-mah",
+      meanings: { korean: "사람들이 사는 건물이에요.", english: "House / Home — the building where you live.", spanish: "Casa — el edificio donde vives.", indonesian: "Rumah — bangunan tempat kamu tinggal." },
+      example: "Rumah saya memiliki taman yang indah.",
+      exampleTranslation: { korean: "우리 집에는 아름다운 정원이 있어요.", english: "My house has a beautiful garden.", spanish: "Mi casa tiene un jardín hermoso.", indonesian: "Rumah saya memiliki taman yang indah." }, speechLang: "id-ID" },
+
+    { word: "Sekolah", emoji: "🏫", pronunciation: "se-KO-lah",
+      meanings: { korean: "학생들이 공부하는 곳이에요.", english: "School — the place where students learn and study.", spanish: "Escuela — el lugar donde los estudiantes aprenden y estudian.", indonesian: "Sekolah — tempat para siswa belajar dan menuntut ilmu." },
+      example: "Anak-anak pergi ke sekolah setiap pagi.",
+      exampleTranslation: { korean: "아이들은 매일 아침 학교에 가요.", english: "The children go to school every morning.", spanish: "Los niños van a la escuela cada mañana.", indonesian: "Anak-anak pergi ke sekolah setiap pagi." }, speechLang: "id-ID" },
+
+    { word: "Keluarga", emoji: "👨‍👩‍👧‍👦", pronunciation: "ke-loo-AR-ga",
+      meanings: { korean: "함께 살거나 혈연으로 이어진 사람들의 집단이에요.", english: "Family — a group of people related by blood or living together.", spanish: "Familia — grupo de personas unidas por sangre o que viven juntas.", indonesian: "Keluarga — sekelompok orang yang terikat hubungan darah atau tinggal bersama." },
+      example: "Keluarga saya berkumpul setiap akhir pekan.",
+      exampleTranslation: { korean: "우리 가족은 주말마다 모여요.", english: "My family gathers every weekend.", spanish: "Mi familia se reúne cada fin de semana.", indonesian: "Keluarga saya berkumpul setiap akhir pekan." }, speechLang: "id-ID" },
+
+    { word: "Teman", emoji: "🤝", pronunciation: "te-MAN",
+      meanings: { korean: "서로 좋아하고 함께 시간을 보내는 사람이에요.", english: "Friend — someone you like and enjoy spending time with.", spanish: "Amigo — alguien que te agrada y con quien disfrutas pasar tiempo.", indonesian: "Teman — seseorang yang kamu sukai dan senang menghabiskan waktu bersamanya." },
+      example: "Teman saya sangat baik dan ramah.",
+      exampleTranslation: { korean: "제 친구는 정말 착하고 친절해요.", english: "My friend is very kind and friendly.", spanish: "Mi amigo es muy amable y simpático.", indonesian: "Teman saya sangat baik dan ramah." }, speechLang: "id-ID" },
+
+    { word: "Ibu", emoji: "👩", pronunciation: "EE-boo",
+      meanings: { korean: "어머니를 뜻하며, 나이 든 여성을 정중히 부를 때도 써요.", english: "Mother — also a polite term for an older woman, like 'ma'am'.", spanish: "Madre — también una forma cortés de dirigirse a una mujer mayor.", indonesian: "Ibu — orang tua perempuan; juga sapaan sopan untuk perempuan yang lebih tua." },
+      example: "Ibu saya memasak makanan yang lezat.",
+      exampleTranslation: { korean: "우리 엄마는 맛있는 음식을 만들어요.", english: "My mother cooks delicious food.", spanish: "Mi madre cocina comida deliciosa.", indonesian: "Ibu saya memasak makanan yang lezat." }, speechLang: "id-ID" },
+
+    { word: "Ayah", emoji: "👨", pronunciation: "A-yah",
+      meanings: { korean: "아버지를 뜻하는 말이에요.", english: "Father — a male parent.", spanish: "Padre — el progenitor masculino.", indonesian: "Ayah — orang tua laki-laki." },
+      example: "Ayah saya bekerja di sebuah kantor.",
+      exampleTranslation: { korean: "우리 아빠는 사무실에서 일해요.", english: "My father works in an office.", spanish: "Mi padre trabaja en una oficina.", indonesian: "Ayah saya bekerja di sebuah kantor." }, speechLang: "id-ID" },
+
+    { word: "Anjing", emoji: "🐶", pronunciation: "AN-jing",
+      meanings: { korean: "사람과 함께 사는 반려동물이에요.", english: "Dog — a pet that lives with people as a companion.", spanish: "Perro — mascota que convive con las personas como compañero.", indonesian: "Anjing — hewan peliharaan yang hidup bersama manusia sebagai teman." },
+      example: "Anjing itu suka bermain di taman.",
+      exampleTranslation: { korean: "그 강아지는 공원에서 노는 것을 좋아해요.", english: "That dog likes to play in the park.", spanish: "Ese perro le gusta jugar en el parque.", indonesian: "Anjing itu suka bermain di taman." }, speechLang: "id-ID" },
+
+    { word: "Kucing", emoji: "🐱", pronunciation: "KOO-ching",
+      meanings: { korean: "독립적이고 우아한 반려동물이에요.", english: "Cat — an independent and graceful pet.", spanish: "Gato — mascota independiente y elegante.", indonesian: "Kucing — hewan peliharaan yang mandiri dan anggun." },
+      example: "Kucing itu tidur di atas sofa.",
+      exampleTranslation: { korean: "그 고양이는 소파 위에서 자요.", english: "The cat sleeps on the sofa.", spanish: "El gato duerme en el sofá.", indonesian: "Kucing itu tidur di atas sofa." }, speechLang: "id-ID" },
+
+    { word: "Buku", emoji: "📖", pronunciation: "BOO-koo",
+      meanings: { korean: "읽기 위해 묶인 페이지들로 이루어진 물건이에요.", english: "Book — pages bound together for reading.", spanish: "Libro — páginas encuadernadas para leer.", indonesian: "Buku — halaman-halaman yang dijilid untuk dibaca." },
+      example: "Saya sedang membaca buku yang menarik.",
+      exampleTranslation: { korean: "저는 재미있는 책을 읽고 있어요.", english: "I am reading an interesting book.", spanish: "Estoy leyendo un libro interesante.", indonesian: "Saya sedang membaca buku yang menarik." }, speechLang: "id-ID" },
+
+    { word: "Satu", emoji: "1️⃣", pronunciation: "SA-too",
+      meanings: { korean: "숫자 1을 뜻하는 말이에요.", english: "One — the number 1.", spanish: "Uno — el número 1.", indonesian: "Satu — angka 1." },
+      example: "Saya hanya punya satu adik perempuan.",
+      exampleTranslation: { korean: "저는 여동생이 한 명뿐이에요.", english: "I only have one younger sister.", spanish: "Solo tengo una hermana menor.", indonesian: "Saya hanya punya satu adik perempuan." }, speechLang: "id-ID" },
+
+    { word: "Dua", emoji: "2️⃣", pronunciation: "DOO-a",
+      meanings: { korean: "숫자 2를 뜻하는 말이에요.", english: "Two — the number 2.", spanish: "Dos — el número 2.", indonesian: "Dua — angka 2." },
+      example: "Kami memesan dua cangkir teh.",
+      exampleTranslation: { korean: "우리는 차 두 잔을 주문했어요.", english: "We ordered two cups of tea.", spanish: "Pedimos dos tazas de té.", indonesian: "Kami memesan dua cangkir teh." }, speechLang: "id-ID" },
+
+    { word: "Tiga", emoji: "3️⃣", pronunciation: "TEE-ga",
+      meanings: { korean: "숫자 3을 뜻하는 말이에요.", english: "Three — the number 3.", spanish: "Tres — el número 3.", indonesian: "Tiga — angka 3." },
+      example: "Ada tiga buku di atas meja.",
+      exampleTranslation: { korean: "탁자 위에 책 세 권이 있어요.", english: "There are three books on the table.", spanish: "Hay tres libros sobre la mesa.", indonesian: "Ada tiga buku di atas meja." }, speechLang: "id-ID" },
+
+    { word: "Besar", emoji: "🐘", pronunciation: "be-SAR",
+      meanings: { korean: "크기나 규모가 큰 것을 표현하는 말이에요.", english: "Big / Large — great in size or amount.", spanish: "Grande — de gran tamaño o cantidad.", indonesian: "Besar — besar dalam ukuran atau jumlah." },
+      example: "Mereka tinggal di rumah yang besar.",
+      exampleTranslation: { korean: "그들은 큰 집에 살아요.", english: "They live in a big house.", spanish: "Viven en una casa grande.", indonesian: "Mereka tinggal di rumah yang besar." }, speechLang: "id-ID" },
+
+    { word: "Kecil", emoji: "🐭", pronunciation: "ke-CHIL",
+      meanings: { korean: "크기나 규모가 작은 것을 표현하는 말이에요.", english: "Small / Little — not big; of little size.", spanish: "Pequeño — no grande; de poco tamaño.", indonesian: "Kecil — tidak besar; berukuran kecil." },
+      example: "Dia punya apartemen kecil tapi nyaman.",
+      exampleTranslation: { korean: "그녀는 작지만 아늑한 아파트에 살아요.", english: "She has a small but cozy apartment.", spanish: "Tiene un apartamento pequeño pero acogedor.", indonesian: "Dia punya apartemen kecil tapi nyaman." }, speechLang: "id-ID" },
+
+    { word: "Bagus", emoji: "👍", pronunciation: "BA-goos",
+      meanings: { korean: "좋거나 훌륭한 것을 표현하는 말이에요.", english: "Good / Nice — of high quality; pleasing.", spanish: "Bueno / Bonito — de buena calidad; agradable.", indonesian: "Bagus — berkualitas baik; menyenangkan." },
+      example: "Cuaca hari ini sangat bagus.",
+      exampleTranslation: { korean: "오늘 날씨가 정말 좋아요.", english: "The weather today is very nice.", spanish: "El clima de hoy es muy bueno.", indonesian: "Cuaca hari ini sangat bagus." }, speechLang: "id-ID" },
+
+    { word: "Enak", emoji: "😋", pronunciation: "E-nak",
+      meanings: { korean: "음식이 맛있다고 표현할 때 사용해요.", english: "Delicious / Tasty — used to say food tastes great.", spanish: "Delicioso / Rico — para decir que la comida sabe muy bien.", indonesian: "Enak — dipakai untuk menyatakan makanan terasa lezat." },
+      example: "Masakan ibu sangat enak.",
+      exampleTranslation: { korean: "엄마 요리는 정말 맛있어요.", english: "Mom's cooking is very delicious.", spanish: "La comida de mamá es muy rica.", indonesian: "Masakan ibu sangat enak." }, speechLang: "id-ID" },
+
+    { word: "Merah", emoji: "🔴", pronunciation: "ME-rah",
+      meanings: { korean: "피나 불의 색깔이에요.", english: "Red — the color of blood or fire.", spanish: "Rojo — el color de la sangre o el fuego.", indonesian: "Merah — warna darah atau api." },
+      example: "Bunga mawar merah sangat indah.",
+      exampleTranslation: { korean: "빨간 장미는 정말 아름다워요.", english: "Red roses are very beautiful.", spanish: "Las rosas rojas son muy hermosas.", indonesian: "Bunga mawar merah sangat indah." }, speechLang: "id-ID" },
+
+    { word: "Biru", emoji: "🔵", pronunciation: "BEE-roo",
+      meanings: { korean: "하늘이나 바다의 색깔이에요.", english: "Blue — the color of the sky or the sea.", spanish: "Azul — el color del cielo o el mar.", indonesian: "Biru — warna langit atau laut." },
+      example: "Langit hari ini berwarna biru cerah.",
+      exampleTranslation: { korean: "오늘 하늘은 밝은 파란색이에요.", english: "The sky today is bright blue.", spanish: "El cielo de hoy es azul brillante.", indonesian: "Langit hari ini berwarna biru cerah." }, speechLang: "id-ID" },
+
+    { word: "Hari ini", emoji: "📅", pronunciation: "HA-ri EE-ni",
+      meanings: { korean: "바로 지금의 날, 즉 오늘을 뜻해요.", english: "Today — this present day.", spanish: "Hoy — el día presente.", indonesian: "Hari ini — hari yang sedang berlangsung sekarang." },
+      example: "Hari ini saya pergi ke pasar.",
+      exampleTranslation: { korean: "오늘 저는 시장에 가요.", english: "Today I am going to the market.", spanish: "Hoy voy al mercado.", indonesian: "Hari ini saya pergi ke pasar." }, speechLang: "id-ID" },
+
+    { word: "Besok", emoji: "🌅", pronunciation: "BE-sok",
+      meanings: { korean: "오늘 다음 날, 즉 내일을 뜻해요.", english: "Tomorrow — the day after today.", spanish: "Mañana — el día después de hoy.", indonesian: "Besok — hari setelah hari ini." },
+      example: "Besok kita akan bertemu lagi.",
+      exampleTranslation: { korean: "내일 우리는 다시 만날 거예요.", english: "Tomorrow we will meet again.", spanish: "Mañana nos veremos de nuevo.", indonesian: "Besok kita akan bertemu lagi." }, speechLang: "id-ID" },
+
+    { word: "Pergi", emoji: "🚶", pronunciation: "per-GEE",
+      meanings: { korean: "어떤 장소로 이동하거나 떠나는 행동이에요.", english: "To go — to move or leave toward a place.", spanish: "Ir — desplazarse o partir hacia un lugar.", indonesian: "Pergi — berpindah atau berangkat menuju suatu tempat." },
+      example: "Saya pergi ke kantor naik bus.",
+      exampleTranslation: { korean: "저는 버스를 타고 사무실에 가요.", english: "I go to the office by bus.", spanish: "Voy a la oficina en autobús.", indonesian: "Saya pergi ke kantor naik bus." }, speechLang: "id-ID" },
+
+    { word: "Tidur", emoji: "😴", pronunciation: "TEE-door",
+      meanings: { korean: "몸과 마음이 자연스럽게 쉬는 수면 상태예요.", english: "To sleep — the natural rest state of body and mind.", spanish: "Dormir — el estado natural de descanso del cuerpo y la mente.", indonesian: "Tidur — keadaan istirahat alami tubuh dan pikiran." },
+      example: "Saya perlu tidur lebih awal malam ini.",
+      exampleTranslation: { korean: "오늘 밤에는 일찍 자야 해요.", english: "I need to sleep early tonight.", spanish: "Necesito dormir temprano esta noche.", indonesian: "Saya perlu tidur lebih awal malam ini." }, speechLang: "id-ID" },
+
+    { word: "Cinta", emoji: "❤️", pronunciation: "CHEEN-ta",
+      meanings: { korean: "누군가나 무언가에 대한 깊은 사랑의 감정이에요.", english: "Love — a deep feeling of affection for someone or something.", spanish: "Amor — un sentimiento profundo de afecto por alguien o algo.", indonesian: "Cinta — perasaan kasih sayang yang mendalam pada seseorang atau sesuatu." },
+      example: "Saya cinta keluarga saya sepenuh hati.",
+      exampleTranslation: { korean: "저는 온 마음으로 가족을 사랑해요.", english: "I love my family with all my heart.", spanish: "Amo a mi familia con todo mi corazón.", indonesian: "Saya cinta keluarga saya sepenuh hati." }, speechLang: "id-ID" },
+
+    { word: "Senang", emoji: "😊", pronunciation: "se-NANG",
+      meanings: { korean: "기쁘고 즐거운 감정 상태예요.", english: "Happy / Glad — feeling joy or pleasure.", spanish: "Feliz / Contento — sentir alegría o placer.", indonesian: "Senang — merasakan sukacita atau kesenangan." },
+      example: "Saya senang bertemu denganmu.",
+      exampleTranslation: { korean: "당신을 만나서 기뻐요.", english: "I am happy to meet you.", spanish: "Estoy contento de conocerte.", indonesian: "Saya senang bertemu denganmu." }, speechLang: "id-ID" },
+
+    { word: "Sedih", emoji: "😢", pronunciation: "se-DEEH",
+      meanings: { korean: "슬프거나 불행한 감정을 표현하는 말이에요.", english: "Sad — feeling unhappy or sorrowful.", spanish: "Triste — sentirse infeliz o afligido.", indonesian: "Sedih — merasa tidak bahagia atau berduka." },
+      example: "Dia sedih karena kehilangan kucingnya.",
+      exampleTranslation: { korean: "그녀는 고양이를 잃어버려서 슬퍼해요.", english: "She is sad because she lost her cat.", spanish: "Está triste porque perdió a su gato.", indonesian: "Dia sedih karena kehilangan kucingnya." }, speechLang: "id-ID" },
+
+    { word: "Berapa", emoji: "💰", pronunciation: "be-RA-pa",
+      meanings: { korean: "수량이나 가격을 물을 때 쓰는 '얼마'라는 말이에요.", english: "How much / How many — used to ask about quantity or price.", spanish: "Cuánto / Cuántos — para preguntar por cantidad o precio.", indonesian: "Berapa — dipakai untuk menanyakan jumlah atau harga." },
+      example: "Berapa harga buah ini?",
+      exampleTranslation: { korean: "이 과일은 얼마예요?", english: "How much is this fruit?", spanish: "¿Cuánto cuesta esta fruta?", indonesian: "Berapa harga buah ini?" }, speechLang: "id-ID" },
+
+    { word: "Di mana", emoji: "📍", pronunciation: "dee MA-na",
+      meanings: { korean: "장소를 물을 때 쓰는 '어디'라는 표현이에요.", english: "Where — used to ask about a location.", spanish: "Dónde — para preguntar por un lugar.", indonesian: "Di mana — dipakai untuk menanyakan suatu tempat." },
+      example: "Di mana toilet yang terdekat?",
+      exampleTranslation: { korean: "가장 가까운 화장실이 어디예요?", english: "Where is the nearest toilet?", spanish: "¿Dónde está el baño más cercano?", indonesian: "Di mana toilet yang terdekat?" }, speechLang: "id-ID" },
+
+    { word: "Sampai jumpa", emoji: "👋", pronunciation: "SAM-pai JOOM-pa",
+      meanings: { korean: "헤어질 때 '또 봐요'라고 하는 작별 인사예요.", english: "See you later — a friendly goodbye in Indonesian.", spanish: "Hasta luego — una despedida amistosa en indonesio.", indonesian: "Sampai jumpa — ucapan perpisahan yang ramah dalam bahasa Indonesia." },
+      example: "Sampai jumpa minggu depan!",
+      exampleTranslation: { korean: "다음 주에 봐요!", english: "See you next week!", spanish: "¡Hasta la próxima semana!", indonesian: "Sampai jumpa minggu depan!" }, speechLang: "id-ID" },
+  ],
   /* ── ENGLISH (user is learning English) ────────────────── */
   english: [
     /* ── A1 Beginner ── */
@@ -715,8 +915,73 @@ const BEGINNER_CARDS_BY_LANG: Record<NativeLanguage, FlashCard[]> = {
 };
 
 const ADVANCED_CARDS: Record<NativeLanguage, FlashCard[]> = {
-  // Indonesian is native/UI only (Phase 1); never a learning target.
-  indonesian: [],
+  /* ── INDONESIAN A2 ──────────────────────────────────────── */
+  indonesian: [
+    { word: "Berkunjung", emoji: "🚪", pronunciation: "ber-KOON-joong",
+      meanings: { korean: "다른 사람의 집이나 장소를 방문하는 것이에요.", english: "To visit — to go and spend time at someone's home or a place.", spanish: "Visitar — ir y pasar tiempo en casa de alguien o en un lugar.", indonesian: "Berkunjung — pergi dan menghabiskan waktu di rumah seseorang atau suatu tempat." },
+      example: "Akhir pekan ini kami akan berkunjung ke rumah nenek.",
+      exampleTranslation: { korean: "이번 주말에 우리는 할머니 댁을 방문할 거예요.", english: "This weekend we will visit grandma's house.", spanish: "Este fin de semana visitaremos la casa de la abuela.", indonesian: "Akhir pekan ini kami akan berkunjung ke rumah nenek." }, speechLang: "id-ID" },
+
+    { word: "Membantu", emoji: "🤲", pronunciation: "mem-BAN-too",
+      meanings: { korean: "다른 사람을 돕거나 거드는 것이에요.", english: "To help — to make things easier or possible for someone.", spanish: "Ayudar — hacer las cosas más fáciles o posibles para alguien.", indonesian: "Membantu — meringankan atau memungkinkan sesuatu bagi orang lain." },
+      example: "Dia selalu membantu temannya yang sedang kesulitan.",
+      exampleTranslation: { korean: "그는 어려움에 처한 친구를 항상 도와줘요.", english: "He always helps his friend who is struggling.", spanish: "Siempre ayuda a su amigo que está pasando dificultades.", indonesian: "Dia selalu membantu temannya yang sedang kesulitan." }, speechLang: "id-ID" },
+
+    { word: "Sibuk", emoji: "🏃", pronunciation: "SEE-book",
+      meanings: { korean: "할 일이 많아 바쁜 상태예요.", english: "Busy — having a lot to do; occupied with many tasks.", spanish: "Ocupado — con muchas cosas que hacer; lleno de tareas.", indonesian: "Sibuk — memiliki banyak hal untuk dikerjakan; penuh kegiatan." },
+      example: "Saya sangat sibuk dengan pekerjaan minggu ini.",
+      exampleTranslation: { korean: "저는 이번 주에 일 때문에 정말 바빠요.", english: "I am very busy with work this week.", spanish: "Estoy muy ocupado con el trabajo esta semana.", indonesian: "Saya sangat sibuk dengan pekerjaan minggu ini." }, speechLang: "id-ID" },
+
+    { word: "Penting", emoji: "⭐", pronunciation: "PEN-ting",
+      meanings: { korean: "크게 가치 있거나 의미 있는 것이에요.", english: "Important — having great value or significance.", spanish: "Importante — que tiene gran valor o significado.", indonesian: "Penting — memiliki nilai atau makna yang besar." },
+      example: "Sangat penting untuk berlatih bahasa setiap hari.",
+      exampleTranslation: { korean: "매일 언어를 연습하는 것이 매우 중요해요.", english: "It is very important to practice the language every day.", spanish: "Es muy importante practicar el idioma cada día.", indonesian: "Sangat penting untuk berlatih bahasa setiap hari." }, speechLang: "id-ID" },
+
+    { word: "Pengalaman", emoji: "🧭", pronunciation: "peng-a-LA-man",
+      meanings: { korean: "직접 겪으면서 얻은 지식이나 경험이에요.", english: "Experience — knowledge or skill gained from doing something.", spanish: "Experiencia — conocimiento o habilidad adquiridos al hacer algo.", indonesian: "Pengalaman — pengetahuan atau keterampilan yang diperoleh dari melakukan sesuatu." },
+      example: "Perjalanan itu menjadi pengalaman yang tak terlupakan.",
+      exampleTranslation: { korean: "그 여행은 잊을 수 없는 경험이 됐어요.", english: "That trip became an unforgettable experience.", spanish: "Ese viaje se convirtió en una experiencia inolvidable.", indonesian: "Perjalanan itu menjadi pengalaman yang tak terlupakan." }, speechLang: "id-ID" },
+
+    { word: "Berbeda", emoji: "🔄", pronunciation: "ber-BE-da",
+      meanings: { korean: "같지 않거나 다른 종류의 것이에요.", english: "Different — not the same; unlike others.", spanish: "Diferente — no igual; a diferencia de los demás.", indonesian: "Berbeda — tidak sama; tidak seperti yang lain." },
+      example: "Setiap daerah memiliki budaya yang berbeda.",
+      exampleTranslation: { korean: "모든 지역은 서로 다른 문화를 가지고 있어요.", english: "Every region has a different culture.", spanish: "Cada región tiene una cultura diferente.", indonesian: "Setiap daerah memiliki budaya yang berbeda." }, speechLang: "id-ID" },
+
+    { word: "Mungkin", emoji: "🤔", pronunciation: "MOONG-kin",
+      meanings: { korean: "확실하지 않지만 가능성이 있는 것을 뜻해요.", english: "Maybe / Possibly — expressing that something could happen.", spanish: "Quizás / Posiblemente — para expresar que algo podría suceder.", indonesian: "Mungkin — menyatakan bahwa sesuatu bisa saja terjadi." },
+      example: "Mungkin besok akan turun hujan.",
+      exampleTranslation: { korean: "아마 내일 비가 올 거예요.", english: "Maybe it will rain tomorrow.", spanish: "Quizás llueva mañana.", indonesian: "Mungkin besok akan turun hujan." }, speechLang: "id-ID" },
+
+    { word: "Sebenarnya", emoji: "💡", pronunciation: "se-be-NAR-nya",
+      meanings: { korean: "사실이나 진실을 강조할 때 쓰는 '사실은'이라는 말이에요.", english: "Actually / In fact — used to emphasize the truth of something.", spanish: "En realidad / De hecho — para enfatizar la verdad de algo.", indonesian: "Sebenarnya — dipakai untuk menegaskan kebenaran sesuatu." },
+      example: "Sebenarnya saya tidak tahu jawabannya.",
+      exampleTranslation: { korean: "사실 저는 그 답을 몰라요.", english: "Actually, I do not know the answer.", spanish: "En realidad, no sé la respuesta.", indonesian: "Sebenarnya saya tidak tahu jawabannya." }, speechLang: "id-ID" },
+
+    { word: "Bangga", emoji: "🦁", pronunciation: "BANG-ga",
+      meanings: { korean: "자신이나 다른 사람의 성취에 깊이 만족하는 감정이에요.", english: "Proud — feeling deep satisfaction from achievements.", spanish: "Orgulloso — sentir satisfacción profunda por los logros.", indonesian: "Bangga — merasakan kepuasan mendalam atas suatu pencapaian." },
+      example: "Saya sangat bangga padamu karena tidak pernah menyerah.",
+      exampleTranslation: { korean: "절대 포기하지 않는 당신이 정말 자랑스러워요.", english: "I am very proud of you for never giving up.", spanish: "Estoy muy orgulloso de ti por no rendirte nunca.", indonesian: "Saya sangat bangga padamu karena tidak pernah menyerah." }, speechLang: "id-ID" },
+
+    { word: "Khawatir", emoji: "😟", pronunciation: "kha-WA-tir",
+      meanings: { korean: "무언가 잘못될까봐 불안하고 걱정하는 감정이에요.", english: "Worried — feeling anxious about something that might go wrong.", spanish: "Preocupado — sentirse ansioso por algo que podría salir mal.", indonesian: "Khawatir — merasa cemas akan sesuatu yang mungkin tidak beres." },
+      example: "Ibu khawatir karena anaknya belum pulang.",
+      exampleTranslation: { korean: "엄마는 아이가 아직 안 돌아와서 걱정해요.", english: "The mother is worried because her child has not come home.", spanish: "La madre está preocupada porque su hijo no ha vuelto a casa.", indonesian: "Ibu khawatir karena anaknya belum pulang." }, speechLang: "id-ID" },
+
+    { word: "Bingung", emoji: "😕", pronunciation: "BEE-ngoong",
+      meanings: { korean: "이해하지 못하거나 어찌할 바를 모르는 혼란스러운 상태예요.", english: "Confused — unable to understand or decide; puzzled.", spanish: "Confundido — incapaz de entender o decidir; desconcertado.", indonesian: "Bingung — tidak mampu memahami atau menentukan; kebingungan." },
+      example: "Saya bingung memilih antara dua pilihan ini.",
+      exampleTranslation: { korean: "저는 이 두 가지 선택 사이에서 갈팡질팡하고 있어요.", english: "I am confused about choosing between these two options.", spanish: "Estoy confundido al elegir entre estas dos opciones.", indonesian: "Saya bingung memilih antara dua pilihan ini." }, speechLang: "id-ID" },
+
+    { word: "Menarik", emoji: "🔍", pronunciation: "me-NA-rik",
+      meanings: { korean: "관심과 호기심을 불러일으키는 것이에요.", english: "Interesting / Attractive — arousing curiosity and attention.", spanish: "Interesante / Atractivo — que despierta curiosidad y atención.", indonesian: "Menarik — membangkitkan rasa ingin tahu dan perhatian." },
+      example: "Sejarah Indonesia sangat panjang dan menarik.",
+      exampleTranslation: { korean: "인도네시아의 역사는 매우 길고 흥미로워요.", english: "The history of Indonesia is very long and interesting.", spanish: "La historia de Indonesia es muy larga e interesante.", indonesian: "Sejarah Indonesia sangat panjang dan menarik." }, speechLang: "id-ID" },
+
+    { word: "Kebersamaan", emoji: "🤗", pronunciation: "ke-ber-sa-MA-an",
+      meanings: { korean: "함께 어울리며 느끼는 따뜻한 유대감이에요 — 인도네시아 문화에서 소중히 여기는 가치예요.", english: "Togetherness — the warm sense of community and unity, deeply valued in Indonesian culture.", spanish: "Unión / Convivencia — el cálido sentido de comunidad, muy valorado en la cultura indonesia.", indonesian: "Kebersamaan — rasa hangat akan persatuan dan kebersatuan yang sangat dihargai dalam budaya Indonesia." },
+      example: "Kebersamaan keluarga adalah hal yang paling berharga.",
+      exampleTranslation: { korean: "가족과 함께하는 시간은 가장 소중한 것이에요.", english: "Family togetherness is the most precious thing.", spanish: "La unión familiar es lo más valioso.", indonesian: "Kebersamaan keluarga adalah hal yang paling berharga." }, speechLang: "id-ID" },
+  ],
   /* ── ENGLISH B1+ Advanced ───────────────────────────────── */
   english: [
     { word: "Serendipity", emoji: "✨", pronunciation: "sair-en-DIP-i-tee",

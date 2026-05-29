@@ -19,12 +19,13 @@ import { LESSON_CONTENT, MISSION_CONTENT, REVIEW_CONTENT, type LearningLangKey }
 import type { LearningGoal, SpeakingProgress } from "../lib/learnerProfile";
 import { RUDY_GUIDE_CARDS } from "../lib/rudyGuideCards";
 
-// Core verification stays scoped to the three fully-covered languages. The
-// DailySpeakingLanguage union also includes "indonesian" (BETA), but the lock
-// must NOT require a full Indonesian corpus, so this loop type is the core-only
-// LearningLangKey (same three runtime values). Indonesian is intentionally
-// excluded from every content-count loop below.
-const languages: LearningLangKey[] = ["korean", "english", "spanish"];
+// All four languages now run through the content-count loops. Indonesian
+// (id-ID) is lock-covered for what these loops actually check: the day 1-6
+// survival-phrase families, per-goal daily-speaking content, and survival
+// coverage. (The days 7-30 course UNITS are enrichment and are NOT asserted by
+// these loops, so Indonesian is promoted to first-class on day1-6 + daily
+// speaking; unit 2-5 course content remains a non-blocking follow-on.)
+const languages: LearningLangKey[] = ["korean", "english", "spanish", "indonesian"];
 const goals: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"];
 const onboardingSource = readFileSync("app/onboarding.tsx", "utf8");
 const speakSource = readFileSync("app/(tabs)/speak.tsx", "utf8");
@@ -855,7 +856,7 @@ for (const lang of languages) {
       assert.ok(phrase.meanings.korean, `${lang}/${goal}/${phrase.phrase} missing Korean meaning`);
       assert.ok(phrase.meanings.english, `${lang}/${goal}/${phrase.phrase} missing English meaning`);
       assert.ok(phrase.meanings.spanish, `${lang}/${goal}/${phrase.phrase} missing Spanish meaning`);
-      assert.ok(phrase.speechLang === "ko-KR" || phrase.speechLang === "en-US" || phrase.speechLang === "es-ES");
+      assert.ok(phrase.speechLang === "ko-KR" || phrase.speechLang === "en-US" || phrase.speechLang === "es-ES" || phrase.speechLang === "id-ID");
       assert.equal(phrase.practiceContext, goal, `${lang}/${goal}/${phrase.phrase} missing goal practice context`);
       assert.ok(phrase.contextTip, `${lang}/${goal}/${phrase.phrase} missing context tip`);
     }

@@ -816,8 +816,8 @@ export default function NpcMissionScreen() {
     ? "Untuk masukan tata bahasa yang lebih rinci, mengobrollah dengan tutor! 💬"
     : "For detailed grammar feedback, chat with a tutor! 💬";
 
-  const nativeScenario = native === "korean" ? npc?.scenarioKo : native === "spanish" ? npc?.scenarioEs : npc?.scenario;
-  const learnScenario  = language === "korean" ? npc?.scenarioKo : language === "spanish" ? npc?.scenarioEs : npc?.scenario;
+  const nativeScenario = native === "korean" ? npc?.scenarioKo : native === "spanish" ? npc?.scenarioEs : native === "indonesian" ? npc?.scenarioId : npc?.scenario;
+  const learnScenario  = language === "korean" ? npc?.scenarioKo : language === "spanish" ? npc?.scenarioEs : language === "indonesian" ? npc?.scenarioId : npc?.scenario;
   const scenario = native === language ? nativeScenario : `${nativeScenario} (${learnScenario})`;
 
   return (
