@@ -2047,7 +2047,11 @@ export default function SpeakScreen() {
     ? getDailySpeakingMissionPhrase(activeLang, selectedGoal, dailySpokenCount, nativeLang)
     : null;
   const showFirstMissionGoalPrompt = isFirstSpeakingMission && !selectedGoal;
-  const showDeepPronunciationCoach = !isFirstSpeakingMission;
+  // Show the full pronunciation assessment + GPT coaching even in the first
+  // speaking mission. The encouraging label/copy stays (gentle colors,
+  // "first-mission" scoreInfo variant) so it's still low-pressure, but the
+  // learner now sees their score + sub-scores + coaching instead of nothing.
+  const showDeepPronunciationCoach = true;
 
   const idleRecordHint = hasListened
     ? (nativeLang === "korean" ? "탭하여 발음 녹음" : nativeLang === "spanish" ? "Toca para grabar" : "Tap to record")
@@ -2448,7 +2452,7 @@ export default function SpeakScreen() {
                     ? scoreInfo.label
                     : `${scoreInfo.label}. ${nativeLang === "korean" ? `점수 ${score} / 100` : nativeLang === "spanish" ? `Puntuación ${score} de 100` : `Score ${score} out of 100`}`}
                 >
-                  {isGuidedSentenceMission ? (
+                  {isGuidedSentenceMission && (
                     <View style={styles.firstAttemptResult}>
                       <Ionicons name="chatbubble-ellipses" size={18} color={scoreInfo.color} />
                       <View style={styles.firstAttemptResultText}>
@@ -2458,7 +2462,8 @@ export default function SpeakScreen() {
                         </Text>
                       </View>
                     </View>
-                  ) : (
+                  )}
+                  {(
                     <>
                       <View style={styles.resultRow}>
                         <View
