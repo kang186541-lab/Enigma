@@ -148,8 +148,12 @@ assert.ok(
   "Onboarding should keep a single setup CTA before the first spoken sentence"
 );
 assert.ok(
-  onboardingSource.includes('mission: "first-sentence"') && onboardingSource.includes("goal: goalSel"),
-  "Onboarding should route the learner into a personalized first speaking sentence"
+  onboardingSource.includes('router.replace("/(tabs)"'),
+  "Onboarding should land the learner on Home after setup (Home's primary CTA carries the first-utterance handoff)"
+);
+assert.ok(
+  onboardingSource.includes('router.replace("/basic-course")'),
+  "Onboarding should keep the foreign-script beginner protection branch routing into Basics first"
 );
 assert.ok(
   onboardingSource.includes("getDailySpeakingMissionPhrase") &&
@@ -168,7 +172,6 @@ assert.ok(
   !onboardingSource.includes("setStep(3)") &&
   onboardingSource.includes("if (!learnSel) return;") &&
   onboardingSource.includes("goalWaiting") &&
-  onboardingSource.includes('missionIndex: "0"') &&
   onboardingSource.includes('accessibilityState={{ selected: sel }}') &&
   onboardingSetupStartIndex > onboardingSetupNextIndex &&
   onboardingSetNativeIndex > onboardingStartSpeakingIndex &&

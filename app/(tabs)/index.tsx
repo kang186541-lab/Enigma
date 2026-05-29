@@ -344,7 +344,7 @@ export default function HomeScreen() {
   const showDueReviewBanner = todaySpeakingMission.dailyGoalMet && srsDueCount > 0;
   const morePracticeTitle = showMorePractice
     ? nativeLang === "korean" ? "다시 말하기에 집중하기" : nativeLang === "spanish" ? "Volver a enfocarme en hablar" : "Refocus on speaking"
-    : nativeLang === "korean" ? "다른 학습도 보기" : nativeLang === "spanish" ? "Ver otras prácticas" : "Show other practice";
+    : nativeLang === "korean" ? "루디 훈련소 · 스토리 · NPC 더 보기" : nativeLang === "spanish" ? "Más: Campamento, Historia y NPC" : nativeLang === "indonesian" ? "Lainnya: Kamp Rudy, Cerita & NPC" : "More: Rudy's Camp, Story & NPC";
   const morePracticeSub = nativeLang === "korean"
     ? "오늘의 실제 문장을 먼저 입 밖으로 꺼내고, 필요하면 복습과 스토리로 이어가요."
     : nativeLang === "spanish"

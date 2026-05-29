@@ -19,7 +19,7 @@ import { C, F } from "@/constants/theme";
 import { resetGuideForDrip } from "@/components/RudyGuideModal";
 import { trackLearningEvent } from "@/lib/learningEvents";
 import { getHomeGoalPrompt, getHomeLearningGoalOptions } from "@/lib/homeSpeakingMission";
-import { setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
+import { loadLearnerProfile, setPrimaryLearningGoal, type LearningGoal } from "@/lib/learnerProfile";
 import { getDailySpeakingMissionPhrase, type DailySpeakingLanguage, type DailySpeakingPhrase } from "@/lib/dailySpeakingMissions";
 
 const rudySplashImg = require("@/assets/rudy_splash.png");
@@ -254,6 +254,27 @@ export default function OnboardingScreen() {
         targetLanguage: learnSel,
         goal: goalSel,
       });
+      // True foreign-script absolute beginners should do the ~10-min Basics
+      // (which culminates in a spoken greeting) before the cold speak. Hangul is
+      // the only non-Latin learning target among our three, so a non-Korean
+      // native learning Korean can't read the script yet — route them to Basics
+      // first (unless they've already completed it). The language/goal state is
+      // already saved above, so the Speak handoff is preserved for after Basics.
+      const needsBasicsFirst = learnSel === "korean" && nativeSel !== "korean";
+      let basicsCompleted = false;
+      if (needsBasicsFirst) {
+        try {
+          const profile = await loadLearnerProfile();
+          basicsCompleted = profile.basicCourse?.[learnSel]?.completed === true;
+        } catch (err) {
+          console.warn("[Onboarding] basics completion check failed:", err);
+        }
+      }
+      if (needsBasicsFirst && !basicsCompleted) {
+        setLoading(true);
+        router.replace("/basic-course");
+        return;
+      }
       await finishToCourse();
     } catch (err) {
       console.warn("[Onboarding] start speaking failed:", err);
@@ -265,15 +286,7 @@ export default function OnboardingScreen() {
   const finishToCourse = async () => {
     if (!learnSel) return;
     setLoading(true);
-    router.replace({
-      pathname: "/(tabs)/speak",
-      params: {
-        mission: "first-sentence",
-        targetLang: learnSel,
-        goal: goalSel ?? "",
-        missionIndex: "0",
-      },
-    } as any);
+    router.replace("/(tabs)" as any);
   };
 
   return (

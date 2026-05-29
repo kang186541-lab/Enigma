@@ -2061,14 +2061,21 @@ export default function SpeakScreen() {
   // learner now sees their score + sub-scores + coaching instead of nothing.
   const showDeepPronunciationCoach = true;
 
+  // First guided sentence: gate Listen -> Record so an absolute beginner hears
+  // the sentence before being asked to speak it cold (hear -> repeat). Open and
+  // clinic practice keep listening OPTIONAL, so this gate only applies when
+  // isGuidedSentenceMission && !hasListened.
+  const mustListenFirst = isGuidedSentenceMission && !hasListened;
   const idleRecordHint = hasListened
     ? (nativeLang === "korean" ? "탭하여 발음 녹음" : nativeLang === "spanish" ? "Toca para grabar" : "Tap to record")
-    : isGuidedSentenceMission
+    : mustListenFirst
     ? (nativeLang === "korean"
-        ? "바로 말해도 좋아요. 필요하면 먼저 들어보세요."
+        ? "먼저 듣기를 누르고 따라 말해요"
         : nativeLang === "spanish"
-        ? "Puedes hablar ya. Escucha primero si lo necesitas."
-        : "You can speak now. Listen first if you need it.")
+        ? "Toca Escuchar y luego dilo"
+        : nativeLang === "indonesian"
+        ? "Ketuk Dengar dulu, lalu ucapkan"
+        : "Tap Listen first, then say it")
     : (nativeLang === "korean" ? "먼저 듣기를 눌러보세요" : nativeLang === "spanish" ? "Primero toca escuchar" : "Press listen first");
   const micAccessibilityLabel = isRecording
     ? (nativeLang === "korean" ? "녹음 중. 탭하여 정지" : nativeLang === "spanish" ? "Grabando. Toca para parar" : "Recording. Tap to stop")
@@ -2606,13 +2613,13 @@ export default function SpeakScreen() {
             <View style={styles.micWrap}>
               <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
                 <Pressable
-                  style={({ pressed }) => [styles.micBtn, pressed && { opacity: 0.88 }]}
+                  style={({ pressed }) => [styles.micBtn, mustListenFirst && styles.micBtnDisabled, pressed && { opacity: 0.88 }]}
                   onPress={handleRecord}
-                  disabled={isProcessing}
+                  disabled={isProcessing || mustListenFirst}
                   testID="mic-button"
                   accessibilityRole="button"
                   accessibilityLabel={micAccessibilityLabel}
-                  accessibilityState={{ disabled: isProcessing, busy: isProcessing }}
+                  accessibilityState={{ disabled: isProcessing || mustListenFirst, busy: isProcessing }}
                 >
                   <LinearGradient
                     colors={isRecording ? ["#FF4081", "#E91E63"] : [tabInfo.color, tabInfo.color + "CC"]}
@@ -2882,6 +2889,7 @@ const styles = StyleSheet.create({
     shadowColor: C.gold, shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3, shadowRadius: 14, elevation: 7,
   },
+  micBtnDisabled: { opacity: 0.5 },
   micHint: {
     fontSize: 13, fontFamily: F.body, color: C.goldDim,
     textAlign: "center", fontStyle: "italic",
