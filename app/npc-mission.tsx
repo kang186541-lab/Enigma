@@ -743,8 +743,8 @@ export default function NpcMissionScreen() {
     const isFetching    = fetchingTranslSet.has(item.id);
     const resolvedTransl = item.translation || onDemandTranslMap[item.id] || "";
     const btnLabel = translShown
-      ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : "Hide")
-      : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : "Translate");
+      ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : native === "indonesian" ? "Sembunyikan" : "Hide")
+      : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : native === "indonesian" ? "Terjemahkan" : "Translate");
 
     return (
       <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowNpc]}>
@@ -806,12 +806,14 @@ export default function NpcMissionScreen() {
 
   const familiarChoices = choices.slice(0, 2);
 
-  const sendLabel    = native === "korean" ? "보내기" : native === "spanish" ? "Enviar" : "Send";
-  const reselectLabel = native === "korean" ? "다시선택" : native === "spanish" ? "Cancelar" : "Reselect";
+  const sendLabel    = native === "korean" ? "보내기" : native === "spanish" ? "Enviar" : native === "indonesian" ? "Kirim" : "Send";
+  const reselectLabel = native === "korean" ? "다시선택" : native === "spanish" ? "Cancelar" : native === "indonesian" ? "Pilih ulang" : "Reselect";
   const tutorHint    = native === "korean"
     ? "더 자세한 문법 피드백은 튜터와 대화해보세요! 💬"
     : native === "spanish"
     ? "Para comentarios gramaticales detallados, habla con un tutor. 💬"
+    : native === "indonesian"
+    ? "Untuk masukan tata bahasa yang lebih rinci, mengobrollah dengan tutor! 💬"
     : "For detailed grammar feedback, chat with a tutor! 💬";
 
   const nativeScenario = native === "korean" ? npc?.scenarioKo : native === "spanish" ? npc?.scenarioEs : npc?.scenario;
@@ -910,8 +912,8 @@ export default function NpcMissionScreen() {
                     >
                       <Text style={styles.translToggleText}>
                         {choiceTranslVisible[i]
-                          ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : "Hide translation")
-                          : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : "Show translation")}
+                          ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : native === "indonesian" ? "Sembunyikan terjemahan" : "Hide translation")
+                          : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : native === "indonesian" ? "Lihat terjemahan" : "Show translation")}
                       </Text>
                     </Pressable>
                   ) : null}
@@ -944,8 +946,8 @@ export default function NpcMissionScreen() {
                         >
                           <Text style={styles.translToggleText}>
                             {choiceTranslVisible[i]
-                              ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : "Hide translation")
-                              : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : "Show translation")}
+                              ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : native === "indonesian" ? "Sembunyikan terjemahan" : "Hide translation")
+                              : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : native === "indonesian" ? "Lihat terjemahan" : "Show translation")}
                           </Text>
                         </Pressable>
                       ) : null}
@@ -962,7 +964,7 @@ export default function NpcMissionScreen() {
                   style={styles.input}
                   value={inputText}
                   onChangeText={setInputText}
-                  placeholder={native === "korean" ? "직접 입력..." : native === "spanish" ? "Escribe tu mensaje..." : "Type freely..."}
+                  placeholder={native === "korean" ? "직접 입력..." : native === "spanish" ? "Escribe tu mensaje..." : native === "indonesian" ? "Ketik bebas..." : "Type freely..."}
                   placeholderTextColor={C.goldDark}
                   multiline
                   maxLength={300}
@@ -1002,8 +1004,8 @@ export default function NpcMissionScreen() {
                 onChangeText={setInputText}
                 placeholder={
                   tier === "close"
-                    ? (native === "korean" ? "친한 친구처럼 대화해요..." : native === "spanish" ? "Habla libremente..." : "Talk freely — you're close!")
-                    : (native === "korean" ? "자유롭게 대화하세요..." : native === "spanish" ? "Escribe tu mensaje..." : "Free conversation...")
+                    ? (native === "korean" ? "친한 친구처럼 대화해요..." : native === "spanish" ? "Habla libremente..." : native === "indonesian" ? "Mengobrollah bebas — kalian sudah akrab!" : "Talk freely — you're close!")
+                    : (native === "korean" ? "자유롭게 대화하세요..." : native === "spanish" ? "Escribe tu mensaje..." : native === "indonesian" ? "Percakapan bebas..." : "Free conversation...")
                 }
                 placeholderTextColor={C.goldDark}
                 multiline
@@ -1041,6 +1043,8 @@ export default function NpcMissionScreen() {
                   ? "답변을 불러올 수 없어요. 네트워크를 확인해주세요."
                   : native === "spanish"
                   ? "No se pudieron cargar las respuestas. Verifica tu conexión."
+                  : native === "indonesian"
+                  ? "Tidak bisa memuat jawaban. Periksa koneksimu."
                   : "Could not load replies. Please check your connection."}
               </Text>
               <Pressable
@@ -1052,7 +1056,7 @@ export default function NpcMissionScreen() {
               >
                 <Ionicons name="refresh" size={14} color={C.bg1} />
                 <Text style={styles.errorRetryText}>
-                  {native === "korean" ? "다시 시도" : native === "spanish" ? "Reintentar" : "Retry"}
+                  {native === "korean" ? "다시 시도" : native === "spanish" ? "Reintentar" : native === "indonesian" ? "Coba lagi" : "Retry"}
                 </Text>
               </Pressable>
             </View>
@@ -1092,7 +1096,7 @@ export default function NpcMissionScreen() {
               <Text style={styles.popupAvatarEmoji}>{npc?.emoji ?? "?"}</Text>
             </View>
             <Text style={styles.popupLabel}>
-              {native === "korean" ? "선택한 문장" : native === "spanish" ? "Tu respuesta" : "Your response"}
+              {native === "korean" ? "선택한 문장" : native === "spanish" ? "Tu respuesta" : native === "indonesian" ? "Jawabanmu" : "Your response"}
             </Text>
             <Text style={styles.popupText}>{pendingChoice}</Text>
 
@@ -1102,7 +1106,7 @@ export default function NpcMissionScreen() {
             >
               <Ionicons name={popupPlaying ? "volume-high" : "volume-medium-outline"} size={18} color={C.gold} />
               <Text style={styles.popupReplayLabel}>
-                {native === "korean" ? "다시 듣기" : native === "spanish" ? "Reproducir" : "Replay"}
+                {native === "korean" ? "다시 듣기" : native === "spanish" ? "Reproducir" : native === "indonesian" ? "Putar lagi" : "Replay"}
               </Text>
             </Pressable>
 
@@ -1142,7 +1146,7 @@ export default function NpcMissionScreen() {
               <View style={styles.wordLoadingRow}>
                 <ActivityIndicator color={C.gold} size="small" />
                 <Text style={styles.wordLoadingText}>
-                  {native === "korean" ? "검색 중…" : native === "spanish" ? "Buscando…" : "Looking up…"}
+                  {native === "korean" ? "검색 중…" : native === "spanish" ? "Buscando…" : native === "indonesian" ? "Mencari…" : "Looking up…"}
                 </Text>
               </View>
             ) : wordPopup ? (
@@ -1184,7 +1188,7 @@ export default function NpcMissionScreen() {
                 {/* ── Meaning ── */}
                 <View style={styles.wordMeaningRow}>
                   <Text style={styles.wordSectionLabel}>
-                    {native === "korean" ? "의미" : native === "spanish" ? "Significado" : "Meaning"}
+                    {native === "korean" ? "의미" : native === "spanish" ? "Significado" : native === "indonesian" ? "Arti" : "Meaning"}
                   </Text>
                   <Text style={styles.wordMeaning}>{wordPopup.meaning}</Text>
                 </View>
@@ -1195,7 +1199,7 @@ export default function NpcMissionScreen() {
                     <View style={styles.wordDivider} />
                     <View style={styles.wordMeaningRow}>
                       <Text style={styles.wordSectionLabel}>
-                        {native === "korean" ? "문장 번역" : native === "spanish" ? "Traducción de la frase" : "Sentence translation"}
+                        {native === "korean" ? "문장 번역" : native === "spanish" ? "Traducción de la frase" : native === "indonesian" ? "Terjemahan kalimat" : "Sentence translation"}
                       </Text>
                       <Text style={styles.wordSentenceTransl}>{wordPopup.sentenceTranslation}</Text>
                     </View>
@@ -1206,7 +1210,7 @@ export default function NpcMissionScreen() {
                 {!!wordPopup.example && (
                   <View style={styles.wordExampleRow}>
                     <Text style={styles.wordSectionLabel}>
-                      {native === "korean" ? "예문" : native === "spanish" ? "Ejemplo" : "Example"}
+                      {native === "korean" ? "예문" : native === "spanish" ? "Ejemplo" : native === "indonesian" ? "Contoh" : "Example"}
                     </Text>
                     <Text style={styles.wordExample}>{wordPopup.example}</Text>
                     <Pressable
@@ -1219,7 +1223,7 @@ export default function NpcMissionScreen() {
                         color={wordExPlaying ? C.gold : C.goldDark}
                       />
                       <Text style={styles.wordPlayLabel}>
-                        {native === "korean" ? "예문 듣기" : native === "spanish" ? "Escuchar" : "Listen"}
+                        {native === "korean" ? "예문 듣기" : native === "spanish" ? "Escuchar" : native === "indonesian" ? "Dengarkan" : "Listen"}
                       </Text>
                     </Pressable>
                   </View>

@@ -1273,8 +1273,8 @@ export default function CardsScreen() {
     } catch (err) {
       console.warn("[Cards] speak mission handoff failed:", err);
       Alert.alert(
-        nativeLang === "korean" ? "잠시 후 다시 시도해 주세요" : nativeLang === "spanish" ? "Inténtalo de nuevo en un momento" : "Please try again in a moment",
-        nativeLang === "korean" ? "말하기 연습을 준비하지 못했어요." : nativeLang === "spanish" ? "No pudimos preparar la práctica oral." : "We could not prepare speaking practice."
+        nativeLang === "korean" ? "잠시 후 다시 시도해 주세요" : nativeLang === "spanish" ? "Inténtalo de nuevo en un momento" : nativeLang === "indonesian" ? "Coba lagi sebentar lagi" : "Please try again in a moment",
+        nativeLang === "korean" ? "말하기 연습을 준비하지 못했어요." : nativeLang === "spanish" ? "No pudimos preparar la práctica oral." : nativeLang === "indonesian" ? "Kami tidak bisa menyiapkan latihan berbicara." : "We could not prepare speaking practice."
       );
       return;
     }
@@ -1398,14 +1398,14 @@ export default function CardsScreen() {
             accessibilityRole="tab"
             accessibilityState={{ selected: deckType === "srs" }}
             accessibilityLabel={
-              nativeLang === "korean" ? `복습 ${srsDueCount}` : nativeLang === "spanish" ? `Repaso ${srsDueCount}` : `Review ${srsDueCount}`
+              nativeLang === "korean" ? `복습 ${srsDueCount}` : nativeLang === "spanish" ? `Repaso ${srsDueCount}` : nativeLang === "indonesian" ? `Ulas ${srsDueCount}` : `Review ${srsDueCount}`
             }
           >
             {deckType === "srs" && (
               <LinearGradient colors={[C.gold, C.goldDark]} style={[StyleSheet.absoluteFill, { borderRadius: 14 }]} />
             )}
             <Text style={[styles.deckTabText, deckType === "srs" && styles.deckTabTextActive]}>
-              {nativeLang === "korean" ? `복습 ${srsDueCount}` : nativeLang === "spanish" ? `Repaso ${srsDueCount}` : `Review ${srsDueCount}`}
+              {nativeLang === "korean" ? `복습 ${srsDueCount}` : nativeLang === "spanish" ? `Repaso ${srsDueCount}` : nativeLang === "indonesian" ? `Ulas ${srsDueCount}` : `Review ${srsDueCount}`}
             </Text>
           </Pressable>
           <Pressable
@@ -1414,14 +1414,14 @@ export default function CardsScreen() {
             accessibilityRole="tab"
             accessibilityState={{ selected: deckType === "beginner" }}
             accessibilityLabel={
-              nativeLang === "korean" ? "초급" : nativeLang === "spanish" ? "Principiante" : "Beginner"
+              nativeLang === "korean" ? "초급" : nativeLang === "spanish" ? "Principiante" : nativeLang === "indonesian" ? "Pemula" : "Beginner"
             }
           >
             {deckType === "beginner" && (
               <LinearGradient colors={[C.gold, C.goldDark]} style={[StyleSheet.absoluteFill, { borderRadius: 14 }]} />
             )}
             <Text style={[styles.deckTabText, deckType === "beginner" && styles.deckTabTextActive]}>
-              {nativeLang === "korean" ? "초급" : nativeLang === "spanish" ? "Principiante" : "Beginner"}
+              {nativeLang === "korean" ? "초급" : nativeLang === "spanish" ? "Principiante" : nativeLang === "indonesian" ? "Pemula" : "Beginner"}
             </Text>
           </Pressable>
           <Pressable
@@ -1430,14 +1430,14 @@ export default function CardsScreen() {
             accessibilityRole="tab"
             accessibilityState={{ selected: deckType === "advanced" }}
             accessibilityLabel={
-              nativeLang === "korean" ? "고급" : nativeLang === "spanish" ? "Avanzado" : "Advanced"
+              nativeLang === "korean" ? "고급" : nativeLang === "spanish" ? "Avanzado" : nativeLang === "indonesian" ? "Lanjutan" : "Advanced"
             }
           >
             {deckType === "advanced" && (
               <LinearGradient colors={[C.gold, C.goldDark]} style={[StyleSheet.absoluteFill, { borderRadius: 14 }]} />
             )}
             <Text style={[styles.deckTabText, deckType === "advanced" && styles.deckTabTextActive]}>
-              {nativeLang === "korean" ? "고급" : nativeLang === "spanish" ? "Avanzado" : "Advanced"}
+              {nativeLang === "korean" ? "고급" : nativeLang === "spanish" ? "Avanzado" : nativeLang === "indonesian" ? "Lanjutan" : "Advanced"}
             </Text>
           </Pressable>
         </View>
@@ -1460,8 +1460,8 @@ export default function CardsScreen() {
           <Text style={styles.completedEmoji}>📭</Text>
           <Text style={styles.completedTitle}>
             {srsQueueEmpty
-              ? nativeLang === "korean" ? "오늘 복습 대기열을 비웠어요" : nativeLang === "spanish" ? "Repaso al día" : "Review queue clear"
-              : nativeLang === "korean" ? "복습할 카드가 없어요" : nativeLang === "spanish" ? "Sin tarjetas para revisar" : "No cards to review"}
+              ? nativeLang === "korean" ? "오늘 복습 대기열을 비웠어요" : nativeLang === "spanish" ? "Repaso al día" : nativeLang === "indonesian" ? "Antrean ulasan sudah kosong" : "Review queue clear"
+              : nativeLang === "korean" ? "복습할 카드가 없어요" : nativeLang === "spanish" ? "Sin tarjetas para revisar" : nativeLang === "indonesian" ? "Tidak ada kartu untuk diulas" : "No cards to review"}
           </Text>
           <Text style={styles.completedSub}>
             {srsQueueEmpty
@@ -1469,11 +1469,15 @@ export default function CardsScreen() {
                 ? "오늘 예정된 복습 카드는 모두 확인했어요.\n초급 덱에서 계속 연습할 수 있어요."
                 : nativeLang === "spanish"
                 ? "Ya revisaste todas las tarjetas pendientes.\nPuedes seguir con el mazo principiante."
+                : nativeLang === "indonesian"
+                ? "Kamu sudah memeriksa semua kartu yang jatuh tempo.\nKamu bisa lanjut berlatih di dek pemula."
                 : "You reviewed every due card for now.\nYou can keep practicing in the beginner deck."
               : nativeLang === "korean"
               ? "레슨이나 스토리를 진행하면\n카드가 자동으로 추가됩니다!"
               : nativeLang === "spanish"
               ? "Completa lecciones o historias\npara añadir tarjetas automáticamente!"
+              : nativeLang === "indonesian"
+              ? "Selesaikan pelajaran atau cerita\nuntuk menambah kartu secara otomatis!"
               : "Complete lessons or stories\nto add cards automatically!"}
           </Text>
           {/* F3 fix (UX agent review): empty SRS state had no CTA, leaving
@@ -1492,7 +1496,7 @@ export default function CardsScreen() {
               }}
             >
               <Text style={{ fontFamily: F.label, color: C.bg1, fontSize: 13 }}>
-                {nativeLang === "korean" ? "🦊 오늘의 훈련 시작" : nativeLang === "spanish" ? "🦊 Comenzar entrenamiento" : "🦊 Start training"}
+                {nativeLang === "korean" ? "🦊 오늘의 훈련 시작" : nativeLang === "spanish" ? "🦊 Comenzar entrenamiento" : nativeLang === "indonesian" ? "🦊 Mulai latihan" : "🦊 Start training"}
               </Text>
             </Pressable>
             <Pressable
@@ -1506,7 +1510,7 @@ export default function CardsScreen() {
               }}
             >
               <Text style={{ fontFamily: F.label, color: C.gold, fontSize: 13 }}>
-                {nativeLang === "korean" ? "초급 덱 →" : nativeLang === "spanish" ? "Mazo principiante →" : "Beginner deck →"}
+                {nativeLang === "korean" ? "초급 덱 →" : nativeLang === "spanish" ? "Mazo principiante →" : nativeLang === "indonesian" ? "Dek pemula →" : "Beginner deck →"}
               </Text>
             </Pressable>
           </View>
@@ -1518,13 +1522,15 @@ export default function CardsScreen() {
         >
           <Text style={styles.completedEmoji}>🏆</Text>
           <Text style={styles.completedTitle}>
-            {nativeLang === "korean" ? "오늘 목표 달성!" : nativeLang === "spanish" ? "¡Meta diaria completada!" : "Daily Goal Complete!"}
+            {nativeLang === "korean" ? "오늘 목표 달성!" : nativeLang === "spanish" ? "¡Meta diaria completada!" : nativeLang === "indonesian" ? "Target Harian Tercapai!" : "Daily Goal Complete!"}
           </Text>
           <Text style={styles.completedSub}>
             {nativeLang === "korean"
               ? `오늘 ${DAILY_GOAL}장의 카드를 복습했어요.\n내일 다시 와서 새 단어를 만나요!`
               : nativeLang === "spanish"
               ? `Repasaste ${DAILY_GOAL} tarjetas hoy.\n¡Vuelve mañana para nuevas palabras!`
+              : nativeLang === "indonesian"
+              ? `Kamu sudah mengulas ${DAILY_GOAL} kartu hari ini.\nKembali besok untuk kata-kata baru!`
               : `You've reviewed ${DAILY_GOAL} cards today.\nCome back tomorrow for new words!`}
           </Text>
           <View style={styles.scoreRow}>
@@ -1532,14 +1538,14 @@ export default function CardsScreen() {
               <Text style={styles.scoreEmoji}>✅</Text>
               <Text style={[styles.scoreNum, { color: "#5a9" }]}>{gotIt}</Text>
               <Text style={styles.scoreLabel}>
-                {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : "Got it!"}
+                {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : nativeLang === "indonesian" ? "Sudah tahu!" : "Got it!"}
               </Text>
             </View>
             <View style={styles.scoreCard}>
               <Text style={styles.scoreEmoji}>😅</Text>
               <Text style={styles.scoreNum}>{again}</Text>
               <Text style={styles.scoreLabel}>
-                {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : "Again"}
+                {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : nativeLang === "indonesian" ? "Lagi" : "Again"}
               </Text>
             </View>
           </View>
@@ -1549,7 +1555,7 @@ export default function CardsScreen() {
           >
             <Ionicons name="refresh" size={18} color={C.bg1} />
             <Text style={styles.resetBtnText}>
-              {nativeLang === "korean" ? "더 연습하기" : nativeLang === "spanish" ? "Practicar más" : "Practice More"}
+              {nativeLang === "korean" ? "더 연습하기" : nativeLang === "spanish" ? "Practicar más" : nativeLang === "indonesian" ? "Latihan Lagi" : "Practice More"}
             </Text>
           </Pressable>
           <Pressable
@@ -1561,6 +1567,8 @@ export default function CardsScreen() {
                 ? `${deckType === "beginner" ? "고급" : "초급"} 덱 도전 →`
                 : nativeLang === "spanish"
                 ? `Prueba el mazo ${deckType === "beginner" ? "avanzado" : "principiante"} →`
+                : nativeLang === "indonesian"
+                ? `Coba dek ${deckType === "beginner" ? "lanjutan" : "pemula"} →`
                 : `Try ${deckType === "beginner" ? "Advanced" : "Beginner"} deck →`}
             </Text>
           </Pressable>
@@ -1584,6 +1592,8 @@ export default function CardsScreen() {
                     ? "플래시카드, 탭하여 뒤집기"
                     : nativeLang === "spanish"
                     ? "Tarjeta, toca para girar"
+                    : nativeLang === "indonesian"
+                    ? "Kartu, ketuk untuk membalik"
                     : "Flashcard, tap to flip"
                 }
               >
@@ -1616,6 +1626,8 @@ export default function CardsScreen() {
                           ? "발음 듣기"
                           : nativeLang === "spanish"
                           ? "Escuchar pronunciación"
+                          : nativeLang === "indonesian"
+                          ? "Dengar pelafalan"
                           : "Hear pronunciation"
                       }
                     >
@@ -1657,7 +1669,7 @@ export default function CardsScreen() {
                     <Text style={styles.cardMeaning}>{card?.meanings[nativeLang as NativeLanguage]}</Text>
                     <View style={styles.exampleBox}>
                       <Text style={styles.exampleLabel}>
-                        {nativeLang === "korean" ? "예문" : nativeLang === "spanish" ? "Ejemplo" : "Example"}
+                        {nativeLang === "korean" ? "예문" : nativeLang === "spanish" ? "Ejemplo" : nativeLang === "indonesian" ? "Contoh" : "Example"}
                       </Text>
                       <Text style={styles.exampleText}>{card?.example}</Text>
                       {card?.exampleTranslation[nativeLang as NativeLanguage] &&
@@ -1685,6 +1697,8 @@ export default function CardsScreen() {
                     ? "발음 듣기"
                     : nativeLang === "spanish"
                     ? "Escuchar pronunciación"
+                    : nativeLang === "indonesian"
+                    ? "Dengar pelafalan"
                     : "Hear pronunciation"
                 }
               >
@@ -1694,7 +1708,7 @@ export default function CardsScreen() {
                   color={C.parchment}
                 />
                 <Text style={styles.speakerBtnBackText}>
-                  {nativeLang === "korean" ? "듣기" : nativeLang === "spanish" ? "Escuchar" : "Listen"}
+                  {nativeLang === "korean" ? "듣기" : nativeLang === "spanish" ? "Escuchar" : nativeLang === "indonesian" ? "Dengarkan" : "Listen"}
                 </Text>
               </Pressable>
               {speakPracticeSentence ? (
@@ -1705,7 +1719,7 @@ export default function CardsScreen() {
               >
                 <Ionicons name="mic" size={16} color={C.bg1} />
                 <Text style={styles.speakReviewBtnText}>
-                  {nativeLang === "korean" ? "문장 말하기" : nativeLang === "spanish" ? "Decir frase" : "Say sentence"}
+                  {nativeLang === "korean" ? "문장 말하기" : nativeLang === "spanish" ? "Decir frase" : nativeLang === "indonesian" ? "Ucapkan kalimat" : "Say sentence"}
                 </Text>
               </Pressable>
               ) : null}
@@ -1726,6 +1740,8 @@ export default function CardsScreen() {
                     ? "다시, 더 연습할게요"
                     : nativeLang === "spanish"
                     ? "Otra vez, necesito más práctica"
+                    : nativeLang === "indonesian"
+                    ? "Lagi, saya perlu lebih banyak latihan"
                     : "Again, I need more practice"
                 }
                 style={styles.actionBtnWrap}
@@ -1738,7 +1754,7 @@ export default function CardsScreen() {
                   <View style={styles.actionBtnInner}>
                     <Text style={styles.againBtnEmoji}>😅</Text>
                     <Text style={[styles.actionLabel, { color: C.gold }]}>
-                      {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : "Again"}
+                      {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : nativeLang === "indonesian" ? "Lagi" : "Again"}
                     </Text>
                   </View>
                 </RippleButton>
@@ -1751,6 +1767,8 @@ export default function CardsScreen() {
                     ? "알아요, 이 단어를 알고 있어요"
                     : nativeLang === "spanish"
                     ? "Lo sé, conozco esta palabra"
+                    : nativeLang === "indonesian"
+                    ? "Sudah tahu, saya tahu kata ini"
                     : "Got it, I know this word"
                 }
                 style={styles.actionBtnWrap}
@@ -1763,7 +1781,7 @@ export default function CardsScreen() {
                   <View style={styles.actionBtnInner}>
                     <Text style={styles.gotItBtnEmoji}>✅</Text>
                     <Text style={[styles.actionLabel, { color: "#5a9" }]}>
-                      {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : "Got it!"}
+                      {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : nativeLang === "indonesian" ? "Sudah tahu!" : "Got it!"}
                     </Text>
                   </View>
                 </RippleButton>
@@ -1778,7 +1796,7 @@ export default function CardsScreen() {
                 <LinearGradient colors={[C.gold, C.goldDark]} style={styles.flipPromptGradient}>
                   <Ionicons name="sync" size={18} color={C.bg1} />
                   <Text style={styles.flipPromptText}>
-                    {nativeLang === "korean" ? "탭해서 뜻 보기" : nativeLang === "spanish" ? "Toca para ver el significado" : "Tap to reveal meaning"}
+                    {nativeLang === "korean" ? "탭해서 뜻 보기" : nativeLang === "spanish" ? "Toca para ver el significado" : nativeLang === "indonesian" ? "Ketuk untuk lihat arti" : "Tap to reveal meaning"}
                   </Text>
                 </LinearGradient>
               </Pressable>

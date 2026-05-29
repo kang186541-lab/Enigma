@@ -104,14 +104,18 @@ export default function NpcListScreen() {
       ? `${chName} 완료 시 해금`
       : native === "spanish"
       ? `Se desbloquea al completar ${chName}`
+      : native === "indonesian"
+      ? `Terbuka setelah menyelesaikan ${chName}`
       : `Unlocks after completing ${chName}`;
   };
 
-  const headerTitle = native === "korean" ? "실전 미션" : native === "spanish" ? "Misión Real" : "Real Missions";
+  const headerTitle = native === "korean" ? "실전 미션" : native === "spanish" ? "Misión Real" : native === "indonesian" ? "Misi Nyata" : "Real Missions";
   const headerSub = native === "korean"
     ? "NPC와 대화하며 실전 언어를 연습하세요"
     : native === "spanish"
     ? "Practica el idioma real con los NPC"
+    : native === "indonesian"
+    ? "Latih bahasa di dunia nyata bersama NPC"
     : "Practice real-world language with NPCs";
 
   return (
@@ -207,13 +211,15 @@ export default function NpcListScreen() {
           <>
             <View style={styles.sectionDivider} />
             <Text style={styles.sectionTitle}>
-              {native === "korean" ? "🩹 NPC 언어의 상처" : native === "spanish" ? "🩹 Heridas Lingüísticas" : "🩹 Language Wounds"}
+              {native === "korean" ? "🩹 NPC 언어의 상처" : native === "spanish" ? "🩹 Heridas Lingüísticas" : native === "indonesian" ? "🩹 Luka Bahasa" : "🩹 Language Wounds"}
             </Text>
             <Text style={styles.sectionSub}>
               {native === "korean"
                 ? "스토리를 진행하며 NPC의 숨겨진 아픔을 발견하세요"
                 : native === "spanish"
                 ? "Descubre el dolor oculto de cada NPC mientras avanzas"
+                : native === "indonesian"
+                ? "Temukan luka tersembunyi tiap NPC seiring kemajuanmu"
                 : "Discover each NPC's hidden pain as you progress"}
             </Text>
 
@@ -264,6 +270,8 @@ export default function NpcListScreen() {
                         ? `${npcName}과(와) 더 친해지면 열립니다`
                         : native === "spanish"
                         ? `Aumenta tu relación con ${npcName}`
+                        : native === "indonesian"
+                        ? `Tingkatkan kedekatanmu dengan ${npcName}`
                         : `Increase your bond with ${npcName}`}
                     </Text>
                   )}

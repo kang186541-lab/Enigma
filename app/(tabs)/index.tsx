@@ -187,11 +187,11 @@ export default function HomeScreen() {
   const lingoGreeting = getLingoGreeting(nativeLang);
   const syncLabel = user
     ? syncStatus.status === "error"
-      ? nativeLang === "korean" ? "저장 확인 필요" : nativeLang === "spanish" ? "Revisar guardado" : "Save needs check"
+      ? nativeLang === "korean" ? "저장 확인 필요" : nativeLang === "spanish" ? "Revisar guardado" : nativeLang === "indonesian" ? "Perlu cek penyimpanan" : "Save needs check"
       : syncStatus.status === "pending" || syncStatus.status === "syncing"
-      ? nativeLang === "korean" ? "저장 중" : nativeLang === "spanish" ? "Guardando" : "Saving"
-      : nativeLang === "korean" ? "동기화됨" : nativeLang === "spanish" ? "Sincronizado" : "Synced"
-    : nativeLang === "korean" ? "로그인 안 됨" : nativeLang === "spanish" ? "Sin sesión" : "Signed out";
+      ? nativeLang === "korean" ? "저장 중" : nativeLang === "spanish" ? "Guardando" : nativeLang === "indonesian" ? "Menyimpan" : "Saving"
+      : nativeLang === "korean" ? "동기화됨" : nativeLang === "spanish" ? "Sincronizado" : nativeLang === "indonesian" ? "Tersinkron" : "Synced"
+    : nativeLang === "korean" ? "로그인 안 됨" : nativeLang === "spanish" ? "Sin sesión" : nativeLang === "indonesian" ? "Belum masuk" : "Signed out";
 
   const level    = getLevel(stats.xp);
   const progress = getLevelProgress(stats.xp);
@@ -354,26 +354,32 @@ export default function HomeScreen() {
     ? `오늘 ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL}문장 말했어요`
     : nativeLang === "spanish"
     ? `Hoy dijiste ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL} frases`
+    : nativeLang === "indonesian"
+    ? `Hari ini kamu mengucapkan ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL} kalimat`
     : `You spoke ${displayedSpokenToday}/${SPEAKING_DAILY_GOAL} sentences today`;
   const shouldFocusSpeaking = !todaySpeakingMission.dailyGoalMet;
   const showSecondaryHomeSections = !shouldFocusSpeaking || showMorePractice;
   const showProgressSummary = todaySpeakingMission.dailyGoalMet;
   const showDueReviewBanner = todaySpeakingMission.dailyGoalMet && srsDueCount > 0;
   const morePracticeTitle = showMorePractice
-    ? nativeLang === "korean" ? "다시 말하기에 집중하기" : nativeLang === "spanish" ? "Volver a enfocarme en hablar" : "Refocus on speaking"
+    ? nativeLang === "korean" ? "다시 말하기에 집중하기" : nativeLang === "spanish" ? "Volver a enfocarme en hablar" : nativeLang === "indonesian" ? "Fokus lagi ke berbicara" : "Refocus on speaking"
     : nativeLang === "korean" ? "루디 훈련소 · 스토리 · NPC 더 보기" : nativeLang === "spanish" ? "Más: Campamento, Historia y NPC" : nativeLang === "indonesian" ? "Lainnya: Kamp Rudy, Cerita & NPC" : "More: Rudy's Camp, Story & NPC";
   const morePracticeSub = nativeLang === "korean"
     ? "오늘의 실제 문장을 먼저 입 밖으로 꺼내고, 필요하면 복습과 스토리로 이어가요."
     : nativeLang === "spanish"
     ? "Primero di tus frases reales de hoy. Después puedes repasar, jugar historia o hablar con NPCs."
+    : nativeLang === "indonesian"
+    ? "Ucapkan dulu kalimat nyatamu hari ini. Setelah itu, ulasan, cerita, dan NPC cuma satu ketukan saja."
     : "Say today's real sentences first. Then review, story, and NPC practice stay one tap away.";
   const moreToolsTitle = showMoreTools
-    ? nativeLang === "korean" ? "통계·문화·빠른 연습 접기" : nativeLang === "spanish" ? "Ocultar estadísticas y práctica" : "Hide stats & quick practice"
-    : nativeLang === "korean" ? "통계·문화·빠른 연습 더 보기" : nativeLang === "spanish" ? "Más: estadísticas, cultura y práctica" : "More: stats, culture & quick practice";
+    ? nativeLang === "korean" ? "통계·문화·빠른 연습 접기" : nativeLang === "spanish" ? "Ocultar estadísticas y práctica" : nativeLang === "indonesian" ? "Sembunyikan statistik & latihan cepat" : "Hide stats & quick practice"
+    : nativeLang === "korean" ? "통계·문화·빠른 연습 더 보기" : nativeLang === "spanish" ? "Más: estadísticas, cultura y práctica" : nativeLang === "indonesian" ? "Lainnya: statistik, budaya & latihan cepat" : "More: stats, culture & quick practice";
   const moreToolsSub = nativeLang === "korean"
     ? "통계, 문화노트, 빠른 학습은 말하기 흐름 뒤에 가볍게 열어요."
     : nativeLang === "spanish"
     ? "Estadísticas, notas culturales y práctica rápida quedan después de hablar."
+    : nativeLang === "indonesian"
+    ? "Statistik, catatan budaya, dan latihan cepat tetap di belakang alur berbicara."
     : "Stats, culture notes, and quick practice stay behind the speaking flow.";
 
   useEffect(() => {
@@ -399,38 +405,40 @@ export default function HomeScreen() {
     });
   };
 
-  const storyLabel = nativeLang === "korean" ? "스토리 모드" : nativeLang === "spanish" ? "Modo Historia" : "Story Mode";
-  const storyDesc  = nativeLang === "korean" ? "이야기 속에서 말하고 풀기" : nativeLang === "spanish" ? "Habla dentro de la historia" : "Speak inside the story";
+  const storyLabel = nativeLang === "korean" ? "스토리 모드" : nativeLang === "spanish" ? "Modo Historia" : nativeLang === "indonesian" ? "Mode Cerita" : "Story Mode";
+  const storyDesc  = nativeLang === "korean" ? "이야기 속에서 말하고 풀기" : nativeLang === "spanish" ? "Habla dentro de la historia" : nativeLang === "indonesian" ? "Berbicara di dalam cerita" : "Speak inside the story";
 
-  const writingLabel = nativeLang === "korean" ? "내 문장 만들기" : nativeLang === "spanish" ? "Mis frases" : "My Sentences";
-  const writingDesc  = nativeLang === "korean" ? "내가 쓸 말을 문장으로 만들기" : nativeLang === "spanish" ? "Crea frases que usarías" : "Build sentences you would use";
+  const writingLabel = nativeLang === "korean" ? "내 문장 만들기" : nativeLang === "spanish" ? "Mis frases" : nativeLang === "indonesian" ? "Kalimatku" : "My Sentences";
+  const writingDesc  = nativeLang === "korean" ? "내가 쓸 말을 문장으로 만들기" : nativeLang === "spanish" ? "Crea frases que usarías" : nativeLang === "indonesian" ? "Susun kalimat yang akan kamu pakai" : "Build sentences you would use";
   // Keep the quick entry aligned with the core promise: speak real sentences
   // with Rudy first; pronunciation scoring is the feedback layer underneath.
   const speakLabel = nativeLang === "korean" ? "루디와 말하기"
     : nativeLang === "spanish" ? "Habla con Rudy"
+    : nativeLang === "indonesian" ? "Bicara dengan Rudy"
     : "Speak with Rudy";
   const speakDesc = nativeLang === "korean" ? "말하면 Rudy가 바로 다듬어줘요"
     : nativeLang === "spanish" ? "Habla y Rudy te ayuda al instante"
+    : nativeLang === "indonesian" ? "Bicara, lalu Rudy merapikannya"
     : "Speak, then Rudy shapes it";
 
   const quickItems = [
     {
       icon: "albums",
       color: C.gold,
-      label: nativeLang === "korean" ? "다시 만날 문장" : nativeLang === "spanish" ? "Frases para repetir" : "Repeat Sentences",
+      label: nativeLang === "korean" ? "다시 만날 문장" : nativeLang === "spanish" ? "Frases para repetir" : nativeLang === "indonesian" ? "Kalimat Ulangan" : "Repeat Sentences",
       desc: cardReviewDone
-        ? nativeLang === "korean" ? "오늘 복습 완료" : nativeLang === "spanish" ? "Repaso de hoy completo" : "Today's review complete"
-        : nativeLang === "korean" ? "잊을 때쯤 다시 말해요" : nativeLang === "spanish" ? "Vuelve a decirlas cuando toca" : "Say them again when they are due",
+        ? nativeLang === "korean" ? "오늘 복습 완료" : nativeLang === "spanish" ? "Repaso de hoy completo" : nativeLang === "indonesian" ? "Ulasan hari ini selesai" : "Today's review complete"
+        : nativeLang === "korean" ? "잊을 때쯤 다시 말해요" : nativeLang === "spanish" ? "Vuelve a decirlas cuando toca" : nativeLang === "indonesian" ? "Ucapkan lagi pas waktunya" : "Say them again when they are due",
       meta: cardReviewDone
-        ? nativeLang === "korean" ? "완료" : nativeLang === "spanish" ? "Listo" : "Done"
+        ? nativeLang === "korean" ? "완료" : nativeLang === "spanish" ? "Listo" : nativeLang === "indonesian" ? "Selesai" : "Done"
         : `${displayedCardReviewToday}/${HOME_CARD_DAILY_GOAL}`,
       route: "/(tabs)/cards",
     },
     {
       icon: "chatbubbles",
       color: "#7eb8c9",
-      label: nativeLang === "korean" ? "대화하기" : nativeLang === "spanish" ? "Conversar" : "Conversation",
-      desc: nativeLang === "korean" ? "실제로 할 말을 짧게 주고받기" : nativeLang === "spanish" ? "Intercambia frases que usarías" : "Trade short lines you would use",
+      label: nativeLang === "korean" ? "대화하기" : nativeLang === "spanish" ? "Conversar" : nativeLang === "indonesian" ? "Percakapan" : "Conversation",
+      desc: nativeLang === "korean" ? "실제로 할 말을 짧게 주고받기" : nativeLang === "spanish" ? "Intercambia frases que usarías" : nativeLang === "indonesian" ? "Tukar kalimat singkat yang akan kamu pakai" : "Trade short lines you would use",
       route: "/(tabs)/chat",
     },
     { icon: "mic",         color: "#9b8bb4", label: speakLabel,        desc: speakDesc,                route: "/(tabs)/speak"  },
@@ -442,18 +450,18 @@ export default function HomeScreen() {
   // path updated it — it always rendered 0%), so we removed it. If/when we
   // wire up a real rolling-average accuracy metric, drop it back in here.
   const statItems = [
-    { label: nativeLang === "korean" ? "연속학습일" : nativeLang === "spanish" ? "Racha" : "Streak",   value: `${activeStreak}🔥` },
-    { label: nativeLang === "korean" ? "오늘 말한 문장" : nativeLang === "spanish" ? "Frases hoy" : "Spoken today", value: `${displayedSpokenToday}/${SPEAKING_DAILY_GOAL}` },
-    { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : "XP",          value: `${stats.xp}`           },
+    { label: nativeLang === "korean" ? "연속학습일" : nativeLang === "spanish" ? "Racha" : nativeLang === "indonesian" ? "Beruntun" : "Streak",   value: `${activeStreak}🔥` },
+    { label: nativeLang === "korean" ? "오늘 말한 문장" : nativeLang === "spanish" ? "Frases hoy" : nativeLang === "indonesian" ? "Diucapkan hari ini" : "Spoken today", value: `${displayedSpokenToday}/${SPEAKING_DAILY_GOAL}` },
+    { label: nativeLang === "korean" ? "경험치"     : nativeLang === "spanish" ? "XP" : nativeLang === "indonesian" ? "XP" : "XP",          value: `${stats.xp}`           },
   ];
 
   // Name the Training-Camp divider after the camp itself ("루디의 훈련소"), not
   // "오늘의 말하기 · 10분" — that collided with the speaking hero above it and
   // mislabeled the 4-step routine as the daily speaking mission. The "10분"
   // length cue now lives only inside the camp card (start button / done msg).
-  const missionLabel  = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : "Rudy's Training Camp";
-  const npcMissionLabel = nativeLang === "korean" ? "실전 미션" : nativeLang === "spanish" ? "Misión Real" : "Real Mission";
-  const npcMissionDesc  = nativeLang === "korean" ? "NPC와 실제 상황 문장을 주고받아요" : nativeLang === "spanish" ? "Habla con NPC en situaciones reales" : "Speak real situation lines with NPCs";
+  const missionLabel  = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : nativeLang === "indonesian" ? "Kamp Latihan Rudy" : "Rudy's Training Camp";
+  const npcMissionLabel = nativeLang === "korean" ? "실전 미션" : nativeLang === "spanish" ? "Misión Real" : nativeLang === "indonesian" ? "Misi Nyata" : "Real Mission";
+  const npcMissionDesc  = nativeLang === "korean" ? "NPC와 실제 상황 문장을 주고받아요" : nativeLang === "spanish" ? "Habla con NPC en situaciones reales" : nativeLang === "indonesian" ? "Bertukar kalimat situasi nyata dengan NPC" : "Speak real situation lines with NPCs";
 
   return (
     <>
@@ -489,7 +497,7 @@ export default function HomeScreen() {
               onPress={() => router.push("/settings")}
               style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, padding: 8, margin: -8 })}
               accessibilityRole="button"
-              accessibilityLabel={nativeLang === "korean" ? "설정" : nativeLang === "spanish" ? "Ajustes" : "Settings"}
+              accessibilityLabel={nativeLang === "korean" ? "설정" : nativeLang === "spanish" ? "Ajustes" : nativeLang === "indonesian" ? "Pengaturan" : "Settings"}
               hitSlop={8}
             >
               <Ionicons name="settings-outline" size={22} color={C.goldDim} />
@@ -526,7 +534,7 @@ export default function HomeScreen() {
               {LANG_FLAGS[nativeLang]} → {LANG_FLAGS[effectiveLearningLang]}
             </Text>
             <Text style={styles.langChipEdit}>
-              {nativeLang === "korean" ? "변경" : nativeLang === "spanish" ? "Cambiar" : "Change"}
+              {nativeLang === "korean" ? "변경" : nativeLang === "spanish" ? "Cambiar" : nativeLang === "indonesian" ? "Ubah" : "Change"}
             </Text>
           </Pressable>
         </View>
@@ -645,7 +653,7 @@ export default function HomeScreen() {
             <View style={styles.todaySpeechProgressTop}>
               <Text style={styles.todaySpeechProgressText}>{spokenProgressLabel}</Text>
               <Text style={styles.todaySpeechProgressGoal}>
-                {nativeLang === "korean" ? `목표 ${SPEAKING_DAILY_GOAL}` : nativeLang === "spanish" ? `Meta ${SPEAKING_DAILY_GOAL}` : `Goal ${SPEAKING_DAILY_GOAL}`}
+                {nativeLang === "korean" ? `목표 ${SPEAKING_DAILY_GOAL}` : nativeLang === "spanish" ? `Meta ${SPEAKING_DAILY_GOAL}` : nativeLang === "indonesian" ? `Target ${SPEAKING_DAILY_GOAL}` : `Goal ${SPEAKING_DAILY_GOAL}`}
               </Text>
             </View>
             <View style={styles.todaySpeechProgressTrack}>
@@ -697,7 +705,7 @@ export default function HomeScreen() {
         </View>
 
         {/* ── STREAK CARD ───────────────────────────────── */}
-        <GoldDivider label={nativeLang === "korean" ? "연속 학습" : nativeLang === "spanish" ? "RACHA DIARIA" : "DAILY STREAK"} />
+        <GoldDivider label={nativeLang === "korean" ? "연속 학습" : nativeLang === "spanish" ? "RACHA DIARIA" : nativeLang === "indonesian" ? "BERUNTUN HARIAN" : "DAILY STREAK"} />
         <View style={styles.pad}>
           <View style={styles.streakCard}>
             <View style={styles.streakHeader}>
@@ -710,14 +718,14 @@ export default function HomeScreen() {
                     </Animated.Text>
                   </Animated.View>
                   <Text style={styles.streakLabel}>
-                    {nativeLang === "korean" ? "일 연속 학습" : nativeLang === "spanish" ? "días seguidos" : "day streak"}
+                    {nativeLang === "korean" ? "일 연속 학습" : nativeLang === "spanish" ? "días seguidos" : nativeLang === "indonesian" ? "hari beruntun" : "day streak"}
                   </Text>
                 </View>
               </View>
               <View style={styles.streakBadge}>
                 <Ionicons name="trophy" size={14} color={C.gold} />
                 <Text style={styles.streakBadgeText}>
-                  {nativeLang === "korean" ? "최고 기록" : nativeLang === "spanish" ? "Récord" : "Best"}
+                  {nativeLang === "korean" ? "최고 기록" : nativeLang === "spanish" ? "Récord" : nativeLang === "indonesian" ? "Terbaik" : "Best"}
                 </Text>
               </View>
             </View>
@@ -773,6 +781,8 @@ export default function HomeScreen() {
                   ? "루디가 복습 카드를 준비했어요!"
                   : nativeLang === "spanish"
                   ? "¡Rudy preparó tarjetas de repaso!"
+                  : nativeLang === "indonesian"
+                  ? "Rudy sudah menyiapkan kartu ulasan untukmu!"
                   : "Rudy prepared review cards for you!"}
               </Text>
               <Text style={styles.srsBannerSub}>
@@ -780,6 +790,8 @@ export default function HomeScreen() {
                   ? `${srsDueCount}장의 카드가 복습을 기다리고 있어요`
                   : nativeLang === "spanish"
                   ? `${srsDueCount} tarjetas esperan tu repaso`
+                  : nativeLang === "indonesian"
+                  ? `${srsDueCount} kartu menunggu untuk diulas`
                   : `${srsDueCount} cards are waiting for review`}
               </Text>
             </View>
@@ -817,8 +829,8 @@ export default function HomeScreen() {
           >
             <Text style={styles.basicCoursePillText}>
               {courseCompleted
-                ? (nativeLang === "korean" ? "📚  기초 과정 복습" : nativeLang === "spanish" ? "📚  Repasar curso" : "📚  Review Course")
-                : (nativeLang === "korean" ? "📚  선택 기초 연습" : nativeLang === "spanish" ? "📚  Base opcional" : "📚  Optional Basics")}
+                ? (nativeLang === "korean" ? "📚  기초 과정 복습" : nativeLang === "spanish" ? "📚  Repasar curso" : nativeLang === "indonesian" ? "📚  Ulas Kursus" : "📚  Review Course")
+                : (nativeLang === "korean" ? "📚  선택 기초 연습" : nativeLang === "spanish" ? "📚  Base opcional" : nativeLang === "indonesian" ? "📚  Dasar Opsional" : "📚  Optional Basics")}
             </Text>
           </Pressable>
         </View>
@@ -849,7 +861,7 @@ export default function HomeScreen() {
             <Text style={styles.npcMissionTitle}>{npcMissionDesc}</Text>
             <View style={styles.npcMissionBtn}>
               <Text style={styles.npcMissionBtnText}>
-                {nativeLang === "korean" ? "NPC 선택" : nativeLang === "spanish" ? "Elegir NPC" : "Choose NPC"}
+                {nativeLang === "korean" ? "NPC 선택" : nativeLang === "spanish" ? "Elegir NPC" : nativeLang === "indonesian" ? "Pilih NPC" : "Choose NPC"}
               </Text>
               <Ionicons name="arrow-forward" size={13} color={C.bg1} />
             </View>
@@ -882,7 +894,7 @@ export default function HomeScreen() {
       {showMoreTools && (
       <>
       {/* ── FEATURE SHORTCUTS (Stats, Achievements, Leaderboard) ── */}
-      <GoldDivider label={nativeLang === "korean" ? "나의 성장" : nativeLang === "spanish" ? "MI PROGRESO" : "MY PROGRESS"} />
+      <GoldDivider label={nativeLang === "korean" ? "나의 성장" : nativeLang === "spanish" ? "MI PROGRESO" : nativeLang === "indonesian" ? "PROGRESKU" : "MY PROGRESS"} />
       <View style={styles.pad}>
         <View style={{ flexDirection: "row", gap: 10 }}>
           <Pressable
@@ -891,7 +903,7 @@ export default function HomeScreen() {
           >
             <EmojiText style={{ fontSize: 24 }}>📊</EmojiText>
             <Text style={styles.featureLabel}>
-              {nativeLang === "korean" ? "학습 통계" : nativeLang === "spanish" ? "Estadísticas" : "Stats"}
+              {nativeLang === "korean" ? "학습 통계" : nativeLang === "spanish" ? "Estadísticas" : nativeLang === "indonesian" ? "Statistik" : "Stats"}
             </Text>
           </Pressable>
           <Pressable
@@ -900,7 +912,7 @@ export default function HomeScreen() {
           >
             <EmojiText style={{ fontSize: 24 }}>🏆</EmojiText>
             <Text style={styles.featureLabel}>
-              {nativeLang === "korean" ? "업적" : nativeLang === "spanish" ? "Logros" : "Achievements"}
+              {nativeLang === "korean" ? "업적" : nativeLang === "spanish" ? "Logros" : nativeLang === "indonesian" ? "Pencapaian" : "Achievements"}
             </Text>
           </Pressable>
           <Pressable
@@ -909,7 +921,7 @@ export default function HomeScreen() {
           >
             <EmojiText style={{ fontSize: 24 }}>🥇</EmojiText>
             <Text style={styles.featureLabel}>
-              {nativeLang === "korean" ? "리더보드" : nativeLang === "spanish" ? "Ranking" : "Leaderboard"}
+              {nativeLang === "korean" ? "리더보드" : nativeLang === "spanish" ? "Ranking" : nativeLang === "indonesian" ? "Papan Peringkat" : "Leaderboard"}
             </Text>
           </Pressable>
         </View>
@@ -919,7 +931,7 @@ export default function HomeScreen() {
       <CulturalNoteSection nativeLang={nativeLang} learningLang={effectiveLearningLang} />
 
       {/* ── QUICK PRACTICE ────────────────────────────── */}
-      <GoldDivider label={nativeLang === "korean" ? "빠른 학습" : nativeLang === "spanish" ? "PRÁCTICA RÁPIDA" : "QUICK PRACTICE"} />
+      <GoldDivider label={nativeLang === "korean" ? "빠른 학습" : nativeLang === "spanish" ? "PRÁCTICA RÁPIDA" : nativeLang === "indonesian" ? "LATIHAN CEPAT" : "QUICK PRACTICE"} />
       <View style={styles.pad}>
         <View style={styles.quickList}>
           {quickItems.map((item, idx) => (
@@ -974,7 +986,7 @@ function CulturalNoteSection({ nativeLang, learningLang }: { nativeLang: string;
   const learningCode = learningLang === "korean" ? "ko" : learningLang === "spanish" ? "es" : "en";
   const note = getTodayNote(learningCode);
   const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
-  const sectionLabel = nativeLang === "korean" ? "오늘의 문화 노트" : nativeLang === "spanish" ? "NOTA CULTURAL" : "CULTURAL NOTE";
+  const sectionLabel = nativeLang === "korean" ? "오늘의 문화 노트" : nativeLang === "spanish" ? "NOTA CULTURAL" : nativeLang === "indonesian" ? "CATATAN BUDAYA" : "CULTURAL NOTE";
 
   return (
     <>
@@ -1004,10 +1016,11 @@ function RudyTrainingCard({
   onPress: () => void;
 }) {
   const lc = langToCode(nativeLang);
-  const trainingLabel = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : "Rudy's Training Camp";
-  const startLabel    = nativeLang === "korean" ? "10분 훈련 시작 →" : nativeLang === "spanish" ? "10 min, comenzar →" : "Start 10-min Training →";
+  const trainingLabel = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : nativeLang === "indonesian" ? "Kamp Latihan Rudy" : "Rudy's Training Camp";
+  const startLabel    = nativeLang === "korean" ? "10분 훈련 시작 →" : nativeLang === "spanish" ? "10 min, comenzar →" : nativeLang === "indonesian" ? "Mulai Latihan 10 menit →" : "Start 10-min Training →";
   const doneMsg       = nativeLang === "korean" ? "10분 훈련 완료! 내일 봐, 파트너! 🦊"
     : nativeLang === "spanish" ? "¡10 min completados! ¡Hasta mañana! 🦊"
+    : nativeLang === "indonesian" ? "Latihan 10 menit selesai! Sampai besok, partner! 🦊"
     : "10 min done! See you tomorrow, partner! 🦊";
 
   if (!dailyProgress) {
@@ -1078,7 +1091,7 @@ function RudyTrainingCard({
               {blocks.map((filled, i) => (
                 <View key={i} style={[styles.rudyStepBlock, filled && styles.rudyStepBlockFilled]} />
               ))}
-              <Text style={styles.rudyStepLabel}>{nativeLang === "korean" ? "단계" : nativeLang === "spanish" ? "PASO" : "STEP"} {stepsCompleted}/{totalSteps}</Text>
+              <Text style={styles.rudyStepLabel}>{nativeLang === "korean" ? "단계" : nativeLang === "spanish" ? "PASO" : nativeLang === "indonesian" ? "LANGKAH" : "STEP"} {stepsCompleted}/{totalSteps}</Text>
             </View>
           </>
         )}

@@ -550,6 +550,9 @@ function getVoiceServiceUnavailableMessage(nativeLang: NativeLanguage): string {
   if (nativeLang === "spanish") {
     return "El servicio de voz aún no está conectado. Revisa la configuración del dominio API.";
   }
+  if (nativeLang === "indonesian") {
+    return "Layanan suara belum tersambung. Periksa pengaturan domain API.";
+  }
   return "Voice service is not connected yet. Check the API domain configuration.";
 }
 
@@ -560,24 +563,30 @@ function getUnsupportedRecordingMessage(nativeLang: NativeLanguage): string {
   if (nativeLang === "spanish") {
     return "Este navegador no soporta grabación con micrófono.\nUsa una versión reciente de Chrome o Safari.";
   }
+  if (nativeLang === "indonesian") {
+    return "Browser ini tidak mendukung perekaman mikrofon.\nGunakan Chrome atau Safari versi terbaru.";
+  }
   return "This browser doesn't support microphone recording.\nUse a current version of Chrome or Safari.";
 }
 
 function getNoVoiceDetectedMessage(nativeLang: NativeLanguage): string {
   if (nativeLang === "korean") return "음성이 감지되지 않았어요. 다시 시도해 주세요.";
   if (nativeLang === "spanish") return "No se detectó voz. Inténtalo de nuevo.";
+  if (nativeLang === "indonesian") return "Suara tidak terdeteksi. Silakan coba lagi.";
   return "No voice detected. Please try again.";
 }
 
 function getContinueWithoutScoreLabel(nativeLang: NativeLanguage): string {
   if (nativeLang === "korean") return "점수 없이 시도 기록";
   if (nativeLang === "spanish") return "Contar sin nota";
+  if (nativeLang === "indonesian") return "Hitung tanpa skor";
   return "Count without score";
 }
 
 function getContinueWithoutScoreHint(nativeLang: NativeLanguage): string {
   if (nativeLang === "korean") return "정말로 말했는데 채점만 실패했을 때 사용하세요.";
   if (nativeLang === "spanish") return "Úsalo solo si hablaste y falló la evaluación.";
+  if (nativeLang === "indonesian") return "Pakai ini hanya jika kamu sudah bicara tapi penilaiannya gagal.";
   return "Use this only if you spoke and the scorer failed.";
 }
 
@@ -592,23 +601,22 @@ function tryGetApiUrl(scope: string): string | null {
 
 function getScoreInfo(
   score: number,
-  // Accepts the full native-language set. Indonesian (Phase 1 native/UI) is not
-  // given bespoke score copy — every branch below defaults non-korean/spanish
-  // to the English labels, so indonesian transparently uses English.
+  // Accepts the full native-language set, including Indonesian (Phase 1
+  // native/UI), which now has localized score copy alongside ko/es/en.
   nativeLang: NativeLanguage = "english",
   mode: "clinic" | "first-mission" = "clinic"
 ): { label: string; color: string; emoji: string } {
   if (mode === "first-mission") {
-    const clear = nativeLang === "korean" ? "루디가 잘 들었어요" : nativeLang === "spanish" ? "Rudy te escuchó bien" : "Rudy heard you clearly";
-    const heard = nativeLang === "korean" ? "입 밖으로 말했어요" : nativeLang === "spanish" ? "Lo dijiste en voz alta" : "You said it out loud";
-    const shape = nativeLang === "korean" ? "좋아요, 이제 다듬어봐요" : nativeLang === "spanish" ? "Bien, ahora lo pulimos" : "Good. Now we shape it";
+    const clear = nativeLang === "korean" ? "루디가 잘 들었어요" : nativeLang === "spanish" ? "Rudy te escuchó bien" : nativeLang === "indonesian" ? "Rudy mendengarmu dengan jelas" : "Rudy heard you clearly";
+    const heard = nativeLang === "korean" ? "입 밖으로 말했어요" : nativeLang === "spanish" ? "Lo dijiste en voz alta" : nativeLang === "indonesian" ? "Kamu mengucapkannya dengan lantang" : "You said it out loud";
+    const shape = nativeLang === "korean" ? "좋아요, 이제 다듬어봐요" : nativeLang === "spanish" ? "Bien, ahora lo pulimos" : nativeLang === "indonesian" ? "Bagus. Sekarang kita rapikan" : "Good. Now we shape it";
     if (score >= 75) return { label: clear, color: C.success, emoji: "" };
     if (score >= 50) return { label: heard, color: C.gold, emoji: "" };
     return { label: shape, color: C.goldDim, emoji: "" };
   }
-  const great = nativeLang === "korean" ? "훌륭해요!" : nativeLang === "spanish" ? "¡Excelente!" : "Excellent!";
-  const good = nativeLang === "korean" ? "잘했어요!" : nativeLang === "spanish" ? "¡Bien hecho!" : "Good Job!";
-  const keep = nativeLang === "korean" ? "계속 연습해요" : nativeLang === "spanish" ? "Sigue practicando" : "Keep Practicing";
+  const great = nativeLang === "korean" ? "훌륭해요!" : nativeLang === "spanish" ? "¡Excelente!" : nativeLang === "indonesian" ? "Luar biasa!" : "Excellent!";
+  const good = nativeLang === "korean" ? "잘했어요!" : nativeLang === "spanish" ? "¡Bien hecho!" : nativeLang === "indonesian" ? "Kerja bagus!" : "Good Job!";
+  const keep = nativeLang === "korean" ? "계속 연습해요" : nativeLang === "spanish" ? "Sigue practicando" : nativeLang === "indonesian" ? "Terus berlatih" : "Keep Practicing";
   if (score >= 75) return { label: great, color: C.success, emoji: "🎉" };
   if (score >= 50) return { label: good, color: C.gold, emoji: "😊" };
   return { label: keep, color: C.goldDim, emoji: "" };
@@ -872,6 +880,8 @@ function getReviewSentencePhrase(
     ? "카드 문장을 통째로 말해보세요. 완벽하지 않아도 괜찮아요."
     : nativeLang === "spanish"
     ? "Di la frase completa. No tiene que salir perfecta."
+    : nativeLang === "indonesian"
+    ? "Ucapkan kalimat kartunya secara utuh. Tidak harus sempurna."
     : "Say the whole card sentence. It does not have to be perfect.";
   return {
     word,
@@ -904,11 +914,14 @@ function getFirstSpeakingMissionCopy(nativeLang: NativeLanguage, targetLang: Lan
   return {
     title: nativeLang === "korean" ? "오늘의 실제 한 문장"
       : nativeLang === "spanish" ? "Una frase real hoy"
+      : nativeLang === "indonesian" ? "Satu kalimat nyata hari ini"
       : "Today's real sentence",
     subtitle: nativeLang === "korean"
       ? `${targetName[nativeLang][targetLang]}로 ${label ?? "처음 쓸"} 문장을 Rudy와 입 밖으로 말해요.`
       : nativeLang === "spanish"
       ? `Di una frase ${label ?? "real"} en ${targetName[nativeLang][targetLang]} con Rudy.`
+      : nativeLang === "indonesian"
+      ? `Ucapkan satu kalimat ${targetName[nativeLang][targetLang]} ${label ?? "untuk kehidupan nyata"} dengan lantang bareng Rudy.`
       : `Say one ${targetName[nativeLang][targetLang]} sentence for ${label ?? "real life"} out loud with Rudy.`,
   };
 }
@@ -926,6 +939,12 @@ function getReviewSentenceMissionCopy(nativeLang: NativeLanguage) {
       subtitle: "No solo mires la tarjeta. Dila una vez en voz alta.",
     };
   }
+  if (nativeLang === "indonesian") {
+    return {
+      title: "Kalimat ulasan",
+      subtitle: "Jangan berhenti di mengenali kartunya. Ucapkan sekali dengan lantang.",
+    };
+  }
   return {
     title: "Review sentence",
     subtitle: "Do not stop at recognizing the card. Say it once out loud.",
@@ -934,18 +953,19 @@ function getReviewSentenceMissionCopy(nativeLang: NativeLanguage) {
 
 function getLearningGoalOptions(nativeLang: NativeLanguage): { key: LearningGoal; label: string }[] {
   return [
-    { key: "travel", label: nativeLang === "korean" ? "여행" : nativeLang === "spanish" ? "Viajes" : "Travel" },
-    { key: "hobby", label: nativeLang === "korean" ? "콘텐츠/취미" : nativeLang === "spanish" ? "Series y gustos" : "Shows and interests" },
-    { key: "relationship", label: nativeLang === "korean" ? "친구/관계" : nativeLang === "spanish" ? "Amistades" : "Friends" },
-    { key: "work", label: nativeLang === "korean" ? "일" : nativeLang === "spanish" ? "Trabajo" : "Work" },
-    { key: "study", label: nativeLang === "korean" ? "학교" : nativeLang === "spanish" ? "Estudios" : "School" },
-    { key: "exam", label: nativeLang === "korean" ? "시험" : nativeLang === "spanish" ? "Examen" : "Exam" },
+    { key: "travel", label: nativeLang === "korean" ? "여행" : nativeLang === "spanish" ? "Viajes" : nativeLang === "indonesian" ? "Perjalanan" : "Travel" },
+    { key: "hobby", label: nativeLang === "korean" ? "콘텐츠/취미" : nativeLang === "spanish" ? "Series y gustos" : nativeLang === "indonesian" ? "Tontonan & minat" : "Shows and interests" },
+    { key: "relationship", label: nativeLang === "korean" ? "친구/관계" : nativeLang === "spanish" ? "Amistades" : nativeLang === "indonesian" ? "Pertemanan" : "Friends" },
+    { key: "work", label: nativeLang === "korean" ? "일" : nativeLang === "spanish" ? "Trabajo" : nativeLang === "indonesian" ? "Pekerjaan" : "Work" },
+    { key: "study", label: nativeLang === "korean" ? "학교" : nativeLang === "spanish" ? "Estudios" : nativeLang === "indonesian" ? "Sekolah" : "School" },
+    { key: "exam", label: nativeLang === "korean" ? "시험" : nativeLang === "spanish" ? "Examen" : nativeLang === "indonesian" ? "Ujian" : "Exam" },
   ];
 }
 
 function getGoalQuestion(nativeLang: NativeLanguage): string {
   if (nativeLang === "korean") return "다음엔 어떤 상황을 말해볼까요?";
   if (nativeLang === "spanish") return "¿Qué quieres decir con Rudy después?";
+  if (nativeLang === "indonesian") return "Apa yang mau kamu ucapkan bareng Rudy berikutnya?";
   return "What should Rudy help you say next?";
 }
 
@@ -953,27 +973,32 @@ function getFirstMissionResultMessage(nativeLang: NativeLanguage, score: number)
   if (score >= 75) {
     if (nativeLang === "korean") return "Rudy가 들었어요. 이제 점수보다 중요한 건 다음 문장을 입 밖으로 꺼내는 거예요.";
     if (nativeLang === "spanish") return "Rudy te escuchó. Ahora lo importante no es la nota, sino decir la siguiente frase.";
+    if (nativeLang === "indonesian") return "Rudy mendengarmu. Sekarang yang penting bukan skornya, tapi mengucapkan kalimat berikutnya.";
     return "Rudy heard you. Now the important thing is not the score, but saying the next sentence.";
   }
   if (score >= 50) {
     if (nativeLang === "korean") return "조금 흔들려도 괜찮아요. 한 번 말했으니, 다음 문장에서 더 편해질 거예요.";
     if (nativeLang === "spanish") return "No importa si salió un poco tembloroso. Ya lo dijiste; la siguiente frase será más fácil.";
+    if (nativeLang === "indonesian") return "Tidak apa-apa kalau terasa gugup. Kamu sudah mengucapkannya sekali; kalimat berikutnya akan terasa lebih mudah.";
     return "It is okay if it felt shaky. You said it once; the next sentence will feel easier.";
   }
   if (nativeLang === "korean") return "완벽하지 않아도 기록했어요. 다시 해도 좋고, 다음 문장으로 넘어가도 괜찮아요.";
   if (nativeLang === "spanish") return "No tuvo que ser perfecto. Puedes repetirla o seguir con la siguiente frase.";
+  if (nativeLang === "indonesian") return "Tidak harus sempurna. Kamu bisa mengulanginya atau lanjut ke kalimat berikutnya.";
   return "It did not have to be perfect. You can retry it or continue to the next sentence.";
 }
 
 function getNextMissionPreviewTitle(nativeLang: NativeLanguage, step: number): string {
   if (nativeLang === "korean") return `다음 실제 문장 ${step}/${SPEAKING_DAILY_GOAL}`;
   if (nativeLang === "spanish") return `Siguiente frase real ${step}/${SPEAKING_DAILY_GOAL}`;
+  if (nativeLang === "indonesian") return `Kalimat nyata berikutnya ${step}/${SPEAKING_DAILY_GOAL}`;
   return `Next real sentence ${step}/${SPEAKING_DAILY_GOAL}`;
 }
 
 function getNextMissionPreviewHint(nativeLang: NativeLanguage): string {
   if (nativeLang === "korean") return "한 문장씩만. Rudy는 시험관이 아니라, 같이 입을 여는 파트너예요.";
   if (nativeLang === "spanish") return "Una frase a la vez. Rudy no es examinador; abre la boca contigo.";
+  if (nativeLang === "indonesian") return "Satu kalimat saja. Rudy bukan penguji; dia di sini untuk berbicara bersamamu.";
   return "One sentence at a time. Rudy is not an examiner; he is here to speak with you.";
 }
 
@@ -988,6 +1013,7 @@ function getScoreBand(score: number): "pass" | "coach" | "repair" {
 function getUnscoredAttemptAcceptedMessage(nativeLang: NativeLanguage): string {
   if (nativeLang === "korean") return "채점은 잠시 실패했지만, 말하기 시도는 기록했어요. 계속 진행해도 좋아요.";
   if (nativeLang === "spanish") return "La evaluación falló por ahora, pero guardamos tu intento hablado. Puedes continuar.";
+  if (nativeLang === "indonesian") return "Penilaian gagal untuk sekarang, tapi percobaan bicaramu sudah tersimpan. Kamu bisa lanjut.";
   return "Scoring failed for now, but your spoken attempt was saved. You can continue.";
 }
 
@@ -1043,6 +1069,8 @@ export default function SpeakScreen() {
     ? "루디가 듣고 있어요… 🦊"
     : nativeLang === "spanish"
     ? "Rudy está escuchando… 🦊"
+    : nativeLang === "indonesian"
+    ? "Rudy sedang mendengarkan… 🦊"
     : "Rudy is listening… 🦊";
 
   const visibleTabs = learningLanguage && learningLanguage !== nativeLang
@@ -1439,6 +1467,8 @@ export default function SpeakScreen() {
           ? "음성이 감지되지 않았어요. 다시 시도해 주세요."
           : nativeLang === "spanish"
           ? "No se detectó voz. Inténtalo de nuevo."
+          : nativeLang === "indonesian"
+          ? "Suara tidak terdeteksi. Silakan coba lagi."
           : "No voice detected. Please try again.");
       setSttError(msg);
       if (!data.feedback) setSttError(getNoVoiceDetectedMessage(nativeLang));
@@ -1607,7 +1637,7 @@ export default function SpeakScreen() {
       // Empty audio guard — show 0% instead of sending to Azure
       if (!base64 || base64.length < 2000) {
         setScore(0);
-        setSttError(nativeLang === "korean" ? "음성이 감지되지 않았어요. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se detectó voz. Inténtalo de nuevo." : "No voice detected. Please try again.");
+        setSttError(nativeLang === "korean" ? "음성이 감지되지 않았어요. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se detectó voz. Inténtalo de nuevo." : nativeLang === "indonesian" ? "Suara tidak terdeteksi. Silakan coba lagi." : "No voice detected. Please try again.");
         setRecordState("done");
         recordStateRef.current = "done";
         return;
@@ -1670,7 +1700,7 @@ export default function SpeakScreen() {
       // Always restore audio mode so NPC/tutor sounds work after a failed recording
       Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch((e2: unknown) => console.warn('[Audio] audio mode restore failed:', e2));
       if (!isCurrentPracticeAttempt(attemptGeneration)) return;
-      setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
+      setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : nativeLang === "indonesian" ? "Terjadi kesalahan saat menilai. Silakan coba lagi." : "Scoring error. Please try again.");
       if (hasRecordableAudio) {
         offerContinueWithoutScore(attemptGeneration);
       }
@@ -1764,7 +1794,7 @@ export default function SpeakScreen() {
           console.warn('[Audio] microphone start failed:', e);
           // Restore audio mode so other sounds (NPC, tutor) can play again
           Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true, shouldDuckAndroid: false, playThroughEarpieceAndroid: false }).catch((e2: unknown) => console.warn('[Audio] audio mode restore failed:', e2));
-          setSttError(nativeLang === "korean" ? "마이크를 시작할 수 없습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se pudo iniciar el micrófono." : "Could not start microphone. Please try again.");
+          setSttError(nativeLang === "korean" ? "마이크를 시작할 수 없습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se pudo iniciar el micrófono." : nativeLang === "indonesian" ? "Tidak bisa memulai mikrofon. Silakan coba lagi." : "Could not start microphone. Please try again.");
           setRecordState("done");
           recordStateRef.current = "done";
         } finally {
@@ -1851,7 +1881,7 @@ export default function SpeakScreen() {
         // Empty audio guard — show 0% instead of sending to Azure
         if (!base64 || base64.length < 2000) {
           setScore(0);
-          setSttError(nativeLang === "korean" ? "음성이 감지되지 않았어요. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se detectó voz. Inténtalo de nuevo." : "No voice detected. Please try again.");
+          setSttError(nativeLang === "korean" ? "음성이 감지되지 않았어요. 다시 시도해 주세요." : nativeLang === "spanish" ? "No se detectó voz. Inténtalo de nuevo." : nativeLang === "indonesian" ? "Suara tidak terdeteksi. Silakan coba lagi." : "No voice detected. Please try again.");
           setRecordState("done");
           recordStateRef.current = "done";
           return;
@@ -1913,7 +1943,7 @@ export default function SpeakScreen() {
         } catch (e) {
           console.warn('[Audio] web recording scoring failed:', e);
           if (!isCurrentPracticeAttempt(attemptGeneration)) return;
-          setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : "Scoring error. Please try again.");
+          setSttError(nativeLang === "korean" ? "채점 중 오류가 발생했습니다. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error al evaluar. Inténtalo de nuevo." : nativeLang === "indonesian" ? "Terjadi kesalahan saat menilai. Silakan coba lagi." : "Scoring error. Please try again.");
           if (hasRecordableAudio) {
             offerContinueWithoutScore(attemptGeneration);
           }
@@ -1960,7 +1990,7 @@ export default function SpeakScreen() {
     }).catch((e) => {
       console.warn('[Speak] microphone access failed:', e);
       recordStartPendingRef.current = false;
-      setSttError(nativeLang === "korean" ? "마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)" : nativeLang === "spanish" ? "Permite el acceso al micrófono.\n(Configuración del navegador → Micrófono)" : "Please allow microphone access.\n(Browser settings → Microphone)");
+      setSttError(nativeLang === "korean" ? "마이크 권한을 허용해주세요.\n(브라우저 설정 → 마이크 허용)" : nativeLang === "spanish" ? "Permite el acceso al micrófono.\n(Configuración del navegador → Micrófono)" : nativeLang === "indonesian" ? "Mohon izinkan akses mikrofon.\n(Pengaturan browser → Mikrofon)" : "Please allow microphone access.\n(Browser settings → Microphone)");
       setRecordState("done");
       recordStateRef.current = "done";
     });
@@ -2050,6 +2080,8 @@ export default function SpeakScreen() {
     ? `오늘 ${dailySpokenCount}/${SPEAKING_DAILY_GOAL}문장 말했어요`
     : nativeLang === "spanish"
     ? `Hoy dijiste ${dailySpokenCount}/${SPEAKING_DAILY_GOAL} frases`
+    : nativeLang === "indonesian"
+    ? `Hari ini kamu mengucapkan ${dailySpokenCount}/${SPEAKING_DAILY_GOAL} kalimat`
     : `You spoke ${dailySpokenCount}/${SPEAKING_DAILY_GOAL} sentences today`;
   const headerProgressPct = isFirstSpeakingMission ? spokenProgressPct : progressPct;
   const headerProgressLabel = isFirstSpeakingMission
@@ -2066,8 +2098,10 @@ export default function SpeakScreen() {
       ? `다음 문장 말하기 ${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
       : nativeLang === "spanish"
       ? `Siguiente frase ${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
+      : nativeLang === "indonesian"
+      ? `Kalimat berikutnya ${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
       : `Next sentence ${Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
-    : nativeLang === "korean" ? "루디와 계속 말하기" : nativeLang === "spanish" ? "Seguir hablando con Rudy" : "Keep speaking with Rudy";
+    : nativeLang === "korean" ? "루디와 계속 말하기" : nativeLang === "spanish" ? "Seguir hablando con Rudy" : nativeLang === "indonesian" ? "Terus bicara dengan Rudy" : "Keep speaking with Rudy";
   const nextMissionStep = Math.min(dailySpokenCount + 1, SPEAKING_DAILY_GOAL);
   const nextMissionPreview = isFirstSpeakingMission && shouldContinueDailySpeaking
     ? getDailySpeakingMissionPhrase(activeLang, selectedGoal, dailySpokenCount, nativeLang)
@@ -2085,7 +2119,7 @@ export default function SpeakScreen() {
   // isGuidedSentenceMission && !hasListened.
   const mustListenFirst = isGuidedSentenceMission && !hasListened;
   const idleRecordHint = hasListened
-    ? (nativeLang === "korean" ? "탭하여 발음 녹음" : nativeLang === "spanish" ? "Toca para grabar" : "Tap to record")
+    ? (nativeLang === "korean" ? "탭하여 발음 녹음" : nativeLang === "spanish" ? "Toca para grabar" : nativeLang === "indonesian" ? "Ketuk untuk merekam" : "Tap to record")
     : mustListenFirst
     ? (nativeLang === "korean"
         ? "먼저 듣기를 누르고 따라 말해요"
@@ -2094,15 +2128,15 @@ export default function SpeakScreen() {
         : nativeLang === "indonesian"
         ? "Ketuk Dengar dulu, lalu ucapkan"
         : "Tap Listen first, then say it")
-    : (nativeLang === "korean" ? "먼저 듣기를 눌러보세요" : nativeLang === "spanish" ? "Primero toca escuchar" : "Press listen first");
+    : (nativeLang === "korean" ? "먼저 듣기를 눌러보세요" : nativeLang === "spanish" ? "Primero toca escuchar" : nativeLang === "indonesian" ? "Tekan dengar dulu" : "Press listen first");
   const micAccessibilityLabel = isRecording
-    ? (nativeLang === "korean" ? "녹음 중. 탭하여 정지" : nativeLang === "spanish" ? "Grabando. Toca para parar" : "Recording. Tap to stop")
+    ? (nativeLang === "korean" ? "녹음 중. 탭하여 정지" : nativeLang === "spanish" ? "Grabando. Toca para parar" : nativeLang === "indonesian" ? "Merekam. Ketuk untuk berhenti" : "Recording. Tap to stop")
     : isGuidedSentenceMission
-    ? (nativeLang === "korean" ? "문장 말하기 시작" : nativeLang === "spanish" ? "Empezar a decir la frase" : "Start speaking the sentence")
-    : (nativeLang === "korean" ? "발음 녹음 시작" : nativeLang === "spanish" ? "Iniciar grabación de pronunciación" : "Start recording pronunciation");
+    ? (nativeLang === "korean" ? "문장 말하기 시작" : nativeLang === "spanish" ? "Empezar a decir la frase" : nativeLang === "indonesian" ? "Mulai mengucapkan kalimat" : "Start speaking the sentence")
+    : (nativeLang === "korean" ? "발음 녹음 시작" : nativeLang === "spanish" ? "Iniciar grabación de pronunciación" : nativeLang === "indonesian" ? "Mulai merekam pengucapan" : "Start recording pronunciation");
   const lockedNextLabel = isGuidedSentenceMission
-    ? (nativeLang === "korean" ? "먼저 말하기" : nativeLang === "spanish" ? "Habla primero" : "Speak first")
-    : (nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : "Next");
+    ? (nativeLang === "korean" ? "먼저 말하기" : nativeLang === "spanish" ? "Habla primero" : nativeLang === "indonesian" ? "Bicara dulu" : "Speak first")
+    : (nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : nativeLang === "indonesian" ? "Berikutnya" : "Next");
 
   const returnToReviewCards = () => {
     router.replace({
@@ -2153,27 +2187,29 @@ export default function SpeakScreen() {
           <Text style={styles.completeTrophy}>🏆</Text>
           <Text style={styles.completeTitle}>
             {isFirstSpeakingMission
-              ? nativeLang === "korean" ? "오늘의 말하기 목표\n완료!" : nativeLang === "spanish" ? "¡Meta oral de hoy\ncompleta!" : "Today's speaking goal\ncomplete!"
+              ? nativeLang === "korean" ? "오늘의 말하기 목표\n완료!" : nativeLang === "spanish" ? "¡Meta oral de hoy\ncompleta!" : nativeLang === "indonesian" ? "Target berbicara hari ini\nselesai!" : "Today's speaking goal\ncomplete!"
               : isReviewSentenceMission
-              ? nativeLang === "korean" ? "복습 문장을\n말했어요!" : nativeLang === "spanish" ? "¡Dijiste la frase\nde repaso!" : "You said the\nreview sentence!"
-              : nativeLang === "korean" ? "발음 연습\n완료!" : nativeLang === "spanish" ? "¡Práctica de pronunciación\ncompleta!" : "Pronunciation Practice\nComplete!"}
+              ? nativeLang === "korean" ? "복습 문장을\n말했어요!" : nativeLang === "spanish" ? "¡Dijiste la frase\nde repaso!" : nativeLang === "indonesian" ? "Kamu mengucapkan\nkalimat ulasan!" : "You said the\nreview sentence!"
+              : nativeLang === "korean" ? "발음 연습\n완료!" : nativeLang === "spanish" ? "¡Práctica de pronunciación\ncompleta!" : nativeLang === "indonesian" ? "Latihan pengucapan\nselesai!" : "Pronunciation Practice\nComplete!"}
           </Text>
           <Text style={styles.completeSub}>
             {isFirstSpeakingMission
               ? nativeLang === "korean" ? "한 문장씩 입 밖으로 꺼낸 오늘의 루프를 끝냈어요. 내일도 같은 방식으로 더 편해질 거예요."
                 : nativeLang === "spanish" ? "Terminaste el ciclo de hoy: una frase real a la vez. Mañana será un poco más fácil."
+                : nativeLang === "indonesian" ? "Kamu menyelesaikan putaran hari ini: satu kalimat nyata dengan lantang setiap kali. Besok akan terasa sedikit lebih mudah."
                 : "You finished today's loop: one real sentence out loud at a time. Tomorrow will feel a little easier."
               : isReviewSentenceMission
               ? nativeLang === "korean" ? "반복은 눈으로 볼 때보다 입 밖으로 말할 때 더 강해져요."
                 : nativeLang === "spanish" ? "La repetición se vuelve más fuerte cuando la dices en voz alta."
+                : nativeLang === "indonesian" ? "Pengulangan jadi lebih kuat ketika keluar dari halaman dan menjadi ucapan."
                 : "Repetition gets stronger when it leaves the page and becomes speech."
-              : nativeLang === "korean" ? `이번 세션에서 ${sessionWords.length}개 단어를 연습했어요.` : nativeLang === "spanish" ? `Practicaste ${sessionWords.length} palabras en esta sesión.` : `You practiced ${sessionWords.length} words this session.`}
+              : nativeLang === "korean" ? `이번 세션에서 ${sessionWords.length}개 단어를 연습했어요.` : nativeLang === "spanish" ? `Practicaste ${sessionWords.length} palabras en esta sesión.` : nativeLang === "indonesian" ? `Kamu berlatih ${sessionWords.length} kata di sesi ini.` : `You practiced ${sessionWords.length} words this session.`}
           </Text>
           <View style={styles.spokenGoalBox}>
             <View style={styles.spokenGoalTop}>
               <Text style={styles.spokenGoalText}>{spokenTodayLabel}</Text>
               <Text style={styles.spokenGoalPill}>
-                {nativeLang === "korean" ? "말하기 목표" : nativeLang === "spanish" ? "Meta oral" : "Speaking goal"}
+                {nativeLang === "korean" ? "말하기 목표" : nativeLang === "spanish" ? "Meta oral" : nativeLang === "indonesian" ? "Target bicara" : "Speaking goal"}
               </Text>
             </View>
             <View style={styles.spokenGoalTrack}>
@@ -2189,11 +2225,11 @@ export default function SpeakScreen() {
                 </View>
                 {prog.next ? (
                   <Text style={styles.pronLevelHint}>
-                    {nativeLang === "korean" ? `${prog.next}까지 ${prog.done}/${prog.total} 연습` : nativeLang === "spanish" ? `${prog.done}/${prog.total} prácticas hasta ${prog.next}` : `${prog.done}/${prog.total} practices to ${prog.next}`}
+                    {nativeLang === "korean" ? `${prog.next}까지 ${prog.done}/${prog.total} 연습` : nativeLang === "spanish" ? `${prog.done}/${prog.total} prácticas hasta ${prog.next}` : nativeLang === "indonesian" ? `${prog.done}/${prog.total} latihan menuju ${prog.next}` : `${prog.done}/${prog.total} practices to ${prog.next}`}
                   </Text>
                 ) : (
                   <Text style={styles.pronLevelHint}>
-                    {nativeLang === "korean" ? "최고 레벨 달성 🏆" : nativeLang === "spanish" ? "¡Nivel máximo alcanzado! 🏆" : "Max Level Reached 🏆"}
+                    {nativeLang === "korean" ? "최고 레벨 달성 🏆" : nativeLang === "spanish" ? "¡Nivel máximo alcanzado! 🏆" : nativeLang === "indonesian" ? "Level Maks Tercapai 🏆" : "Max Level Reached 🏆"}
                   </Text>
                 )}
               </View>
@@ -2204,7 +2240,7 @@ export default function SpeakScreen() {
               <View style={styles.weakBoxHeader}>
                 <Ionicons name="warning-outline" size={14} color="#EF4444" />
                 <Text style={styles.weakBoxTitle}>
-                  {nativeLang === "korean" ? "복습이 필요한 단어" : nativeLang === "spanish" ? "Palabras débiles para repasar" : "Weak Words for Review"}
+                  {nativeLang === "korean" ? "복습이 필요한 단어" : nativeLang === "spanish" ? "Palabras débiles para repasar" : nativeLang === "indonesian" ? "Kata Lemah untuk Diulas" : "Weak Words for Review"}
                 </Text>
               </View>
               {weakWords.slice(0, 5).map((w) => (
@@ -2268,10 +2304,10 @@ export default function SpeakScreen() {
             <Ionicons name={isGuidedSentenceMission ? "mic" : "refresh"} size={18} color={C.bg1} />
             <Text style={styles.newSessionBtnText}>
               {isReviewSentenceMission
-                ? nativeLang === "korean" ? "카드 복습으로 돌아가기" : nativeLang === "spanish" ? "Volver al repaso" : "Back to review"
+                ? nativeLang === "korean" ? "카드 복습으로 돌아가기" : nativeLang === "spanish" ? "Volver al repaso" : nativeLang === "indonesian" ? "Kembali ke ulasan kartu" : "Back to review"
                 : isFirstSpeakingMission
                 ? continueSpeakingLabel
-                : nativeLang === "korean" ? "새 세션" : nativeLang === "spanish" ? "Nueva sesión" : "New Session"}
+                : nativeLang === "korean" ? "새 세션" : nativeLang === "spanish" ? "Nueva sesión" : nativeLang === "indonesian" ? "Sesi Baru" : "New Session"}
             </Text>
           </Pressable>
         </ScrollView>
@@ -2311,19 +2347,19 @@ export default function SpeakScreen() {
             <View style={styles.levelUpCard}>
               <Text style={styles.levelUpEmoji}>🎉</Text>
               <Text style={styles.levelUpTitle}>
-                {nativeLang === "korean" ? "레벨 업!" : nativeLang === "spanish" ? "¡Subiste de nivel!" : "Level Up!"}
+                {nativeLang === "korean" ? "레벨 업!" : nativeLang === "spanish" ? "¡Subiste de nivel!" : nativeLang === "indonesian" ? "Naik Level!" : "Level Up!"}
               </Text>
               <Text style={styles.levelUpSub}>
-                {nativeLang === "korean" ? "도달" : nativeLang === "spanish" ? "Has alcanzado" : "You've reached"}
+                {nativeLang === "korean" ? "도달" : nativeLang === "spanish" ? "Has alcanzado" : nativeLang === "indonesian" ? "Kamu mencapai" : "You've reached"}
               </Text>
               <View style={styles.levelUpBadge}>
                 <Text style={styles.levelUpBadgeText}>{levelUpNewLevel}</Text>
               </View>
               <Text style={styles.levelUpHint}>
-                {nativeLang === "korean" ? "더 어려운 단어가 열렸어요!" : nativeLang === "spanish" ? "¡Palabras más difíciles desbloqueadas!" : "Harder words unlocked!"}
+                {nativeLang === "korean" ? "더 어려운 단어가 열렸어요!" : nativeLang === "spanish" ? "¡Palabras más difíciles desbloqueadas!" : nativeLang === "indonesian" ? "Kata yang lebih sulit terbuka!" : "Harder words unlocked!"}
               </Text>
               <Text style={styles.levelUpDismiss}>
-                {nativeLang === "korean" ? "탭해서 계속하기" : nativeLang === "spanish" ? "Toca para continuar" : "Tap to continue"}
+                {nativeLang === "korean" ? "탭해서 계속하기" : nativeLang === "spanish" ? "Toca para continuar" : nativeLang === "indonesian" ? "Ketuk untuk lanjut" : "Tap to continue"}
               </Text>
             </View>
           </Pressable>
@@ -2337,6 +2373,7 @@ export default function SpeakScreen() {
               <Text style={styles.title}>
                 {nativeLang === "korean" ? "루디와 말하기"
                   : nativeLang === "spanish" ? "Habla con Rudy"
+                  : nativeLang === "indonesian" ? "Bicara dengan Rudy"
                   : "Speak with Rudy"}
               </Text>
               {/* Pronunciation level row */}
@@ -2352,7 +2389,7 @@ export default function SpeakScreen() {
                         {prog.done}/{prog.total} → {getCefrTierLabel(prog.next as "A1"|"A2"|"B1"|"B2", nativeLang)}
                       </Text>
                     ) : (
-                      <Text style={styles.pronLevelHint}>{nativeLang === "korean" ? "최고 단계 🏆" : nativeLang === "spanish" ? "Nivel máximo 🏆" : "Max Level 🏆"}</Text>
+                      <Text style={styles.pronLevelHint}>{nativeLang === "korean" ? "최고 단계 🏆" : nativeLang === "spanish" ? "Nivel máximo 🏆" : nativeLang === "indonesian" ? "Level Maks 🏆" : "Max Level 🏆"}</Text>
                     )}
                   </View>
                 );
@@ -2483,7 +2520,7 @@ export default function SpeakScreen() {
                   accessibilityLiveRegion="polite"
                   accessibilityLabel={isGuidedSentenceMission
                     ? scoreInfo.label
-                    : `${scoreInfo.label}. ${nativeLang === "korean" ? `점수 ${score} / 100` : nativeLang === "spanish" ? `Puntuación ${score} de 100` : `Score ${score} out of 100`}`}
+                    : `${scoreInfo.label}. ${nativeLang === "korean" ? `점수 ${score} / 100` : nativeLang === "spanish" ? `Puntuación ${score} de 100` : nativeLang === "indonesian" ? `Skor ${score} dari 100` : `Score ${score} out of 100`}`}
                 >
                   {isGuidedSentenceMission && (
                     <View style={styles.firstAttemptResult}>
@@ -2534,19 +2571,19 @@ export default function SpeakScreen() {
                           {accuracyScore !== null && (
                             <View style={styles.subScoreBox}>
                               <Text style={[styles.subScoreNum, { color: getGentleScoreColor(accuracyScore) }]}>{accuracyScore}</Text>
-                              <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "정확도" : nativeLang === "spanish" ? "Precisión" : "Accuracy"}</Text>
+                              <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "정확도" : nativeLang === "spanish" ? "Precisión" : nativeLang === "indonesian" ? "Akurasi" : "Accuracy"}</Text>
                             </View>
                           )}
                           {fluencyScore !== null && (
                             <View style={styles.subScoreBox}>
                               <Text style={[styles.subScoreNum, { color: getGentleScoreColor(fluencyScore) }]}>{fluencyScore}</Text>
-                              <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "유창성" : nativeLang === "spanish" ? "Fluidez" : "Fluency"}</Text>
+                              <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "유창성" : nativeLang === "spanish" ? "Fluidez" : nativeLang === "indonesian" ? "Kelancaran" : "Fluency"}</Text>
                             </View>
                           )}
                           {completenessScore !== null && (
                             <View style={styles.subScoreBox}>
                               <Text style={[styles.subScoreNum, { color: getGentleScoreColor(completenessScore) }]}>{completenessScore}</Text>
-                              <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "완성도" : nativeLang === "spanish" ? "Integridad" : "Completeness"}</Text>
+                              <Text style={styles.subScoreLabel}>{nativeLang === "korean" ? "완성도" : nativeLang === "spanish" ? "Integridad" : nativeLang === "indonesian" ? "Kelengkapan" : "Completeness"}</Text>
                             </View>
                           )}
                         </View>
@@ -2595,7 +2632,7 @@ export default function SpeakScreen() {
                     color={showAcceptedUnscoredNotice ? C.gold : C.error}
                   />
                   <Text style={showAcceptedUnscoredNotice ? styles.noticeText : styles.errorText}>
-                    {sttError || (nativeLang === "korean" ? "음성 인식 실패. 다시 시도해 주세요." : nativeLang === "spanish" ? "Fallo en reconocimiento de voz." : "Speech recognition failed. Please try again.")}
+                    {sttError || (nativeLang === "korean" ? "음성 인식 실패. 다시 시도해 주세요." : nativeLang === "spanish" ? "Fallo en reconocimiento de voz." : nativeLang === "indonesian" ? "Pengenalan suara gagal. Silakan coba lagi." : "Speech recognition failed. Please try again.")}
                   </Text>
                 </View>
               )}
@@ -2623,7 +2660,7 @@ export default function SpeakScreen() {
                 testID="retry-button"
               >
                 <Ionicons name="refresh" size={13} color={tabInfo.color} />
-                <Text style={[styles.retryChipText, { color: tabInfo.color }]}>{nativeLang === "korean" ? "다시 시도" : nativeLang === "spanish" ? "Reintentar" : "Retry"}</Text>
+                <Text style={[styles.retryChipText, { color: tabInfo.color }]}>{nativeLang === "korean" ? "다시 시도" : nativeLang === "spanish" ? "Reintentar" : nativeLang === "indonesian" ? "Coba lagi" : "Retry"}</Text>
               </Pressable>
             </ScrollView>
           ) : (
@@ -2658,6 +2695,7 @@ export default function SpeakScreen() {
                       const tail = `(${sec}s)`;
                       if (nativeLang === "korean") return `녹음 중… 탭하여 정지 ${tail}`;
                       if (nativeLang === "spanish") return `Grabando… toca para parar ${tail}`;
+                      if (nativeLang === "indonesian") return `Merekam… ketuk untuk berhenti ${tail}`;
                       return `Recording… tap to stop ${tail}`;
                     })()
                   : isProcessing ? rudyListeningMsg
@@ -2677,7 +2715,7 @@ export default function SpeakScreen() {
           >
             <Ionicons name="arrow-back" size={16} color={sessionIdx === 0 ? C.goldDark : C.gold} />
             <Text style={[styles.navBtnText, { color: sessionIdx === 0 ? C.goldDark : C.gold }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
-              {nativeLang === "korean" ? "이전" : nativeLang === "spanish" ? "Anterior" : "Prev"}
+              {nativeLang === "korean" ? "이전" : nativeLang === "spanish" ? "Anterior" : nativeLang === "indonesian" ? "Sebelumnya" : "Prev"}
             </Text>
           </Pressable>
 
@@ -2696,8 +2734,8 @@ export default function SpeakScreen() {
                 {isFirstSpeakingMission && sessionIdx + 1 >= sessionWords.length && shouldContinueDailySpeaking
                   ? continueSpeakingLabel
                   : sessionIdx + 1 >= sessionWords.length
-                  ? (nativeLang === "korean" ? "완료" : nativeLang === "spanish" ? "Completar" : "Done")
-                  : (nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : "Next")}
+                  ? (nativeLang === "korean" ? "완료" : nativeLang === "spanish" ? "Completar" : nativeLang === "indonesian" ? "Selesai" : "Done")
+                  : (nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : nativeLang === "indonesian" ? "Berikutnya" : "Next")}
               </Text>
               <Ionicons
                 name={isFirstSpeakingMission && shouldContinueDailySpeaking ? "arrow-forward" : sessionIdx + 1 >= sessionWords.length ? "checkmark" : "arrow-forward"}

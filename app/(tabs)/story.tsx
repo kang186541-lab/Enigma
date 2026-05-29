@@ -208,6 +208,8 @@ export default function StoryTab() {
       ? "견습생, 어서 와요! 🦊\nLexicon Society가 언어를 훔치고 있어요. 함께 막아봐요!"
       : lang === "spanish"
       ? "¡Bienvenido, Aprendiz! 🦊\nLa Sociedad Lexicon roba idiomas. ¡Detengámoslos juntos!"
+      : lang === "indonesian"
+      ? "Selamat datang, Murid! 🦊\nLexicon Society mencuri bahasa. Ayo hentikan mereka bersama!"
       : "Welcome, Apprentice! 🦊\nThe Lexicon Society is stealing languages. Let's stop them!";
 
   const chapterLabel =
@@ -215,15 +217,17 @@ export default function StoryTab() {
       ? "챕터"
       : lang === "spanish"
       ? "Capítulo"
+      : lang === "indonesian"
+      ? "Bab"
       : "Chapter";
   const scenesLabel =
-    lang === "korean" ? "장면" : lang === "spanish" ? "escenas" : "scenes";
+    lang === "korean" ? "장면" : lang === "spanish" ? "escenas" : lang === "indonesian" ? "adegan" : "scenes";
   const doneLabel =
-    lang === "korean" ? "완료" : lang === "spanish" ? "Completado" : "Done";
+    lang === "korean" ? "완료" : lang === "spanish" ? "Completado" : lang === "indonesian" ? "Selesai" : "Done";
   const replayLabel =
-    lang === "korean" ? "다시 보기" : lang === "spanish" ? "Replay" : "Replay";
+    lang === "korean" ? "다시 보기" : lang === "spanish" ? "Replay" : lang === "indonesian" ? "Putar lagi" : "Replay";
   const playLabel =
-    lang === "korean" ? "시작 ▶" : lang === "spanish" ? "Iniciar ▶" : "Play ▶";
+    lang === "korean" ? "시작 ▶" : lang === "spanish" ? "Iniciar ▶" : lang === "indonesian" ? "Mulai ▶" : "Play ▶";
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
@@ -233,12 +237,14 @@ export default function StoryTab() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.headerEyebrow}>🦊 {lang === "korean" ? "루디 탐정의" : lang === "spanish" ? "Detective Rudy presenta" : "Detective Rudy presents"}</Text>
+        <Text style={styles.headerEyebrow}>🦊 {lang === "korean" ? "루디 탐정의" : lang === "spanish" ? "Detective Rudy presenta" : lang === "indonesian" ? "Detektif Rudy mempersembahkan" : "Detective Rudy presents"}</Text>
         <Text style={styles.headerTitle}>
           {lang === "korean"
             ? "언어 음모"
             : lang === "spanish"
             ? "La Conspiración del Lenguaje"
+            : lang === "indonesian"
+            ? "Konspirasi Bahasa"
             : "The Language Conspiracy"}
         </Text>
         <Text style={styles.headerSub}>
@@ -246,6 +252,8 @@ export default function StoryTab() {
             ? "∆LX. Lexicon Society의 비밀을 밝혀라"
             : lang === "spanish"
             ? "∆LX. Descubre el secreto de la Sociedad Lexicon"
+            : lang === "indonesian"
+            ? "∆LX. Ungkap rahasia Lexicon Society"
             : "∆LX. Uncover the secrets of the Lexicon Society"}
         </Text>
       </LinearGradient>
@@ -265,7 +273,7 @@ export default function StoryTab() {
         >
           <Ionicons name="book-outline" size={16} color={C.gold} />
           <Text style={styles.quickBtnText}>
-            {lang === "korean" ? "표현 도감" : lang === "spanish" ? "Expresiones" : "Expression Book"}
+            {lang === "korean" ? "표현 도감" : lang === "spanish" ? "Expresiones" : lang === "indonesian" ? "Buku Ekspresi" : "Expression Book"}
           </Text>
         </Pressable>
         <Pressable
@@ -274,7 +282,7 @@ export default function StoryTab() {
         >
           <Ionicons name="people-outline" size={16} color={C.gold} />
           <Text style={styles.quickBtnText}>
-            {lang === "korean" ? "NPC 미션" : lang === "spanish" ? "Misiones NPC" : "NPC Missions"}
+            {lang === "korean" ? "NPC 미션" : lang === "spanish" ? "Misiones NPC" : lang === "indonesian" ? "Misi NPC" : "NPC Missions"}
           </Text>
         </Pressable>
       </View>
@@ -422,7 +430,7 @@ export default function StoryTab() {
                     <Text style={styles.arcText}>🎭 {getArc(ch)}</Text>
                     <View style={styles.langRatioPill}>
                       <Text style={styles.langRatioText}>
-                        {lang === "korean" ? "목표어" : "Target"} {Math.round(ch.npcLangRatio * 100)}%
+                        {lang === "korean" ? "목표어" : lang === "indonesian" ? "Bahasa target" : "Target"} {Math.round(ch.npcLangRatio * 100)}%
                       </Text>
                     </View>
                   </View>
@@ -495,6 +503,8 @@ export default function StoryTab() {
                       ? " 보상"
                       : lang === "spanish"
                       ? " de recompensa"
+                      : lang === "indonesian"
+                      ? " hadiah"
                       : " reward"}
                   </Text>
                   {(() => {
@@ -506,14 +516,14 @@ export default function StoryTab() {
                     return (
                       <View style={styles.ioRow}>
                         <Text style={styles.ioLabel}>
-                          {lang === "korean" ? "입력" : "In"}
+                          {lang === "korean" ? "입력" : lang === "indonesian" ? "Masuk" : "In"}
                         </Text>
                         <View style={styles.ioBar}>
                           <View style={[styles.ioBarInput, { flex: io.inputCount }]} />
                           <View style={[styles.ioBarOutput, { flex: io.outputCount }]} />
                         </View>
                         <Text style={styles.ioLabel}>
-                          {lang === "korean" ? "출력" : "Out"}
+                          {lang === "korean" ? "출력" : lang === "indonesian" ? "Keluar" : "Out"}
                         </Text>
                         <Text style={styles.ioPct}>{outputPct}%</Text>
                       </View>

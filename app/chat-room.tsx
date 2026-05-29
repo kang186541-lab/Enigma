@@ -1127,25 +1127,32 @@ export default function ChatRoomScreen() {
     // ── Trilingual labels for lesson badge + correction sub-bubble ────────────
     const TODAY_LABEL = userNativeLang === "korean" ? "오늘의 레슨"
                        : userNativeLang === "spanish" ? "Lección de hoy"
+                       : userNativeLang === "indonesian" ? "Pelajaran Hari Ini"
                        : "Today's Lesson";
     const DAY_LABEL = (n: number) => userNativeLang === "korean" ? `Day ${n}`
                                     : userNativeLang === "spanish" ? `Día ${n}`
+                                    : userNativeLang === "indonesian" ? `Hari ${n}`
                                     : `Day ${n}`;
     const FIX_LABEL = userNativeLang === "korean" ? "교정"
                      : userNativeLang === "spanish" ? "Corrección"
+                     : userNativeLang === "indonesian" ? "Koreksi"
                      : "Correction";
     const EXPLAIN_LABEL = userNativeLang === "korean" ? "설명"
                          : userNativeLang === "spanish" ? "Explicación"
+                         : userNativeLang === "indonesian" ? "Mengapa"
                          : "Why";
     // Phase 2: strategy-specific labels
     const RECAST_LABEL = userNativeLang === "korean" ? "자연스러운 교정"
                          : userNativeLang === "spanish" ? "Corrección natural"
+                         : userNativeLang === "indonesian" ? "Pengingat lembut"
                          : "Gentle reminder";
     const ELICIT_LABEL = userNativeLang === "korean" ? "스스로 고쳐보기"
                          : userNativeLang === "spanish" ? "Intenta corregirlo"
+                         : userNativeLang === "indonesian" ? "Coba perbaiki sendiri"
                          : "Try it yourself";
     const MINI_LESSON_LABEL = userNativeLang === "korean" ? "자세한 설명"
                          : userNativeLang === "spanish" ? "Explicación detallada"
+                         : userNativeLang === "indonesian" ? "Penjelasan singkat"
                          : "Mini-lesson";
 
     return (
@@ -1230,8 +1237,8 @@ export default function ChatRoomScreen() {
             // form, can toggle it hidden again to retry mentally.
             if (strat === "elicit") {
               const revealed = expandedCorrectionIds.has(item.id);
-              const REVEAL_SHOW = userNativeLang === "korean" ? "정답 보기" : userNativeLang === "spanish" ? "Ver respuesta" : "Reveal answer";
-              const REVEAL_HIDE = userNativeLang === "korean" ? "정답 숨기기" : userNativeLang === "spanish" ? "Ocultar respuesta" : "Hide answer";
+              const REVEAL_SHOW = userNativeLang === "korean" ? "정답 보기" : userNativeLang === "spanish" ? "Ver respuesta" : userNativeLang === "indonesian" ? "Lihat jawaban" : "Reveal answer";
+              const REVEAL_HIDE = userNativeLang === "korean" ? "정답 숨기기" : userNativeLang === "spanish" ? "Ocultar respuesta" : userNativeLang === "indonesian" ? "Sembunyikan jawaban" : "Hide answer";
               return (
                 <View style={styles.correctionElicit}>
                   <View style={styles.correctionHeader}>
@@ -1328,7 +1335,7 @@ export default function ChatRoomScreen() {
     return (
       <View style={[styles.screen, { paddingTop: topPad, justifyContent: "center", alignItems: "center" }]}>
         <Text style={{ fontFamily: F.body, color: C.goldDim }}>
-          {userNativeLang === "korean" ? "튜터를 찾을 수 없어요" : userNativeLang === "spanish" ? "Tutor no encontrado" : "Tutor not found"}
+          {userNativeLang === "korean" ? "튜터를 찾을 수 없어요" : userNativeLang === "spanish" ? "Tutor no encontrado" : userNativeLang === "indonesian" ? "Tutor tidak ditemukan" : "Tutor not found"}
         </Text>
       </View>
     );
@@ -1357,10 +1364,10 @@ export default function ChatRoomScreen() {
               <View style={styles.tierBadge}>
                 <Text style={styles.tierBadgeText}>
                   {tutorTier === "intimate"
-                    ? (userNativeLang === "korean" ? "💛 절친" : userNativeLang === "spanish" ? "💛 Íntimo" : "💛 Close friend")
+                    ? (userNativeLang === "korean" ? "💛 절친" : userNativeLang === "spanish" ? "💛 Íntimo" : userNativeLang === "indonesian" ? "💛 Sahabat" : "💛 Close friend")
                     : tutorTier === "close"
-                    ? (userNativeLang === "korean" ? "🤝 친해짐" : userNativeLang === "spanish" ? "🤝 Cercanos" : "🤝 Close")
-                    : (userNativeLang === "korean" ? "👋 아는 사이" : userNativeLang === "spanish" ? "👋 Conocidos" : "👋 Familiar")}
+                    ? (userNativeLang === "korean" ? "🤝 친해짐" : userNativeLang === "spanish" ? "🤝 Cercanos" : userNativeLang === "indonesian" ? "🤝 Akrab" : "🤝 Close")
+                    : (userNativeLang === "korean" ? "👋 아는 사이" : userNativeLang === "spanish" ? "👋 Conocidos" : userNativeLang === "indonesian" ? "👋 Kenalan" : "👋 Familiar")}
                 </Text>
               </View>
             )}
@@ -1496,11 +1503,13 @@ export default function ChatRoomScreen() {
                 ? "오늘의 수업 완료!"
                 : userNativeLang === "spanish"
                 ? "¡Lección completada!"
+                : userNativeLang === "indonesian"
+                ? "Pelajaran selesai!"
                 : "Lesson complete!"}
             </Text>
             {lessonTopicNativeRef.current && (
               <Text style={styles.lessonReportTopic}>
-                {userNativeLang === "korean" ? "주제: " : userNativeLang === "spanish" ? "Tema: " : "Topic: "}
+                {userNativeLang === "korean" ? "주제: " : userNativeLang === "spanish" ? "Tema: " : userNativeLang === "indonesian" ? "Topik: " : "Topic: "}
                 {lessonTopicNativeRef.current}
               </Text>
             )}
@@ -1510,6 +1519,7 @@ export default function ChatRoomScreen() {
                 <Text style={styles.lessonReportStatLabel}>
                   {userNativeLang === "korean" ? "주고받은 대화"
                     : userNativeLang === "spanish" ? "Intercambios"
+                    : userNativeLang === "indonesian" ? "Percakapan"
                     : "Exchanges"}
                 </Text>
               </View>
@@ -1518,6 +1528,7 @@ export default function ChatRoomScreen() {
                 <Text style={styles.lessonReportStatLabel}>
                   {userNativeLang === "korean" ? "교정 받음"
                     : userNativeLang === "spanish" ? "Correcciones"
+                    : userNativeLang === "indonesian" ? "Koreksi"
                     : "Corrections"}
                 </Text>
               </View>
@@ -1526,7 +1537,7 @@ export default function ChatRoomScreen() {
                   {Math.max(1, Math.round((Date.now() - lessonMetricsRef.current.startedAt) / 60000))}
                 </Text>
                 <Text style={styles.lessonReportStatLabel}>
-                  {userNativeLang === "korean" ? "분" : userNativeLang === "spanish" ? "min" : "min"}
+                  {userNativeLang === "korean" ? "분" : userNativeLang === "spanish" ? "min" : userNativeLang === "indonesian" ? "mnt" : "min"}
                 </Text>
               </View>
             </View>
@@ -1536,6 +1547,7 @@ export default function ChatRoomScreen() {
                 <Text style={styles.lessonReportSectionTitle}>
                   {userNativeLang === "korean" ? "✨ 오늘의 잘한 점"
                     : userNativeLang === "spanish" ? "✨ Lo que hiciste bien"
+                    : userNativeLang === "indonesian" ? "✨ Yang kamu lakukan dengan baik"
                     : "✨ What you did well"}
                 </Text>
                 <Text style={styles.lessonReportItem}>{sessionSummaryRef.current.highlight}</Text>
@@ -1548,6 +1560,7 @@ export default function ChatRoomScreen() {
                 <Text style={styles.lessonReportSectionTitle}>
                   {userNativeLang === "korean" ? "🎯 다음에 주목할 점"
                     : userNativeLang === "spanish" ? "🎯 A trabajar la próxima vez"
+                    : userNativeLang === "indonesian" ? "🎯 Fokus untuk lain kali"
                     : "🎯 Focus for next time"}
                 </Text>
                 <Text style={styles.lessonReportItem}>{sessionSummaryRef.current.focusNextTime}</Text>
@@ -1560,6 +1573,7 @@ export default function ChatRoomScreen() {
                 <Text style={styles.lessonReportSectionTitle}>
                   {userNativeLang === "korean" ? "🎯 다음에 주목할 점"
                     : userNativeLang === "spanish" ? "🎯 A trabajar la próxima vez"
+                    : userNativeLang === "indonesian" ? "🎯 Fokus untuk lain kali"
                     : "🎯 Focus for next time"}
                 </Text>
                 {lessonMetricsRef.current.corrections.slice(0, 3).map((c, i) => (
@@ -1582,6 +1596,7 @@ export default function ChatRoomScreen() {
               <Text style={styles.lessonReportBtnText}>
                 {userNativeLang === "korean" ? "돌아가기"
                   : userNativeLang === "spanish" ? "Volver"
+                  : userNativeLang === "indonesian" ? "Kembali ke beranda"
                   : "Back home"}
               </Text>
             </Pressable>
