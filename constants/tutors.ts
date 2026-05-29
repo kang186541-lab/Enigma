@@ -2,7 +2,7 @@ import { ImageSourcePropType, Platform } from "react-native";
 import { Audio } from "expo-av";
 import { getApiUrl } from "@/lib/query-client";
 
-export type TutorLanguage = "english" | "spanish" | "korean";
+export type TutorLanguage = "english" | "spanish" | "korean" | "indonesian";
 
 export const TUTOR_IMAGES: Record<string, ImageSourcePropType> = {
   // Story character tutors reuse existing avatar assets
@@ -12,6 +12,7 @@ export const TUTOR_IMAGES: Record<string, ImageSourcePropType> = {
   miguel:  require("../assets/avatars/alex.png"),     // Don Miguel (Latin Spanish)
   sujin:   require("../assets/avatars/jisu.png"),     // Sujin (formal Korean)
   minho_tutor: require("../assets/avatars/minjun.png"), // Minho (MZ Korean)
+  dewi:    require("../assets/avatars/jane.png"),     // Dewi (Indonesian, BETA) — reuses an existing avatar
   // Legacy aliases for backward compat
   sarah:  require("../assets/avatars/sarah.png"),
   jake:   require("../assets/avatars/jake.png"),
@@ -171,12 +172,36 @@ export const TUTORS: Tutor[] = [
       "존맛 발음이에요~!! 진짜임? 완전 한국 사람 같은걸요 🇰🇷🔥",
     ],
   },
+  // ── Indonesian Tutor (BETA) ──────────────────────────────────────────────
+  {
+    id: "dewi",
+    name: "Dewi",
+    emoji: "🌺",
+    flag: "🇮🇩",
+    region: "Indonesian",
+    personality: "Warm Jakarta guide. Patient, friendly, and encouraging. Helps you speak everyday Indonesian.",
+    speechLang: "id-ID",
+    language: "indonesian",
+    style: "casual",
+    greeting:
+      "Halo! Saya Dewi. Senang bertemu kamu! Ayo kita belajar bahasa Indonesia bersama-sama. Jangan takut salah, ya!",
+    responses: [
+      "Bagus sekali! Pengucapanmu makin alami. Mau coba kalimat yang sedikit lebih panjang?",
+      "Hampir benar! Di bahasa Indonesia sehari-hari, kita biasanya mengatakannya begini. Coba lagi, ya.",
+      "Mantap! Kamu belajar cepat sekali. Teruskan!",
+      "Tidak apa-apa, semua orang pernah salah. Ucapkan pelan-pelan saja.",
+      "Keren! Kedengarannya makin seperti orang Indonesia.",
+      "Coba sekali lagi dengan lebih percaya diri. Kamu pasti bisa!",
+      "Terima kasih sudah berani bicara. Itu yang paling penting!",
+    ],
+  },
 ];
 
 export const TUTOR_GROUPS: { language: TutorLanguage; label: string; flag: string }[] = [
   { language: "english", label: "English", flag: "🇬🇧🇺🇸" },
   { language: "spanish", label: "Spanish", flag: "🇪🇸🇲🇽" },
   { language: "korean", label: "Korean", flag: "🇰🇷" },
+  { language: "indonesian", label: "Indonesian", flag: "🇮🇩" },
 ];
 
 export function getTutor(id: string): Tutor | undefined {

@@ -19,7 +19,12 @@ import { LESSON_CONTENT, MISSION_CONTENT, REVIEW_CONTENT, type LearningLangKey }
 import type { LearningGoal, SpeakingProgress } from "../lib/learnerProfile";
 import { RUDY_GUIDE_CARDS } from "../lib/rudyGuideCards";
 
-const languages: DailySpeakingLanguage[] = ["korean", "english", "spanish"];
+// Core verification stays scoped to the three fully-covered languages. The
+// DailySpeakingLanguage union also includes "indonesian" (BETA), but the lock
+// must NOT require a full Indonesian corpus, so this loop type is the core-only
+// LearningLangKey (same three runtime values). Indonesian is intentionally
+// excluded from every content-count loop below.
+const languages: LearningLangKey[] = ["korean", "english", "spanish"];
 const goals: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"];
 const onboardingSource = readFileSync("app/onboarding.tsx", "utf8");
 const speakSource = readFileSync("app/(tabs)/speak.tsx", "utf8");
@@ -60,6 +65,25 @@ const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string
     no: ["no"],
     help: ["help"],
     name: ["my name"],
+  },
+  // Indonesian (BETA) is intentionally excluded from the `languages` loop above,
+  // so this entry is never asserted — it exists only to satisfy the
+  // Record<LearningLangKey> type after the union was widened for Phase 2.
+  indonesian: {
+    greeting: ["halo"],
+    goodbye: ["selamat tinggal", "sampai jumpa", "hati-hati"],
+    thanks: ["terima kasih"],
+    sorry: ["maaf"],
+    dont_understand: ["tidak mengerti", "saya tidak mengerti"],
+    repeat: ["ulangi", "tolong ulangi"],
+    slow_speech: ["pelan-pelan", "bicara lebih pelan"],
+    bridge_language: ["apakah kamu bisa bahasa inggris"],
+    where: ["di mana toilet"],
+    how_much: ["berapa harganya"],
+    yes: ["ya"],
+    no: ["tidak"],
+    help: ["tolong"],
+    name: ["nama saya"],
   },
   spanish: {
     greeting: ["hola"],
@@ -841,7 +865,7 @@ for (const lang of languages) {
 for (const lang of languages) {
   const unknownLoop = getDailySpeakingSentenceLoop(lang, "unknown");
   const phrases = new Set(unknownLoop.map((phrase) => phrase.phrase));
-  for (const [family, familyPhrases] of Object.entries(SURVIVAL_PHRASE_FAMILIES[lang])) {
+  for (const [family, familyPhrases] of Object.entries(SURVIVAL_PHRASE_FAMILIES[lang] ?? {})) {
     assert.ok(
       familyPhrases.some((phrase) => phrases.has(phrase)),
       `${lang}/unknown is missing survival phrase family: ${family}`

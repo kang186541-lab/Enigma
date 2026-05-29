@@ -1,13 +1,15 @@
 import type { LearningGoal } from "@/lib/learnerProfile";
 
-export type DailySpeakingLanguage = "korean" | "english" | "spanish";
+export type DailySpeakingLanguage = "korean" | "english" | "spanish" | "indonesian";
 
 export type DailySpeakingPhrase = {
   phrase: string;
   ipa: string;
-  meanings: Record<DailySpeakingLanguage, string>;
+  // Indonesian (BETA) target content does not always carry every native-language
+  // meaning, so this is Partial. Accessors fall back through the available keys.
+  meanings: Partial<Record<DailySpeakingLanguage, string>>;
   level: "A1";
-  speechLang: "ko-KR" | "en-US" | "es-ES";
+  speechLang: "ko-KR" | "en-US" | "es-ES" | "id-ID";
   tip: string;
   practiceContext?: LearningGoal;
   contextTip?: string;
@@ -20,9 +22,18 @@ type RawDailyPhrase = {
   meaningEs: string;
   speechLang: DailySpeakingPhrase["speechLang"];
   tip: string;
+  // Indonesian (BETA) target phrases carry both the explicit English and the
+  // Indonesian self-meaning, because an Indonesian TARGET word needs ko/en/es
+  // glosses (meaning=ko, meaningEs=es) plus its own Indonesian text for an
+  // Indonesian-native learner. These are unused by the 3 core languages.
+  meaningEn?: string;
+  meaningId?: string;
 };
 
-const DAILY_SPEAKING_PACKS: Record<DailySpeakingLanguage, Partial<Record<LearningGoal | "default", RawDailyPhrase[]>>> = {
+// These data maps are Partial so Indonesian (BETA) can ship a starter set
+// without forcing a full per-goal corpus. Accessors fall back to the language's
+// own DEFAULT pack (never to English) when a specific goal pack is missing.
+const DAILY_SPEAKING_PACKS: Partial<Record<DailySpeakingLanguage, Partial<Record<LearningGoal | "default", RawDailyPhrase[]>>>> = {
   korean: {
     default: [
       { word: "안녕하세요", ipa: "/an.njʌŋ.ha.se.jo/", meaning: "Hello", meaningEs: "Hola", speechLang: "ko-KR", tip: "A real first greeting. Keep each syllable even and gentle." },
@@ -155,7 +166,61 @@ const DAILY_SPEAKING_PACKS: Record<DailySpeakingLanguage, Partial<Record<Learnin
       { word: "Estoy listo.", ipa: "/esˈtoj ˈlis.to/", meaning: "준비됐어요.", meaningEs: "I am ready.", speechLang: "es-ES", tip: "A short confidence sentence before a test." },
     ],
   },
+  // ── Indonesian (BETA) starter packs ──────────────────────────────────────
+  // A solid A1 starter set so the Home CTA and the first Speak mission work in
+  // Indonesian. Goals without a specific pack fall back to `default` (Indonesian),
+  // never to English. The full per-goal corpus is a separate follow-on.
+  // For Indonesian TARGET phrases: word = Indonesian (spoken), meaning = Korean,
+  // meaningEn = English, meaningEs = Spanish, meaningId = Indonesian self.
+  indonesian: {
+    default: [
+      { word: "Halo", ipa: "/ˈha.lo/", meaning: "안녕하세요", meaningEn: "Hello", meaningEs: "Hola", meaningId: "Halo", speechLang: "id-ID", tip: "A friendly all-purpose greeting. Two even syllables: HA-lo." },
+      { word: "Terima kasih.", ipa: "/təˈri.ma ˈka.sih/", meaning: "감사합니다.", meaningEn: "Thank you.", meaningEs: "Gracias.", meaningId: "Terima kasih.", speechLang: "id-ID", tip: "Say all four syllables evenly: te-ri-ma-ka-sih." },
+      { word: "Saya tidak mengerti.", ipa: "/ˈsa.ja ˈti.daʔ məˈŋər.ti/", meaning: "이해 못 했어요.", meaningEn: "I don't understand.", meaningEs: "No entiendo.", meaningId: "Saya tidak mengerti.", speechLang: "id-ID", tip: "A real repair sentence. Keep tidak short and clear." },
+      { word: "Tolong ulangi.", ipa: "/ˈto.loŋ uˈla.ŋi/", meaning: "다시 말해 주세요.", meaningEn: "Please repeat that.", meaningEs: "Repítelo, por favor.", meaningId: "Tolong ulangi.", speechLang: "id-ID", tip: "Tolong = please. Use it to ask for a repeat." },
+      { word: "Selamat pagi.", ipa: "/səˈla.mat ˈpa.gi/", meaning: "좋은 아침이에요.", meaningEn: "Good morning.", meaningEs: "Buenos días.", meaningId: "Selamat pagi.", speechLang: "id-ID", tip: "A real morning greeting. Pagi = morning." },
+      { word: "Sampai jumpa.", ipa: "/ˈsam.pai ˈdʒum.pa/", meaning: "또 만나요.", meaningEn: "See you later.", meaningEs: "Hasta luego.", meaningId: "Sampai jumpa.", speechLang: "id-ID", tip: "A warm goodbye: 'see you again'." },
+      { word: "Maaf.", ipa: "/ˈma.ʔaf/", meaning: "미안해요.", meaningEn: "Sorry.", meaningEs: "Lo siento.", meaningId: "Maaf.", speechLang: "id-ID", tip: "Keep the glottal stop between the two a's: ma-'af." },
+      { word: "Tolong bicara pelan-pelan.", ipa: "/ˈto.loŋ biˈtʃa.ra ˈpə.lan ˈpə.lan/", meaning: "천천히 말해 주세요.", meaningEn: "Please speak slowly.", meaningEs: "Habla despacio, por favor.", meaningId: "Tolong bicara pelan-pelan.", speechLang: "id-ID", tip: "pelan-pelan = slowly. A real survival request." },
+    ],
+    travel: [
+      { word: "Di mana toilet?", ipa: "/di ˈma.na ˈtoi.let/", meaning: "화장실이 어디예요?", meaningEn: "Where is the bathroom?", meaningEs: "¿Dónde está el baño?", meaningId: "Di mana toilet?", speechLang: "id-ID", tip: "Di mana = where. A real travel question." },
+      { word: "Berapa harganya?", ipa: "/bəˈra.pa harˈga.ɲa/", meaning: "얼마예요?", meaningEn: "How much is it?", meaningEs: "¿Cuánto cuesta?", meaningId: "Berapa harganya?", speechLang: "id-ID", tip: "A shopping survival question. Stress GA in harganya." },
+      { word: "Tolong bantu saya.", ipa: "/ˈto.loŋ ˈban.tu ˈsa.ja/", meaning: "도와주세요.", meaningEn: "Please help me.", meaningEs: "Ayúdame, por favor.", meaningId: "Tolong bantu saya.", speechLang: "id-ID", tip: "bantu = help. Say it slowly and clearly." },
+      { word: "Saya mau air.", ipa: "/ˈsa.ja ˈmau ˈa.ir/", meaning: "물 주세요.", meaningEn: "I want water.", meaningEs: "Quiero agua.", meaningId: "Saya mau air.", speechLang: "id-ID", tip: "mau = want. air = water. A real request." },
+      { word: "Berhenti di sini.", ipa: "/bərˈhən.ti di ˈsi.ni/", meaning: "여기 세워 주세요.", meaningEn: "Stop here.", meaningEs: "Pare aquí.", meaningId: "Berhenti di sini.", speechLang: "id-ID", tip: "Taxi survival. di sini = here." },
+      { word: "Saya tersesat.", ipa: "/ˈsa.ja tərˈsə.sat/", meaning: "길을 잃었어요.", meaningEn: "I am lost.", meaningEs: "Estoy perdido.", meaningId: "Saya tersesat.", speechLang: "id-ID", tip: "Say it calmly when you need help finding the way." },
+      { word: "Berapa lama?", ipa: "/bəˈra.pa ˈla.ma/", meaning: "얼마나 걸려요?", meaningEn: "How long does it take?", meaningEs: "¿Cuánto tiempo?", meaningId: "Berapa lama?", speechLang: "id-ID", tip: "lama = long (time). Useful for trips and waits." },
+      { word: "Tolong panggil taksi.", ipa: "/ˈto.loŋ ˈpaŋ.gil ˈtak.si/", meaning: "택시 불러 주세요.", meaningEn: "Please call a taxi.", meaningEs: "Llame un taxi, por favor.", meaningId: "Tolong panggil taksi.", speechLang: "id-ID", tip: "panggil = call. A practical street request." },
+    ],
+    relationship: [
+      { word: "Siapa nama kamu?", ipa: "/siˈa.pa ˈna.ma ˈka.mu/", meaning: "이름이 뭐예요?", meaningEn: "What is your name?", meaningEs: "¿Cómo te llamas?", meaningId: "Siapa nama kamu?", speechLang: "id-ID", tip: "A real first-meeting question. nama = name." },
+      { word: "Nama saya Alex.", ipa: "/ˈna.ma ˈsa.ja ˈa.leks/", meaning: "제 이름은 알렉스예요.", meaningEn: "My name is Alex.", meaningEs: "Me llamo Alex.", meaningId: "Nama saya Alex.", speechLang: "id-ID", tip: "Swap Alex for your name when you practice." },
+      { word: "Senang bertemu kamu.", ipa: "/səˈnaŋ bərˈtə.mu ˈka.mu/", meaning: "만나서 반가워요.", meaningEn: "Nice to meet you.", meaningEs: "Mucho gusto.", meaningId: "Senang bertemu kamu.", speechLang: "id-ID", tip: "A warm first-meeting line. senang = happy." },
+      { word: "Apa kabar?", ipa: "/ˈa.pa ˈka.bar/", meaning: "잘 지내요?", meaningEn: "How are you?", meaningEs: "¿Cómo estás?", meaningId: "Apa kabar?", speechLang: "id-ID", tip: "A friendly check-in. Literally 'what news?'." },
+      { word: "Sampai nanti.", ipa: "/ˈsam.pai ˈnan.ti/", meaning: "나중에 봐요.", meaningEn: "See you soon.", meaningEs: "Hasta pronto.", meaningId: "Sampai nanti.", speechLang: "id-ID", tip: "nanti = later. A casual goodbye." },
+      { word: "Terima kasih banyak.", ipa: "/təˈri.ma ˈka.sih ˈba.ɲaʔ/", meaning: "정말 고마워요.", meaningEn: "Thank you very much.", meaningEs: "Muchas gracias.", meaningId: "Terima kasih banyak.", speechLang: "id-ID", tip: "banyak = much. Warm gratitude." },
+      { word: "Maaf, saya terlambat.", ipa: "/ˈma.ʔaf ˈsa.ja tərˈlam.bat/", meaning: "늦어서 미안해요.", meaningEn: "Sorry, I am late.", meaningEs: "Perdón por llegar tarde.", meaningId: "Maaf, saya terlambat.", speechLang: "id-ID", tip: "terlambat = late. A gentle, honest apology." },
+      { word: "Sampai jumpa lagi.", ipa: "/ˈsam.pai ˈdʒum.pa ˈla.gi/", meaning: "또 만나요.", meaningEn: "See you again.", meaningEs: "Hasta la próxima.", meaningId: "Sampai jumpa lagi.", speechLang: "id-ID", tip: "lagi = again. A warm parting line." },
+    ],
+    work: [
+      { word: "Tolong ulangi.", ipa: "/ˈto.loŋ uˈla.ŋi/", meaning: "다시 말해 주세요.", meaningEn: "Please repeat that.", meaningEs: "Repítelo, por favor.", meaningId: "Tolong ulangi.", speechLang: "id-ID", tip: "A useful meeting repair phrase. Say it calmly." },
+      { word: "Saya tidak mengerti.", ipa: "/ˈsa.ja ˈti.daʔ məˈŋər.ti/", meaning: "이해 못 했어요.", meaningEn: "I don't understand.", meaningEs: "No entiendo.", meaningId: "Saya tidak mengerti.", speechLang: "id-ID", tip: "It is okay to ask for help. Keep tidak short." },
+      { word: "Saya punya pertanyaan.", ipa: "/ˈsa.ja ˈpu.ɲa pər.taˈɲa.an/", meaning: "질문 있어요.", meaningEn: "I have a question.", meaningEs: "Tengo una pregunta.", meaningId: "Saya punya pertanyaan.", speechLang: "id-ID", tip: "Say it before you get stuck. punya = have." },
+      { word: "Tolong tunggu sebentar.", ipa: "/ˈto.loŋ ˈtuŋ.gu səbənˈtar/", meaning: "잠시만 기다려 주세요.", meaningEn: "Please wait a moment.", meaningEs: "Espere un momento, por favor.", meaningId: "Tolong tunggu sebentar.", speechLang: "id-ID", tip: "sebentar = a moment. A polite pause at work." },
+      { word: "Terima kasih.", ipa: "/təˈri.ma ˈka.sih/", meaning: "감사합니다.", meaningEn: "Thank you.", meaningEs: "Gracias.", meaningId: "Terima kasih.", speechLang: "id-ID", tip: "End politely and clearly." },
+      { word: "Tolong bantu saya.", ipa: "/ˈto.loŋ ˈban.tu ˈsa.ja/", meaning: "도와주세요.", meaningEn: "Please help me.", meaningEs: "Ayúdame, por favor.", meaningId: "Tolong bantu saya.", speechLang: "id-ID", tip: "A real workplace request. Keep it calm and polite." },
+      { word: "Saya akan kirim email.", ipa: "/ˈsa.ja ˈa.kan ˈki.rim ˈi.mel/", meaning: "이메일 보낼게요.", meaningEn: "I will send an email.", meaningEs: "Enviaré un correo.", meaningId: "Saya akan kirim email.", speechLang: "id-ID", tip: "akan = will. A real work promise." },
+      { word: "Tolong periksa ini.", ipa: "/ˈto.loŋ pəˈrik.sa ˈi.ni/", meaning: "확인해 주세요.", meaningEn: "Please check this.", meaningEs: "Revísalo, por favor.", meaningId: "Tolong periksa ini.", speechLang: "id-ID", tip: "periksa = check. Useful for documents." },
+    ],
+  },
 };
+
+// `meaning` = Korean, `meaningEn` = English, `meaningEs` = Spanish; the spoken
+// word IS the Indonesian self-meaning.
+function id(word: string, ipa: string, meaning: string, meaningEn: string, meaningEs: string, tip: string): RawDailyPhrase {
+  return { word, ipa, meaning, meaningEn, meaningEs, meaningId: word, speechLang: "id-ID", tip };
+}
 
 function ko(word: string, ipa: string, meaning: string, meaningEs: string, tip: string): RawDailyPhrase {
   return { word, ipa, meaning, meaningEs, speechLang: "ko-KR", tip };
@@ -169,7 +234,7 @@ function es(word: string, ipa: string, meaning: string, meaningEs: string, tip: 
   return { word, ipa, meaning, meaningEs, speechLang: "es-ES", tip };
 }
 
-const DAILY_SPEAKING_STARTERS: Record<DailySpeakingLanguage, RawDailyPhrase[]> = {
+const DAILY_SPEAKING_STARTERS: Partial<Record<DailySpeakingLanguage, RawDailyPhrase[]>> = {
   korean: [
     ko("네.", "/ne/", "Yes.", "Sí.", "A tiny real answer. Keep it short and clear."),
     ko("아니요.", "/a.ni.jo/", "No.", "No.", "A safe answer. Keep the final 요 soft."),
@@ -236,9 +301,23 @@ const DAILY_SPEAKING_STARTERS: Record<DailySpeakingLanguage, RawDailyPhrase[]> =
     es("No hay problema.", "/no aj pɾoˈβle.ma/", "문제없어요.", "No problem.", "Use it as reassurance."),
     es("Lo intento otra vez.", "/lo inˈten.to ˈo.tɾa βes/", "다시 해 볼게요.", "I will try again.", "The app's core sentence: try, then fix."),
   ],
+  indonesian: [
+    id("Ya.", "/ja/", "네.", "Yes.", "Sí.", "A tiny real answer. Keep it short and clear."),
+    id("Tidak.", "/ˈti.daʔ/", "아니요.", "No.", "No.", "A safe answer. Keep the final glottal stop crisp."),
+    id("Tidak apa-apa.", "/ˈti.daʔ ˈa.pa ˈa.pa/", "괜찮아요.", "It's okay.", "Está bien.", "A gentle 'it's okay' you can use often."),
+    id("Tolong bicara pelan-pelan.", "/ˈto.loŋ biˈtʃa.ra ˈpə.lan ˈpə.lan/", "천천히 말해 주세요.", "Please speak slowly.", "Habla despacio, por favor.", "A survival sentence. pelan-pelan = slowly."),
+    id("Saya pemula.", "/ˈsa.ja pəˈmu.la/", "저는 초보자예요.", "I am a beginner.", "Soy principiante.", "Say it without apology. It helps people help you."),
+    id("Apakah kamu bisa bahasa Inggris?", "/aˈpa.kah ˈka.mu ˈbi.sa baˈha.sa ˈiŋ.gris/", "영어 할 줄 아세요?", "Do you speak English?", "¿Hablas inglés?", "Useful when you need a bridge language."),
+    id("Sampai jumpa.", "/ˈsam.pai ˈdʒum.pa/", "안녕히 가세요.", "Goodbye.", "Adiós.", "A warm goodbye: 'see you again'."),
+    id("Maaf.", "/ˈma.ʔaf/", "죄송합니다.", "Sorry.", "Lo siento.", "A repair word. Keep the glottal stop: ma-'af."),
+    id("Di mana toilet?", "/di ˈma.na ˈtoi.let/", "화장실이 어디예요?", "Where is the bathroom?", "¿Dónde está el baño?", "A real travel question. Di mana = where."),
+    id("Berapa harganya?", "/bəˈra.pa harˈga.ɲa/", "얼마예요?", "How much is it?", "¿Cuánto cuesta?", "A tiny money question you can use every day."),
+    id("Tolong bantu saya.", "/ˈto.loŋ ˈban.tu ˈsa.ja/", "도와주세요.", "Please help me.", "Ayúdame, por favor.", "An emergency sentence. Slow and clear is enough."),
+    id("Siapa nama kamu?", "/siˈa.pa ˈna.ma ˈka.mu/", "이름이 뭐예요?", "What is your name?", "¿Cómo te llamas?", "A real first conversation question."),
+  ],
 };
 
-const DAILY_GOAL_BOOSTERS: Record<DailySpeakingLanguage, Partial<Record<LearningGoal, RawDailyPhrase[]>>> = {
+const DAILY_GOAL_BOOSTERS: Partial<Record<DailySpeakingLanguage, Partial<Record<LearningGoal, RawDailyPhrase[]>>>> = {
   korean: {
     travel: [
       ko("역 어디예요?", "/jʌk ʌ.di.je.jo/", "Where is the station?", "¿Dónde está la estación?", "A real street question. Let the pitch rise."),
@@ -407,7 +486,7 @@ export type SurvivalPhraseFamily =
   | "help"
   | "name";
 
-export const SURVIVAL_PHRASE_FAMILIES: Record<DailySpeakingLanguage, Record<SurvivalPhraseFamily, string[]>> = {
+export const SURVIVAL_PHRASE_FAMILIES: Partial<Record<DailySpeakingLanguage, Record<SurvivalPhraseFamily, string[]>>> = {
   korean: {
     greeting: ["안녕하세요"],
     goodbye: ["안녕히 가세요."],
@@ -483,11 +562,19 @@ function toDailyPhrase(
   raw: RawDailyPhrase,
   practiceContext?: LearningGoal
 ): DailySpeakingPhrase {
-  const meanings: Record<DailySpeakingLanguage, string> = targetLanguage === "korean"
-    ? { korean: raw.word, english: raw.meaning, spanish: raw.meaningEs }
+  // `meanings` maps each native language to how the target phrase reads in it.
+  // For the 3 core languages the raw phrase carries ko/en/es (the meaning of
+  // `meaning`/`meaningEs` flips per target — see toDailyPhrase branches). When
+  // the target IS Indonesian, the spoken `word` is Indonesian and ko/en/es come
+  // from meaning/meaningEn/meaningEs. `meanings` is Partial, so missing keys
+  // simply fall back at the call site.
+  const meanings: Partial<Record<DailySpeakingLanguage, string>> = targetLanguage === "korean"
+    ? { korean: raw.word, english: raw.meaning, spanish: raw.meaningEs, indonesian: raw.meaningId }
     : targetLanguage === "english"
-    ? { korean: raw.meaning, english: raw.word, spanish: raw.meaningEs }
-    : { korean: raw.meaning, english: raw.meaningEs, spanish: raw.word };
+    ? { korean: raw.meaning, english: raw.word, spanish: raw.meaningEs, indonesian: raw.meaningId }
+    : targetLanguage === "spanish"
+    ? { korean: raw.meaning, english: raw.meaningEs, spanish: raw.word, indonesian: raw.meaningId }
+    : { korean: raw.meaning, english: raw.meaningEn, spanish: raw.meaningEs, indonesian: raw.word };
 
   return {
     phrase: raw.word,
@@ -502,16 +589,20 @@ function toDailyPhrase(
 }
 
 export function getDailySpeakingPhrasePack(lang: DailySpeakingLanguage, goal: LearningGoal | null): DailySpeakingPhrase[] {
-  const pack = DAILY_SPEAKING_PACKS[lang][goal ?? "default"] ?? DAILY_SPEAKING_PACKS[lang].default ?? [];
+  // Maps are Partial (Indonesian BETA ships a starter set). When a goal-specific
+  // pack is missing, fall back to THIS language's own default pack — never to
+  // English, so an Indonesian learner never gets English target phrases.
+  const langPacks = DAILY_SPEAKING_PACKS[lang];
+  const pack = langPacks?.[goal ?? "default"] ?? langPacks?.default ?? [];
   return pack.map((phrase) => toDailyPhrase(lang, phrase, goal ?? undefined));
 }
 
 export function getDailySpeakingSentenceLoop(lang: DailySpeakingLanguage, goal: LearningGoal | null): DailySpeakingPhrase[] {
   const practiceContext = goal ?? "unknown";
   const goalSentences = goal ? getDailySpeakingPhrasePack(lang, goal) : [];
-  const goalBoosters = goal ? (DAILY_GOAL_BOOSTERS[lang][goal] ?? []) : [];
-  const survivalSentences = (DAILY_SPEAKING_PACKS[lang].default ?? []).map((phrase) => toDailyPhrase(lang, phrase, practiceContext));
-  const starterSentences = DAILY_SPEAKING_STARTERS[lang].map((phrase) => toDailyPhrase(lang, phrase, practiceContext));
+  const goalBoosters = goal ? (DAILY_GOAL_BOOSTERS[lang]?.[goal] ?? []) : [];
+  const survivalSentences = (DAILY_SPEAKING_PACKS[lang]?.default ?? []).map((phrase) => toDailyPhrase(lang, phrase, practiceContext));
+  const starterSentences = (DAILY_SPEAKING_STARTERS[lang] ?? []).map((phrase) => toDailyPhrase(lang, phrase, practiceContext));
   const boosterSentences = goalBoosters.map((phrase) => toDailyPhrase(lang, phrase, practiceContext));
   const seen = new Set<string>();
   const loop: DailySpeakingPhrase[] = [];
@@ -524,7 +615,10 @@ export function getDailySpeakingSentenceLoop(lang: DailySpeakingLanguage, goal: 
 }
 
 export function getDailySpeakingSurvivalCoverage(lang: DailySpeakingLanguage): SurvivalPhraseCoverage[] {
+  // SURVIVAL_PHRASE_FAMILIES is Partial; languages without an authored family
+  // map (e.g. Indonesian BETA) simply report no survival coverage.
   const families = SURVIVAL_PHRASE_FAMILIES[lang];
+  if (!families) return [];
   return Object.entries(families).map(([family, phrases]) => {
     const phraseSet = new Set(phrases);
     const loopHits: LearningGoal[] = [];

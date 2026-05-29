@@ -171,19 +171,18 @@ export default function OnboardingScreen() {
 
   const uiLang: NativeLanguage = nativeSel ?? "english";
   const ui = UI[uiLang];
-  // Step 1 (native picker) shows all four languages. The LEARNING list excludes
-  // indonesian — it's a native/UI language only in Phase 1, not a learning target.
-  const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel && l.id !== "indonesian");
+  // Step 1 (native picker) shows all four languages. The LEARNING list now
+  // includes Indonesian as a selectable target (BETA) — it just can't equal the
+  // chosen native language.
+  const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel);
   const setupCtaLabel = !learnSel ? ui.chooseLanguageCta : !goalSel ? ui.chooseGoalCta : ui.continueToGuideCta;
-  // The learning target is never indonesian (Phase 1), so cast the lookup key.
-  // We widen the preview's `meanings` to the full native set via the cast below
-  // so the native-keyed read on the next line type-checks even though the
-  // underlying data only carries the 3 learning languages — an Indonesian
-  // native simply gets `undefined` here and falls back to English.
+  // Indonesian is now a valid learning target (BETA). `meanings` is Partial, so
+  // the native-keyed read below may be undefined; the cast keeps the native-keyed
+  // lookup type-checking and the `??` chain falls back through English.
   const firstSpeakingPreview = (learnSel && goalSel
     ? getDailySpeakingMissionPhrase(learnSel as DailySpeakingLanguage, goalSel, 0)
-    : null) as (Omit<DailySpeakingPhrase, "meanings"> & { meanings: Record<NativeLanguage, string> }) | null;
-  const firstSpeakingMeaning = firstSpeakingPreview?.meanings[uiLang] ?? firstSpeakingPreview?.meanings.english ?? null;
+    : null) as (Omit<DailySpeakingPhrase, "meanings"> & { meanings: Partial<Record<NativeLanguage, string>> }) | null;
+  const firstSpeakingMeaning = firstSpeakingPreview?.meanings[uiLang] ?? firstSpeakingPreview?.meanings.english ?? firstSpeakingPreview?.phrase ?? null;
 
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Math.max((Platform.OS === "web" ? 34 : insets.bottom) + 16, 34);
@@ -395,7 +394,7 @@ export default function OnboardingScreen() {
                     onPress={() => handleLearnPick(lang.id)}
                     accessibilityRole="button"
                     accessibilityState={{ selected: sel }}
-                    accessibilityLabel={lang.nameMap[uiLang]}
+                    accessibilityLabel={lang.id === "indonesian" ? `${lang.nameMap[uiLang]} (BETA)` : lang.nameMap[uiLang]}
                   >
                     <View style={styles.langBadge}>
                       <Text style={styles.langBadgeText}>{lang.badge}</Text>
@@ -403,6 +402,11 @@ export default function OnboardingScreen() {
                     <Text style={[styles.cardName, sel && styles.cardNameSel]}>
                       {lang.nameMap[uiLang]}
                     </Text>
+                    {lang.id === "indonesian" && (
+                      <View style={styles.betaBadge}>
+                        <Text style={styles.betaBadgeText}>BETA</Text>
+                      </View>
+                    )}
                     {sel && (
                       <View style={styles.check}>
                         <Ionicons name="checkmark" size={16} color={C.bg1} />
@@ -553,6 +557,13 @@ const styles = StyleSheet.create({
   },
   cardName: { flex: 1, fontSize: 18, fontFamily: F.bodySemi, color: C.parchment },
   cardNameSel: { color: C.textParchment },
+  betaBadge: {
+    paddingHorizontal: 8, paddingVertical: 3,
+    borderRadius: 8, borderWidth: 1, borderColor: C.gold,
+    backgroundColor: "rgba(201,162,39,0.12)",
+    marginRight: 8,
+  },
+  betaBadgeText: { fontSize: 10, fontFamily: F.bodySemi, color: C.gold, letterSpacing: 1 },
   check: {
     width: 28, height: 28, borderRadius: 14,
     backgroundColor: C.gold,

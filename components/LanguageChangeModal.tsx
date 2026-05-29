@@ -15,10 +15,10 @@ const LANG_META: Record<NativeLanguage, { flag: string; ko: string; en: string; 
   indonesian: { flag: "🇮🇩", ko: "인도네시아어", en: "Indonesian", es: "Indonesio" },
 };
 
-// Native picker shows all four languages; the learning picker excludes
-// indonesian (it's a native/UI language only in Phase 1, not a learning target).
+// Native picker shows all four languages; the learning picker now also offers
+// Indonesian as a selectable target (BETA).
 const ALL_LANGS: NativeLanguage[] = ["korean", "english", "spanish", "indonesian"];
-const LEARNING_LANGS: NativeLanguage[] = ALL_LANGS.filter((l) => l !== "indonesian");
+const LEARNING_LANGS: NativeLanguage[] = [...ALL_LANGS];
 
 function getLangName(lang: NativeLanguage, nativeLang: NativeLanguage): string {
   const m = LANG_META[lang];
@@ -146,7 +146,7 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
             </Pressable>
           ))}
 
-          {/* Learning language — indonesian excluded (Phase 1 native-only) */}
+          {/* Learning language — Indonesian is selectable (BETA) */}
           <Text style={[s.sectionLabel, { marginTop: 18 }]}>{getLabel("learnSec", nativeLang)}</Text>
           {LEARNING_LANGS.filter((l) => l !== selNative).map((lang) => (
             <Pressable
@@ -158,6 +158,9 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
               <Text style={[s.langName, selLearn === lang && s.langNameSelected]}>
                 {getLangName(lang, nativeLang)}
               </Text>
+              {lang === "indonesian" && (
+                <View style={s.betaBadge}><Text style={s.betaBadgeText}>BETA</Text></View>
+              )}
               {selLearn === lang && <Text style={s.checkmark}>✓</Text>}
             </Pressable>
           ))}
@@ -229,6 +232,12 @@ const s = StyleSheet.create({
   langFlag: { fontSize: 22, marginRight: 12 },
   langName: { flex: 1, fontSize: 15, fontFamily: F.body, color: C.parchment },
   langNameSelected: { color: C.gold, fontFamily: F.bodySemi },
+  betaBadge: {
+    paddingHorizontal: 7, paddingVertical: 2, marginRight: 8,
+    borderRadius: 7, borderWidth: 1, borderColor: C.gold,
+    backgroundColor: "rgba(201,162,39,0.12)",
+  },
+  betaBadgeText: { fontSize: 10, fontFamily: F.bodySemi, color: C.gold, letterSpacing: 1 },
   checkmark: { fontSize: 16, color: C.gold, fontFamily: F.header },
   conflictText: {
     fontSize: 13, fontFamily: F.label, color: "#e05252",

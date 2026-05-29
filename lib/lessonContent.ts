@@ -112,7 +112,7 @@ export interface DayRewards {
   bonusPronunciation: number;
 }
 
-export type LearningLangKey = "english" | "spanish" | "korean";
+export type LearningLangKey = "english" | "spanish" | "korean" | "indonesian";
 
 // ── Speech lang codes ────────────────────────────────────────────────────────
 
@@ -120,6 +120,7 @@ export const SPEECH_LANG: Record<LearningLangKey, string> = {
   english: "en-GB",
   spanish: "es-ES",
   korean:  "ko-KR",
+  indonesian: "id-ID",
 };
 
 // ── Day 1–30 content (all 3 learning languages) ────────────────────────────

@@ -946,6 +946,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     "en-GB": "en-GB-SoniaNeural",
     "es-ES": "es-ES-ElviraNeural",
     "es-MX": "es-MX-DaliaNeural",
+    "id-ID": "id-ID-GadisNeural",
   };
 
   // SSML express-as style per voice — applied automatically based on voice name.
@@ -1193,6 +1194,254 @@ Student's ${learnName} answer: ${userAnswer}`;
     }
   });
 
+  // ── Indonesian STT-based pronunciation fallback helpers ───────────────────
+  // Azure Pronunciation Assessment has no id-ID model, so for Indonesian we
+  // transcribe with plain Azure STT and approximate a pronunciation score from
+  // how well the recognised text matches the target phrase.
+
+  // Lowercase, strip punctuation, fold the few common Indonesian-adjacent
+  // diacritics, and collapse whitespace. Keeps latin letters + digits + spaces.
+  function normalizeIdText(s: string): string {
+    return s
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")         // strip combining diacritics
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")       // drop punctuation
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function tokenizeId(s: string): string[] {
+    const n = normalizeIdText(s);
+    return n.length ? n.split(" ") : [];
+  }
+
+  // Standard Levenshtein edit distance between two strings.
+  function levenshtein(a: string, b: string): number {
+    if (a === b) return 0;
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    let prev = new Array(b.length + 1);
+    let curr = new Array(b.length + 1);
+    for (let j = 0; j <= b.length; j++) prev[j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      curr[0] = i;
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost);
+      }
+      [prev, curr] = [curr, prev];
+    }
+    return prev[b.length];
+  }
+
+  // 1.0 = identical, 0.0 = completely different (normalized edit-distance ratio).
+  function levenshteinRatio(a: string, b: string): number {
+    const maxLen = Math.max(a.length, b.length);
+    if (maxLen === 0) return 1;
+    return 1 - levenshtein(a, b) / maxLen;
+  }
+
+  function clamp01to100(n: number): number {
+    return Math.max(0, Math.min(100, Math.round(n)));
+  }
+
+  // Convert any audio buffer → 16kHz mono WAV PCM (same recipe the Azure
+  // pronunciation path and /api/stt use). Falls back to the raw buffer if
+  // ffmpeg is unavailable.
+  async function convertTo16kMonoWav(rawBuffer: Buffer): Promise<Buffer> {
+    const { spawn } = await import("child_process");
+    const { writeFile, unlink, readFile } = await import("fs/promises");
+    const { randomUUID } = await import("crypto");
+    const { tmpdir } = await import("os");
+    const { join } = await import("path");
+
+    const inputPath = join(tmpdir(), `pa-id-in-${randomUUID()}`);
+    const outputPath = join(tmpdir(), `pa-id-out-${randomUUID()}.wav`);
+    try {
+      await writeFile(inputPath, rawBuffer);
+      await new Promise<void>((resolve, reject) => {
+        const ff = spawn("ffmpeg", [
+          "-i", inputPath,
+          "-vn", "-ar", "16000", "-ac", "1", "-acodec", "pcm_s16le", "-y",
+          outputPath,
+        ]);
+        const errs: string[] = [];
+        ff.stderr.on("data", (d: Buffer) => errs.push(d.toString()));
+        ff.on("close", (code: number) => code === 0 ? resolve() : reject(new Error(`ffmpeg exit ${code}: ${errs.slice(-2).join(" ")}`)));
+        ff.on("error", reject);
+      });
+      const wav = await readFile(outputPath);
+      console.log(`[assess-id] ffmpeg ok → ${wav.length}B WAV`);
+      return wav;
+    } catch (convErr) {
+      console.error("[assess-id] ffmpeg unavailable, using raw buffer:", (convErr as Error).message);
+      return rawBuffer;
+    } finally {
+      await unlink(inputPath).catch(() => {});
+      await unlink(outputPath).catch(() => {});
+    }
+  }
+
+  // Build the standard pronunciation-assess success/failure payload for id-ID
+  // using plain Azure STT. Returns the SAME shape the ko/en/es path returns so
+  // the client needs no changes.
+  async function assessViaStt(args: {
+    res: Response;
+    key: string;
+    region: string;
+    word: string;
+    audio: string;
+    mimeType?: string;
+  }): Promise<Response> {
+    const { res, key, region, word, audio, mimeType } = args;
+    const sttLang = "id-ID";
+
+    const rawBuffer = Buffer.from(audio, "base64");
+    console.log(`[assess-id] raw=${rawBuffer.length}B  mime=${mimeType}  lang=${sttLang}  word="${word}"`);
+    const wavBuffer = await convertTo16kMonoWav(rawBuffer);
+
+    // Indonesian-aware "no voice detected" failure payload.
+    const noVoicePayload = (status: string, recognizedText: string) => ({
+      success: false as const,
+      score: 0,
+      accuracyScore: 0,
+      fluencyScore: 0,
+      completenessScore: 0,
+      recognizedText,
+      feedback: `Suara tidak terdeteksi (${status}). Coba bicara lebih keras dan jelas.`,
+      words: [] as Array<{ word: string; score: number; errorType: string }>,
+    });
+
+    let data: {
+      RecognitionStatus?: string;
+      DisplayText?: string;
+      NBest?: { Lexical?: string; Display?: string; Confidence?: number }[];
+    };
+    try {
+      const sttController = new AbortController();
+      setTimeout(() => sttController.abort(), 15000);
+      const azureRes = await fetch(
+        `https://${region}.stt.speech.microsoft.com/speech/recognition/interactive` +
+          `/cognitiveservices/v1?language=${encodeURIComponent(sttLang)}&format=detailed`,
+        {
+          method: "POST",
+          headers: {
+            "Ocp-Apim-Subscription-Key": key,
+            "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000",
+          },
+          body: wavBuffer as unknown as BodyInit,
+          signal: sttController.signal,
+        }
+      );
+      if (!azureRes.ok) {
+        const errText = await azureRes.text();
+        logProviderError("[assess-id] Azure STT HTTP error:", azureRes.status, errText);
+        return res.status(500).json({ error: "Azure assessment failed" });
+      }
+      data = await azureRes.json();
+    } catch (err) {
+      console.error("[assess-id] Azure STT request failed:", err);
+      return res.status(500).json({ error: "Azure assessment failed" });
+    }
+
+    const status = data.RecognitionStatus ?? "Unknown";
+    const nb0 = data.NBest?.[0];
+    const displayText = data.DisplayText ?? nb0?.Display ?? "";
+    const lexical = nb0?.Lexical ?? displayText;
+    if (isVerboseVoiceLogging()) {
+      console.log(`[assess-id] Azure status=${status}  display="${displayText}"  lexical="${lexical}"`);
+    } else {
+      console.log(`[assess-id] Azure status=${status}  display=${redactTranscript(displayText)}`);
+    }
+
+    if (status !== "Success" || !displayText.trim()) {
+      return res.json(noVoicePayload(status, displayText));
+    }
+
+    // ── Token + edit-distance scoring ──────────────────────────────────────
+    const targetTokens = tokenizeId(word);
+    const saidTokens = tokenizeId(lexical || displayText);
+    const saidSet = new Set(saidTokens);
+    // Order-tolerant set match: each target token present in the said tokens.
+    const matched = targetTokens.reduce((acc, t) => acc + (saidSet.has(t) ? 1 : 0), 0);
+    const similarity = targetTokens.length > 0 ? matched / targetTokens.length : 0;
+
+    const targetJoined = targetTokens.join(" ");
+    const saidJoined = saidTokens.join(" ");
+    const levRatio = levenshteinRatio(targetJoined, saidJoined);
+    const simRefined = 0.6 * similarity + 0.4 * levRatio;
+
+    const confidence = typeof nb0?.Confidence === "number" ? nb0!.Confidence! : 0.8;
+
+    let score = clamp01to100(100 * (0.7 * simRefined + 0.3 * confidence));
+    const fluencyScore = clamp01to100(confidence * 100);
+    const completenessScore = clamp01to100(similarity * 100);
+
+    // Per-target-token word breakdown.
+    const words = targetTokens.map((t) => {
+      const present = saidSet.has(t);
+      return { word: t, score: present ? 100 : 0, errorType: present ? "None" : "Omission" };
+    });
+
+    // Templated Indonesian feedback by band (used directly, or when GPT is skipped/fails).
+    function templatedFeedbackId(s: number): string {
+      if (s >= 90) return "Pengucapan sempurna! Kerja bagus!";
+      if (s >= 75) return `Bagus! Sedikit latihan lagi dan kamu akan menguasainya. (akurasi: ${s})`;
+      if (s >= 50) return `Perlu latihan. Ucapkan setiap suku kata perlahan dan jelas. (akurasi: ${s})`;
+      return "Coba lagi! Dengarkan dulu pengucapan asli dengan tombol suara.";
+    }
+
+    let accuracyScore = score;
+    let feedback = templatedFeedbackId(score);
+
+    // ── Optional GPT intelligibility judgment for borderline results ─────────
+    // Skip when clearly pass (>0.85) or clearly fail (<0.4) to keep latency sane.
+    if (simRefined >= 0.4 && simRefined <= 0.85) {
+      try {
+        const raw = await completeText({
+          taskLabel: "/api/pronunciation-assess#id",
+          model: "gpt-4o-mini",
+          temperature: 0.3,
+          maxTokens: 120,
+          responseFormat: { type: "json_object" },
+          messages: [
+            {
+              role: "user",
+              content:
+                `Target Indonesian phrase: "${word}". ` +
+                `Learner said (STT): "${displayText}". ` +
+                `Rate intelligibility 0-100 (did they produce the target words?). ` +
+                `Reply ONLY JSON {"score":N,"note":"<short Indonesian tip>"}.`,
+            },
+          ],
+        });
+        const parsed = JSON.parse(raw) as { score?: unknown; note?: unknown };
+        const gptScore = typeof parsed.score === "number" ? clamp01to100(parsed.score) : null;
+        const note = typeof parsed.note === "string" ? parsed.note.trim() : "";
+        if (gptScore !== null) {
+          score = clamp01to100(0.5 * score + 0.5 * gptScore);
+          accuracyScore = score;
+          feedback = note || templatedFeedbackId(score);
+        }
+      } catch (e) {
+        console.warn("[assess-id] GPT judgment failed, using formula score:", (e as Error)?.message ?? e);
+        // feedback / score already hold the formula-based values.
+      }
+    }
+
+    return res.json({
+      success: true,
+      score,
+      accuracyScore,
+      fluencyScore,
+      completenessScore,
+      recognizedText: displayText,
+      feedback,
+      words,
+    });
+  }
+
   // ── GPT Pronunciation Scoring ─────────────────────────────────────────────
   // Receives the target word and what the speech recogniser heard, then asks
   // Azure Pronunciation Assessment — sends real audio to Azure's phoneme-level scorer.
@@ -1213,6 +1462,16 @@ Student's ${learnName} answer: ${userAnswer}`;
       const region = process.env.AZURE_SPEECH_REGION?.trim();
       if (!key || !region) {
         return sendVoiceServiceUnavailable(res, "Pronunciation assessment");
+      }
+
+      // ── Indonesian (id-ID) fallback ─────────────────────────────────────────
+      // Azure Pronunciation Assessment does NOT support id-ID. We approximate a
+      // score from a plain Azure STT transcription (id-ID IS supported by STT):
+      // normalize + token-match the recognised text against the target phrase,
+      // optionally refining a borderline result with a GPT intelligibility check.
+      // Returns the EXACT same response shape the ko/en/es path returns.
+      if (lang === "id-ID" || lang.toLowerCase().startsWith("id")) {
+        return await assessViaStt({ res, key, region, word, audio, mimeType });
       }
 
       const { detectAudioFormat } = await import("./replit_integrations/audio/client");

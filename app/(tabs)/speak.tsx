@@ -50,7 +50,7 @@ const TAB_BAR_HEIGHT = 49;
 const SESSION_SIZE = 8;
 const WEAK_THRESHOLD = 75;
 
-type LangTab = "korean" | "english" | "spanish";
+type LangTab = "korean" | "english" | "spanish" | "indonesian";
 
 interface Phrase {
   word: string;
@@ -510,12 +510,28 @@ const PHRASE_SETS: Record<LangTab, Phrase[]> = {
     { word: "국제화", ipa: "/kuk.tɕe.ɦwa/", meaning: "Internationalization", level: "C2", speechLang: "ko-KR", tip: "3 syllables but with complex liaisons: KUK-je-hwa." },
     { word: "민주주의", ipa: "/min.dʑu.dʑu.ɯi/", meaning: "Democracy", level: "C2", speechLang: "ko-KR", tip: "4 syllables. Two ㅈ sounds: MIN-ju-ju-ui. The final 의 is subtle." },
   ],
+  // ── Indonesian (BETA) open-practice drills ───────────────────────────────
+  // A small A1 word/phrase set for free pronunciation practice. The guided
+  // daily-speaking flow uses the richer sentence packs in dailySpeakingMissions.
+  indonesian: [
+    { word: "Halo", ipa: "/ˈha.lo/", meaning: "안녕하세요", meaningEs: "Hola", level: "A1", speechLang: "id-ID", tip: "A friendly greeting. Two even syllables: HA-lo." },
+    { word: "Terima kasih", ipa: "/təˈri.ma ˈka.sih/", meaning: "감사합니다", meaningEs: "Gracias", level: "A1", speechLang: "id-ID", tip: "Say all four syllables evenly: te-ri-ma-ka-sih." },
+    { word: "Maaf", ipa: "/ˈma.ʔaf/", meaning: "미안해요", meaningEs: "Lo siento", level: "A1", speechLang: "id-ID", tip: "Keep the glottal stop between the two a's: ma-'af." },
+    { word: "Ya", ipa: "/ja/", meaning: "네", meaningEs: "Sí", level: "A1", speechLang: "id-ID", tip: "A tiny real answer. Keep it short." },
+    { word: "Tidak", ipa: "/ˈti.daʔ/", meaning: "아니요", meaningEs: "No", level: "A1", speechLang: "id-ID", tip: "Crisp final glottal stop: TI-da'." },
+    { word: "Air", ipa: "/ˈa.ir/", meaning: "물", meaningEs: "Agua", level: "A1", speechLang: "id-ID", tip: "Two clean syllables: A-ir." },
+    { word: "Makan", ipa: "/ˈma.kan/", meaning: "먹다", meaningEs: "Comer", level: "A1", speechLang: "id-ID", tip: "Stress the first syllable: MA-kan." },
+    { word: "Minum", ipa: "/ˈmi.num/", meaning: "마시다", meaningEs: "Beber", level: "A1", speechLang: "id-ID", tip: "Two even syllables: MI-num." },
+    { word: "Rumah", ipa: "/ˈru.mah/", meaning: "집", meaningEs: "Casa", level: "A1", speechLang: "id-ID", tip: "Soft final h: RU-mah." },
+    { word: "Teman", ipa: "/ˈtə.man/", meaning: "친구", meaningEs: "Amigo", level: "A1", speechLang: "id-ID", tip: "Stress the first syllable: TE-man." },
+  ],
 };
 
 const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] = [
   { key: "korean", label: "Korean", flag: "🇰🇷", color: C.gold },
   { key: "english", label: "English", flag: "🇬🇧", color: "#6B9DFF" },
   { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#FF9D6B" },
+  { key: "indonesian", label: "Indonesian", flag: "🇮🇩", color: "#6BCB9D" },
 ];
 
 // Overall score bands are deliberately gentle. The app philosophy is
@@ -723,10 +739,10 @@ function dailyPhraseToSpeakPhrase(phrase: DailySpeakingPhrase, nativeLang: Nativ
   return {
     word: phrase.phrase,
     ipa: phrase.ipa,
-    // The learning target is never indonesian (Phase 1), but the NATIVE user
-    // can be — meanings only carry 3 langs, so cast the key and fall back to
-    // English so an Indonesian-native still sees a meaning.
-    meaning: phrase.meanings[nativeLang as DailySpeakingLanguage] ?? phrase.meanings.english,
+    // meanings is Partial (Indonesian BETA target may omit some keys). Read the
+    // native-language meaning, then fall back through English to the phrase
+    // itself so a meaning is always shown.
+    meaning: phrase.meanings[nativeLang] ?? phrase.meanings.english ?? phrase.phrase,
     meaningEs: phrase.meanings.spanish,
     level: phrase.level,
     speechLang: phrase.speechLang,
@@ -808,7 +824,7 @@ function routeParam(value: string | string[] | undefined): string | undefined {
 }
 
 function normalizeLangTab(value: unknown): LangTab | null {
-  return value === "korean" || value === "english" || value === "spanish" ? value : null;
+  return value === "korean" || value === "english" || value === "spanish" || value === "indonesian" ? value : null;
 }
 
 function normalizeDeckType(value: unknown): "srs" | "beginner" | "advanced" {
@@ -827,12 +843,14 @@ function langFromSpeechLang(value: string | undefined): LangTab | null {
   if (lang.startsWith("ko")) return "korean";
   if (lang.startsWith("en")) return "english";
   if (lang.startsWith("es")) return "spanish";
+  if (lang.startsWith("id")) return "indonesian";
   return null;
 }
 
 function speechLangForLang(lang: LangTab): string {
   if (lang === "korean") return "ko-KR";
   if (lang === "spanish") return "es-ES";
+  if (lang === "indonesian") return "id-ID";
   return "en-US";
 }
 
@@ -868,10 +886,10 @@ function getReviewSentencePhrase(
 
 function getFirstSpeakingMissionCopy(nativeLang: NativeLanguage, targetLang: LangTab, goal: LearningGoal | null) {
   const targetName: Record<NativeLanguage, Record<LangTab, string>> = {
-    korean: { korean: "한국어", english: "영어", spanish: "스페인어" },
-    english: { korean: "Korean", english: "English", spanish: "Spanish" },
-    spanish: { korean: "coreano", english: "inglés", spanish: "español" },
-    indonesian: { korean: "Korea", english: "Inggris", spanish: "Spanyol" },
+    korean: { korean: "한국어", english: "영어", spanish: "스페인어", indonesian: "인도네시아어" },
+    english: { korean: "Korean", english: "English", spanish: "Spanish", indonesian: "Indonesian" },
+    spanish: { korean: "coreano", english: "inglés", spanish: "español", indonesian: "indonesio" },
+    indonesian: { korean: "Korea", english: "Inggris", spanish: "Spanyol", indonesian: "Indonesia" },
   };
   const goalLabel: Partial<Record<LearningGoal, Record<NativeLanguage, string>>> = {
     travel: { korean: "여행에서 쓸", english: "travel", spanish: "de viaje", indonesian: "untuk perjalanan" },

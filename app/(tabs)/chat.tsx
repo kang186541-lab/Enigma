@@ -22,6 +22,7 @@ const LANG_COLORS: Record<TutorLanguage, string> = {
   english: "#7eb8c9",
   spanish: "#c97b27",
   korean:  "#9b8bb4",
+  indonesian: "#6BCB9D",
 };
 
 type NLang = "korean" | "english" | "spanish" | "indonesian";
@@ -85,12 +86,22 @@ const TUTOR_I18N: Record<string, {
       indonesian: "Streamer Hongdae. Bahasa gaul generasi MZ dan budaya internet. Santai dan kekinian. Dari bab Seoul.",
     },
   },
+  dewi: {
+    region: { korean: "인도네시아어", english: "Indonesian", spanish: "Indonesio", indonesian: "Bahasa Indonesia" },
+    personality: {
+      korean: "따뜻한 자카르타 가이드. 인내심 있고 친근하며 격려를 잘함. 일상 인도네시아어를 가르침.",
+      english: "Warm Jakarta guide. Patient, friendly, and encouraging. Helps you speak everyday Indonesian.",
+      spanish: "Guía cálida de Yakarta. Paciente, amable y alentadora. Te ayuda a hablar indonesio cotidiano.",
+      indonesian: "Pemandu Jakarta yang hangat. Sabar, ramah, dan suka memberi semangat. Membantumu berbicara bahasa Indonesia sehari-hari.",
+    },
+  },
 };
 
 const GROUP_LABELS: Record<TutorLanguage, Record<NLang, string>> = {
   english: { korean: "영어", english: "English", spanish: "Inglés", indonesian: "Inggris" },
   spanish: { korean: "스페인어", english: "Spanish", spanish: "Español", indonesian: "Spanyol" },
   korean:  { korean: "한국어", english: "Korean", spanish: "Coreano", indonesian: "Korea" },
+  indonesian: { korean: "인도네시아어", english: "Indonesian", spanish: "Indonesio", indonesian: "Indonesia" },
 };
 
 const STYLE_LABELS: Record<"formal" | "casual", Record<NLang, string>> = {

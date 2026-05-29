@@ -71,6 +71,17 @@ const FALLBACK_SENTENCE: Record<LearningLangKey, LessonSentence> = {
       es: "Hola, soy Rudy.",
     },
   },
+  // Indonesian (BETA): the 30-day course content is a follow-on, so a missing
+  // Indonesian course day degrades to this fallback opener instead of crashing.
+  indonesian: {
+    text: "Halo, nama saya Rudy.",
+    speechLang: "id-ID",
+    meaning: {
+      ko: "안녕하세요. 제 이름은 Rudy예요.",
+      en: "Hello, my name is Rudy.",
+      es: "Hola, me llamo Rudy.",
+    },
+  },
 };
 
 const LANGUAGE_LABEL: Record<NativeLanguage, Record<NativeLanguage, string>> = {
