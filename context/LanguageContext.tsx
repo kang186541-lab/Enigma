@@ -333,7 +333,7 @@ const translations: Record<NativeLanguage, Record<string, string>> = {
     great_job: "Kerja bagus!",
     score: "Skor",
     chat_pick_tutor: "Pilih Tutormu",
-    chat_pick_sub: "💬 Mengobrol bebas dengan tutormu!",
+    chat_pick_sub: "💬 Ngobrol bebas dengan tutormu!",
   },
 };
 

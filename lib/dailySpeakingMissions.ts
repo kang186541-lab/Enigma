@@ -532,7 +532,7 @@ const DAILY_GOAL_BOOSTERS: Partial<Record<DailySpeakingLanguage, Partial<Record<
     relationship: [
       id("Apa kabar?", "/ˈa.pa ˈka.bar/", "잘 지냈어요?", "How are you?", "¿Cómo estás?", "A warm check-in. Literally 'what news?'."),
       id("Mari pergi bersama.", "/ˈma.ri ˈpər.gi bərˈsa.ma/", "같이 가요.", "Let's go together.", "Vamos juntos.", "pergi = go. A simple invitation."),
-      id("Saya merindukan kamu.", "/ˈsa.ja mə.rinˈdu.kan ˈka.mu/", "보고 싶었어요.", "I missed you.", "Te extrañé.", "rindu = miss. Say it softly and honestly."),
+      id("Aku kangen kamu.", "/ˈa.ku ˈka.ŋən ˈka.mu/", "보고 싶었어요.", "I missed you.", "Te extrañé.", "kangen = miss. Say it softly and honestly."),
       id("Tolong hubungi saya.", "/ˈto.loŋ huˈbu.ŋi ˈsa.ja/", "연락해 주세요.", "Please contact me.", "Contáctame, por favor.", "hubungi = contact. Keep a connection alive."),
       id("Terima kasih banyak.", "/təˈri.ma ˈka.sih ˈba.ɲaʔ/", "정말 고마워요.", "Thank you very much.", "Muchas gracias.", "banyak = much. Warm gratitude."),
       id("Saya senang hari ini.", "/ˈsa.ja səˈnaŋ ˈha.ri ˈi.ni/", "오늘 즐거웠어요.", "I had fun today.", "Me divertí hoy.", "senang = happy. A real end-of-day sentence."),

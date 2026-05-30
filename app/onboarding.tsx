@@ -135,7 +135,7 @@ const UI: Record<NativeLanguage, {
     cta1: "Siguiente", cta2: "Empezar a hablar", back: "Atrás",
   },
   indonesian: {
-    step1Title: "Bahasa ibu?",
+    step1Title: "Bahasa ibumu?",
     step1Sub:   "Pilih bahasa yang kamu pakai sehari-hari",
     guideEyebrow: "Panduan Bahasa Rudy",
     guideNext: "Kartu berikutnya",
@@ -144,7 +144,7 @@ const UI: Record<NativeLanguage, {
     step2Title: "Bahasa apa yang ingin kamu pelajari?",
     step2Sub:   "Pilih bahasa yang ingin kamu kuasai",
     firstSpeechTitle: "Selanjutnya: ucapkan satu kalimat nyata",
-    firstSpeechSub: "Salah itu wajar. Rudy menghitung usaha bicaramu sebelum nilainya.",
+    firstSpeechSub: "Salah itu wajar. Rudy menghitung usaha bicaramu dulu, baru nilainya.",
     goalPrompt: "Pertama, pilih di mana kamu akan benar-benar memakainya",
     firstSentenceLabel: "Kalimat pertama",
     firstSentenceWaiting: "Pilih bahasa dan situasi, lalu Rudy akan menampilkan kalimat pertama yang akan kamu ucapkan.",

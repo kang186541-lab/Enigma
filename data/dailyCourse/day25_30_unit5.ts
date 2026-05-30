@@ -1002,7 +1002,7 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "Saya ___ sepak bola setiap akhir pekan.", answer: "bermain", options: ["bermain", "membaca", "memasak"], fullSentence: "Saya bermain sepak bola setiap akhir pekan.", fullSentenceMeaning: { ko: "매주 주말 축구.", en: "Football every weekend.", es: "Fútbol cada fin de semana." } },
       { type: "speak", sentence: "Hobi saya memasak. Apa yang Anda suka lakukan?", speechLang: "id-ID", meaning: { ko: "취미는 요리. 뭘 좋아해요?", en: "Hobby: cooking. What do you like?", es: "Hobby: cocinar. ¿Qué te gusta?" } },
       { type: "speak", sentence: "Di mana toilet?", speechLang: "id-ID", meaning: { ko: "화장실이 어디에요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" }, isYesterdayReview: true },
-      { type: "speak", sentence: "Berapa harganya ini?", speechLang: "id-ID", meaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Ini berapa harganya?", speechLang: "id-ID", meaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" }, isYesterdayReview: true },
     ],
   },
 

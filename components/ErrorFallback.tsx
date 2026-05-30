@@ -62,7 +62,7 @@ const FALLBACK_COPY: Record<Lang, {
     title: "Terjadi kesalahan",
     message: "Silakan muat ulang aplikasi untuk melanjutkan.",
     restart: "Coba Lagi",
-    details: "Detail Error",
+    details: "Detail Kesalahan",
     copy: "Salin",
     copied: "Tersalin",
     close: "Tutup",

@@ -220,8 +220,8 @@ const BEGINNER_CARDS_BY_LANG: Record<NativeLanguage, FlashCard[]> = {
 
     { word: "Cinta", emoji: "❤️", pronunciation: "CHEEN-ta",
       meanings: { korean: "누군가나 무언가에 대한 깊은 사랑의 감정이에요.", english: "Love — a deep feeling of affection for someone or something.", spanish: "Amor — un sentimiento profundo de afecto por alguien o algo.", indonesian: "Cinta — perasaan kasih sayang yang mendalam pada seseorang atau sesuatu." },
-      example: "Saya cinta keluarga saya sepenuh hati.",
-      exampleTranslation: { korean: "저는 온 마음으로 가족을 사랑해요.", english: "I love my family with all my heart.", spanish: "Amo a mi familia con todo mi corazón.", indonesian: "Saya cinta keluarga saya sepenuh hati." }, speechLang: "id-ID" },
+      example: "Saya sangat mencintai keluarga saya.",
+      exampleTranslation: { korean: "저는 온 마음으로 가족을 사랑해요.", english: "I love my family with all my heart.", spanish: "Amo a mi familia con todo mi corazón.", indonesian: "Saya sangat mencintai keluarga saya." }, speechLang: "id-ID" },
 
     { word: "Senang", emoji: "😊", pronunciation: "se-NANG",
       meanings: { korean: "기쁘고 즐거운 감정 상태예요.", english: "Happy / Glad — feeling joy or pleasure.", spanish: "Feliz / Contento — sentir alegría o placer.", indonesian: "Senang — merasakan sukacita atau kesenangan." },

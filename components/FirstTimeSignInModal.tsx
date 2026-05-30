@@ -78,7 +78,7 @@ const COPY: Record<LangKey, {
     or: "o",
   },
   indonesian: {
-    title: "Fitur penyimpan progresmu sudah tiba 🦊",
+    title: "Fitur simpan progresmu sudah hadir 🦊",
     body: (xp, streak) =>
       `Kamu punya ${xp} XP dan ${streak} hari beruntun. Masuk sekali supaya semuanya tetap aman saat ganti ponsel atau instal ulang.`,
     google: "Masuk dengan Google",
