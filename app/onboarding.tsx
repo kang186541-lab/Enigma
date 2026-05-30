@@ -289,7 +289,25 @@ export default function OnboardingScreen() {
       }
       if (needsBasicsFirst && !basicsCompleted) {
         setLoading(true);
-        router.replace("/basic-course");
+        // New default for the unfamiliar-script cohort: a ~2-min micro-foundation
+        // that teaches ONLY today's first sentence (understand → hear the pieces →
+        // say it) before the cold mic, instead of the full ~10-min Basics. We hand
+        // the micro-screen the language/goal/native picks as params.
+        //
+        // Genuine fallback: if there is no daily mission phrase for this
+        // language/goal pairing, the micro-screen has nothing to teach, so route
+        // to the full /basic-course alphabet course instead (which still
+        // culminates in a scored spoken greeting). This keeps the locked
+        // basic-course branch a real, reachable code path.
+        const hasMissionPhrase = getDailySpeakingMissionPhrase(learnSel as DailySpeakingLanguage, goalSel, 0) !== null;
+        if (!hasMissionPhrase) {
+          router.replace("/basic-course");
+          return;
+        }
+        router.replace({
+          pathname: "/first-sentence-intro",
+          params: { learn: learnSel, goal: goalSel ?? "", native: nativeSel },
+        } as any);
         return;
       }
       await finishToCourse();
