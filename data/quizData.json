@@ -8,7 +8,8 @@
       "title": {
         "ko": "숨겨진 메시지",
         "en": "The Hidden Message",
-        "es": "El Mensaje Oculto"
+        "es": "El Mensaje Oculto",
+        "id": "Pesan Tersembunyi"
       },
       "difficulty": 1,
       "timeLimit": null,
@@ -16,7 +17,8 @@
       "storyContext": {
         "ko": "석판의 암호를 해독하기 위해 문장을 올바르게 배열해야 한다.",
         "en": "You must arrange the words correctly to decode the cipher on the tablet.",
-        "es": "Debes ordenar las palabras correctamente para descifrar el código de la tablilla."
+        "es": "Debes ordenar las palabras correctamente para descifrar el código de la tablilla.",
+        "id": "Kamu harus menyusun kata-kata dengan benar untuk memecahkan sandi di lempengan itu."
       },
       "content": {
         "en": {
@@ -205,6 +207,73 @@
               }
             }
           ]
+        },
+        "id": {
+          "questions": [
+            {
+              "scrambled": [
+                "nama",
+                "Halo",
+                "Rudy",
+                "saya"
+              ],
+              "answer": "Halo nama saya Rudy",
+              "hint": {
+                "ko": "인사말 'Halo'가 문장 맨 앞에 옵니다.",
+                "en": "The greeting 'Halo' goes first.",
+                "es": "El saludo 'Halo' va primero.",
+                "id": "Sapaan 'Halo' diletakkan di awal."
+              },
+              "grammarNote": {
+                "ko": "인도네시아어 자기소개: 'Halo' + 'nama saya' + 이름.",
+                "en": "Indonesian introduction: 'Halo' + 'nama saya' (my name is) + name.",
+                "es": "Presentación en indonesio: 'Halo' + 'nama saya' (me llamo) + nombre.",
+                "id": "Perkenalan: 'Halo' + 'nama saya' + nama. 'Saya' berarti 'aku' yang sopan."
+              }
+            },
+            {
+              "scrambled": [
+                "pintu",
+                "Di",
+                "keluar",
+                "mana"
+              ],
+              "answer": "Di mana pintu keluar",
+              "hint": {
+                "ko": "의문사 'Di mana'(어디)가 문장 맨 앞에 옵니다.",
+                "en": "The question phrase 'Di mana' (where) goes first.",
+                "es": "La frase interrogativa 'Di mana' (dónde) va primero.",
+                "id": "Frasa tanya 'Di mana' diletakkan di awal kalimat."
+              },
+              "grammarNote": {
+                "ko": "장소 질문: 'Di mana' + 명사. 'pintu keluar'는 '출구'입니다.",
+                "en": "Asking location: 'Di mana' + noun. 'Pintu keluar' means 'the exit'.",
+                "es": "Preguntar ubicación: 'Di mana' + sustantivo. 'Pintu keluar' significa 'salida'.",
+                "id": "Bertanya lokasi: 'Di mana' + kata benda. 'Pintu keluar' artinya jalan ke luar."
+              }
+            },
+            {
+              "scrambled": [
+                "mengerti",
+                "Maaf",
+                "tidak",
+                "saya"
+              ],
+              "answer": "Maaf saya tidak mengerti",
+              "hint": {
+                "ko": "'Maaf'(미안해요)가 먼저, 그 다음 'tidak'으로 부정문을 만듭니다.",
+                "en": "'Maaf' (sorry) comes first, then 'tidak' forms the negative.",
+                "es": "'Maaf' (lo siento) va primero, luego 'tidak' forma la negación.",
+                "id": "'Maaf' di depan, lalu 'tidak' membentuk kalimat negatif."
+              },
+              "grammarNote": {
+                "ko": "부정문: 주어 + 'tidak' + 동사. 'Maaf'는 사과 표현입니다.",
+                "en": "Negative: Subject + 'tidak' + verb. 'Maaf' expresses apology.",
+                "es": "Negación: Sujeto + 'tidak' + verbo. 'Maaf' expresa disculpa.",
+                "id": "Kalimat negatif: subjek + 'tidak' + kata kerja. 'Maaf' untuk meminta maaf."
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -223,7 +292,8 @@
       "title": {
         "ko": "톰의 목격담",
         "en": "Tom's Testimony",
-        "es": "El Testimonio de Tom"
+        "es": "El Testimonio de Tom",
+        "id": "Kesaksian Tom"
       },
       "difficulty": 2,
       "timeLimit": null,
@@ -231,7 +301,8 @@
       "storyContext": {
         "ko": "톰이 수상한 인물을 목격했지만 구어체로만 설명한다. 이해해야 단서를 얻을 수 있다.",
         "en": "Tom witnessed a suspicious figure but describes it only in slang. You must understand to get the clue.",
-        "es": "Tom vio a una persona sospechosa pero lo describe solo en jerga. Debes entender para obtener la pista."
+        "es": "Tom vio a una persona sospechosa pero lo describe solo en jerga. Debes entender para obtener la pista.",
+        "id": "Tom melihat sosok mencurigakan tetapi hanya menjelaskannya dengan bahasa gaul. Kamu harus memahaminya untuk mendapatkan petunjuk."
       },
       "npcDialogueBefore": {
         "npc": "tom",
@@ -403,6 +474,61 @@
             "es": "El argot coreano combina palabras creativamente. '꿀잼' = 꿀(miel) + 재미(diversión), 'super divertido'.",
             "ko": "한국어 신조어는 단어를 창의적으로 결합합니다. '꿀잼' = 꿀 + 재미."
           }
+        },
+        "id": {
+          "pairs": [
+            {
+              "left": "mencurigakan",
+              "right": "patut dicurigai",
+              "wrongOptions": [
+                "ramah",
+                "pandai",
+                "lelah"
+              ]
+            },
+            {
+              "left": "ngelirik",
+              "right": "melihat sekilas",
+              "wrongOptions": [
+                "memasak",
+                "membeli",
+                "memakan"
+              ]
+            },
+            {
+              "left": "kabur",
+              "right": "lari menjauh",
+              "wrongOptions": [
+                "duduk",
+                "tidur",
+                "berjalan pelan"
+              ]
+            },
+            {
+              "left": "cowok",
+              "right": "laki-laki",
+              "wrongOptions": [
+                "gedung",
+                "hewan",
+                "mobil"
+              ]
+            },
+            {
+              "left": "mencurigakan banget",
+              "right": "sangat mencurigakan",
+              "wrongOptions": [
+                "sangat manis",
+                "cukup biasa",
+                "sangat lelah"
+              ]
+            }
+          ],
+          "grammarNote": {
+            "ko": "인도네시아어 구어체는 일상 대화에서 흔합니다. 'banget'은 '매우'를 뜻하는 비격식 표현입니다.",
+            "en": "Indonesian slang is common in casual talk. 'Banget' means 'very/really' and is informal.",
+            "es": "El argot indonesio es común en charlas informales. 'Banget' significa 'muy' y es informal.",
+            "id": "Bahasa gaul sering dipakai dalam obrolan santai. 'Banget' artinya 'sangat' secara informal."
+          }
         }
       },
       "rewards": {
@@ -422,14 +548,16 @@
       "title": {
         "ko": "발음 도전",
         "en": "Pronunciation Challenge",
-        "es": "Desafío de Pronunciación"
+        "es": "Desafío de Pronunciación",
+        "id": "Tantangan Pelafalan"
       },
       "difficulty": 2,
       "isBoss": false,
       "storyContext": {
         "ko": "수호석의 메시지를 정확하게 소리 내어 읽어야 한다.",
         "en": "You must read the Guardian Stone's message aloud accurately.",
-        "es": "Debes leer el mensaje de la Piedra Guardiana en voz alta con precisión."
+        "es": "Debes leer el mensaje de la Piedra Guardiana en voz alta con precisión.",
+        "id": "Kamu harus membaca pesan Batu Penjaga dengan lantang dan tepat."
       },
       "content": {
         "en": {
@@ -467,6 +595,18 @@
               "minScore": 60
             }
           ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "text": "Batu penjaga melindungi bahasa",
+              "minScore": 60
+            },
+            {
+              "text": "Temukan mereka sebelum terlambat",
+              "minScore": 60
+            }
+          ]
         }
       },
       "rewards": {
@@ -483,7 +623,8 @@
       "title": {
         "ko": "고문서 번역",
         "en": "The Old Manuscript",
-        "es": "El Manuscrito Antiguo"
+        "es": "El Manuscrito Antiguo",
+        "id": "Naskah Kuno"
       },
       "difficulty": 2,
       "timeLimit": null,
@@ -491,7 +632,8 @@
       "storyContext": {
         "ko": "미스 페니가 건넨 오래된 문서의 훼손된 부분을 채워야 한다.",
         "en": "You must fill in the damaged parts of the old document Miss Penny gave you.",
-        "es": "Debes completar las partes dañadas del documento antiguo que te dio Miss Penny."
+        "es": "Debes completar las partes dañadas del documento antiguo que te dio Miss Penny.",
+        "id": "Kamu harus melengkapi bagian yang rusak dari dokumen tua yang diberikan Miss Penny."
       },
       "content": {
         "en": {
@@ -688,6 +830,75 @@
               }
             }
           ]
+        },
+        "id": {
+          "passage": "Halo, ___(1)___ saya Rudy. Senang ___(2)___ Anda. Maaf, saya tidak ___(3)___. Bisakah Anda mengatakannya ___(4)___?",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "nama",
+              "options": [
+                "nama",
+                "teman",
+                "rumah",
+                "buku"
+              ],
+              "hint": {
+                "ko": "자기소개할 때 '___ saya'에 들어갈 단어는?",
+                "en": "When introducing yourself, '___ saya' needs which word?",
+                "es": "Al presentarte, '___ saya' necesita qué palabra?",
+                "id": "Saat memperkenalkan diri, '___ saya' membutuhkan kata apa?"
+              }
+            },
+            {
+              "id": 2,
+              "answer": "bertemu",
+              "options": [
+                "bertemu",
+                "melihat",
+                "tahu",
+                "membantu"
+              ],
+              "hint": {
+                "ko": "처음 만났을 때 하는 인사 표현입니다.",
+                "en": "A greeting when you first meet someone.",
+                "es": "Un saludo cuando conoces a alguien por primera vez.",
+                "id": "Sapaan ketika pertama kali bertemu seseorang."
+              }
+            },
+            {
+              "id": 3,
+              "answer": "mengerti",
+              "options": [
+                "mengerti",
+                "ingat",
+                "percaya",
+                "bicara"
+              ],
+              "hint": {
+                "ko": "상대방의 말을 모를 때 쓰는 표현입니다.",
+                "en": "Used when you can't follow what someone said.",
+                "es": "Se usa cuando no puedes seguir lo que alguien dijo.",
+                "id": "Dipakai saat kamu tidak bisa mengikuti perkataan seseorang."
+              }
+            },
+            {
+              "id": 4,
+              "answer": "lagi",
+              "options": [
+                "lagi",
+                "sekarang",
+                "di sini",
+                "cepat"
+              ],
+              "hint": {
+                "ko": "한 번 더 말해달라는 표현입니다.",
+                "en": "Asking someone to repeat what they said.",
+                "es": "Pidiendo a alguien que repita lo que dijo.",
+                "id": "Meminta seseorang mengulang perkataannya."
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -706,7 +917,8 @@
       "title": {
         "ko": "도청",
         "en": "Eavesdropping",
-        "es": "Escucha Secreta"
+        "es": "Escucha Secreta",
+        "id": "Menguping"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -715,7 +927,8 @@
       "storyContext": {
         "ko": "미스 페니의 뒷방에서 수상한 전화 통화가 들린다. 핵심 정보를 추출하라.",
         "en": "A suspicious phone call from Miss Penny's back room. Extract the key information.",
-        "es": "Una llamada sospechosa desde la trastienda de Miss Penny. Extrae la información clave."
+        "es": "Una llamada sospechosa desde la trastienda de Miss Penny. Extrae la información clave.",
+        "id": "Panggilan telepon mencurigakan dari ruang belakang Miss Penny. Tarik informasi pentingnya."
       },
       "content": {
         "en": {
@@ -851,6 +1064,53 @@
               ]
             }
           ]
+        },
+        "id": {
+          "ttsScript": "Batu pertama sudah diamankan. Penjaga London hampir menjadi milik kita. Pindahkan operasi ke Madrid. Batu Spanyol tidak akan semudah ini. Kita butuh orang dalam.",
+          "ttsVoice": "id-ID-GadisNeural",
+          "ttsSpeed": "0.9",
+          "questions": [
+            {
+              "question": {
+                "ko": "무엇이 확보되었나요?",
+                "en": "What has been secured?",
+                "es": "¿Qué ha sido asegurado?",
+                "id": "Apa yang telah diamankan?"
+              },
+              "answer": "Batu pertama",
+              "acceptableAnswers": [
+                "batu pertama",
+                "batunya",
+                "batu"
+              ]
+            },
+            {
+              "question": {
+                "ko": "다음 도시는 어디인가요?",
+                "en": "What city is mentioned next?",
+                "es": "¿Qué ciudad se menciona?",
+                "id": "Kota apa yang disebut berikutnya?"
+              },
+              "answer": "Madrid",
+              "acceptableAnswers": [
+                "madrid"
+              ]
+            },
+            {
+              "question": {
+                "ko": "마드리드에서 무엇이 필요한가요?",
+                "en": "What do they need in Madrid?",
+                "es": "¿Qué necesitan en Madrid?",
+                "id": "Apa yang mereka butuhkan di Madrid?"
+              },
+              "answer": "Orang dalam",
+              "acceptableAnswers": [
+                "orang dalam",
+                "seseorang di dalam",
+                "orang di dalam"
+              ]
+            }
+          ]
         }
       },
       "rewards": {
@@ -870,7 +1130,8 @@
       "title": {
         "ko": "수호석의 수수께끼",
         "en": "The Guardian's Riddle",
-        "es": "El Acertijo del Guardián"
+        "es": "El Acertijo del Guardián",
+        "id": "Teka-teki Sang Penjaga"
       },
       "difficulty": 4,
       "timeLimit": null,
@@ -879,7 +1140,8 @@
       "storyContext": {
         "ko": "수호석이 있던 자리에 남겨진 3개의 수수께끼. 학습 언어로 답해야 한다.",
         "en": "Three riddles left where the Guardian Stone once was. Answer in your target language.",
-        "es": "Tres acertijos dónde estaba la Piedra Guardiana. Responde en tu idioma objetivo."
+        "es": "Tres acertijos dónde estaba la Piedra Guardiana. Responde en tu idioma objetivo.",
+        "id": "Tiga teka-teki tertinggal di tempat Batu Penjaga dulu berada. Jawablah dalam bahasa yang kamu pelajari."
       },
       "content": {
         "en": {
@@ -974,6 +1236,37 @@
               ]
             }
           ]
+        },
+        "id": {
+          "riddles": [
+            {
+              "text": "Aku punya kota, tapi tak punya rumah. Aku punya gunung, tapi tak punya pohon. Aku punya air, tapi tak punya ikan. Apakah aku?",
+              "answer": "peta",
+              "acceptableAnswers": [
+                "peta",
+                "sebuah peta",
+                "peta dunia"
+              ]
+            },
+            {
+              "text": "Semakin banyak kau ambil, semakin banyak kau tinggalkan. Apakah aku?",
+              "answer": "jejak kaki",
+              "acceptableAnswers": [
+                "jejak kaki",
+                "jejak",
+                "langkah kaki"
+              ]
+            },
+            {
+              "text": "Aku berbicara segala bahasa tapi tak bermulut. Aku menceritakan segala kisah tapi tak bersuara. Aku hidup berabad-abad tapi tak pernah bernyawa. Apakah aku?",
+              "answer": "buku",
+              "acceptableAnswers": [
+                "buku",
+                "sebuah buku",
+                "buku-buku"
+              ]
+            }
+          ]
         }
       },
       "gptPrompt": "You are a quiz evaluator for a language learning game. The player must answer riddles in {targetLang}. Evaluate if the answer is correct considering meaning, not exact wording. If correct, respond with encouragement in {targetLang}. If wrong, give a small hint in {nativeLang}. Return JSON: {\"correct\": true/false, \"feedback\": \"...\", \"score\": 0-100}",
@@ -991,32 +1284,64 @@
       "title": {
         "ko": "Mr. Black의 메시지",
         "en": "Mr. Black's Message",
-        "es": "El Mensaje de Mr. Black"
+        "es": "El Mensaje de Mr. Black",
+        "id": "Pesan Mr. Black"
       },
       "difficulty": 1,
       "isBoss": false,
       "storyContext": {
         "ko": "Mr. Black이 남긴 메시지를 소리내어 읽어보세요. 탐정은 증거를 목소리로 기록합니다.",
         "en": "Read Mr. Black's message aloud. A detective records evidence with their voice.",
-        "es": "Lee el mensaje de Mr. Black en voz alta. Un detective registra la evidencia con su voz."
+        "es": "Lee el mensaje de Mr. Black en voz alta. Un detective registra la evidencia con su voz.",
+        "id": "Bacakan pesan Mr. Black dengan lantang. Seorang detektif merekam bukti dengan suaranya."
       },
       "content": {
         "en": {
           "sentences": [
-            { "text": "Hello. My name is Mr. Black.", "minScore": 60 },
-            { "text": "Thank you. Goodbye, London.", "minScore": 60 }
+            {
+              "text": "Hello. My name is Mr. Black.",
+              "minScore": 60
+            },
+            {
+              "text": "Thank you. Goodbye, London.",
+              "minScore": 60
+            }
           ]
         },
         "es": {
           "sentences": [
-            { "text": "Hola. Me llamo Mr. Black.", "minScore": 60 },
-            { "text": "Gracias. Adiós, Londres.", "minScore": 60 }
+            {
+              "text": "Hola. Me llamo Mr. Black.",
+              "minScore": 60
+            },
+            {
+              "text": "Gracias. Adiós, Londres.",
+              "minScore": 60
+            }
           ]
         },
         "ko": {
           "sentences": [
-            { "text": "안녕하세요. 제 이름은 Mr. Black이에요.", "minScore": 60 },
-            { "text": "감사합니다. 안녕, 런던.", "minScore": 60 }
+            {
+              "text": "안녕하세요. 제 이름은 Mr. Black이에요.",
+              "minScore": 60
+            },
+            {
+              "text": "감사합니다. 안녕, 런던.",
+              "minScore": 60
+            }
+          ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "text": "Halo. Nama saya Mr. Black.",
+              "minScore": 60
+            },
+            {
+              "text": "Terima kasih. Selamat tinggal, London.",
+              "minScore": 60
+            }
           ]
         }
       },
@@ -1302,14 +1627,16 @@
       "title": {
         "ko": "발음 도전",
         "en": "Pronunciation Challenge",
-        "es": "Desafío de Pronunciación"
+        "es": "Desafío de Pronunciación",
+        "id": "Tantangan Pelafalan"
       },
       "difficulty": 2,
       "isBoss": false,
       "storyContext": {
         "ko": "화랑의 숨겨진 메시지를 소리 내어 읽어야 한다.",
         "en": "You must read the gallery's hidden message aloud.",
-        "es": "Debes leer en voz alta el mensaje oculto de la galería."
+        "es": "Debes leer en voz alta el mensaje oculto de la galería.",
+        "id": "Kamu harus membaca pesan tersembunyi di galeri itu dengan lantang."
       },
       "content": {
         "en": {
@@ -1344,6 +1671,18 @@
             },
             {
               "text": "더 가까이 보면 알 수 있다",
+              "minScore": 60
+            }
+          ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "text": "Kebenaran tersembunyi dalam seni",
+              "minScore": 60
+            },
+            {
+              "text": "Lihat lebih dekat dan kamu akan melihatnya",
               "minScore": 60
             }
           ]
@@ -1967,35 +2306,80 @@
       "title": {
         "ko": "Don Miguel의 주문",
         "en": "Don Miguel's Order",
-        "es": "El Pedido de Don Miguel"
+        "es": "El Pedido de Don Miguel",
+        "id": "Pesanan Don Miguel"
       },
       "difficulty": 2,
       "isBoss": false,
       "storyContext": {
         "ko": "Don Miguel은 주문을 받기 전에 절대 이야기하지 않아요. 직접 말로 주문해보세요!",
         "en": "Don Miguel won't talk until you order properly. Speak your order aloud!",
-        "es": "Don Miguel no habla hasta que pidas correctamente. ¡Pide en voz alta!"
+        "es": "Don Miguel no habla hasta que pidas correctamente. ¡Pide en voz alta!",
+        "id": "Don Miguel tidak mau bicara sampai kamu memesan dengan benar. Ucapkan pesananmu dengan lantang!"
       },
       "content": {
         "en": {
           "sentences": [
-            { "text": "Excuse me. I would like bread, please.", "minScore": 60 },
-            { "text": "How much is this?", "minScore": 60 },
-            { "text": "Thank you very much!", "minScore": 60 }
+            {
+              "text": "Excuse me. I would like bread, please.",
+              "minScore": 60
+            },
+            {
+              "text": "How much is this?",
+              "minScore": 60
+            },
+            {
+              "text": "Thank you very much!",
+              "minScore": 60
+            }
           ]
         },
         "es": {
           "sentences": [
-            { "text": "Perdón. Quisiera pan, por favor.", "minScore": 60 },
-            { "text": "¿Cuánto cuesta esto?", "minScore": 60 },
-            { "text": "¡Muchas gracias!", "minScore": 60 }
+            {
+              "text": "Perdón. Quisiera pan, por favor.",
+              "minScore": 60
+            },
+            {
+              "text": "¿Cuánto cuesta esto?",
+              "minScore": 60
+            },
+            {
+              "text": "¡Muchas gracias!",
+              "minScore": 60
+            }
           ]
         },
         "ko": {
           "sentences": [
-            { "text": "저기요. 빵 주세요.", "minScore": 60 },
-            { "text": "이거 얼마예요?", "minScore": 60 },
-            { "text": "정말 감사합니다!", "minScore": 60 }
+            {
+              "text": "저기요. 빵 주세요.",
+              "minScore": 60
+            },
+            {
+              "text": "이거 얼마예요?",
+              "minScore": 60
+            },
+            {
+              "text": "정말 감사합니다!",
+              "minScore": 60
+            }
+          ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "text": "Permisi. Saya mau roti, tolong.",
+              "minScore": 60
+            },
+            {
+              "text": "Berapa harganya?",
+              "minScore": 60
+            },
+            {
+              "text": "Terima kasih banyak!",
+              "minScore": 60
+            }
           ]
         }
       },
@@ -2425,14 +2809,16 @@
       "title": {
         "ko": "발음 도전",
         "en": "Pronunciation Challenge",
-        "es": "Desafío de Pronunciación"
+        "es": "Desafío de Pronunciación",
+        "id": "Tantangan Pelafalan"
       },
       "difficulty": 2,
       "isBoss": false,
       "storyContext": {
         "ko": "고대 도서관의 비문을 큰 소리로 읽어야 한다.",
         "en": "You must read the ancient library inscription aloud.",
-        "es": "Debes leer en voz alta la inscripción de la biblioteca antigua."
+        "es": "Debes leer en voz alta la inscripción de la biblioteca antigua.",
+        "id": "Kamu harus membaca prasasti perpustakaan kuno itu dengan lantang."
       },
       "content": {
         "en": {
@@ -2467,6 +2853,18 @@
             },
             {
               "text": "말은 문명의 힘을 담고 있다",
+              "minScore": 60
+            }
+          ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "text": "Bahasa menghubungkan orang di seluruh dunia",
+              "minScore": 60
+            },
+            {
+              "text": "Kata-kata membawa kekuatan peradaban",
               "minScore": 60
             }
           ]
@@ -3130,35 +3528,80 @@
       "title": {
         "ko": "인천공항에서",
         "en": "At Incheon Airport",
-        "es": "En el Aeropuerto de Incheon"
+        "es": "En el Aeropuerto de Incheon",
+        "id": "Di Bandara Incheon"
       },
       "difficulty": 2,
       "isBoss": false,
       "storyContext": {
         "ko": "루디의 전화가 죽었어요. 번역 앱도 없어요. 직접 한국어로 말해야 해요!",
         "en": "Rudy's phone is dead. No translator app. You have to speak Korean yourself!",
-        "es": "El teléfono de Rudy está muerto. Sin traductor. ¡Hay que hablar coreano!"
+        "es": "El teléfono de Rudy está muerto. Sin traductor. ¡Hay que hablar coreano!",
+        "id": "Ponsel Rudy mati. Tidak ada aplikasi penerjemah. Kamu harus berbicara sendiri!"
       },
       "content": {
         "en": {
           "sentences": [
-            { "text": "Excuse me. Do you speak English?", "minScore": 55 },
-            { "text": "I don't understand. Can you say that again slowly?", "minScore": 55 },
-            { "text": "Where is the subway?", "minScore": 55 }
+            {
+              "text": "Excuse me. Do you speak English?",
+              "minScore": 55
+            },
+            {
+              "text": "I don't understand. Can you say that again slowly?",
+              "minScore": 55
+            },
+            {
+              "text": "Where is the subway?",
+              "minScore": 55
+            }
           ]
         },
         "es": {
           "sentences": [
-            { "text": "Disculpe. ¿Habla inglés?", "minScore": 55 },
-            { "text": "No entiendo. ¿Puede repetirlo más despacio?", "minScore": 55 },
-            { "text": "¿Dónde está el metro?", "minScore": 55 }
+            {
+              "text": "Disculpe. ¿Habla inglés?",
+              "minScore": 55
+            },
+            {
+              "text": "No entiendo. ¿Puede repetirlo más despacio?",
+              "minScore": 55
+            },
+            {
+              "text": "¿Dónde está el metro?",
+              "minScore": 55
+            }
           ]
         },
         "ko": {
           "sentences": [
-            { "text": "실례합니다. 영어 할 줄 아세요?", "minScore": 55 },
-            { "text": "이해 못 했어요. 천천히 다시 말해 주세요.", "minScore": 55 },
-            { "text": "지하철이 어디예요?", "minScore": 55 }
+            {
+              "text": "실례합니다. 영어 할 줄 아세요?",
+              "minScore": 55
+            },
+            {
+              "text": "이해 못 했어요. 천천히 다시 말해 주세요.",
+              "minScore": 55
+            },
+            {
+              "text": "지하철이 어디예요?",
+              "minScore": 55
+            }
+          ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "text": "Permisi. Apakah Anda bisa berbahasa Inggris?",
+              "minScore": 55
+            },
+            {
+              "text": "Saya tidak mengerti. Bisakah Anda mengulanginya pelan-pelan?",
+              "minScore": 55
+            },
+            {
+              "text": "Di mana stasiun kereta bawah tanah?",
+              "minScore": 55
+            }
           ]
         }
       },
@@ -4728,7 +5171,8 @@
       "title": {
         "ko": "3개 국어 비문 읽기",
         "en": "Reading the Trilingual Inscription",
-        "es": "Leyendo la Inscripción Trilingüe"
+        "es": "Leyendo la Inscripción Trilingüe",
+        "id": "Membaca Prasasti Tiga Bahasa"
       },
       "difficulty": 4,
       "timeLimit": null,
@@ -4737,7 +5181,8 @@
       "storyContext": {
         "ko": "4층 관문을 열려면 벽에 적힌 3개 국어 비문을 소리 내어 읽어야 한다. 미스 페니가 스페인어를 맡았다. 루디는 영어와 한국어를 읽어야 한다.",
         "en": "To open the fourth floor gate, you must read the trilingual wall inscription aloud. Miss Penny handles the Spanish. Rudy must read the English and Korean.",
-        "es": "Para abrir la puerta del cuarto piso, debes leer en voz alta la inscripcion trilingue de la pared. Miss Penny se encarga del espanol. Rudy debe leer el ingles y el coreano."
+        "es": "Para abrir la puerta del cuarto piso, debes leer en voz alta la inscripcion trilingue de la pared. Miss Penny se encarga del espanol. Rudy debe leer el ingles y el coreano.",
+        "id": "Untuk membuka gerbang lantai empat, kamu harus membaca prasasti tiga bahasa di dinding dengan lantang. Miss Penny menangani bahasa Spanyol. Rudy harus membaca bahasa Inggris dan Korea."
       },
       "content": {
         "en": {
@@ -4784,6 +5229,22 @@
             },
             {
               "text": "도와주셔서 감사합니다. 또 만나요.",
+              "minScore": 55
+            }
+          ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "text": "Halo, nama saya Rudy. Senang bertemu denganmu.",
+              "minScore": 60
+            },
+            {
+              "text": "Saya dari London. Saya seorang detektif.",
+              "minScore": 60
+            },
+            {
+              "text": "Terima kasih atas bantuanmu. Sampai jumpa lagi.",
               "minScore": 55
             }
           ]
@@ -5248,7 +5709,6 @@
         "badge": "language_defender"
       }
     },
-
     {
       "id": "ch3_quiz_voice_power",
       "chapter": "ch3",
@@ -5257,54 +5717,166 @@
       "title": {
         "ko": "수호석의 공명",
         "en": "The Stone's Resonance",
-        "es": "La Resonancia de la Piedra"
+        "es": "La Resonancia de la Piedra",
+        "id": "Resonansi Sang Batu"
       },
       "difficulty": 3,
       "timeLimit": null,
       "isBoss": false,
       "tprsStage": 3,
-      "targetExpressions": ["How are you?", "I'm fine, thank you", "Nice to meet you"],
-      "previouslyLearned": ["Hello", "My name is", "Goodbye"],
+      "targetExpressions": [
+        "How are you?",
+        "I'm fine, thank you",
+        "Nice to meet you"
+      ],
+      "previouslyLearned": [
+        "Hello",
+        "My name is",
+        "Goodbye"
+      ],
       "speakAfter": true,
       "storyReason": "수호석이 반응하려면 올바른 발음으로 주문을 외워야 한다",
       "storyConsequence": "수호석이 빛나며 서울의 단서를 드러낸다",
-      "onFail": { "addToWeakExpressions": ["How are you?", "Nice to meet you"], "reviewInDailyCourse": true, "reviewDays": 3 },
+      "onFail": {
+        "addToWeakExpressions": [
+          "How are you?",
+          "Nice to meet you"
+        ],
+        "reviewInDailyCourse": true,
+        "reviewDays": 3
+      },
       "storyContext": {
         "ko": "수호석을 깨우려면 올바른 발음으로 영어를 말해야 한다. 루디가 말한다: '이건 마법이 아니야... 진심이 담긴 말이 돌을 깨우는 거야.'",
         "en": "To awaken the Guardian Stone, you must speak English with true pronunciation. Rudy says: 'This isn't magic... it's heartfelt words that wake the stone.'",
-        "es": "Para despertar la Piedra Guardiana, debes hablar inglés con pronunciación verdadera. Rudy dice: 'Esto no es magia... son palabras sinceras las que despiertan la piedra.'"
+        "es": "Para despertar la Piedra Guardiana, debes hablar inglés con pronunciación verdadera. Rudy dice: 'Esto no es magia... son palabras sinceras las que despiertan la piedra.'",
+        "id": "Untuk membangunkan Batu Penjaga, kamu harus berbicara dengan pelafalan yang sungguh-sungguh. Rudy berkata: 'Ini bukan sihir... kata-kata yang tulus lah yang membangunkan batu itu.'"
       },
       "content": {
         "en": {
           "sentences": [
-            { "sentence": "How are you?", "translation": "어떻게 지내세요?", "stoneEffect": "glow", "stoneCount": 1, "visualEffect": "Blue pulse", "minScore": 60 },
-            { "sentence": "I'm fine, thank you.", "translation": "잘 지내요, 감사합니다.", "stoneEffect": "bright", "stoneCount": 2, "visualEffect": "Gold shimmer", "minScore": 65 },
-            { "sentence": "Nice to meet you.", "translation": "만나서 반갑습니다.", "stoneEffect": "blinding", "stoneCount": 3, "visualEffect": "Diamond burst", "minScore": 70 }
+            {
+              "sentence": "How are you?",
+              "translation": "어떻게 지내세요?",
+              "stoneEffect": "glow",
+              "stoneCount": 1,
+              "visualEffect": "Blue pulse",
+              "minScore": 60
+            },
+            {
+              "sentence": "I'm fine, thank you.",
+              "translation": "잘 지내요, 감사합니다.",
+              "stoneEffect": "bright",
+              "stoneCount": 2,
+              "visualEffect": "Gold shimmer",
+              "minScore": 65
+            },
+            {
+              "sentence": "Nice to meet you.",
+              "translation": "만나서 반갑습니다.",
+              "stoneEffect": "blinding",
+              "stoneCount": 3,
+              "visualEffect": "Diamond burst",
+              "minScore": 70
+            }
           ]
         },
         "es": {
           "sentences": [
-            { "sentence": "How are you?", "translation": "¿Cómo estás?", "stoneEffect": "glow", "stoneCount": 1, "visualEffect": "Blue pulse", "minScore": 60 },
-            { "sentence": "I'm fine, thank you.", "translation": "Estoy bien, gracias.", "stoneEffect": "bright", "stoneCount": 2, "visualEffect": "Gold shimmer", "minScore": 65 },
-            { "sentence": "Nice to meet you.", "translation": "Mucho gusto.", "stoneEffect": "blinding", "stoneCount": 3, "visualEffect": "Diamond burst", "minScore": 70 }
+            {
+              "sentence": "How are you?",
+              "translation": "¿Cómo estás?",
+              "stoneEffect": "glow",
+              "stoneCount": 1,
+              "visualEffect": "Blue pulse",
+              "minScore": 60
+            },
+            {
+              "sentence": "I'm fine, thank you.",
+              "translation": "Estoy bien, gracias.",
+              "stoneEffect": "bright",
+              "stoneCount": 2,
+              "visualEffect": "Gold shimmer",
+              "minScore": 65
+            },
+            {
+              "sentence": "Nice to meet you.",
+              "translation": "Mucho gusto.",
+              "stoneEffect": "blinding",
+              "stoneCount": 3,
+              "visualEffect": "Diamond burst",
+              "minScore": 70
+            }
           ]
         },
         "ko": {
           "sentences": [
-            { "sentence": "How are you?", "translation": "어떻게 지내세요?", "stoneEffect": "glow", "stoneCount": 1, "visualEffect": "Blue pulse", "minScore": 60 },
-            { "sentence": "I'm fine, thank you.", "translation": "잘 지내요, 감사합니다.", "stoneEffect": "bright", "stoneCount": 2, "visualEffect": "Gold shimmer", "minScore": 65 },
-            { "sentence": "Nice to meet you.", "translation": "만나서 반갑습니다.", "stoneEffect": "blinding", "stoneCount": 3, "visualEffect": "Diamond burst", "minScore": 70 }
+            {
+              "sentence": "How are you?",
+              "translation": "어떻게 지내세요?",
+              "stoneEffect": "glow",
+              "stoneCount": 1,
+              "visualEffect": "Blue pulse",
+              "minScore": 60
+            },
+            {
+              "sentence": "I'm fine, thank you.",
+              "translation": "잘 지내요, 감사합니다.",
+              "stoneEffect": "bright",
+              "stoneCount": 2,
+              "visualEffect": "Gold shimmer",
+              "minScore": 65
+            },
+            {
+              "sentence": "Nice to meet you.",
+              "translation": "만나서 반갑습니다.",
+              "stoneEffect": "blinding",
+              "stoneCount": 3,
+              "visualEffect": "Diamond burst",
+              "minScore": 70
+            }
+          ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "sentence": "Apa kabar?",
+              "translation": "How are you?",
+              "stoneEffect": "glow",
+              "stoneCount": 1,
+              "visualEffect": "Blue pulse",
+              "minScore": 60
+            },
+            {
+              "sentence": "Saya baik, terima kasih.",
+              "translation": "I'm fine, thank you.",
+              "stoneEffect": "bright",
+              "stoneCount": 2,
+              "visualEffect": "Gold shimmer",
+              "minScore": 65
+            },
+            {
+              "sentence": "Senang bertemu denganmu.",
+              "translation": "Nice to meet you.",
+              "stoneEffect": "blinding",
+              "stoneCount": 3,
+              "visualEffect": "Diamond burst",
+              "minScore": 70
+            }
           ]
         }
       },
       "rewards": {
         "xp": 80,
-        "items": ["guardian_stone_shard"],
-        "npcRelation": { "npc": "sujin", "points": 10 },
+        "items": [
+          "guardian_stone_shard"
+        ],
+        "npcRelation": {
+          "npc": "sujin",
+          "points": 10
+        },
         "badge": null
       }
     },
-
     {
       "id": "ch4_quiz_debate",
       "chapter": "ch4",
@@ -5319,12 +5891,29 @@
       "timeLimit": null,
       "isBoss": false,
       "tprsStage": 4,
-      "targetExpressions": ["How much is this?", "That's too expensive", "Can you lower the price?"],
-      "previouslyLearned": ["Thank you", "Please", "Yes", "No", "Excuse me"],
+      "targetExpressions": [
+        "How much is this?",
+        "That's too expensive",
+        "Can you lower the price?"
+      ],
+      "previouslyLearned": [
+        "Thank you",
+        "Please",
+        "Yes",
+        "No",
+        "Excuse me"
+      ],
       "speakAfter": true,
       "storyReason": "하산이 수호석의 위치를 알려주는 대가로 흥정 실력을 증명하라고 요구한다",
       "storyConsequence": "하산이 감동하여 피라미드 비밀 통로의 지도를 준다",
-      "onFail": { "addToWeakExpressions": ["How much is this?", "Can you lower the price?"], "reviewInDailyCourse": true, "reviewDays": 3 },
+      "onFail": {
+        "addToWeakExpressions": [
+          "How much is this?",
+          "Can you lower the price?"
+        ],
+        "reviewInDailyCourse": true,
+        "reviewDays": 3
+      },
       "storyContext": {
         "ko": "하산이 말한다: '네가 진정한 협상가인지 증명해봐. 내 주장을 논리적으로 반박해야 해. 아랍어로 하면 가산점이야.'",
         "en": "Hassan says: 'Prove you're a real negotiator. Counter my arguments logically. Arabic earns bonus points.'",
@@ -5337,19 +5926,49 @@
           "minExpressions": 1,
           "roundData": [
             {
-              "topic": { "ko": "이 램프의 가격", "en": "Price of this lamp", "es": "Precio de esta lámpara" },
-              "npcArgument": { "ko": "이 램프는 300년 된 골동품이야. 500달러도 싸.", "en": "This lamp is a 300-year-old antique. $500 is a steal.", "es": "Esta lámpara es una antigüedad de 300 años. $500 es una ganga." },
-              "requiredExpressions": ["How much is this?"]
+              "topic": {
+                "ko": "이 램프의 가격",
+                "en": "Price of this lamp",
+                "es": "Precio de esta lámpara"
+              },
+              "npcArgument": {
+                "ko": "이 램프는 300년 된 골동품이야. 500달러도 싸.",
+                "en": "This lamp is a 300-year-old antique. $500 is a steal.",
+                "es": "Esta lámpara es una antigüedad de 300 años. $500 es una ganga."
+              },
+              "requiredExpressions": [
+                "How much is this?"
+              ]
             },
             {
-              "topic": { "ko": "유사한 램프 가격", "en": "Comparable lamp prices", "es": "Precios de lámparas comparables" },
-              "npcArgument": { "ko": "다른 가게에서 이런 품질 못 찾아. 내 것만이 진품이야.", "en": "You won't find this quality anywhere else. Mine is the only authentic one.", "es": "No encontrarás esta calidad en otro lugar. El mío es el único auténtico." },
-              "requiredExpressions": ["That's too expensive"]
+              "topic": {
+                "ko": "유사한 램프 가격",
+                "en": "Comparable lamp prices",
+                "es": "Precios de lámparas comparables"
+              },
+              "npcArgument": {
+                "ko": "다른 가게에서 이런 품질 못 찾아. 내 것만이 진품이야.",
+                "en": "You won't find this quality anywhere else. Mine is the only authentic one.",
+                "es": "No encontrarás esta calidad en otro lugar. El mío es el único auténtico."
+              },
+              "requiredExpressions": [
+                "That's too expensive"
+              ]
             },
             {
-              "topic": { "ko": "최종 가격 협상", "en": "Final price negotiation", "es": "Negociación de precio final" },
-              "npcArgument": { "ko": "좋아, 네 진심이 보여. 하지만 400달러 이하는 절대 안 돼.", "en": "OK, I see your sincerity. But below $400 is absolutely impossible.", "es": "OK, veo tu sinceridad. Pero menos de $400 es absolutamente imposible." },
-              "requiredExpressions": ["Can you lower the price?"]
+              "topic": {
+                "ko": "최종 가격 협상",
+                "en": "Final price negotiation",
+                "es": "Negociación de precio final"
+              },
+              "npcArgument": {
+                "ko": "좋아, 네 진심이 보여. 하지만 400달러 이하는 절대 안 돼.",
+                "en": "OK, I see your sincerity. But below $400 is absolutely impossible.",
+                "es": "OK, veo tu sinceridad. Pero menos de $400 es absolutamente imposible."
+              },
+              "requiredExpressions": [
+                "Can you lower the price?"
+              ]
             }
           ]
         },
@@ -5359,19 +5978,49 @@
           "minExpressions": 1,
           "roundData": [
             {
-              "topic": { "ko": "이 램프의 가격", "en": "Price of this lamp", "es": "Precio de esta lámpara" },
-              "npcArgument": { "ko": "이 램프는 300년 된 골동품이야.", "en": "This lamp is a 300-year-old antique.", "es": "Esta lámpara es una antigüedad de 300 años. $500 es una ganga." },
-              "requiredExpressions": ["How much is this?"]
+              "topic": {
+                "ko": "이 램프의 가격",
+                "en": "Price of this lamp",
+                "es": "Precio de esta lámpara"
+              },
+              "npcArgument": {
+                "ko": "이 램프는 300년 된 골동품이야.",
+                "en": "This lamp is a 300-year-old antique.",
+                "es": "Esta lámpara es una antigüedad de 300 años. $500 es una ganga."
+              },
+              "requiredExpressions": [
+                "How much is this?"
+              ]
             },
             {
-              "topic": { "ko": "유사한 램프 가격", "en": "Comparable prices", "es": "Precios comparables" },
-              "npcArgument": { "ko": "다른 가게에선 못 찾아.", "en": "You won't find this elsewhere.", "es": "No encontrarás esta calidad en otro lugar." },
-              "requiredExpressions": ["That's too expensive"]
+              "topic": {
+                "ko": "유사한 램프 가격",
+                "en": "Comparable prices",
+                "es": "Precios comparables"
+              },
+              "npcArgument": {
+                "ko": "다른 가게에선 못 찾아.",
+                "en": "You won't find this elsewhere.",
+                "es": "No encontrarás esta calidad en otro lugar."
+              },
+              "requiredExpressions": [
+                "That's too expensive"
+              ]
             },
             {
-              "topic": { "ko": "최종 협상", "en": "Final negotiation", "es": "Negociación final" },
-              "npcArgument": { "ko": "400달러 이하는 안 돼.", "en": "Below $400 is impossible.", "es": "Menos de $400 es imposible." },
-              "requiredExpressions": ["Can you lower the price?"]
+              "topic": {
+                "ko": "최종 협상",
+                "en": "Final negotiation",
+                "es": "Negociación final"
+              },
+              "npcArgument": {
+                "ko": "400달러 이하는 안 돼.",
+                "en": "Below $400 is impossible.",
+                "es": "Menos de $400 es imposible."
+              },
+              "requiredExpressions": [
+                "Can you lower the price?"
+              ]
             }
           ]
         },
@@ -5381,31 +6030,65 @@
           "minExpressions": 1,
           "roundData": [
             {
-              "topic": { "ko": "이 램프의 가격", "en": "Price of this lamp", "es": "Precio de esta lámpara" },
-              "npcArgument": { "ko": "이 램프는 300년 된 골동품이야. 500달러도 싸다고.", "en": "This lamp is a 300-year-old antique. $500 is a steal.", "es": "Esta lámpara es una antigüedad de 300 años." },
-              "requiredExpressions": ["How much is this?"]
+              "topic": {
+                "ko": "이 램프의 가격",
+                "en": "Price of this lamp",
+                "es": "Precio de esta lámpara"
+              },
+              "npcArgument": {
+                "ko": "이 램프는 300년 된 골동품이야. 500달러도 싸다고.",
+                "en": "This lamp is a 300-year-old antique. $500 is a steal.",
+                "es": "Esta lámpara es una antigüedad de 300 años."
+              },
+              "requiredExpressions": [
+                "How much is this?"
+              ]
             },
             {
-              "topic": { "ko": "유사한 램프 가격", "en": "Comparable prices", "es": "Precios comparables" },
-              "npcArgument": { "ko": "다른 가게에서 이런 품질 절대 못 찾아. 내 것만이 진품이야.", "en": "You won't find this quality elsewhere.", "es": "No encontrarás esta calidad." },
-              "requiredExpressions": ["That's too expensive"]
+              "topic": {
+                "ko": "유사한 램프 가격",
+                "en": "Comparable prices",
+                "es": "Precios comparables"
+              },
+              "npcArgument": {
+                "ko": "다른 가게에서 이런 품질 절대 못 찾아. 내 것만이 진품이야.",
+                "en": "You won't find this quality elsewhere.",
+                "es": "No encontrarás esta calidad."
+              },
+              "requiredExpressions": [
+                "That's too expensive"
+              ]
             },
             {
-              "topic": { "ko": "최종 가격 협상", "en": "Final negotiation", "es": "Negociación final" },
-              "npcArgument": { "ko": "좋아, 네 진심이 보여. 하지만 400달러 이하는 절대 안 된다.", "en": "Below $400 is impossible.", "es": "Menos de $400 es imposible." },
-              "requiredExpressions": ["Can you lower the price?"]
+              "topic": {
+                "ko": "최종 가격 협상",
+                "en": "Final negotiation",
+                "es": "Negociación final"
+              },
+              "npcArgument": {
+                "ko": "좋아, 네 진심이 보여. 하지만 400달러 이하는 절대 안 된다.",
+                "en": "Below $400 is impossible.",
+                "es": "Menos de $400 es imposible."
+              },
+              "requiredExpressions": [
+                "Can you lower the price?"
+              ]
             }
           ]
         }
       },
       "rewards": {
         "xp": 120,
-        "items": ["hassan_map"],
-        "npcRelation": { "npc": "hassan", "points": 15 },
+        "items": [
+          "hassan_map"
+        ],
+        "npcRelation": {
+          "npc": "hassan",
+          "points": 15
+        },
         "badge": null
       }
     },
-
     {
       "id": "ch2_quiz_npc_rescue",
       "chapter": "ch2",
@@ -5420,12 +6103,27 @@
       "timeLimit": null,
       "isBoss": false,
       "tprsStage": 2,
-      "targetExpressions": ["Help me please", "Where are you?", "Don't worry"],
-      "previouslyLearned": ["Hello", "Thank you", "Sorry"],
+      "targetExpressions": [
+        "Help me please",
+        "Where are you?",
+        "Don't worry"
+      ],
+      "previouslyLearned": [
+        "Hello",
+        "Thank you",
+        "Sorry"
+      ],
       "speakAfter": true,
       "storyReason": "카를로스가 렉시콘에 납치되어 영어로 구조 신호를 보내야 한다",
       "storyConsequence": "카를로스가 구출되어 렉시콘의 언어 소거 장치 정보를 알려준다",
-      "onFail": { "addToWeakExpressions": ["Help me please", "Where are you?"], "reviewInDailyCourse": true, "reviewDays": 3 },
+      "onFail": {
+        "addToWeakExpressions": [
+          "Help me please",
+          "Where are you?"
+        ],
+        "reviewInDailyCourse": true,
+        "reviewDays": 3
+      },
       "storyContext": {
         "ko": "카를로스가 어딘가에 갇혀 있다. 이사벨이 위치 단서를 찾았지만, 구조 신호를 영어로 정확하게 말해야 카를로스가 반응할 수 있다.",
         "en": "Carlos is trapped somewhere. Isabel found location clues, but you must speak the rescue phrases in clear English for Carlos to respond.",
@@ -5436,15 +6134,31 @@
           "npcToRescue": "Carlos",
           "stages": [
             {
-              "instruction": { "ko": "카를로스에게 도움을 요청하세요", "en": "Call for help to Carlos", "es": "Pide ayuda a Carlos" },
+              "instruction": {
+                "ko": "카를로스에게 도움을 요청하세요",
+                "en": "Call for help to Carlos",
+                "es": "Pide ayuda a Carlos"
+              },
               "targetPhrase": "Help me please",
-              "hint": { "ko": "'Help'으로 시작하세요", "en": "Start with 'Help'", "es": "Empieza con 'Help'" },
+              "hint": {
+                "ko": "'Help'으로 시작하세요",
+                "en": "Start with 'Help'",
+                "es": "Empieza con 'Help'"
+              },
               "minScore": 55
             },
             {
-              "instruction": { "ko": "카를로스의 위치를 물어보세요", "en": "Ask Carlos where he is", "es": "Pregunta a Carlos dónde está" },
+              "instruction": {
+                "ko": "카를로스의 위치를 물어보세요",
+                "en": "Ask Carlos where he is",
+                "es": "Pregunta a Carlos dónde está"
+              },
               "targetPhrase": "Where are you?",
-              "hint": { "ko": "의문사 'Where'를 사용하세요", "en": "Use the question word 'Where'", "es": "Usa la palabra interrogativa 'Where'" },
+              "hint": {
+                "ko": "의문사 'Where'를 사용하세요",
+                "en": "Use the question word 'Where'",
+                "es": "Usa la palabra interrogativa 'Where'"
+              },
               "minScore": 55
             }
           ],
@@ -5454,15 +6168,31 @@
           "npcToRescue": "Carlos",
           "stages": [
             {
-              "instruction": { "ko": "카를로스에게 도움을 요청하세요", "en": "Call for help", "es": "Pide ayuda a Carlos" },
+              "instruction": {
+                "ko": "카를로스에게 도움을 요청하세요",
+                "en": "Call for help",
+                "es": "Pide ayuda a Carlos"
+              },
               "targetPhrase": "Help me please",
-              "hint": { "ko": "'Help'으로 시작", "en": "Start with 'Help'", "es": "Empieza con 'Help'" },
+              "hint": {
+                "ko": "'Help'으로 시작",
+                "en": "Start with 'Help'",
+                "es": "Empieza con 'Help'"
+              },
               "minScore": 55
             },
             {
-              "instruction": { "ko": "카를로스의 위치를 물어보세요", "en": "Ask where he is", "es": "Pregunta dónde está" },
+              "instruction": {
+                "ko": "카를로스의 위치를 물어보세요",
+                "en": "Ask where he is",
+                "es": "Pregunta dónde está"
+              },
               "targetPhrase": "Where are you?",
-              "hint": { "ko": "'Where' 사용", "en": "Use 'Where'", "es": "Usa 'Where'" },
+              "hint": {
+                "ko": "'Where' 사용",
+                "en": "Use 'Where'",
+                "es": "Usa 'Where'"
+              },
               "minScore": 55
             }
           ],
@@ -5472,15 +6202,31 @@
           "npcToRescue": "Carlos",
           "stages": [
             {
-              "instruction": { "ko": "카를로스에게 도움을 요청하세요", "en": "Call for help", "es": "Pide ayuda" },
+              "instruction": {
+                "ko": "카를로스에게 도움을 요청하세요",
+                "en": "Call for help",
+                "es": "Pide ayuda"
+              },
               "targetPhrase": "Help me please",
-              "hint": { "ko": "'Help'으로 시작하세요", "en": "Start with 'Help'", "es": "Empieza con 'Help'" },
+              "hint": {
+                "ko": "'Help'으로 시작하세요",
+                "en": "Start with 'Help'",
+                "es": "Empieza con 'Help'"
+              },
               "minScore": 55
             },
             {
-              "instruction": { "ko": "카를로스의 위치를 물어보세요", "en": "Ask where he is", "es": "Pregunta dónde está" },
+              "instruction": {
+                "ko": "카를로스의 위치를 물어보세요",
+                "en": "Ask where he is",
+                "es": "Pregunta dónde está"
+              },
               "targetPhrase": "Where are you?",
-              "hint": { "ko": "의문사 'Where'를 사용하세요", "en": "Use 'Where'", "es": "Usa 'Where'" },
+              "hint": {
+                "ko": "의문사 'Where'를 사용하세요",
+                "en": "Use 'Where'",
+                "es": "Usa 'Where'"
+              },
               "minScore": 55
             }
           ],
@@ -5490,7 +6236,10 @@
       "rewards": {
         "xp": 80,
         "items": [],
-        "npcRelation": { "npc": "isabel", "points": 10 },
+        "npcRelation": {
+          "npc": "isabel",
+          "points": 10
+        },
         "badge": null
       }
     }

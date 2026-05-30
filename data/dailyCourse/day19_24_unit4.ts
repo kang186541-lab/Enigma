@@ -888,12 +888,14 @@ export const MISSION_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKe
     english: { situation: { ko: "카이로에서 루디 탐정의 장비가 모두 없어졌어요. 맨몸으로 현지인에게 물어서 기차역을 찾아야 합니다!", en: "In Cairo, Detective Rudy's equipment is gone. He must ask locals directly to find the train station and escape!", es: "En El Cairo, el equipo del detective Rudy desapareció. ¡Debe preguntar a los lugareños para encontrar la estación de tren y escapar!" }, gptPrompt: "You are a friendly local in Cairo. Detective Rudy (the user) has lost all his equipment and must ask locals for help to reach the train station. Detective/mystery framing throughout. Simple A1 {targetLang}. They need to find the train station. Practice: saying they're lost, asking for map help, asking which way, confirming directions. Be very patient and encouraging. This is the hardest Mission Talk yet — the user must combine everything from Unit 4.", speechLang: "en-GB", suggestedAnswers: ["Excuse me, I'm lost.", "Can you show me on the map?", "I don't know this area.", "Which way is the station?", "Is this the right way?", "Thank you so much!"] },
     spanish: { situation: { ko: "카이로에서 탐정 루디의 장비가 없어졌어요. 도움을 요청하세요!", en: "Cairo — Detective Rudy's equipment is gone. Ask locals for help!", es: "El Cairo — El equipo del detective Rudy desapareció. ¡Pide ayuda a los lugareños!" }, gptPrompt: "You are a friendly local in Cairo. Detective Rudy (the user) has lost all equipment and must reach the train station. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: being lost, map, which way, confirming. Be patient.", speechLang: "es-ES", suggestedAnswers: ["Perdone, estoy perdido.", "¿Me puede señalar en el mapa?", "No conozco esta zona.", "¿Por dónde está la estación?", "¿Voy bien?", "¡Muchas gracias!"] },
     korean: { situation: { ko: "카이로에서 탐정 루디의 장비가 모두 없어졌어요. 현지인에게 물어서 기차역을 찾아야 해요!", en: "Cairo — Detective Rudy has no equipment! Ask locals to find the station!", es: "¡El Cairo — Sin equipo! ¡Pregunta para encontrar la estación!" }, gptPrompt: "You are a friendly local in Cairo. Detective Rudy (the user) has lost all equipment and must reach 기차역. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: 길을 잃었어요, 지도, 어느 쪽, confirming. Be patient.", speechLang: "ko-KR", suggestedAnswers: ["실례합니다, 길을 잃었어요.", "지도에서 보여주실 수 있나요?", "이 동네를 잘 몰라요.", "기차역이 어느 쪽인가요?", "이 길이 맞나요?", "정말 감사합니다!"] },
+    indonesian: { situation: { ko: "카이로에서 탐정 루디의 장비가 모두 없어졌어요. 현지인에게 물어서 기차역을 찾아야 해요!", en: "Cairo — Detective Rudy has no equipment! Ask locals to find the station!", es: "¡El Cairo — Sin equipo! ¡Pregunta para encontrar la estación!" }, gptPrompt: "You are a friendly local in Cairo. Detective Rudy (the user) has lost all his equipment and must reach the train station ('stasiun kereta'). Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: saying they're lost ('Permisi, saya tersesat'), asking for map help ('Bisakah Anda tunjukkan di peta?'), asking which way ('Ke arah mana ___?'), and confirming directions ('Apakah ini jalan yang benar?'). Be very patient and encouraging. This is the hardest Mission Talk yet — the user must combine everything from Unit 4.", speechLang: "id-ID", suggestedAnswers: ["Permisi, saya tersesat.", "Bisakah Anda tunjukkan di peta?", "Saya tidak tahu daerah ini.", "Ke arah mana stasiunnya?", "Apakah ini jalan yang benar?", "Terima kasih banyak!"] },
   },
 
   day_24: {
     english: { situation: { ko: "루디 탐정의 최종 추적! 공항에서 블랙 씨의 마지막 은신처까지 Unit 4 모든 어휘를 사용해서 이동하세요!", en: "Detective Rudy's final chase! Navigate from the airport to Mr. Black's last hideout using ALL Unit 4 vocabulary!", es: "¡La persecución final del detective Rudy! Navega del aeropuerto al último escondite del Sr. Black con TODO el vocabulario de la Unidad 4." }, gptPrompt: "You are Detective Rudy's handler coordinating the final mission to catch Mr. Black. The user must navigate from the airport to Mr. Black's last hideout. Detective/mystery framing throughout. Test ALL Unit 4 in natural A1 {targetLang}: 1) get a taxi at the airport 2) ask for directions when the taxi drops them off 3) navigate on foot using directions 4) ask locals when lost 5) find the subway and take the right exit. Create a multi-step navigation scenario. Mix in vocabulary from Units 1-3 naturally. Be urgent but encouraging.", speechLang: "en-GB", suggestedAnswers: ["Can I get a taxi?", "Where is the subway?", "Turn left?", "I'm lost!", "One ticket, please.", "Is this the right way?", "Thank you, goodbye!"] },
     spanish: { situation: { ko: "탐정 루디의 최종 추적! 공항에서 블랙 씨의 마지막 은신처까지!", en: "Detective Rudy's final chase! Airport to Mr. Black's last hideout!", es: "¡La persecución final! Del aeropuerto al último escondite del Sr. Black." }, gptPrompt: "You are Detective Rudy's handler. The final mission: navigate from the airport to Mr. Black's last hideout. Detective/mystery framing throughout. Test ALL Unit 4 in A1 {targetLang}: taxi, directions, on foot, lost, subway. Mix Units 1-3. Urgent but encouraging.", speechLang: "es-ES", suggestedAnswers: ["¿Un taxi, por favor?", "¿Dónde está el metro?", "¿Giro a la izquierda?", "¡Estoy perdido!", "Un billete, por favor.", "¿Voy bien?", "¡Gracias, adiós!"] },
     korean: { situation: { ko: "탐정 루디의 최종 추격! 공항에서 블랙 씨의 마지막 은신처까지 이동하세요!", en: "Detective Rudy's final chase! Airport to Mr. Black's last hideout!", es: "¡Persecución final! Del aeropuerto al último refugio del Sr. Black." }, gptPrompt: "You are Detective Rudy's handler. The final mission: navigate from the airport to Mr. Black's last hideout. Detective/mystery framing throughout. Test ALL Unit 4 in A1 {targetLang}: 택시, directions, on foot, lost, 지하철. Mix Units 1-3. Urgent but encouraging.", speechLang: "ko-KR", suggestedAnswers: ["택시 불러주세요.", "지하철 어디예요?", "왼쪽으로요?", "길을 잃었어요!", "표 한 장 주세요.", "이 길이 맞나요?", "감사합니다, 안녕히 계세요!"] },
+    indonesian: { situation: { ko: "탐정 루디의 최종 추격! 공항에서 블랙 씨의 마지막 은신처까지 이동하세요!", en: "Detective Rudy's final chase! Airport to Mr. Black's last hideout!", es: "¡Persecución final! Del aeropuerto al último refugio del Sr. Black." }, gptPrompt: "You are Detective Rudy's handler coordinating the final mission to catch Mr. Black. The user must navigate from the airport to Mr. Black's last hideout. Detective/mystery framing throughout. Test ALL Unit 4 in natural A1 {targetLang}: 1) get a taxi at the airport ('Bisakah saya memesan taksi?') 2) ask for directions when the taxi drops them off 3) navigate on foot ('Belok kiri/kanan', 'Jalan lurus terus') 4) ask locals when lost ('Permisi, saya tersesat') 5) find the subway and take the right exit ('pintu keluar'). Create a multi-step navigation scenario. Mix in vocabulary from Units 1-3 naturally. Be urgent but encouraging.", speechLang: "id-ID", suggestedAnswers: ["Bisakah saya memesan taksi?", "Di mana stasiunnya?", "Belok kiri?", "Saya tersesat!", "Satu tiket, tolong.", "Apakah ini jalan yang benar?", "Terima kasih, sampai jumpa!"] },
   },
 };
 
@@ -925,6 +927,13 @@ export const REVIEW_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "___에 약국이 있나요?", answer: "근처", options: ["근처", "안", "위"], fullSentence: "근처에 약국이 있나요?", fullSentenceMeaning: { ko: "근처에 약국?", en: "Pharmacy nearby?", es: "¿Farmacia cerca?" } },
       { type: "speak", sentence: "걸어서 5분 정도예요.", speechLang: "ko-KR", meaning: { ko: "걸어서 5분.", en: "Five minutes on foot.", es: "Cinco minutos a pie." } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Saya merekomendasikan steaknya. Ini enak sekali!", speechLang: "id-ID", meaning: { ko: "스테이크 추천. 맛있어요!", en: "I recommend the steak. Delicious!", es: "Recomiendo el bistec. ¡Delicioso!" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Bisakah saya bayar dengan ___?", answer: "kartu", options: ["kartu", "tunai", "cek"], fullSentence: "Bisakah saya bayar dengan kartu?", fullSentenceMeaning: { ko: "카드로 결제?", en: "Pay by card?", es: "¿Con tarjeta?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Di mana stasiun kereta bawah tanah?", speechLang: "id-ID", meaning: { ko: "지하철역이 어디?", en: "Where is the subway?", es: "¿Dónde está el metro?" } },
+      { type: "fill_blank", promptWithBlank: "Apakah ada apotek di ___ sini?", answer: "dekat", options: ["dekat", "sana", "jauh"], fullSentence: "Apakah ada apotek di dekat sini?", fullSentenceMeaning: { ko: "근처에 약국?", en: "Pharmacy nearby?", es: "¿Farmacia cerca?" } },
+      { type: "speak", sentence: "Sekitar lima menit jalan kaki.", speechLang: "id-ID", meaning: { ko: "걸어서 5분.", en: "Five minutes on foot.", es: "Cinco minutos a pie." } },
+    ],
   },
 
   day_20: {
@@ -948,6 +957,13 @@ export const REVIEW_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "왼쪽으로 돌아서 직진하세요.", speechLang: "ko-KR", meaning: { ko: "왼쪽으로 돌아서 직진.", en: "Turn left, go straight.", es: "Izquierda y recto." } },
       { type: "fill_blank", promptWithBlank: "오른쪽에 ___요.", answer: "있어", options: ["있어", "없어", "가"], fullSentence: "오른쪽에 있어요.", fullSentenceMeaning: { ko: "오른쪽에 있어요.", en: "On the right.", es: "A la derecha." } },
       { type: "speak", sentence: "오른쪽 첫 번째 길로 가세요.", speechLang: "ko-KR", meaning: { ko: "오른쪽 첫 번째 길.", en: "First street right.", es: "Primera calle derecha." } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Di mana stasiunnya? Dekat museum.", speechLang: "id-ID", meaning: { ko: "지하철역? 박물관 근처.", en: "Subway? Near the museum.", es: "¿Metro? Cerca del museo." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Berapa ___ dari sini?", answer: "jauh", options: ["jauh", "lama", "harga"], fullSentence: "Berapa jauh dari sini?", fullSentenceMeaning: { ko: "얼마나 멀어요?", en: "How far?", es: "¿A qué distancia?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Belok kiri dan jalan lurus terus.", speechLang: "id-ID", meaning: { ko: "왼쪽으로 돌아서 직진.", en: "Turn left, go straight.", es: "Izquierda y recto." } },
+      { type: "fill_blank", promptWithBlank: "Ada di sebelah ___ Anda.", answer: "kanan", options: ["kanan", "atas", "belakang"], fullSentence: "Ada di sebelah kanan Anda.", fullSentenceMeaning: { ko: "오른쪽에 있어요.", en: "On the right.", es: "A la derecha." } },
+      { type: "speak", sentence: "Ambil jalan pertama di sebelah kanan.", speechLang: "id-ID", meaning: { ko: "오른쪽 첫 번째 길.", en: "First street right.", es: "Primera calle derecha." } },
     ],
   },
 
@@ -979,6 +995,15 @@ export const REVIEW_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "영어 할 줄 아세요?", speechLang: "ko-KR", meaning: { ko: "영어 할 줄 아세요?", en: "Do you speak English?", es: "¿Habla inglés?" }, isYesterdayReview: true },
       { type: "speak", sentence: "도와주세요! 제발 도와주세요.", speechLang: "ko-KR", meaning: { ko: "도와주세요! 제발 도와주세요.", en: "Help! Please help me.", es: "¡Ayuda! Por favor, ayúdeme." }, isYesterdayReview: true },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Belok kiri dan jalan lurus terus. Ada di sebelah kanan.", speechLang: "id-ID", meaning: { ko: "왼쪽, 직진, 오른쪽.", en: "Left, straight, right.", es: "Izquierda, recto, derecha." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Belok ___.", answer: "kanan", options: ["kanan", "atas", "bawah"], fullSentence: "Belok kanan.", fullSentenceMeaning: { ko: "오른쪽으로.", en: "Turn right.", es: "Gira a la derecha." }, isYesterdayReview: true },
+      { type: "speak", sentence: "Seberangi jembatan dan tempatnya di sebelah minimarket.", speechLang: "id-ID", meaning: { ko: "다리 건너면 가게 옆.", en: "Cross bridge, next to store.", es: "Cruza, al lado de la tienda." } },
+      { type: "fill_blank", promptWithBlank: "Anda sudah melewatinya — ___ lagi.", answer: "kembali", options: ["kembali", "maju", "naik"], fullSentence: "Anda sudah melewatinya — kembali lagi.", fullSentenceMeaning: { ko: "지나쳤어요 — 돌아가세요.", en: "Passed it, go back.", es: "Lo pasaste, vuelve." } },
+      { type: "speak", sentence: "Keluar dari pintu keluar tiga di stasiun.", speechLang: "id-ID", meaning: { ko: "지하철 3번 출구로.", en: "Take exit 3.", es: "Salida 3 del metro." } },
+      { type: "speak", sentence: "Apakah kamu bisa bahasa Inggris?", speechLang: "id-ID", meaning: { ko: "영어 할 줄 아세요?", en: "Do you speak English?", es: "¿Habla inglés?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Tolong! Tolong bantu saya.", speechLang: "id-ID", meaning: { ko: "도와주세요! 제발 도와주세요.", en: "Help! Please help me.", es: "¡Ayuda! Por favor, ayúdeme." }, isYesterdayReview: true },
+    ],
   },
 
   day_22: {
@@ -1002,6 +1027,13 @@ export const REVIEW_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "택시 불러주세요. 공항으로 가주세요.", speechLang: "ko-KR", meaning: { ko: "택시요. 공항으로.", en: "Taxi. To the airport.", es: "Taxi. Al aeropuerto." } },
       { type: "fill_blank", promptWithBlank: "시내___지 얼마예요?", answer: "까", options: ["까", "에", "로"], fullSentence: "시내까지 얼마예요?", fullSentenceMeaning: { ko: "시내까지 얼마?", en: "How much to city?", es: "¿Cuánto al centro?" } },
       { type: "speak", sentence: "서울역 표 한 장 주세요.", speechLang: "ko-KR", meaning: { ko: "서울역 표 한 장.", en: "One ticket to Seoul Station.", es: "Billete a Seúl." } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Seberangi jembatan. Tempatnya di sebelah minimarket.", speechLang: "id-ID", meaning: { ko: "다리 건너서 가게 옆.", en: "Cross bridge, next to store.", es: "Cruza, al lado de la tienda." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Di persimpangan, belok ___.", answer: "kanan", options: ["kanan", "atas", "belakang"], fullSentence: "Di persimpangan, belok kanan.", fullSentenceMeaning: { ko: "교차로에서 오른쪽.", en: "Turn right at intersection.", es: "En el cruce, derecha." }, isYesterdayReview: true },
+      { type: "speak", sentence: "Bisakah saya memesan taksi? Ke bandara, tolong.", speechLang: "id-ID", meaning: { ko: "택시? 공항으로.", en: "Taxi? To the airport.", es: "¿Taxi? Al aeropuerto." } },
+      { type: "fill_blank", promptWithBlank: "Berapa ___ ke pusat kota?", answer: "ongkos", options: ["ongkos", "jauh", "lama"], fullSentence: "Berapa ongkos ke pusat kota?", fullSentenceMeaning: { ko: "시내까지 얼마?", en: "How much to city?", es: "¿Cuánto al centro?" } },
+      { type: "speak", sentence: "Satu tiket ke Stasiun Seoul, tolong.", speechLang: "id-ID", meaning: { ko: "서울역 표 한 장.", en: "One ticket to Seoul Station.", es: "Billete a Seúl." } },
     ],
   },
 
@@ -1027,6 +1059,13 @@ export const REVIEW_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "이 동네를 잘 ___요.", answer: "몰라", options: ["몰라", "알아", "좋아"], fullSentence: "이 동네를 잘 몰라요.", fullSentenceMeaning: { ko: "이 동네 몰라요.", en: "Don't know this area.", es: "No conozco." } },
       { type: "speak", sentence: "박물관 가는 길이 맞나요?", speechLang: "ko-KR", meaning: { ko: "박물관 길 맞나요?", en: "Right way?", es: "¿Voy bien?" } },
     ],
+    indonesian: [
+      { type: "speak", sentence: "Bisakah saya memesan taksi? Ke bandara, tolong.", speechLang: "id-ID", meaning: { ko: "택시? 공항.", en: "Taxi? Airport.", es: "¿Taxi? Aeropuerto." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Apakah bus ini ___ museum?", answer: "ke", options: ["ke", "di", "dari"], fullSentence: "Apakah bus ini ke museum?", fullSentenceMeaning: { ko: "이 버스 박물관 가나요?", en: "Does this bus go?", es: "¿Va al museo?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Permisi, saya tersesat. Bisakah Anda tunjukkan di peta?", speechLang: "id-ID", meaning: { ko: "길을 잃었어요. 지도 보여주세요.", en: "Lost. Show me on the map?", es: "Perdido. ¿El mapa?" } },
+      { type: "fill_blank", promptWithBlank: "Saya tidak ___ daerah ini.", answer: "tahu", options: ["tahu", "mau", "bisa"], fullSentence: "Saya tidak tahu daerah ini.", fullSentenceMeaning: { ko: "이 동네 몰라요.", en: "Don't know this area.", es: "No conozco esta zona." } },
+      { type: "speak", sentence: "Apakah ini jalan yang benar ke museum?", speechLang: "id-ID", meaning: { ko: "박물관 길 맞나요?", en: "Right way?", es: "¿Voy bien?" } },
+    ],
   },
 
   day_24: {
@@ -1050,6 +1089,13 @@ export const REVIEW_CONTENT_UNIT4: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "지하철 어디예요? 왼쪽으로 돌아서 직진.", speechLang: "ko-KR", meaning: { ko: "지하철? 왼쪽 직진.", en: "Subway? Left, straight.", es: "¿Metro? Izquierda, recto." } },
       { type: "speak", sentence: "공항행 표 한 장. 얼마예요?", speechLang: "ko-KR", meaning: { ko: "공항 표. 얼마?", en: "Airport ticket. How much?", es: "Billete. ¿Cuánto?" } },
       { type: "speak", sentence: "다리 건너면 오른쪽에 있어요. 감사합니다!", speechLang: "ko-KR", meaning: { ko: "다리 건너면 오른쪽. 감사!", en: "Cross bridge, right. Thanks!", es: "Cruza, derecha. ¡Gracias!" } },
+    ],
+    indonesian: [
+      { type: "speak", sentence: "Permisi, saya tersesat. Ke arah mana stasiunnya?", speechLang: "id-ID", meaning: { ko: "길 잃었어요. 역 어디?", en: "Lost. Station?", es: "Perdido. ¿Estación?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "Bisakah Anda ___ di peta?", answer: "tunjukkan", options: ["tunjukkan", "katakan", "berikan"], fullSentence: "Bisakah Anda tunjukkan di peta?", fullSentenceMeaning: { ko: "지도에서 보여주세요.", en: "Show on map?", es: "¿Señalar?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "Di mana stasiun? Belok kiri dan jalan lurus terus.", speechLang: "id-ID", meaning: { ko: "지하철? 왼쪽 직진.", en: "Subway? Left, straight.", es: "¿Metro? Izquierda, recto." } },
+      { type: "speak", sentence: "Satu tiket ke bandara. Berapa?", speechLang: "id-ID", meaning: { ko: "공항 표. 얼마?", en: "Airport ticket. How much?", es: "Billete. ¿Cuánto?" } },
+      { type: "speak", sentence: "Seberangi jembatan dan ada di sebelah kanan. Terima kasih!", speechLang: "id-ID", meaning: { ko: "다리 건너면 오른쪽. 감사!", en: "Cross bridge, right. Thanks!", es: "Cruza, derecha. ¡Gracias!" } },
     ],
   },
 };

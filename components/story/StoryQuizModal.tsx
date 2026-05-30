@@ -1514,7 +1514,7 @@ const STONE_COLORS: Record<StoneEffect, string> = {
   bright: "#F59E0B",
   blinding: "#E879F9",
 };
-const STONE_LABELS: Record<StoneEffect, { ko: string; en: string; es: string }> = {
+const STONE_LABELS: Record<StoneEffect, { ko: string; en: string; es: string; id?: string }> = {
   dim: { ko: "희미함", en: "Dim", es: "Tenue" },
   glow: { ko: "빛남", en: "Glow", es: "Brillo" },
   bright: { ko: "밝음", en: "Bright", es: "Brillante" },

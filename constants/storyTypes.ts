@@ -1,6 +1,11 @@
-export type LangCode = "ko" | "en" | "es";
+export type LangCode = "ko" | "en" | "es" | "id";
 
-export type LocalizedText = Record<LangCode, string>;
+/**
+ * Localized text. `ko`/`en`/`es` are the original required locales; `id`
+ * (Indonesian) is optional so existing ko/en/es-only data stays valid and
+ * partial Indonesian rollout is safe (consumers fall back to `en`).
+ */
+export type LocalizedText = { ko: string; en: string; es: string; id?: string };
 
 export interface StoryNpc {
   id: string;
@@ -182,7 +187,8 @@ export interface BaseQuiz extends TprsQuizMeta {
   useAzureTTS?: boolean;
   gptPrompt?: string;
   rewards: QuizRewards;
-  content: Record<LangCode, unknown>;
+  // `id` (Indonesian) content is optional — loader falls back to `en`.
+  content: { ko: unknown; en: unknown; es: unknown; id?: unknown };
 }
 
 export interface LoadedQuiz extends Omit<BaseQuiz, "title" | "storyContext" | "content"> {

@@ -1,7 +1,7 @@
 import type { NativeLanguage } from "@/context/LanguageContext";
 import type {
   LangCode, LocalizedText, LoadedQuiz, StoryChapter, StoryScene,
-  StoryDialogue, UiTextSet, NpcRelationLevel, TtsVoiceMap,
+  StoryDialogue, UiTextSet, NpcRelationLevel,
   ChapterProgress, StoryProgress, NpcRelationState,
   ChapterGauge, GaugeGrade, StoryClue,
 } from "@/constants/storyTypes";
@@ -10,12 +10,13 @@ import { queueProgressPush } from "@/lib/progressSync";
 import storyData from "@/data/storyData.json";
 import quizData from "@/data/quizData.json";
 
-/** Map the app's long language name → 2-letter code used in storyData */
+/** Map the app's long language name → 2-letter code used in storyData/quizData */
 export function toLangCode(lang: NativeLanguage | null | undefined): LangCode {
   switch (lang) {
-    case "korean":  return "ko";
-    case "spanish": return "es";
-    default:        return "en";
+    case "korean":     return "ko";
+    case "spanish":    return "es";
+    case "indonesian": return "id";
+    default:           return "en";
   }
 }
 
@@ -24,6 +25,7 @@ export function fromLangCode(code: LangCode): NativeLanguage {
   switch (code) {
     case "ko": return "korean";
     case "es": return "spanish";
+    case "id": return "indonesian";
     default:   return "english";
   }
 }
@@ -36,7 +38,9 @@ export function pick(text: LocalizedText | undefined, lang: LangCode): string {
 
 /** Get UI text strings for the given native language */
 export function getUiText(nativeLang: LangCode): UiTextSet {
-  return (storyData.uiText as Record<LangCode, UiTextSet>)[nativeLang] ?? storyData.uiText["en"];
+  // storyData.uiText only carries ko/en/es; index by string and fall back to
+  // English for any code without its own UI strings (e.g. "id").
+  return (storyData.uiText as Record<string, UiTextSet>)[nativeLang] ?? storyData.uiText["en"];
 }
 
 /** Get all chapters from storyData */
@@ -71,7 +75,10 @@ export function loadQuiz(
     ...quiz,
     storyContext: pick(quiz.storyContext as LocalizedText, nativeLang),
     title: pick(quiz.title as LocalizedText, nativeLang),
-    content: quiz.content?.[targetLang] ?? {},
+    // Fall back to English content when the target block is missing (e.g. a
+    // quiz that doesn't yet have an `id`/Indonesian block) so partial
+    // translation coverage is always safe.
+    content: quiz.content?.[targetLang] ?? quiz.content?.["en"] ?? {},
     nativeLang,
     targetLang,
   };
@@ -101,7 +108,9 @@ export function loadChapterQuizzes(
     ...quiz,
     storyContext: pick(quiz.storyContext as LocalizedText, nativeLang),
     title: pick(quiz.title as LocalizedText, nativeLang),
-    content: quiz.content?.[targetLang] ?? {},
+    // English fallback keeps quizzes without an `id` block playable for an
+    // Indonesian learning target.
+    content: quiz.content?.[targetLang] ?? quiz.content?.["en"] ?? {},
     nativeLang,
     targetLang,
   }));
@@ -163,7 +172,9 @@ export function getNextRelationLevel(points: number): NpcRelationLevel | null {
 
 /** Get TTS voice for a language and gender */
 export function getTtsVoice(lang: LangCode, gender: "default" | "male" = "default"): string {
-  const map = quizData.ttsVoiceMap as TtsVoiceMap;
+  // ttsVoiceMap only carries ko/en/es voices; codes without a dedicated voice
+  // (e.g. "id") fall back to the English default.
+  const map = quizData.ttsVoiceMap as Record<string, { default: string; male: string }>;
   return map[lang]?.[gender] ?? map["en"].default;
 }
 
