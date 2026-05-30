@@ -40,11 +40,9 @@ import { loadSpeakMissionHandoff, type SpeakMissionHandoff } from "@/lib/speakMi
 import { buildAcquisitionSession } from "@/lib/acquisitionSession";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import {
-  getDailySpeakingMissionPhrase as getSharedDailySpeakingMissionPhrase,
   getProgressiveMissionPhrase,
   getDailySpeakingSentenceLoop,
   type DailySpeakingPhrase,
-  type DailySpeakingLanguage,
 } from "@/lib/dailySpeakingMissions";
 
 const TAB_BAR_HEIGHT = 49;

@@ -19,6 +19,7 @@ import { RudyMascot } from "@/components/LingoMascot";
 import { C, F } from "@/constants/theme";
 import { getIORatioData, type IORatioData } from "@/lib/storyUtils";
 import { loadProgress as loadDailyCourseProgress } from "@/lib/dailyCourseData";
+import { getLatestCampPhrase, type LearningLangKey } from "@/lib/lessonContent";
 
 const { width } = Dimensions.get("window");
 export const STORY_PROGRESS_KEY = "lingo_story_progress";
@@ -143,7 +144,7 @@ const CHAPTERS = [
 
 export default function StoryTab() {
   const insets = useSafeAreaInsets();
-  const { nativeLanguage } = useLanguage();
+  const { nativeLanguage, learningLanguage } = useLanguage();
   const lang = nativeLanguage ?? "english";
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 84 : 49 + insets.bottom;
@@ -156,6 +157,7 @@ export default function StoryTab() {
   // Camp (daily course) progress — drives the sequencing hint that connects the
   // Camp's taught phrases to Story Mode (the promise made by guide card 10).
   const [campDaysDone, setCampDaysDone] = useState<number | null>(null);
+  const [campPhrase, setCampPhrase] = useState<string | null>(null);
 
   const loadProgress = useCallback(async () => {
     try {
@@ -167,8 +169,11 @@ export default function StoryTab() {
       if (raw) setProgress(JSON.parse(raw));
       setIoData(io);
       setCampDaysDone(camp.completedDays?.length ?? 0);
+      // Name a real phrase the learner trained at Camp for the reuse nudge.
+      const learnKey = (learningLanguage ?? "english") as LearningLangKey;
+      setCampPhrase(getLatestCampPhrase(camp.completedDays, learnKey)?.text ?? null);
     } catch (e) { console.warn('[Story] progress load failed:', e); }
-  }, []);
+  }, [learningLanguage]);
 
   useFocusEffect(
     useCallback(() => {
@@ -238,8 +243,15 @@ export default function StoryTab() {
   // Camp → Story sequencing hint. When the learner has finished ≥1 Camp day, we
   // remind them the phrases they trained show up here (matching guide card 10).
   // When they haven't started the Camp, we point them there first.
-  const campStartedHint =
-    lang === "korean"
+  const campStartedHint = campPhrase
+    ? lang === "korean"
+      ? `훈련소에서 배운 「${campPhrase}」, 여기서 써보세요`
+      : lang === "spanish"
+      ? `Practica aquí lo que aprendiste: «${campPhrase}»`
+      : lang === "indonesian"
+      ? `Coba pakai yang kamu pelajari di Kamp: "${campPhrase}"`
+      : `Try using what you trained at Camp: "${campPhrase}"`
+    : lang === "korean"
       ? "훈련소에서 배운 표현을 여기서 써보세요"
       : lang === "spanish"
       ? "Usa aquí las frases que aprendiste en el campamento"

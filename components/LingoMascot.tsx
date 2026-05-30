@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, Image, Animated, StyleSheet, ViewStyle, Platform } from "react-native";
+import { View, Text, Animated, StyleSheet, ViewStyle } from "react-native";
 import { C } from "@/constants/theme";
 
 const rudyBadgeImg = require("@/assets/rudy_badge.png");

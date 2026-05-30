@@ -113,12 +113,12 @@ export default function RudyCourseScreen() {
   const totalDays = UNITS.reduce((s, u) => s + u.days.length, 0);
   const completedDays = progress.completedDays.length;
 
-  const headerLabel = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : "Rudy's Training Camp";
-  const levelLabel = nativeLang === "korean" ? "현재 레벨" : nativeLang === "spanish" ? "Nivel Actual" : "Current Level";
+  const headerLabel = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : nativeLang === "indonesian" ? "Kamp Latihan Rudy" : "Rudy's Training Camp";
+  const levelLabel = nativeLang === "korean" ? "현재 레벨" : nativeLang === "spanish" ? "Nivel Actual" : nativeLang === "indonesian" ? "Level Sekarang" : "Current Level";
 
-  const unitLabelDropdown = nativeLang === "korean" ? "단원 선택" : nativeLang === "spanish" ? "Seleccionar Unidad" : "Select Unit";
-  const startLabel = nativeLang === "korean" ? "시작하기" : nativeLang === "spanish" ? "Comenzar" : "Start";
-  const todayLabel = nativeLang === "korean" ? "오늘" : nativeLang === "spanish" ? "Hoy" : "Today";
+  const unitLabelDropdown = nativeLang === "korean" ? "단원 선택" : nativeLang === "spanish" ? "Seleccionar Unidad" : nativeLang === "indonesian" ? "Pilih Unit" : "Select Unit";
+  const startLabel = nativeLang === "korean" ? "시작하기" : nativeLang === "spanish" ? "Comenzar" : nativeLang === "indonesian" ? "Mulai" : "Start";
+  const todayLabel = nativeLang === "korean" ? "오늘" : nativeLang === "spanish" ? "Hoy" : nativeLang === "indonesian" ? "Hari ini" : "Today";
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>

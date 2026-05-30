@@ -372,7 +372,6 @@ export default function HomeScreen() {
   // there are due cards. Rendered inside the dailyGoalMet block below.
   const campDoneOrUnstarted = dailyProgress === null || (dailyProgress.todayCompleted ?? false);
   const nextStepIsReview = showProgressSummary && campDoneOrUnstarted && srsDueCount > 0;
-  const nextStepIsCamp = showProgressSummary && !nextStepIsReview;
   const nextStepEyebrow = nativeLang === "korean"
     ? "다음 단계"
     : nativeLang === "spanish"

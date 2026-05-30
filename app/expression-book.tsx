@@ -37,19 +37,19 @@ export interface ExpressionBookData {
 
 // ─── Chapter Info ────────────────────────────────────────────────────────────
 
-const CHAPTER_INFO: Record<string, { emoji: string; name: { ko: string; en: string; es: string }; color: string }> = {
-  ch1: { emoji: "🇬🇧", name: { ko: "런던", en: "London", es: "Londres" }, color: "#60A5FA" },
-  ch2: { emoji: "🇪🇸", name: { ko: "마드리드", en: "Madrid", es: "Madrid" }, color: "#F59E0B" },
-  ch3: { emoji: "🇰🇷", name: { ko: "서울", en: "Seoul", es: "Seúl" }, color: "#34D399" },
-  ch4: { emoji: "🇪🇬", name: { ko: "카이로", en: "Cairo", es: "El Cairo" }, color: "#E879F9" },
-  ch5: { emoji: "🌍", name: { ko: "바벨", en: "Babel", es: "Babel" }, color: "#FB923C" },
+const CHAPTER_INFO: Record<string, { emoji: string; name: { ko: string; en: string; es: string; id: string }; color: string }> = {
+  ch1: { emoji: "🇬🇧", name: { ko: "런던", en: "London", es: "Londres", id: "London" }, color: "#60A5FA" },
+  ch2: { emoji: "🇪🇸", name: { ko: "마드리드", en: "Madrid", es: "Madrid", id: "Madrid" }, color: "#F59E0B" },
+  ch3: { emoji: "🇰🇷", name: { ko: "서울", en: "Seoul", es: "Seúl", id: "Seoul" }, color: "#34D399" },
+  ch4: { emoji: "🇪🇬", name: { ko: "카이로", en: "Cairo", es: "El Cairo", id: "Kairo" }, color: "#E879F9" },
+  ch5: { emoji: "🌍", name: { ko: "바벨", en: "Babel", es: "Babel", id: "Babel" }, color: "#FB923C" },
 };
 
-const TPRS_LABELS: Record<number, { ko: string; en: string; es: string }> = {
-  1: { ko: "만남", en: "Encounter", es: "Encuentro" },
-  2: { ko: "인식", en: "Recognize", es: "Reconocer" },
-  3: { ko: "생산", en: "Produce", es: "Producir" },
-  4: { ko: "적용", en: "Apply", es: "Aplicar" },
+const TPRS_LABELS: Record<number, { ko: string; en: string; es: string; id: string }> = {
+  1: { ko: "만남", en: "Encounter", es: "Encuentro", id: "Perkenalan" },
+  2: { ko: "인식", en: "Recognize", es: "Reconocer", id: "Mengenali" },
+  3: { ko: "생산", en: "Produce", es: "Producir", id: "Memproduksi" },
+  4: { ko: "적용", en: "Apply", es: "Aplicar", id: "Menerapkan" },
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ export default function ExpressionBookScreen() {
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
   const native = nativeLanguage ?? "english";
-  const nl = native === "korean" ? "ko" : native === "spanish" ? "es" : "en";
+  const nl = native === "korean" ? "ko" : native === "spanish" ? "es" : native === "indonesian" ? "id" : "en";
 
   const [data, setData] = useState<ExpressionBookData>({ expressions: [] });
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
@@ -83,11 +83,13 @@ export default function ExpressionBookScreen() {
   const totalExpressions = data.expressions.length;
   const masteredCount = data.expressions.filter((e) => e.mastered).length;
 
-  const headerTitle = native === "korean" ? "표현 도감" : native === "spanish" ? "Libro de Expresiones" : "Expression Book";
+  const headerTitle = native === "korean" ? "표현 도감" : native === "spanish" ? "Libro de Expresiones" : native === "indonesian" ? "Buku Ekspresi" : "Expression Book";
   const headerSub = native === "korean"
     ? "스토리에서 배운 표현들을 모아보세요"
     : native === "spanish"
     ? "Colecciona las expresiones del modo historia"
+    : native === "indonesian"
+    ? "Kumpulkan ekspresi dari mode cerita"
     : "Collect expressions from story mode";
 
   return (
@@ -112,21 +114,21 @@ export default function ExpressionBookScreen() {
         <View style={styles.statItem}>
           <Text style={styles.statNum}>{totalExpressions}</Text>
           <Text style={styles.statLabel}>
-            {native === "korean" ? "총 표현" : native === "spanish" ? "Total" : "Total"}
+            {native === "korean" ? "총 표현" : native === "spanish" ? "Total" : native === "indonesian" ? "Total" : "Total"}
           </Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
           <Text style={[styles.statNum, { color: "#4caf50" }]}>{masteredCount}</Text>
           <Text style={styles.statLabel}>
-            {native === "korean" ? "마스터" : native === "spanish" ? "Dominado" : "Mastered"}
+            {native === "korean" ? "마스터" : native === "spanish" ? "Dominado" : native === "indonesian" ? "Dikuasai" : "Mastered"}
           </Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
           <Text style={[styles.statNum, { color: "#F59E0B" }]}>{totalExpressions - masteredCount}</Text>
           <Text style={styles.statLabel}>
-            {native === "korean" ? "학습 중" : native === "spanish" ? "Aprendiendo" : "Learning"}
+            {native === "korean" ? "학습 중" : native === "spanish" ? "Aprendiendo" : native === "indonesian" ? "Belajar" : "Learning"}
           </Text>
         </View>
       </View>

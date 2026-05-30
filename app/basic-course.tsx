@@ -586,11 +586,11 @@ function parseReviewSection(value: unknown): ReviewSection | null {
 }
 
 function daysAgoLabel(ts: number | null, native: string): string {
-  if (!ts) return native === "korean" ? "미복습" : native === "spanish" ? "Sin repasar" : "Not reviewed";
+  if (!ts) return native === "korean" ? "미복습" : native === "spanish" ? "Sin repasar" : native === "indonesian" ? "Belum diulang" : "Not reviewed";
   const days = Math.floor((Date.now() - ts) / 86400000);
-  if (days === 0) return native === "korean" ? "오늘" : native === "spanish" ? "Hoy" : "Today";
-  if (days === 1) return native === "korean" ? "1일 전" : native === "spanish" ? "Ayer" : "Yesterday";
-  return native === "korean" ? `${days}일 전` : native === "spanish" ? `Hace ${days} días` : `${days} days ago`;
+  if (days === 0) return native === "korean" ? "오늘" : native === "spanish" ? "Hoy" : native === "indonesian" ? "Hari ini" : "Today";
+  if (days === 1) return native === "korean" ? "1일 전" : native === "spanish" ? "Ayer" : native === "indonesian" ? "Kemarin" : "Yesterday";
+  return native === "korean" ? `${days}일 전` : native === "spanish" ? `Hace ${days} días` : native === "indonesian" ? `${days} hari lalu` : `${days} days ago`;
 }
 
 export default function BasicCourseScreen() {
@@ -1007,15 +1007,23 @@ export default function BasicCourseScreen() {
   const frontRotate = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["0deg", "180deg"] });
   const backRotate  = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ["180deg", "360deg"] });
 
-  const listenLabel  = native === "korean" ? "듣기" : native === "spanish" ? "Escuchar" : "Listen";
-  const traceLabel   = native === "korean" ? "✍️ 따라 써보기" : native === "spanish" ? "✍️ Trazar" : "✍️ Trace it";
+  const listenLabel  = native === "korean" ? "듣기" : native === "spanish" ? "Escuchar" : native === "indonesian" ? "Dengarkan" : "Listen";
+  const traceLabel   = native === "korean" ? "✍️ 따라 써보기" : native === "spanish" ? "✍️ Trazar" : native === "indonesian" ? "✍️ Tirukan" : "✍️ Trace it";
   const nextLabel    = step === 3
-    ? (native === "korean" ? "시작하기 🚀" : native === "spanish" ? "¡Empezar! 🚀" : "Start Learning 🚀")
+    ? (native === "korean" ? "시작하기 🚀" : native === "spanish" ? "¡Empezar! 🚀" : native === "indonesian" ? "Mulai Belajar 🚀" : "Start Learning 🚀")
     : isLastOfStep && isReviewMode
-      ? (native === "korean" ? "완료 ✓" : native === "spanish" ? "Listo ✓" : "Done ✓")
+      ? (native === "korean" ? "완료 ✓" : native === "spanish" ? "Listo ✓" : native === "indonesian" ? "Selesai ✓" : "Done ✓")
     : isLastOfStep
-      ? (native === "korean" ? "다음 단계 →" : native === "spanish" ? "Siguiente paso →" : "Next Step →")
-      : (native === "korean" ? "다음 →"      : native === "spanish" ? "Siguiente →"      : "Next →");
+      ? (native === "korean" ? "다음 단계 →" : native === "spanish" ? "Siguiente paso →" : native === "indonesian" ? "Langkah berikutnya →" : "Next Step →")
+      : (native === "korean" ? "다음 →"      : native === "spanish" ? "Siguiente →"      : native === "indonesian" ? "Berikutnya →"      : "Next →");
+
+  /* ── Accessibility labels (localized) ── */
+  const a11yPrev    = native === "korean" ? "이전" : native === "spanish" ? "Anterior" : native === "indonesian" ? "Sebelumnya" : "Previous";
+  const a11ySkip    = native === "korean" ? "건너뛰기" : native === "spanish" ? "Omitir" : native === "indonesian" ? "Lewati" : "Skip";
+  const a11yBack    = native === "korean" ? "뒤로" : native === "spanish" ? "Atrás" : native === "indonesian" ? "Kembali" : "Back";
+  const a11yHome    = native === "korean" ? "홈으로" : native === "spanish" ? "Ir a inicio" : native === "indonesian" ? "Ke beranda" : "Go home";
+  const a11yListen  = native === "korean" ? "발음 듣기" : native === "spanish" ? "Escuchar pronunciación" : native === "indonesian" ? "Dengarkan pelafalan" : "Listen to pronunciation";
+  const a11yRecord  = native === "korean" ? "따라 말하기" : native === "spanish" ? "Hablar ahora" : native === "indonesian" ? "Ucapkan sekarang" : "Speak now";
 
   /* ── bottom nav bar ── */
   const NavBar = () => (
@@ -1027,13 +1035,13 @@ export default function BasicCourseScreen() {
           {!canNext && step < 3 && (
             <Text style={s.nudge}>
               {step === 1
-                ? (native === "korean" ? "카드를 탭해서 의미를 확인하세요 👆" : native === "spanish" ? "Toca la tarjeta para ver el significado 👆" : "Tap the card to see the meaning 👆")
-                : (native === "korean" ? "발음 듣기를 먼저 눌러보세요 👆" : native === "spanish" ? "Toca el botón de escuchar arriba 👆" : "Tap the listen button above 👆")}
+                ? (native === "korean" ? "카드를 탭해서 의미를 확인하세요 👆" : native === "spanish" ? "Toca la tarjeta para ver el significado 👆" : native === "indonesian" ? "Ketuk kartu untuk melihat artinya 👆" : "Tap the card to see the meaning 👆")
+                : (native === "korean" ? "발음 듣기를 먼저 눌러보세요 👆" : native === "spanish" ? "Toca el botón de escuchar arriba 👆" : native === "indonesian" ? "Ketuk tombol dengarkan di atas 👆" : "Tap the listen button above 👆")}
             </Text>
           )}
           <View style={s.navRow}>
             {step < 3 && subIdx > 0 && (
-              <Pressable style={({ pressed }) => [s.prevBtn, pressed && { opacity: 0.7 }]} onPress={goPrev}>
+              <Pressable style={({ pressed }) => [s.prevBtn, pressed && { opacity: 0.7 }]} onPress={goPrev} accessibilityRole="button" accessibilityLabel={a11yPrev}>
                 <Ionicons name="arrow-back" size={18} color={C.goldDark} />
               </Pressable>
             )}
@@ -1041,6 +1049,9 @@ export default function BasicCourseScreen() {
               style={({ pressed }) => [s.nextBtn, !canNext && s.nextBtnOff, pressed && canNext && { opacity: 0.85 }]}
               onPress={canNext ? goNext : undefined}
               disabled={!canNext}
+              accessibilityRole="button"
+              accessibilityLabel={nextLabel}
+              accessibilityState={{ disabled: !canNext }}
             >
               <Text style={s.nextBtnTxt}>{nextLabel}</Text>
             </Pressable>
@@ -1048,9 +1059,9 @@ export default function BasicCourseScreen() {
 
           {/* Skip current item */}
           {isReviewMode && step < 3 && (
-            <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+            <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap} accessibilityRole="button" accessibilityLabel={a11ySkip}>
               <Text style={s.inlineSkip}>
-                {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : native === "indonesian" ? "Lewati ›" : "Skip ›"}
               </Text>
             </Pressable>
           )}
@@ -1127,9 +1138,9 @@ export default function BasicCourseScreen() {
       {
         section: "full",
         icon: "🔄",
-        title: native === "korean" ? "전체 복습" : native === "spanish" ? "Repaso completo" : "Full Review",
-        desc:  native === "korean" ? "듣기 + 발음 + 쓰기 전체" : native === "spanish" ? "Escucha + pronunciación + escritura" : "Listening + speaking + writing",
-        sub:   native === "korean" ? "전체" : native === "spanish" ? "Todo" : "All",
+        title: native === "korean" ? "전체 복습" : native === "spanish" ? "Repaso completo" : native === "indonesian" ? "Ulasan Lengkap" : "Full Review",
+        desc:  native === "korean" ? "듣기 + 발음 + 쓰기 전체" : native === "spanish" ? "Escucha + pronunciación + escritura" : native === "indonesian" ? "Mendengar + berbicara + menulis" : "Listening + speaking + writing",
+        sub:   native === "korean" ? "전체" : native === "spanish" ? "Todo" : native === "indonesian" ? "Semua" : "All",
       },
     ];
     return (
@@ -1139,17 +1150,17 @@ export default function BasicCourseScreen() {
           <Pressable style={({ pressed }) => [rv.backBtn, pressed && { opacity: 0.7 }]} onPress={() => {
             stopBcTTS();
             router.back();
-          }}>
+          }} accessibilityRole="button" accessibilityLabel={a11yBack}>
             <Ionicons name="arrow-back" size={22} color={C.gold} />
           </Pressable>
           <Text style={rv.headerTitle}>
-            {native === "korean" ? "기초 과정 복습" : native === "spanish" ? "Repaso del curso" : "Course Review"}
+            {native === "korean" ? "기초 과정 복습" : native === "spanish" ? "Repaso del curso" : native === "indonesian" ? "Ulasan Kursus" : "Course Review"}
           </Text>
           <View style={{ width: 36 }} />
         </View>
 
         <Text style={rv.subtitle}>
-          {native === "korean" ? "복습할 섹션을 선택하세요" : native === "spanish" ? "Elige una sección para repasar" : "Choose a section to review"}
+          {native === "korean" ? "복습할 섹션을 선택하세요" : native === "spanish" ? "Elige una sección para repasar" : native === "indonesian" ? "Pilih bagian untuk diulang" : "Choose a section to review"}
         </Text>
 
         <ScrollView contentContainerStyle={rv.list} showsVerticalScrollIndicator={false}>
@@ -1158,6 +1169,8 @@ export default function BasicCourseScreen() {
               key={card.section}
               style={({ pressed }) => [rv.card, pressed && { opacity: 0.85, transform: [{ scale: 0.985 }] }]}
               onPress={() => startReviewSection(card.section)}
+              accessibilityRole="button"
+              accessibilityLabel={`${card.title}. ${card.desc}`}
             >
               <View style={rv.cardLeft}>
                 <Text style={rv.cardIcon}>{card.icon}</Text>
@@ -1169,7 +1182,7 @@ export default function BasicCourseScreen() {
               <View style={rv.cardRight}>
                 <Text style={rv.cardSub}>{card.sub}</Text>
                 <Text style={rv.cardTs}>
-                  {native === "korean" ? "마지막: " : native === "spanish" ? "Último: " : "Last: "}
+                  {native === "korean" ? "마지막: " : native === "spanish" ? "Último: " : native === "indonesian" ? "Terakhir: " : "Last: "}
                   {daysAgoLabel(reviewTs[card.section], native)}
                 </Text>
                 <Ionicons name="chevron-forward" size={14} color={C.goldDark} style={{ marginTop: 2 }} />
@@ -1201,6 +1214,8 @@ export default function BasicCourseScreen() {
         <Pressable
           style={({ pressed }) => [intro.startBtn, pressed && { opacity: 0.85 }]}
           onPress={() => setShowIntro(false)}
+          accessibilityRole="button"
+          accessibilityLabel={startLabel}
         >
           <Text style={intro.startBtnTxt}>✅  {startLabel}</Text>
         </Pressable>
@@ -1209,6 +1224,8 @@ export default function BasicCourseScreen() {
         <Pressable
           style={({ pressed }) => [intro.skipBtn, pressed && { opacity: 0.75 }]}
           onPress={() => setShowSkipConfirm(true)}
+          accessibilityRole="button"
+          accessibilityLabel={skipLabel}
         >
           <Text style={intro.skipBtnTxt}>⏭️  {skipLabel}</Text>
         </Pressable>
@@ -1220,31 +1237,37 @@ export default function BasicCourseScreen() {
           <View style={s.modalOverlay}>
             <View style={s.modalBox}>
               <Text style={s.modalTitle}>
-                {native === "korean" ? "홈으로 이동할까요?" : native === "spanish" ? "¿Ir a inicio?" : "Go to Home?"}
+                {native === "korean" ? "홈으로 이동할까요?" : native === "spanish" ? "¿Ir a inicio?" : native === "indonesian" ? "Pergi ke Beranda?" : "Go to Home?"}
               </Text>
               <Text style={s.modalDesc}>
                 {native === "korean"
                   ? "기초 과정 학습은 홈에서 다시 가능합니다."
                   : native === "spanish"
                     ? "Puedes retomar el curso básico desde inicio."
+                    : native === "indonesian"
+                      ? "Kamu bisa melanjutkan kursus dasar dari beranda kapan saja."
                     : "You can resume the basic course from home anytime."}
               </Text>
               <View style={s.modalBtns}>
                 <Pressable
                   style={({ pressed }) => [s.modalCancel, pressed && { opacity: 0.8 }]}
                   onPress={() => setShowSkipConfirm(false)}
+                  accessibilityRole="button"
+                  accessibilityLabel={native === "korean" ? "계속 학습" : native === "spanish" ? "Continuar" : native === "indonesian" ? "Lanjut Belajar" : "Continue"}
                 >
                   <Text style={s.modalCancelTxt}>
-                    {native === "korean" ? "계속 학습" : native === "spanish" ? "Continuar" : "Continue"}
+                    {native === "korean" ? "계속 학습" : native === "spanish" ? "Continuar" : native === "indonesian" ? "Lanjut Belajar" : "Continue"}
                   </Text>
                 </Pressable>
                 <Pressable
                   style={({ pressed }) => [s.modalConfirm, { flexDirection: "row", gap: 6, justifyContent: "center" }, pressed && { opacity: 0.8 }]}
                   onPress={handleSkip}
+                  accessibilityRole="button"
+                  accessibilityLabel={native === "korean" ? "홈으로" : native === "spanish" ? "Ir a inicio" : native === "indonesian" ? "Ke Beranda" : "Go Home"}
                 >
                   <Ionicons name="home" size={14} color={C.gold} />
                   <Text style={s.modalConfirmTxt}>
-                    {native === "korean" ? "홈으로" : native === "spanish" ? "Ir a inicio" : "Go Home"}
+                    {native === "korean" ? "홈으로" : native === "spanish" ? "Ir a inicio" : native === "indonesian" ? "Ke Beranda" : "Go Home"}
                   </Text>
                 </Pressable>
               </View>
@@ -1264,7 +1287,7 @@ export default function BasicCourseScreen() {
           <Pressable style={({ pressed }) => [s.reviewBackBtn, pressed && { opacity: 0.7 }]} onPress={() => {
             stopBcTTS();
             setShowReviewMenu(true);
-          }}>
+          }} accessibilityRole="button" accessibilityLabel={a11yBack}>
             <Ionicons name="arrow-back" size={18} color={C.goldDark} />
           </Pressable>
         ) : (
@@ -1275,15 +1298,15 @@ export default function BasicCourseScreen() {
           <Text style={s.lingoStripText}>{course.lingoTips[step]}</Text>
         </View>
         {isReviewMode ? (
-          <Pressable style={({ pressed }) => [s.skipPill, pressed && { opacity: 0.7 }]} onPress={goNext}>
+          <Pressable style={({ pressed }) => [s.skipPill, pressed && { opacity: 0.7 }]} onPress={goNext} accessibilityRole="button" accessibilityLabel={a11ySkip}>
             <Text style={s.skipPillTxt}>
-              {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+              {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : native === "indonesian" ? "Lewati ›" : "Skip ›"}
             </Text>
           </Pressable>
         ) : (
           <View style={s.topRightRow}>
             <Text style={s.stepNum}>{step + 1}/{totalSteps}</Text>
-            <Pressable onPress={() => { stopBcTTS(); setShowSkipConfirm(true); }} hitSlop={10}>
+            <Pressable onPress={() => { stopBcTTS(); setShowSkipConfirm(true); }} hitSlop={10} accessibilityRole="button" accessibilityLabel={a11yHome}>
               <Ionicons name="home-outline" size={18} color={C.goldDim} />
             </Pressable>
           </View>
@@ -1323,16 +1346,18 @@ export default function BasicCourseScreen() {
               <Pressable
                 style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]}
                 onPress={() => playAudio(charItem.char)}
+                accessibilityRole="button"
+                accessibilityLabel={a11yListen}
               >
                 <Ionicons name="volume-high-outline" size={24} color={C.bg1} />
                 <Text style={s.listenBtnTxt}>
-                  {native === "korean" ? "🔊  발음 듣기" : native === "spanish" ? "🔊  Escuchar" : "🔊  Listen"}
+                  {native === "korean" ? "🔊  발음 듣기" : native === "spanish" ? "🔊  Escuchar" : native === "indonesian" ? "🔊  Dengarkan" : "🔊  Listen"}
                 </Text>
               </Pressable>
 
               {audioPlayed && (
                 <Text style={{ fontFamily: F.body, color: C.goldDim, fontSize: 12, textAlign: "center" }}>
-                  {native === "korean" ? "다시 들으려면 버튼을 탭하세요" : native === "spanish" ? "Toca para escuchar de nuevo" : "Tap to listen again"}
+                  {native === "korean" ? "다시 들으려면 버튼을 탭하세요" : native === "spanish" ? "Toca para escuchar de nuevo" : native === "indonesian" ? "Ketuk untuk mendengarkan lagi" : "Tap to listen again"}
                 </Text>
               )}
             </ScrollView>
@@ -1344,17 +1369,22 @@ export default function BasicCourseScreen() {
                   style={({ pressed }) => [s.nextBtn, !audioPlayed && s.nextBtnOff, pressed && audioPlayed && { opacity: 0.85 }]}
                   onPress={audioPlayed ? goNext : undefined}
                   disabled={!audioPlayed}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !audioPlayed }}
+                  accessibilityLabel={isLastOfStep
+                    ? (native === "korean" ? "완료" : native === "spanish" ? "Listo" : native === "indonesian" ? "Selesai" : "Done")
+                    : (native === "korean" ? "다음" : native === "spanish" ? "Siguiente" : native === "indonesian" ? "Berikutnya" : "Next")}
                 >
                   <Text style={s.nextBtnTxt}>
                     {isLastOfStep
-                      ? (native === "korean" ? "완료 ✓" : native === "spanish" ? "Listo ✓" : "Done ✓")
-                      : (native === "korean" ? "다음 →" : native === "spanish" ? "Siguiente →" : "Next →")}
+                      ? (native === "korean" ? "완료 ✓" : native === "spanish" ? "Listo ✓" : native === "indonesian" ? "Selesai ✓" : "Done ✓")
+                      : (native === "korean" ? "다음 →" : native === "spanish" ? "Siguiente →" : native === "indonesian" ? "Berikutnya →" : "Next →")}
                   </Text>
                 </Pressable>
               </View>
-              <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+              <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap} accessibilityRole="button" accessibilityLabel={a11ySkip}>
                 <Text style={s.inlineSkip}>
-                  {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                  {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : native === "indonesian" ? "Lewati ›" : "Skip ›"}
                 </Text>
               </Pressable>
             </View>
@@ -1377,6 +1407,8 @@ export default function BasicCourseScreen() {
           <Pressable
             style={({ pressed }) => [s.listenBtn, { paddingVertical: 7 }, pressed && { opacity: 0.75 }]}
             onPress={() => playAudio(charItem.char)}
+            accessibilityRole="button"
+            accessibilityLabel={a11yListen}
           >
             <Ionicons name="volume-medium-outline" size={18} color={C.bg1} />
             <Text style={s.listenBtnTxt}>{listenLabel}</Text>
@@ -1406,25 +1438,30 @@ export default function BasicCourseScreen() {
               <Pressable
                 style={({ pressed }) => [s.retryBtn, { flex: 1 }, pressed && { opacity: 0.7 }]}
                 onPress={handleRetry}
+                accessibilityRole="button"
+                accessibilityLabel={native === "korean" ? "다시 해볼게요" : native === "spanish" ? "Otra vez" : native === "indonesian" ? "Coba lagi" : "Try again"}
               >
                 <Text style={s.retryBtnTxt}>
-                  {native === "korean" ? "🔄  다시 해볼게요" : native === "spanish" ? "🔄  Otra vez" : "🔄  Try again"}
+                  {native === "korean" ? "🔄  다시 해볼게요" : native === "spanish" ? "🔄  Otra vez" : native === "indonesian" ? "🔄  Coba lagi" : "🔄  Try again"}
                 </Text>
               </Pressable>
               <Pressable
                 style={({ pressed }) => [s.nextBtn, !traced && s.nextBtnOff, pressed && traced && { opacity: 0.85 }]}
                 onPress={traced ? goNext : undefined}
                 disabled={!traced}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: !traced }}
+                accessibilityLabel={native === "korean" ? "잘했어요!" : native === "spanish" ? "¡Bien hecho!" : native === "indonesian" ? "Bagus!" : "Looks good!"}
               >
                 <Text style={s.nextBtnTxt}>
-                  {native === "korean" ? "✅  잘했어요!" : native === "spanish" ? "✅  ¡Bien hecho!" : "✅  Looks good!"}
+                  {native === "korean" ? "✅  잘했어요!" : native === "spanish" ? "✅  ¡Bien hecho!" : native === "indonesian" ? "✅  Bagus!" : "✅  Looks good!"}
                 </Text>
               </Pressable>
             </View>
             {isReviewMode && (
-              <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+              <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap} accessibilityRole="button" accessibilityLabel={a11ySkip}>
                 <Text style={s.inlineSkip}>
-                  {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                  {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : native === "indonesian" ? "Lewati ›" : "Skip ›"}
                 </Text>
               </Pressable>
             )}
@@ -1449,11 +1486,16 @@ export default function BasicCourseScreen() {
             {/* ── STEP 1: VOCABULARY FLASHCARDS ── */}
             {step === 1 && wordItem && (
               <>
-                <Pressable onPress={handleFlip} style={s.flipBox}>
+                <Pressable
+                  onPress={handleFlip}
+                  style={s.flipBox}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${wordItem.word}. ${native === "korean" ? "탭해서 의미 확인" : native === "spanish" ? "Toca para ver el significado" : native === "indonesian" ? "Ketuk untuk melihat arti" : "Tap to reveal the meaning"}`}
+                >
                   <Animated.View style={[s.flipCard, { transform: [{ perspective: 1200 }, { rotateY: frontRotate }] }]}>
                     <EmojiText style={s.wordEmoji}>{wordItem.emoji}</EmojiText>
                     <Text style={s.wordText}>{wordItem.word}</Text>
-                    <Text style={s.wordHint}>{native === "korean" ? "탭해서 의미 확인" : native === "spanish" ? "Toca para ver" : "Tap to reveal"}</Text>
+                    <Text style={s.wordHint}>{native === "korean" ? "탭해서 의미 확인" : native === "spanish" ? "Toca para ver" : native === "indonesian" ? "Ketuk untuk melihat" : "Tap to reveal"}</Text>
                   </Animated.View>
                   <Animated.View style={[s.flipCard, s.flipBack, { transform: [{ perspective: 1200 }, { rotateY: backRotate }] }]}>
                     <EmojiText style={s.wordEmoji}>{wordItem.emoji}</EmojiText>
@@ -1461,7 +1503,7 @@ export default function BasicCourseScreen() {
                     <Text style={s.wordSub}>{wordItem.word}</Text>
                   </Animated.View>
                 </Pressable>
-                <Pressable style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.75 }]} onPress={() => playAudio(wordItem.word)}>
+                <Pressable style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.75 }]} onPress={() => playAudio(wordItem.word)} accessibilityRole="button" accessibilityLabel={a11yListen}>
                   <Ionicons name="volume-medium-outline" size={18} color={C.bg1} />
                   <Text style={s.listenBtnTxt}>{listenLabel}</Text>
                 </Pressable>
@@ -1485,16 +1527,16 @@ export default function BasicCourseScreen() {
                   {/* Phase: listen */}
                   {greetPhase === "listen" && (
                     <>
-                      <Pressable style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]} onPress={handleGreetListen}>
+                      <Pressable style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]} onPress={handleGreetListen} accessibilityRole="button" accessibilityLabel={a11yListen}>
                         <Ionicons name="volume-high-outline" size={22} color={C.bg1} />
                         <Text style={s.listenBtnTxt}>
-                          {native === "korean" ? "🔊  듣기" : native === "spanish" ? "🔊  Escuchar" : "🔊  Listen"}
+                          {native === "korean" ? "🔊  듣기" : native === "spanish" ? "🔊  Escuchar" : native === "indonesian" ? "🔊  Dengarkan" : "🔊  Listen"}
                         </Text>
                       </Pressable>
                       {isReviewMode && (
-                        <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+                        <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap} accessibilityRole="button" accessibilityLabel={a11ySkip}>
                           <Text style={s.inlineSkip}>
-                            {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                            {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : native === "indonesian" ? "Lewati ›" : "Skip ›"}
                           </Text>
                         </Pressable>
                       )}
@@ -1505,18 +1547,18 @@ export default function BasicCourseScreen() {
                   {greetPhase === "speak" && (
                     <View style={{ gap: 10, width: "100%", alignItems: "center" }}>
                       <Text style={{ fontFamily: F.body, color: C.goldDim, fontSize: 13, textAlign: "center" }}>
-                        {native === "korean" ? "이제 따라 말해보세요!" : native === "spanish" ? "¡Ahora repite en voz alta!" : "Now say it aloud!"}
+                        {native === "korean" ? "이제 따라 말해보세요!" : native === "spanish" ? "¡Ahora repite en voz alta!" : native === "indonesian" ? "Sekarang ucapkan dengan lantang!" : "Now say it aloud!"}
                       </Text>
-                      <Pressable style={({ pressed }) => [s.micBtn, pressed && { opacity: 0.75 }]} onPress={handleGreetRecord}>
+                      <Pressable style={({ pressed }) => [s.micBtn, pressed && { opacity: 0.75 }]} onPress={handleGreetRecord} accessibilityRole="button" accessibilityLabel={a11yRecord}>
                         <Ionicons name="mic-outline" size={28} color={C.bg1} />
                         <Text style={s.listenBtnTxt}>
-                          {native === "korean" ? "🎤  따라 말하기" : native === "spanish" ? "🎤  Repetir" : "🎤  Speak Now"}
+                          {native === "korean" ? "🎤  따라 말하기" : native === "spanish" ? "🎤  Repetir" : native === "indonesian" ? "🎤  Ucapkan Sekarang" : "🎤  Speak Now"}
                         </Text>
                       </Pressable>
                       {isReviewMode && (
-                        <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap}>
+                        <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap} accessibilityRole="button" accessibilityLabel={a11ySkip}>
                           <Text style={s.inlineSkip}>
-                            {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : "Skip ›"}
+                            {native === "korean" ? "건너뛰기 ›" : native === "spanish" ? "Omitir ›" : native === "indonesian" ? "Lewati ›" : "Skip ›"}
                           </Text>
                         </Pressable>
                       )}
@@ -1528,7 +1570,7 @@ export default function BasicCourseScreen() {
                     <View style={s.recordingRow}>
                       <View style={s.recDot} />
                       <Text style={s.recordingTxt}>
-                        {native === "korean" ? "녹음 중..." : native === "spanish" ? "Grabando..." : "Recording..."}
+                        {native === "korean" ? "녹음 중..." : native === "spanish" ? "Grabando..." : native === "indonesian" ? "Merekam..." : "Recording..."}
                       </Text>
                     </View>
                   )}
@@ -1536,7 +1578,7 @@ export default function BasicCourseScreen() {
                   {/* Phase: processing */}
                   {greetPhase === "processing" && (
                     <Text style={s.processingTxt}>
-                      {native === "korean" ? "⏳  평가 중..." : native === "spanish" ? "⏳  Evaluando..." : "⏳  Evaluating..."}
+                      {native === "korean" ? "⏳  평가 중..." : native === "spanish" ? "⏳  Evaluando..." : native === "indonesian" ? "⏳  Menilai..." : "⏳  Evaluating..."}
                     </Text>
                   )}
 
@@ -1545,14 +1587,14 @@ export default function BasicCourseScreen() {
                     <View style={s.scoreDone}>
                       <Text style={s.scoreDoneEmoji}>🎉</Text>
                       <Text style={s.scoreDoneTxt}>
-                        {native === "korean" ? "시도 완료! +5 XP" : native === "spanish" ? "¡Intento contado! +5 XP" : "Attempt counted! +5 XP"}
+                        {native === "korean" ? "시도 완료! +5 XP" : native === "spanish" ? "¡Intento contado! +5 XP" : native === "indonesian" ? "Percobaan dihitung! +5 XP" : "Attempt counted! +5 XP"}
                       </Text>
                       {greetScore !== null && (
                         <Text style={s.scoreNum}>{Math.round(greetScore)}</Text>
                       )}
-                      <Pressable style={({ pressed }) => [s.retrySmBtn, pressed && { opacity: 0.75 }]} onPress={handleGreetRetry}>
+                      <Pressable style={({ pressed }) => [s.retrySmBtn, pressed && { opacity: 0.75 }]} onPress={handleGreetRetry} accessibilityRole="button" accessibilityLabel={native === "korean" ? "한 번 더 말해보기" : native === "spanish" ? "Decirlo otra vez" : native === "indonesian" ? "Ucapkan sekali lagi" : "Say it once more"}>
                         <Text style={s.retrySmTxt}>
-                          {native === "korean" ? "한 번 더 말해보기" : native === "spanish" ? "Decirlo otra vez" : "Say it once more"}
+                          {native === "korean" ? "한 번 더 말해보기" : native === "spanish" ? "Decirlo otra vez" : native === "indonesian" ? "Ucapkan sekali lagi" : "Say it once more"}
                         </Text>
                       </Pressable>
                     </View>
@@ -1568,10 +1610,10 @@ export default function BasicCourseScreen() {
               <View style={s.completionCard}>
                 <Text style={s.bigEmoji}>🎉</Text>
                 <Text style={s.completionTitle}>
-                  {native === "korean" ? "기초 과정 완료!" : native === "spanish" ? "¡Curso Básico Completado!" : "Basic Course Complete!"}
+                  {native === "korean" ? "기초 과정 완료!" : native === "spanish" ? "¡Curso Básico Completado!" : native === "indonesian" ? "Kursus Dasar Selesai!" : "Basic Course Complete!"}
                 </Text>
                 <Text style={s.completionSub}>
-                  {native === "korean" ? "이제 Enigma와 함께 본격적인 학습을 시작해봐요!" : native === "spanish" ? "¡Ahora comienza tu aventura con Enigma!" : "You're ready to start your full language journey!"}
+                  {native === "korean" ? "이제 Enigma와 함께 본격적인 학습을 시작해봐요!" : native === "spanish" ? "¡Ahora comienza tu aventura con Enigma!" : native === "indonesian" ? "Kamu siap memulai perjalanan bahasamu sepenuhnya!" : "You're ready to start your full language journey!"}
                 </Text>
                 <Animated.View style={[s.xpBadge, {
                   opacity: xpAnim,
@@ -1599,31 +1641,37 @@ export default function BasicCourseScreen() {
         <View style={s.modalOverlay}>
           <View style={s.modalBox}>
             <Text style={s.modalTitle}>
-              {native === "korean" ? "홈으로 이동할까요?" : native === "spanish" ? "¿Ir a inicio?" : "Go to Home?"}
+              {native === "korean" ? "홈으로 이동할까요?" : native === "spanish" ? "¿Ir a inicio?" : native === "indonesian" ? "Pergi ke Beranda?" : "Go to Home?"}
             </Text>
             <Text style={s.modalDesc}>
               {native === "korean"
                 ? "기초 과정 학습은 홈에서 다시 가능합니다."
                 : native === "spanish"
                   ? "Puedes retomar el curso básico desde inicio."
+                  : native === "indonesian"
+                    ? "Kamu bisa melanjutkan kursus dasar dari beranda kapan saja."
                   : "You can resume the basic course from home anytime."}
             </Text>
             <View style={s.modalBtns}>
               <Pressable
                 style={({ pressed }) => [s.modalCancel, pressed && { opacity: 0.8 }]}
                 onPress={() => setShowSkipConfirm(false)}
+                accessibilityRole="button"
+                accessibilityLabel={native === "korean" ? "계속 학습" : native === "spanish" ? "Continuar" : native === "indonesian" ? "Lanjut Belajar" : "Continue"}
               >
                 <Text style={s.modalCancelTxt}>
-                  {native === "korean" ? "계속 학습" : native === "spanish" ? "Continuar" : "Continue"}
+                  {native === "korean" ? "계속 학습" : native === "spanish" ? "Continuar" : native === "indonesian" ? "Lanjut Belajar" : "Continue"}
                 </Text>
               </Pressable>
               <Pressable
                 style={({ pressed }) => [s.modalConfirm, { flexDirection: "row", gap: 6, justifyContent: "center" }, pressed && { opacity: 0.8 }]}
                 onPress={handleSkip}
+                accessibilityRole="button"
+                accessibilityLabel={native === "korean" ? "홈으로" : native === "spanish" ? "Ir a inicio" : native === "indonesian" ? "Ke Beranda" : "Go Home"}
               >
                 <Ionicons name="home" size={14} color={C.gold} />
                 <Text style={s.modalConfirmTxt}>
-                  {native === "korean" ? "홈으로" : native === "spanish" ? "Ir a inicio" : "Go Home"}
+                  {native === "korean" ? "홈으로" : native === "spanish" ? "Ir a inicio" : native === "indonesian" ? "Ke Beranda" : "Go Home"}
                 </Text>
               </Pressable>
             </View>

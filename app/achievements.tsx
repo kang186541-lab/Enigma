@@ -10,14 +10,14 @@ import { ACHIEVEMENTS } from "@/constants/achievements";
 import { loadEarnedAchievements, getProgress } from "@/lib/achievementManager";
 
 const T = {
-  title:   { ko: "업적", en: "Achievements", es: "Logros" },
-  earned:  { ko: "획득", en: "Earned", es: "Obtenido" },
-  locked:  { ko: "미획득", en: "Locked", es: "Bloqueado" },
-  back:    { ko: "뒤로", en: "Back", es: "Volver" },
-  learning: { ko: "학습", en: "Learning", es: "Aprendizaje" },
-  social:   { ko: "소셜", en: "Social", es: "Social" },
-  mastery:  { ko: "마스터리", en: "Mastery", es: "Maestria" },
-  welcome: { ko: "첫 업적을 기다리고 있어요! 레슨을 시작해보세요 ✨", en: "Your first achievement awaits! Start a lesson ✨", es: "¡Tu primer logro te espera! Empieza una lección ✨" },
+  title:   { ko: "업적", en: "Achievements", es: "Logros", id: "Pencapaian" },
+  earned:  { ko: "획득", en: "Earned", es: "Obtenido", id: "Didapat" },
+  locked:  { ko: "미획득", en: "Locked", es: "Bloqueado", id: "Terkunci" },
+  back:    { ko: "뒤로", en: "Back", es: "Volver", id: "Kembali" },
+  learning: { ko: "학습", en: "Learning", es: "Aprendizaje", id: "Belajar" },
+  social:   { ko: "소셜", en: "Social", es: "Social", id: "Sosial" },
+  mastery:  { ko: "마스터리", en: "Mastery", es: "Maestria", id: "Penguasaan" },
+  welcome: { ko: "첫 업적을 기다리고 있어요! 레슨을 시작해보세요 ✨", en: "Your first achievement awaits! Start a lesson ✨", es: "¡Tu primer logro te espera! Empieza una lección ✨", id: "Pencapaian pertamamu menanti! Mulai satu pelajaran ✨" },
 } as const;
 
 function t(obj: Record<string, string>, lang: string) { return obj[lang] || obj.en; }
@@ -26,7 +26,7 @@ export default function AchievementsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { nativeLanguage: nativeLang, stats } = useLanguage();
-  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
+  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
 
   const [earned, setEarned] = useState<string[]>([]);
   const [selectedCat, setSelectedCat] = useState<"all" | "learning" | "social" | "mastery">("all");
@@ -37,7 +37,7 @@ export default function AchievementsScreen() {
 
   const categories = ["all", "learning", "social", "mastery"] as const;
   const catLabels = {
-    all: { ko: "전체", en: "All", es: "Todos" },
+    all: { ko: "전체", en: "All", es: "Todos", id: "Semua" },
     learning: T.learning,
     social: T.social,
     mastery: T.mastery,

@@ -127,7 +127,6 @@ function buildChunks(phrase: string, ipa: string): Chunk[] {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  const graphemes = splitGraphemes(phrase).filter((g) => g.trim().length > 0 || g === " ");
   // Visible (non-space) graphemes — for matching syllable counts.
   const visibleGraphemes = splitGraphemes(phrase).filter((g) => g.trim().length > 0);
 

@@ -29,7 +29,7 @@ import { C, F } from "@/constants/theme";
 import { startSession, endSession } from "@/lib/sessionTracker";
 import { UNITS, loadProgress } from "@/lib/dailyCourseData";
 import {
-  loadLearnerProfile, saveLearnerProfile, markDiagnosed,
+  loadLearnerProfile, markDiagnosed,
   recordErrorPattern, buildLearnerSummary, bumpSession,
   seedDiagnosedIfExistingUser, isValidCefrLevel,
   bumpTutorSession, recordSessionSummary, buildTutorMemorySummary,
@@ -399,7 +399,7 @@ export default function ChatRoomScreen() {
   // Phase 2: tracks which user messages have their correction sub-bubble
   // expanded (for recast/elicit strategies that start collapsed).
   const [expandedCorrectionIds, setExpandedCorrectionIds] = useState<Set<string>>(new Set());
-  const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
+  const [, setLoadingAudioId] = useState<string | null>(null);
 
   // Voice settings — speed (persisted)
   const [rate, setRate] = useState(1.0);
@@ -1133,10 +1133,6 @@ export default function ChatRoomScreen() {
                                     : userNativeLang === "spanish" ? `Día ${n}`
                                     : userNativeLang === "indonesian" ? `Hari ${n}`
                                     : `Day ${n}`;
-    const FIX_LABEL = userNativeLang === "korean" ? "교정"
-                     : userNativeLang === "spanish" ? "Corrección"
-                     : userNativeLang === "indonesian" ? "Koreksi"
-                     : "Correction";
     const EXPLAIN_LABEL = userNativeLang === "korean" ? "설명"
                          : userNativeLang === "spanish" ? "Explicación"
                          : userNativeLang === "indonesian" ? "Mengapa"

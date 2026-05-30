@@ -265,10 +265,12 @@ function BriefingScreen({
 
   const startLabel = nativeLang === "korean" ? "훈련 시작! →"
     : nativeLang === "spanish" ? "¡Empezar el Entrenamiento! →"
+    : nativeLang === "indonesian" ? "Mulai Latihan! →"
     : "Start Training! →";
 
   const todayTopicLabel = nativeLang === "korean" ? "오늘의 훈련 주제"
     : nativeLang === "spanish" ? "Tema de hoy"
+    : nativeLang === "indonesian" ? "Topik hari ini"
     : "Today's topic";
 
   return (
@@ -402,10 +404,12 @@ function LessonScreen({
 
   const sentenceLabel = nativeLang === "korean" ? "문장 완료"
     : nativeLang === "spanish" ? "oraciones"
+    : nativeLang === "indonesian" ? "kalimat selesai"
     : "sentences done";
 
   const nextLabel = nativeLang === "korean" ? "다음 →"
     : nativeLang === "spanish" ? "Siguiente →"
+    : nativeLang === "indonesian" ? "Lanjut →"
     : "Next →";
 
   // F2 fix (UX agent review): drop the English "STEP" remnant from the
@@ -413,17 +417,22 @@ function LessonScreen({
   // Keeping "STEP" mid-sentence in those locales reads as half-translated.
   const completeStepLabel = nativeLang === "korean" ? "단계 완료 →"
     : nativeLang === "spanish" ? "Completar PASO →"
+    : nativeLang === "indonesian" ? "Selesaikan LANGKAH →"
     : "Complete STEP →";
   const speakingGoalLabel = nativeLang === "korean"
     ? `오늘 말하기 ${Math.min(sentenceCount, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
     : nativeLang === "spanish"
     ? `Hoy hablaste ${Math.min(sentenceCount, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
+    : nativeLang === "indonesian"
+    ? `Bicara hari ini ${Math.min(sentenceCount, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`
     : `Spoken today ${Math.min(sentenceCount, SPEAKING_DAILY_GOAL)}/${SPEAKING_DAILY_GOAL}`;
   const speakingGoalProgress = Math.min(1, sentenceCount / SPEAKING_DAILY_GOAL);
   const speakingGoalNudgeText = nativeLang === "korean"
     ? `조금만 더요. Rudy와 ${SPEAKING_DAILY_GOAL - sentenceCount}문장만 더 말하면 오늘 훈련이 끝나요.`
     : nativeLang === "spanish"
     ? `Un poco más. Di ${SPEAKING_DAILY_GOAL - sentenceCount} frases más con Rudy para terminar hoy.`
+    : nativeLang === "indonesian"
+    ? `Sedikit lagi. Ucapkan ${SPEAKING_DAILY_GOAL - sentenceCount} kalimat lagi bersama Rudy untuk menyelesaikan hari ini.`
     : `A little more. Say ${SPEAKING_DAILY_GOAL - sentenceCount} more sentences with Rudy to finish today.`;
 
   const selfCompletes = SELF_COMPLETING_STEPS.includes(currentStep);
@@ -442,11 +451,11 @@ function LessonScreen({
         </Pressable>
         <View style={styles.lessonHeaderCenter}>
           <Text style={styles.lessonDayLabel}>
-            {nativeLang === "korean" ? `${day.dayNumber}일차` : nativeLang === "spanish" ? `Día ${day.dayNumber}` : `Day ${day.dayNumber}`} · {getTri(day.topic, lc)}
+            {nativeLang === "korean" ? `${day.dayNumber}일차` : nativeLang === "spanish" ? `Día ${day.dayNumber}` : nativeLang === "indonesian" ? `Hari ${day.dayNumber}` : `Day ${day.dayNumber}`} · {getTri(day.topic, lc)}
           </Text>
           <View style={styles.stepRow}>
             <Text style={styles.stepCounter}>
-              {nativeLang === "korean" ? "단계" : nativeLang === "spanish" ? "PASO" : "STEP"} {currentStep + 1}/{totalSteps}
+              {nativeLang === "korean" ? "단계" : nativeLang === "spanish" ? "PASO" : nativeLang === "indonesian" ? "LANGKAH" : "STEP"} {currentStep + 1}/{totalSteps}
             </Text>
             <Text style={styles.stepName}>{stepLabels[currentStep]}</Text>
           </View>
@@ -520,6 +529,7 @@ function LessonScreen({
             <Text style={styles.stepCompleteTitle}>
               {nativeLang === "korean" ? `${stepLabels[currentStep]} 완료! 🎉`
                 : nativeLang === "spanish" ? `¡${stepLabels[currentStep]} Completado! 🎉`
+                : nativeLang === "indonesian" ? `${stepLabels[currentStep]} Selesai! 🎉`
                 : `${stepLabels[currentStep]} Complete! 🎉`}
             </Text>
             <View style={styles.stepCompleteRudy}>
@@ -714,8 +724,9 @@ function NoContentCard({
 }: { nativeLang: string; step: number; onSkip: () => void }) {
   const msg = nativeLang === "korean" ? `STEP ${step} 콘텐츠가 아직 없어요.`
     : nativeLang === "spanish" ? `Contenido del STEP ${step} aún no disponible.`
+    : nativeLang === "indonesian" ? `Konten LANGKAH ${step} belum tersedia.`
     : `STEP ${step} content not yet available.`;
-  const skipLabel = nativeLang === "korean" ? "건너뛰기 →" : nativeLang === "spanish" ? "Omitir →" : "Skip →";
+  const skipLabel = nativeLang === "korean" ? "건너뛰기 →" : nativeLang === "spanish" ? "Omitir →" : nativeLang === "indonesian" ? "Lewati →" : "Skip →";
   return (
     <View style={stepContentStyles.container}>
       <View style={stepContentStyles.placeholder}>
@@ -782,17 +793,17 @@ function CompleteScreen({
   const rudyMsg = getCompletionMessage(nativeLang, sentenceCount, nextTopic);
 
   const homeLabel = nativeLang === "korean" ? "홈으로"
-    : nativeLang === "spanish" ? "Volver al Inicio" : "Go Home";
+    : nativeLang === "spanish" ? "Volver al Inicio" : nativeLang === "indonesian" ? "Ke Beranda" : "Go Home";
   const courseLabel = nativeLang === "korean" ? "코스 보기"
-    : nativeLang === "spanish" ? "Ver Curso" : "View Course";
+    : nativeLang === "spanish" ? "Ver Curso" : nativeLang === "indonesian" ? "Lihat Kursus" : "View Course";
   const statsTitle = nativeLang === "korean" ? "📊 오늘의 성과"
-    : nativeLang === "spanish" ? "📊 Resultados de Hoy" : "📊 Today's Results";
-  const sentLabel = nativeLang === "korean" ? "말한 문장" : nativeLang === "spanish" ? "Oraciones habladas" : "Sentences spoken";
-  const pronLabel = nativeLang === "korean" ? "평균 발음 점수" : nativeLang === "spanish" ? "Pronunciación promedio" : "Avg. pronunciation";
-  const xpLabel   = nativeLang === "korean" ? "XP 획득" : nativeLang === "spanish" ? "XP ganado" : "XP earned";
-  const bonusVoiceLabel = nativeLang === "korean" ? "🎤 음성 전용 보너스" : nativeLang === "spanish" ? "🎤 Bono todo voz" : "🎤 All-voice bonus";
-  const bonusPronLabel  = nativeLang === "korean" ? "🌟 발음 완벽 보너스" : nativeLang === "spanish" ? "🌟 Bono pronunciación" : "🌟 Pronunciation bonus";
-  const grammarTitle = nativeLang === "korean" ? "💡 오늘의 문법 포인트" : nativeLang === "spanish" ? "💡 Puntos gramaticales" : "💡 Grammar notes";
+    : nativeLang === "spanish" ? "📊 Resultados de Hoy" : nativeLang === "indonesian" ? "📊 Hasil Hari Ini" : "📊 Today's Results";
+  const sentLabel = nativeLang === "korean" ? "말한 문장" : nativeLang === "spanish" ? "Oraciones habladas" : nativeLang === "indonesian" ? "Kalimat diucapkan" : "Sentences spoken";
+  const pronLabel = nativeLang === "korean" ? "평균 발음 점수" : nativeLang === "spanish" ? "Pronunciación promedio" : nativeLang === "indonesian" ? "Rata-rata pelafalan" : "Avg. pronunciation";
+  const xpLabel   = nativeLang === "korean" ? "XP 획득" : nativeLang === "spanish" ? "XP ganado" : nativeLang === "indonesian" ? "XP didapat" : "XP earned";
+  const bonusVoiceLabel = nativeLang === "korean" ? "🎤 음성 전용 보너스" : nativeLang === "spanish" ? "🎤 Bono todo voz" : nativeLang === "indonesian" ? "🎤 Bonus semua suara" : "🎤 All-voice bonus";
+  const bonusPronLabel  = nativeLang === "korean" ? "🌟 발음 완벽 보너스" : nativeLang === "spanish" ? "🌟 Bono pronunciación" : nativeLang === "indonesian" ? "🌟 Bonus pelafalan" : "🌟 Pronunciation bonus";
+  const grammarTitle = nativeLang === "korean" ? "💡 오늘의 문법 포인트" : nativeLang === "spanish" ? "💡 Puntos gramaticales" : nativeLang === "indonesian" ? "💡 Catatan tata bahasa" : "💡 Grammar notes";
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -801,7 +812,7 @@ function CompleteScreen({
           {/* Title */}
           <Text style={completeStyles.titleEmoji}>🎉</Text>
           <Text style={completeStyles.title}>
-            {nativeLang === "korean" ? "미션 완료!" : nativeLang === "spanish" ? "¡Misión Completada!" : "Mission Complete!"}
+            {nativeLang === "korean" ? "미션 완료!" : nativeLang === "spanish" ? "¡Misión Completada!" : nativeLang === "indonesian" ? "Misi Selesai!" : "Mission Complete!"}
           </Text>
 
           {/* Stats */}

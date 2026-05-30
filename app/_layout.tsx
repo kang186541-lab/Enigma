@@ -17,7 +17,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef } from "react";
-import { View, Text, Image, Animated, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Animated, StyleSheet, Dimensions } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ErrorBoundary } from "@/components/ErrorBoundary";

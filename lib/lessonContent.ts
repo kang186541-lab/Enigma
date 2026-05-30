@@ -135,6 +135,29 @@ export const LESSON_CONTENT: Record<string, Partial<Record<LearningLangKey, DayL
   ...LESSON_CONTENT_UNIT5,      // Day 25-30
 };
 
+/**
+ * The most recent phrase the learner actually trained at the Training Camp, for
+ * the "use what you learned here" reuse nudge on Story/NPC. Reads the real
+ * `completedDays` → that day's first `step1Sentence` (the same source the Camp
+ * seeds into SRS), so the nudge reflects the learner's genuine progress. Returns
+ * null if the camp hasn't been started or that day lacks content for the
+ * learning language. This is a reuse-your-skills hint, NOT a guarantee the story
+ * literally contains this exact string.
+ */
+export function getLatestCampPhrase(
+  completedDays: string[] | undefined,
+  learnLangKey: LearningLangKey,
+): LessonSentence | null {
+  if (!completedDays || completedDays.length === 0) return null;
+  // completedDays preserves completion order — take the most recently finished
+  // day that has content for this learning language.
+  for (let i = completedDays.length - 1; i >= 0; i -= 1) {
+    const first = LESSON_CONTENT[completedDays[i]]?.[learnLangKey]?.step1Sentences?.[0];
+    if (first?.text) return first;
+  }
+  return null;
+}
+
 // ── STEP 3: Mission Talk content ──────────────────────────────────────────────
 
 export const MISSION_CONTENT: Record<string, Partial<Record<LearningLangKey, MissionTalkLangData>>> = {

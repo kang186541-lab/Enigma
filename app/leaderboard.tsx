@@ -10,12 +10,12 @@ import { useLanguage } from "@/context/LanguageContext";
 import { getWeeklyXP, generateLeaderboard, getTierInfo, type LeagueEntry } from "@/lib/leagueManager";
 
 const T = {
-  title:    { ko: "주간 리더보드", en: "Weekly Leaderboard", es: "Tabla Semanal" },
-  you:      { ko: "나", en: "You", es: "Tu" },
-  weeklyXP: { ko: "주간 XP", en: "Weekly XP", es: "XP Semanal" },
-  league:   { ko: "리그", en: "League", es: "Liga" },
-  back:     { ko: "뒤로", en: "Back", es: "Volver" },
-  noXP:     { ko: "아직 XP가 없어요! 레슨을 완료하면 리더보드에 올라갈 수 있어요 🏆", en: "No XP yet! Complete a lesson to climb the leaderboard 🏆", es: "¡Sin XP aún! Completa una lección para subir en la tabla 🏆" },
+  title:    { ko: "주간 리더보드", en: "Weekly Leaderboard", es: "Tabla Semanal", id: "Papan Peringkat Mingguan" },
+  you:      { ko: "나", en: "You", es: "Tu", id: "Kamu" },
+  weeklyXP: { ko: "주간 XP", en: "Weekly XP", es: "XP Semanal", id: "XP Mingguan" },
+  league:   { ko: "리그", en: "League", es: "Liga", id: "Liga" },
+  back:     { ko: "뒤로", en: "Back", es: "Volver", id: "Kembali" },
+  noXP:     { ko: "아직 XP가 없어요! 레슨을 완료하면 리더보드에 올라갈 수 있어요 🏆", en: "No XP yet! Complete a lesson to climb the leaderboard 🏆", es: "¡Sin XP aún! Completa una lección para subir en la tabla 🏆", id: "Belum ada XP! Selesaikan satu pelajaran untuk naik di papan peringkat 🏆" },
 } as const;
 
 function t(obj: Record<string, string>, lang: string) { return obj[lang] || obj.en; }
@@ -24,7 +24,7 @@ export default function LeaderboardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { nativeLanguage: nativeLang } = useLanguage();
-  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
+  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
 
   const [entries, setEntries] = useState<LeagueEntry[]>([]);
   const [weeklyXP, setWeeklyXP] = useState(0);

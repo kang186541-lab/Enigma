@@ -16,6 +16,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { NPCS, NPC, NPC_REL_LEVELS, NPC_EMOTIONS, getRelTier, getRelLabel, RelationshipTier, NPC_UNLOCK_CHAPTER, CHAPTER_ID_MAP } from "@/constants/npcs";
 import { C, F } from "@/constants/theme";
 import { loadProgress as loadDailyCourseProgress } from "@/lib/dailyCourseData";
+import { getLatestCampPhrase, type LearningLangKey } from "@/lib/lessonContent";
 
 // ─── Language Wound Data ──────────────────────────────────────────────────────
 import languageWoundsRaw from "@/data/storyMode/characters.json";
@@ -55,6 +56,7 @@ export default function NpcListScreen() {
   // Camp (daily course) progress — drives the sequencing hint connecting the
   // Camp's taught phrases to NPC practice (the promise of guide card 11).
   const [campDaysDone, setCampDaysDone] = useState<number | null>(null);
+  const [campPhrase, setCampPhrase] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -68,6 +70,8 @@ export default function NpcListScreen() {
       if (emoRaw) setEmotions(JSON.parse(emoRaw));
       if (spRaw) setStoryProgress(JSON.parse(spRaw));
       setCampDaysDone(camp.completedDays?.length ?? 0);
+      const learnKey = (learningLanguage ?? "english") as LearningLangKey;
+      setCampPhrase(getLatestCampPhrase(camp.completedDays, learnKey)?.text ?? null);
     } catch (e) { console.warn('[NpcList] data load failed:', e); }
   }, []);
 
@@ -126,8 +130,15 @@ export default function NpcListScreen() {
 
   // Camp → NPC sequencing hint. ≥1 Camp day done → remind them to reuse those
   // phrases here (guide card 11); not started → send them to the Camp first.
-  const campStartedHint =
-    native === "korean"
+  const campStartedHint = campPhrase
+    ? native === "korean"
+      ? `훈련소에서 배운 「${campPhrase}」, NPC와 써보세요`
+      : native === "spanish"
+      ? `Practica con los NPC lo que aprendiste: «${campPhrase}»`
+      : native === "indonesian"
+      ? `Coba pakai bersama NPC: "${campPhrase}"`
+      : `Try it with an NPC: "${campPhrase}"`
+    : native === "korean"
       ? "훈련소에서 배운 표현을 여기서 써보세요"
       : native === "spanish"
       ? "Usa aquí las frases que aprendiste en el campamento"

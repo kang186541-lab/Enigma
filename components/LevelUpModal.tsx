@@ -6,7 +6,6 @@ import {
   Animated,
   Pressable,
   StyleSheet,
-  Image,
   Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
