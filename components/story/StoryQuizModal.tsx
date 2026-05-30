@@ -1228,13 +1228,13 @@ function PronunciationQuizView({
   quiz: LoadedQuiz;
   onDone: (correct: number, total: number) => void;
 }) {
-  const tl = quiz.targetLang as "en" | "es" | "ko";
+  const tl = quiz.targetLang as "en" | "es" | "ko" | "id";
   const nl = quiz.nativeLang;
   // loadQuiz already resolves content to targetLang, so quiz.content is { sentences: [...] }
   const resolved = quiz.content as { sentences?: { text: string; minScore: number }[] } | undefined;
   const sentences = resolved?.sentences ?? [];
 
-  const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : "en-US";
+  const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : tl === "id" ? "id-ID" : "en-US";
   const rudyMsg = nl === "ko" ? "루디가 듣고 있어요… 🦊" : nl === "es" ? "Rudy está escuchando… 🦊" : "Rudy is listening… 🦊";
 
   const [sIdx, setSIdx] = useState(0);
@@ -1535,13 +1535,13 @@ function VoicePowerQuizView({
   quiz: LoadedQuiz;
   onDone: (correct: number, total: number) => void;
 }) {
-  const tl = quiz.targetLang as "en" | "es" | "ko";
+  const tl = quiz.targetLang as "en" | "es" | "ko" | "id";
   const nl = quiz.nativeLang;
   // loadQuiz already resolves content to targetLang, so quiz.content is { sentences: [...] }
   const contentRaw = quiz.content as any;
   const sentences: VoicePowerContent[] = contentRaw?.sentences ?? [];
 
-  const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : "en-US";
+  const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : tl === "id" ? "id-ID" : "en-US";
   const rudyMsg = nl === "ko" ? "수호석이 반응하고 있어… 🦊" : nl === "es" ? "La piedra reacciona… 🦊" : "The stone reacts… 🦊";
 
   const [sIdx, setSIdx] = useState(0);
@@ -1970,12 +1970,12 @@ function NpcRescueQuizView({
   quiz: LoadedQuiz;
   onDone: (correct: number, total: number) => void;
 }) {
-  const tl = quiz.targetLang as "en" | "es" | "ko";
+  const tl = quiz.targetLang as "en" | "es" | "ko" | "id";
   const nl = quiz.nativeLang;
   // loadQuiz already resolves content to targetLang
   const rescue: NpcRescueContent = (quiz.content as any) ?? { npcToRescue: "NPC", stages: [], progressiveIntro: true };
 
-  const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : "en-US";
+  const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : tl === "id" ? "id-ID" : "en-US";
 
   const [stageIdx, setStageIdx] = useState(0);
   const [recordState, setRecordState] = useState<"idle" | "recording" | "processing" | "done">("idle");
