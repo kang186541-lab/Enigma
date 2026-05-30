@@ -67,9 +67,10 @@ const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string
     help: ["help"],
     name: ["my name"],
   },
-  // Indonesian (BETA) is intentionally excluded from the `languages` loop above,
-  // so this entry is never asserted — it exists only to satisfy the
-  // Record<LearningLangKey> type after the union was widened for Phase 2.
+  // Indonesian is now first-class: it's in the `languages` array above, so the
+  // day 1-6 survival-phrase loop DOES assert these families against the
+  // Indonesian course content. Keep them in sync with the day1-6 Indonesian
+  // lessons (data/dailyCourse/day1_6_improved.ts).
   indonesian: {
     greeting: ["halo"],
     goodbye: ["selamat tinggal", "sampai jumpa", "hati-hati"],

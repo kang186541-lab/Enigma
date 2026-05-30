@@ -593,7 +593,7 @@ function StepContent({
             <Ionicons name="headset" size={26} color={C.gold} />
           </View>
           <Text style={stepContentStyles.stepTitle}>
-            {nativeLang === "korean" ? "단계 1: " : nativeLang === "spanish" ? "PASO 1: " : "STEP 1: "}{stepLabels[0]}
+            {nativeLang === "korean" ? "단계 1: " : nativeLang === "spanish" ? "PASO 1: " : nativeLang === "indonesian" ? "LANGKAH 1: " : "STEP 1: "}{stepLabels[0]}
           </Text>
           <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
         </View>
@@ -623,7 +623,7 @@ function StepContent({
             <Ionicons name="bulb" size={26} color={C.gold} />
           </View>
           <Text style={stepContentStyles.stepTitle}>
-            {nativeLang === "korean" ? "단계 2: " : nativeLang === "spanish" ? "PASO 2: " : "STEP 2: "}{stepLabels[1]}
+            {nativeLang === "korean" ? "단계 2: " : nativeLang === "spanish" ? "PASO 2: " : nativeLang === "indonesian" ? "LANGKAH 2: " : "STEP 2: "}{stepLabels[1]}
           </Text>
           <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
         </View>
@@ -654,7 +654,7 @@ function StepContent({
             <Ionicons name="mic" size={26} color={C.gold} />
           </View>
           <Text style={stepContentStyles.stepTitle}>
-            {nativeLang === "korean" ? "단계 3: " : nativeLang === "spanish" ? "PASO 3: " : "STEP 3: "}{stepLabels[2]}
+            {nativeLang === "korean" ? "단계 3: " : nativeLang === "spanish" ? "PASO 3: " : nativeLang === "indonesian" ? "LANGKAH 3: " : "STEP 3: "}{stepLabels[2]}
           </Text>
           <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
         </View>
@@ -686,7 +686,7 @@ function StepContent({
             <Ionicons name="refresh-circle" size={26} color={C.gold} />
           </View>
           <Text style={stepContentStyles.stepTitle}>
-            {nativeLang === "korean" ? "단계 4: " : nativeLang === "spanish" ? "PASO 4: " : "STEP 4: "}{stepLabels[3]}
+            {nativeLang === "korean" ? "단계 4: " : nativeLang === "spanish" ? "PASO 4: " : nativeLang === "indonesian" ? "LANGKAH 4: " : "STEP 4: "}{stepLabels[3]}
           </Text>
           <Text style={stepContentStyles.stepTopic}>{getTri(day.topic, lc)}</Text>
         </View>

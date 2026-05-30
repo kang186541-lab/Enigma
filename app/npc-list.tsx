@@ -75,8 +75,8 @@ export default function NpcListScreen() {
   const native = nativeLanguage ?? "english";
 
   const getScenarioLabel = (npc: NPC) => {
-    const nativeName = native === "korean" ? npc.scenarioKo : native === "spanish" ? npc.scenarioEs : npc.scenario;
-    const learnName  = lang === "korean" ? npc.scenarioKo : lang === "spanish" ? npc.scenarioEs : npc.scenario;
+    const nativeName = native === "korean" ? npc.scenarioKo : native === "spanish" ? npc.scenarioEs : native === "indonesian" ? npc.scenarioId : npc.scenario;
+    const learnName  = lang === "korean" ? npc.scenarioKo : lang === "spanish" ? npc.scenarioEs : lang === "indonesian" ? npc.scenarioId : npc.scenario;
     if (native === lang) return nativeName;
     return `${nativeName} (${learnName})`;
   };

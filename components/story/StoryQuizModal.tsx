@@ -15,27 +15,27 @@ import { checkAnswer as checkSpelling } from "@/lib/answerUtils";
 
 // ─── Quiz UI i18n ────────────────────────────────────────────────────────────
 
-type QL = "ko" | "es" | "en";
+type QL = "ko" | "es" | "en" | "id";
 const QT: Record<string, Record<QL, string>> = {
-  checkAnswers:   { ko: "정답 확인 ✓",         es: "Comprobar ✓",             en: "Check Answers ✓" },
-  arrangeWords:   { ko: "단어를 올바른 순서로 배열하세요:", es: "Ordena las palabras en la oración correcta:", en: "Arrange the words into the correct sentence:" },
-  tapWords:       { ko: "아래 단어를 탭하여 문장을 만드세요", es: "Toca las palabras abajo para formar la oración", en: "Tap words below to build the sentence" },
-  check:          { ko: "확인 ✓",              es: "Comprobar ✓",             en: "Check ✓" },
-  playing:        { ko: "재생 중...",           es: "Reproduciendo...",        en: "Playing..." },
-  playRecording:  { ko: "녹음 재생",           es: "Reproducir grabación",    en: "Play Recording" },
-  typeAnswer:     { ko: "답을 입력하세요...",    es: "Escribe tu respuesta...", en: "Type your answer..." },
-  submit:         { ko: "제출 ✓",              es: "Enviar ✓",               en: "Submit ✓" },
-  submitted:      { ko: "제출 완료! 연습을 계속하세요.", es: "¡Enviado! Sigue practicando.", en: "Submitted! Keep practising." },
-  requiredWords:  { ko: "필수 단어:",           es: "Palabras requeridas:",    en: "Required words:" },
-  readAloud:      { ko: "다음 문장을 소리 내어 읽으세요:", es: "Lee la siguiente oración en voz alta:", en: "Read the following sentence aloud:" },
-  noSentences:    { ko: "문장을 찾을 수 없습니다.", es: "No se encontraron oraciones.", en: "No sentences found." },
-  submitReview:   { ko: "검토 제출 ✓",         es: "Enviar para revisión ✓",  en: "Submit for Review ✓" },
-  yourAnswer:     { ko: "답변...",              es: "Tu respuesta...",         en: "Your answer..." },
-  translateTo:    { ko: "번역하세요:",          es: "Traduce a:",              en: "Translate to:" },
-  submitArgument: { ko: "주장 제출",            es: "Enviar argumento",        en: "Submit Argument" },
-  typeArgument:   { ko: "반론을 입력하세요…",    es: "Escribe tu contraargumento…", en: "Type your counter-argument…" },
-  listening:      { ko: "듣는 중…",             es: "Escuchando…",             en: "Listening…" },
-  blank:          { ko: "빈칸",                 es: "Espacio",                 en: "Blank" },
+  checkAnswers:   { ko: "정답 확인 ✓",         es: "Comprobar ✓",             en: "Check Answers ✓",            id: "Cek Jawaban ✓" },
+  arrangeWords:   { ko: "단어를 올바른 순서로 배열하세요:", es: "Ordena las palabras en la oración correcta:", en: "Arrange the words into the correct sentence:", id: "Susun kata-kata menjadi kalimat yang benar:" },
+  tapWords:       { ko: "아래 단어를 탭하여 문장을 만드세요", es: "Toca las palabras abajo para formar la oración", en: "Tap words below to build the sentence", id: "Ketuk kata di bawah untuk menyusun kalimat" },
+  check:          { ko: "확인 ✓",              es: "Comprobar ✓",             en: "Check ✓",                    id: "Cek ✓" },
+  playing:        { ko: "재생 중...",           es: "Reproduciendo...",        en: "Playing...",                 id: "Memutar..." },
+  playRecording:  { ko: "녹음 재생",           es: "Reproducir grabación",    en: "Play Recording",             id: "Putar Rekaman" },
+  typeAnswer:     { ko: "답을 입력하세요...",    es: "Escribe tu respuesta...", en: "Type your answer...",        id: "Ketik jawabanmu..." },
+  submit:         { ko: "제출 ✓",              es: "Enviar ✓",               en: "Submit ✓",                   id: "Kirim ✓" },
+  submitted:      { ko: "제출 완료! 연습을 계속하세요.", es: "¡Enviado! Sigue practicando.", en: "Submitted! Keep practising.", id: "Terkirim! Terus berlatih ya." },
+  requiredWords:  { ko: "필수 단어:",           es: "Palabras requeridas:",    en: "Required words:",            id: "Kata wajib:" },
+  readAloud:      { ko: "다음 문장을 소리 내어 읽으세요:", es: "Lee la siguiente oración en voz alta:", en: "Read the following sentence aloud:", id: "Baca kalimat berikut dengan lantang:" },
+  noSentences:    { ko: "문장을 찾을 수 없습니다.", es: "No se encontraron oraciones.", en: "No sentences found.",   id: "Tidak ada kalimat ditemukan." },
+  submitReview:   { ko: "검토 제출 ✓",         es: "Enviar para revisión ✓",  en: "Submit for Review ✓",        id: "Kirim untuk Ditinjau ✓" },
+  yourAnswer:     { ko: "답변...",              es: "Tu respuesta...",         en: "Your answer...",             id: "Jawabanmu..." },
+  translateTo:    { ko: "번역하세요:",          es: "Traduce a:",              en: "Translate to:",              id: "Terjemahkan ke:" },
+  submitArgument: { ko: "주장 제출",            es: "Enviar argumento",        en: "Submit Argument",            id: "Kirim Argumen" },
+  typeArgument:   { ko: "반론을 입력하세요…",    es: "Escribe tu contraargumento…", en: "Type your counter-argument…", id: "Ketik argumen bantahanmu…" },
+  listening:      { ko: "듣는 중…",             es: "Escuchando…",             en: "Listening…",                 id: "Mendengarkan…" },
+  blank:          { ko: "빈칸",                 es: "Espacio",                 en: "Blank",                      id: "Kosong" },
 };
 function qt(key: string, lang: LangCode): string {
   const entry = QT[key];
@@ -174,12 +174,12 @@ function ResultView({
       <Text style={styles.resultEmoji}>{passed ? "🎉" : "💪"}</Text>
       <Text style={styles.resultTitle}>
         {passed
-          ? (nativeLang === "ko" ? "잘했어요!" : nativeLang === "es" ? "¡Buen trabajo!" : "Great job!")
-          : (nativeLang === "ko" ? "계속 도전해요!" : nativeLang === "es" ? "¡Sigue intentando!" : "Keep trying!")}
+          ? (nativeLang === "ko" ? "잘했어요!" : nativeLang === "es" ? "¡Buen trabajo!" : nativeLang === "id" ? "Bagus sekali!" : "Great job!")
+          : (nativeLang === "ko" ? "계속 도전해요!" : nativeLang === "es" ? "¡Sigue intentando!" : nativeLang === "id" ? "Terus coba!" : "Keep trying!")}
       </Text>
       <Text style={styles.resultScore}>{pct}%</Text>
       <Text style={styles.resultSub}>
-        {correct}/{total} {nativeLang === "ko" ? "정답" : nativeLang === "es" ? "correctas" : "correct"}
+        {correct}/{total} {nativeLang === "ko" ? "정답" : nativeLang === "es" ? "correctas" : nativeLang === "id" ? "benar" : "correct"}
       </Text>
       <View style={styles.xpBubble}>
         <Text style={styles.xpText}>+{xp} XP</Text>
@@ -191,7 +191,7 @@ function ResultView({
       )}
       <Pressable style={styles.continueBtn} onPress={onContinue}>
         <Text style={styles.continueBtnText}>
-          {nativeLang === "ko" ? "계속하기 →" : nativeLang === "es" ? "Continuar →" : "Continue →"}
+          {nativeLang === "ko" ? "계속하기 →" : nativeLang === "es" ? "Continuar →" : nativeLang === "id" ? "Lanjut →" : "Continue →"}
         </Text>
       </Pressable>
     </Animated.View>

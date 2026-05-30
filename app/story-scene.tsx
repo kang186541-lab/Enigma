@@ -5272,10 +5272,10 @@ function PuzzleSolvedBadge({ onNext, lang }: { onNext: () => void; lang: string 
   return (
     <Animated.View style={[styles.solvedBadge, { transform: [{ scale }] }]}>
       <EmojiText style={styles.solvedEmoji}>🔍</EmojiText>
-      <Text style={styles.solvedTitle}>{lang === "korean" ? "퍼즐 해결!" : lang === "spanish" ? "¡Puzzle Resuelto!" : "Puzzle Solved!"}</Text>
+      <Text style={styles.solvedTitle}>{lang === "korean" ? "퍼즐 해결!" : lang === "spanish" ? "¡Puzzle Resuelto!" : lang === "indonesian" ? "Teka-teki selesai!" : "Puzzle Solved!"}</Text>
       <Text style={styles.solvedXp}>+20 XP</Text>
       <Pressable style={styles.solvedBtn} onPress={onNext}>
-        <Text style={styles.solvedBtnText}>{lang === "korean" ? "계속 ▶" : lang === "spanish" ? "Continuar ▶" : "Continue ▶"}</Text>
+        <Text style={styles.solvedBtnText}>{lang === "korean" ? "계속 ▶" : lang === "spanish" ? "Continuar ▶" : lang === "indonesian" ? "Lanjut ▶" : "Continue ▶"}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -5318,10 +5318,10 @@ function WordMatchPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
         <EmojiText style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</EmojiText>
-        <Text style={styles.puzzleType}>{lang === "korean" ? "단어 매칭" : lang === "spanish" ? "Relacionar palabras" : "Word Matching"}</Text>
+        <Text style={styles.puzzleType}>{lang === "korean" ? "단어 매칭" : lang === "spanish" ? "Relacionar palabras" : lang === "indonesian" ? "Cocokkan kata" : "Word Matching"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
-        <Text style={styles.puzzleWordLabel}>{lang === "korean" ? "이 단어의 뜻은?" : lang === "spanish" ? "¿Qué significa?" : "What does this mean?"}</Text>
+        <Text style={styles.puzzleWordLabel}>{lang === "korean" ? "이 단어의 뜻은?" : lang === "spanish" ? "¿Qué significa?" : lang === "indonesian" ? "Apa artinya ini?" : "What does this mean?"}</Text>
         <Text style={styles.puzzleWordMain}>{tri(q.word, learningLang)}</Text>
       </View>
       <View style={styles.puzzleOptions}>
@@ -5349,7 +5349,7 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
   puzzle: { pType: "fill-blank"; questions: FillBlankQ[] };
   lang: string; learningLang: string; onSolved: () => void; onResetHints?: () => void;
 }) {
-  const ko = lang === "korean"; const es = lang === "spanish";
+  const ko = lang === "korean"; const es = lang === "spanish"; const id = lang === "indonesian";
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -5397,10 +5397,10 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
         <EmojiText style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</EmojiText>
-        <Text style={styles.puzzleType}>{ko ? "빈칸 채우기" : es ? "Completar espacios" : "Fill in the Blank"}</Text>
+        <Text style={styles.puzzleType}>{ko ? "빈칸 채우기" : es ? "Completar espacios" : id ? "Isi bagian kosong" : "Fill in the Blank"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
-        <Text style={styles.puzzleWordLabel}>{ko ? "빈칸에 알맞은 단어는?" : es ? "¿Qué palabra completa la frase?" : "Which word fills the blank?"}</Text>
+        <Text style={styles.puzzleWordLabel}>{ko ? "빈칸에 알맞은 단어는?" : es ? "¿Qué palabra completa la frase?" : id ? "Kata mana yang mengisi bagian kosong?" : "Which word fills the blank?"}</Text>
         <Text style={styles.puzzleSentence}>{display}</Text>
       </View>
       <View style={styles.puzzleOptions}>
@@ -5426,17 +5426,17 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
           onPress={() => { setHintVisible(true); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
         >
           <Text style={styles.sharedHintBtnText}>
-            💡 {ko ? `힌트 보기 (${hintLevel}/${allQHints.length})` : es ? `Ver pistas (${hintLevel}/${allQHints.length})` : `Hints (${hintLevel}/${allQHints.length})`}
+            💡 {ko ? `힌트 보기 (${hintLevel}/${allQHints.length})` : es ? `Ver pistas (${hintLevel}/${allQHints.length})` : id ? `Petunjuk (${hintLevel}/${allQHints.length})` : `Hints (${hintLevel}/${allQHints.length})`}
           </Text>
         </Pressable>
       )}
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: selected ? 1 : 0.5 }]} onPress={handleConfirm} disabled={!selected}>
-          <Text style={styles.puzzleConfirmText}>{ko ? "확인 ✓" : es ? "Confirmar ✓" : "Confirm ✓"}</Text>
+          <Text style={styles.puzzleConfirmText}>{ko ? "확인 ✓" : es ? "Confirmar ✓" : id ? "Konfirmasi ✓" : "Confirm ✓"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
-          <Text style={styles.puzzleConfirmText}>{idx < puzzle.questions.length - 1 ? (ko ? "다음 ▶" : "Next ▶") : (ko ? "완료 ✓" : es ? "Listo ✓" : "Done ✓")}</Text>
+          <Text style={styles.puzzleConfirmText}>{idx < puzzle.questions.length - 1 ? (ko ? "다음 ▶" : id ? "Lanjut ▶" : "Next ▶") : (ko ? "완료 ✓" : es ? "Listo ✓" : id ? "Selesai ✓" : "Done ✓")}</Text>
         </Pressable>
       )}
       {hasQHints && (
@@ -5444,7 +5444,7 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
           <Pressable style={styles.hintOverlay} onPress={() => setHintVisible(false)}>
             <Pressable style={styles.hintNotebook} onPress={() => {}}>
               <View style={styles.hintNotebookHeader}>
-                <EmojiText style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</EmojiText>
+                <EmojiText style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : id ? "Catatan Detektif" : "Detective's Notebook"}</EmojiText>
                 <Pressable onPress={() => setHintVisible(false)} style={styles.hintCloseBtn}>
                   <Text style={styles.hintCloseBtnText}>✕</Text>
                 </Pressable>
@@ -5457,24 +5457,24 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
                   <View key={i} style={styles.hintRow}>
                     {isUnlocked ? (
                       <View style={styles.hintUnlocked}>
-                        <Text style={styles.hintLabel}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                        <Text style={styles.hintLabel}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : id ? `Petunjuk ${i + 1}` : `Hint ${i + 1}`}</Text>
                         <Text style={styles.hintText}>{hint}</Text>
                       </View>
                     ) : isNext ? (
                       <Pressable style={styles.hintLocked} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setHintLevel(i + 1); }}>
                         <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
-                        <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
+                        <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : id ? `Buka petunjuk ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
                       </Pressable>
                     ) : (
                       <View style={[styles.hintLocked, { opacity: 0.4 }]}>
                         <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
-                        <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                        <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : id ? `Petunjuk ${i + 1}` : `Hint ${i + 1}`}</Text>
                       </View>
                     )}
                   </View>
                 );
               })}
-              <Text style={styles.hintFooter}>{ko ? "이전 힌트를 먼저 열어야 해요" : es ? "Desbloquea las pistas en orden" : "Unlock hints in order"}</Text>
+              <Text style={styles.hintFooter}>{ko ? "이전 힌트를 먼저 열어야 해요" : es ? "Desbloquea las pistas en orden" : id ? "Buka petunjuk secara berurutan" : "Unlock hints in order"}</Text>
             </Pressable>
           </Pressable>
         </Modal>
@@ -5528,12 +5528,12 @@ function DialogueChoicePuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
         <EmojiText style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</EmojiText>
-        <Text style={styles.puzzleType}>{lang === "korean" ? "대화 선택" : lang === "spanish" ? "Elección de diálogo" : "Dialogue Choice"}</Text>
+        <Text style={styles.puzzleType}>{lang === "korean" ? "대화 선택" : lang === "spanish" ? "Elección de diálogo" : lang === "indonesian" ? "Pilih dialog" : "Dialogue Choice"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>{tri(q.prompt, lang)}</Text>
         <Text style={styles.puzzleContext}>{tri(q.context, lang)}</Text>
-        <Text style={styles.puzzleChooseHint}>{lang === "korean" ? "↓ 올바른 대답을 선택하세요" : lang === "spanish" ? "↓ Elige la respuesta correcta" : "↓ Choose the correct response"}</Text>
+        <Text style={styles.puzzleChooseHint}>{lang === "korean" ? "↓ 올바른 대답을 선택하세요" : lang === "spanish" ? "↓ Elige la respuesta correcta" : lang === "indonesian" ? "↓ Pilih jawaban yang benar" : "↓ Choose the correct response"}</Text>
       </View>
       <View style={styles.puzzleOptions}>
         {options[idx].map((opt, i) => {
@@ -5554,14 +5554,14 @@ function DialogueChoicePuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
       </View>
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: selected ? 1 : 0.5 }]} onPress={handleConfirm} disabled={!selected}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Confirmar ✓" : "Confirm ✓"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Confirmar ✓" : lang === "indonesian" ? "Konfirmasi ✓" : "Confirm ✓"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
           <Text style={styles.puzzleConfirmText}>{
             idx < puzzle.questions.length - 1
-              ? (lang === "korean" ? "다음 ▶" : lang === "spanish" ? "Siguiente ▶" : "Next ▶")
-              : (lang === "korean" ? "완료 ✓" : lang === "spanish" ? "Hecho ✓" : "Done ✓")
+              ? (lang === "korean" ? "다음 ▶" : lang === "spanish" ? "Siguiente ▶" : lang === "indonesian" ? "Lanjut ▶" : "Next ▶")
+              : (lang === "korean" ? "완료 ✓" : lang === "spanish" ? "Hecho ✓" : lang === "indonesian" ? "Selesai ✓" : "Done ✓")
           }</Text>
         </Pressable>
       )}
@@ -5615,13 +5615,13 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
         <EmojiText style={styles.puzzleNum}>🧩 PUZZLE {idx + 1}/{puzzle.questions.length}</EmojiText>
-        <Text style={styles.puzzleType}>{lang === "korean" ? "문장 만들기" : lang === "spanish" ? "Construir oraciones" : "Sentence Builder"}</Text>
+        <Text style={styles.puzzleType}>{lang === "korean" ? "문장 만들기" : lang === "spanish" ? "Construir oraciones" : lang === "indonesian" ? "Susun kalimat" : "Sentence Builder"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>{tri(q.instruction, lang)}</Text>
         <View style={styles.sbAnswerRow}>
           {placed.length === 0
-            ? <Text style={styles.sbAnswerPlaceholder}>{lang === "korean" ? "단어를 탭하세요..." : lang === "spanish" ? "Toca las palabras..." : "Tap words below..."}</Text>
+            ? <Text style={styles.sbAnswerPlaceholder}>{lang === "korean" ? "단어를 탭하세요..." : lang === "spanish" ? "Toca las palabras..." : lang === "indonesian" ? "Ketuk kata di bawah..." : "Tap words below..."}</Text>
             : placed.map((originalIdx, i) => (
                 <Pressable key={i} style={styles.sbAnswerChip} onPress={() => tapWord(originalIdx)}>
                   <Text style={styles.sbAnswerChipText}>{tri(q.words[originalIdx], learningLang)}</Text>
@@ -5632,8 +5632,8 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
         {confirmed && (
           <Text style={[styles.sbFeedback, { color: isCorrect ? "#5a9" : "#e55" }]}>
             {isCorrect
-              ? (lang === "korean" ? "✓ 정답이에요!" : "✓ Correct!")
-              : (lang === "korean" ? "✗ 다시 시도해요" : "✗ Try again")}
+              ? (lang === "korean" ? "✓ 정답이에요!" : lang === "indonesian" ? "✓ Benar!" : "✓ Correct!")
+              : (lang === "korean" ? "✗ 다시 시도해요" : lang === "indonesian" ? "✗ Coba lagi" : "✗ Try again")}
           </Text>
         )}
       </View>
@@ -5655,14 +5655,14 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
       </View>
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: placed.length > 0 ? 1 : 0.5 }]} onPress={handleCheck} disabled={placed.length === 0}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Verificar ✓" : "Check ✓"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Verificar ✓" : lang === "indonesian" ? "Periksa ✓" : "Check ✓"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={isCorrect ? handleNext : () => { setPlaced([]); setConfirmed(false); setIsCorrect(false); }}>
           <Text style={styles.puzzleConfirmText}>{
             isCorrect
-              ? (lang === "korean" ? "다음 ▶" : lang === "spanish" ? "Siguiente ▶" : "Next ▶")
-              : (lang === "korean" ? "다시 시도 ↺" : lang === "spanish" ? "Reintentar ↺" : "Try Again ↺")
+              ? (lang === "korean" ? "다음 ▶" : lang === "spanish" ? "Siguiente ▶" : lang === "indonesian" ? "Lanjut ▶" : "Next ▶")
+              : (lang === "korean" ? "다시 시도 ↺" : lang === "spanish" ? "Reintentar ↺" : lang === "indonesian" ? "Coba lagi ↺" : "Try Again ↺")
           }</Text>
         </Pressable>
       )}
@@ -5712,11 +5712,11 @@ function InvestigationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
         <EmojiText style={styles.puzzleNum}>🧩 INVESTIGATION</EmojiText>
-        <Text style={styles.puzzleType}>{lang === "korean" ? "단서 조사" : lang === "spanish" ? "Investigar pistas" : "Evidence Analysis"}</Text>
+        <Text style={styles.puzzleType}>{lang === "korean" ? "단서 조사" : lang === "spanish" ? "Investigar pistas" : lang === "indonesian" ? "Analisis bukti" : "Evidence Analysis"}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>{tri(q.prompt, lang)}</Text>
-        <Text style={styles.puzzleChooseHint}>{lang === "korean" ? "↓ 핵심 증거를 선택하세요" : lang === "spanish" ? "↓ Selecciona la evidencia clave" : "↓ Select the key evidence"}</Text>
+        <Text style={styles.puzzleChooseHint}>{lang === "korean" ? "↓ 핵심 증거를 선택하세요" : lang === "spanish" ? "↓ Selecciona la evidencia clave" : lang === "indonesian" ? "↓ Pilih bukti kunci" : "↓ Select the key evidence"}</Text>
       </View>
       <View style={styles.investigationGrid}>
         {q.clues.map((clue, i) => {
@@ -5738,14 +5738,14 @@ function InvestigationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
       </View>
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: selected !== null ? 1 : 0.5 }]} onPress={handleConfirm} disabled={selected === null}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "증거 제출 ✓" : lang === "spanish" ? "Presentar evidencia ✓" : "Submit Evidence ✓"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "증거 제출 ✓" : lang === "spanish" ? "Presentar evidencia ✓" : lang === "indonesian" ? "Kirim bukti ✓" : "Submit Evidence ✓"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
           <Text style={styles.puzzleConfirmText}>
             {selected === q.answerIdx
-              ? (lang === "korean" ? "계속 ▶" : "Continue ▶")
-              : (lang === "korean" ? "다시 선택하기" : lang === "spanish" ? "Elegir otra vez" : "Choose again")}
+              ? (lang === "korean" ? "계속 ▶" : lang === "indonesian" ? "Lanjut ▶" : "Continue ▶")
+              : (lang === "korean" ? "다시 선택하기" : lang === "spanish" ? "Elegir otra vez" : lang === "indonesian" ? "Pilih lagi" : "Choose again")}
           </Text>
         </Pressable>
       )}
@@ -5777,8 +5777,9 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   // nativeTranslation shows the same answer in the UI language (for understanding)
   const nativeTranslation = lang === "korean" ? q.answer.ko
     : lang === "spanish" ? q.answer.es
+    : lang === "indonesian" ? (q.answer.id ?? q.answer.en)
     : q.answer.en;
-  const hintText = lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : q.hint.en;
+  const hintText = lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : lang === "indonesian" ? (q.hint.id ?? q.hint.en) : q.hint.en;
 
   const [shuffledOpts] = useState(() =>
     puzzle.questions.map((qq) => {
@@ -5852,6 +5853,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
     );
     const ko = lang === "korean";
     const es = lang === "spanish";
+    const id = lang === "indonesian";
     const halfLen = Math.ceil(encodedWord.length / 2);
     const decodedHalf = encodedWord.slice(0, halfLen).split("").map((ch: string) =>
       String.fromCharCode(((ch.charCodeAt(0) - 65 - q.shift + 26) % 26) + 65)
@@ -5859,12 +5861,15 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
     return [
       ko ? "각 글자를 알파벳에서 한 칸 앞 글자로 바꿔보세요."
         : es ? "Cambia cada letra por la que está una posición antes en el alfabeto."
+        : id ? "Ganti tiap huruf dengan huruf satu langkah sebelumnya di alfabet."
         : "Replace each letter with the one that comes one step before it in the alphabet.",
       ko ? `예: ${firstLetter} → ${decodedFirst}`
         : es ? `Ejemplo: ${firstLetter} → ${decodedFirst}`
+        : id ? `Contoh: ${firstLetter} → ${decodedFirst}`
         : `Example: ${firstLetter} → ${decodedFirst}`,
       ko ? `단어의 앞부분: ${decodedHalf}. 나머지 글자도 같은 방법으로 풀어봐`
         : es ? `Primeras letras descifradas: ${decodedHalf}. Descifra el resto con el mismo método`
+        : id ? `Huruf awal terpecahkan: ${decodedHalf}. Pakai pergeseran yang sama untuk sisanya`
         : `First letters decoded: ${decodedHalf}. Apply the same shift to the rest`,
     ];
   }
@@ -5877,20 +5882,21 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   if (showResult) {
     const ko = lang === "korean";
     const es = lang === "spanish";
+    const id = lang === "indonesian";
 
     if (!isCorrect) {
       // ── WRONG ANSWER ──
       return (
         <View style={styles.puzzleBox}>
           <View style={styles.puzzleHeaderRow}>
-            <EmojiText style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : "Decode the Cipher!"}</EmojiText>
+            <EmojiText style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : id ? "Pecahkan sandinya!" : "Decode the Cipher!"}</EmojiText>
             <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
           </View>
 
           {/* Error banner — NO answer reveal */}
           <View style={styles.cipherResultWrong}>
             <Text style={styles.cipherResultTitle}>
-              ❌ {ko ? "틀렸어요" : es ? "Incorrecto" : "Wrong!"}
+              ❌ {ko ? "틀렸어요" : es ? "Incorrecto" : id ? "Salah!" : "Wrong!"}
             </Text>
           </View>
 
@@ -5899,19 +5905,19 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
             <EmojiText style={styles.cipherLingoEmoji}>🦊</EmojiText>
             <View style={styles.cipherLingoBubble}>
               <Text style={styles.cipherLingoBubbleText}>
-                {ko ? "흠... 뭔가 조금 다른 것 같군요, 파트너." : es ? "Hmm... algo no está bien, compañero." : "Hmm... something's not quite right, partner."}
+                {ko ? "흠... 뭔가 조금 다른 것 같군요, 파트너." : es ? "Hmm... algo no está bien, compañero." : id ? "Hmm... ada yang kurang pas, partner." : "Hmm... something's not quite right, partner."}
               </Text>
             </View>
           </View>
           <Text style={styles.cipherRetryHint}>
-            {ko ? "조금만 더 생각해보세요." : es ? "Piénsalo un poco más." : "Think it over a bit more."}
+            {ko ? "조금만 더 생각해보세요." : es ? "Piénsalo un poco más." : id ? "Pikirkan sedikit lagi." : "Think it over a bit more."}
           </Text>
 
           {/* Buttons: Retry + Hint */}
           <View style={styles.cipherBtnRow}>
             <Pressable style={[styles.puzzleConfirmBtn, styles.cipherRetryBtn]} onPress={handleRetry}>
               <Text style={[styles.puzzleConfirmText, { color: C.gold }]}>
-                {ko ? "다시 시도" : es ? "Reintentar" : "Retry"}
+                {ko ? "다시 시도" : es ? "Reintentar" : id ? "Coba lagi" : "Retry"}
               </Text>
             </Pressable>
             <Pressable
@@ -5919,7 +5925,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
               onPress={() => { setShowHintModal(true); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
             >
               <Text style={styles.puzzleConfirmText}>
-                💡 {ko ? "힌트 보기" : es ? "Ver pistas" : "Show Hints"}
+                💡 {ko ? "힌트 보기" : es ? "Ver pistas" : id ? "Lihat petunjuk" : "Show Hints"}
               </Text>
             </Pressable>
           </View>
@@ -5929,7 +5935,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
             <Pressable style={styles.hintOverlay} onPress={() => setShowHintModal(false)}>
               <Pressable style={styles.hintNotebook} onPress={() => {}}>
                 <View style={styles.hintNotebookHeader}>
-                  <EmojiText style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</EmojiText>
+                  <EmojiText style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : id ? "Catatan Detektif" : "Detective's Notebook"}</EmojiText>
                   <Pressable onPress={() => setShowHintModal(false)} style={styles.hintCloseBtn}>
                     <Text style={styles.hintCloseBtnText}>✕</Text>
                   </Pressable>
@@ -5942,24 +5948,24 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
                     <View key={i} style={styles.hintRow}>
                       {isUnlocked ? (
                         <View style={styles.hintUnlocked}>
-                          <Text style={styles.hintLabel}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                          <Text style={styles.hintLabel}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : id ? `Petunjuk ${i + 1}` : `Hint ${i + 1}`}</Text>
                           <Text style={styles.hintText}>{hint}</Text>
                         </View>
                       ) : isNext ? (
                         <Pressable style={styles.hintLocked} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setUnlockedHints(i + 1); }}>
                           <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
-                          <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
+                          <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : id ? `Buka petunjuk ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
                         </Pressable>
                       ) : (
                         <View style={[styles.hintLocked, { opacity: 0.4 }]}>
                           <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
-                          <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                          <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : id ? `Petunjuk ${i + 1}` : `Hint ${i + 1}`}</Text>
                         </View>
                       )}
                     </View>
                   );
                 })}
-                <Text style={styles.hintFooter}>{ko ? "이전 힌트를 먼저 열어야 해요" : es ? "Desbloquea las pistas en orden" : "Unlock hints in order"}</Text>
+                <Text style={styles.hintFooter}>{ko ? "이전 힌트를 먼저 열어야 해요" : es ? "Desbloquea las pistas en orden" : id ? "Buka petunjuk secara berurutan" : "Unlock hints in order"}</Text>
               </Pressable>
             </Pressable>
           </Modal>
@@ -5971,13 +5977,13 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
     return (
       <View style={styles.puzzleBox}>
         <View style={styles.puzzleHeaderRow}>
-          <EmojiText style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : "Decode the Cipher!"}</EmojiText>
+          <EmojiText style={styles.puzzleNum}>🔐 {ko ? "암호를 해독하라!" : es ? "¡Descifra el código!" : id ? "Pecahkan sandinya!" : "Decode the Cipher!"}</EmojiText>
           <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
         </View>
 
         {/* Success banner */}
         <View style={styles.cipherResultCorrect}>
-          <EmojiText style={styles.cipherResultTitle}>✨ {ko ? "퍼즐 해결!" : es ? "¡Puzzle resuelto!" : "Puzzle Solved!"}</EmojiText>
+          <EmojiText style={styles.cipherResultTitle}>✨ {ko ? "퍼즐 해결!" : es ? "¡Puzzle resuelto!" : id ? "Teka-teki selesai!" : "Puzzle Solved!"}</EmojiText>
         </View>
 
         {/* Fox celebration */}
@@ -5985,7 +5991,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
           <EmojiText style={styles.cipherLingoEmoji}>🦊</EmojiText>
           <View style={styles.cipherLingoBubble}>
             <Text style={styles.cipherLingoBubbleText}>
-              {ko ? "훌륭하군요, 파트너! 암호를 완벽히 해독했어요." : es ? "¡Brillante, compañero! Has descifrado el código perfectamente." : "Brilliant, partner! You've decoded the cipher perfectly."}
+              {ko ? "훌륭하군요, 파트너! 암호를 완벽히 해독했어요." : es ? "¡Brillante, compañero! Has descifrado el código perfectamente." : id ? "Hebat, partner! Kamu memecahkan sandinya dengan sempurna." : "Brilliant, partner! You've decoded the cipher perfectly."}
             </Text>
           </View>
         </View>
@@ -5994,7 +6000,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
         <View style={styles.cipherDivider} />
         <View style={styles.cipherExplainBox}>
           <Text style={styles.cipherExplainLabel}>
-            💡 {ko ? "해설:" : es ? "Explicación:" : "Explanation:"}
+            💡 {ko ? "해설:" : es ? "Explicación:" : id ? "Penjelasan:" : "Explanation:"}
           </Text>
           <Text style={styles.cipherExplainBreakdown}>{breakdown}</Text>
           <Text style={styles.cipherExplainResult}>
@@ -6007,13 +6013,13 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
 
         {/* XP reward */}
         <Text style={styles.cipherXpText}>
-          🏆 {ko ? "+50 XP 획득!" : es ? "¡+50 XP obtenidos!" : "+50 XP earned!"}
+          🏆 {ko ? "+50 XP 획득!" : es ? "¡+50 XP obtenidos!" : id ? "+50 XP didapat!" : "+50 XP earned!"}
         </Text>
 
         {/* Continue button */}
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleContinue}>
           <Text style={styles.puzzleConfirmText}>
-            {ko ? "다음 퍼즐 →" : es ? "Siguiente →" : "Next Puzzle →"}
+            {ko ? "다음 퍼즐 →" : es ? "Siguiente →" : id ? "Teka-teki berikutnya →" : "Next Puzzle →"}
           </Text>
         </Pressable>
       </View>
@@ -6024,7 +6030,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <EmojiText style={styles.puzzleNum}>🔐 {lang === "korean" ? "암호를 해독하라!" : lang === "spanish" ? "¡Descifra el código!" : "Decode the Cipher!"}</EmojiText>
+        <EmojiText style={styles.puzzleNum}>🔐 {lang === "korean" ? "암호를 해독하라!" : lang === "spanish" ? "¡Descifra el código!" : lang === "indonesian" ? "Pecahkan sandinya!" : "Decode the Cipher!"}</EmojiText>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
 
@@ -6033,7 +6039,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
         <EmojiText style={styles.cipherLingoEmoji}>🦊</EmojiText>
         <View style={styles.cipherLingoBubble}>
           <Text style={styles.cipherLingoBubbleText}>
-            {lang === "korean" ? "이 암호를 해독해봐, 파트너!" : lang === "spanish" ? "¡Descifra este código, compañero!" : "Decode this cipher, partner!"}
+            {lang === "korean" ? "이 암호를 해독해봐, 파트너!" : lang === "spanish" ? "¡Descifra este código, compañero!" : lang === "indonesian" ? "Pecahkan sandi ini, partner!" : "Decode this cipher, partner!"}
           </Text>
         </View>
       </View>
@@ -6041,12 +6047,12 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
       {/* Puzzle card — cipher text + clue only */}
       <View style={styles.cipherWordCard}>
         <Text style={styles.cipherCardLabel}>
-          {lang === "korean" ? "암호" : lang === "spanish" ? "Cifrado" : "Cipher"}
+          {lang === "korean" ? "암호" : lang === "spanish" ? "Cifrado" : lang === "indonesian" ? "Sandi" : "Cipher"}
         </Text>
         <Text style={styles.cipherEncoded}>{encodedWord}</Text>
         <View style={styles.cipherCardDivider} />
         <Text style={styles.cipherCardLabel}>
-          {lang === "korean" ? "단서" : lang === "spanish" ? "Pista" : "Clue"}
+          {lang === "korean" ? "단서" : lang === "spanish" ? "Pista" : lang === "indonesian" ? "Petunjuk" : "Clue"}
         </Text>
         <Text style={styles.cipherHint}>{hintText}</Text>
       </View>
@@ -6057,7 +6063,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
         onPress={() => { setShowHintModal(true); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
       >
         <Text style={styles.hintBtnText}>
-          💡 {lang === "korean" ? "힌트 보기" : lang === "spanish" ? "Ver pistas" : "Show Hints"}
+          💡 {lang === "korean" ? "힌트 보기" : lang === "spanish" ? "Ver pistas" : lang === "indonesian" ? "Lihat petunjuk" : "Show Hints"}
           {unlockedHints > 0 && (
             <Text style={styles.hintBtnCount}> ({unlockedHints}/3)</Text>
           )}
@@ -6093,7 +6099,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
             {/* Notebook header */}
             <View style={styles.hintNotebookHeader}>
               <Text style={styles.hintNotebookTitle}>
-                🔍 {lang === "korean" ? "수사 노트" : lang === "spanish" ? "Cuaderno de Detective" : "Detective's Notebook"}
+                🔍 {lang === "korean" ? "수사 노트" : lang === "spanish" ? "Cuaderno de Detective" : lang === "indonesian" ? "Catatan Detektif" : "Detective's Notebook"}
               </Text>
               <Pressable onPress={() => setShowHintModal(false)} style={styles.hintCloseBtn}>
                 <Text style={styles.hintCloseBtnText}>✕</Text>
@@ -6110,7 +6116,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
                   {isUnlocked ? (
                     <View style={styles.hintUnlocked}>
                       <Text style={styles.hintLabel}>
-                        {lang === "korean" ? `힌트 ${i + 1}` : lang === "spanish" ? `Pista ${i + 1}` : `Hint ${i + 1}`}
+                        {lang === "korean" ? `힌트 ${i + 1}` : lang === "spanish" ? `Pista ${i + 1}` : lang === "indonesian" ? `Petunjuk ${i + 1}` : `Hint ${i + 1}`}
                       </Text>
                       <Text style={styles.hintText}>{hint}</Text>
                     </View>
@@ -6124,14 +6130,14 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
                     >
                       <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                       <Text style={styles.hintLockedText}>
-                        {lang === "korean" ? `힌트 ${i + 1} 열기` : lang === "spanish" ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}
+                        {lang === "korean" ? `힌트 ${i + 1} 열기` : lang === "spanish" ? `Abrir pista ${i + 1}` : lang === "indonesian" ? `Buka petunjuk ${i + 1}` : `Unlock Hint ${i + 1}`}
                       </Text>
                     </Pressable>
                   ) : (
                     <View style={[styles.hintLocked, { opacity: 0.4 }]}>
                       <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
                       <Text style={styles.hintLockedText}>
-                        {lang === "korean" ? `힌트 ${i + 1}` : lang === "spanish" ? `Pista ${i + 1}` : `Hint ${i + 1}`}
+                        {lang === "korean" ? `힌트 ${i + 1}` : lang === "spanish" ? `Pista ${i + 1}` : lang === "indonesian" ? `Petunjuk ${i + 1}` : `Hint ${i + 1}`}
                       </Text>
                     </View>
                   )}
@@ -6140,7 +6146,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
             })}
 
             <Text style={styles.hintFooter}>
-              {lang === "korean" ? "이전 힌트를 먼저 열어야 해요" : lang === "spanish" ? "Desbloquea las pistas en orden" : "Unlock hints in order"}
+              {lang === "korean" ? "이전 힌트를 먼저 열어야 해요" : lang === "spanish" ? "Desbloquea las pistas en orden" : lang === "indonesian" ? "Buka petunjuk secara berurutan" : "Unlock hints in order"}
             </Text>
           </Pressable>
         </Pressable>
@@ -6167,12 +6173,13 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
                    : learningLang === "korean"  ? q.word.ko
                    : q.word.en;
   const targetLangLabel = learningLang === "spanish"
-    ? (lang === "korean" ? "스페인어" : lang === "spanish" ? "español" : "Spanish")
+    ? (lang === "korean" ? "스페인어" : lang === "spanish" ? "español" : lang === "indonesian" ? "bahasa Spanyol" : "Spanish")
     : learningLang === "korean"
-    ? (lang === "korean" ? "한국어" : lang === "spanish" ? "coreano" : "Korean")
-    : (lang === "korean" ? "영어" : lang === "spanish" ? "inglés" : "English");
+    ? (lang === "korean" ? "한국어" : lang === "spanish" ? "coreano" : lang === "indonesian" ? "bahasa Korea" : "Korean")
+    : (lang === "korean" ? "영어" : lang === "spanish" ? "inglés" : lang === "indonesian" ? "bahasa Inggris" : "English");
   const meaning = lang === "korean" ? q.opts[q.answerIdx].ko
                 : lang === "spanish" ? q.opts[q.answerIdx].es
+                : lang === "indonesian" ? (q.opts[q.answerIdx].id ?? q.opts[q.answerIdx].en)
                 : q.opts[q.answerIdx].en;
 
   const isCorrect = answerResult?.correct ?? false;
@@ -6204,20 +6211,24 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
     if (!answerResult.correct) {
       return lang === "korean" ? `오답. 정답: ${targetWord}`
            : lang === "spanish" ? `Incorrecto. Respuesta: ${targetWord}`
+           : lang === "indonesian" ? `Salah. Jawaban: ${targetWord}`
            : `Incorrect. Answer: ${targetWord}`;
     }
     if (answerResult.accentDiff) {
       return lang === "korean" ? `🎉 정답! 참고: 올바른 표기는 ${targetWord}입니다`
            : lang === "spanish" ? `🎉 ¡Correcto! Nota: la ortografía correcta es ${targetWord}`
+           : lang === "indonesian" ? `🎉 Benar! Catatan: ejaan yang tepat adalah ${targetWord}`
            : `🎉 Correct! Note: the proper spelling is ${targetWord}`;
     }
     if (answerResult.isVariant) {
       return lang === "korean" ? `🎉 정답! 참고: 표준 표기는 ${targetWord}입니다`
            : lang === "spanish" ? `🎉 ¡Correcto! Nota: la ortografía estándar es ${targetWord}`
+           : lang === "indonesian" ? `🎉 Benar! Catatan: ejaan baku-nya adalah ${targetWord}`
            : `🎉 Correct! Note: the standard spelling is ${targetWord}`;
     }
     return lang === "korean" ? "🎉 정답이에요!"
          : lang === "spanish" ? "🎉 ¡Correcto!"
+         : lang === "indonesian" ? "🎉 Benar!"
          : "🎉 Correct!";
   }
 
@@ -6226,13 +6237,13 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <EmojiText style={styles.puzzleNum}>✍️ {lang === "korean" ? "단어 입력" : lang === "spanish" ? "Escribe la palabra" : "Word Typing"}</EmojiText>
+        <EmojiText style={styles.puzzleNum}>✍️ {lang === "korean" ? "단어 입력" : lang === "spanish" ? "Escribe la palabra" : lang === "indonesian" ? "Ketik kata" : "Word Typing"}</EmojiText>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
 
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>
-          {lang === "korean" ? `이 뜻에 맞는 ${targetLangLabel} 단어를 입력하세요` : lang === "spanish" ? `Escribe la palabra en ${targetLangLabel} que significa:` : `Type the ${targetLangLabel} word that means:`}
+          {lang === "korean" ? `이 뜻에 맞는 ${targetLangLabel} 단어를 입력하세요` : lang === "spanish" ? `Escribe la palabra en ${targetLangLabel} que significa:` : lang === "indonesian" ? `Ketik kata ${targetLangLabel} yang berarti:` : `Type the ${targetLangLabel} word that means:`}
         </Text>
         <Text style={[styles.puzzleWordMain, { fontSize: 17, textTransform: "none", lineHeight: 26 }]}>{meaning}</Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginTop: 10, gap: 5 }}>
@@ -6240,7 +6251,7 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
             <View key={i} style={{ width: 14, height: 3, backgroundColor: C.gold, borderRadius: 2, opacity: 0.45 }} />
           ))}
           <Text style={{ fontFamily: F.body, fontSize: 11, color: C.goldDim, width: "100%", textAlign: "center", marginTop: 5 }}>
-            {targetWord.length} {lang === "korean" ? "글자" : lang === "spanish" ? "letras" : "letters"}
+            {targetWord.length} {lang === "korean" ? "글자" : lang === "spanish" ? "letras" : lang === "indonesian" ? "huruf" : "letters"}
           </Text>
         </View>
       </View>
@@ -6250,7 +6261,7 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
         style={[styles.writingInput, confirmed && (isCorrect ? styles.writingInputCorrect : styles.writingInputWrong)]}
         value={answer}
         onChangeText={setAnswer}
-        placeholder={lang === "korean" ? `${targetLangLabel} 단어를 입력하세요...` : lang === "spanish" ? `Escribe en ${targetLangLabel}...` : `Type the ${targetLangLabel} word...`}
+        placeholder={lang === "korean" ? `${targetLangLabel} 단어를 입력하세요...` : lang === "spanish" ? `Escribe en ${targetLangLabel}...` : lang === "indonesian" ? `Ketik kata ${targetLangLabel}...` : `Type the ${targetLangLabel} word...`}
         placeholderTextColor={C.goldDim}
         editable={!confirmed}
         autoCapitalize="none"
@@ -6269,11 +6280,11 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
 
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: answer.trim() ? 1 : 0.5 }]} onPress={handleConfirm} disabled={!answer.trim()}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Confirmar ✓" : "Check ✓"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Confirmar ✓" : lang === "indonesian" ? "Periksa ✓" : "Check ✓"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속 ▶" : lang === "spanish" ? "Continuar ▶" : "Continue ▶"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속 ▶" : lang === "spanish" ? "Continuar ▶" : lang === "indonesian" ? "Lanjut ▶" : "Continue ▶"}</Text>
         </Pressable>
       )}
     </View>
@@ -6430,19 +6441,20 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
 
   const ko = lang === "korean";
   const es = lang === "spanish";
+  const id = lang === "indonesian";
 
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
         <Text style={styles.puzzleNum}>
-          ✏️ {ko ? "손으로 쓰기" : es ? "Escritura a mano" : "Write the Word"}
+          ✏️ {ko ? "손으로 쓰기" : es ? "Escritura a mano" : id ? "Tulis Kata" : "Write the Word"}
         </Text>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
 
       {/* Instruction */}
       <Text style={styles.hwInstruction}>
-        {ko ? "이 단어를 손가락으로 써보세요:" : es ? "Escribe esta palabra con el dedo:" : "Write this word with your finger:"}
+        {ko ? "이 단어를 손가락으로 써보세요:" : es ? "Escribe esta palabra con el dedo:" : id ? "Tulis kata ini dengan jarimu:" : "Write this word with your finger:"}
       </Text>
 
       {/* Word display */}
@@ -6482,7 +6494,7 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
         </Svg>
         {allPaths.length === 0 && currentPath.length === 0 && (
           <Text style={styles.hwPlaceholder}>
-            {ko ? "여기에 쓰세요..." : es ? "Escribe aquí..." : "Write here..."}
+            {ko ? "여기에 쓰세요..." : es ? "Escribe aquí..." : id ? "Tulis di sini..." : "Write here..."}
           </Text>
         )}
       </View>
@@ -6491,7 +6503,7 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
       {recognizedText ? (
         <View style={styles.hwRecognized}>
           <Text style={styles.hwRecognizedLabel}>
-            {ko ? "인식된 텍스트:" : es ? "Texto reconocido:" : "Recognized:"}
+            {ko ? "인식된 텍스트:" : es ? "Texto reconocido:" : id ? "Dikenali:" : "Recognized:"}
           </Text>
           <Text style={styles.hwRecognizedText}>{recognizedText}</Text>
         </View>
@@ -6501,18 +6513,18 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
       {feedback === "good" && (
         <View style={styles.pronFeedbackGood}>
           <Text style={styles.pronFeedbackText}>
-            ✨ {ko ? "잘 썼어요!" : es ? "¡Excelente escritura!" : "Great handwriting!"}
+            ✨ {ko ? "잘 썼어요!" : es ? "¡Excelente escritura!" : id ? "Tulisan bagus!" : "Great handwriting!"}
           </Text>
         </View>
       )}
       {feedback === "retry" && (
         <View style={styles.pronFeedbackRetry}>
           <Text style={styles.pronFeedbackText}>
-            🔄 {ko ? "다시 써보세요." : es ? "Inténtalo de nuevo." : "Try again."}
+            🔄 {ko ? "다시 써보세요." : es ? "Inténtalo de nuevo." : id ? "Coba lagi." : "Try again."}
           </Text>
           <Pressable style={styles.pronSkipBtn} onPress={advanceNext}>
             <Text style={styles.pronSkipText}>
-              {ko ? "그냥 넘어가기 →" : es ? "Continuar →" : "Skip →"}
+              {ko ? "그냥 넘어가기 →" : es ? "Continuar →" : id ? "Lewati →" : "Skip →"}
             </Text>
           </Pressable>
         </View>
@@ -6523,7 +6535,7 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
         <Pressable style={[styles.hwBtn, styles.hwClearBtn]} onPress={clearCanvas}>
           <Ionicons name="trash-outline" size={18} color={C.gold} />
           <Text style={[styles.hwBtnText, { color: C.gold }]}>
-            {ko ? "지우기" : es ? "Borrar" : "Clear"}
+            {ko ? "지우기" : es ? "Borrar" : id ? "Hapus" : "Clear"}
           </Text>
         </Pressable>
         <Pressable
@@ -6537,7 +6549,7 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
             <>
               <Ionicons name="checkmark-circle" size={18} color={C.bg1} />
               <Text style={[styles.hwBtnText, { color: C.bg1 }]}>
-                {ko ? "제출" : es ? "Enviar" : "Submit"}
+                {ko ? "제출" : es ? "Enviar" : id ? "Kirim" : "Submit"}
               </Text>
             </>
           )}
@@ -6563,8 +6575,8 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
 
   const q = puzzle.questions[idx];
   const targetWord = learningLang === "korean" ? q.word.ko : learningLang === "spanish" ? q.word.es : q.word.en;
-  const displayWord = lang === "korean" ? q.word.ko : lang === "spanish" ? q.word.es : q.word.en;
-  const hintText = q.hint ? (lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : q.hint.en) : null;
+  const displayWord = lang === "korean" ? q.word.ko : lang === "spanish" ? q.word.es : lang === "indonesian" ? (q.word.id ?? q.word.en) : q.word.en;
+  const hintText = q.hint ? (lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : lang === "indonesian" ? (q.hint.id ?? q.hint.en) : q.hint.en) : null;
 
   const isCorrect = answerResult?.correct ?? false;
 
@@ -6587,15 +6599,18 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
     if (!answerResult.correct) {
       return lang === "korean" ? `정답: ${targetWord}`
            : lang === "spanish" ? `Respuesta: ${targetWord}`
+           : lang === "indonesian" ? `Jawaban: ${targetWord}`
            : `Answer: ${targetWord}`;
     }
     if (answerResult.isVariant) {
       return lang === "korean" ? `🎉 정답! 참고: 표준 표기는 ${targetWord}입니다`
            : lang === "spanish" ? `🎉 ¡Correcto! Nota: la ortografía estándar es ${targetWord}`
+           : lang === "indonesian" ? `🎉 Benar! Catatan: ejaan baku-nya adalah ${targetWord}`
            : `🎉 Correct! Note: the standard spelling is ${targetWord}`;
     }
     return lang === "korean" ? "🎉 정답이에요!"
          : lang === "spanish" ? "🎉 ¡Correcto!"
+         : lang === "indonesian" ? "🎉 Benar!"
          : "🎉 Correct!";
   }
 
@@ -6604,7 +6619,7 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <EmojiText style={styles.puzzleNum}>✏️ {lang === "korean" ? "쓰기 미션" : lang === "spanish" ? "Misión de escritura" : "Writing Mission"}</EmojiText>
+        <EmojiText style={styles.puzzleNum}>✏️ {lang === "korean" ? "쓰기 미션" : lang === "spanish" ? "Misión de escritura" : lang === "indonesian" ? "Misi Menulis" : "Writing Mission"}</EmojiText>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
@@ -6613,6 +6628,8 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
             ? `'${displayWord}'을(를) ${learningLang === "spanish" ? "스페인어" : learningLang === "korean" ? "한국어" : "영어"}로 써보세요`
             : lang === "spanish"
             ? `Escribe '${displayWord}' en ${learningLang === "spanish" ? "español" : learningLang === "korean" ? "coreano" : "inglés"}`
+            : lang === "indonesian"
+            ? `Tulis '${displayWord}' dalam ${learningLang === "spanish" ? "bahasa Spanyol" : learningLang === "korean" ? "bahasa Korea" : "bahasa Inggris"}`
             : `Type '${displayWord}' in ${learningLang === "spanish" ? "Spanish" : learningLang === "korean" ? "Korean" : "English"}`}
         </Text>
         <Text style={styles.puzzleWordMain}>{displayWord}</Text>
@@ -6622,7 +6639,7 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
         style={[styles.writingInput, confirmed && (isCorrect ? styles.writingInputCorrect : styles.writingInputWrong)]}
         value={answer}
         onChangeText={setAnswer}
-        placeholder={lang === "korean" ? "여기에 입력하세요..." : lang === "spanish" ? "Escribe aquí..." : "Type here..."}
+        placeholder={lang === "korean" ? "여기에 입력하세요..." : lang === "spanish" ? "Escribe aquí..." : lang === "indonesian" ? "Ketik di sini..." : "Type here..."}
         placeholderTextColor={C.goldDim}
         editable={!confirmed}
         autoCapitalize="sentences"
@@ -6637,11 +6654,11 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
       )}
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: answer.trim() ? 1 : 0.5 }]} onPress={handleConfirm} disabled={!answer.trim()}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Confirmar ✓" : "Check ✓"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인 ✓" : lang === "spanish" ? "Confirmar ✓" : lang === "indonesian" ? "Periksa ✓" : "Check ✓"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속 ▶" : lang === "spanish" ? "Continuar ▶" : "Continue ▶"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속 ▶" : lang === "spanish" ? "Continuar ▶" : lang === "indonesian" ? "Lanjut ▶" : "Continue ▶"}</Text>
         </Pressable>
       )}
     </View>
@@ -6692,12 +6709,12 @@ function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <EmojiText style={styles.puzzleNum}>🔀 {lang === "korean" ? "단어 맞추기" : lang === "spanish" ? "Ordenar letras" : "Word Unscramble"}</EmojiText>
+        <EmojiText style={styles.puzzleNum}>🔀 {lang === "korean" ? "단어 맞추기" : lang === "spanish" ? "Ordenar letras" : lang === "indonesian" ? "Susun Kata" : "Word Unscramble"}</EmojiText>
         <Text style={styles.puzzleType}>{idx + 1}/{puzzle.questions.length}</Text>
       </View>
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>
-          {lang === "korean" ? "글자를 순서대로 탭해서 단어를 완성하세요" : lang === "spanish" ? "Toca las letras en orden para formar la palabra" : "Tap letters in order to form the word"}
+          {lang === "korean" ? "글자를 순서대로 탭해서 단어를 완성하세요" : lang === "spanish" ? "Toca las letras en orden para formar la palabra" : lang === "indonesian" ? "Ketuk huruf secara berurutan untuk membentuk kata" : "Tap letters in order to form the word"}
         </Text>
         <View style={styles.wordPuzzleAnswerRow}>
           {correctWord.split("").map((_, i) => (
@@ -6725,7 +6742,7 @@ function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
       {tapped.length > 0 && !isCorrect && (
         <Pressable style={[styles.puzzleConfirmBtn, { backgroundColor: "rgba(201,162,39,0.2)" }]} onPress={handleReset}>
           <Text style={[styles.puzzleConfirmText, { color: C.gold }]}>
-            {lang === "korean" ? "🔄 다시 시작" : lang === "spanish" ? "🔄 Reiniciar" : "🔄 Reset"}
+            {lang === "korean" ? "🔄 다시 시작" : lang === "spanish" ? "🔄 Reiniciar" : lang === "indonesian" ? "🔄 Ulang" : "🔄 Reset"}
           </Text>
         </Pressable>
       )}
@@ -6739,8 +6756,8 @@ function FallbackPuzzle({ lang, onSolved }: { lang: string; onSolved: () => void
   const [selected, setSelected] = useState<number | null>(null);
   const [done, setDone] = useState(false);
   const questions = [
-    { q: lang === "korean" ? "'Hello'는 무슨 뜻인가요?" : lang === "spanish" ? "¿Qué significa 'Hello'?" : "What does 'Bonjour' mean?",
-      opts: lang === "korean" ? ["안녕하세요", "감사합니다", "죄송합니다", "잘 자요"] : lang === "spanish" ? ["Hola", "Gracias", "Lo siento", "Buenas noches"] : ["Hello", "Thank you", "Sorry", "Good night"],
+    { q: lang === "korean" ? "'Hello'는 무슨 뜻인가요?" : lang === "spanish" ? "¿Qué significa 'Hello'?" : lang === "indonesian" ? "Apa arti 'Hello'?" : "What does 'Bonjour' mean?",
+      opts: lang === "korean" ? ["안녕하세요", "감사합니다", "죄송합니다", "잘 자요"] : lang === "spanish" ? ["Hola", "Gracias", "Lo siento", "Buenas noches"] : lang === "indonesian" ? ["Halo", "Terima kasih", "Maaf", "Selamat malam"] : ["Hello", "Thank you", "Sorry", "Good night"],
       answer: 0 },
   ];
   const q = questions[0];
@@ -6758,7 +6775,7 @@ function FallbackPuzzle({ lang, onSolved }: { lang: string; onSolved: () => void
   return (
     <View style={styles.puzzleBox}>
       <View style={styles.puzzleHeaderRow}>
-        <EmojiText style={styles.puzzleNum}>🧩 {lang === "korean" ? "퀴즈" : lang === "spanish" ? "Quiz" : "Quick Quiz"}</EmojiText>
+        <EmojiText style={styles.puzzleNum}>🧩 {lang === "korean" ? "퀴즈" : lang === "spanish" ? "Quiz" : lang === "indonesian" ? "Kuis" : "Quick Quiz"}</EmojiText>
       </View>
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordMain}>{q.q}</Text>
@@ -6805,12 +6822,12 @@ function ClueReveal({ clue, lang, onNext }: { clue: SeqClue; lang: string; onNex
   return (
     <View style={styles.clueReveal}>
       <Animated.View style={[styles.clueRevealCard, { transform: [{ scale }] }]}>
-        <EmojiText style={styles.clueRevealBadge}>🔍 {lang === "korean" ? "단서 발견!" : lang === "spanish" ? "¡Pista Descubierta!" : "Clue Discovered!"}</EmojiText>
+        <EmojiText style={styles.clueRevealBadge}>🔍 {lang === "korean" ? "단서 발견!" : lang === "spanish" ? "¡Pista Descubierta!" : lang === "indonesian" ? "Petunjuk Ditemukan!" : "Clue Discovered!"}</EmojiText>
         <Text style={styles.clueSymbol}>{clue.symbol}</Text>
         <Text style={styles.clueRevealTitle}>{title}</Text>
         <Text style={styles.clueRevealDesc}>{desc}</Text>
         <Pressable style={styles.clueRevealBtn} onPress={onNext}>
-          <Text style={styles.clueRevealBtnText}>{lang === "korean" ? "계속 수사하기 ▶" : lang === "spanish" ? "Continuar investigando ▶" : "Continue Investigation ▶"}</Text>
+          <Text style={styles.clueRevealBtnText}>{lang === "korean" ? "계속 수사하기 ▶" : lang === "spanish" ? "Continuar investigando ▶" : lang === "indonesian" ? "Lanjut menyelidiki ▶" : "Continue Investigation ▶"}</Text>
         </Pressable>
       </Animated.View>
     </View>
@@ -6830,24 +6847,24 @@ function CompletionScreen({ story, lang, xpEarned }: { story: Story; lang: strin
     <ScrollView contentContainerStyle={styles.completionScroll} showsVerticalScrollIndicator={false}>
       <Animated.View style={[styles.completionCard, { transform: [{ scale }] }]}>
         <EmojiText style={styles.completionEmoji}>🦊</EmojiText>
-        <Text style={styles.completionTitle}>{lang === "korean" ? "챕터 완료!" : lang === "spanish" ? "¡Capítulo Completado!" : "Chapter Complete!"}</Text>
+        <Text style={styles.completionTitle}>{lang === "korean" ? "챕터 완료!" : lang === "spanish" ? "¡Capítulo Completado!" : lang === "indonesian" ? "Bab Selesai!" : "Chapter Complete!"}</Text>
         <Text style={styles.completionStoryTitle}>{lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : lang === "indonesian" ? (story.titleId ?? story.title) : story.title}</Text>
         <View style={styles.xpRewardRow}>
           <Ionicons name="flash" size={22} color={C.bg1} />
           <Text style={styles.xpRewardNum}>+{xpEarned} XP</Text>
         </View>
-        <Text style={styles.completionMsg}>{lang === "korean" ? "훌륭해요! 언어 탐정으로서의 실력이 향상되었어요. 다음 챕터가 기다립니다..." : lang === "spanish" ? "¡Excelente! Tus habilidades como detective lingüístico han mejorado. El próximo capítulo te espera..." : "Excellent! Your skills as a Language Detective have grown. The next chapter awaits..."}</Text>
+        <Text style={styles.completionMsg}>{lang === "korean" ? "훌륭해요! 언어 탐정으로서의 실력이 향상되었어요. 다음 챕터가 기다립니다..." : lang === "spanish" ? "¡Excelente! Tus habilidades como detective lingüístico han mejorado. El próximo capítulo te espera..." : lang === "indonesian" ? "Luar biasa! Kemampuanmu sebagai Detektif Bahasa makin terasah. Bab berikutnya menanti..." : "Excellent! Your skills as a Language Detective have grown. The next chapter awaits..."}</Text>
         {story.nextChapterId && (
           <Pressable
             style={styles.completionNextBtn}
             onPress={() => router.replace(`/story-scene?id=${story.nextChapterId}` as any)}
           >
             <Ionicons name="arrow-forward" size={18} color={C.bg1} />
-            <Text style={styles.completionNextBtnText}>{lang === "korean" ? "다음 챕터 ▶" : lang === "spanish" ? "Próximo Capítulo ▶" : "Next Chapter ▶"}</Text>
+            <Text style={styles.completionNextBtnText}>{lang === "korean" ? "다음 챕터 ▶" : lang === "spanish" ? "Próximo Capítulo ▶" : lang === "indonesian" ? "Bab Berikutnya ▶" : "Next Chapter ▶"}</Text>
           </Pressable>
         )}
         <Pressable style={styles.completionHomeBtn} onPress={() => router.replace("/(tabs)/story" as any)}>
-          <Text style={styles.completionHomeBtnText}>{lang === "korean" ? "스토리 목록으로" : lang === "spanish" ? "Lista de capítulos" : "Back to Story Map"}</Text>
+          <Text style={styles.completionHomeBtnText}>{lang === "korean" ? "스토리 목록으로" : lang === "spanish" ? "Lista de capítulos" : lang === "indonesian" ? "Kembali ke Peta Cerita" : "Back to Story Map"}</Text>
         </Pressable>
       </Animated.View>
     </ScrollView>
@@ -7254,8 +7271,8 @@ export default function StoryScene() {
             <View style={styles.narrationBtn}>
               <Text style={styles.narrationBtnText}>
                 {typingDone
-                  ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : "Next")
-                  : (lang === "korean" ? "전체 보기" : lang === "spanish" ? "Mostrar todo" : "Show all")}
+                  ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : lang === "indonesian" ? "Lanjut" : "Next")
+                  : (lang === "korean" ? "전체 보기" : lang === "spanish" ? "Mostrar todo" : lang === "indonesian" ? "Tampilkan semua" : "Show all")}
               </Text>
               {typingDone && <BlinkingArrow color={C.gold} />}
             </View>
@@ -7323,8 +7340,8 @@ export default function StoryScene() {
               <View style={styles.nextBtn}>
                 <Text style={styles.nextBtnText}>
                   {typingDone
-                    ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : "Next")
-                    : (lang === "korean" ? "전체 보기" : lang === "spanish" ? "Mostrar todo" : "Show all")}
+                    ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : lang === "indonesian" ? "Lanjut" : "Next")
+                    : (lang === "korean" ? "전체 보기" : lang === "spanish" ? "Mostrar todo" : lang === "indonesian" ? "Tampilkan semua" : "Show all")}
                 </Text>
                 {typingDone && <BlinkingArrow color={C.bg1} />}
               </View>
@@ -7341,12 +7358,15 @@ export default function StoryScene() {
         {item.kind === "puzzle" && (() => {
           const ko = lang === "korean";
           const es = lang === "spanish";
+          const id = lang === "indonesian";
           const headerText = item.pType === "writing-mission"
-            ? (ko ? `🎤 ${(item as any).title?.ko || "말하기 미션"}` : es ? `🎤 ${(item as any).title?.es || "Misión de habla"}` : `🎤 ${(item as any).title?.en || "Speaking Mission"}`)
+            ? (ko ? `🎤 ${(item as any).title?.ko || "말하기 미션"}` : es ? `🎤 ${(item as any).title?.es || "Misión de habla"}` : id ? `🎤 ${(item as any).title?.id || (item as any).title?.en || "Misi Berbicara"}` : `🎤 ${(item as any).title?.en || "Speaking Mission"}`)
             : ko
             ? `🧩 퍼즐 ${item.puzzleNum}: 언어 실력을 증명하세요!`
             : es
             ? `🧩 Puzzle ${item.puzzleNum}: ¡Demuestra tus habilidades lingüísticas!`
+            : id
+            ? `🧩 Teka-teki ${item.puzzleNum}: Buktikan kemampuan bahasamu!`
             : `🧩 Puzzle ${item.puzzleNum}: Prove your language skills!`;
           const hasSharedHints = !!item.hints && item.pType !== "cipher" && item.pType !== "fill-blank" && item.pType !== "boss-spell";
           const h1 = item.hints ? resolveHint(item.hints.h1, lang, learningLang) : "";
@@ -7401,7 +7421,7 @@ export default function StoryScene() {
                     onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSharedHintVisible(true); }}
                   >
                     <Text style={styles.sharedHintBtnText}>
-                      💡 {ko ? `힌트 보기 (${sharedHintLevel}/${totalHints})` : es ? `Ver pistas (${sharedHintLevel}/${totalHints})` : `Hints (${sharedHintLevel}/${totalHints})`}
+                      💡 {ko ? `힌트 보기 (${sharedHintLevel}/${totalHints})` : es ? `Ver pistas (${sharedHintLevel}/${totalHints})` : id ? `Petunjuk (${sharedHintLevel}/${totalHints})` : `Hints (${sharedHintLevel}/${totalHints})`}
                     </Text>
                   </Pressable>
                 )}
@@ -7412,7 +7432,7 @@ export default function StoryScene() {
                   <Pressable style={styles.hintOverlay} onPress={() => setSharedHintVisible(false)}>
                     <Pressable style={styles.hintNotebook} onPress={() => {}}>
                       <View style={styles.hintNotebookHeader}>
-                        <EmojiText style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : "Detective's Notebook"}</EmojiText>
+                        <EmojiText style={styles.hintNotebookTitle}>🔍 {ko ? "수사 노트" : es ? "Cuaderno de Detective" : id ? "Catatan Detektif" : "Detective's Notebook"}</EmojiText>
                         <Pressable onPress={() => setSharedHintVisible(false)} style={styles.hintCloseBtn}>
                           <Text style={styles.hintCloseBtnText}>✕</Text>
                         </Pressable>
@@ -7422,23 +7442,23 @@ export default function StoryScene() {
                         <View key={i} style={styles.hintRow}>
                           {sharedHintLevel > i ? (
                             <View style={styles.hintUnlocked}>
-                              <Text style={styles.hintLabel}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                              <Text style={styles.hintLabel}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : id ? `Petunjuk ${i + 1}` : `Hint ${i + 1}`}</Text>
                               <Text style={styles.hintText}>{hint}</Text>
                             </View>
                           ) : sharedHintLevel === i ? (
                             <Pressable style={styles.hintLocked} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setSharedHintLevel(i + 1); }}>
                               <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
-                              <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
+                              <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1} 열기` : es ? `Abrir pista ${i + 1}` : id ? `Buka petunjuk ${i + 1}` : `Unlock Hint ${i + 1}`}</Text>
                             </Pressable>
                           ) : (
                             <View style={[styles.hintLocked, { opacity: 0.4 }]}>
                               <EmojiText style={styles.hintLockedIcon}>🔒</EmojiText>
-                              <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : `Hint ${i + 1}`}</Text>
+                              <Text style={styles.hintLockedText}>{ko ? `힌트 ${i + 1}` : es ? `Pista ${i + 1}` : id ? `Petunjuk ${i + 1}` : `Hint ${i + 1}`}</Text>
                             </View>
                           )}
                         </View>
                       ))}
-                      <Text style={styles.hintFooter}>{ko ? "이전 힌트를 먼저 열어야 해요" : es ? "Desbloquea las pistas en orden" : "Unlock hints in order"}</Text>
+                      <Text style={styles.hintFooter}>{ko ? "이전 힌트를 먼저 열어야 해요" : es ? "Desbloquea las pistas en orden" : id ? "Buka petunjuk secara berurutan" : "Unlock hints in order"}</Text>
                     </Pressable>
                   </Pressable>
                 </Modal>
