@@ -99,7 +99,7 @@ export interface LanguageContextType {
 }
 
 export function getDefaultLearning(native: NativeLanguage): NativeLanguage {
-  const all: NativeLanguage[] = ["english", "korean", "spanish"];
+  const all: NativeLanguage[] = ["english", "korean", "spanish", "indonesian"];
   return all.find((l) => l !== native) ?? "english";
 }
 

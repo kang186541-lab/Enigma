@@ -26,9 +26,9 @@ const STORY_PROGRESS_KEY = "lingo_story_progress";
 
 interface LanguageWound {
   npcId: string;
-  name: { ko: string; en: string; es: string };
+  name: { ko: string; en: string; es: string; id: string };
   chapter: string;
-  wound: { ko: string; en: string; es: string };
+  wound: { ko: string; en: string; es: string; id: string };
   unlockTier: string;
   emoji: string;
 }
@@ -282,7 +282,7 @@ export default function NpcListScreen() {
               const unlocked = isTierUnlocked(currentTier, w.unlockTier);
               const isExpanded = expandedWound === w.npcId;
 
-              const npcName = native === "korean" ? w.name.ko : native === "spanish" ? w.name.es : w.name.en;
+              const npcName = native === "korean" ? w.name.ko : native === "spanish" ? w.name.es : native === "indonesian" ? w.name.id : w.name.en;
               const chapterLabel = w.chapter.replace("ch", "Ch.");
 
               return (
@@ -308,7 +308,7 @@ export default function NpcListScreen() {
                   </View>
                   {unlocked && isExpanded && (
                     <Text style={styles.woundText}>
-                      {native === "korean" ? w.wound.ko : native === "spanish" ? w.wound.es : w.wound.en}
+                      {native === "korean" ? w.wound.ko : native === "spanish" ? w.wound.es : native === "indonesian" ? w.wound.id : w.wound.en}
                     </Text>
                   )}
                   {!unlocked && (

@@ -334,120 +334,130 @@
   "languageWounds": {
     "ellis": {
       "npcId": "ellis",
-      "name": { "ko": "Dr. Ellis", "en": "Dr. Ellis", "es": "Dra. Ellis" },
+      "name": { "ko": "Dr. Ellis", "en": "Dr. Ellis", "es": "Dra. Ellis", "id": "Dr. Ellis" },
       "chapter": "ch1",
       "wound": {
         "ko": "세계적 언어학자였지만 렉시콘의 언어 소거 장치에 노출되어 모든 말을 잃었다. 단어 하나도 꺼낼 수 없는 침묵 속에서, 그녀는 '언어를 잃는다는 것은 자기 자신을 잃는 것'이라는 걸 온몸으로 체감했다.",
         "en": "A world-renowned linguist who lost all speech after exposure to Lexicon's Language Erasure Device. Trapped in silence, unable to produce a single word, she learned firsthand that losing language means losing yourself.",
-        "es": "Una lingüista de renombre mundial que perdió toda capacidad de habla tras la exposición al Dispositivo de Borrado Lingüístico de Lexicón. Atrapada en silencio, incapaz de producir una sola palabra, aprendió de primera mano que perder el idioma significa perderse a uno mismo."
+        "es": "Una lingüista de renombre mundial que perdió toda capacidad de habla tras la exposición al Dispositivo de Borrado Lingüístico de Lexicón. Atrapada en silencio, incapaz de producir una sola palabra, aprendió de primera mano que perder el idioma significa perderse a uno mismo.",
+        "id": "Ahli bahasa kelas dunia yang kehilangan kemampuan bicara setelah terpapar Alat Penghapus Bahasa milik Lexicon. Terjebak dalam keheningan, tak bisa mengucapkan satu kata pun, dia merasakan langsung bahwa kehilangan bahasa berarti kehilangan diri sendiri."
       },
       "unlockTier": "familiar",
       "emoji": "🤐"
     },
     "tom": {
       "npcId": "tom",
-      "name": { "ko": "Tom", "en": "Tom", "es": "Tom" },
+      "name": { "ko": "Tom", "en": "Tom", "es": "Tom", "id": "Tom" },
       "chapter": "ch1",
       "wound": {
         "ko": "코크니 슬랭이 자부심이었지만, 사람들이 '제대로 된 영어'가 아니라고 놀릴 때마다 자신의 말이 가치 없다고 느꼈다. 루디가 그의 슬랭을 진지하게 배우려 한 첫 번째 사람이다.",
         "en": "Proud of his Cockney slang, but every time people mocked it as 'not real English,' he felt his words were worthless. Rudy was the first person who genuinely wanted to learn his way of speaking.",
-        "es": "Orgulloso de su jerga cockney, pero cada vez que la gente se burlaba diciendo que 'no es inglés de verdad,' sentía que sus palabras no valían nada. Rudy fue la primera persona que genuinamente quiso aprender su forma de hablar."
+        "es": "Orgulloso de su jerga cockney, pero cada vez que la gente se burlaba diciendo que 'no es inglés de verdad,' sentía que sus palabras no valían nada. Rudy fue la primera persona que genuinamente quiso aprender su forma de hablar.",
+        "id": "Dia bangga dengan slang Cockney-nya, tapi tiap kali orang mengejeknya sebagai 'bukan bahasa Inggris asli,' dia merasa kata-katanya tak berharga. Rudy adalah orang pertama yang benar-benar mau belajar cara bicaranya."
       },
       "unlockTier": "friendly",
       "emoji": "🗣️"
     },
     "isabel": {
       "npcId": "isabel",
-      "name": { "ko": "Isabel", "en": "Isabel", "es": "Isabel" },
+      "name": { "ko": "Isabel", "en": "Isabel", "es": "Isabel", "id": "Isabel" },
       "chapter": "ch2",
       "wound": {
         "ko": "할머니의 안달루시아 사투리를 유일하게 기억하는 사람. 할머니가 돌아가신 뒤, 그 특별한 표현들을 쓸 사람이 아무도 없다. 그래서 카를로스가 말을 잃었을 때, 자기 할머니를 떠올리며 누구보다 필사적으로 도왔다.",
         "en": "The only person who remembers her grandmother's Andalusian dialect. After her grandmother passed, there was no one left to share those special expressions with. When Carlos lost his words, it reminded her of losing her grandmother's voice... that's why she fought harder than anyone to help.",
-        "es": "La única persona que recuerda el dialecto andaluz de su abuela. Después de que su abuela falleció, no quedó nadie con quien compartir esas expresiones especiales. Cuando Carlos perdió sus palabras, le recordó a perder la voz de su abuela... por eso luchó más que nadie para ayudar."
+        "es": "La única persona que recuerda el dialecto andaluz de su abuela. Después de que su abuela falleció, no quedó nadie con quien compartir esas expresiones especiales. Cuando Carlos perdió sus palabras, le recordó a perder la voz de su abuela... por eso luchó más que nadie para ayudar.",
+        "id": "Satu-satunya orang yang masih mengingat dialek Andalusia neneknya. Setelah neneknya meninggal, tak ada lagi orang untuk berbagi ungkapan-ungkapan istimewa itu. Saat Carlos kehilangan kata-katanya, itu mengingatkannya pada hilangnya suara sang nenek... itulah kenapa dia berjuang lebih keras dari siapa pun untuk membantu."
       },
       "unlockTier": "familiar",
       "emoji": "💃"
     },
     "miguel": {
       "npcId": "miguel",
-      "name": { "ko": "Don Miguel", "en": "Don Miguel", "es": "Don Miguel" },
+      "name": { "ko": "Don Miguel", "en": "Don Miguel", "es": "Don Miguel", "id": "Don Miguel" },
       "chapter": "ch2",
       "wound": {
         "ko": "50년간 시장에서 속담으로 사람들을 이어주던 사람. 하지만 렉시콘의 언어 소거가 시장에 퍼지면서, 단골들이 하나둘 그의 속담을 이해하지 못하게 되었다. '속담이 죽으면 지혜도 죽는다'고 말하며 울었다.",
         "en": "For 50 years, his proverbs connected people at the market. But as Lexicon's erasure spread, regulars stopped understanding his sayings one by one. 'When proverbs die, wisdom dies,' he said, weeping.",
-        "es": "Durante 50 años, sus proverbios conectaron a la gente del mercado. Pero cuando el borrado de Lexicón se extendió, los habituales dejaron de entender sus dichos uno por uno. 'Cuando mueren los proverbios, muere la sabiduría,' dijo, llorando."
+        "es": "Durante 50 años, sus proverbios conectaron a la gente del mercado. Pero cuando el borrado de Lexicón se extendió, los habituales dejaron de entender sus dichos uno por uno. 'Cuando mueren los proverbios, muere la sabiduría,' dijo, llorando.",
+        "id": "Selama 50 tahun, peribahasanya menghubungkan orang-orang di pasar. Tapi saat penghapusan Lexicon menyebar, para pelanggan setia satu per satu berhenti memahami pepatahnya. 'Saat peribahasa mati, kebijaksanaan pun mati,' katanya sambil menangis."
       },
       "unlockTier": "friendly",
       "emoji": "📖"
     },
     "sujin": {
       "npcId": "sujin",
-      "name": { "ko": "Sujin", "en": "Sujin", "es": "Sujin" },
+      "name": { "ko": "Sujin", "en": "Sujin", "es": "Sujin", "id": "Sujin" },
       "chapter": "ch3",
       "wound": {
         "ko": "언어학 교수로서 '프로젝트 이레이즈'의 실체를 처음 발견한 사람. 하지만 학계에 경고했을 때 아무도 믿지 않았다. '미쳤다'는 소리를 듣고 대학에서 밀려났다. 루디가 믿어준 첫 번째 사람.",
         "en": "As a linguistics professor, she was the first to discover Project Erase. But when she warned academia, no one believed her. Called 'crazy' and pushed out of the university. Rudy was the first person who believed her.",
-        "es": "Como profesora de lingüística, fue la primera en descubrir el Proyecto Borrado. Pero cuando advirtió a la academia, nadie le creyó. La llamaron 'loca' y la apartaron de la universidad. Rudy fue la primera persona que le creyó."
+        "es": "Como profesora de lingüística, fue la primera en descubrir el Proyecto Borrado. Pero cuando advirtió a la academia, nadie le creyó. La llamaron 'loca' y la apartaron de la universidad. Rudy fue la primera persona que le creyó.",
+        "id": "Sebagai profesor linguistik, dia orang pertama yang menemukan Proyek Penghapusan. Tapi saat dia memperingatkan kalangan akademis, tak ada yang percaya. Dia disebut 'gila' dan didepak dari universitas. Rudy adalah orang pertama yang mempercayainya."
       },
       "unlockTier": "familiar",
       "emoji": "🔬"
     },
     "youngsook": {
       "npcId": "youngsook",
-      "name": { "ko": "할머니 영숙", "en": "Grandma Youngsook", "es": "Abuela Youngsook" },
+      "name": { "ko": "할머니 영숙", "en": "Grandma Youngsook", "es": "Abuela Youngsook", "id": "Nenek Youngsook" },
       "chapter": "ch3",
       "wound": {
         "ko": "어린 시절 쓰던 고향 사투리가 '촌스럽다'고 놀림받으며 표준어만 쓰게 됐다. 60년 만에 시장에서 같은 고향 사람을 만났지만, 이미 사투리를 잊어버린 뒤였다. 그래서 지금 자신의 모든 속담과 표현을 루디에게 가르치려 한다... 누군가는 기억해야 하니까.",
         "en": "Mocked for her hometown dialect as 'unsophisticated,' she switched to standard Korean. After 60 years, she met someone from her village at the market... but had already forgotten the dialect. Now she teaches Rudy every proverb and expression she remembers, because someone must carry them forward.",
-        "es": "Burlada por su dialecto natal como 'poco sofisticado,' cambió al coreano estándar. Después de 60 años, encontró a alguien de su pueblo en el mercado... pero ya había olvidado el dialecto. Ahora le enseña a Rudy cada proverbio y expresión que recuerda, porque alguien debe llevarlos adelante."
+        "es": "Burlada por su dialecto natal como 'poco sofisticado,' cambió al coreano estándar. Después de 60 años, encontró a alguien de su pueblo en el mercado... pero ya había olvidado el dialecto. Ahora le enseña a Rudy cada proverbio y expresión que recuerda, porque alguien debe llevarlos adelante.",
+        "id": "Diejek karena dialek kampung halamannya dianggap 'kampungan,' dia beralih ke bahasa Korea baku. Setelah 60 tahun, dia bertemu orang sekampungnya di pasar... tapi sudah lupa dialeknya. Kini dia mengajari Rudy setiap peribahasa dan ungkapan yang masih diingatnya, karena harus ada yang meneruskannya."
       },
       "unlockTier": "friendly",
       "emoji": "👵"
     },
     "minho": {
       "npcId": "minho",
-      "name": { "ko": "Minho", "en": "Minho", "es": "Minho" },
+      "name": { "ko": "Minho", "en": "Minho", "es": "Minho", "id": "Minho" },
       "chapter": "ch3",
       "wound": {
         "ko": "래퍼로서 한국어의 리듬과 소리를 사랑하지만, 해외 팬들을 위해 영어로만 곡을 써야 한다는 압박을 받는다. '내 가사의 한국어 말장난을 번역하면 영혼이 사라진다'고 고백한다.",
         "en": "As a rapper, he loves the rhythm of Korean, but faces pressure to write only in English for international fans. 'When you translate my Korean wordplay, the soul disappears,' he confesses.",
-        "es": "Como rapero, ama el ritmo del coreano, pero enfrenta presión para escribir solo en inglés para fans internacionales. 'Cuando traduces mis juegos de palabras en coreano, el alma desaparece,' confiesa."
+        "es": "Como rapero, ama el ritmo del coreano, pero enfrenta presión para escribir solo en inglés para fans internacionales. 'Cuando traduces mis juegos de palabras en coreano, el alma desaparece,' confiesa.",
+        "id": "Sebagai rapper, dia mencintai irama bahasa Korea, tapi ditekan untuk menulis lagu hanya dalam bahasa Inggris demi penggemar internasional. 'Kalau permainan kata Korea-ku diterjemahkan, jiwanya hilang,' akunya."
       },
       "unlockTier": "familiar",
       "emoji": "🎤"
     },
     "farid": {
       "npcId": "farid",
-      "name": { "ko": "Farid", "en": "Farid", "es": "Farid" },
+      "name": { "ko": "Farid", "en": "Farid", "es": "Farid", "id": "Farid" },
       "chapter": "ch4",
       "wound": {
         "ko": "고대 이집트 상형문자를 해독하는 것이 꿈이었지만, 렉시콘이 로제타 석판의 핵심 부분을 훼손했다. '고대인의 목소리를 영원히 침묵시킨 것'이라며 분노한다.",
         "en": "His dream was deciphering ancient Egyptian hieroglyphs, but Lexicon damaged key sections of the Rosetta Stone. 'They silenced the voice of the ancients forever,' he says with fury.",
-        "es": "Su sueño era descifrar los jeroglíficos del antiguo Egipto, pero Lexicón dañó secciones clave de la Piedra Rosetta. 'Silenciaron la voz de los antiguos para siempre,' dice con furia."
+        "es": "Su sueño era descifrar los jeroglíficos del antiguo Egipto, pero Lexicón dañó secciones clave de la Piedra Rosetta. 'Silenciaron la voz de los antiguos para siempre,' dice con furia.",
+        "id": "Mimpinya adalah memecahkan hieroglif Mesir kuno, tapi Lexicon merusak bagian-bagian penting Batu Rosetta. 'Mereka membungkam suara orang-orang kuno selamanya,' katanya dengan amarah."
       },
       "unlockTier": "familiar",
       "emoji": "🏛️"
     },
     "amira": {
       "npcId": "amira",
-      "name": { "ko": "Amira", "en": "Amira", "es": "Amira" },
+      "name": { "ko": "Amira", "en": "Amira", "es": "Amira", "id": "Amira" },
       "chapter": "ch4",
       "wound": {
         "ko": "카이로 대학에서 소수 언어 보존 프로젝트를 이끌었지만, 연구 자금이 끊기고 보존하려던 3개 부족 언어가 마지막 화자와 함께 사라졌다. '내가 더 빨랐더라면' 하는 죄책감을 안고 산다.",
         "en": "Led a minority language preservation project at Cairo University, but funding was cut and three tribal languages she was trying to save died with their last speakers. She lives with the guilt of 'if only I had been faster.'",
-        "es": "Lideró un proyecto de preservación de lenguas minoritarias en la Universidad de El Cairo, pero se cortó la financiación y tres lenguas tribales que intentaba salvar murieron con sus últimos hablantes. Vive con la culpa de 'si tan solo hubiera sido más rápida.'"
+        "es": "Lideró un proyecto de preservación de lenguas minoritarias en la Universidad de El Cairo, pero se cortó la financiación y tres lenguas tribales que intentaba salvar murieron con sus últimos hablantes. Vive con la culpa de 'si tan solo hubiera sido más rápida.'",
+        "id": "Dia memimpin proyek pelestarian bahasa minoritas di Universitas Kairo, tapi dananya dipotong dan tiga bahasa suku yang ingin diselamatkannya punah bersama penutur terakhirnya. Dia hidup dengan rasa bersalah 'andai saja aku lebih cepat.'"
       },
       "unlockTier": "friendly",
       "emoji": "📚"
     },
     "hassan": {
       "npcId": "hassan",
-      "name": { "ko": "Hassan", "en": "Hassan", "es": "Hassan" },
+      "name": { "ko": "Hassan", "en": "Hassan", "es": "Hassan", "id": "Hassan" },
       "chapter": "ch4",
       "wound": {
         "ko": "시장에서 5개 언어로 흥정하던 능력이 자부심이었는데, 렉시콘의 영향으로 아랍어 속담이 하나씩 머릿속에서 사라지고 있다. '어제 할아버지가 가르쳐준 속담을 잊어버렸어. 이름도 잊어버릴까 봐 무섭다.'",
         "en": "Proud of his ability to bargain in 5 languages, but Lexicon's influence is erasing Arabic proverbs from his mind one by one. 'Yesterday I forgot a proverb my grandfather taught me. I'm terrified I'll forget his name next.'",
-        "es": "Orgulloso de su capacidad de regatear en 5 idiomas, pero la influencia de Lexicón está borrando proverbios árabes de su mente uno por uno. 'Ayer olvidé un proverbio que me enseñó mi abuelo. Tengo terror de olvidar su nombre después.'"
+        "es": "Orgulloso de su capacidad de regatear en 5 idiomas, pero la influencia de Lexicón está borrando proverbios árabes de su mente uno por uno. 'Ayer olvidé un proverbio que me enseñó mi abuelo. Tengo terror de olvidar su nombre después.'",
+        "id": "Kemampuannya menawar dalam 5 bahasa di pasar adalah kebanggaannya, tapi pengaruh Lexicon menghapus peribahasa Arab dari benaknya satu per satu. 'Kemarin aku lupa peribahasa yang diajarkan kakekku. Aku takut akan lupa namanya juga.'"
       },
       "unlockTier": "familiar",
       "emoji": "🏪"

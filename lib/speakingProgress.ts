@@ -1,4 +1,30 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { loadLearnerProfile, saveLearnerProfile, type SpeakingDayProgress, type SpeakingProgress } from "@/lib/learnerProfile";
+
+// Monotonic lifetime-day counter, kept in its OWN AsyncStorage keys rather than
+// inside SpeakingProgress on purpose:
+//   - SpeakingProgress is merged field-by-field on sync (see
+//     mergeSpeakingProgress / progressSync's learner_profile merge). A new field
+//     there would be silently dropped unless we also widened the locked merge
+//     path. A standalone key avoids touching the progress-sync/merge shape.
+//   - It must NOT be trimmed: the bug was that the offset was derived from
+//     `history` (capped at the last 45 days), so it plateaued. A dedicated
+//     counter grows forever.
+// `LIFETIME_SPOKEN_DAYS_KEY` counts every distinct calendar day the learner has
+// spoken >=1 sentence (today included once it happens). `LAST_SPOKEN_DAY_KEY`
+// is the date-key of the most recent counted day, used to fire the increment
+// exactly once per new day. `LIFETIME_DAYS_OWNER_KEY` stamps which signed-in
+// account the counter belongs to: the old history-derived offset reset to 0 on
+// account switch (because @lingua_learner_profile is wiped), and these
+// standalone keys are NOT in that cleanup list, so we self-reset when the
+// active user changes to avoid one account inheriting another's day offset.
+const LIFETIME_SPOKEN_DAYS_KEY = "@lingua_lifetime_spoken_days";
+const LAST_SPOKEN_DAY_KEY = "@lingua_last_spoken_day";
+const LIFETIME_DAYS_OWNER_KEY = "@lingua_lifetime_spoken_days_owner";
+// Literal of progressStorage's ACTIVE_USER_KEY. Inlined (not imported) to keep
+// this fix self-contained to speakingProgress.ts; kept in sync deliberately.
+const ACTIVE_USER_KEY = "@lingua_active_user_id";
 
 // Daily spoken-sentence target. This is a PRODUCT LEVER, not just copy: it
 // gates `dailyGoalMet`, which un-collapses the home dashboard and lifts
@@ -23,19 +49,115 @@ function normalizeSpeakingProgress(progress?: Partial<SpeakingProgress> | null):
   };
 }
 
+function parseNonNegativeInt(raw: string | null): number | null {
+  if (raw == null) return null;
+  const n = Number.parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
 /**
- * How many DISTINCT prior days the learner has spoken on (not counting today),
- * derived from the date-keyed speaking history. Used to advance the home
- * "first sentence" mission day-to-day so a returning learner meets new survival
- * phrases instead of re-opening with the same greeting. No new storage — the
- * history keys (last ~45 days) already exist. Returns 0 on day one.
+ * Drop the standalone lifetime-day keys when they belong to a different signed-in
+ * account than the one currently active. The old offset was derived from
+ * @lingua_learner_profile (wiped on account switch), so it reset to 0 for a new
+ * account; these standalone keys aren't in that cleanup list, so without this a
+ * second account on the same device would inherit the first account's offset.
+ * Signed-out (no active user id) is treated as "no owner change" so a plain
+ * relaunch never wipes progress.
  */
-export async function loadSpokenDayOffset(): Promise<number> {
+async function reconcileLifetimeDaysOwner(): Promise<void> {
+  try {
+    const activeUserId = await AsyncStorage.getItem(ACTIVE_USER_KEY);
+    if (!activeUserId) return; // signed out — keep local counter as-is
+    const owner = await AsyncStorage.getItem(LIFETIME_DAYS_OWNER_KEY);
+    if (owner === activeUserId) return;
+    // Different account (or first stamp): clear the counter so the seed below
+    // re-derives from THIS account's history, and claim ownership.
+    await AsyncStorage.multiRemove([LIFETIME_SPOKEN_DAYS_KEY, LAST_SPOKEN_DAY_KEY]);
+    await AsyncStorage.setItem(LIFETIME_DAYS_OWNER_KEY, activeUserId);
+  } catch (e) {
+    console.warn("[speakingProgress] lifetime-day owner reconcile failed:", e);
+  }
+}
+
+/**
+ * Number of distinct calendar days the learner has spoken on so far, today
+ * included once they speak. Backed by a monotonic AsyncStorage counter that is
+ * NEVER trimmed, so it keeps growing past 45 days (unlike the speaking history).
+ *
+ * Migration: pre-existing users have no counter yet but do have history. We
+ * seed the counter from the distinct day-count in their (trimmed) history so
+ * they don't reset to day 0. This is a floor — `history` was capped at 45 days,
+ * so a very long-tenured user may under-count slightly on the seed, but the
+ * counter then grows correctly from there and never plateaus again.
+ */
+async function loadLifetimeSpokenDays(): Promise<number> {
+  await reconcileLifetimeDaysOwner();
+  const stored = parseNonNegativeInt(await AsyncStorage.getItem(LIFETIME_SPOKEN_DAYS_KEY));
+  if (stored != null) return stored;
+
+  // No counter yet — seed from existing history so returning users keep their
+  // progression. Persist the seed so the migration only runs once.
   const profile = await loadLearnerProfile();
   const progress = normalizeSpeakingProgress(profile.speakingProgress);
+  const distinctDays = Object.keys(progress.history).length;
   const today = getLocalDateKey();
-  const priorDays = Object.keys(progress.history).filter((k) => k < today).length;
-  return Math.max(0, priorDays);
+  const lastSpokenDay = progress.history[today] ? today : null;
+  try {
+    const pairs: [string, string][] = [[LIFETIME_SPOKEN_DAYS_KEY, String(distinctDays)]];
+    if (lastSpokenDay) pairs.push([LAST_SPOKEN_DAY_KEY, lastSpokenDay]);
+    await AsyncStorage.multiSet(pairs);
+  } catch (e) {
+    console.warn("[speakingProgress] lifetime-day seed failed:", e);
+  }
+  return distinctDays;
+}
+
+/**
+ * How many DISTINCT prior days the learner has spoken on (NOT counting today).
+ * Used to advance the home "first sentence" mission day-to-day so a returning
+ * learner meets new survival phrases instead of re-opening with the same
+ * greeting. Returns 0 on day one.
+ *
+ * Off-by-one: the lifetime counter includes today once the learner has spoken,
+ * but `getProgressiveMissionPhrase` expects `dayOffset` = days BEFORE today
+ * (day 0 on the first day, where `idx = dayOffset * goal + spokenCount`). So we
+ * subtract today (clamped at 0). On a fresh day, if today hasn't been counted
+ * yet the counter already equals the number of prior days, and `max(0, n-1)`
+ * would under-count by 1 — so we only subtract when today has already been
+ * counted. This keeps the offset advancing the moment a new day's first
+ * sentence lands, rather than lagging a day behind.
+ */
+export async function loadSpokenDayOffset(): Promise<number> {
+  const lifetimeDays = await loadLifetimeSpokenDays();
+  const lastSpokenDay = await AsyncStorage.getItem(LAST_SPOKEN_DAY_KEY);
+  const todayCounted = lastSpokenDay === getLocalDateKey();
+  // Subtract today only when it's already in the count; otherwise the counter
+  // already reflects prior days only.
+  return Math.max(0, lifetimeDays - (todayCounted ? 1 : 0));
+}
+
+/**
+ * Increment the monotonic lifetime-day counter the FIRST time the learner
+ * speaks on a given calendar day. Idempotent within a day: guarded by
+ * LAST_SPOKEN_DAY_KEY so repeated calls for the same `date` are no-ops. Called
+ * from recordSpokenSentence after a sentence is actually committed.
+ */
+async function bumpLifetimeSpokenDayIfNewDay(date: string): Promise<void> {
+  try {
+    const lastSpokenDay = await AsyncStorage.getItem(LAST_SPOKEN_DAY_KEY);
+    if (lastSpokenDay === date) return;
+    // Read through loadLifetimeSpokenDays so a not-yet-seeded counter is
+    // migrated from history before we add today's day.
+    const current = await loadLifetimeSpokenDays();
+    // Re-check the guard: the seed above may have just written today's date.
+    if ((await AsyncStorage.getItem(LAST_SPOKEN_DAY_KEY)) === date) return;
+    await AsyncStorage.multiSet([
+      [LIFETIME_SPOKEN_DAYS_KEY, String(current + 1)],
+      [LAST_SPOKEN_DAY_KEY, date],
+    ]);
+  } catch (e) {
+    console.warn("[speakingProgress] lifetime-day bump failed:", e);
+  }
 }
 
 function trimHistory(history: Record<string, SpeakingDayProgress>): Record<string, SpeakingDayProgress> {
@@ -161,6 +283,11 @@ export async function recordSpokenSentence(params: {
       ...profile,
       speakingProgress: result.progress,
     });
+
+    // First committed sentence of a new calendar day advances the monotonic
+    // lifetime-day counter that backs loadSpokenDayOffset (so the home "first
+    // sentence" keeps progressing past 45 days). Idempotent within the day.
+    await bumpLifetimeSpokenDayIfNewDay(date);
 
     return { day: result.day, counted: true };
   };

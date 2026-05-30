@@ -77,22 +77,22 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
         {/* Stat items */}
         <StatItem
           icon="\u2705"
-          label={lang === "ko" ? "\uC815\uB2F5\uB960" : lang === "es" ? "Precisión" : "Accuracy"}
+          label={lang === "ko" ? "\uC815\uB2F5\uB960" : lang === "es" ? "Precisión" : lang === "id" ? "Akurasi" : "Accuracy"}
           value={`${result.correctRate}%`}
         />
         <StatItem
           icon="\uD83D\uDD0D"
-          label={lang === "ko" ? "\uC218\uC9D1\uD55C \uB2E8\uC11C" : lang === "es" ? "Pistas" : "Clues"}
+          label={lang === "ko" ? "\uC218\uC9D1\uD55C \uB2E8\uC11C" : lang === "es" ? "Pistas" : lang === "id" ? "Petunjuk" : "Clues"}
           value={`${result.cluesFound}/${result.cluesTotal}`}
         />
         <StatItem
           icon="\u2728"
-          label={lang === "ko" ? "\uD68D\uB4DD XP" : lang === "es" ? "XP Ganado" : "XP Earned"}
+          label={lang === "ko" ? "\uD68D\uB4DD XP" : lang === "es" ? "XP Ganado" : lang === "id" ? "XP Didapat" : "XP Earned"}
           value={`+${result.xpEarned}`}
         />
         <StatItem
           icon="\uD83D\uDCD6"
-          label={lang === "ko" ? "\uC0C8 \uD45C\uD604" : lang === "es" ? "Nuevas" : "New Words"}
+          label={lang === "ko" ? "\uC0C8 \uD45C\uD604" : lang === "es" ? "Nuevas" : lang === "id" ? "Kata Baru" : "New Words"}
           value={`${result.newExpressions.length}`}
         />
 
@@ -100,7 +100,7 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
         {Object.keys(result.npcRelationChanges).length > 0 && (
           <View style={styles.npcSection}>
             <Text style={styles.npcTitle}>
-              {lang === "ko" ? "NPC \uD638\uAC10\uB3C4" : lang === "es" ? "Relaciones NPC" : "NPC Relations"}
+              {lang === "ko" ? "NPC \uD638\uAC10\uB3C4" : lang === "es" ? "Relaciones NPC" : lang === "id" ? "Hubungan NPC" : "NPC Relations"}
             </Text>
             {Object.entries(result.npcRelationChanges).map(([npcId, change]) => {
               const npc = getNpcById(npcId);
@@ -123,7 +123,7 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
           <View style={styles.badgeRow}>
             <Text style={styles.badgeIcon}>\uD83C\uDFC5</Text>
             <Text style={styles.badgeText}>
-              {lang === "ko" ? "\uBC43\uC9C0 \uD68D\uB4DD!" : lang === "es" ? "\u00A1Insignia!" : "Badge Earned!"}
+              {lang === "ko" ? "\uBC43\uC9C0 \uD68D\uB4DD!" : lang === "es" ? "\u00A1Insignia!" : lang === "id" ? "Lencana Didapat!" : "Badge Earned!"}
             </Text>
           </View>
         )}
@@ -136,8 +136,8 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
       >
         <Text style={styles.continueBtnText}>
           {result.badgeEarned
-            ? (lang === "ko" ? "\uB2E4\uC74C \uCC55\uD130 \uD574\uAE08!" : lang === "es" ? "\u00A1Siguiente Capítulo!" : "Next Chapter!")
-            : (lang === "ko" ? "\uACC4\uC18D" : lang === "es" ? "Continuar" : "Continue")
+            ? (lang === "ko" ? "\uB2E4\uC74C \uCC55\uD130 \uD574\uAE08!" : lang === "es" ? "\u00A1Siguiente Capítulo!" : lang === "id" ? "Bab Berikutnya!" : "Next Chapter!")
+            : (lang === "ko" ? "\uACC4\uC18D" : lang === "es" ? "Continuar" : lang === "id" ? "Lanjut" : "Continue")
           }
         </Text>
       </Pressable>
