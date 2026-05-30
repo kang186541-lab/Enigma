@@ -1358,7 +1358,8 @@
       "title": {
         "ko": "목격자 증언",
         "en": "Witness Testimony",
-        "es": "Testimonio del Testigo"
+        "es": "Testimonio del Testigo",
+        "id": "Kesaksian Saksi"
       },
       "difficulty": 2,
       "timeLimit": null,
@@ -1366,7 +1367,8 @@
       "storyContext": {
         "ko": "이사벨이 카를로스 실종 당시를 증언한다. 학습 언어로 된 텍스트를 읽고 정보를 추출하라.",
         "en": "Isabel testifies about Carlos's disappearance. Read the text in your target language and extract information.",
-        "es": "Isabel testifica sobre la desaparición de Carlos. Lee el texto y extrae la información."
+        "es": "Isabel testifica sobre la desaparición de Carlos. Lee el texto y extrae la información.",
+        "id": "Isabel bersaksi tentang hilangnya Carlos. Baca teks dalam bahasa targetmu dan ambil informasinya."
       },
       "content": {
         "en": {
@@ -1608,6 +1610,91 @@
               }
             }
           ]
+        },
+        "id": {
+          "passage": "Tadi malam, pukul ___(1)___, aku melihat Carlos keluar museum bersama seorang pria ___(2)___. Pria itu memakai ___(3)___ hitam dan topi. Mereka menuju Taman ___(4)___. Carlos terlihat ___(5)___.",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "sebelas",
+              "options": [
+                "sembilan",
+                "sepuluh",
+                "sebelas",
+                "tengah malam"
+              ],
+              "hint": {
+                "ko": "밤 11시입니다",
+                "en": "It was 11 PM",
+                "es": "Eran las 11 PM",
+                "id": "Saat itu pukul 11 malam"
+              }
+            },
+            {
+              "id": 2,
+              "answer": "tinggi",
+              "options": [
+                "pendek",
+                "tinggi",
+                "muda",
+                "tua"
+              ],
+              "hint": {
+                "ko": "키가 큰",
+                "en": "Vertically big",
+                "es": "De gran estatura",
+                "id": "Bertubuh jangkung"
+              }
+            },
+            {
+              "id": 3,
+              "answer": "mantel",
+              "options": [
+                "mantel",
+                "kemeja",
+                "jas",
+                "syal"
+              ],
+              "hint": {
+                "ko": "외투",
+                "en": "An outer garment",
+                "es": "Prenda de abrigo",
+                "id": "Pakaian luar"
+              }
+            },
+            {
+              "id": 4,
+              "answer": "Retiro",
+              "options": [
+                "Hyde",
+                "Central",
+                "Retiro",
+                "Ueno"
+              ],
+              "hint": {
+                "ko": "마드리드의 유명한 공원",
+                "en": "Famous park in Madrid",
+                "es": "Parque famoso de Madrid",
+                "id": "Taman terkenal di Madrid"
+              }
+            },
+            {
+              "id": 5,
+              "answer": "ketakutan",
+              "options": [
+                "gembira",
+                "ketakutan",
+                "marah",
+                "lelah"
+              ],
+              "hint": {
+                "ko": "무서워하는",
+                "en": "Feeling fear",
+                "es": "Sintiendo miedo",
+                "id": "Merasa takut"
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -1702,7 +1789,8 @@
       "title": {
         "ko": "시장에서 주문하기",
         "en": "Ordering at the Market",
-        "es": "Pidiendo en el Mercado"
+        "es": "Pidiendo en el Mercado",
+        "id": "Memesan di Pasar"
       },
       "difficulty": 2,
       "timeLimit": null,
@@ -1711,7 +1799,8 @@
       "storyContext": {
         "ko": "돈 미겔의 가게에서 학습 언어로 음식 3가지를 주문해야 정보를 얻을 수 있다.",
         "en": "You must order 3 food items in your target language at Don Miguel's stall to get information.",
-        "es": "Debes pedir 3 comidas en tu idioma objetivo en el puesto de Don Miguel para obtener información."
+        "es": "Debes pedir 3 comidas en tu idioma objetivo en el puesto de Don Miguel para obtener información.",
+        "id": "Kamu harus memesan 3 makanan dalam bahasa targetmu di lapak Don Miguel untuk mendapatkan informasi."
       },
       "gptPrompt": "You are Don Miguel, a warm and friendly market merchant in Madrid. The player must order 3 food items from your stall in {targetLang}. Available items: jamón (ham), tortilla española (Spanish omelette), churros, paella, gazpacho (cold soup). Respond warmly in {targetLang}. After 3 successful orders, reveal the secret: you saw suspicious people near Retiro Park. Evaluate: grammar (0-30), vocabulary (0-30), politeness (0-20), cultural awareness (0-20). Return JSON after each exchange: {\"npcResponse\": \"...\", \"ordersCompleted\": 0-3, \"score\": 0-100, \"feedback\": \"...\", \"secretRevealed\": false}",
       "content": {
@@ -1762,6 +1851,22 @@
             "감사합니다",
             "맛있어요"
           ]
+        },
+        "id": {
+          "foodVocab": [
+            "jamón (ham)",
+            "tortilla (telur dadar Spanyol)",
+            "churros",
+            "paella",
+            "gazpacho (sup tomat dingin)"
+          ],
+          "keyPhrases": [
+            "Boleh saya minta...",
+            "Saya mau...",
+            "tolong",
+            "Berapa harganya...?",
+            "terima kasih"
+          ]
         }
       },
       "rewards": {
@@ -1783,7 +1888,8 @@
       "title": {
         "ko": "속담 퍼즐",
         "en": "Proverb Puzzle",
-        "es": "Puzzle de Refranes"
+        "es": "Puzzle de Refranes",
+        "id": "Teka-teki Peribahasa"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -1791,7 +1897,8 @@
       "storyContext": {
         "ko": "레티로 공원의 분수대에 속담이 새겨져 있다. 속담을 완성하면 비밀 통로가 열린다.",
         "en": "Proverbs are carved on the fountain in Retiro Park. Complete them to open the secret passage.",
-        "es": "Hay refranes tallados en la fuente del Retiro. Complétalos para abrir el pasaje secreto."
+        "es": "Hay refranes tallados en la fuente del Retiro. Complétalos para abrir el pasaje secreto.",
+        "id": "Peribahasa terukir di air mancur Taman Retiro. Lengkapi untuk membuka jalan rahasia."
       },
       "content": {
         "en": {
@@ -1973,6 +2080,70 @@
               }
             }
           ]
+        },
+        "id": {
+          "pairs": [
+            {
+              "left": "Sedia payung sebelum...",
+              "right": "hujan",
+              "wrongOptions": [
+                "gerimis",
+                "badai",
+                "petir"
+              ],
+              "meaning": {
+                "ko": "전화위복",
+                "en": "Bad situations can have good outcomes",
+                "es": "Las malas situaciones pueden tener buenos resultados",
+                "id": "Bersiap sebelum kesulitan datang"
+              }
+            },
+            {
+              "left": "Diam itu...",
+              "right": "emas",
+              "wrongOptions": [
+                "perak",
+                "membosankan",
+                "berbahaya"
+              ],
+              "meaning": {
+                "ko": "침묵이 금",
+                "en": "Sometimes it’s better to say nothing",
+                "es": "A veces es mejor no decir nada",
+                "id": "Kadang lebih baik tidak berkata apa-apa"
+              }
+            },
+            {
+              "left": "Lebih baik terlambat daripada...",
+              "right": "tidak sama sekali",
+              "wrongOptions": [
+                "lebih awal",
+                "selalu",
+                "segera"
+              ],
+              "meaning": {
+                "ko": "안 하는 것보다 늦게라도 하는 게 낫다",
+                "en": "Doing something late is better than not doing it",
+                "es": "Hacer algo tarde es mejor que no hacerlo",
+                "id": "Melakukan sesuatu terlambat lebih baik daripada tidak melakukannya"
+              }
+            },
+            {
+              "left": "Jangan mengambil lebih dari yang bisa kamu...",
+              "right": "tanggung",
+              "wrongOptions": [
+                "makan",
+                "telan",
+                "cicipi"
+              ],
+              "meaning": {
+                "ko": "과욕은 금물",
+                "en": "Don’t try to do more than you can handle",
+                "es": "No intentes hacer más de lo que puedes",
+                "id": "Jangan mencoba melakukan lebih dari kemampuanmu"
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -1991,7 +2162,8 @@
       "title": {
         "ko": "예술이 말하다",
         "en": "Art Speaks",
-        "es": "El Arte Habla"
+        "es": "El Arte Habla",
+        "id": "Seni Berbicara"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -2000,7 +2172,8 @@
       "storyContext": {
         "ko": "숨겨진 방의 3개 그림을 학습 언어 2~3문장으로 묘사해야 문이 열린다.",
         "en": "Describe 3 paintings in 2-3 sentences in your target language to open the door.",
-        "es": "Describe 3 pinturas en 2-3 oraciones en tu idioma objetivo para abrir la puerta."
+        "es": "Describe 3 pinturas en 2-3 oraciones en tu idioma objetivo para abrir la puerta.",
+        "id": "Deskripsikan 3 lukisan dalam 2-3 kalimat dengan bahasa targetmu untuk membuka pintu."
       },
       "gptPrompt": "You are an art description evaluator. The player must describe a painting in {targetLang}. Required vocabulary: {requiredVocab}. Minimum {minSentences} sentences. Evaluate: grammar (0-30), vocabulary richness (0-30), descriptive quality (0-20), cultural expression (0-20). Return JSON: {\"score\": 0-100, \"feedback\": \"...\", \"missingVocab\": [], \"grammarErrors\": []}",
       "content": {
@@ -2105,6 +2278,40 @@
               "minSentences": 2
             }
           ]
+        },
+        "id": {
+          "prompts": [
+            {
+              "image": "beach_scene",
+              "description": "Pantai dengan laut biru dan orang-orang",
+              "requiredVocab": [
+                "laut",
+                "langit",
+                "orang"
+              ],
+              "minSentences": 2
+            },
+            {
+              "image": "market_scene",
+              "description": "Pasar berwarna-warni dengan buah-buahan",
+              "requiredVocab": [
+                "buah",
+                "warna",
+                "penjual"
+              ],
+              "minSentences": 2
+            },
+            {
+              "image": "night_scene",
+              "description": "Kota di malam hari dengan bulan dan bintang",
+              "requiredVocab": [
+                "bulan",
+                "bintang",
+                "kota"
+              ],
+              "minSentences": 2
+            }
+          ]
         }
       },
       "rewards": {
@@ -2123,7 +2330,8 @@
       "title": {
         "ko": "렉시콘의 함정",
         "en": "The Lexicon Trap",
-        "es": "La Trampa de Lexicón"
+        "es": "La Trampa de Lexicón",
+        "id": "Jebakan Lexicon"
       },
       "difficulty": 4,
       "timeLimit": 60,
@@ -2133,7 +2341,8 @@
       "storyContext": {
         "ko": "카를로스를 구하려면 60초 안에 5개의 언어 함정을 해제해야 한다!",
         "en": "Save Carlos by disabling 5 language traps within 60 seconds each!",
-        "es": "¡Salva a Carlos desactivando 5 trampas lingüísticas en 60 segundos cada una!"
+        "es": "¡Salva a Carlos desactivando 5 trampas lingüísticas en 60 segundos cada una!",
+        "id": "Selamatkan Carlos dengan menjinakkan 5 jebakan bahasa, masing-masing dalam 60 detik!"
       },
       "content": {
         "en": {
@@ -2288,6 +2497,58 @@
               "prompt": "카를로스에게 탈출 계획을 한국어로 설명하세요. 최소 3문장 이상 사용하세요."
             }
           ]
+        },
+        "id": {
+          "rounds": [
+            {
+              "type": "fill_blank",
+              "question": "Dia ___ (pergi) ke museum kemarin.",
+              "answer": "pergi",
+              "options": [
+                "pergilah",
+                "kepergian",
+                "pergi",
+                "bepergian"
+              ]
+            },
+            {
+              "type": "listening",
+              "ttsScript": "Batu itu disembunyikan di bawah air mancur di taman sebelah timur.",
+              "ttsVoice": "id-ID-GadisNeural",
+              "question": "Di mana batu itu disembunyikan?",
+              "answer": "di bawah air mancur",
+              "acceptableAnswers": [
+                "di bawah air mancur",
+                "bawah air mancur",
+                "air mancur taman timur"
+              ]
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "진실은 예술 속에 숨어 있다",
+                "es": "La verdad está escondida en el arte",
+                "en": "The truth is hidden in art",
+                "id": "Kebenaran tersembunyi dalam seni"
+              },
+              "answer": "Kebenaran tersembunyi dalam seni"
+            },
+            {
+              "type": "fill_blank",
+              "question": "Carlos ___ di dalam museum.",
+              "answer": "terjebak",
+              "options": [
+                "menjebak",
+                "terjebak",
+                "jebakan",
+                "menjebakkan"
+              ]
+            },
+            {
+              "type": "roleplay",
+              "prompt": "Jelaskan rencana pelarianmu kepada Carlos dalam bahasa Indonesia. Gunakan minimal 3 kalimat."
+            }
+          ]
         }
       },
       "rewards": {
@@ -2396,7 +2657,8 @@
       "title": {
         "ko": "도시의 표지판",
         "en": "City Signs",
-        "es": "Señales de la Ciudad"
+        "es": "Señales de la Ciudad",
+        "id": "Rambu Kota"
       },
       "difficulty": 1,
       "timeLimit": null,
@@ -2404,7 +2666,8 @@
       "storyContext": {
         "ko": "새 도시에 도착! 거리의 간판과 표지판을 읽어야 길을 찾을 수 있다.",
         "en": "Arrived in a new city! Read the street signs to find your way.",
-        "es": "¡Llegaste a una nueva ciudad! Lee las señales para encontrar tu camino."
+        "es": "¡Llegaste a una nueva ciudad! Lee las señales para encontrar tu camino.",
+        "id": "Tiba di kota baru! Baca rambu-rambu jalan untuk menemukan jalanmu."
       },
       "content": {
         "en": {
@@ -2793,6 +3056,165 @@
               }
             }
           ]
+        },
+        "id": {
+          "pairs": [
+            {
+              "left": "Keluar",
+              "right": {
+                "ko": "출구",
+                "en": "Exit",
+                "es": "Salida",
+                "id": "Jalan ke luar"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "입구",
+                  "화장실",
+                  "계단"
+                ],
+                "en": [
+                  "Entrance",
+                  "Restroom",
+                  "Stairs"
+                ],
+                "es": [
+                  "Entrada",
+                  "Baño",
+                  "Escalera"
+                ],
+                "id": [
+                  "Masuk",
+                  "Toilet",
+                  "Tangga"
+                ]
+              }
+            },
+            {
+              "left": "Dilarang Merokok",
+              "right": {
+                "ko": "금연",
+                "en": "Smoke-free zone",
+                "es": "Prohibido Fumar",
+                "id": "Kawasan tanpa rokok"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "금지",
+                  "주의",
+                  "위험"
+                ],
+                "en": [
+                  "No entry",
+                  "Caution",
+                  "Danger"
+                ],
+                "es": [
+                  "Prohibido",
+                  "Cuidado",
+                  "Peligro"
+                ],
+                "id": [
+                  "Dilarang Masuk",
+                  "Hati-hati",
+                  "Bahaya"
+                ]
+              }
+            },
+            {
+              "left": "Kereta Bawah Tanah",
+              "right": {
+                "ko": "지하철",
+                "en": "Subway/Metro",
+                "es": "Metro",
+                "id": "Angkutan bawah tanah"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "지하실",
+                  "지하도",
+                  "지하수"
+                ],
+                "en": [
+                  "Basement",
+                  "Tunnel",
+                  "Cellar"
+                ],
+                "es": [
+                  "Sótano",
+                  "Túnel",
+                  "Subsuelo"
+                ],
+                "id": [
+                  "Ruang bawah tanah",
+                  "Terowongan",
+                  "Gudang bawah tanah"
+                ]
+              }
+            },
+            {
+              "left": "Hati-hati",
+              "right": {
+                "ko": "주의",
+                "en": "Be careful",
+                "es": "Cuidado",
+                "id": "Berhati-hatilah"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "위험",
+                  "정지",
+                  "출발"
+                ],
+                "en": [
+                  "Danger",
+                  "Stop",
+                  "Go"
+                ],
+                "es": [
+                  "Peligro",
+                  "Alto",
+                  "Salida"
+                ],
+                "id": [
+                  "Bahaya",
+                  "Berhenti",
+                  "Jalan"
+                ]
+              }
+            },
+            {
+              "left": "Masuk",
+              "right": {
+                "ko": "입구",
+                "en": "Way in",
+                "es": "Entrada",
+                "id": "Jalan masuk"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "출구",
+                  "비상구",
+                  "통로"
+                ],
+                "en": [
+                  "Exit",
+                  "Emergency",
+                  "Passage"
+                ],
+                "es": [
+                  "Salida",
+                  "Emergencia",
+                  "Pasillo"
+                ],
+                "id": [
+                  "Keluar",
+                  "Darurat",
+                  "Lorong"
+                ]
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -2884,7 +3306,8 @@
       "title": {
         "ko": "광장시장 미식 도전",
         "en": "Market Food Challenge",
-        "es": "Desafío Gastronómico del Mercado"
+        "es": "Desafío Gastronómico del Mercado",
+        "id": "Tantangan Kuliner Pasar"
       },
       "difficulty": 2,
       "timeLimit": null,
@@ -2893,7 +3316,8 @@
       "storyContext": {
         "ko": "영숙 할머니의 분식집에서 학습 언어로 주문하고 대화해서 정보를 얻어야 한다.",
         "en": "Order food and chat in your target language at Grandma Youngsook's stall to get information.",
-        "es": "Pide comida y conversa en tu idioma objetivo en el puesto de la Abuela Youngsook."
+        "es": "Pide comida y conversa en tu idioma objetivo en el puesto de la Abuela Youngsook.",
+        "id": "Pesan makanan dan mengobrol dalam bahasa targetmu di lapak Nenek Youngsook untuk mendapatkan informasi."
       },
       "gptPrompt": "You are Grandma Youngsook, a warm Korean market food stall owner. The player must order Korean food and have a conversation in {targetLang}. Available: tteokbokki (spicy rice cakes), kimbap (seaweed rice roll), sundae (Korean blood sausage), hotteok (sweet pancake), bibimbap (mixed rice). Be warm and encouraging. After successful ordering, share the clue: suspicious people have been seen near Bukchon. Evaluate: grammar (0-30), vocabulary (0-30), politeness (0-20), cultural awareness (0-20). Return JSON: {\"npcResponse\": \"...\", \"score\": 0-100, \"feedback\": \"...\", \"clueRevealed\": false}",
       "content": {
@@ -2944,6 +3368,22 @@
             "맛있겠다",
             "감사합니다"
           ]
+        },
+        "id": {
+          "foodVocab": [
+            "tteokbokki (kue beras pedas)",
+            "kimbap (gulungan nasi rumput laut)",
+            "sundae (sosis darah)",
+            "hotteok (panekuk manis)",
+            "bibimbap (nasi campur)"
+          ],
+          "keyPhrases": [
+            "Boleh saya coba...",
+            "Apa rekomendasimu?",
+            "Seberapa pedas?",
+            "Kelihatannya lezat",
+            "terima kasih"
+          ]
         }
       },
       "rewards": {
@@ -2963,7 +3403,8 @@
       "title": {
         "ko": "지혜의 문",
         "en": "The Door of Wisdom",
-        "es": "La Puerta de la Sabiduría"
+        "es": "La Puerta de la Sabiduría",
+        "id": "Pintu Kebijaksanaan"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -2971,7 +3412,8 @@
       "storyContext": {
         "ko": "북촌한옥마을의 4개 문에 격언이 적혀있다. 의미를 이해하고 상황에 맞게 적용해야 한다.",
         "en": "Four doors in Bukchon bear proverbs. Understand their meanings and apply them to situations.",
-        "es": "Cuatro puertas en Bukchon tienen proverbios. Comprende su significado y aplícalos a situaciones."
+        "es": "Cuatro puertas en Bukchon tienen proverbios. Comprende su significado y aplícalos a situaciones.",
+        "id": "Empat pintu di Bukchon memuat peribahasa. Pahami maknanya dan terapkan pada situasi yang tepat."
       },
       "content": {
         "en": {
@@ -3093,6 +3535,50 @@
               }
             }
           ]
+        },
+        "id": {
+          "pairs": [
+            {
+              "left": "Sedia payung sebelum hujan",
+              "right": "Rudy selalu membawa peralatan detektifnya... peribahasa mana?",
+              "meaning": {
+                "ko": "유비무환... 준비가 있으면 걱정 없다",
+                "es": "Hombre prevenido vale por dos",
+                "en": "Being prepared prevents problems",
+                "id": "Bersiap mencegah masalah"
+              }
+            },
+            {
+              "left": "Melihat itu mempercayai",
+              "right": "Lebih baik melihat sendiri Batu Penjaga daripada mendengar Carlos menggambarkannya... peribahasa mana?",
+              "meaning": {
+                "ko": "백문이 불여일견",
+                "es": "Ver para creer",
+                "en": "Direct experience is worth more than hearsay",
+                "id": "Pengalaman langsung lebih berharga daripada kabar burung"
+              }
+            },
+            {
+              "left": "Teman saat susah adalah teman sejati",
+              "right": "Rudy dan teman-temannya berbagi suka dan duka bersama... peribahasa mana?",
+              "meaning": {
+                "ko": "동고동락",
+                "es": "En la necesidad se conoce la amistad",
+                "en": "True friends are proven in difficult times",
+                "id": "Teman sejati terbukti di saat sulit"
+              }
+            },
+            {
+              "left": "Ilmu adalah kekuatan",
+              "right": "Belajar bahasa memberi Rudy kemampuan memecahkan kasus... peribahasa mana?",
+              "meaning": {
+                "ko": "아는 것이 힘이다",
+                "es": "El saber es poder",
+                "en": "What you know gives you strength",
+                "id": "Apa yang kamu ketahui memberimu kekuatan"
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -3111,7 +3597,8 @@
       "title": {
         "ko": "민호의 힌트",
         "en": "Minho's Hint",
-        "es": "La Pista de Minho"
+        "es": "La Pista de Minho",
+        "id": "Petunjuk Minho"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -3120,7 +3607,8 @@
       "storyContext": {
         "ko": "민호가 렉시콘 거점의 비밀번호 힌트를 전달한다.",
         "en": "Minho delivers password hints for the Lexicon base.",
-        "es": "Minho da pistas para la contraseña de la base de Lexicón."
+        "es": "Minho da pistas para la contraseña de la base de Lexicón.",
+        "id": "Minho menyampaikan petunjuk kata sandi untuk markas Lexicon."
       },
       "content": {
         "en": {
@@ -3327,6 +3815,86 @@
             "es": "빛(luz) + 나(primera de 나라/país) + 라(primera de 라면/ramen) → 빛나라 (¡Brilla!)",
             "ko": "빛(어둠의 반대) + 나(나라의 첫 글자) + 라(라면의 첫 글자) → 빛나라!"
           }
+        },
+        "id": {
+          "ttsScript": "Dengarkan baik-baik, kawan. Di gunung di selatan, sebuah menara bersinar terang. Di bawahnya tersembunyi pintu rahasia. Kata sandinya empat huruf. Huruf pertama: awal kata 'biru'. Huruf kedua: huruf kedua kata 'buku'. Huruf ketiga: huruf ketiga kata 'kami'. Huruf keempat: akhir kata 'padi'.",
+          "ttsVoice": "id-ID-ArdiNeural",
+          "ttsSpeed": "0.9",
+          "questions": [
+            {
+              "question": {
+                "ko": "비밀번호의 첫 글자는?",
+                "en": "First letter of the password?",
+                "es": "¿Primera letra de la contraseña?",
+                "id": "Huruf pertama kata sandi?"
+              },
+              "answer": "B",
+              "acceptableAnswers": [
+                "b",
+                "B"
+              ]
+            },
+            {
+              "question": {
+                "ko": "비밀번호의 두 번째 글자는?",
+                "en": "Second letter?",
+                "es": "¿Segunda letra?",
+                "id": "Huruf kedua?"
+              },
+              "answer": "U",
+              "acceptableAnswers": [
+                "u",
+                "U"
+              ]
+            },
+            {
+              "question": {
+                "ko": "비밀번호의 세 번째 글자는?",
+                "en": "Third letter?",
+                "es": "¿Tercera letra?",
+                "id": "Huruf ketiga?"
+              },
+              "answer": "M",
+              "acceptableAnswers": [
+                "m",
+                "M"
+              ]
+            },
+            {
+              "question": {
+                "ko": "비밀번호의 네 번째 글자는?",
+                "en": "Fourth letter?",
+                "es": "¿Cuarta letra?",
+                "id": "Huruf keempat?"
+              },
+              "answer": "I",
+              "acceptableAnswers": [
+                "i",
+                "I"
+              ]
+            },
+            {
+              "question": {
+                "ko": "완성된 비밀번호는?",
+                "en": "Complete password?",
+                "es": "¿Contraseña completa?",
+                "id": "Kata sandi lengkap?"
+              },
+              "answer": "BUMI",
+              "acceptableAnswers": [
+                "BUMI",
+                "bumi",
+                "Bumi"
+              ]
+            }
+          ],
+          "finalAnswer": "BUMI",
+          "explanation": {
+            "ko": "B(biru 시작) + U(buku 둘째) + M(kami 셋째) + I(padi 끝) = BUMI (지구)",
+            "en": "B(biru start) + U(buku 2nd) + M(kami 3rd) + I(padi end) = BUMI (earth)",
+            "es": "B(biru inicio) + U(buku segunda) + M(kami tercera) + I(padi final) = BUMI (tierra)",
+            "id": "B(awal 'biru') + U(kedua 'buku') + M(ketiga 'kami') + I(akhir 'padi') = BUMI"
+          }
         }
       },
       "rewards": {
@@ -3346,7 +3914,8 @@
       "title": {
         "ko": "언어의 심판",
         "en": "The Language Trial",
-        "es": "El Juicio del Idioma"
+        "es": "El Juicio del Idioma",
+        "id": "Pengadilan Bahasa"
       },
       "difficulty": 5,
       "timeLimit": 90,
@@ -3356,7 +3925,8 @@
       "storyContext": {
         "ko": "남산타워 지하에서 수호석을 지키기 위한 최종 시험. 이번 챕터에서 배운 모든 것을 총동원하라!",
         "en": "The final trial beneath Namsan Tower. Use everything you've learned this chapter!",
-        "es": "¡La prueba final bajo la Torre Namsan! ¡Usa todo lo que aprendiste en este capítulo!"
+        "es": "¡La prueba final bajo la Torre Namsan! ¡Usa todo lo que aprendiste en este capítulo!",
+        "id": "Ujian terakhir di bawah Menara Namsan. Gunakan semua yang kamu pelajari di bab ini!"
       },
       "content": {
         "en": {
@@ -3510,6 +4080,58 @@
               "prompt": "수호석에게 왜 언어가 중요한지 설명하세요. 한국어로 최소 3문장 이상 말하세요. 진심을 담아 설득력 있게 말해주세요."
             }
           ]
+        },
+        "id": {
+          "rounds": [
+            {
+              "type": "riddle",
+              "text": "Apa yang punya tuts tapi tak punya gembok, punya spasi tapi tak punya ruangan, dan bisa kau masuki tapi tak bisa kau tempati?",
+              "answer": "papan ketik",
+              "acceptableAnswers": [
+                "papan ketik",
+                "keyboard",
+                "papan kunci"
+              ]
+            },
+            {
+              "type": "translation",
+              "source": {
+                "ko": "별이 빛나는 밤",
+                "es": "La noche estrellada",
+                "en": "A starry night",
+                "id": "Malam berbintang"
+              },
+              "answer": "Malam berbintang"
+            },
+            {
+              "type": "fill_blank",
+              "question": "Seandainya dia ___ (tahu) kebenarannya, dia akan membantu kita.",
+              "answer": "tahu",
+              "options": [
+                "tahu",
+                "mengetahui",
+                "ketahuan",
+                "diketahui"
+              ]
+            },
+            {
+              "type": "listening",
+              "ttsScript": "Batu penjaga bersinar ketika kata-kata yang tulus diucapkan di dekatnya. Ia mengenali ketulusan dalam bahasa apa pun.",
+              "ttsVoice": "id-ID-GadisNeural",
+              "question": "Apa yang membuat batu itu bersinar?",
+              "answer": "kata-kata tulus yang diucapkan di dekatnya",
+              "acceptableAnswers": [
+                "kata-kata tulus",
+                "kata yang tulus",
+                "mengucapkan kata tulus",
+                "ketulusan"
+              ]
+            },
+            {
+              "type": "roleplay",
+              "prompt": "Jelaskan kepada Batu Penjaga mengapa bahasa itu penting. Bicaralah dalam bahasa Indonesia dengan minimal 3 kalimat. Bersikaplah tulus dan meyakinkan."
+            }
+          ]
         }
       },
       "rewards": {
@@ -3618,7 +4240,8 @@
       "title": {
         "ko": "아미라의 시험",
         "en": "Amira's Test",
-        "es": "La Prueba de Amira"
+        "es": "La Prueba de Amira",
+        "id": "Ujian Amira"
       },
       "difficulty": 2,
       "timeLimit": null,
@@ -3626,7 +4249,8 @@
       "storyContext": {
         "ko": "아미라가 물건을 보여주며 세 개 언어로 이름을 말하라고 한다. 그녀의 신뢰를 얻어야 한다.",
         "en": "Amira shows objects and asks you to name them in three languages. Earn her trust.",
-        "es": "Amira muestra objetos y pide que los nombres en tres idiomas. Gana su confianza."
+        "es": "Amira muestra objetos y pide que los nombres en tres idiomas. Gana su confianza.",
+        "id": "Amira menunjukkan benda-benda dan memintamu menyebut namanya dalam tiga bahasa. Raih kepercayaannya."
       },
       "content": {
         "en": {
@@ -3865,6 +4489,103 @@
               }
             }
           ]
+        },
+        "id": {
+          "pairs": [
+            {
+              "left": "peta",
+              "right": {
+                "ko": "지도",
+                "es": "mapa",
+                "en": "map",
+                "id": "gambar wilayah"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "열쇠",
+                  "책",
+                  "물"
+                ],
+                "es": [
+                  "llave",
+                  "libro",
+                  "agua"
+                ],
+                "en": [
+                  "key",
+                  "book",
+                  "water"
+                ],
+                "id": [
+                  "kunci",
+                  "buku",
+                  "air"
+                ]
+              }
+            },
+            {
+              "left": "kunci",
+              "right": {
+                "ko": "열쇠",
+                "es": "llave",
+                "en": "key",
+                "id": "alat pembuka"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "지도",
+                  "돌",
+                  "문"
+                ],
+                "es": [
+                  "mapa",
+                  "piedra",
+                  "puerta"
+                ],
+                "en": [
+                  "map",
+                  "stone",
+                  "door"
+                ],
+                "id": [
+                  "peta",
+                  "batu",
+                  "pintu"
+                ]
+              }
+            },
+            {
+              "left": "air",
+              "right": {
+                "ko": "물",
+                "es": "agua",
+                "en": "water",
+                "id": "cairan bening"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "커피",
+                  "차",
+                  "주스"
+                ],
+                "es": [
+                  "cafe",
+                  "te",
+                  "jugo"
+                ],
+                "en": [
+                  "coffee",
+                  "tea",
+                  "juice"
+                ],
+                "id": [
+                  "kopi",
+                  "teh",
+                  "jus"
+                ]
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -3884,7 +4605,8 @@
       "title": {
         "ko": "하산의 혼란스러운 길 안내",
         "en": "Hassan's Chaotic Directions",
-        "es": "Las Direcciones Caóticas de Hassan"
+        "es": "Las Direcciones Caóticas de Hassan",
+        "id": "Petunjuk Kacau Hassan"
       },
       "difficulty": 2,
       "timeLimit": null,
@@ -3892,7 +4614,8 @@
       "storyContext": {
         "ko": "하산이 흥분해서 미스터 블랙의 은신처 방향을 너무 빨리 말해서 뒤섞였다. 핵심 단어들을 올바른 순서로 정리하라.",
         "en": "Hassan spoke so fast about Mr. Black's hideout that the directions got scrambled. Sort out the key words in the right order.",
-        "es": "Hassan hablo tan rapido sobre el escondite de Mr. Black que las direcciones se revolvieron. Ordena las palabras clave en el orden correcto."
+        "es": "Hassan hablo tan rapido sobre el escondite de Mr. Black que las direcciones se revolvieron. Ordena las palabras clave en el orden correcto.",
+        "id": "Hassan bicara terlalu cepat soal persembunyian Mr. Black sampai petunjuknya teracak. Susun kata-kata kunci dalam urutan yang benar."
       },
       "content": {
         "en": {
@@ -3992,6 +4715,39 @@
               "answer": "매일 밤 9시"
             }
           ]
+        },
+        "id": {
+          "puzzles": [
+            {
+              "instruction": "Susun nama jalan ini:",
+              "scrambled": [
+                "el-Muizz",
+                "Sharia",
+                "Street"
+              ],
+              "answer": "Sharia el-Muizz Street"
+            },
+            {
+              "instruction": "Susun detail lokasinya:",
+              "scrambled": [
+                "pintu",
+                "biru",
+                "ketiga",
+                "papan"
+              ],
+              "answer": "pintu ketiga papan biru"
+            },
+            {
+              "instruction": "Susun waktunya:",
+              "scrambled": [
+                "malam",
+                "pukul",
+                "sembilan",
+                "setiap"
+              ],
+              "answer": "setiap malam pukul sembilan"
+            }
+          ]
         }
       },
       "rewards": {
@@ -4011,7 +4767,8 @@
       "title": {
         "ko": "할머니의 지도",
         "en": "Grandmother's Map",
-        "es": "El Mapa de la Abuela"
+        "es": "El Mapa de la Abuela",
+        "id": "Peta Sang Nenek"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -4019,7 +4776,8 @@
       "storyContext": {
         "ko": "아미라 할머니의 다국어 지시문. 빈칸을 채워 수호석의 정확한 위치를 알아내라.",
         "en": "Amira's grandmother's multilingual instructions. Fill in the blanks to locate the stone's exact position.",
-        "es": "Las instrucciones multilingues de la abuela de Amira. Completa los espacios para localizar la piedra."
+        "es": "Las instrucciones multilingues de la abuela de Amira. Completa los espacios para localizar la piedra.",
+        "id": "Instruksi multibahasa dari nenek Amira. Isi bagian kosong untuk menemukan posisi pasti batu itu."
       },
       "content": {
         "en": {
@@ -4204,6 +4962,67 @@
               ]
             }
           ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "text": "Berjalanlah ___ meter ke ___.",
+              "blanks": [
+                "tiga puluh",
+                "utara"
+              ],
+              "options": [
+                [
+                  "sepuluh",
+                  "lima puluh",
+                  "tiga puluh"
+                ],
+                [
+                  "selatan",
+                  "timur",
+                  "utara"
+                ]
+              ]
+            },
+            {
+              "text": "Galilah ___ meter ke ___.",
+              "blanks": [
+                "dua",
+                "bawah"
+              ],
+              "options": [
+                [
+                  "lima",
+                  "satu",
+                  "dua"
+                ],
+                [
+                  "atas",
+                  "kiri",
+                  "bawah"
+                ]
+              ]
+            },
+            {
+              "text": "Batu itu ada ___ ___ Horus.",
+              "blanks": [
+                "di bawah",
+                "mata"
+              ],
+              "options": [
+                [
+                  "di atas",
+                  "di samping",
+                  "di bawah"
+                ],
+                [
+                  "tangan",
+                  "kaki",
+                  "mata"
+                ]
+              ]
+            }
+          ]
         }
       },
       "rewards": {
@@ -4220,7 +5039,8 @@
       "title": {
         "ko": "학습 언어로만 탈출하라",
         "en": "Escape in Target Language Only",
-        "es": "Escapa Solo en el Idioma Objetivo"
+        "es": "Escapa Solo en el Idioma Objetivo",
+        "id": "Kabur Hanya dengan Bahasa Target"
       },
       "difficulty": 4,
       "timeLimit": 90,
@@ -4229,7 +5049,8 @@
       "storyContext": {
         "ko": "미스터 블랙이 영어를 이해하기 때문에, 아미라와 학습 언어로만 소통하여 탈출을 조율해야 한다. 올바른 문장을 선택하라.",
         "en": "Because Mr. Black understands English, you must coordinate the escape with Amira in ONLY the target language. Choose the right phrases.",
-        "es": "Porque Mr. Black entiende ingles, debes coordinar el escape con Amira SOLO en el idioma objetivo. Elige las frases correctas."
+        "es": "Porque Mr. Black entiende ingles, debes coordinar el escape con Amira SOLO en el idioma objetivo. Elige las frases correctas.",
+        "id": "Karena Mr. Black mengerti bahasa Inggris, kamu harus mengoordinasikan pelarian dengan Amira HANYA dalam bahasa target. Pilih kalimat yang tepat."
       },
       "content": {
         "en": {
@@ -4315,6 +5136,34 @@
               ]
             }
           ]
+        },
+        "id": {
+          "stages": [
+            {
+              "label": "Beri tahu Amira: 'Pergi ke pintu belakang'",
+              "correct": "Pergi ke pintu belakang",
+              "wrong": [
+                "Go to the back door (bahasa Inggris... Mr. Black mengerti!)",
+                "Pergi ke pintu depan (Pintu yang salah!)"
+              ]
+            },
+            {
+              "label": "Beri tahu Amira: 'Batunya ada padaku. Lari sekarang.'",
+              "correct": "Batunya ada padaku. Lari sekarang!",
+              "wrong": [
+                "I have the stone, run! (bahasa Inggris... ketahuan!)",
+                "Batunya tidak ada. Tunggu. (Informasi salah!)"
+              ]
+            },
+            {
+              "label": "Beri tahu Amira: 'Terima kasih. Ayo pergi.'",
+              "correct": "Terima kasih. Ayo pergi.",
+              "wrong": [
+                "Thanks. Let's go. (bahasa Inggris lagi!)",
+                "Maaf. Aku di sini saja. (Menyerah!)"
+              ]
+            }
+          ]
         }
       },
       "resultVariants": {
@@ -4350,7 +5199,8 @@
       "title": {
         "ko": "바벨 타워 안내도",
         "en": "Babel Tower Directory",
-        "es": "Directorio de la Torre de Babel"
+        "es": "Directorio de la Torre de Babel",
+        "id": "Direktori Menara Babel"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -4358,7 +5208,8 @@
       "storyContext": {
         "ko": "바벨 타워에 들어가려면 입구의 다국어 안내판을 해독해야 한다. 각 층의 이름이 다른 언어로 적혀있다.",
         "en": "To enter Babel Tower, you must decode the multilingual directory at the entrance. Each floor's name is written in a different language.",
-        "es": "Para entrar a la Torre de Babel, debes descifrar el directorio multilingue en la entrada. El nombre de cada piso esta escrito en un idioma diferente."
+        "es": "Para entrar a la Torre de Babel, debes descifrar el directorio multilingue en la entrada. El nombre de cada piso esta escrito en un idioma diferente.",
+        "id": "Untuk masuk Menara Babel, kamu harus memecahkan direktori multibahasa di pintu masuk. Nama tiap lantai ditulis dalam bahasa yang berbeda."
       },
       "content": {
         "en": {
@@ -4657,6 +5508,135 @@
               }
             }
           ]
+        },
+        "id": {
+          "pairs": [
+            {
+              "left": "Selamat datang",
+              "right": {
+                "ko": "환영합니다",
+                "es": "Bienvenido",
+                "en": "Welcome"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "안녕히 가세요",
+                  "실례합니다",
+                  "감사합니다"
+                ],
+                "es": [
+                  "Adios",
+                  "Disculpe",
+                  "Gracias"
+                ],
+                "en": [
+                  "Goodbye",
+                  "Excuse me",
+                  "Thank you"
+                ]
+              }
+            },
+            {
+              "left": "Masuk",
+              "right": {
+                "ko": "입구",
+                "es": "Entrada",
+                "en": "Entrance"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "출구",
+                  "비상구",
+                  "계단"
+                ],
+                "es": [
+                  "Salida",
+                  "Emergencia",
+                  "Escalera"
+                ],
+                "en": [
+                  "Exit",
+                  "Emergency",
+                  "Stairs"
+                ]
+              }
+            },
+            {
+              "left": "Keluar",
+              "right": {
+                "ko": "출구",
+                "es": "Salida",
+                "en": "Exit"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "입구",
+                  "엘리베이터",
+                  "화장실"
+                ],
+                "es": [
+                  "Entrada",
+                  "Ascensor",
+                  "Bano"
+                ],
+                "en": [
+                  "Entrance",
+                  "Elevator",
+                  "Restroom"
+                ]
+              }
+            },
+            {
+              "left": "Bahaya",
+              "right": {
+                "ko": "위험",
+                "es": "Peligro",
+                "en": "Danger"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "안전",
+                  "주의",
+                  "금지"
+                ],
+                "es": [
+                  "Seguro",
+                  "Cuidado",
+                  "Prohibido"
+                ],
+                "en": [
+                  "Safe",
+                  "Caution",
+                  "Forbidden"
+                ]
+              }
+            },
+            {
+              "left": "Tolong",
+              "right": {
+                "ko": "도움",
+                "es": "Ayuda",
+                "en": "Help"
+              },
+              "wrongOptions": {
+                "ko": [
+                  "혼자",
+                  "비밀",
+                  "문제"
+                ],
+                "es": [
+                  "Solo",
+                  "Secreto",
+                  "Problema"
+                ],
+                "en": [
+                  "Alone",
+                  "Secret",
+                  "Problem"
+                ]
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -4676,7 +5656,8 @@
       "title": {
         "ko": "블랙의 암호 해독",
         "en": "Decoding Black's Cipher",
-        "es": "Descifrando el Código de Black"
+        "es": "Descifrando el Código de Black",
+        "id": "Memecahkan Sandi Black"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -4684,7 +5665,8 @@
       "storyContext": {
         "ko": "미스터 블랙이 1층 관문에 남긴 메시지. 그의 철학이 담긴 문장의 빈칸을 채워야 관문이 열린다. 적을 이해해야 적을 이길 수 있다.",
         "en": "Mr. Black left a message at the first floor gate. Fill in the blanks of his philosophical statement to open the gate. Know your enemy to defeat him.",
-        "es": "Mr. Black dejo un mensaje en la puerta del primer piso. Completa los espacios en blanco de su declaracion filosofica para abrir la puerta. Conoce a tu enemigo para vencerlo."
+        "es": "Mr. Black dejo un mensaje en la puerta del primer piso. Completa los espacios en blanco de su declaracion filosofica para abrir la puerta. Conoce a tu enemigo para vencerlo.",
+        "id": "Mr. Black meninggalkan pesan di gerbang lantai satu. Isi bagian kosong dari pernyataan filosofisnya untuk membuka gerbang. Kenali musuhmu untuk mengalahkannya."
       },
       "content": {
         "en": {
@@ -4926,6 +5908,91 @@
               }
             }
           ]
+        },
+        "id": {
+          "passage": "Aku tidak ___(1)___ bahasa. Aku ___(2)___ mereka. Ketika seorang anak tidak bisa ___(3)___ pertolongan karena tak ada yang berbicara ___(4)___-nya, itu bukan keberagaman. Itu adalah ___(5)___.",
+          "blanks": [
+            {
+              "id": 1,
+              "answer": "membenci",
+              "options": [
+                "membenci",
+                "mencintai",
+                "membutuhkan",
+                "mempelajari"
+              ],
+              "hint": {
+                "ko": "싫어하다의 반대는 사랑하다",
+                "en": "The opposite of love",
+                "es": "Lo opuesto a amar",
+                "id": "Lawan dari mencintai"
+              }
+            },
+            {
+              "id": 2,
+              "answer": "mengasihani",
+              "options": [
+                "mengasihani",
+                "menikmati",
+                "mengajari",
+                "memakai"
+              ],
+              "hint": {
+                "ko": "불쌍히 여기다",
+                "en": "To feel sorry for something",
+                "es": "Sentir lastima por algo",
+                "id": "Merasa kasihan pada sesuatu"
+              }
+            },
+            {
+              "id": 3,
+              "answer": "meminta",
+              "options": [
+                "meminta",
+                "berlari",
+                "makan",
+                "tidur"
+              ],
+              "hint": {
+                "ko": "도움을 요청하다",
+                "en": "To request something",
+                "es": "Solicitar algo",
+                "id": "Memohon sesuatu"
+              }
+            },
+            {
+              "id": 4,
+              "answer": "bahasa",
+              "options": [
+                "bahasa",
+                "nama",
+                "lagu",
+                "cerita"
+              ],
+              "hint": {
+                "ko": "의사소통의 수단",
+                "en": "The means of communication",
+                "es": "El medio de comunicacion",
+                "id": "Sarana komunikasi"
+              }
+            },
+            {
+              "id": 5,
+              "answer": "kesepian",
+              "options": [
+                "kesepian",
+                "keindahan",
+                "kebebasan",
+                "kebahagiaan"
+              ],
+              "hint": {
+                "ko": "혼자 있을 때 느끼는 감정",
+                "en": "The feeling of being alone",
+                "es": "El sentimiento de estar solo",
+                "id": "Perasaan saat sendirian"
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -4945,7 +6012,8 @@
       "title": {
         "ko": "동맹의 메시지 해독",
         "en": "Decoding the Allies' Messages",
-        "es": "Descifrando los Mensajes de los Aliados"
+        "es": "Descifrando los Mensajes de los Aliados",
+        "id": "Memecahkan Pesan Para Sekutu"
       },
       "difficulty": 3,
       "timeLimit": null,
@@ -4953,7 +6021,8 @@
       "storyContext": {
         "ko": "동맹들이 보낸 메시지가 타워의 전파 방해 때문에 뒤섞여 도착했다. 단어를 올바른 순서로 재배열해서 핵심 정보를 파악해야 한다.",
         "en": "The allies' messages arrived scrambled due to the tower's signal interference. Rearrange the words to uncover the key information.",
-        "es": "Los mensajes de los aliados llegaron desordenados por la interferencia de la torre. Reordena las palabras para descubrir la informacion clave."
+        "es": "Los mensajes de los aliados llegaron desordenados por la interferencia de la torre. Reordena las palabras para descubrir la informacion clave.",
+        "id": "Pesan para sekutu tiba teracak karena gangguan sinyal menara. Susun ulang kata-katanya untuk mengungkap informasi kunci."
       },
       "content": {
         "en": {
@@ -5155,6 +6224,74 @@
               }
             }
           ]
+        },
+        "id": {
+          "sentences": [
+            {
+              "scrambled": [
+                "batu",
+                "itu",
+                "pendengar",
+                "bukan",
+                "kunci"
+              ],
+              "answer": "batu itu pendengar bukan kunci",
+              "hint": {
+                "ko": "수진이 말한 수호석의 비밀",
+                "en": "Sujin’s secret about the stones",
+                "es": "El secreto de Sujin sobre las piedras",
+                "id": "Rahasia Sujin tentang batu-batu itu"
+              }
+            },
+            {
+              "scrambled": [
+                "dia",
+                "butuh",
+                "ketujuh",
+                "batu",
+                "sekaligus"
+              ],
+              "answer": "dia butuh ketujuh batu sekaligus",
+              "hint": {
+                "ko": "민호가 알려준 코드의 약점",
+                "en": "The Code weakness Minho revealed",
+                "es": "La debilidad del Código que revelo Minho",
+                "id": "Kelemahan Kode yang diungkap Minho"
+              }
+            },
+            {
+              "scrambled": [
+                "bicaralah",
+                "kepada",
+                "mereka",
+                "dalam",
+                "bahasamu"
+              ],
+              "answer": "bicaralah kepada mereka dalam bahasamu",
+              "hint": {
+                "ko": "수호석을 활성화하는 방법",
+                "en": "How to activate the Guardian Stones",
+                "es": "Cómo activar las Piedras Guardianas",
+                "id": "Cara mengaktifkan Batu Penjaga"
+              }
+            },
+            {
+              "scrambled": [
+                "selamat",
+                "pagi",
+                "nama",
+                "saya",
+                "Rudy"
+              ],
+              "answer": "selamat pagi nama saya Rudy",
+              "hint": {
+                "ko": "Day 1에서 배운 자기소개",
+                "en": "Self-introduction from Day 1",
+                "es": "Autopresentación del Día 1",
+                "id": "Perkenalan diri dari Hari 1"
+              }
+            }
+          ]
         }
       },
       "rewards": {
@@ -5269,7 +6406,8 @@
       "title": {
         "ko": "최후의 시험... 모든 언어의 화음",
         "en": "The Final Trial... Harmony of All Languages",
-        "es": "La Prueba Final... Armonía de Todos los Idiomas"
+        "es": "La Prueba Final... Armonía de Todos los Idiomas",
+        "id": "Ujian Terakhir... Harmoni Semua Bahasa"
       },
       "difficulty": 5,
       "timeLimit": 120,
@@ -5279,7 +6417,8 @@
       "storyContext": {
         "ko": "수호석에 말을 걸어야 한다. 배운 모든 것을 세 가지 언어로. 인사, 자기소개, 감사, 주문하기, 감정 표현. 완벽할 필요 없다... 진심이면 된다. 이것이 최후의 시험이다.",
         "en": "You must speak to the Guardian Stones. Everything you've learned, in all three languages. Greetings, introductions, gratitude, ordering, expressing feelings. It doesn't need to be perfect... it needs to be sincere. This is the final trial.",
-        "es": "Debes hablar con las Piedras Guardianas. Todo lo que aprendiste, en los tres idiomas. Saludos, presentaciones, gratitud, pedir comida, expresar sentimientos. No necesita ser perfecto... necesita ser sincero. Esta es la prueba final."
+        "es": "Debes hablar con las Piedras Guardianas. Todo lo que aprendiste, en los tres idiomas. Saludos, presentaciones, gratitud, pedir comida, expresar sentimientos. No necesita ser perfecto... necesita ser sincero. Esta es la prueba final.",
+        "id": "Kamu harus berbicara kepada Batu Penjaga. Semua yang telah kamu pelajari, dalam ketiga bahasa. Sapaan, perkenalan, ucapan terima kasih, memesan, mengungkapkan perasaan. Tak harus sempurna... cukup tulus. Inilah ujian terakhir."
       },
       "content": {
         "en": {
@@ -5697,6 +6836,145 @@
               "prompt": "마지막 순간입니다. 학습 언어로 수호석에게 말하세요. 당신이 누구인지, 어디를 다녀왔는지, 누가 도와줬는지, 그리고 왜 언어가 중요한지 말해주세요. 최소 5문장을 사용하세요. 여행 중 배운 표현이나 속담을 최소 1개 포함하세요. 수호석이 듣고 있습니다... 완벽하지 않아도 됩니다, 진심이면 됩니다."
             }
           ]
+        },
+        "id": {
+          "rounds": [
+            {
+              "type": "listening",
+              "ttsScript": "Tujuh batu, tujuh suara. Untuk membangunkannya, ucapkan apa yang kau ketahui. Bukan yang sempurna... yang tulus. Mulailah dengan kata-kata pertama yang pernah kau pelajari. Bagaimana kau menyapa orang yang belum pernah kau temui?",
+              "ttsVoice": "id-ID-GadisNeural",
+              "question": "Dengan apa suara itu memintamu memulai?",
+              "answer": "sapaan",
+              "acceptableAnswers": [
+                "sapaan",
+                "salam",
+                "cara menyapa",
+                "kata-kata pertama",
+                "halo",
+                "kata pertama"
+              ]
+            },
+            {
+              "type": "multilingual_fill",
+              "instruction": "Lengkapi sapaan dalam ketiga bahasa untuk membangunkan tiga batu pertama.",
+              "blanks": [
+                {
+                  "lang": "id",
+                  "sentence": "Selamat ___, nama ___ Rudy.",
+                  "answers": [
+                    "pagi",
+                    "saya"
+                  ],
+                  "acceptableAnswers": [
+                    [
+                      "pagi",
+                      "siang",
+                      "sore"
+                    ],
+                    [
+                      "saya"
+                    ]
+                  ]
+                },
+                {
+                  "lang": "en",
+                  "sentence": "Good ___, my ___ is Rudy.",
+                  "answers": [
+                    "morning",
+                    "name"
+                  ],
+                  "acceptableAnswers": [
+                    [
+                      "morning",
+                      "afternoon"
+                    ],
+                    [
+                      "name"
+                    ]
+                  ]
+                },
+                {
+                  "lang": "ko",
+                  "sentence": "___하세요, 제 ___은 루디입니다.",
+                  "answers": [
+                    "안녕",
+                    "이름"
+                  ],
+                  "acceptableAnswers": [
+                    [
+                      "안녕"
+                    ],
+                    [
+                      "이름"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "translation_chain",
+              "instruction": "Terjemahkan pesan ini melalui ketiga bahasa... Indonesia ke Inggris ke Korea.",
+              "chain": [
+                {
+                  "from": "id",
+                  "text": "Terima kasih telah membantuku.",
+                  "to": "en",
+                  "answer": "Thank you for helping me",
+                  "acceptableAnswers": [
+                    "Thank you for helping me",
+                    "Thanks for your help"
+                  ]
+                },
+                {
+                  "from": "en",
+                  "text": "Thank you for helping me",
+                  "to": "ko",
+                  "answer": "도와주셔서 감사합니다",
+                  "acceptableAnswers": [
+                    "도와주셔서 감사합니다",
+                    "도와줘서 고마워요"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "matching",
+              "description": "Cocokkan ungkapan khas tiap NPC dengan maknanya... buktikan kau mendengarkan semua yang membantumu.",
+              "pairs": [
+                {
+                  "left": "When the going gets tough, the tough get going (Tom)",
+                  "right": "Orang yang kuat bertindak di saat sulit",
+                  "wrongOptions": [
+                    "Hal baik butuh waktu",
+                    "Ilmu adalah kekuatan",
+                    "Diam itu emas"
+                  ]
+                },
+                {
+                  "left": "No hay mal que por bien no venga (Don Miguel)",
+                  "right": "Hal buruk bisa membawa hasil yang baik",
+                  "wrongOptions": [
+                    "Siapa cepat dia dapat",
+                    "Tindakan berbicara lebih lantang daripada kata-kata",
+                    "Lebih baik terlambat daripada tidak sama sekali"
+                  ]
+                },
+                {
+                  "left": "Words are like honey (Hassan)",
+                  "right": "Berbicara dengan lembut memberi hasil lebih baik",
+                  "wrongOptions": [
+                    "Kesabaran adalah kebajikan",
+                    "Ilmu adalah kekuatan",
+                    "Waktu menyembuhkan segalanya"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "roleplay",
+              "prompt": "Inilah saat terakhir. Bicaralah kepada Batu Penjaga dalam bahasa targetmu. Beri tahu mereka: siapa dirimu, ke mana saja kamu pergi, siapa yang membantumu, dan mengapa bahasa itu penting. Gunakan minimal 5 kalimat. Sertakan minimal satu ungkapan atau peribahasa yang kamu pelajari dalam perjalananmu. Batu-batu itu mendengarkan... bersikaplah tulus, bukan sempurna."
+            }
+          ]
         }
       },
       "gptPrompt": "You are the final boss quiz evaluator for Chapter 5 (Babel Tower) of a language learning game. The player must speak to the Guardian Stones, demonstrating everything they've learned across 5 chapters. They should: introduce themselves, describe their journey (London, Madrid, Seoul, Cairo, Babel), mention NPCs who helped them, and explain why language diversity matters. Evaluate: grammar and vocabulary range (0-20), use of expressions from previous chapters like proverbs/idioms (0-20), multilingual awareness showing knowledge of multiple languages (0-20), emotional sincerity and personal voice (0-20), length and completeness minimum 5 sentences (0-20). A perfect answer weaves together greetings, expressions, and cultural references from all chapters into a heartfelt statement. Be generous with partial credit... this is about trying, not perfection. Return JSON: {\"score\": 0-100, \"feedback\": \"...\", \"expressionsRecognized\": [], \"languagesUsed\": [], \"emotionalImpact\": \"cold/warm/moving/extraordinary\"}",
@@ -5885,7 +7163,8 @@
       "title": {
         "ko": "하산과의 흥정 대결",
         "en": "Bargaining Battle with Hassan",
-        "es": "Batalla de Regateo con Hassan"
+        "es": "Batalla de Regateo con Hassan",
+        "id": "Adu Tawar-menawar dengan Hassan"
       },
       "difficulty": 4,
       "timeLimit": null,
@@ -5917,7 +7196,8 @@
       "storyContext": {
         "ko": "하산이 말한다: '네가 진정한 협상가인지 증명해봐. 내 주장을 논리적으로 반박해야 해. 아랍어로 하면 가산점이야.'",
         "en": "Hassan says: 'Prove you're a real negotiator. Counter my arguments logically. Arabic earns bonus points.'",
-        "es": "Hassan dice: 'Demuestra que eres un verdadero negociador. Rebate mis argumentos con lógica. El árabe da puntos extra.'"
+        "es": "Hassan dice: 'Demuestra que eres un verdadero negociador. Rebate mis argumentos con lógica. El árabe da puntos extra.'",
+        "id": "Hassan berkata: 'Buktikan kau negosiator sejati. Bantah argumenku secara logis. Bahasa Arab dapat poin tambahan.'"
       },
       "content": {
         "en": {
@@ -6075,6 +7355,64 @@
               ]
             }
           ]
+        },
+        "id": {
+          "opponent": "Hassan",
+          "rounds": 3,
+          "minExpressions": 1,
+          "roundData": [
+            {
+              "topic": {
+                "ko": "이 램프의 가격",
+                "en": "Price of this lamp",
+                "es": "Precio de esta lámpara",
+                "id": "Harga lampu ini"
+              },
+              "npcArgument": {
+                "ko": "이 램프는 300년 된 골동품이야. 500달러도 싸.",
+                "en": "This lamp is a 300-year-old antique. $500 is a steal.",
+                "es": "Esta lámpara es una antigüedad de 300 años. $500 es una ganga.",
+                "id": "Lampu ini barang antik berumur 300 tahun. $500 itu murah."
+              },
+              "requiredExpressions": [
+                "Berapa harganya?"
+              ]
+            },
+            {
+              "topic": {
+                "ko": "유사한 램프 가격",
+                "en": "Comparable lamp prices",
+                "es": "Precios de lámparas comparables",
+                "id": "Harga lampu sejenis"
+              },
+              "npcArgument": {
+                "ko": "다른 가게에서 이런 품질 못 찾아. 내 것만이 진품이야.",
+                "en": "You won't find this quality anywhere else. Mine is the only authentic one.",
+                "es": "No encontrarás esta calidad en otro lugar. El mío es el único auténtico.",
+                "id": "Kamu tak akan menemukan kualitas ini di tempat lain. Hanya punyaku yang asli."
+              },
+              "requiredExpressions": [
+                "Itu terlalu mahal"
+              ]
+            },
+            {
+              "topic": {
+                "ko": "최종 가격 협상",
+                "en": "Final price negotiation",
+                "es": "Negociación de precio final",
+                "id": "Negosiasi harga akhir"
+              },
+              "npcArgument": {
+                "ko": "좋아, 네 진심이 보여. 하지만 400달러 이하는 절대 안 돼.",
+                "en": "OK, I see your sincerity. But below $400 is absolutely impossible.",
+                "es": "OK, veo tu sinceridad. Pero menos de $400 es absolutamente imposible.",
+                "id": "Baik, aku lihat ketulusanmu. Tapi di bawah $400 mustahil."
+              },
+              "requiredExpressions": [
+                "Bisakah harganya diturunkan?"
+              ]
+            }
+          ]
         }
       },
       "rewards": {
@@ -6097,7 +7435,8 @@
       "title": {
         "ko": "카를로스 구출 작전",
         "en": "Operation: Rescue Carlos",
-        "es": "Operación: Rescatar a Carlos"
+        "es": "Operación: Rescatar a Carlos",
+        "id": "Operasi: Selamatkan Carlos"
       },
       "difficulty": 2,
       "timeLimit": null,
@@ -6127,7 +7466,8 @@
       "storyContext": {
         "ko": "카를로스가 어딘가에 갇혀 있다. 이사벨이 위치 단서를 찾았지만, 구조 신호를 영어로 정확하게 말해야 카를로스가 반응할 수 있다.",
         "en": "Carlos is trapped somewhere. Isabel found location clues, but you must speak the rescue phrases in clear English for Carlos to respond.",
-        "es": "Carlos está atrapado. Isabel encontró pistas, pero debes decir las frases de rescate en inglés claro para que Carlos responda."
+        "es": "Carlos está atrapado. Isabel encontró pistas, pero debes decir las frases de rescate en inglés claro para que Carlos responda.",
+        "id": "Carlos terjebak di suatu tempat. Isabel menemukan petunjuk lokasi, tapi kamu harus mengucapkan kalimat penyelamatan dengan bahasa yang jelas agar Carlos merespons."
       },
       "content": {
         "en": {
@@ -6226,6 +7566,44 @@
                 "ko": "의문사 'Where'를 사용하세요",
                 "en": "Use 'Where'",
                 "es": "Usa 'Where'"
+              },
+              "minScore": 55
+            }
+          ],
+          "progressiveIntro": true
+        },
+        "id": {
+          "npcToRescue": "Carlos",
+          "stages": [
+            {
+              "instruction": {
+                "ko": "카를로스에게 도움을 요청하세요",
+                "en": "Call for help to Carlos",
+                "es": "Pide ayuda a Carlos",
+                "id": "Mintalah pertolongan kepada Carlos"
+              },
+              "targetPhrase": "Tolong saya",
+              "hint": {
+                "ko": "'Help'으로 시작하세요",
+                "en": "Start with 'Help'",
+                "es": "Empieza con 'Help'",
+                "id": "Mulailah dengan 'Tolong'"
+              },
+              "minScore": 55
+            },
+            {
+              "instruction": {
+                "ko": "카를로스의 위치를 물어보세요",
+                "en": "Ask Carlos where he is",
+                "es": "Pregunta a Carlos dónde está",
+                "id": "Tanyakan kepada Carlos di mana dia berada"
+              },
+              "targetPhrase": "Kamu di mana?",
+              "hint": {
+                "ko": "의문사 'Where'를 사용하세요",
+                "en": "Use the question word 'Where'",
+                "es": "Usa la palabra interrogativa 'Where'",
+                "id": "Gunakan kata tanya 'di mana'"
               },
               "minScore": 55
             }
