@@ -39,102 +39,111 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { apiRequest } from "@/lib/query-client";
 
-type LangKey = "ko" | "en" | "es";
+type LangKey = "ko" | "en" | "es" | "id";
 
 // ───────────────────────────────────────────────────────────────────────────
 // Localized copy
 // ───────────────────────────────────────────────────────────────────────────
 const T: Record<string, Record<LangKey, string>> = {
-  title:           { ko: "내 데이터",                                   en: "My Data",                                       es: "Mis datos" },
-  back:            { ko: "뒤로",                                         en: "Back",                                          es: "Volver" },
-  langKo:          { ko: "한국어",                                       en: "Korean",                                        es: "Coreano" },
-  langEn:          { ko: "English",                                      en: "English",                                       es: "Inglés" },
-  langEs:          { ko: "Español",                                      en: "Spanish",                                       es: "Español" },
+  title:           { ko: "내 데이터",                                   en: "My Data",                                       es: "Mis datos",                                     id: "Data Saya" },
+  back:            { ko: "뒤로",                                         en: "Back",                                          es: "Volver",                                        id: "Kembali" },
+  langKo:          { ko: "한국어",                                       en: "Korean",                                        es: "Coreano",                                       id: "Korea" },
+  langEn:          { ko: "English",                                      en: "English",                                       es: "Inglés",                                        id: "Inggris" },
+  langEs:          { ko: "Español",                                      en: "Spanish",                                       es: "Español",                                       id: "Spanyol" },
 
-  signInRequired_h:{ ko: "로그인이 필요합니다",                           en: "Sign-in required",                              es: "Debes iniciar sesión" },
+  signInRequired_h:{ ko: "로그인이 필요합니다",                           en: "Sign-in required",                              es: "Debes iniciar sesión",                          id: "Perlu masuk" },
   signInRequired_b:{
     ko: "데이터 권리를 행사하려면 먼저 로그인해 주세요. 설정 페이지에서 Google 또는 매직 링크로 로그인할 수 있어요.",
     en: "To exercise your data rights, please sign in first. You can sign in with Google or a magic-link from the Settings page.",
     es: "Para ejercer tus derechos sobre los datos, inicia sesión primero. Puedes hacerlo con Google o un enlace mágico desde Ajustes.",
+    id: "Untuk menggunakan hak-hak datamu, silakan masuk terlebih dahulu. Kamu bisa masuk dengan Google atau tautan ajaib dari halaman Pengaturan.",
   },
-  goToSettings:    { ko: "설정으로 이동",                                en: "Go to settings",                                es: "Ir a Ajustes" },
+  goToSettings:    { ko: "설정으로 이동",                                en: "Go to settings",                                es: "Ir a Ajustes",                                  id: "Buka pengaturan" },
 
-  intro_h:         { ko: "데이터 권리 안내",                             en: "Your data rights",                              es: "Tus derechos sobre los datos" },
+  intro_h:         { ko: "데이터 권리 안내",                             en: "Your data rights",                              es: "Tus derechos sobre los datos",                  id: "Hak-hak datamu" },
   intro_b:         {
     ko: "한국 「개인정보 보호법」, EU GDPR에 따라 본인의 개인정보를 열람·이동·삭제할 수 있습니다. 아래 버튼으로 즉시 행사할 수 있어요.",
     en: "Under the Korean Personal Information Protection Act and the EU GDPR you can access, port, and erase your personal data. Use the buttons below to do it right now.",
     es: "Conforme a la Ley Coreana de Protección de Información Personal y al RGPD de la UE, puedes acceder, portar y eliminar tus datos personales. Usa los botones de abajo para hacerlo ahora.",
+    id: "Berdasarkan Undang-Undang Perlindungan Informasi Pribadi Korea dan GDPR Uni Eropa, kamu dapat mengakses, memindahkan, dan menghapus data pribadimu. Gunakan tombol di bawah untuk melakukannya sekarang.",
   },
 
-  account_h:       { ko: "계정",                                         en: "Account",                                       es: "Cuenta" },
-  signedInAs:      { ko: "로그인 계정",                                  en: "Signed in as",                                  es: "Sesión iniciada como" },
-  lastSync:        { ko: "마지막 서버 동기화",                           en: "Last server sync",                              es: "Última sincronización" },
-  syncNever:       { ko: "아직 동기화된 적 없음",                        en: "Never synced",                                  es: "Nunca sincronizado" },
-  syncPending:     { ko: "동기화 대기 중...",                            en: "Sync pending...",                               es: "Sincronización pendiente..." },
-  syncSyncing:     { ko: "동기화 중...",                                  en: "Syncing...",                                    es: "Sincronizando..." },
-  syncError:       { ko: "동기화 오류",                                  en: "Sync error",                                    es: "Error de sincronización" },
+  account_h:       { ko: "계정",                                         en: "Account",                                       es: "Cuenta",                                        id: "Akun" },
+  signedInAs:      { ko: "로그인 계정",                                  en: "Signed in as",                                  es: "Sesión iniciada como",                          id: "Masuk sebagai" },
+  lastSync:        { ko: "마지막 서버 동기화",                           en: "Last server sync",                              es: "Última sincronización",                         id: "Sinkronisasi server terakhir" },
+  syncNever:       { ko: "아직 동기화된 적 없음",                        en: "Never synced",                                  es: "Nunca sincronizado",                            id: "Belum pernah disinkronkan" },
+  syncPending:     { ko: "동기화 대기 중...",                            en: "Sync pending...",                               es: "Sincronización pendiente...",                   id: "Menunggu sinkronisasi..." },
+  syncSyncing:     { ko: "동기화 중...",                                  en: "Syncing...",                                    es: "Sincronizando...",                              id: "Menyinkronkan..." },
+  syncError:       { ko: "동기화 오류",                                  en: "Sync error",                                    es: "Error de sincronización",                       id: "Kesalahan sinkronisasi" },
 
-  export_h:        { ko: "내 데이터 내려받기",                           en: "Download my data",                              es: "Descargar mis datos" },
+  export_h:        { ko: "내 데이터 내려받기",                           en: "Download my data",                              es: "Descargar mis datos",                           id: "Unduh data saya" },
   export_b: {
     ko: "이메일, 학습 진도(XP, 레벨, 연속 학습일, 학습 단어), 도전 과제, 알림 설정 등 회사 서버에 저장된 본인의 모든 정보를 JSON 파일로 받습니다. (Azure Speech와 OpenAI는 데이터를 보관하지 않아 음성·대화 내용은 포함되지 않습니다.)",
     en: "You'll receive a JSON file containing your email, learning progress (XP, level, streak, words learned), achievements, notification settings, and all other data we hold on our servers. (We do not store voice or conversation content — Azure Speech and OpenAI discard it after processing.)",
     es: "Recibirás un archivo JSON con tu correo, progreso de aprendizaje (XP, nivel, racha, palabras aprendidas), logros, ajustes de notificaciones y todos los demás datos que conservamos en nuestros servidores. (No guardamos voz ni conversaciones — Azure Speech y OpenAI los descartan tras el procesamiento.)",
+    id: "Kamu akan menerima berkas JSON berisi emailmu, progres belajar (XP, level, streak, kata yang dipelajari), pencapaian, pengaturan notifikasi, dan semua data lain yang kami simpan di server kami. (Kami tidak menyimpan suara atau percakapan — Azure Speech dan OpenAI menghapusnya setelah diproses.)",
   },
-  exportBtn:       { ko: "JSON 파일 받기",                              en: "Download JSON",                                 es: "Descargar JSON" },
-  exporting:       { ko: "준비 중...",                                  en: "Preparing...",                                  es: "Preparando..." },
-  exportSuccess:   { ko: "내려받기 완료",                                en: "Download started",                              es: "Descarga iniciada" },
+  exportBtn:       { ko: "JSON 파일 받기",                              en: "Download JSON",                                 es: "Descargar JSON",                                id: "Unduh JSON" },
+  exporting:       { ko: "준비 중...",                                  en: "Preparing...",                                  es: "Preparando...",                                 id: "Menyiapkan..." },
+  exportSuccess:   { ko: "내려받기 완료",                                en: "Download started",                              es: "Descarga iniciada",                             id: "Unduhan dimulai" },
   exportSuccessNative: {
     ko: "데이터 사본이 콘솔에 출력되었으며, 곧 공유 시트로 보내드립니다.",
     en: "A copy was logged to the console; we'll open a share sheet shortly.",
     es: "Se imprimió una copia en la consola; abriremos la hoja de compartir.",
+    id: "Salinan telah dicatat ke konsol; kami akan segera membuka lembar berbagi.",
   },
-  exportError:     { ko: "내려받기 실패. 잠시 후 다시 시도해 주세요.",     en: "Download failed. Please try again in a moment.",  es: "Falló la descarga. Inténtalo de nuevo en unos minutos." },
+  exportError:     { ko: "내려받기 실패. 잠시 후 다시 시도해 주세요.",     en: "Download failed. Please try again in a moment.",  es: "Falló la descarga. Inténtalo de nuevo en unos minutos.", id: "Gagal mengunduh. Silakan coba lagi sebentar lagi." },
 
-  delete_h:        { ko: "계정 영구 삭제",                              en: "Delete my account",                             es: "Eliminar mi cuenta" },
+  delete_h:        { ko: "계정 영구 삭제",                              en: "Delete my account",                             es: "Eliminar mi cuenta",                            id: "Hapus akun saya" },
   delete_b: {
     ko: "계정과 모든 학습 진도, 알림 토큰, 도전 과제가 영구 삭제됩니다. 백업본은 최대 30일 이내 폐기됩니다. 이 작업은 되돌릴 수 없습니다.",
     en: "Your account and all learning progress, push tokens, and achievements will be permanently deleted. Backups will be purged within 30 days. This cannot be undone.",
     es: "Tu cuenta y todo el progreso, tokens push y logros se eliminarán de forma permanente. Las copias de seguridad se purgarán en 30 días. Esta acción es irreversible.",
+    id: "Akunmu beserta seluruh progres belajar, token push, dan pencapaian akan dihapus secara permanen. Cadangan akan dibersihkan dalam 30 hari. Tindakan ini tidak dapat dibatalkan.",
   },
-  deleteBtn:       { ko: "계정 삭제",                                    en: "Delete account",                                es: "Eliminar cuenta" },
+  deleteBtn:       { ko: "계정 삭제",                                    en: "Delete account",                                es: "Eliminar cuenta",                               id: "Hapus akun" },
 
   // Step-1 modal
-  deleteStep1_h:   { ko: "정말로 삭제하시겠어요?",                       en: "Are you sure?",                                 es: "¿Seguro que quieres eliminarla?" },
+  deleteStep1_h:   { ko: "정말로 삭제하시겠어요?",                       en: "Are you sure?",                                 es: "¿Seguro que quieres eliminarla?",               id: "Apakah kamu yakin?" },
   deleteStep1_b: {
     ko: "삭제하면 모든 학습 데이터(XP, 레벨, 연속 학습일, 도전 과제, 단어장, 스토리 진행 등)가 사라집니다. 30일 이내에 백업본도 폐기되어 복구할 수 없습니다.\n\n계속하시려면 \"계속\"을 눌러주세요.",
     en: "If you continue, all learning data (XP, level, streak, achievements, vocabulary, story progress, etc.) will be lost. Backups are purged within 30 days; no recovery is possible after that.\n\nPress \"Continue\" to go to the final confirmation.",
     es: "Si continúas, todos los datos de aprendizaje (XP, nivel, racha, logros, vocabulario, progreso de historia, etc.) se perderán. Las copias se purgan en 30 días; no habrá recuperación posible.\n\nPresiona \"Continuar\" para la confirmación final.",
+    id: "Jika kamu lanjutkan, semua data belajar (XP, level, streak, pencapaian, kosakata, progres cerita, dll.) akan hilang. Cadangan dibersihkan dalam 30 hari; setelah itu tidak ada pemulihan yang mungkin dilakukan.\n\nTekan \"Lanjutkan\" untuk menuju konfirmasi akhir.",
   },
-  cancel:          { ko: "취소",                                         en: "Cancel",                                        es: "Cancelar" },
-  continueBtn:     { ko: "계속",                                         en: "Continue",                                      es: "Continuar" },
+  cancel:          { ko: "취소",                                         en: "Cancel",                                        es: "Cancelar",                                      id: "Batal" },
+  continueBtn:     { ko: "계속",                                         en: "Continue",                                      es: "Continuar",                                     id: "Lanjutkan" },
 
   // Step-2 modal (type-to-confirm)
-  deleteStep2_h:   { ko: "최종 확인",                                    en: "Final confirmation",                            es: "Confirmación final" },
+  deleteStep2_h:   { ko: "최종 확인",                                    en: "Final confirmation",                            es: "Confirmación final",                            id: "Konfirmasi akhir" },
   deleteStep2_b:   {
     ko: "삭제를 진행하려면 아래 칸에 본인의 이메일 주소를 그대로 입력한 뒤 \"영구 삭제\" 버튼을 누르세요.",
     en: "To proceed, type your email address exactly into the box below and then press \"Delete permanently\".",
     es: "Para continuar, escribe tu dirección de correo exactamente en el cuadro y presiona \"Eliminar permanentemente\".",
+    id: "Untuk melanjutkan, ketik alamat emailmu persis di kotak di bawah lalu tekan \"Hapus permanen\".",
   },
-  emailPlaceholder:{ ko: "이메일 주소 입력",                             en: "Type your email",                               es: "Escribe tu correo" },
-  deleteConfirm:   { ko: "영구 삭제",                                    en: "Delete permanently",                            es: "Eliminar permanentemente" },
-  deletingNow:     { ko: "삭제 중...",                                   en: "Deleting...",                                   es: "Eliminando..." },
-  emailMismatch:   { ko: "이메일이 일치하지 않아요.",                    en: "That doesn't match your email.",                es: "El correo no coincide." },
-  deleteError:     { ko: "삭제 요청에 실패했어요. 잠시 후 다시 시도해 주세요.", en: "Delete request failed. Please try again shortly.", es: "Falló la solicitud de eliminación. Inténtalo más tarde." },
-  deletedDone_h:   { ko: "계정이 삭제되었습니다",                        en: "Your account has been deleted",                 es: "Tu cuenta ha sido eliminada" },
+  emailPlaceholder:{ ko: "이메일 주소 입력",                             en: "Type your email",                               es: "Escribe tu correo",                             id: "Ketik emailmu" },
+  deleteConfirm:   { ko: "영구 삭제",                                    en: "Delete permanently",                            es: "Eliminar permanentemente",                      id: "Hapus permanen" },
+  deletingNow:     { ko: "삭제 중...",                                   en: "Deleting...",                                   es: "Eliminando...",                                 id: "Menghapus..." },
+  emailMismatch:   { ko: "이메일이 일치하지 않아요.",                    en: "That doesn't match your email.",                es: "El correo no coincide.",                        id: "Email tidak cocok." },
+  deleteError:     { ko: "삭제 요청에 실패했어요. 잠시 후 다시 시도해 주세요.", en: "Delete request failed. Please try again shortly.", es: "Falló la solicitud de eliminación. Inténtalo más tarde.", id: "Permintaan penghapusan gagal. Silakan coba lagi sebentar lagi." },
+  deletedDone_h:   { ko: "계정이 삭제되었습니다",                        en: "Your account has been deleted",                 es: "Tu cuenta ha sido eliminada",                   id: "Akunmu telah dihapus" },
   deletedDone_b:   {
     ko: "그동안 LinguaAI를 이용해 주셔서 감사합니다. 잠시 후 시작 화면으로 이동합니다.",
     en: "Thank you for using LinguaAI. We'll return you to the start screen in a moment.",
     es: "Gracias por usar LinguaAI. Te llevaremos a la pantalla inicial en unos segundos.",
+    id: "Terima kasih telah menggunakan LinguaAI. Kami akan membawamu kembali ke layar awal sebentar lagi.",
   },
 
-  questions_h:     { ko: "추가 문의",                                    en: "Other questions",                               es: "Otras consultas" },
+  questions_h:     { ko: "추가 문의",                                    en: "Other questions",                               es: "Otras consultas",                               id: "Pertanyaan lain" },
   questions_b: {
     ko: "정정 요청, 처리 정지 요청, 제3자 제공 내역 열람 등 다른 권리 행사가 필요하신 경우 privacy@linguaai.example 로 연락 주세요. 한국법 기준 10일, GDPR 기준 1개월 이내에 회신드립니다.",
     en: "For other requests — rectification, restriction of processing, or details of transfers to third parties — write to privacy@linguaai.example. We respond within 10 days under Korean law and within one month under GDPR.",
     es: "Para otras solicitudes — rectificación, limitación del tratamiento o detalles sobre las transferencias a terceros — escribe a privacy@linguaai.example. Responderemos en 10 días bajo la ley coreana y en un mes bajo el RGPD.",
+    id: "Untuk permintaan lain — perbaikan data, pembatasan pemrosesan, atau detail transfer ke pihak ketiga — tulis ke privacy@linguaai.example. Kami merespons dalam 10 hari berdasarkan hukum Korea dan dalam satu bulan berdasarkan GDPR.",
   },
-  privacyLink:     { ko: "개인정보처리방침 보기",                        en: "View Privacy Policy",                           es: "Ver Política de Privacidad" },
-  termsLink:       { ko: "이용약관 보기",                                en: "View Terms of Service",                         es: "Ver Términos de Servicio" },
+  privacyLink:     { ko: "개인정보처리방침 보기",                        en: "View Privacy Policy",                           es: "Ver Política de Privacidad",                    id: "Lihat Kebijakan Privasi" },
+  termsLink:       { ko: "이용약관 보기",                                en: "View Terms of Service",                         es: "Ver Términos de Servicio",                      id: "Lihat Ketentuan Layanan" },
 };
 
 function t(obj: Record<LangKey, string>, lang: LangKey): string {
@@ -153,6 +162,7 @@ function formatTimestamp(iso: string | null, lc: LangKey): string {
       ko: "ko-KR",
       en: "en-US",
       es: "es-ES",
+      id: "id-ID",
     };
     return d.toLocaleString(localeMap[lc], {
       year: "numeric",
@@ -272,7 +282,7 @@ export default function DataRightsScreen() {
   const { user, signOut } = useAuth();
 
   const defaultLc: LangKey =
-    nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
+    nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
   const [lc, setLc] = useState<LangKey>(defaultLc);
 
   const [exportBusy, setExportBusy] = useState(false);

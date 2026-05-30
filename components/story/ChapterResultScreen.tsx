@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useLanguage } from "@/context/LanguageContext";
 import type {
-  ChapterResult, GaugeGrade, LangCode,
+  ChapterResult, LangCode,
 } from "@/constants/storyTypes";
 import { GAUGE_GRADE_META } from "@/constants/storyTypes";
 import { pick, getNpcById, toLangCode } from "@/lib/storyUtils";
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export default function ChapterResultScreen({ result, onContinue }: Props) {
-  const { nativeLanguage, t } = useLanguage();
+  const { nativeLanguage } = useLanguage();
   const lang = toLangCode(nativeLanguage) as LangCode;
 
   // Animations

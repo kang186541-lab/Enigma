@@ -742,7 +742,7 @@ function RoleplayQuizView({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [score, setScore] = useState<number | null>(null);
+  const [, setScore] = useState<number | null>(null);
   const [ordersComplete, setOrdersComplete] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 

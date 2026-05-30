@@ -39,17 +39,6 @@ export async function hydrateAchievementsFromServer(ids: string[]): Promise<void
   }
 }
 
-/** Earn an achievement. Returns the Achievement if newly earned, null if already earned. */
-export async function earnAchievement(id: string): Promise<Achievement | null> {
-  const earned = await loadEarnedAchievements();
-  if (earned.includes(id)) return null;
-
-  earned.push(id);
-  await saveEarned(earned);
-
-  return ACHIEVEMENTS.find((a) => a.id === id) ?? null;
-}
-
 /** Check all achievement conditions and return newly earned ones */
 export async function checkAchievements(context: {
   stats: UserStats;

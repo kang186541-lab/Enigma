@@ -16,10 +16,6 @@ export type HomeSpeakingMission = {
   button: string;
 };
 
-export function getFallbackLearningLanguage(nativeLang: NativeLanguage): NativeLanguage {
-  return nativeLang === "english" ? "korean" : "english";
-}
-
 function getGoalLabel(goal: LearningGoal | null, lang: NativeLanguage): string | null {
   if (!goal) return null;
   const labels: Record<LearningGoal, Record<NativeLanguage, string>> = {

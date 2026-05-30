@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -19,55 +19,55 @@ import { getApiUrl } from "@/lib/query-client";
 import { addPhrases } from "@/lib/srsManager";
 
 const T = {
-  title:       { ko: "쓰기 연습", en: "Writing Practice", es: "Practica de Escritura" },
-  translate:   { ko: "번역하기", en: "Translate", es: "Traducir" },
-  complete:    { ko: "문장 완성", en: "Complete the Sentence", es: "Completa la Oracion" },
-  freeWrite:   { ko: "자유 작문", en: "Free Writing", es: "Escritura Libre" },
-  placeholder: { ko: "여기에 답을 입력하세요...", en: "Type your answer here...", es: "Escribe tu respuesta aqui..." },
-  check:       { ko: "확인", en: "Check", es: "Verificar" },
-  next:        { ko: "다음", en: "Next", es: "Siguiente" },
-  correct:     { ko: "정답!", en: "Correct!", es: "Correcto!" },
-  tryAgain:    { ko: "다시 시도!", en: "Try again!", es: "Intenta de nuevo!" },
-  feedback:    { ko: "피드백", en: "Feedback", es: "Comentarios" },
-  loading:     { ko: "평가 중...", en: "Evaluating...", es: "Evaluando..." },
-  back:        { ko: "뒤로", en: "Back", es: "Volver" },
-  score:       { ko: "점수", en: "Score", es: "Puntuacion" },
-  prompt:      { ko: "주제에 맞게 자유롭게 쓰세요", en: "Write freely about the topic", es: "Escribe libremente sobre el tema" },
-  evalError:   { ko: "평가할 수 없어요. 다시 시도해주세요.", en: "Could not evaluate. Try again.", es: "No se pudo evaluar. Intenta de nuevo." },
-  offline:     { ko: "오프라인 — 평가를 할 수 없어요", en: "Offline — evaluation unavailable", es: "Sin conexion — evaluacion no disponible" },
+  title:       { ko: "쓰기 연습", en: "Writing Practice", es: "Practica de Escritura", id: "Latihan Menulis" },
+  translate:   { ko: "번역하기", en: "Translate", es: "Traducir", id: "Terjemahkan" },
+  complete:    { ko: "문장 완성", en: "Complete the Sentence", es: "Completa la Oracion", id: "Lengkapi Kalimat" },
+  freeWrite:   { ko: "자유 작문", en: "Free Writing", es: "Escritura Libre", id: "Menulis Bebas" },
+  placeholder: { ko: "여기에 답을 입력하세요...", en: "Type your answer here...", es: "Escribe tu respuesta aqui...", id: "Ketik jawabanmu di sini..." },
+  check:       { ko: "확인", en: "Check", es: "Verificar", id: "Periksa" },
+  next:        { ko: "다음", en: "Next", es: "Siguiente", id: "Berikutnya" },
+  correct:     { ko: "정답!", en: "Correct!", es: "Correcto!", id: "Benar!" },
+  tryAgain:    { ko: "다시 시도!", en: "Try again!", es: "Intenta de nuevo!", id: "Coba lagi!" },
+  feedback:    { ko: "피드백", en: "Feedback", es: "Comentarios", id: "Masukan" },
+  loading:     { ko: "평가 중...", en: "Evaluating...", es: "Evaluando...", id: "Menilai..." },
+  back:        { ko: "뒤로", en: "Back", es: "Volver", id: "Kembali" },
+  score:       { ko: "점수", en: "Score", es: "Puntuacion", id: "Skor" },
+  prompt:      { ko: "주제에 맞게 자유롭게 쓰세요", en: "Write freely about the topic", es: "Escribe libremente sobre el tema", id: "Tulis dengan bebas tentang topik ini" },
+  evalError:   { ko: "평가할 수 없어요. 다시 시도해주세요.", en: "Could not evaluate. Try again.", es: "No se pudo evaluar. Intenta de nuevo.", id: "Tidak bisa menilai. Coba lagi." },
+  offline:     { ko: "오프라인 — 평가를 할 수 없어요", en: "Offline — evaluation unavailable", es: "Sin conexion — evaluacion no disponible", id: "Offline — penilaian tidak tersedia" },
 } as const;
 
 function t(obj: Record<string, string>, lang: string) { return obj[lang] || obj.en; }
 
 interface Exercise {
   type: "translate" | "complete" | "free";
-  prompt: { ko: string; en: string; es: string };
+  prompt: { ko: string; en: string; es: string; id: string };
   answer?: string; // for translate/complete
-  hint?: { ko: string; en: string; es: string };
+  hint?: { ko: string; en: string; es: string; id: string };
 }
 
 const EXERCISES: Exercise[] = [
   // Translation exercises
-  { type: "translate", prompt: { ko: "안녕하세요, 만나서 반갑습니다.", en: "Hello, nice to meet you.", es: "Hola, encantado de conocerte." } },
-  { type: "translate", prompt: { ko: "오늘 날씨가 좋아요.", en: "The weather is nice today.", es: "El clima esta bonito hoy." } },
-  { type: "translate", prompt: { ko: "커피 한 잔 주세요.", en: "One coffee, please.", es: "Un cafe, por favor." } },
-  { type: "translate", prompt: { ko: "이것은 얼마입니까?", en: "How much is this?", es: "Cuanto cuesta esto?" } },
-  { type: "translate", prompt: { ko: "화장실이 어디에 있어요?", en: "Where is the restroom?", es: "Donde esta el bano?" } },
+  { type: "translate", prompt: { ko: "안녕하세요, 만나서 반갑습니다.", en: "Hello, nice to meet you.", es: "Hola, encantado de conocerte.", id: "Halo, senang bertemu denganmu." } },
+  { type: "translate", prompt: { ko: "오늘 날씨가 좋아요.", en: "The weather is nice today.", es: "El clima esta bonito hoy.", id: "Cuacanya bagus hari ini." } },
+  { type: "translate", prompt: { ko: "커피 한 잔 주세요.", en: "One coffee, please.", es: "Un cafe, por favor.", id: "Satu kopi, tolong." } },
+  { type: "translate", prompt: { ko: "이것은 얼마입니까?", en: "How much is this?", es: "Cuanto cuesta esto?", id: "Berapa harganya ini?" } },
+  { type: "translate", prompt: { ko: "화장실이 어디에 있어요?", en: "Where is the restroom?", es: "Donde esta el bano?", id: "Di mana toiletnya?" } },
   // Completion exercises
-  { type: "complete", prompt: { ko: "저는 학생___.", en: "I ___ a student.", es: "Yo ___ estudiante." }, answer: "입니다", hint: { ko: "정중한 어미", en: "formal ending", es: "terminacion formal" } },
-  { type: "complete", prompt: { ko: "밥을 ___.", en: "I ___ rice.", es: "Yo ___ arroz." }, answer: "먹어요", hint: { ko: "먹다 (정중형)", en: "to eat (polite)", es: "comer (cortes)" } },
-  { type: "complete", prompt: { ko: "한국에 ___ 싶어요.", en: "I want to ___ to Korea.", es: "Quiero ___ a Corea." }, answer: "가고", hint: { ko: "가다 + 싶다", en: "to go + want", es: "ir + querer" } },
+  { type: "complete", prompt: { ko: "저는 학생___.", en: "I ___ a student.", es: "Yo ___ estudiante.", id: "Saya ___ seorang pelajar." }, answer: "입니다", hint: { ko: "정중한 어미", en: "formal ending", es: "terminacion formal", id: "akhiran formal" } },
+  { type: "complete", prompt: { ko: "밥을 ___.", en: "I ___ rice.", es: "Yo ___ arroz.", id: "Saya ___ nasi." }, answer: "먹어요", hint: { ko: "먹다 (정중형)", en: "to eat (polite)", es: "comer (cortes)", id: "makan (bentuk sopan)" } },
+  { type: "complete", prompt: { ko: "한국에 ___ 싶어요.", en: "I want to ___ to Korea.", es: "Quiero ___ a Corea.", id: "Saya ingin ___ ke Korea." }, answer: "가고", hint: { ko: "가다 + 싶다", en: "to go + want", es: "ir + querer", id: "pergi + ingin" } },
   // Free writing
-  { type: "free", prompt: { ko: "자기 소개를 해보세요", en: "Introduce yourself", es: "Presentate" } },
-  { type: "free", prompt: { ko: "오늘 하루를 설명하세요", en: "Describe your day today", es: "Describe tu dia de hoy" } },
-  { type: "free", prompt: { ko: "좋아하는 음식에 대해 쓰세요", en: "Write about your favorite food", es: "Escribe sobre tu comida favorita" } },
+  { type: "free", prompt: { ko: "자기 소개를 해보세요", en: "Introduce yourself", es: "Presentate", id: "Perkenalkan dirimu" } },
+  { type: "free", prompt: { ko: "오늘 하루를 설명하세요", en: "Describe your day today", es: "Describe tu dia de hoy", id: "Ceritakan harimu hari ini" } },
+  { type: "free", prompt: { ko: "좋아하는 음식에 대해 쓰세요", en: "Write about your favorite food", es: "Escribe sobre tu comida favorita", id: "Tulis tentang makanan favoritmu" } },
 ];
 
 export default function WritingPractice() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { nativeLanguage: nativeLang, learningLanguage, awardXp } = useLanguage();
-  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
+  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
 
   const [exerciseIdx, setExerciseIdx] = useState(0);
   const [input, setInput] = useState("");
@@ -75,7 +75,7 @@ export default function WritingPractice() {
   const [feedback, setFeedback] = useState("");
   const [isCorrect, setIsCorrect] = useState(false);
   const [score, setScore] = useState(0);
-  const [totalScore, setTotalScore] = useState(0);
+  const [, setTotalScore] = useState(0);
   const [completed, setCompleted] = useState(0);
 
   const exercise = EXERCISES[exerciseIdx % EXERCISES.length];

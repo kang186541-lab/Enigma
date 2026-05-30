@@ -86,26 +86,6 @@ function sanitizeForTTS(text: string): string {
     .trim();
 }
 
-// ── Render Rudy's bubble text with **bold** → gold colour ────────────────────
-
-function RudyText({ text, style }: { text: string; style: object }) {
-  const segments = text.split(/(\*\*[^*]+\*\*)/g);
-  return (
-    <Text style={style}>
-      {segments.map((seg, i) => {
-        if (seg.startsWith("**") && seg.endsWith("**")) {
-          return (
-            <Text key={i} style={{ color: C.gold, fontFamily: F.bodySemi }}>
-              {seg.slice(2, -2)}
-            </Text>
-          );
-        }
-        return <Text key={i}>{seg}</Text>;
-      })}
-    </Text>
-  );
-}
-
 // ── Helper ────────────────────────────────────────────────────────────────────
 
 function getMeaning(t: Tri, lc: "ko" | "en" | "es"): string {
@@ -684,8 +664,6 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const micLabel = phase === "recording"
     ? (nativeLang === "korean" ? "탭하여 중지 ■" : nativeLang === "spanish" ? "Toca para parar ■" : "Tap to stop ■")
     : (nativeLang === "korean" ? "말하기 🎤" : nativeLang === "spanish" ? "Hablar 🎤" : "Speak 🎤");
-  const keyboardLabel = nativeLang === "korean" ? "⌨️ 키보드로 입력"
-    : nativeLang === "spanish" ? "⌨️ Escribir" : "⌨️ Type";
   const voiceBonus = nativeLang === "korean" ? "🎤 XP 1.5배!"
     : nativeLang === "spanish" ? "🎤 ¡XP ×1.5!" : "🎤 XP ×1.5!";
   const suggLabel = nativeLang === "korean" ? "💡 추천 답변:"

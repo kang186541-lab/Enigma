@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Pressable,
   Platform,
-  Dimensions,
   Animated,
   Image,
   ScrollView,
@@ -17,7 +16,6 @@ import {
   ImageSourcePropType,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import * as FileSystem from "expo-file-system/legacy";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -27,7 +25,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { STORY_PROGRESS_KEY, StoryProgress } from "@/app/(tabs)/story";
 import { C, F } from "@/constants/theme";
-import { getApiUrl, apiRequest } from "@/lib/query-client";
+import { apiRequest } from "@/lib/query-client";
 import { queueProgressPush } from "@/lib/progressSync";
 import { addToExpressionBook, trackQuizIO, markExpressionsMastered } from "@/lib/storyUtils";
 import { addPhrases as addSrsPhrases } from "@/lib/srsManager";
@@ -67,101 +65,6 @@ const ch5BlackFaceImg = require("@/assets/story/chapter5_motion_comic/ch5_intro_
 // Keyed by "text::lang". Sounds are loaded in advance; on press we just replay.
 const _ttsCacheNative = new Map<string, Audio.Sound>();
 const _ttsCacheWeb    = new Map<string, HTMLAudioElement>();
-
-async function ttsPreload(text: string, lang: string, apiBase: string) {
-  const key = `${text}::${lang}`;
-  const url = new URL("/api/pronunciation-tts", apiBase);
-  url.searchParams.set("text", text);
-  url.searchParams.set("lang", lang);
-  const urlStr = url.toString();
-  if (Platform.OS === "web") {
-    if (_ttsCacheWeb.has(key)) return;
-    try {
-      const audio = new (window as any).Audio(urlStr) as HTMLAudioElement;
-      audio.preload = "auto";
-      audio.volume = 1.0;
-      audio.load();
-      _ttsCacheWeb.set(key, audio);
-    } catch (e) { console.warn('[Audio] TTS web cache prefetch failed:', e); }
-  } else {
-    if (_ttsCacheNative.has(key)) return;
-    try {
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: urlStr },
-        { shouldPlay: false, volume: 1.0 }
-      );
-      _ttsCacheNative.set(key, sound);
-    } catch (e) { console.warn('[Audio] TTS native cache prefetch failed:', e); }
-  }
-}
-
-function ttsPlayCached(
-  text: string,
-  lang: string,
-  apiBase: string,
-  setPlaying: (v: boolean) => void
-) {
-  const key = `${text}::${lang}`;
-  const url = new URL("/api/pronunciation-tts", apiBase);
-  url.searchParams.set("text", text);
-  url.searchParams.set("lang", lang);
-  const urlStr = url.toString();
-
-  if (Platform.OS === "web") {
-    const cached = _ttsCacheWeb.get(key);
-    if (cached) {
-      cached.currentTime = 0;
-      cached.volume = 1.0;
-      setPlaying(true);
-      cached.play().catch((e: unknown) => console.warn('[Audio] cached web TTS play failed:', e));
-      cached.onended = () => setPlaying(false);
-      cached.onerror = () => setPlaying(false);
-    } else {
-      const audio = new (window as any).Audio(urlStr);
-      audio.volume = 1.0;
-      setPlaying(true);
-      audio.play().catch((e: unknown) => console.warn('[Audio] web TTS play failed:', e));
-      audio.onended = () => setPlaying(false);
-      audio.onerror = () => setPlaying(false);
-      _ttsCacheWeb.set(key, audio);
-    }
-  } else {
-    const cached = _ttsCacheNative.get(key);
-    if (cached) {
-      setPlaying(true);
-      (async () => {
-        try {
-          await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
-          await cached.setPositionAsync(0);
-          await cached.setVolumeAsync(1.0);
-          await cached.playAsync();
-          cached.setOnPlaybackStatusUpdate((s) => {
-            if (s.isLoaded && s.didJustFinish) setPlaying(false);
-          });
-        } catch (e) { console.warn('[Audio] cached TTS playback failed:', e); setPlaying(false); }
-      })();
-    } else {
-      setPlaying(true);
-      (async () => {
-        try {
-          await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
-          const { sound } = await Audio.Sound.createAsync(
-            { uri: urlStr },
-            { shouldPlay: false, volume: 1.0 }
-          );
-          _ttsCacheNative.set(key, sound);
-          await sound.setVolumeAsync(1.0);
-          await sound.playAsync();
-          sound.setOnPlaybackStatusUpdate((s) => {
-            if (s.isLoaded && s.didJustFinish) setPlaying(false);
-          });
-        } catch (e) { console.warn('[Audio] TTS playback failed:', e); setPlaying(false); }
-      })();
-    }
-  }
-}
-const { width } = Dimensions.get("window");
 
 /* ─────────────────── TYPES ─────────────────── */
 
@@ -5809,13 +5712,6 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
 
   const breakdown = buildBreakdown(encodedWord, q.shift);
 
-  // Find the circled number label of the correct answer in the shuffled list
-  const correctOptNum = (() => {
-    const labels = ["①", "②", "③", "④"];
-    const ci = shuffledOpts[idx]?.indexOf(correctAnswer);
-    return ci >= 0 ? labels[ci] : "";
-  })();
-
   function handleSelect(opt: string) {
     if (showResult) return;
     const correct = opt === correctAnswer;
@@ -6986,7 +6882,6 @@ export default function StoryScene() {
   }, [audioMuted, introStatus]);
 
   const seq = story.sequence;
-  const totalScenes = seq.filter((s) => s.kind === "scene").length;
 
   const BGM_FULL = 0.4;
   const BGM_DIM  = 0.08;   // dimmed during pronunciation / speaking quizzes
@@ -6998,7 +6893,6 @@ export default function StoryScene() {
       (currentItem.pType === "pronunciation" || currentItem.pType === "voice-power" || currentItem.pType === "npc-rescue");
     bgmRef.current?.setVolumeAsync(isSpeakingQuiz ? BGM_DIM : BGM_FULL).catch((e: unknown) => console.warn('[Audio] BGM volume change failed:', e));
   }, [seqIdx]);
-  const sceneCount = seq.slice(0, seqIdx).filter((s) => s.kind === "scene").length;
 
   function fadeTransition(cb: () => void, onFullyDone?: () => void) {
     // Fade-out 100ms (was 180) + fade-in 120ms (was 250) = ~220ms total transition.
@@ -7072,7 +6966,6 @@ export default function StoryScene() {
         const idiomData = idiomEntry.idiom[tl] ?? idiomEntry.idiom["en"];
         if (idiomData?.expression) {
           const chapter = story.id === "london" ? "ch1" : story.id === "madrid" ? "ch2" : story.id === "seoul" ? "ch3" : story.id === "cairo" ? "ch4" : "ch5";
-          const meaning = Object.values(idiomData.meaning ?? {})[0] ?? "";
           addToExpressionBook(
             [idiomData.expression],
             chapter,

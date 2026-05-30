@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
-  Modal,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,7 +22,6 @@ import {
   langToCode,
   getCefrTierLabel,
   type DailyCourseProgress,
-  type UnitData,
   type DayData,
   type CourseLevel,
 } from "@/lib/dailyCourseData";
@@ -84,7 +82,6 @@ export default function RudyCourseScreen() {
 
   // Progress within selected unit
   const unitDays = currentUnit.days;
-  const completedInUnit = unitDays.filter((d) => progress.completedDays.includes(d.id)).length;
 
   // A day is unlocked if it's completed, it's the active day, or it sits
   // before the active day globally. Once the course is fully done, every
@@ -116,7 +113,6 @@ export default function RudyCourseScreen() {
   const headerLabel = nativeLang === "korean" ? "루디의 훈련소" : nativeLang === "spanish" ? "Campamento de Rudy" : nativeLang === "indonesian" ? "Kamp Latihan Rudy" : "Rudy's Training Camp";
   const levelLabel = nativeLang === "korean" ? "현재 레벨" : nativeLang === "spanish" ? "Nivel Actual" : nativeLang === "indonesian" ? "Level Sekarang" : "Current Level";
 
-  const unitLabelDropdown = nativeLang === "korean" ? "단원 선택" : nativeLang === "spanish" ? "Seleccionar Unidad" : nativeLang === "indonesian" ? "Pilih Unit" : "Select Unit";
   const startLabel = nativeLang === "korean" ? "시작하기" : nativeLang === "spanish" ? "Comenzar" : nativeLang === "indonesian" ? "Mulai" : "Start";
   const todayLabel = nativeLang === "korean" ? "오늘" : nativeLang === "spanish" ? "Hoy" : nativeLang === "indonesian" ? "Hari ini" : "Today";
 

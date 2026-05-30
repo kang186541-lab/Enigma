@@ -42,36 +42,6 @@ export function phaseLabel(phase: LessonPhase, nativeLang: string): string {
   }
 }
 
-/** Longer description used in tooltips / onboarding. */
-export function phaseDescription(phase: LessonPhase, nativeLang: string): string {
-  const isKo = nativeLang === "korean";
-  const isEs = nativeLang === "spanish";
-  switch (phase) {
-    case "connect":
-      return isKo ? "지난 학습 돌아보고 오늘 주제 소개"
-        : isEs ? "Repaso rápido + presentar el tema de hoy"
-        : "Warm up and introduce today's topic";
-    case "model":
-      return isKo ? "튜터가 목표 표현을 직접 시범"
-        : isEs ? "El tutor modela las expresiones objetivo"
-        : "Tutor demonstrates target expressions";
-    case "guided":
-      return isKo ? "안내를 받으며 부분 연습"
-        : isEs ? "Práctica guiada paso a paso"
-        : "Guided practice with scaffolding";
-    case "free":
-      return isKo ? "실제 상황에서 자유롭게 사용"
-        : isEs ? "Uso libre en una situación real"
-        : "Free production in a real context";
-    case "reflect":
-      return isKo ? "배운 것 정리 + 메타인지"
-        : isEs ? "Resumen y metacognición"
-        : "Summary and metacognition";
-    case "done":
-      return isKo ? "수업 완료" : isEs ? "Lección completa" : "Lesson complete";
-  }
-}
-
 /** Server prompt fragment describing what the tutor should do THIS turn. */
 export function phaseInstructionForPrompt(phase: LessonPhase, lessonTopic: string | null): string {
   const topic = lessonTopic ? `"${lessonTopic}"` : "today's topic";

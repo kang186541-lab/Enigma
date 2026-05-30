@@ -6,7 +6,6 @@ import {
   ScrollView,
   Pressable,
   Platform,
-  Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -21,7 +20,6 @@ import { getIORatioData, type IORatioData } from "@/lib/storyUtils";
 import { loadProgress as loadDailyCourseProgress } from "@/lib/dailyCourseData";
 import { getLatestCampPhrase, type LearningLangKey } from "@/lib/lessonContent";
 
-const { width } = Dimensions.get("window");
 export const STORY_PROGRESS_KEY = "lingo_story_progress";
 
 export interface StoryProgress {

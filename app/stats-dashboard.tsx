@@ -14,16 +14,16 @@ const CHART_W = Math.min(SCREEN_W - 48, 380);
 const BAR_W = Math.floor(CHART_W / 7) - 6;
 
 const T = {
-  title:    { ko: "학습 통계", en: "Learning Stats", es: "Estadisticas" },
-  week:     { ko: "이번 주", en: "This Week", es: "Esta Semana" },
-  month:    { ko: "이번 달", en: "This Month", es: "Este Mes" },
-  total:    { ko: "총 세션", en: "Total Sessions", es: "Total Sesiones" },
-  totalXP:  { ko: "총 XP", en: "Total XP", es: "XP Total" },
-  time:     { ko: "총 학습 시간", en: "Total Study Time", es: "Tiempo Total" },
-  streak:   { ko: "스트릭 달력", en: "Streak Calendar", es: "Calendario de Racha" },
-  noData:   { ko: "아직 데이터가 없어요!", en: "No data yet!", es: "Sin datos aun!" },
-  firstWeek:{ ko: "첫 레슨을 완료하면 여기에 학습 기록이 표시돼요 📚", en: "Complete your first lesson to see your progress here 📚", es: "Completa tu primera lección para ver tu progreso aquí 📚" },
-  back:     { ko: "뒤로", en: "Back", es: "Volver" },
+  title:    { ko: "학습 통계", en: "Learning Stats", es: "Estadisticas", id: "Statistik Belajar" },
+  week:     { ko: "이번 주", en: "This Week", es: "Esta Semana", id: "Minggu Ini" },
+  month:    { ko: "이번 달", en: "This Month", es: "Este Mes", id: "Bulan Ini" },
+  total:    { ko: "총 세션", en: "Total Sessions", es: "Total Sesiones", id: "Total Sesi" },
+  totalXP:  { ko: "총 XP", en: "Total XP", es: "XP Total", id: "Total XP" },
+  time:     { ko: "총 학습 시간", en: "Total Study Time", es: "Tiempo Total", id: "Total Waktu Belajar" },
+  streak:   { ko: "스트릭 달력", en: "Streak Calendar", es: "Calendario de Racha", id: "Kalender Streak" },
+  noData:   { ko: "아직 데이터가 없어요!", en: "No data yet!", es: "Sin datos aun!", id: "Belum ada data!" },
+  firstWeek:{ ko: "첫 레슨을 완료하면 여기에 학습 기록이 표시돼요 📚", en: "Complete your first lesson to see your progress here 📚", es: "Completa tu primera lección para ver tu progreso aquí 📚", id: "Selesaikan pelajaran pertamamu untuk melihat progresmu di sini 📚" },
+  back:     { ko: "뒤로", en: "Back", es: "Volver", id: "Kembali" },
 } as const;
 
 const DAYS_KO = ["월", "화", "수", "목", "금", "토", "일"];
@@ -42,7 +42,7 @@ export default function StatsDashboard() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { nativeLanguage: nativeLang, stats } = useLanguage();
-  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
+  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
   const dayNames = lc === "ko" ? DAYS_KO : lc === "es" ? DAYS_ES : DAYS_EN;
 
   const [weekData, setWeekData] = useState<{ date: string; totalXP: number }[]>([]);

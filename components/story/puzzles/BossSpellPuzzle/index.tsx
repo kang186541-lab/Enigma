@@ -95,7 +95,6 @@ export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }
   const flashOpacity = useRef(new Animated.Value(0)).current;
 
   const spellText = useMemo(() => buildSpell(question.spellChunks, question.separators), [question]);
-  const nextChunk = question.spellChunks[filled.length];
   const usedWords = useMemo(() => new Set(filled), [filled]);
   const isComplete = filled.length === question.spellChunks.length;
 

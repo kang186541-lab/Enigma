@@ -28,48 +28,48 @@ import {
 import PaywallCard from "@/components/PaywallCard";
 
 const T = {
-  title:       { ko: "설정",          en: "Settings",           es: "Ajustes" },
-  membership:  { ko: "멤버십",        en: "Membership",         es: "Membresía" },
-  accountTitle:{ ko: "계정",          en: "Account",            es: "Cuenta" },
-  signInWithGoogle: { ko: "Google로 로그인", en: "Sign in with Google", es: "Iniciar sesión con Google" },
-  signedInAs:  { ko: "로그인됨",      en: "Signed in as",       es: "Sesión iniciada como" },
-  signOut:     { ko: "로그아웃",       en: "Sign out",           es: "Cerrar sesión" },
-  signInBenefit: { ko: "로그인하면 진행 상황이 기기 간에 저장돼요", en: "Sign in to save progress across devices", es: "Inicia sesión para guardar tu progreso entre dispositivos" },
-  signInError: { ko: "로그인 실패",    en: "Sign-in failed",     es: "Error al iniciar sesión" },
-  emailLabel:  { ko: "이메일",        en: "Email",              es: "Correo" },
-  emailPlaceholder: { ko: "you@example.com", en: "you@example.com", es: "tu@ejemplo.com" },
-  emailSendLink: { ko: "이메일로 로그인 링크 받기", en: "Send me a magic link", es: "Enviarme un enlace mágico" },
-  emailSent:   { ko: "메일을 확인해서 링크를 누르세요", en: "Check your email and click the link", es: "Revisa tu correo y haz clic en el enlace" },
-  divider:     { ko: "또는",          en: "or",                 es: "o" },
-  notifTitle:  { ko: "알림",          en: "Notifications",      es: "Notificaciones" },
-  notifDaily:  { ko: "매일 학습 알림", en: "Daily reminder",     es: "Recordatorio diario" },
-  notifTime:   { ko: "알림 시간",      en: "Reminder time",      es: "Hora del recordatorio" },
-  notifWeb:    { ko: "웹에서는 지원되지 않습니다", en: "Not supported on web", es: "No disponible en web" },
-  general:     { ko: "일반",          en: "General",            es: "General" },
-  language:    { ko: "학습 언어",      en: "Learning language",  es: "Idioma de estudio" },
-  difficulty:  { ko: "난이도",         en: "Difficulty",         es: "Dificultad" },
-  diffAuto:    { ko: "자동",          en: "Auto",               es: "Auto" },
-  diffEasy:    { ko: "쉬움",          en: "Easy",               es: "Facil" },
-  diffNormal:  { ko: "보통",          en: "Normal",             es: "Normal" },
-  diffHard:    { ko: "어려움",         en: "Hard",               es: "Dificil" },
-  display:     { ko: "화면",          en: "Display",            es: "Pantalla" },
-  theme:       { ko: "테마",          en: "Theme",              es: "Tema" },
-  themeDark:   { ko: "다크",          en: "Dark",               es: "Oscuro" },
-  themeLight:  { ko: "라이트",         en: "Light",              es: "Claro" },
-  themeSystem: { ko: "시스템",         en: "System",             es: "Sistema" },
-  back:        { ko: "뒤로",          en: "Back",               es: "Volver" },
-  helpLink:    { ko: "도움말",         en: "Help",               es: "Ayuda" },
+  title:       { ko: "설정",          en: "Settings",           es: "Ajustes",            id: "Pengaturan" },
+  membership:  { ko: "멤버십",        en: "Membership",         es: "Membresía",          id: "Keanggotaan" },
+  accountTitle:{ ko: "계정",          en: "Account",            es: "Cuenta",             id: "Akun" },
+  signInWithGoogle: { ko: "Google로 로그인", en: "Sign in with Google", es: "Iniciar sesión con Google", id: "Masuk dengan Google" },
+  signedInAs:  { ko: "로그인됨",      en: "Signed in as",       es: "Sesión iniciada como", id: "Masuk sebagai" },
+  signOut:     { ko: "로그아웃",       en: "Sign out",           es: "Cerrar sesión",      id: "Keluar" },
+  signInBenefit: { ko: "로그인하면 진행 상황이 기기 간에 저장돼요", en: "Sign in to save progress across devices", es: "Inicia sesión para guardar tu progreso entre dispositivos", id: "Masuk supaya progresmu tersimpan di semua perangkat" },
+  signInError: { ko: "로그인 실패",    en: "Sign-in failed",     es: "Error al iniciar sesión", id: "Gagal masuk" },
+  emailLabel:  { ko: "이메일",        en: "Email",              es: "Correo",             id: "Email" },
+  emailPlaceholder: { ko: "you@example.com", en: "you@example.com", es: "tu@ejemplo.com", id: "kamu@contoh.com" },
+  emailSendLink: { ko: "이메일로 로그인 링크 받기", en: "Send me a magic link", es: "Enviarme un enlace mágico", id: "Kirimi aku tautan ajaib" },
+  emailSent:   { ko: "메일을 확인해서 링크를 누르세요", en: "Check your email and click the link", es: "Revisa tu correo y haz clic en el enlace", id: "Cek emailmu dan klik tautannya" },
+  divider:     { ko: "또는",          en: "or",                 es: "o",                  id: "atau" },
+  notifTitle:  { ko: "알림",          en: "Notifications",      es: "Notificaciones",     id: "Notifikasi" },
+  notifDaily:  { ko: "매일 학습 알림", en: "Daily reminder",     es: "Recordatorio diario", id: "Pengingat harian" },
+  notifTime:   { ko: "알림 시간",      en: "Reminder time",      es: "Hora del recordatorio", id: "Waktu pengingat" },
+  notifWeb:    { ko: "웹에서는 지원되지 않습니다", en: "Not supported on web", es: "No disponible en web", id: "Tidak tersedia di web" },
+  general:     { ko: "일반",          en: "General",            es: "General",            id: "Umum" },
+  language:    { ko: "학습 언어",      en: "Learning language",  es: "Idioma de estudio",  id: "Bahasa yang dipelajari" },
+  difficulty:  { ko: "난이도",         en: "Difficulty",         es: "Dificultad",         id: "Tingkat kesulitan" },
+  diffAuto:    { ko: "자동",          en: "Auto",               es: "Auto",               id: "Otomatis" },
+  diffEasy:    { ko: "쉬움",          en: "Easy",               es: "Facil",              id: "Mudah" },
+  diffNormal:  { ko: "보통",          en: "Normal",             es: "Normal",             id: "Normal" },
+  diffHard:    { ko: "어려움",         en: "Hard",               es: "Dificil",            id: "Sulit" },
+  display:     { ko: "화면",          en: "Display",            es: "Pantalla",           id: "Tampilan" },
+  theme:       { ko: "테마",          en: "Theme",              es: "Tema",               id: "Tema" },
+  themeDark:   { ko: "다크",          en: "Dark",               es: "Oscuro",             id: "Gelap" },
+  themeLight:  { ko: "라이트",         en: "Light",              es: "Claro",              id: "Terang" },
+  themeSystem: { ko: "시스템",         en: "System",             es: "Sistema",            id: "Sistem" },
+  back:        { ko: "뒤로",          en: "Back",               es: "Volver",             id: "Kembali" },
+  helpLink:    { ko: "도움말",         en: "Help",               es: "Ayuda",              id: "Bantuan" },
   // ── Privacy / Terms / My Data section
-  legalTitle:  { ko: "개인정보 / 약관 / 내 데이터", en: "Privacy / Terms / My Data", es: "Privacidad / Términos / Mis datos" },
-  privacy:     { ko: "개인정보처리방침", en: "Privacy Policy",   es: "Política de Privacidad" },
-  privacyDesc: { ko: "수집·이용·보관 안내", en: "What we collect and why", es: "Qué recopilamos y por qué" },
-  terms:       { ko: "이용약관",       en: "Terms of Service",  es: "Términos de Servicio" },
-  termsDesc:   { ko: "서비스 이용 조건", en: "Service conditions",      es: "Condiciones del servicio" },
-  myData:      { ko: "내 데이터",       en: "My Data",           es: "Mis datos" },
-  myDataDesc:  { ko: "내려받기·삭제",   en: "Download / delete", es: "Descargar / eliminar" },
+  legalTitle:  { ko: "개인정보 / 약관 / 내 데이터", en: "Privacy / Terms / My Data", es: "Privacidad / Términos / Mis datos", id: "Privasi / Ketentuan / Data Saya" },
+  privacy:     { ko: "개인정보처리방침", en: "Privacy Policy",   es: "Política de Privacidad", id: "Kebijakan Privasi" },
+  privacyDesc: { ko: "수집·이용·보관 안내", en: "What we collect and why", es: "Qué recopilamos y por qué", id: "Apa yang kami kumpulkan dan alasannya" },
+  terms:       { ko: "이용약관",       en: "Terms of Service",  es: "Términos de Servicio", id: "Ketentuan Layanan" },
+  termsDesc:   { ko: "서비스 이용 조건", en: "Service conditions",      es: "Condiciones del servicio", id: "Syarat penggunaan layanan" },
+  myData:      { ko: "내 데이터",       en: "My Data",           es: "Mis datos",          id: "Data Saya" },
+  myDataDesc:  { ko: "내려받기·삭제",   en: "Download / delete", es: "Descargar / eliminar", id: "Unduh / hapus" },
 } as const;
 
-type LangKey = "ko" | "en" | "es";
+type LangKey = "ko" | "en" | "es" | "id";
 function t(obj: Record<string, string>, lang: LangKey) {
   return obj[lang] || obj.en;
 }
@@ -80,7 +80,9 @@ export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { nativeLanguage: nativeLang } = useLanguage();
-  const lc: LangKey = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
+  const lc: LangKey = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
+  // Daily-reminder notifications only ship ko/en/es copy; Indonesian natives fall back to English here.
+  const notifLc: "ko" | "en" | "es" = lc === "id" ? "en" : lc;
 
   const [notifOn, setNotifOn] = useState(true);
   const [notifHour, setNotifHour] = useState(9);
@@ -148,7 +150,7 @@ export default function SettingsScreen() {
     await setNotifEnabled(val);
     if (val) {
       await registerForPushNotifications();
-      await scheduleDailyReminder(notifHour, notifMinute, lc);
+      await scheduleDailyReminder(notifHour, notifMinute, notifLc);
     }
   };
 
@@ -156,7 +158,7 @@ export default function SettingsScreen() {
     setNotifHour(hour);
     await setNotifTime(hour, 0);
     if (notifOn) {
-      await scheduleDailyReminder(hour, 0, lc);
+      await scheduleDailyReminder(hour, 0, notifLc);
     }
   };
 

@@ -3,7 +3,6 @@
  * Uses expo-av for playback. All sounds are optional — missing files are silently skipped.
  */
 import { Audio, AVPlaybackSource } from "expo-av";
-import { Platform } from "react-native";
 
 // ─── Sound Effect Registry ──────────────────────────────────────────────────
 
@@ -30,16 +29,6 @@ const SFX_SOURCES: Record<SfxSlot, AVPlaybackSource | null> = {
   choiceMade: null,
   dialogueTap: null,
   gaugeWarning: null,
-};
-
-const BGM_SOURCES: Record<BgmSlot, AVPlaybackSource | null> = {
-  ch1: null,
-  ch2: null,
-  ch3: null,
-  ch4: null,
-  ch5: null,
-  boss: null,
-  result: null,
 };
 
 // ─── State ──────────────────────────────────────────────────────────────────
@@ -81,30 +70,6 @@ export async function playSfx(slot: SfxSlot): Promise<void> {
   }
 }
 
-/** Start BGM for a chapter or scene type. Crossfades if already playing. */
-export async function playBgm(slot: BgmSlot): Promise<void> {
-  if (!audioEnabled) return;
-  if (currentBgmSlot === slot && currentBgm) return; // already playing this track
-
-  const source = BGM_SOURCES[slot];
-  if (!source) return; // placeholder — no asset yet
-
-  try {
-    // Stop current BGM
-    await stopBgm();
-
-    const { sound } = await Audio.Sound.createAsync(source, {
-      volume: bgmVolume,
-      isLooping: true,
-      shouldPlay: true,
-    });
-    currentBgm = sound;
-    currentBgmSlot = slot;
-  } catch {
-    // Silently skip
-  }
-}
-
 /** Stop the current BGM */
 export async function stopBgm(): Promise<void> {
   if (currentBgm) {
@@ -117,11 +82,6 @@ export async function stopBgm(): Promise<void> {
     currentBgm = null;
     currentBgmSlot = null;
   }
-}
-
-/** Set SFX volume (0.0 - 1.0) */
-export function setSfxVolume(vol: number): void {
-  sfxVolume = Math.max(0, Math.min(1, vol));
 }
 
 /** Set BGM volume (0.0 - 1.0) */
@@ -143,41 +103,4 @@ export function setAudioEnabled(enabled: boolean): void {
 /** Get current audio settings */
 export function getAudioSettings() {
   return { sfxVolume, bgmVolume, audioEnabled };
-}
-
-/** Cleanup all cached sounds (call on app unmount) */
-export async function unloadAll(): Promise<void> {
-  await stopBgm();
-  for (const sound of Object.values(sfxCache)) {
-    try { await sound?.unloadAsync(); } catch (e) { console.warn('[Audio] sfx unload failed:', e); }
-  }
-  Object.keys(sfxCache).forEach(k => delete sfxCache[k as SfxSlot]);
-}
-
-/** Map chapter ID to BGM slot */
-export function chapterToBgm(chapterId: string): BgmSlot {
-  switch (chapterId) {
-    case "ch1": return "ch1";
-    case "ch2": return "ch2";
-    case "ch3": return "ch3";
-    case "ch4": return "ch4";
-    case "ch5": return "ch5";
-    default: return "ch1";
-  }
-}
-
-// ─── Audio Mode Setup ───────────────────────────────────────────────────────
-
-/** Initialize audio mode for playback (call once at app startup) */
-export async function initAudioMode(): Promise<void> {
-  if (Platform.OS === "web") return;
-  try {
-    await Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      playsInSilentModeIOS: true,
-      staysActiveInBackground: false,
-    });
-  } catch {
-    // ignore
-  }
 }
