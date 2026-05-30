@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
 import { NPCS, NPC, NPC_REL_LEVELS, NPC_EMOTIONS, getRelTier, getRelLabel, RelationshipTier, NPC_UNLOCK_CHAPTER, CHAPTER_ID_MAP } from "@/constants/npcs";
 import { C, F } from "@/constants/theme";
+import { loadProgress as loadDailyCourseProgress } from "@/lib/dailyCourseData";
 
 // ─── Language Wound Data ──────────────────────────────────────────────────────
 import languageWoundsRaw from "@/data/storyMode/characters.json";
@@ -51,17 +52,22 @@ export default function NpcListScreen() {
   const [emotions, setEmotions] = useState<Record<string, string>>({});
   const [storyProgress, setStoryProgress] = useState<{ completed: string[]; unlocked: string[] }>({ completed: [], unlocked: [] });
   const [expandedWound, setExpandedWound] = useState<string | null>(null);
+  // Camp (daily course) progress — drives the sequencing hint connecting the
+  // Camp's taught phrases to NPC practice (the promise of guide card 11).
+  const [campDaysDone, setCampDaysDone] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     try {
-      const [relRaw, emoRaw, spRaw] = await Promise.all([
+      const [relRaw, emoRaw, spRaw, camp] = await Promise.all([
         AsyncStorage.getItem(REL_KEY),
         AsyncStorage.getItem(EMO_KEY),
         AsyncStorage.getItem(STORY_PROGRESS_KEY),
+        loadDailyCourseProgress(),
       ]);
       if (relRaw) setRelationships(JSON.parse(relRaw));
       if (emoRaw) setEmotions(JSON.parse(emoRaw));
       if (spRaw) setStoryProgress(JSON.parse(spRaw));
+      setCampDaysDone(camp.completedDays?.length ?? 0);
     } catch (e) { console.warn('[NpcList] data load failed:', e); }
   }, []);
 
@@ -118,6 +124,27 @@ export default function NpcListScreen() {
     ? "Latih bahasa di dunia nyata bersama NPC"
     : "Practice real-world language with NPCs";
 
+  // Camp → NPC sequencing hint. ≥1 Camp day done → remind them to reuse those
+  // phrases here (guide card 11); not started → send them to the Camp first.
+  const campStartedHint =
+    native === "korean"
+      ? "훈련소에서 배운 표현을 여기서 써보세요"
+      : native === "spanish"
+      ? "Usa aquí las frases que aprendiste en el campamento"
+      : native === "indonesian"
+      ? "Pakai di sini ungkapan yang kamu pelajari di Kamp"
+      : "Use the phrases you learned at Camp here";
+  const campNotStartedHint =
+    native === "korean"
+      ? "먼저 루디 훈련소에서 기초 표현을 배우면 더 쉬워요"
+      : native === "spanish"
+      ? "Aprende primero frases básicas en el Campamento de Rudy y será más fácil"
+      : native === "indonesian"
+      ? "Belajar dulu ungkapan dasar di Kamp Rudy agar lebih mudah"
+      : "Learn basic phrases at Rudy's Camp first and this gets easier";
+  const showCampStarted = campDaysDone !== null && campDaysDone >= 1;
+  const showCampNotStarted = campDaysDone !== null && campDaysDone === 0;
+
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
       <View style={styles.header}>
@@ -138,6 +165,26 @@ export default function NpcListScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad + 24 }]}
       >
+        {/* Camp → NPC sequencing hint */}
+        {showCampStarted && (
+          <View style={styles.campHint}>
+            <Ionicons name="link-outline" size={14} color={C.gold} />
+            <Text style={styles.campHintText}>{campStartedHint}</Text>
+          </View>
+        )}
+        {showCampNotStarted && (
+          <Pressable
+            style={({ pressed }) => [styles.campHint, styles.campHintTappable, pressed && { opacity: 0.7 }]}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/rudy-course" as any); }}
+            accessibilityRole="link"
+            accessibilityLabel={campNotStartedHint}
+          >
+            <Ionicons name="school-outline" size={14} color={C.gold} />
+            <Text style={[styles.campHintText, styles.campHintTappableText]}>{campNotStartedHint}</Text>
+            <Ionicons name="chevron-forward" size={13} color={C.goldDim} />
+          </Pressable>
+        )}
+
         {NPCS.map((npc) => {
           const unlocked = isNpcUnlocked(npc.id);
           const score = relationships[npc.id] ?? 0;
@@ -318,6 +365,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     gap: 12,
+  },
+
+  campHint: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.28)",
+    backgroundColor: "rgba(201,162,39,0.07)",
+  },
+  campHintTappable: {
+    borderColor: "rgba(201,162,39,0.4)",
+  },
+  campHintText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+    lineHeight: 17,
+  },
+  campHintTappableText: {
+    color: C.gold,
   },
 
   npcCard: {

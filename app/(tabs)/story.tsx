@@ -18,6 +18,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
 import { C, F } from "@/constants/theme";
 import { getIORatioData, type IORatioData } from "@/lib/storyUtils";
+import { loadProgress as loadDailyCourseProgress } from "@/lib/dailyCourseData";
 
 const { width } = Dimensions.get("window");
 export const STORY_PROGRESS_KEY = "lingo_story_progress";
@@ -152,15 +153,20 @@ export default function StoryTab() {
     unlocked: ["london"],
   });
   const [ioData, setIoData] = useState<IORatioData>({ chapters: {} });
+  // Camp (daily course) progress — drives the sequencing hint that connects the
+  // Camp's taught phrases to Story Mode (the promise made by guide card 10).
+  const [campDaysDone, setCampDaysDone] = useState<number | null>(null);
 
   const loadProgress = useCallback(async () => {
     try {
-      const [raw, io] = await Promise.all([
+      const [raw, io, camp] = await Promise.all([
         AsyncStorage.getItem(STORY_PROGRESS_KEY),
         getIORatioData(),
+        loadDailyCourseProgress(),
       ]);
       if (raw) setProgress(JSON.parse(raw));
       setIoData(io);
+      setCampDaysDone(camp.completedDays?.length ?? 0);
     } catch (e) { console.warn('[Story] progress load failed:', e); }
   }, []);
 
@@ -229,6 +235,28 @@ export default function StoryTab() {
   const playLabel =
     lang === "korean" ? "시작 ▶" : lang === "spanish" ? "Iniciar ▶" : lang === "indonesian" ? "Mulai ▶" : "Play ▶";
 
+  // Camp → Story sequencing hint. When the learner has finished ≥1 Camp day, we
+  // remind them the phrases they trained show up here (matching guide card 10).
+  // When they haven't started the Camp, we point them there first.
+  const campStartedHint =
+    lang === "korean"
+      ? "훈련소에서 배운 표현을 여기서 써보세요"
+      : lang === "spanish"
+      ? "Usa aquí las frases que aprendiste en el campamento"
+      : lang === "indonesian"
+      ? "Pakai di sini ungkapan yang kamu pelajari di Kamp"
+      : "Use the phrases you learned at Camp here";
+  const campNotStartedHint =
+    lang === "korean"
+      ? "먼저 루디 훈련소에서 기초 표현을 배우면 더 쉬워요"
+      : lang === "spanish"
+      ? "Aprende primero frases básicas en el Campamento de Rudy y será más fácil"
+      : lang === "indonesian"
+      ? "Belajar dulu ungkapan dasar di Kamp Rudy agar lebih mudah"
+      : "Learn basic phrases at Rudy's Camp first and this gets easier";
+  const showCampStarted = campDaysDone !== null && campDaysDone >= 1;
+  const showCampNotStarted = campDaysDone !== null && campDaysDone === 0;
+
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
       <LinearGradient
@@ -286,6 +314,26 @@ export default function StoryTab() {
           </Text>
         </Pressable>
       </View>
+
+      {/* Camp → Story sequencing hint */}
+      {showCampStarted && (
+        <View style={styles.campHint}>
+          <Ionicons name="link-outline" size={14} color={C.gold} />
+          <Text style={styles.campHintText}>{campStartedHint}</Text>
+        </View>
+      )}
+      {showCampNotStarted && (
+        <Pressable
+          style={({ pressed }) => [styles.campHint, styles.campHintTappable, pressed && { opacity: 0.7 }]}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/rudy-course" as any); }}
+          accessibilityRole="link"
+          accessibilityLabel={campNotStartedHint}
+        >
+          <Ionicons name="school-outline" size={14} color={C.gold} />
+          <Text style={[styles.campHintText, styles.campHintTappableText]}>{campNotStartedHint}</Text>
+          <Ionicons name="chevron-forward" size={13} color={C.goldDim} />
+        </Pressable>
+      )}
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -595,6 +643,32 @@ const styles = StyleSheet.create({
   quickBtnText: {
     fontSize: 12,
     fontFamily: F.bodySemi,
+    color: C.gold,
+  },
+  campHint: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    marginHorizontal: 16,
+    marginTop: 10,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.28)",
+    backgroundColor: "rgba(201,162,39,0.07)",
+  },
+  campHintTappable: {
+    borderColor: "rgba(201,162,39,0.4)",
+  },
+  campHintText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: F.bodySemi,
+    color: C.parchment,
+    lineHeight: 17,
+  },
+  campHintTappableText: {
     color: C.gold,
   },
   lingoSpeech: {

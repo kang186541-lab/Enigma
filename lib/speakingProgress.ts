@@ -23,6 +23,21 @@ function normalizeSpeakingProgress(progress?: Partial<SpeakingProgress> | null):
   };
 }
 
+/**
+ * How many DISTINCT prior days the learner has spoken on (not counting today),
+ * derived from the date-keyed speaking history. Used to advance the home
+ * "first sentence" mission day-to-day so a returning learner meets new survival
+ * phrases instead of re-opening with the same greeting. No new storage — the
+ * history keys (last ~45 days) already exist. Returns 0 on day one.
+ */
+export async function loadSpokenDayOffset(): Promise<number> {
+  const profile = await loadLearnerProfile();
+  const progress = normalizeSpeakingProgress(profile.speakingProgress);
+  const today = getLocalDateKey();
+  const priorDays = Object.keys(progress.history).filter((k) => k < today).length;
+  return Math.max(0, priorDays);
+}
+
 function trimHistory(history: Record<string, SpeakingDayProgress>): Record<string, SpeakingDayProgress> {
   const keep = Object.keys(history).sort().slice(-45);
   const out: Record<string, SpeakingDayProgress> = {};

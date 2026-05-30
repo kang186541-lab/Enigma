@@ -35,12 +35,13 @@ import {
   updatePronunciationPractice,
   type LearningGoal,
 } from "@/lib/learnerProfile";
-import { buildSpeakingPromptKey, getSpeakingCountForLanguage, loadTodaySpeakingProgress, recordSpokenSentence, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
+import { buildSpeakingPromptKey, getSpeakingCountForLanguage, loadTodaySpeakingProgress, loadSpokenDayOffset, recordSpokenSentence, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 import { loadSpeakMissionHandoff, type SpeakMissionHandoff } from "@/lib/speakMissionHandoff";
 import { buildAcquisitionSession } from "@/lib/acquisitionSession";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import {
   getDailySpeakingMissionPhrase as getSharedDailySpeakingMissionPhrase,
+  getProgressiveMissionPhrase,
   getDailySpeakingSentenceLoop,
   type DailySpeakingPhrase,
   type DailySpeakingLanguage,
@@ -769,7 +770,11 @@ function getDailySpeakingMissionPhrase(
   spokenCount: number,
   nativeLang: NativeLanguage
 ): Phrase | null {
-  const phrase = getSharedDailySpeakingMissionPhrase(lang, goal, spokenCount);
+  // `spokenCount` already carries the cross-day offset (dayOffset * GOAL +
+  // in-session count — see where firstMissionIndex is built), so a returning
+  // learner advances to new survival phrases instead of re-opening with the
+  // same greeting. Serve from the beginner-ordered loop (survival first).
+  const phrase = getProgressiveMissionPhrase(lang, goal, spokenCount, 0);
   return phrase ? dailyPhraseToSpeakPhrase(phrase, nativeLang) : null;
 }
 
@@ -1255,6 +1260,12 @@ export default function SpeakScreen() {
         spokenCountForMission = getSpeakingCountForLanguage(day, lang);
         dailySpokenCountRef.current = spokenCountForMission;
         setDailySpokenCount(spokenCountForMission);
+        // Advance the served phrase day-to-day: fold the cross-day offset into
+        // the index so a returning learner meets new survival phrases instead
+        // of re-opening with the same greeting. (The route-provided first index
+        // from onboarding still wins via firstMissionRouteIndexRef below.)
+        const dayOffset = await loadSpokenDayOffset();
+        spokenCountForMission = dayOffset * SPEAKING_DAILY_GOAL + spokenCountForMission;
       }
       if (isReviewSentenceMission && missionIdParam && !reviewHandoffReady && !forceFullSession) {
         return;

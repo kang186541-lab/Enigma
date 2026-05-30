@@ -12,7 +12,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router, useFocusEffect } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
+import { showGuideCardByMilestone } from "@/components/RudyGuideModal";
 import { C, F } from "@/constants/theme";
 import {
   loadProgress,
@@ -40,6 +42,21 @@ export default function RudyCourseScreen() {
     const p = await loadProgress();
     setProgress(p);
     setSelectedUnitIdx(p.currentUnitIndex);
+    // Milestone: the first time the learner opens the Training Camp, fast-forward
+    // the philosophy-card drip pointer to card 8 ("루디의 훈련소가 핵심이야") so the
+    // guide's prescribed order reaches them WHEN it's relevant, instead of waiting
+    // for the calendar drip to arrive on ~day 9. The helper is forward-only +
+    // philosophy-first guarded (no-op unless cards 0-6 are already seen) +
+    // throttle-safe; the card surfaces on the learner's next Home visit.
+    try {
+      const seen = await AsyncStorage.getItem("@first_camp_opened");
+      if (!seen) {
+        await AsyncStorage.setItem("@first_camp_opened", "1");
+        await showGuideCardByMilestone(8);
+      }
+    } catch (err) {
+      console.warn("[RudyCourse] milestone guide card failed:", err);
+    }
   }, []);
 
   useFocusEffect(useCallback(() => { loadData(); }, [loadData]));

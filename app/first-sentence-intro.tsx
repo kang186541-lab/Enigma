@@ -189,6 +189,7 @@ type UIStrings = {
   alreadyKnow: string;
   back: string;
   loadingFallback: string;
+  basicCourseNudge: string;
 };
 
 const UI: Record<NativeLanguage, UIStrings> = {
@@ -214,6 +215,7 @@ const UI: Record<NativeLanguage, UIStrings> = {
     alreadyKnow: "이미 읽을 수 있어요 — 바로 말하기",
     back: "뒤로",
     loadingFallback: "첫 문장을 불러오는 중…",
+    basicCourseNudge: "전체 알파벳도 배우고 싶어요? (10분)",
   },
   english: {
     eyebrow: "Today's first sentence",
@@ -237,6 +239,7 @@ const UI: Record<NativeLanguage, UIStrings> = {
     alreadyKnow: "I can already read this — just speak",
     back: "Back",
     loadingFallback: "Loading your first sentence…",
+    basicCourseNudge: "Want to learn the full alphabet too? (10 min)",
   },
   spanish: {
     eyebrow: "Tu primera frase",
@@ -260,6 +263,7 @@ const UI: Record<NativeLanguage, UIStrings> = {
     alreadyKnow: "Ya sé leer esto — hablar directamente",
     back: "Atrás",
     loadingFallback: "Cargando tu primera frase…",
+    basicCourseNudge: "¿Quieres aprender todo el alfabeto también? (10 min)",
   },
   indonesian: {
     eyebrow: "Kalimat pertamamu",
@@ -283,6 +287,7 @@ const UI: Record<NativeLanguage, UIStrings> = {
     alreadyKnow: "Saya sudah bisa membacanya — langsung bicara",
     back: "Kembali",
     loadingFallback: "Memuat kalimat pertamamu…",
+    basicCourseNudge: "Mau belajar seluruh alfabet juga? (10 mnt)",
   },
 };
 
@@ -334,6 +339,15 @@ export default function FirstSentenceIntroScreen() {
   const [playedOnce, setPlayedOnce] = useState(false);
   const [playedChunks, setPlayedChunks] = useState<Set<number>>(new Set());
   const [revealedChunks, setRevealedChunks] = useState<Set<number>>(new Set());
+  const [basicNudgeDismissed, setBasicNudgeDismissed] = useState(false);
+
+  // The full-alphabet course (/basic-course) only has data for these four
+  // learning targets. normalizeLearn already restricts learnCode to them, so a
+  // non-null learnCode is sufficient — but we keep the explicit set so the
+  // nudge never points an unfamiliar-script beginner at an empty course.
+  const learnHasBasicCourse =
+    learnCode === "korean" || learnCode === "english" ||
+    learnCode === "spanish" || learnCode === "indonesian";
 
   const chunks = useMemo(
     () => (phrase ? buildChunks(phrase.phrase, phrase.ipa) : []),
@@ -401,6 +415,19 @@ export default function FirstSentenceIntroScreen() {
       },
     } as any);
   }, [goalCode, learnCode]);
+
+  // Optional detour for unfamiliar-script beginners who want the FULL alphabet
+  // course. Subtle, dismissible — the primary path stays "say your first
+  // sentence", so this is a quiet underline link, not a CTA.
+  const goToBasicCourse = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push("/basic-course" as any);
+  }, []);
+
+  const dismissBasicNudge = useCallback(() => {
+    Haptics.selectionAsync().catch(() => {});
+    setBasicNudgeDismissed(true);
+  }, []);
 
   const advance = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -508,6 +535,29 @@ export default function FirstSentenceIntroScreen() {
               <Pressable style={styles.selfExempt} onPress={goToSpeak} accessibilityRole="button">
                 <Text style={styles.selfExemptText}>{ui.alreadyKnow}</Text>
               </Pressable>
+
+              {/* Optional full-alphabet detour — dismissible, subtle underline link. */}
+              {learnHasBasicCourse && !basicNudgeDismissed ? (
+                <View style={styles.basicNudgeRow}>
+                  <Pressable
+                    style={styles.basicNudgeLink}
+                    onPress={goToBasicCourse}
+                    accessibilityRole="link"
+                    accessibilityLabel={ui.basicCourseNudge}
+                  >
+                    <Text style={styles.basicNudgeText}>{ui.basicCourseNudge}</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.basicNudgeDismiss}
+                    onPress={dismissBasicNudge}
+                    accessibilityRole="button"
+                    accessibilityLabel="✕"
+                    hitSlop={8}
+                  >
+                    <Ionicons name="close" size={14} color={C.goldDark} />
+                  </Pressable>
+                </View>
+              ) : null}
             </View>
           </>
         )}
@@ -741,5 +791,19 @@ const styles = StyleSheet.create({
   selfExemptText: {
     fontSize: 13, fontFamily: F.bodySemi, color: C.goldDim,
     textDecorationLine: "underline", textAlign: "center",
+  },
+
+  basicNudgeRow: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, paddingTop: 2,
+  },
+  basicNudgeLink: { paddingVertical: 6, paddingHorizontal: 2 },
+  basicNudgeText: {
+    fontSize: 12, fontFamily: F.body, color: C.goldDim,
+    textDecorationLine: "underline", textAlign: "center", opacity: 0.85,
+  },
+  basicNudgeDismiss: {
+    width: 22, height: 22, borderRadius: 11,
+    alignItems: "center", justifyContent: "center",
   },
 });

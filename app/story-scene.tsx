@@ -7155,6 +7155,25 @@ export default function StoryScene() {
         }));
         addSrsPhrases(srsPhrases).catch((e: unknown) => console.warn('[Story] addSrsPhrases failed:', e));
       }
+
+      // Route the author-curated failure-prone expressions into spaced review.
+      // Each puzzle declares `onFail.addToWeakExpressions` (the subset most likely
+      // to be fumbled) with `reviewInDailyCourse`, but until now nothing consumed
+      // it — story failures never fed the SRS forgetting-curve. Puzzles are
+      // retry-until-correct, so "solved" is the only signal point; seeding the
+      // weak set here guarantees these phrases resurface in the Cards "복습" deck.
+      // addPhrases() dedupes by phrase, so this is additive next to targetExpressions
+      // and also covers investigation puzzles (skipped by the block above).
+      const onFail = puzzleItem.onFail;
+      if (onFail?.reviewInDailyCourse && onFail.addToWeakExpressions?.length) {
+        const weakPhrases = onFail.addToWeakExpressions.map((expr) => ({
+          phrase: expr,
+          meaning: `${chapter} · 복습 (${puzzleItem.pType})`,
+          source: `story-${story.id}-p${puzzleItem.puzzleNum}-weak`,
+        }));
+        addSrsPhrases(weakPhrases).catch((e: unknown) => console.warn('[Story] addSrsPhrases (weak) failed:', e));
+      }
+
       trackQuizIO(chapter, puzzleItem.pType).catch((e: unknown) => console.warn('[Story] trackQuizIO failed:', e));
     }
 

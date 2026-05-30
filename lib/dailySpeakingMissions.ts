@@ -1,4 +1,5 @@
 import type { LearningGoal } from "@/lib/learnerProfile";
+import { SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 
 export type DailySpeakingLanguage = "korean" | "english" | "spanish" | "indonesian";
 
@@ -741,4 +742,58 @@ export function getDailySpeakingMissionPhrase(
   const loop = getDailySpeakingSentenceLoop(lang, goal);
   if (loop.length === 0) return null;
   return loop[Math.max(0, spokenCount) % loop.length];
+}
+
+/**
+ * Beginner-FIRST serving order for the home "first sentence" mission.
+ *
+ * `getDailySpeakingSentenceLoop` keeps goal phrases at index 0 (the verify-lock
+ * asserts that, e.g. exam → "When is the exam?" at [0]). But a true day-0
+ * beginner should meet SURVIVAL phrases (greetings, "I don't understand",
+ * "Help") before goal-specific ones — that's what Day 1 of the course and Story
+ * Ch.1 both honor. So for the *served* mission we reorder a copy:
+ * survival/starter first, then goal/booster — same set, no duplicates, every
+ * phrase still A1. The locked loop is untouched.
+ */
+export function getBeginnerOrderedSpeakingLoop(
+  lang: DailySpeakingLanguage,
+  goal: LearningGoal | null
+): DailySpeakingPhrase[] {
+  const practiceContext = goal ?? "unknown";
+  const survival = (DAILY_SPEAKING_PACKS[lang]?.default ?? []).map((p) => toDailyPhrase(lang, p, practiceContext));
+  const starters = (DAILY_SPEAKING_STARTERS[lang] ?? []).map((p) => toDailyPhrase(lang, p, practiceContext));
+  const goalSentences = goal ? getDailySpeakingPhrasePack(lang, goal) : [];
+  const goalBoosters = goal ? (DAILY_GOAL_BOOSTERS[lang]?.[goal] ?? []) : [];
+  const boosters = goalBoosters.map((p) => toDailyPhrase(lang, p, practiceContext));
+  const seen = new Set<string>();
+  const out: DailySpeakingPhrase[] = [];
+  // Survival + starter FIRST (the day-0 priority), then goal-personalized.
+  for (const phrase of [...survival, ...starters, ...goalSentences, ...boosters]) {
+    if (seen.has(phrase.phrase)) continue;
+    seen.add(phrase.phrase);
+    out.push(phrase);
+  }
+  return out;
+}
+
+/**
+ * The phrase to serve for the home/first speaking mission, progressing
+ * day-to-day instead of resetting to index 0 each calendar day.
+ *
+ * `dayOffset` = how many distinct days the learner has already spoken (derived
+ * from speakingProgress.history keys). Combined with the in-session
+ * `spokenCount`, the entry point advances each day so a returning learner meets
+ * NEW survival phrases rather than re-opening with the same greeting forever.
+ * Uses the beginner-ordered serving loop (survival first).
+ */
+export function getProgressiveMissionPhrase(
+  lang: DailySpeakingLanguage,
+  goal: LearningGoal | null,
+  spokenCount: number,
+  dayOffset: number
+): DailySpeakingPhrase | null {
+  const loop = getBeginnerOrderedSpeakingLoop(lang, goal);
+  if (loop.length === 0) return null;
+  const idx = Math.max(0, dayOffset) * SPEAKING_DAILY_GOAL + Math.max(0, spokenCount);
+  return loop[idx % loop.length];
 }

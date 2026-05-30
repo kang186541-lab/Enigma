@@ -68,6 +68,41 @@ export async function resetGuideForDrip(): Promise<void> {
   await AsyncStorage.removeItem(GUIDE_LAST_SHOWN_KEY);
 }
 
+/**
+ * Milestone fast-forward (drip-safe).
+ *
+ * A fast learner who reaches a milestone (e.g. opens the Training Camp for the
+ * first time on day 2) would otherwise wait until the natural 1-per-day drip
+ * reaches the relevant card — card 8 ("훈련소가 핵심") only surfaces on day 9.
+ * This nudges the drip *pointer* forward to `targetIndex` so the very next time
+ * Home runs its existing drip check (`getNextGuideIndex`), the milestone card is
+ * the one shown — without minting a second modal render path.
+ *
+ * Guardrails (keeps the locked invariants intact):
+ *  - Never rewinds: no-op if the learner has already reached/passed targetIndex
+ *    (so seen cards are never replayed and we only move forward).
+ *  - Philosophy-first: only advances once the learner has already seen the
+ *    locked philosophy block (indices 0-6, i.e. current index >= 7), so no
+ *    unseen philosophy card is ever skipped.
+ *  - Throttle-safe: does NOT touch GUIDE_LAST_SHOWN_KEY, so the once-per-day
+ *    drip gate still applies — the milestone card replaces the day's card, it
+ *    does not stack an extra modal on top of today's drip.
+ *
+ * Returns the index that will now be surfaced next, or null if it was a no-op.
+ */
+export async function showGuideCardByMilestone(targetIndex: number): Promise<number | null> {
+  if (targetIndex < 0 || targetIndex >= GUIDE_CARDS.length) return null;
+  const raw = await AsyncStorage.getItem(GUIDE_KEY);
+  const idx = raw ? parseInt(raw, 10) : 0;
+  // Philosophy-first + forward-only: only fast-forward learners who have cleared
+  // the locked philosophy block and are still behind the milestone card.
+  const PHILOSOPHY_BLOCK_END = 7; // indices 0-6 are the locked philosophy cards
+  if (idx < PHILOSOPHY_BLOCK_END) return null;
+  if (idx >= targetIndex) return null;
+  await AsyncStorage.setItem(GUIDE_KEY, String(targetIndex));
+  return targetIndex;
+}
+
 // One-time migration: users who saw the old all-at-once onboarding dump were
 // stamped at the old max (8) via markGuideComplete and would never see the
 // drip. Resume them at the first NEW card (index 8) instead of replaying 1-7.

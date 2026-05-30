@@ -37,7 +37,7 @@ import { getDueCount } from "@/lib/srsManager";
 import { getTodayNote } from "@/data/culturalNotes";
 import { trackLearningEvent } from "@/lib/learningEvents";
 import { loadCardPractice, loadLearnerProfile, markBasicCourseCompleted, type LearnerProfile, setPrimaryLearningGoal, type LearningGoal, isLearningGoal } from "@/lib/learnerProfile";
-import { getSpeakingCountForLanguage, loadTodaySpeakingProgress, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
+import { getSpeakingCountForLanguage, loadTodaySpeakingProgress, loadSpokenDayOffset, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 import { localDateString } from "@/lib/progressStorage";
 import { LANG_FLAGS } from "@/constants/langFlags";
 import { parseLocalHomeDate, dayDiff, getActiveStreak } from "@/lib/streak";
@@ -205,6 +205,7 @@ export default function HomeScreen() {
   const [srsDueCount, setSrsDueCount] = React.useState(0);
   const [primaryGoal, setPrimaryGoal] = React.useState<LearningGoal | null>(null);
   const [spokenToday, setSpokenToday] = React.useState(0);
+  const [speakingDayOffset, setSpeakingDayOffset] = React.useState(0);
   const [cardReviewToday, setCardReviewToday] = React.useState(0);
   const [lastSessionDate, setLastSessionDate] = React.useState<string | null>(null);
   const [showMorePractice, setShowMorePractice] = React.useState(false);
@@ -277,6 +278,7 @@ export default function HomeScreen() {
         setCardReviewToday(0);
       });
     loadTodaySpeakingProgress().then((day) => setSpokenToday(getSpeakingCountForLanguage(day, effectiveLearningLang)));
+    loadSpokenDayOffset().then(setSpeakingDayOffset);
     AsyncStorage.getItem("@lingua_last_session_date").then(setLastSessionDate);
   }, [effectiveLearningLang, refreshBasicCourseCompleted]);
 
@@ -345,7 +347,7 @@ export default function HomeScreen() {
   const lingoMood = activeStreak >= 7 ? "excited" : activeStreak > 0 ? "happy" : hasLearningHistory ? "sad" : "happy";
   const weekData   = getWeekStreakData(stats.streak, nativeLang, lastSessionDate);
   const streakText = getStreakText(activeStreak, nativeLang);
-  const todaySpeakingMission = getTodaySpeakingMission(nativeLang, effectiveLearningLang, primaryGoal, spokenToday);
+  const todaySpeakingMission = getTodaySpeakingMission(nativeLang, effectiveLearningLang, primaryGoal, spokenToday, speakingDayOffset);
   const displayedSpokenToday = Math.min(spokenToday, SPEAKING_DAILY_GOAL);
   const displayedCardReviewToday = Math.min(cardReviewToday, HOME_CARD_DAILY_GOAL);
   const cardReviewDone = displayedCardReviewToday >= HOME_CARD_DAILY_GOAL;
@@ -361,6 +363,44 @@ export default function HomeScreen() {
   const showSecondaryHomeSections = !shouldFocusSpeaking || showMorePractice;
   const showProgressSummary = todaySpeakingMission.dailyGoalMet;
   const showDueReviewBanner = todaySpeakingMission.dailyGoalMet && srsDueCount > 0;
+  // ── NEXT STEP (linguist P1) ────────────────────────────────────────────────
+  // Once today's Speak goal is met, sequence the learner along the guide-card
+  // path "기초 → 훈련소(핵심) → 스토리 → NPC" instead of leaving the core
+  // Training Camp buried in an accordion. Promote the Rudy Training Camp
+  // next-day card as THE suggested next action; only fall back to surfacing the
+  // SRS review when the camp has no work left today (done or not started) and
+  // there are due cards. Rendered inside the dailyGoalMet block below.
+  const campDoneOrUnstarted = dailyProgress === null || (dailyProgress.todayCompleted ?? false);
+  const nextStepIsReview = showProgressSummary && campDoneOrUnstarted && srsDueCount > 0;
+  const nextStepIsCamp = showProgressSummary && !nextStepIsReview;
+  const nextStepEyebrow = nativeLang === "korean"
+    ? "다음 단계"
+    : nativeLang === "spanish"
+    ? "Siguiente paso"
+    : nativeLang === "indonesian"
+    ? "Langkah berikutnya"
+    : "Next step";
+  const nextStepCampLine = nativeLang === "korean"
+    ? "오늘 말하기 완료! 다음은 루디 훈련소예요."
+    : nativeLang === "spanish"
+    ? "¡Terminaste de hablar hoy! Lo siguiente es el Campamento de Rudy."
+    : nativeLang === "indonesian"
+    ? "Berbicara hari ini selesai! Berikutnya Kamp Latihan Rudy."
+    : "Today's speaking is done! Next up is Rudy's Training Camp.";
+  const nextStepReviewLine = nativeLang === "korean"
+    ? "오늘 말하기 완료! 다음은 루디가 준비한 복습이에요."
+    : nativeLang === "spanish"
+    ? "¡Terminaste de hablar hoy! Lo siguiente es el repaso que preparó Rudy."
+    : nativeLang === "indonesian"
+    ? "Berbicara hari ini selesai! Berikutnya ulasan yang disiapkan Rudy."
+    : "Today's speaking is done! Next up is the review Rudy prepared.";
+  const nextStepReviewCta = nativeLang === "korean"
+    ? `복습 카드 ${srsDueCount}장 시작 →`
+    : nativeLang === "spanish"
+    ? `Repasar ${srsDueCount} tarjetas →`
+    : nativeLang === "indonesian"
+    ? `Mulai ulas ${srsDueCount} kartu →`
+    : `Review ${srsDueCount} cards →`;
   const morePracticeTitle = showMorePractice
     ? nativeLang === "korean" ? "다시 말하기에 집중하기" : nativeLang === "spanish" ? "Volver a enfocarme en hablar" : nativeLang === "indonesian" ? "Fokus lagi ke berbicara" : "Refocus on speaking"
     : nativeLang === "korean" ? "루디 훈련소 · 스토리 · NPC 더 보기" : nativeLang === "spanish" ? "Más: Campamento, Historia y NPC" : nativeLang === "indonesian" ? "Lainnya: Kamp Rudy, Cerita & NPC" : "More: Rudy's Camp, Story & NPC";
@@ -695,6 +735,59 @@ export default function HomeScreen() {
       {/* ── STATS ROW ─────────────────────────────────── */}
       {showProgressSummary && (
       <>
+        {/* ── NEXT STEP (다음 단계) ───────────────────────── */}
+        {/*
+          Surfaces the ordered learning path the moment today's Speak goal is
+          met: the core Rudy Training Camp card (reused component, same
+          /rudy-course route) is promoted as the obvious next tap, with a quiet
+          fallback to the due SRS review when the camp has nothing left today.
+          This lives inside showSecondaryHomeSections, so the locked
+          rudyCourseRouteIndex > secondarySectionsIndex (and < basicCourseRoute)
+          ordering still holds.
+        */}
+        <GoldDivider label={nextStepEyebrow} />
+        <View style={[styles.pad, { marginTop: 0 }]}>
+          <Text style={styles.nextStepLine}>
+            <Text style={styles.nextStepCheck}>✅ </Text>
+            {nextStepIsReview ? nextStepReviewLine : nextStepCampLine}
+          </Text>
+          {nextStepIsReview ? (
+            <Pressable
+              style={({ pressed }) => [styles.nextStepReviewCard, pressed && { opacity: 0.9, transform: [{ scale: 0.99 }] }]}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push({ pathname: "/(tabs)/cards", params: { deck: "srs" } } as any);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={`${nextStepEyebrow}. ${nextStepReviewLine} ${nextStepReviewCta}`}
+            >
+              <EmojiText style={styles.srsBannerEmoji}>🦊</EmojiText>
+              <View style={styles.srsBannerText}>
+                <Text style={styles.srsBannerTitle}>
+                  {nativeLang === "korean"
+                    ? "루디가 복습 카드를 준비했어요!"
+                    : nativeLang === "spanish"
+                    ? "¡Rudy preparó tarjetas de repaso!"
+                    : nativeLang === "indonesian"
+                    ? "Rudy sudah menyiapkan kartu ulasan untukmu!"
+                    : "Rudy prepared review cards for you!"}
+                </Text>
+                <Text style={styles.srsBannerSub}>{nextStepReviewCta}</Text>
+              </View>
+              <Ionicons name="arrow-forward-circle" size={24} color={C.gold} />
+            </Pressable>
+          ) : (
+            <RudyTrainingCard
+              nativeLang={nativeLang}
+              dailyProgress={dailyProgress}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push("/rudy-course" as any);
+              }}
+            />
+          )}
+        </View>
+
         <View style={styles.statsRow}>
           {statItems.map((s, i) => (
             <View key={i} style={styles.statCard}>
@@ -1439,6 +1532,17 @@ const styles = StyleSheet.create({
   srsBannerText: { flex: 1 },
   srsBannerTitle: { fontSize: 14, fontFamily: F.header, color: C.gold, lineHeight: 20 },
   srsBannerSub: { fontSize: 12, fontFamily: F.body, color: C.goldDim, marginTop: 2 },
+
+  /* ─ NEXT STEP (다음 단계) ─ */
+  nextStepLine: { fontSize: 13, fontFamily: F.body, color: C.goldDim, lineHeight: 19, marginBottom: 10 },
+  nextStepCheck: { fontFamily: F.body },
+  nextStepReviewCard: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "rgba(201,162,39,0.1)",
+    borderWidth: 1.5, borderColor: "rgba(201,162,39,0.3)",
+    borderRadius: 16, padding: 14,
+    shadowColor: C.gold, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 8, elevation: 3,
+  },
 
   /* ─ STREAK CARD ─ */
   streakCard: {
