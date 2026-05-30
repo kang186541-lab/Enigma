@@ -201,6 +201,50 @@ const COURSES: Record<string, CourseData> = {
       { phrase: "Perdón.",    meaning: { ko: "실례합니다.",  en: "Excuse me.",   es: "Pedir paso o atención" },usage: { ko: "정중히 주의를 끌 때",      en: "To get attention politely", es: "Para llamar la atención" } },
     ],
   },
+
+  indonesian: {
+    stepNames: ["Alfabet", "Kata Dasar", "Sapaan Dasar", "Selesai!"],
+    lang: "id-ID",
+    lingoTips: [
+      "Dengarkan lalu tirukan hurufnya! 🦊",
+      "Ketuk setiap kartu untuk melihat artinya! 🦊",
+      "Dengarkan dan ucapkan dengan lantang! 🦊",
+      "Kursus dasar selesai! 🦊🎉",
+    ],
+    chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => ({
+      char: c,
+      roman: c.toLowerCase(),
+      tip: ({
+        A:"'a' — seperti Apel 🍎",   B:"'be' — seperti Bola ⚽",  C:"'ce' — seperti Cinta ❤️",
+        D:"'de' — seperti Daun 🍃",  E:"'e' — seperti Emas 🥇",  F:"'ef' — seperti Foto 📷",
+        G:"'ge' — seperti Gajah 🐘", H:"'ha' — seperti Hujan 🌧️", I:"'i' — seperti Ikan 🐟",
+        J:"'je' — seperti Jam ⏰",   K:"'ka' — seperti Kucing 🐱", L:"'el' — seperti Laut 🌊",
+        M:"'em' — seperti Mata 👁️",  N:"'en' — seperti Nasi 🍚", O:"'o' — seperti Obat 💊",
+        P:"'pe' — seperti Pohon 🌳", Q:"'ki' — seperti Quran 📖", R:"'er' — seperti Rumah 🏠",
+        S:"'es' — seperti Sekolah 🏫", T:"'te' — seperti Teman 🤝", U:"'u' — seperti Udara 💨",
+        V:"'ve' — seperti Vas 🏺",   W:"'we' — seperti Wajah 😊", X:"'eks' — seperti Sinar-X 🩻",
+        Y:"'ye' — seperti Yoga 🧘",  Z:"'zet' — seperti Zebra 🦓",
+      } as Record<string, string>)[c] ?? c,
+    })),
+    words: [
+      { word: "Halo",         meaning: { ko: "안녕하세요",  en: "Hello",      es: "Hola" },        emoji: "👋" },
+      { word: "Terima kasih", meaning: { ko: "감사합니다",  en: "Thank you",  es: "Gracias" },     emoji: "🙏" },
+      { word: "Ya",           meaning: { ko: "네",          en: "Yes",        es: "Sí" },          emoji: "✅" },
+      { word: "Tidak",        meaning: { ko: "아니요",      en: "No",         es: "No" },          emoji: "❌" },
+      { word: "Air",          meaning: { ko: "물",          en: "Water",      es: "Agua" },        emoji: "💧" },
+      { word: "Makan",        meaning: { ko: "먹다",        en: "Eat",        es: "Comer" },       emoji: "🍽️" },
+      { word: "Rumah",        meaning: { ko: "집",          en: "House",      es: "Casa" },        emoji: "🏠" },
+      { word: "Sekolah",      meaning: { ko: "학교",        en: "School",     es: "Escuela" },     emoji: "🏫" },
+      { word: "Cinta",        meaning: { ko: "사랑",        en: "Love",       es: "Amor" },        emoji: "❤️" },
+      { word: "Teman",        meaning: { ko: "친구",        en: "Friend",     es: "Amigo" },       emoji: "🤝" },
+    ],
+    greetings: [
+      { phrase: "Halo!",         meaning: { ko: "안녕하세요!",  en: "Hello!",      es: "¡Hola!" },     usage: { ko: "누군가에게 인사할 때",     en: "When greeting someone",     es: "Al saludar a alguien" } },
+      { phrase: "Terima kasih!", meaning: { ko: "감사합니다!",  en: "Thank you!",  es: "¡Gracias!" },  usage: { ko: "감사를 표현할 때",         en: "To show gratitude",         es: "Para mostrar gratitud" } },
+      { phrase: "Maaf.",         meaning: { ko: "죄송합니다.",  en: "I'm sorry.",  es: "Lo siento." }, usage: { ko: "사과할 때",                en: "When apologising",          es: "Para disculparse" } },
+      { phrase: "Permisi.",      meaning: { ko: "실례합니다.",  en: "Excuse me.",  es: "Perdón." },    usage: { ko: "정중히 주의를 끌 때",      en: "To get attention politely", es: "Para llamar la atención" } },
+    ],
+  },
 };
 
 
@@ -210,6 +254,7 @@ const BC_VOICES: Record<string, string> = {
   "en-GB": "en-GB-RyanNeural",
   "es-ES": "es-ES-AlvaroNeural",
   "ko-KR": "ko-KR-InJoonNeural",
+  "id-ID": "id-ID-ArdiNeural",
 };
 
 /** Stop and unload the module-level native sound */

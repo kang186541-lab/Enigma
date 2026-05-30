@@ -255,11 +255,29 @@ export default function OnboardingScreen() {
       });
       // True foreign-script absolute beginners should do the ~10-min Basics
       // (which culminates in a spoken greeting) before the cold speak. Hangul is
-      // the only non-Latin learning target among our three, so a non-Korean
-      // native learning Korean can't read the script yet — route them to Basics
-      // first (unless they've already completed it). The language/goal state is
-      // already saved above, so the Speak handoff is preserved for after Basics.
-      const needsBasicsFirst = learnSel === "korean" && nativeSel !== "korean";
+      // Route a true beginner facing an UNFAMILIAR SCRIPT through Basics first
+      // (which culminates in a scored spoken greeting), so they earn the ability
+      // to read their first sentence instead of being dropped onto a cold mic in
+      // a writing system they've never seen. Same-script and false beginners go
+      // straight to the speaking hook. The language/goal state is already saved
+      // above, so the Speak handoff is preserved for after Basics. (The basic
+      // course intro has a one-tap "I already know this" skip for anyone the
+      // script heuristic over-catches.)
+      //
+      // SCRIPT_BY_LANG: the writing system each learning language uses. When the
+      // learner's native script differs from the target's, they can't yet read
+      // the target — that's the cohort Basics protects. hasBasicsData guards
+      // against routing into a course we don't have (e.g. Indonesian before its
+      // alphabet course exists → it would teach the English ABC instead).
+      const SCRIPT_BY_LANG: Record<string, string> = {
+        korean: "hangul",
+        english: "latin",
+        spanish: "latin",
+        indonesian: "latin",
+      };
+      const unfamiliarScript = SCRIPT_BY_LANG[learnSel] !== SCRIPT_BY_LANG[nativeSel];
+      const hasBasicsData = learnSel === "korean" || learnSel === "english" || learnSel === "spanish" || learnSel === "indonesian";
+      const needsBasicsFirst = unfamiliarScript && hasBasicsData;
       let basicsCompleted = false;
       if (needsBasicsFirst) {
         try {
