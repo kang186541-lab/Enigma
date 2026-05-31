@@ -39,6 +39,16 @@ export interface ModerationResult {
   category?: string;
 }
 
+function summarizeProviderFailure(err: unknown): string {
+  const status = typeof (err as { status?: unknown })?.status === "number"
+    ? `status=${(err as { status: number }).status}`
+    : "status=unknown";
+  const name = typeof (err as { name?: unknown })?.name === "string"
+    ? (err as { name: string }).name
+    : "Error";
+  return `${name} ${status}`;
+}
+
 /**
  * Run text through OpenAI's omni-moderation classifier.
  *
@@ -74,8 +84,8 @@ export async function moderateText(text: string): Promise<ModerationResult> {
     return { flagged: true, category };
   } catch (err) {
     // Fail open. Log once so we can spot a sustained outage in dashboards,
-    // but never propagate the error.
-    console.warn("[moderation] omni-moderation-latest call failed; failing open:", err);
+    // but never propagate the error or archive provider response bodies.
+    console.warn("[moderation] omni-moderation-latest call failed; failing open:", summarizeProviderFailure(err));
     return { flagged: false };
   }
 }

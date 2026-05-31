@@ -987,10 +987,13 @@ assert.ok(
   routesSource.includes("dewi: `You are Dewi, a warm Indonesian tutor") &&
   routesSource.includes('if (["dewi"].includes(id)) return "Indonesian";') &&
   routesSource.includes("function offlineChatReplyFor") &&
+  routesSource.includes("function summarizeAiProviderFailure") &&
   routesSource.includes("aiUnavailable: true") &&
   routesSource.includes('id: "Indonesian"') &&
   chatRoomSource.includes('userNativeLang === "indonesian" ? "id"') &&
   moderationSource.includes('id: "Jaga percakapan tetap sopan. Coba lagi!"') &&
+  moderationSource.includes("function summarizeProviderFailure") &&
+  !moderationSource.includes('console.warn("[moderation] omni-moderation-latest call failed; failing open:", err)') &&
   rudyStep3Source.includes('indonesian: "id-ID"') &&
   rudyStep3Source.includes('indonesian: "id-ID-ArdiNeural"') &&
   rudyStep2Source.includes('indonesian: "id-ID"') &&

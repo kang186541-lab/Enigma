@@ -166,6 +166,16 @@ function shouldReturnChatFallback(err: unknown): boolean {
   );
 }
 
+function summarizeAiProviderFailure(err: unknown): string {
+  const status = typeof (err as { status?: unknown })?.status === "number"
+    ? `status=${(err as { status: number }).status}`
+    : "status=unknown";
+  const name = typeof (err as { name?: unknown })?.name === "string"
+    ? (err as { name: string }).name
+    : "Error";
+  return `${name} ${status}`;
+}
+
 function offlineChatReplyFor(tutorId: string | undefined, nativeLang: string | undefined): string {
   const id = (tutorId ?? "").toLowerCase();
   if (id === "dewi") {
@@ -639,7 +649,7 @@ Never emit any block inside your conversational reply. Never emit a block that w
           tutorId?: string;
           nativeLang?: string;
         };
-        console.warn("[/api/chat] AI providers unavailable; returning offline fallback:", (err as Error)?.message ?? err);
+        console.warn("[/api/chat] AI providers unavailable; returning offline fallback:", summarizeAiProviderFailure(err));
         return res.json({
           reply: offlineChatReplyFor(body.tutorId, body.nativeLang),
           correction: null,
