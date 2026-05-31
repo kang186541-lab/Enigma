@@ -223,8 +223,10 @@ assert.ok(
   guideModalSource.includes("export async function migrateGuideIfStale") &&
   guideModalSource.includes("advanceGuideIndex(cardIndex)") &&
   guideModalSource.includes("function parseGuideIndex") &&
-  guideModalSource.includes("Number.isInteger(cardIndex)"),
-  "RudyGuideModal: once-per-day throttle + reset + migration, advance by shown cardIndex, and corrupt-index hardening (parseGuideIndex normalizes NaN/negative; the render guard rejects non-integer cardIndex so a stale rudy_guide_index cannot crash GUIDE_CARDS[NaN].title)"
+  guideModalSource.includes("Number.isInteger(cardIndex)") &&
+  guideModalSource.includes("withGuideLock") &&
+  !guideModalSource.includes('setItem(GUIDE_KEY, "8")'),
+  "RudyGuideModal: throttle + reset + migration, advance by shown cardIndex, corrupt-index hardening, all guide-key writes serialized via withGuideLock, and migrateGuideIfStale must NOT rewind the index (no setItem(GUIDE_KEY, \"8\") rewrite that replayed already-seen cards)"
 );
 assert.ok(
   homeSource.includes("guide-drip-on-open") &&
@@ -233,8 +235,9 @@ assert.ok(
   homeSource.includes("setGuideIndex") &&
   homeSource.includes("cardIndex={guideIndex}") &&
   homeSource.includes("useFocusEffect(maybeShowGuideDrip)") &&
-  homeSource.includes('next === "active"'),
-  "Home must show the Rudy guide drip on app open / focus / foreground (one card/day, not gated behind speaking; NOT mount-only): migrate -> next index -> pass cardIndex, wired via useFocusEffect + AppState active so the daily card still appears after a midnight rollover or a background->foreground return"
+  homeSource.includes('next === "active"') &&
+  homeSource.includes("cancelActive"),
+  "Home must show the Rudy guide drip on app open / focus / foreground (one card/day, not gated behind speaking; NOT mount-only): migrate -> next index -> pass cardIndex, wired via useFocusEffect + AppState active (with cancelActive cleanup so the foreground path can't setState after unmount) so the daily card still appears after a midnight rollover or a background->foreground return"
 );
 assert.ok(
   speakSource.includes("missionIndex?: string | string[]") &&

@@ -321,10 +321,14 @@ export default function HomeScreen() {
   useFocusEffect(maybeShowGuideDrip);
 
   useEffect(() => {
+    let cancelActive: (() => void) | undefined;
     const sub = AppState.addEventListener("change", (next) => {
-      if (next === "active") maybeShowGuideDrip();
+      if (next === "active") {
+        cancelActive?.();
+        cancelActive = maybeShowGuideDrip();
+      }
     });
-    return () => sub.remove();
+    return () => { cancelActive?.(); sub.remove(); };
   }, [maybeShowGuideDrip]);
 
   useEffect(() => {

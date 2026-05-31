@@ -40,6 +40,19 @@ function parseGuideIndex(raw: string | null): number {
   return Number.isInteger(n) && n >= 0 ? n : 0;
 }
 
+// All guide-key access is read-modify-write (getItem -> compute -> setItem with
+// an await in between). Concurrent callers (a milestone write landing between a
+// dismiss's read and write, or the focus + foreground paths both firing) would
+// otherwise interleave and lose updates. Serialize every guide-key read/write
+// through one in-module promise chain — same pattern as _cardPracticeLock in
+// lib/learnerProfile.ts. Reads go through it too, so they never see a torn state.
+let _guideLock: Promise<unknown> = Promise.resolve();
+function withGuideLock<T>(fn: () => Promise<T>): Promise<T> {
+  const next = _guideLock.then(fn, fn);
+  _guideLock = next.catch(() => null);
+  return next;
+}
+
 /**
  * Returns the next guide card index to show.
  * Returns null if either:
@@ -50,37 +63,45 @@ function parseGuideIndex(raw: string | null): number {
  * tab focus — the user only sees it once per calendar day.
  */
 export async function getNextGuideIndex(): Promise<number | null> {
-  const lastShown = await AsyncStorage.getItem(GUIDE_LAST_SHOWN_KEY);
-  if (lastShown === todayKey()) return null; // already shown today
-  const idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
-  if (idx >= GUIDE_CARDS.length) return null;
-  return idx;
+  return withGuideLock(async () => {
+    const lastShown = await AsyncStorage.getItem(GUIDE_LAST_SHOWN_KEY);
+    if (lastShown === todayKey()) return null; // already shown today
+    const idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
+    if (idx >= GUIDE_CARDS.length) return null;
+    return idx;
+  });
 }
 
 export async function advanceGuideIndex(shownIndex?: number): Promise<void> {
-  // Advance past the card the user ACTUALLY saw (shownIndex), not whatever is
-  // currently in storage. Re-reading storage here could skip a card if a
-  // milestone write or the initial async load changed the stored index between
-  // render and dismiss. Falls back to storage only when no index is provided.
-  let idx: number;
-  if (typeof shownIndex === "number") {
-    idx = shownIndex;
-  } else {
-    idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
-  }
-  await AsyncStorage.setItem(GUIDE_KEY, String(idx + 1));
-  // Mark today so we don't show another card until tomorrow
-  await AsyncStorage.setItem(GUIDE_LAST_SHOWN_KEY, todayKey());
+  await withGuideLock(async () => {
+    // Advance past the card the user ACTUALLY saw (shownIndex), not whatever is
+    // currently in storage. Re-reading storage here could skip a card if a
+    // milestone write or the initial async load changed the stored index between
+    // render and dismiss. Falls back to storage only when no index is provided.
+    let idx: number;
+    if (typeof shownIndex === "number") {
+      idx = shownIndex;
+    } else {
+      idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
+    }
+    await AsyncStorage.setItem(GUIDE_KEY, String(idx + 1));
+    // Mark today so we don't show another card until tomorrow
+    await AsyncStorage.setItem(GUIDE_LAST_SHOWN_KEY, todayKey());
+  });
 }
 
 export async function markGuideComplete(): Promise<void> {
-  await AsyncStorage.setItem(GUIDE_KEY, String(GUIDE_CARDS.length));
-  await AsyncStorage.setItem(GUIDE_LAST_SHOWN_KEY, todayKey());
+  await withGuideLock(async () => {
+    await AsyncStorage.setItem(GUIDE_KEY, String(GUIDE_CARDS.length));
+    await AsyncStorage.setItem(GUIDE_LAST_SHOWN_KEY, todayKey());
+  });
 }
 
 export async function resetGuideForDrip(): Promise<void> {
-  await AsyncStorage.removeItem(GUIDE_KEY);
-  await AsyncStorage.removeItem(GUIDE_LAST_SHOWN_KEY);
+  await withGuideLock(async () => {
+    await AsyncStorage.removeItem(GUIDE_KEY);
+    await AsyncStorage.removeItem(GUIDE_LAST_SHOWN_KEY);
+  });
 }
 
 /**
@@ -106,28 +127,32 @@ export async function resetGuideForDrip(): Promise<void> {
  * Returns the index that will now be surfaced next, or null if it was a no-op.
  */
 export async function showGuideCardByMilestone(targetIndex: number): Promise<number | null> {
-  if (targetIndex < 0 || targetIndex >= GUIDE_CARDS.length) return null;
-  const idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
-  // Philosophy-first + forward-only: only fast-forward learners who have cleared
-  // the locked philosophy block and are still behind the milestone card.
-  const PHILOSOPHY_BLOCK_END = 7; // indices 0-6 are the locked philosophy cards
-  if (idx < PHILOSOPHY_BLOCK_END) return null;
-  if (idx >= targetIndex) return null;
-  await AsyncStorage.setItem(GUIDE_KEY, String(targetIndex));
-  return targetIndex;
+  return withGuideLock(async () => {
+    if (targetIndex < 0 || targetIndex >= GUIDE_CARDS.length) return null;
+    const idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
+    // Philosophy-first + forward-only: only fast-forward learners who have cleared
+    // the locked philosophy block and are still behind the milestone card.
+    const PHILOSOPHY_BLOCK_END = 7; // indices 0-6 are the locked philosophy cards
+    if (idx < PHILOSOPHY_BLOCK_END) return null;
+    if (idx >= targetIndex) return null;
+    await AsyncStorage.setItem(GUIDE_KEY, String(targetIndex));
+    return targetIndex;
+  });
 }
 
-// One-time migration: users who saw the old all-at-once onboarding dump were
-// stamped at the old max (8) via markGuideComplete and would never see the
-// drip. Resume them at the first NEW card (index 8) instead of replaying 1-7.
+// One-time migration flag for the daily-drip v2 rollout. NOTE: this previously
+// rewrote rudy_guide_index to "8" whenever idx >= 8, which could REWIND a learner
+// already mid-drip (idx 9-12) back to card 8 and replay cards they had seen — the
+// one writer that was missing a no-rewind guard. Legacy "old all-at-once dump"
+// users were stamped at the old deck max (8), which the new 13-card deck already
+// resumes correctly on its own (getNextGuideIndex returns 8 = first new card), so
+// the index rewrite was unnecessary and is removed; only the flag is stamped.
 export async function migrateGuideIfStale(): Promise<void> {
-  const MIGRATION_KEY = "rudy_guide_drip_v2";
-  if (await AsyncStorage.getItem(MIGRATION_KEY)) return;
-  const idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
-  if (idx >= 8 && idx < GUIDE_CARDS.length) {
-    await AsyncStorage.setItem(GUIDE_KEY, "8");
-  }
-  await AsyncStorage.setItem(MIGRATION_KEY, "1");
+  await withGuideLock(async () => {
+    const MIGRATION_KEY = "rudy_guide_drip_v2";
+    if (await AsyncStorage.getItem(MIGRATION_KEY)) return;
+    await AsyncStorage.setItem(MIGRATION_KEY, "1");
+  });
 }
 
 export function RudyGuideModal({
