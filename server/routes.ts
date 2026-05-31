@@ -149,6 +149,41 @@ function tutorLanguageFullName(tutorId: string): string {
   return "the target language";
 }
 
+function shouldReturnChatFallback(err: unknown): boolean {
+  const status = typeof (err as { status?: unknown })?.status === "number"
+    ? (err as { status: number }).status
+    : undefined;
+  const text = [
+    (err as { message?: unknown })?.message,
+    (err as { error?: { message?: unknown } })?.error?.message,
+  ].filter((value): value is string => typeof value === "string").join(" ").toLowerCase();
+  return (
+    status === 400 ||
+    status === 429 ||
+    text.includes("insufficient_quota") ||
+    text.includes("credit balance") ||
+    text.includes("too many requests")
+  );
+}
+
+function offlineChatReplyFor(tutorId: string | undefined, nativeLang: string | undefined): string {
+  const id = (tutorId ?? "").toLowerCase();
+  if (id === "dewi") {
+    return "Maaf, koneksi AI sedang bermasalah. Kita tetap bisa latihan: coba ucapkan satu kalimat pendek dalam bahasa Indonesia.";
+  }
+  const lang = tutorLanguageFullName(id);
+  if (lang === "Spanish") {
+    return "Perdón, la conexión de IA está fallando. Sigamos con una frase corta: escribe o di una oración sencilla en español.";
+  }
+  if (lang === "Korean") {
+    return "죄송해요, 지금 AI 연결이 불안정해요. 그래도 짧은 한국어 문장 하나로 계속 연습해 볼까요?";
+  }
+  if (nativeLang === "id") {
+    return "Maaf, koneksi AI sedang bermasalah. Coba lagi sebentar lagi, atau latih satu kalimat pendek dulu.";
+  }
+  return "Sorry, the AI connection is having trouble. We can still practice: try one short sentence and then tap again.";
+}
+
 // Canonical error-key enum — mirrors the client's learnerProfile types so
 // counts aggregate predictably across sessions no matter what GPT echoes back.
 const CANONICAL_ERROR_KEYS: ReadonlySet<string> = new Set([
@@ -599,7 +634,22 @@ Never emit any block inside your conversational reply. Never emit a block that w
         .trim() || "...";
       res.json({ reply, correction, diagnosis, phaseAdvance, sessionSummary });
     } catch (err) {
-      console.error("OpenAI error:", err);
+      if (shouldReturnChatFallback(err)) {
+        const body = (req.body && typeof req.body === "object" ? req.body : {}) as {
+          tutorId?: string;
+          nativeLang?: string;
+        };
+        console.warn("[/api/chat] AI providers unavailable; returning offline fallback:", (err as Error)?.message ?? err);
+        return res.json({
+          reply: offlineChatReplyFor(body.tutorId, body.nativeLang),
+          correction: null,
+          diagnosis: null,
+          phaseAdvance: null,
+          sessionSummary: null,
+          aiUnavailable: true,
+        });
+      }
+      console.error("[/api/chat] unexpected error:", err);
       res.status(500).json({ error: "Failed to get AI response" });
     }
   });
