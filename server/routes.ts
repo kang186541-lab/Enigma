@@ -2002,7 +2002,7 @@ Student's ${learnName} answer: ${userAnswer}`;
             };
           }
         } catch (e) {
-          console.warn("[pronunciation-coach] GPT call failed, using fallback:", (e as Error)?.message ?? e);
+          console.warn("[pronunciation-coach] GPT call failed, using fallback:", summarizeAiProviderFailure(e));
         }
         if (!payload) payload = fallbackCoach(trimmedWord, score, weak);
         COACH_CACHE.set(cacheKey, { value: payload, at: Date.now() });

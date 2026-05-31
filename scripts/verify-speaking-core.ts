@@ -990,6 +990,7 @@ assert.ok(
   routesSource.includes("function offlineChatReplyFor") &&
   routesSource.includes("function summarizeAiProviderFailure") &&
   routesSource.includes("aiUnavailable: true") &&
+  !routesSource.includes('[pronunciation-coach] GPT call failed, using fallback:", (e as Error)?.message ?? e') &&
   routesSource.includes('id: "Indonesian"') &&
   chatRoomSource.includes('userNativeLang === "indonesian" ? "id"') &&
   moderationSource.includes('id: "Jaga percakapan tetap sopan. Coba lagi!"') &&
