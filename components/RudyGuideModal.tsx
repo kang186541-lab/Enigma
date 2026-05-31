@@ -72,6 +72,13 @@ export async function getNextGuideIndex(): Promise<number | null> {
   });
 }
 
+// Current drip pointer (normalized), ignoring the once-per-day throttle. Lets a
+// caller tell how far the learner has progressed — e.g. whether a milestone
+// fast-forward is still relevant or already moot (idx already at/past the card).
+export async function getGuideIndex(): Promise<number> {
+  return withGuideLock(async () => parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY)));
+}
+
 export async function advanceGuideIndex(shownIndex?: number): Promise<void> {
   await withGuideLock(async () => {
     // Advance past the card the user ACTUALLY saw (shownIndex), not whatever is

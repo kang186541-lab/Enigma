@@ -13,7 +13,7 @@ import * as Haptics from "expo-haptics";
 import { router, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
-import { showGuideCardByMilestone } from "@/components/RudyGuideModal";
+import { showGuideCardByMilestone, getGuideIndex } from "@/components/RudyGuideModal";
 import { C, F } from "@/constants/theme";
 import {
   loadProgress,
@@ -49,14 +49,13 @@ export default function RudyCourseScreen() {
     try {
       const seen = await AsyncStorage.getItem("@first_camp_opened");
       if (!seen) {
-        // Only consume the one-time marker once the fast-forward ACTUALLY fired.
-        // showGuideCardByMilestone is a no-op (returns null) when the learner has
-        // not yet cleared the philosophy block (idx < 7). Stamping the marker
-        // unconditionally would burn it on an early camp open, so the camp
-        // milestone card would never be delivered. Leave it unset to retry on a
-        // later camp visit once cards 0-6 are seen.
-        const surfaced = await showGuideCardByMilestone(8);
-        if (surfaced !== null) {
+        await showGuideCardByMilestone(8);
+        // Consume the one-time marker once the camp milestone is RESOLVED: either
+        // the fast-forward just fired (pointer now at 8) or the learner is already
+        // at/past card 8 (saw it via the natural drip), so re-attempting is moot.
+        // Only leave it unset while the philosophy block (idx < 7) is unfinished,
+        // so an early camp open retries on a later visit instead of being burned.
+        if ((await getGuideIndex()) >= 8) {
           await AsyncStorage.setItem("@first_camp_opened", "1");
         }
       }

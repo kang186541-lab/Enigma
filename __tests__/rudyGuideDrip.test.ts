@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // eslint-disable-next-line import/first
 import {
   getNextGuideIndex,
+  getGuideIndex,
   advanceGuideIndex,
   migrateGuideIfStale,
   resetGuideForDrip,
@@ -101,6 +102,14 @@ describe("Rudy guide daily drip", () => {
     await AsyncStorage.setItem(GUIDE_LAST_SHOWN_KEY, todayStr());
     await resetGuideForDrip();
     expect(await getNextGuideIndex()).toBe(0);
+  });
+
+  it("getGuideIndex reports the normalized drip pointer, ignoring the daily throttle", async () => {
+    expect(await getGuideIndex()).toBe(0);
+    await AsyncStorage.setItem(GUIDE_KEY, "8");
+    expect(await getGuideIndex()).toBe(8); // unaffected by GUIDE_LAST_SHOWN_KEY
+    await AsyncStorage.setItem(GUIDE_KEY, "abc");
+    expect(await getGuideIndex()).toBe(0); // corrupt value normalized to 0
   });
 
   it("serializes concurrent advances without losing an update (withGuideLock)", async () => {
