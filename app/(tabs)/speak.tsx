@@ -40,6 +40,7 @@ import { loadSpeakMissionHandoff, type SpeakMissionHandoff } from "@/lib/speakMi
 import { buildAcquisitionSession } from "@/lib/acquisitionSession";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import {
+  getGoalContextTip,
   getProgressiveMissionPhrase,
   getDailySpeakingSentenceLoop,
   type DailySpeakingPhrase,
@@ -754,7 +755,9 @@ function dailyPhraseToSpeakPhrase(phrase: DailySpeakingPhrase, nativeLang: Nativ
     level: phrase.level,
     speechLang: phrase.speechLang,
     tip: phrase.tip,
-    contextTip: phrase.contextTip,
+    contextTip: phrase.practiceContext
+      ? getGoalContextTip(phrase.practiceContext, nativeLang)
+      : phrase.contextTip,
   };
 }
 

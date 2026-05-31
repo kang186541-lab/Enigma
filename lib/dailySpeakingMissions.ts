@@ -634,15 +634,64 @@ export const SURVIVAL_PHRASE_FAMILIES: Partial<Record<DailySpeakingLanguage, Rec
 
 const DAILY_SPEAKING_GOALS: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"];
 
-const GOAL_CONTEXT_TIPS: Record<LearningGoal, string> = {
-  travel: "Travel context: use it with staff, drivers, shopkeepers, or strangers who can help.",
-  work: "Work context: use it in a meeting, chat, email follow-up, or quick desk conversation.",
-  study: "Study context: use it with a teacher, classmate, tutor, or study group.",
-  hobby: "Hobby context: use it while talking about shows, music, games, food, or things you like.",
-  relationship: "Relationship context: use it with a friend, date, host family, or someone you want to know better.",
-  exam: "Exam context: use it before, during, or after a test when you need to ask, repair, or respond.",
-  unknown: "First-day context: use it whenever a real conversation starts, stops, or gets stuck.",
+const GOAL_CONTEXT_TIPS: Record<LearningGoal, Record<DailySpeakingLanguage, string>> = {
+  travel: {
+    english: "Travel context: use it with staff, drivers, shopkeepers, or strangers who can help.",
+    korean: "여행 상황: 직원, 기사님, 가게 주인, 또는 도와줄 수 있는 사람에게 써요.",
+    spanish: "Contexto de viaje: úsala con personal, conductores, vendedores o desconocidos que puedan ayudar.",
+    indonesian: "Konteks perjalanan: pakai dengan petugas, sopir, penjual, atau orang asing yang bisa membantu.",
+  },
+  work: {
+    english: "Work context: use it in a meeting, chat, email follow-up, or quick desk conversation.",
+    korean: "업무 상황: 회의, 채팅, 이메일 후속 연락, 또는 짧은 대화에서 써요.",
+    spanish: "Contexto de trabajo: úsala en una reunión, un chat, un correo de seguimiento o una charla rápida.",
+    indonesian: "Konteks kerja: pakai saat rapat, chat, tindak lanjut email, atau obrolan singkat di meja.",
+  },
+  study: {
+    english: "Study context: use it with a teacher, classmate, tutor, or study group.",
+    korean: "공부 상황: 선생님, 같은 반 친구, 튜터, 또는 스터디 그룹에서 써요.",
+    spanish: "Contexto de estudio: úsala con un profesor, un compañero, un tutor o un grupo de estudio.",
+    indonesian: "Konteks belajar: pakai dengan guru, teman sekelas, tutor, atau kelompok belajar.",
+  },
+  hobby: {
+    english: "Hobby context: use it while talking about shows, music, games, food, or things you like.",
+    korean: "취미 상황: 드라마, 음악, 게임, 음식, 또는 좋아하는 것에 대해 이야기할 때 써요.",
+    spanish: "Contexto de pasatiempos: úsala al hablar de series, música, juegos, comida o cosas que te gustan.",
+    indonesian: "Konteks hobi: pakai saat membahas acara, musik, game, makanan, atau hal yang kamu suka.",
+  },
+  relationship: {
+    english: "Relationship context: use it with a friend, date, host family, or someone you want to know better.",
+    korean: "인간관계 상황: 친구, 데이트 상대, 홈스테이 가족, 또는 더 알고 싶은 사람에게 써요.",
+    spanish: "Contexto de relaciones: úsala con un amigo, una cita, una familia anfitriona o alguien que quieras conocer mejor.",
+    indonesian: "Konteks hubungan: pakai dengan teman, kencan, keluarga angkat, atau orang yang ingin kamu kenal lebih dekat.",
+  },
+  exam: {
+    english: "Exam context: use it before, during, or after a test when you need to ask, repair, or respond.",
+    korean: "시험 상황: 시험 전, 중, 후에 묻거나 고치거나 답해야 할 때 써요.",
+    spanish: "Contexto de examen: úsala antes, durante o después de una prueba cuando necesites preguntar, corregir o responder.",
+    indonesian: "Konteks ujian: pakai sebelum, saat, atau sesudah tes ketika kamu perlu bertanya, memperbaiki, atau menjawab.",
+  },
+  unknown: {
+    english: "First-day context: use it whenever a real conversation starts, stops, or gets stuck.",
+    korean: "첫날 상황: 실제 대화가 시작되거나 멈추거나 막힐 때 언제든 써요.",
+    spanish: "Contexto del primer día: úsala cuando una conversación real empiece, se detenga o se trabe.",
+    indonesian: "Konteks hari pertama: pakai kapan pun percakapan nyata dimulai, berhenti, atau tersendat.",
+  },
 };
+
+/**
+ * Resolve a goal's context tip in the reader's native language. Falls back
+ * through English so any future locale still gets a non-empty string.
+ */
+export function getGoalContextTip(
+  goal: LearningGoal | null | undefined,
+  nativeLang: DailySpeakingLanguage,
+): string | undefined {
+  if (!goal) return undefined;
+  const tips = GOAL_CONTEXT_TIPS[goal];
+  if (!tips) return undefined;
+  return tips[nativeLang] ?? tips.english;
+}
 
 export type SurvivalPhraseCoverage = {
   family: SurvivalPhraseFamily;
@@ -679,7 +728,9 @@ function toDailyPhrase(
     tip: raw.tip,
     meanings,
     practiceContext,
-    contextTip: practiceContext ? GOAL_CONTEXT_TIPS[practiceContext] : undefined,
+    // English by default; consumers that know the reader's native language
+    // re-resolve via getGoalContextTip(practiceContext, nativeLang).
+    contextTip: practiceContext ? GOAL_CONTEXT_TIPS[practiceContext].english : undefined,
   };
 }
 

@@ -1,5 +1,9 @@
 import type { NativeLanguage } from "@/context/LanguageContext";
-import { getProgressiveMissionPhrase, type DailySpeakingLanguage } from "@/lib/dailySpeakingMissions";
+import {
+  getGoalContextTip,
+  getProgressiveMissionPhrase,
+  type DailySpeakingLanguage,
+} from "@/lib/dailySpeakingMissions";
 import type { LearningGoal } from "@/lib/learnerProfile";
 import { SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 
@@ -70,6 +74,10 @@ export function getTodaySpeakingMission(
     indonesian: { korean: "bahasa Korea", english: "bahasa Inggris", spanish: "bahasa Spanyol", indonesian: "bahasa Indonesia" },
   };
   const goalLabel = getGoalLabel(goal, nativeLang);
+  const localizedContextTip = getGoalContextTip(
+    missionPhrase?.practiceContext ?? goal ?? "unknown",
+    nativeLang as DailySpeakingLanguage,
+  );
 
   if (dailyGoalMet) {
     return {
@@ -126,8 +134,8 @@ export function getTodaySpeakingMission(
       : nativeLang === "spanish"
       ? "Rudy: No la prepares perfecta. Dila primero y la pulimos después."
       : nativeLang === "indonesian"
-      ? `Rudy: ${missionPhrase?.contextTip ?? missionPhrase?.tip ?? "Ucapkan dulu. Kita perbaiki setelah keluar dari mulutmu."}`
-      : `Rudy: ${missionPhrase?.contextTip ?? missionPhrase?.tip ?? "Say it first. We can shape it after it is out loud."}`,
+      ? `Rudy: ${localizedContextTip ?? missionPhrase?.tip ?? "Ucapkan dulu. Kita perbaiki setelah keluar dari mulutmu."}`
+      : `Rudy: ${localizedContextTip ?? missionPhrase?.tip ?? "Say it first. We can shape it after it is out loud."}`,
     button: nativeLang === "korean" ? "말하기 시작" : nativeLang === "spanish" ? "Empezar a hablar" : nativeLang === "indonesian" ? "Mulai bicara" : "Start speaking",
   };
 }

@@ -1246,10 +1246,25 @@ Student's ${learnName} answer: ${userAnswer}`;
     return Math.max(0, Math.min(100, Math.round(n)));
   }
 
+  // Azure Speech REST content-type for a client-reported mime — used when we
+  // send the RAW (un-converted) buffer because ffmpeg was unavailable. Sending
+  // raw webm/m4a mislabeled as "WAV PCM" makes Azure fail to decode the audio
+  // ("no voice detected"). The ko/en/es path already labels correctly; the id
+  // path hardcoded WAV, which is why Indonesian assessment broke without ffmpeg.
+  function azureContentTypeForMime(mime: string | undefined): string {
+    const m = (mime ?? "").toLowerCase();
+    if (!m) return "audio/wav; codecs=audio/pcm; samplerate=16000";
+    if (m.includes("wav") || m.includes("pcm")) return "audio/wav; codecs=audio/pcm; samplerate=16000";
+    if (m.includes("mp4") || m.includes("m4a") || m.includes("aac")) return "audio/mp4";
+    if (m.includes("webm")) return "audio/webm; codecs=opus";
+    if (m.includes("ogg") || m.includes("opus")) return "audio/ogg; codecs=opus";
+    return "audio/wav; codecs=audio/pcm; samplerate=16000";
+  }
+
   // Convert any audio buffer → 16kHz mono WAV PCM (same recipe the Azure
   // pronunciation path and /api/stt use). Falls back to the raw buffer if
   // ffmpeg is unavailable.
-  async function convertTo16kMonoWav(rawBuffer: Buffer): Promise<Buffer> {
+  async function convertTo16kMonoWav(rawBuffer: Buffer, mimeType?: string): Promise<{ buffer: Buffer; contentType: string }> {
     const { spawn } = await import("child_process");
     const { writeFile, unlink, readFile } = await import("fs/promises");
     const { randomUUID } = await import("crypto");
@@ -1273,10 +1288,10 @@ Student's ${learnName} answer: ${userAnswer}`;
       });
       const wav = await readFile(outputPath);
       console.log(`[assess-id] ffmpeg ok → ${wav.length}B WAV`);
-      return wav;
+      return { buffer: wav, contentType: "audio/wav; codecs=audio/pcm; samplerate=16000" };
     } catch (convErr) {
-      console.error("[assess-id] ffmpeg unavailable, using raw buffer:", (convErr as Error).message);
-      return rawBuffer;
+      console.error("[assess-id] ffmpeg unavailable, sending raw audio with its real content-type:", (convErr as Error).message);
+      return { buffer: rawBuffer, contentType: azureContentTypeForMime(mimeType) };
     } finally {
       await unlink(inputPath).catch(() => {});
       await unlink(outputPath).catch(() => {});
@@ -1299,7 +1314,7 @@ Student's ${learnName} answer: ${userAnswer}`;
 
     const rawBuffer = Buffer.from(audio, "base64");
     console.log(`[assess-id] raw=${rawBuffer.length}B  mime=${mimeType}  lang=${sttLang}  word="${word}"`);
-    const wavBuffer = await convertTo16kMonoWav(rawBuffer);
+    const { buffer: wavBuffer, contentType: sttContentType } = await convertTo16kMonoWav(rawBuffer, mimeType);
 
     // Indonesian-aware "no voice detected" failure payload.
     const noVoicePayload = (status: string, recognizedText: string) => ({
@@ -1328,7 +1343,7 @@ Student's ${learnName} answer: ${userAnswer}`;
           method: "POST",
           headers: {
             "Ocp-Apim-Subscription-Key": key,
-            "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000",
+            "Content-Type": sttContentType,
           },
           body: wavBuffer as unknown as BodyInit,
           signal: sttController.signal,
@@ -1495,11 +1510,12 @@ Student's ${learnName} answer: ${userAnswer}`;
       // iOS clients now send WAV (LINEARPCM 16kHz); Android sends MPEG-4/AAC.
       // Azure Speech REST supports both natively without ffmpeg.
       function getAzureContentType(mime: string | undefined): string {
-        if (!mime) return "audio/wav; codecs=audio/pcm; samplerate=16000";
-        if (mime.includes("wav") || mime.includes("pcm")) return "audio/wav; codecs=audio/pcm; samplerate=16000";
-        if (mime.includes("mp4") || mime.includes("m4a") || mime.includes("aac")) return "audio/mp4";
-        if (mime.includes("ogg") || mime.includes("opus")) return "audio/ogg; codecs=opus";
-        if (mime.includes("webm")) return "audio/webm; codecs=opus";
+        const m = (mime ?? "").toLowerCase();
+        if (!m) return "audio/wav; codecs=audio/pcm; samplerate=16000";
+        if (m.includes("wav") || m.includes("pcm")) return "audio/wav; codecs=audio/pcm; samplerate=16000";
+        if (m.includes("mp4") || m.includes("m4a") || m.includes("aac")) return "audio/mp4";
+        if (m.includes("webm")) return "audio/webm; codecs=opus";
+        if (m.includes("ogg") || m.includes("opus")) return "audio/ogg; codecs=opus";
         return "audio/wav; codecs=audio/pcm; samplerate=16000";
       }
 

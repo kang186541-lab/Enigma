@@ -5,6 +5,7 @@ import {
   getDailySpeakingSurvivalCoverage,
   getDailySpeakingMissionPhrase,
   getDailySpeakingSentenceLoop,
+  getGoalContextTip,
   SURVIVAL_PHRASE_FAMILIES,
   type DailySpeakingLanguage,
 } from "../lib/dailySpeakingMissions";
@@ -49,6 +50,7 @@ const rudyStep2Source = readFileSync("components/rudy/Step2KeyPoint.tsx", "utf8"
 const rudyStep3Source = readFileSync("components/rudy/Step3MissionTalk.tsx", "utf8");
 const rudyStep4Source = readFileSync("components/rudy/Step4QuickReview.tsx", "utf8");
 const apiFetchWithAuthSource = readFileSync("lib/apiFetchWithAuth.ts", "utf8");
+const routesSource = readFileSync("server/routes.ts", "utf8");
 
 const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string[]>> = {
   english: {
@@ -914,12 +916,36 @@ assert.equal(getDailySpeakingMissionPhrase("english", "exam", englishExamLoop.le
 assert.equal(getDailySpeakingMissionPhrase("english", "exam", englishExamLoop.length + 1)?.phrase, englishExamLoop[1].phrase);
 assert.equal(getDailySpeakingMissionPhrase("english", null, 0)?.practiceContext, "unknown");
 assert.ok(getDailySpeakingMissionPhrase("english", null, 0)?.contextTip?.includes("First-day context"));
+assert.equal(
+  getGoalContextTip("travel", "indonesian"),
+  "Konteks perjalanan: pakai dengan petugas, sopir, penjual, atau orang asing yang bisa membantu."
+);
+assert.ok(getGoalContextTip("travel", "korean")?.startsWith("여행 상황:"), "travel context tip should localize to Korean");
 
 const activeHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL - 1);
 assert.equal(activeHomeMission.dailyGoalMet, false);
 assert.notEqual(activeHomeMission.phrase, `${SPEAKING_DAILY_GOAL} / ${SPEAKING_DAILY_GOAL}`);
 assert.equal(activeHomeMission.button, "Start speaking");
 assert.ok(activeHomeMission.rudyTip.startsWith("Rudy: "), "active home mission should include a Rudy guidance line");
+const indonesianTravelHomeMission = getTodaySpeakingMission("indonesian", "english", "travel", 0);
+assert.ok(
+  indonesianTravelHomeMission.rudyTip.includes("Konteks perjalanan:"),
+  "Indonesian-native travel home mission should show localized context"
+);
+assert.ok(
+  !indonesianTravelHomeMission.rudyTip.includes("Travel context:"),
+  "Indonesian-native travel home mission must not leak English context"
+);
+assert.ok(
+  speakSource.includes("getGoalContextTip(phrase.practiceContext, nativeLang)"),
+  "Speak daily phrases should resolve context tips in the learner's native language before render"
+);
+assert.ok(
+  routesSource.includes('const { buffer: wavBuffer, contentType: sttContentType } = await convertTo16kMonoWav(rawBuffer, mimeType);') &&
+  routesSource.includes('"Content-Type": sttContentType') &&
+  routesSource.indexOf('m.includes("webm")') < routesSource.indexOf('m.includes("ogg") || m.includes("opus")'),
+  "Indonesian pronunciation fallback should send raw webm/opus audio with the real Azure content type"
+);
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);
 assert.equal(completedHomeMission.dailyGoalMet, true);
