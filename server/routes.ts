@@ -1058,6 +1058,7 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       const explicitRate = typeof rate === "string" && /^[-+]?\d+%$/.test(rate) ? rate : undefined;
       const prosodyRate = explicitRate ?? (mode === "slow" ? "-30%" : "-5%");
+      const leadingBreak = lang.toLowerCase().startsWith("id") ? `<break time="180ms"/>` : "";
       const textContent = mode === "letter"
         ? `<say-as interpret-as="characters">${safeText}</say-as>`
         : safeText;
@@ -1066,7 +1067,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         ` xmlns="http://www.w3.org/2001/10/synthesis"`,
         ` xml:lang="${lang}">`,
         `<voice name="${voiceName}">`,
-        `<prosody rate="${prosodyRate}">${textContent}</prosody>`,
+        `${leadingBreak}<prosody rate="${prosodyRate}">${textContent}</prosody>`,
         `</voice>`,
         `</speak>`,
       ].join("");
@@ -1206,6 +1207,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       .toLowerCase()
       .normalize("NFD")
       .replace(/[̀-ͯ]/g, "")         // strip combining diacritics
+      .replace(/\bdimana\b/g, "di mana")
       .replace(/[^\p{L}\p{N}\s]/gu, " ")       // drop punctuation
       .replace(/\s+/g, " ")
       .trim();
@@ -1244,6 +1246,31 @@ Student's ${learnName} answer: ${userAnswer}`;
 
   function clamp01to100(n: number): number {
     return Math.max(0, Math.min(100, Math.round(n)));
+  }
+
+  function indonesianTokenSimilarity(target: string, said: string): number {
+    if (target === said) return 1;
+    if (!target || !said) return 0;
+
+    const editRatio = levenshteinRatio(target, said);
+    const minLen = Math.min(target.length, said.length);
+    const maxLen = Math.max(target.length, said.length);
+
+    // Azure STT often trims Indonesian suffixes or final vowels on short
+    // survival phrases, e.g. "ulangi" -> "ulang". Treat close stems as
+    // mostly correct while still failing unrelated words.
+    const stemLike = minLen >= 4 && maxLen - minLen <= 2 && (target.startsWith(said) || said.startsWith(target));
+    if (stemLike) return Math.max(editRatio, 0.86);
+
+    return editRatio;
+  }
+
+  function bestIndonesianTokenScore(target: string, saidTokens: string[]): number {
+    let best = 0;
+    for (const said of saidTokens) {
+      best = Math.max(best, indonesianTokenSimilarity(target, said));
+    }
+    return best;
   }
 
   // Azure Speech REST content-type for a client-reported mime — used when we
@@ -1377,10 +1404,11 @@ Student's ${learnName} answer: ${userAnswer}`;
     // ── Token + edit-distance scoring ──────────────────────────────────────
     const targetTokens = tokenizeId(word);
     const saidTokens = tokenizeId(lexical || displayText);
-    const saidSet = new Set(saidTokens);
-    // Order-tolerant set match: each target token present in the said tokens.
-    const matched = targetTokens.reduce((acc, t) => acc + (saidSet.has(t) ? 1 : 0), 0);
-    const similarity = targetTokens.length > 0 ? matched / targetTokens.length : 0;
+    const tokenScores = targetTokens.map((t) => bestIndonesianTokenScore(t, saidTokens));
+    const matched = tokenScores.filter((s) => s >= 0.78).length;
+    const similarity = tokenScores.length > 0
+      ? tokenScores.reduce((acc, s) => acc + s, 0) / tokenScores.length
+      : 0;
 
     const targetJoined = targetTokens.join(" ");
     const saidJoined = saidTokens.join(" ");
@@ -1391,12 +1419,15 @@ Student's ${learnName} answer: ${userAnswer}`;
 
     let score = clamp01to100(100 * (0.7 * simRefined + 0.3 * confidence));
     const fluencyScore = clamp01to100(confidence * 100);
-    const completenessScore = clamp01to100(similarity * 100);
+    const completenessScore = targetTokens.length > 0
+      ? clamp01to100((matched / targetTokens.length) * 100)
+      : 0;
 
     // Per-target-token word breakdown.
-    const words = targetTokens.map((t) => {
-      const present = saidSet.has(t);
-      return { word: t, score: present ? 100 : 0, errorType: present ? "None" : "Omission" };
+    const words = targetTokens.map((t, index) => {
+      const tokenScore = tokenScores[index] ?? 0;
+      const present = tokenScore >= 0.78;
+      return { word: t, score: clamp01to100(tokenScore * 100), errorType: present ? "None" : "Omission" };
     });
 
     // Templated Indonesian feedback by band (used directly, or when GPT is skipped/fails).

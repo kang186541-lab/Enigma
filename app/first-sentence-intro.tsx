@@ -31,6 +31,7 @@ import type { LearningGoal } from "@/lib/learnerProfile";
 // module, but use the EXACT same URL + apiFetchWithAuth bearer path.
 let _ttsWebAudio: HTMLAudioElement | null = null;
 let _ttsNativeSound: Audio.Sound | null = null;
+const _ttsWebObjectUrlCache = new Map<string, Promise<string>>();
 
 function tryGetApiBase(): string | null {
   try {
@@ -41,12 +42,37 @@ function tryGetApiBase(): string | null {
   }
 }
 
+function buildTtsUrl(text: string, lang: string, apiBase: string): string {
+  const url = new URL("/api/pronunciation-tts", apiBase);
+  url.searchParams.set("text", text);
+  url.searchParams.set("lang", lang);
+  return url.toString();
+}
+
+async function getWebTtsObjectUrl(urlStr: string): Promise<string> {
+  let cached = _ttsWebObjectUrlCache.get(urlStr);
+  if (!cached) {
+    cached = apiFetchWithAuth(urlStr)
+      .then((res) => {
+        if (!res.ok) throw new Error(`TTS ${res.status}`);
+        return res.blob();
+      })
+      .then((blob) => URL.createObjectURL(blob));
+    _ttsWebObjectUrlCache.set(urlStr, cached);
+  }
+  return cached;
+}
+
+function primeTTS(text: string, lang: string, apiBase: string) {
+  if (Platform.OS !== "web") return;
+  void getWebTtsObjectUrl(buildTtsUrl(text, lang, apiBase)).catch((error) => {
+    if (__DEV__) console.warn("[FirstSentence] TTS preload skipped:", error);
+  });
+}
+
 async function playTTS(text: string, lang: string, apiBase: string) {
   try {
-    const url = new URL("/api/pronunciation-tts", apiBase);
-    url.searchParams.set("text", text);
-    url.searchParams.set("lang", lang);
-    const urlStr = url.toString();
+    const urlStr = buildTtsUrl(text, lang, apiBase);
 
     if (Platform.OS === "web") {
       if (_ttsWebAudio) {
@@ -54,14 +80,13 @@ async function playTTS(text: string, lang: string, apiBase: string) {
         _ttsWebAudio.src = "";
         _ttsWebAudio = null;
       }
-      const res = await apiFetchWithAuth(urlStr);
-      if (!res.ok) throw new Error(`TTS ${res.status}`);
-      const blob = await res.blob();
-      const objectUrl = URL.createObjectURL(blob);
+      const objectUrl = await getWebTtsObjectUrl(urlStr);
       const audio = new (window as any).Audio(objectUrl) as HTMLAudioElement;
+      audio.preload = "auto";
       _ttsWebAudio = audio;
       audio.onended = () => { _ttsWebAudio = null; };
       audio.onerror = () => { _ttsWebAudio = null; };
+      audio.currentTime = 0;
       await audio.play();
     } else {
       if (_ttsNativeSound) {
@@ -359,6 +384,13 @@ export default function FirstSentenceIntroScreen() {
     : "";
 
   const apiBase = tryGetApiBase();
+  const phraseText = phrase?.phrase;
+  const phraseSpeechLang = phrase?.speechLang;
+
+  React.useEffect(() => {
+    if (!phraseText || !phraseSpeechLang || !apiBase) return;
+    primeTTS(phraseText, phraseSpeechLang, apiBase);
+  }, [phraseText, phraseSpeechLang, apiBase]);
 
   const handleListen = useCallback(() => {
     if (!phrase) return;

@@ -15,6 +15,7 @@ import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/l
 import { PhonemeCoaching } from "./PhonemeCoaching";
 
 const RUDY_RECORDING_MS = 8000;
+const RUDY_RECORD_READY_DELAY_MS = 250;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -104,6 +105,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   const pulseAnim     = useRef(new Animated.Value(1)).current;
   const pulseLoop     = useRef<Animated.CompositeAnimation | null>(null);
   const advancingRef  = useRef(false);
+  const recordingStartPendingRef = useRef(false);
 
   const apiBase = getApiUrl();
   const sentence = sentences[sentIdx];
@@ -221,17 +223,16 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   }
 
   async function startRecording() {
-    if (phase !== "idle" && phase !== "result") return;
+    if ((phase !== "idle" && phase !== "result") || recordingStartPendingRef.current) return;
+    recordingStartPendingRef.current = true;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setScore(null);
     setFeedback("");
-    setPhase("recording");
-    startPulse();
 
     if (Platform.OS !== "web") {
       try {
         const { granted } = await Audio.requestPermissionsAsync();
-        if (!granted) { stopPulse(); setPhase("idle"); return; }
+        if (!granted) { recordingStartPendingRef.current = false; stopPulse(); setPhase("idle"); return; }
         await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
         const rec = new Audio.Recording();
         // iOS: record as 16kHz WAV so Azure accepts it without ffmpeg conversion
@@ -253,18 +254,23 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         await rec.prepareToRecordAsync(recOptions);
         await rec.startAsync();
         nativeRecRef.current = rec;
+        await new Promise((resolve) => setTimeout(resolve, RUDY_RECORD_READY_DELAY_MS));
+        recordingStartPendingRef.current = false;
+        setPhase("recording");
+        startPulse();
         autoStopRef.current = setTimeout(() => stopNativeRecording(), RUDY_RECORDING_MS);
       } catch (e) {
         console.warn('[Speech] recording start failed:', e);
+        recordingStartPendingRef.current = false;
         stopPulse();
         setPhase("idle");
       }
     } else {
-      if (!navigator?.mediaDevices?.getUserMedia) { showMicUnavailable(); return; }
+      if (!navigator?.mediaDevices?.getUserMedia) { recordingStartPendingRef.current = false; showMicUnavailable(); return; }
       const MediaRecorderCtor = typeof window !== "undefined" ? (window as any).MediaRecorder : undefined;
-      if (typeof MediaRecorderCtor !== "function") { showMicUnavailable(); return; }
+      if (typeof MediaRecorderCtor !== "function") { recordingStartPendingRef.current = false; showMicUnavailable(); return; }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
-      if (!stream) { showMicUnavailable(); return; }
+      if (!stream) { recordingStartPendingRef.current = false; showMicUnavailable(); return; }
       audioChunks.current = [];
       const mimeType = getWebRecordingMimeType(MediaRecorderCtor);
       let recorder: MediaRecorder;
@@ -273,6 +279,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       } catch (e) {
         console.warn('[Step1] MediaRecorder creation failed:', e);
         stream.getTracks().forEach((t: any) => t.stop());
+        recordingStartPendingRef.current = false;
         showMicUnavailable();
         return;
       }
@@ -285,10 +292,20 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         console.warn('[Step1] MediaRecorder start failed:', e);
         stream.getTracks().forEach((t: any) => t.stop());
         mediaRecRef.current = null;
+        recordingStartPendingRef.current = false;
         showMicUnavailable();
         return;
       }
-      autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, RUDY_RECORDING_MS);
+      setTimeout(() => {
+        if (recorder.state !== "recording") {
+          recordingStartPendingRef.current = false;
+          return;
+        }
+        recordingStartPendingRef.current = false;
+        setPhase("recording");
+        startPulse();
+        autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, RUDY_RECORDING_MS);
+      }, RUDY_RECORD_READY_DELAY_MS);
     }
   }
 
@@ -316,6 +333,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   }
 
   async function handleWebRecordingStop(mimeType: string, stream: MediaStream) {
+    recordingStartPendingRef.current = false;
     stopPulse();
     stream.getTracks().forEach((t: any) => t.stop());
     setPhase("assessing");

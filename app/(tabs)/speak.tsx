@@ -1144,6 +1144,7 @@ export default function SpeakScreen() {
   const unscoredFallbackAttemptRef = useRef<number | null>(null);
   const unscoredAcceptingRef = useRef<number | null>(null);
   const RECORD_MAX_SEC = 8;
+  const RECORD_READY_DELAY_MS = 250;
   // Countdown shown to the user while a recording is in progress so they
   // know HOW LONG they have before the 8-second auto-stop kicks in. Without
   // a visible timer, slow speakers / long phrases ("Ferrocarril") used to
@@ -1789,6 +1790,11 @@ export default function SpeakScreen() {
             return;
           }
           nativeRecordingRef.current = recording;
+          await new Promise((resolve) => setTimeout(resolve, RECORD_READY_DELAY_MS));
+          if (!isCurrentPracticeAttempt(attemptGeneration)) {
+            await recording.stopAndUnloadAsync().catch((e: unknown) => console.warn('[Audio] stale recording stop failed:', e));
+            return;
+          }
           setRecordState("listening");
           recordStateRef.current = "listening";
           setScore(null);
@@ -1868,6 +1874,7 @@ export default function SpeakScreen() {
       };
 
       recorder.onstop = async () => {
+        recordStartPendingRef.current = false;
         stream.getTracks().forEach((t: any) => t.stop());
         if (!isCurrentPracticeAttempt(attemptGeneration)) return;
         stopPulse();
@@ -1979,26 +1986,33 @@ export default function SpeakScreen() {
         recordStateRef.current = "done";
         return;
       }
-      recordStartPendingRef.current = false;
-      setRecordState("listening");
-      recordStateRef.current = "listening";
-      setScore(null);
-      setAccuracyScore(null);
-      setFluencyScore(null);
-      setCompletenessScore(null);
-      setGptFeedback("");
-      setRecognizedText("");
-      setWordResults([]);
-      setSttError("");
-      startPulse();
-      startCountdown();
-
-      // Auto-stop after RECORD_MAX_SEC seconds
-      autoStopTimerRef.current = setTimeout(() => {
-        if (mediaRecorderRef.current?.state === "recording") {
-          mediaRecorderRef.current.stop();
+      setTimeout(() => {
+        if (!isCurrentPracticeAttempt(attemptGeneration)) return;
+        if (recorder.state !== "recording") {
+          recordStartPendingRef.current = false;
+          return;
         }
-      }, RECORD_MAX_SEC * 1000);
+        recordStartPendingRef.current = false;
+        setRecordState("listening");
+        recordStateRef.current = "listening";
+        setScore(null);
+        setAccuracyScore(null);
+        setFluencyScore(null);
+        setCompletenessScore(null);
+        setGptFeedback("");
+        setRecognizedText("");
+        setWordResults([]);
+        setSttError("");
+        startPulse();
+        startCountdown();
+
+        // Auto-stop after RECORD_MAX_SEC seconds
+        autoStopTimerRef.current = setTimeout(() => {
+          if (mediaRecorderRef.current?.state === "recording") {
+            mediaRecorderRef.current.stop();
+          }
+        }, RECORD_MAX_SEC * 1000);
+      }, RECORD_READY_DELAY_MS);
     }).catch((e) => {
       console.warn('[Speak] microphone access failed:', e);
       recordStartPendingRef.current = false;

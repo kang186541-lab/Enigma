@@ -946,6 +946,36 @@ assert.ok(
   routesSource.indexOf('m.includes("webm")') < routesSource.indexOf('m.includes("ogg") || m.includes("opus")'),
   "Indonesian pronunciation fallback should send raw webm/opus audio with the real Azure content type"
 );
+assert.ok(
+  routesSource.includes('lang.toLowerCase().startsWith("id") ? `<break time="180ms"/>`') &&
+  routesSource.includes('${leadingBreak}<prosody rate="${prosodyRate}">${textContent}</prosody>'),
+  "Indonesian TTS should preserve the short opening syllable with a tiny leading break"
+);
+assert.ok(
+  routesSource.includes('.replace(/\\bdimana\\b/g, "di mana")') &&
+  routesSource.includes("function bestIndonesianTokenScore") &&
+  routesSource.includes("tokenScores.filter((s) => s >= 0.78)") &&
+  routesSource.includes('target.startsWith(said) || said.startsWith(target)'),
+  "Indonesian assessment should tolerate common STT variants like dimana/di mana and ulangi/ulang"
+);
+const firstSentenceIntroSource = readFileSync("app/first-sentence-intro.tsx", "utf8");
+assert.ok(
+  firstSentenceIntroSource.includes("primeTTS(phraseText, phraseSpeechLang, apiBase)") &&
+  firstSentenceIntroSource.includes("getWebTtsObjectUrl(buildTtsUrl(text, lang, apiBase))"),
+  "First-sentence intro should preload the first TTS clip and reuse the cached audio on first listen"
+);
+assert.ok(
+  speakSource.includes("const RECORD_READY_DELAY_MS = 250") &&
+  speakSource.includes("await new Promise((resolve) => setTimeout(resolve, RECORD_READY_DELAY_MS))") &&
+  speakSource.includes("}, RECORD_READY_DELAY_MS);"),
+  "Speak recording should warm up before telling the learner to start speaking"
+);
+assert.ok(
+  rudyStep1Source.includes("const RUDY_RECORD_READY_DELAY_MS = 250") &&
+  rudyStep1Source.includes("recordingStartPendingRef.current") &&
+  rudyStep1Source.includes("}, RUDY_RECORD_READY_DELAY_MS);"),
+  "Rudy Step1 recording should warm up before showing the active recording state"
+);
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);
 assert.equal(completedHomeMission.dailyGoalMet, true);
