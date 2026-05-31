@@ -978,6 +978,12 @@ assert.ok(
   rudyStep1Source.includes("recorder.onerror"),
   "Rudy Step1 recording should warm up before showing the active recording state, and release the mic stream on a recorder error"
 );
+assert.ok(
+  routesSource.includes("dewi:") &&
+  rudyStep3Source.includes('indonesian: "id-ID"') &&
+  rudyStep3Source.includes('indonesian: "id-ID-ArdiNeural"'),
+  "Indonesian listening must be wired end-to-end: the Dewi tutor needs a server TTS voice (TUTOR_AZURE_VOICES), and Rudy Step3 STT_LANG + RUDY_VOICE must map indonesian to id-ID, otherwise Indonesian audio is read in an English voice or recognized as English"
+);
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);
 assert.equal(completedHomeMission.dailyGoalMet, true);

@@ -800,6 +800,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     alex:   { voice: "es-MX-JorgeNeural",  lang: "es-MX" }, // male  ✓
     jisu:   { voice: "ko-KR-SunHiNeural",  lang: "ko-KR" }, // female ✓
     minjun: { voice: "ko-KR-InJoonNeural", lang: "ko-KR" }, // male  ✓
+    dewi:   { voice: "id-ID-GadisNeural",  lang: "id-ID" }, // female ✓ (Indonesian)
     // Story character tutors
     eleanor:     { voice: "en-GB-SoniaNeural",  lang: "en-GB" }, // Lady Eleanor
     tom_tutor:   { voice: "en-US-TonyNeural",   lang: "en-US" }, // Tom
