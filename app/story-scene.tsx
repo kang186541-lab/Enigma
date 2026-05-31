@@ -1260,6 +1260,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "스페인어 시장 표현: ¿Cuánto cuesta?, delicioso, adiós", en: "Spanish market phrases: ¿Cuánto cuesta?, delicioso, adiós", es: "Frases del mercado en español: ¿Cuánto cuesta?, delicioso, adiós", id: "Frasa pasar dalam bahasa Spanyol: ¿Cuánto cuesta?, delicioso, adiós" },
               korean:  { ko: "한국어 기본 표현: 얼마예요?, 맛있는, 안녕히 계세요", en: "Korean basic phrases: 얼마예요?, 맛있는, 안녕히 계세요", es: "Frases básicas en coreano: 얼마예요?, 맛있는, 안녕히 계세요", id: "Frasa dasar dalam bahasa Korea: 얼마예요?, 맛있는, 안녕히 계세요" },
+              english: { ko: "영어 시장 표현: How much is this?, delicious, goodbye", en: "English market phrases: How much is this?, delicious, goodbye", es: "Frases del mercado en inglés: How much is this?, delicious, goodbye", id: "Frasa pasar dalam bahasa Inggris: How much is this?, delicious, goodbye" },
+              indonesian: { ko: "인도네시아어 시장 표현: Berapa harganya?, lezat, selamat tinggal", en: "Indonesian market phrases: Berapa harganya?, lezat, selamat tinggal", es: "Frases del mercado en indonesio: Berapa harganya?, lezat, selamat tinggal", id: "Frasa pasar dalam bahasa Indonesia: Berapa harganya?, lezat, selamat tinggal" },
             },
           },
           h2: {
@@ -1270,6 +1272,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "'¿Cuánto cuesta?'=가격 묻기, 'delicioso'=맛있는, 'adiós'=작별", en: "'¿Cuánto cuesta?'=asking price, 'delicioso'=tasty, 'adiós'=farewell", es: "'¿Cuánto cuesta?'=precio, 'delicioso'=sabroso, 'adiós'=despedida", id: "'¿Cuánto cuesta?'=menanyakan harga, 'delicioso'=lezat, 'adiós'=perpisahan" },
               korean:  { ko: "'얼마예요?'=가격 묻기, '맛있는'=delicious, '안녕히 계세요'=작별", en: "'얼마예요?'=asking price, '맛있는'=tasty, '안녕히 계세요'=farewell", es: "'얼마예요?'=precio, '맛있는'=sabroso, '안녕히 계세요'=despedida", id: "'얼마예요?'=menanyakan harga, '맛있는'=lezat, '안녕히 계세요'=perpisahan" },
+              english: { ko: "'How much is this?'=가격 묻기, 'delicious'=맛있는, 'goodbye'=작별", en: "'How much is this?'=asking price, 'delicious'=tasty, 'goodbye'=farewell", es: "'How much is this?'=precio, 'delicious'=sabroso, 'goodbye'=despedida", id: "'How much is this?'=menanyakan harga, 'delicious'=lezat, 'goodbye'=perpisahan" },
+              indonesian: { ko: "'Berapa harganya?'=가격 묻기, 'lezat'=맛있는, 'selamat tinggal'=작별", en: "'Berapa harganya?'=asking price, 'lezat'=tasty, 'selamat tinggal'=farewell", es: "'Berapa harganya?'=precio, 'lezat'=sabroso, 'selamat tinggal'=despedida", id: "'Berapa harganya?'=menanyakan harga, 'lezat'=lezat, 'selamat tinggal'=perpisahan" },
             },
           },
           h3: {
@@ -1280,6 +1284,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "¿Cuánto cuesta esto?=가격 / delicioso=맛 / adiós=작별", en: "¿Cuánto cuesta esto?=price / delicioso=taste / adiós=farewell", es: "¿Cuánto cuesta esto?=precio / delicioso=sabor / adiós=despedida", id: "¿Cuánto cuesta esto?=harga / delicioso=rasa / adiós=perpisahan" },
               korean:  { ko: "이거 얼마예요?=가격 / 맛있는=맛 / 안녕히 계세요=작별", en: "이거 얼마예요?=price / 맛있는=taste / 안녕히 계세요=farewell", es: "이거 얼마예요?=precio / 맛있는=sabor / 안녕히 계세요=despedida", id: "이거 얼마예요?=harga / 맛있는=rasa / 안녕히 계세요=perpisahan" },
+              english: { ko: "How much is this?=가격 / delicious=맛 / goodbye=작별", en: "How much is this?=price / delicious=taste / goodbye=farewell", es: "How much is this?=precio / delicious=sabor / goodbye=despedida", id: "How much is this?=harga / delicious=rasa / goodbye=perpisahan" },
+              indonesian: { ko: "Berapa harganya?=가격 / lezat=맛 / selamat tinggal=작별", en: "Berapa harganya?=price / lezat=taste / selamat tinggal=farewell", es: "Berapa harganya?=precio / lezat=sabor / selamat tinggal=despedida", id: "Berapa harganya?=harga / lezat=rasa / selamat tinggal=perpisahan" },
             },
           },
         },
@@ -1387,6 +1393,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "'Buenos días'로 인사하고 'por favor'로 주문해봐", en: "Greet with 'Buenos días' and order with 'por favor'", es: "Saluda con 'Buenos días' y pide con 'por favor'", id: "Sapa dengan 'Buenos días' dan pesan dengan 'por favor'" },
               korean:  { ko: "'좋은 아침이에요'로 인사하고 '주세요'로 주문해봐", en: "Greet with '좋은 아침이에요' and order with '주세요'", es: "Saluda con '좋은 아침이에요' y pide con '주세요'", id: "Sapa dengan '좋은 아침이에요' dan pesan dengan '주세요'" },
+              english: { ko: "'Good morning'으로 인사하고 'please'로 주문해봐", en: "Greet with 'Good morning' and order with 'please'", es: "Saluda con 'Good morning' y pide con 'please'", id: "Sapa dengan 'Good morning' dan pesan dengan 'please'" },
+              indonesian: { ko: "'Selamat pagi'로 인사하고 'tolong'으로 주문해봐", en: "Greet with 'Selamat pagi' and order with 'tolong'", es: "Saluda con 'Selamat pagi' y pide con 'tolong'", id: "Sapa dengan 'Selamat pagi' dan pesan dengan 'tolong'" },
             },
           },
           h2: {
@@ -1397,6 +1405,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "Buenos días + por favor + gracias가 핵심이야", en: "Buenos días + por favor + gracias are key", es: "Buenos días + por favor + gracias son clave", id: "Buenos días + por favor + gracias adalah kuncinya" },
               korean:  { ko: "좋은 아침 + 주세요 + 감사합니다가 핵심이야", en: "좋은 아침 + 주세요 + 감사합니다 are key", es: "좋은 아침 + 주세요 + 감사합니다 son clave", id: "좋은 아침 + 주세요 + 감사합니다 adalah kuncinya" },
+              english: { ko: "Good morning + please + thank you가 핵심이야", en: "Good morning + please + thank you are key", es: "Good morning + please + thank you son clave", id: "Good morning + please + thank you adalah kuncinya" },
+              indonesian: { ko: "Selamat pagi + tolong + terima kasih가 핵심이야", en: "Selamat pagi + tolong + terima kasih are key", es: "Selamat pagi + tolong + terima kasih son clave", id: "Selamat pagi + tolong + terima kasih adalah kuncinya" },
             },
           },
           h3: {
@@ -1407,6 +1417,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "'¡Buenos días! ... por favor. ¿Cuánto es?' 형식으로 주문해", en: "Order: '¡Buenos días! ... por favor. ¿Cuánto es?'", es: "Pide: '¡Buenos días! ... por favor. ¿Cuánto es?'", id: "Pesan: '¡Buenos días! ... por favor. ¿Cuánto es?'" },
               korean:  { ko: "'좋은 아침이에요! 커피 주세요. 얼마예요?' 형식으로 주문해", en: "Order: '좋은 아침이에요! 커피 주세요. 얼마예요?'", es: "Pide: '좋은 아침이에요! 커피 주세요. 얼마예요?'", id: "Pesan: '좋은 아침이에요! 커피 주세요. 얼마예요?'" },
+              english: { ko: "'Good morning! I would like coffee, please. How much is it?' 형식으로 주문해", en: "Order: 'Good morning! I would like coffee, please. How much is it?'", es: "Pide: 'Good morning! I would like coffee, please. How much is it?'", id: "Pesan: 'Good morning! I would like coffee, please. How much is it?'" },
+              indonesian: { ko: "'Selamat pagi! Saya mau kopi, tolong. Berapa harganya?' 형식으로 주문해", en: "Order: 'Selamat pagi! Saya mau kopi, tolong. Berapa harganya?'", es: "Pide: 'Selamat pagi! Saya mau kopi, tolong. Berapa harganya?'", id: "Pesan: 'Selamat pagi! Saya mau kopi, tolong. Berapa harganya?'" },
             },
           },
         },
@@ -1648,6 +1660,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "카를로스의 외침: Hola, Necesito ayuda, ¿Dónde está el baño?", en: "Carlos's cries: Hola, Necesito ayuda, ¿Dónde está el baño?", es: "Los gritos de Carlos: Hola, Necesito ayuda, ¿Dónde está el baño?", id: "Teriakan Carlos: Hola, Necesito ayuda, ¿Dónde está el baño?" },
               korean:  { ko: "카를로스의 외침: 안녕하세요, 도움이 필요해요, 화장실이 어디에요?", en: "Carlos's cries: 안녕하세요, 도움이 필요해요, 화장실이 어디에요?", es: "Los gritos de Carlos: 안녕하세요, 도움이 필요해요, 화장실이 어디에요?", id: "Teriakan Carlos: 안녕하세요, 도움이 필요해요, 화장실이 어디에요?" },
+              english: { ko: "카를로스의 외침: Hello, I need help, Where is the bathroom?", en: "Carlos's cries: Hello, I need help, Where is the bathroom?", es: "Los gritos de Carlos: Hello, I need help, Where is the bathroom?", id: "Teriakan Carlos: Hello, I need help, Where is the bathroom?" },
+              indonesian: { ko: "카를로스의 외침: Halo, Saya butuh bantuan, Di mana kamar mandi?", en: "Carlos's cries: Halo, Saya butuh bantuan, Di mana kamar mandi?", es: "Los gritos de Carlos: Halo, Saya butuh bantuan, Di mana kamar mandi?", id: "Teriakan Carlos: Halo, Saya butuh bantuan, Di mana kamar mandi?" },
             },
           },
           h2: {
@@ -1658,6 +1672,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "스페인어 어순: 주어 → 동사 → 목적어 (Hola → Necesito → ayuda)", en: "Spanish word order: Subject → Verb → Object (Hola → Necesito → ayuda)", es: "Orden en español: Sujeto → Verbo → Objeto (Hola → Necesito → ayuda)", id: "Urutan kata bahasa Spanyol: Subjek → Kata Kerja → Objek (Hola → Necesito → ayuda)" },
               korean:  { ko: "한국어 어순: 주어 → 목적어 → 동사 (안녕하세요 → 도움이 → 필요해요)", en: "Korean word order: Subject → Object → Verb (안녕하세요 → 도움이 → 필요해요)", es: "Orden en coreano: Sujeto → Objeto → Verbo (안녕하세요 → 도움이 → 필요해요)", id: "Urutan kata bahasa Korea: Subjek → Objek → Kata Kerja (안녕하세요 → 도움이 → 필요해요)" },
+              english: { ko: "영어 어순: 주어 → 동사 → 목적어 (Hello → I need → help)", en: "English word order: Subject → Verb → Object (Hello → I need → help)", es: "Orden en inglés: Sujeto → Verbo → Objeto (Hello → I need → help)", id: "Urutan kata bahasa Inggris: Subjek → Kata Kerja → Objek (Hello → I need → help)" },
+              indonesian: { ko: "인도네시아어 어순: 주어 → 동사 → 목적어 (Halo → Saya butuh → bantuan)", en: "Indonesian word order: Subject → Verb → Object (Halo → Saya butuh → bantuan)", es: "Orden en indonesio: Sujeto → Verbo → Objeto (Halo → Saya butuh → bantuan)", id: "Urutan kata bahasa Indonesia: Subjek → Kata Kerja → Objek (Halo → Saya butuh → bantuan)" },
             },
           },
           h3: {
@@ -1668,6 +1684,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "1: Hola, Necesito ayuda / 2: Dónde está el baño / 3: Ayuda, Por favor ayúdame", en: "1: Hola, Necesito ayuda / 2: Dónde está el baño / 3: Ayuda, Por favor ayúdame", es: "1: Hola, Necesito ayuda / 2: Dónde está el baño / 3: Ayuda, Por favor ayúdame", id: "1: Hola, Necesito ayuda / 2: Dónde está el baño / 3: Ayuda, Por favor ayúdame" },
               korean:  { ko: "1: 안녕하세요, 도움이 필요해요 / 2: 화장실이 어디에요 / 3: 도와주세요, 제발 도와줘요", en: "1: 안녕하세요, 도움이 필요해요 / 2: 화장실이 어디에요 / 3: 도와주세요, 제발 도와줘요", es: "1: 안녕하세요, 도움이 필요해요 / 2: 화장실이 어디에요 / 3: 도와주세요, 제발 도와줘요", id: "1: 안녕하세요, 도움이 필요해요 / 2: 화장실이 어디에요 / 3: 도와주세요, 제발 도와줘요" },
+              english: { ko: "1: Hello, I need help / 2: Where is the bathroom / 3: Help, Please help me", en: "1: Hello, I need help / 2: Where is the bathroom / 3: Help, Please help me", es: "1: Hello, I need help / 2: Where is the bathroom / 3: Help, Please help me", id: "1: Hello, I need help / 2: Where is the bathroom / 3: Help, Please help me" },
+              indonesian: { ko: "1: Halo, Saya butuh bantuan / 2: Di mana kamar mandi / 3: Tolong, Kumohon tolong aku", en: "1: Halo, Saya butuh bantuan / 2: Di mana kamar mandi / 3: Tolong, Kumohon tolong aku", es: "1: Halo, Saya butuh bantuan / 2: Di mana kamar mandi / 3: Tolong, Kumohon tolong aku", id: "1: Halo, Saya butuh bantuan / 2: Di mana kamar mandi / 3: Tolong, Kumohon tolong aku" },
             },
           },
         },
@@ -1766,6 +1784,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "카를로스에게 남은 스페인어 표현: Hola, Ayuda, ¿Dónde está la puerta?", en: "Carlos's remaining Spanish phrases: Hola, Ayuda, ¿Dónde está la puerta?", es: "Las frases en español que le quedaron a Carlos: Hola, Ayuda, ¿Dónde está la puerta?", id: "Frasa bahasa Spanyol yang tersisa pada Carlos: Hola, Ayuda, ¿Dónde está la puerta?" },
               korean:  { ko: "카를로스에게 남은 한국어 표현: 안녕하세요, 도와주세요, 문이 어디예요?", en: "Carlos's remaining Korean phrases: 안녕하세요, 도와주세요, 문이 어디예요?", es: "Las frases en coreano que le quedaron a Carlos: 안녕하세요, 도와주세요, 문이 어디예요?", id: "Frasa bahasa Korea yang tersisa pada Carlos: 안녕하세요, 도와주세요, 문이 어디예요?" },
+              english: { ko: "카를로스에게 남은 영어 표현: Hello, Help, Where is the door?", en: "Carlos's remaining English phrases: Hello, Help, Where is the door?", es: "Las frases en inglés que le quedaron a Carlos: Hello, Help, Where is the door?", id: "Frasa bahasa Inggris yang tersisa pada Carlos: Hello, Help, Where is the door?" },
+              indonesian: { ko: "카를로스에게 남은 인도네시아어 표현: Halo, Tolong, Di mana pintunya?", en: "Carlos's remaining Indonesian phrases: Halo, Tolong, Di mana pintunya?", es: "Las frases en indonesio que le quedaron a Carlos: Halo, Tolong, Di mana pintunya?", id: "Frasa bahasa Indonesia yang tersisa pada Carlos: Halo, Tolong, Di mana pintunya?" },
             },
           },
           h2: {
@@ -1776,6 +1796,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "카를로스의 비명: 'Hola. Ayuda. ¿Dónde está la puerta?' — 기초 스페인어만 남았어", en: "Carlos screamed: 'Hola. Ayuda. ¿Dónde está la puerta?' — only basic Spanish remained", es: "Carlos gritó: 'Hola. Ayuda. ¿Dónde está la puerta?' — solo quedaba español básico", id: "Carlos berteriak: 'Hola. Ayuda. ¿Dónde está la puerta?' — hanya bahasa Spanyol dasar yang tersisa" },
               korean:  { ko: "카를로스의 비명: '안녕하세요. 도와주세요. 문이 어디예요?' — 기초 한국어만 남았어", en: "Carlos screamed: '안녕하세요. 도와주세요. 문이 어디예요?' — only basic Korean remained", es: "Carlos gritó: '안녕하세요. 도와주세요. 문이 어디예요?' — solo quedaba coreano básico", id: "Carlos berteriak: '안녕하세요. 도와주세요. 문이 어디예요?' — hanya bahasa Korea dasar yang tersisa" },
+              english: { ko: "카를로스의 비명: 'Hello. Help. Where is the door?' — 기초 영어만 남았어", en: "Carlos screamed: 'Hello. Help. Where is the door?' — only basic English remained", es: "Carlos gritó: 'Hello. Help. Where is the door?' — solo quedaba inglés básico", id: "Carlos berteriak: 'Hello. Help. Where is the door?' — hanya bahasa Inggris dasar yang tersisa" },
+              indonesian: { ko: "카를로스의 비명: 'Halo. Tolong. Di mana pintunya?' — 기초 인도네시아어만 남았어", en: "Carlos screamed: 'Halo. Tolong. Di mana pintunya?' — only basic Indonesian remained", es: "Carlos gritó: 'Halo. Tolong. Di mana pintunya?' — solo quedaba indonesio básico", id: "Carlos berteriak: 'Halo. Tolong. Di mana pintunya?' — hanya bahasa Indonesia dasar yang tersisa" },
             },
           },
           h3: {
@@ -1786,6 +1808,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "첫 번째: 'Son quince dólares' (가격) / 두 번째: '¿Puedo tener agua, por favor?' (생존 요청)", en: "First: 'Son quince dólares' (price) / Second: '¿Puedo tener agua, por favor?' (survival request)", es: "Primero: 'Son quince dólares' (precio) / Segundo: '¿Puedo tener agua, por favor?' (petición de supervivencia)", id: "Pertama: 'Son quince dólares' (harga) / Kedua: '¿Puedo tener agua, por favor?' (permintaan bertahan hidup)" },
               korean:  { ko: "첫 번째: '15달러입니다' (가격) / 두 번째: '물 좀 주세요' (생존 요청)", en: "First: '15달러입니다' (price) / Second: '물 좀 주세요' (survival request)", es: "Primero: '15달러입니다' (precio) / Segundo: '물 좀 주세요' (petición de supervivencia)", id: "Pertama: '15달러입니다' (harga) / Kedua: '물 좀 주세요' (permintaan bertahan hidup)" },
+              english: { ko: "첫 번째: 'That's fifteen dollars' (가격) / 두 번째: 'Can I have water, please?' (생존 요청)", en: "First: 'That's fifteen dollars' (price) / Second: 'Can I have water, please?' (survival request)", es: "Primero: 'That's fifteen dollars' (precio) / Segundo: 'Can I have water, please?' (petición de supervivencia)", id: "Pertama: 'That's fifteen dollars' (harga) / Kedua: 'Can I have water, please?' (permintaan bertahan hidup)" },
+              indonesian: { ko: "첫 번째: 'Harganya lima belas dolar' (가격) / 두 번째: 'Boleh minta air?' (생존 요청)", en: "First: 'Harganya lima belas dolar' (price) / Second: 'Boleh minta air?' (survival request)", es: "Primero: 'Harganya lima belas dolar' (precio) / Segundo: 'Boleh minta air?' (petición de supervivencia)", id: "Pertama: 'Harganya lima belas dolar' (harga) / Kedua: 'Boleh minta air?' (permintaan bertahan hidup)" },
             },
           },
         },
@@ -2061,6 +2085,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               korean: { ko: "출구는 나가는 곳, 지하철역은 기차 정거장, 택시는 유료 차, 실례합니다는 정중한 표현", en: "'출구' is the way out, '지하철역' is a train stop, '택시' is a paid car, '실례합니다' is polite", es: "'출구' es la salida, '지하철역' es parada de tren, '택시' es coche de pago, '실례합니다' es educado", id: "'출구' adalah jalan keluar, '지하철역' adalah perhentian kereta, '택시' adalah mobil berbayar, '실례합니다' itu sopan" },
               spanish: { ko: "salida는 나가는 곳, estación de metro는 기차 정거장, taxi는 유료 차, disculpe는 정중한 표현", en: "'Salida' is the way out, 'estación de metro' is a train stop, 'taxi' is a paid car, 'disculpe' is polite", es: "Salida es la salida, estación de metro es parada de tren, taxi es coche de pago, disculpe es educado", id: "'salida' adalah jalan keluar, 'estación de metro' adalah perhentian kereta, 'taxi' adalah mobil berbayar, 'disculpe' itu sopan" },
+              english: { ko: "exit은 나가는 곳, subway station은 기차 정거장, taxi는 유료 차, excuse me는 정중한 표현", en: "'Exit' is the way out, 'subway station' is a train stop, 'taxi' is a paid car, 'excuse me' is polite", es: "'Exit' es la salida, 'subway station' es parada de tren, 'taxi' es coche de pago, 'excuse me' es educado", id: "'Exit' adalah jalan keluar, 'subway station' adalah perhentian kereta, 'taxi' adalah mobil berbayar, 'excuse me' itu sopan" },
+              indonesian: { ko: "pintu keluar는 나가는 곳, stasiun kereta bawah tanah는 기차 정거장, taksi는 유료 차, permisi는 정중한 표현", en: "'Pintu keluar' is the way out, 'stasiun kereta bawah tanah' is a train stop, 'taksi' is a paid car, 'permisi' is polite", es: "'Pintu keluar' es la salida, 'stasiun kereta bawah tanah' es parada de tren, 'taksi' es coche de pago, 'permisi' es educado", id: "'Pintu keluar' adalah jalan keluar, 'stasiun kereta bawah tanah' adalah perhentian kereta, 'taksi' adalah mobil berbayar, 'permisi' itu sopan" },
             },
           },
           h3: {
@@ -2071,6 +2097,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               korean: { ko: "출구=나가는 곳 / 지하철역=기차 정거장 / 택시=유료 차 / 실례합니다=정중한 표현", en: "출구=way out / 지하철역=underground train / 택시=car for hire / 실례합니다=polite attention", es: "출구=salida / 지하철역=tren subterráneo / 택시=coche de alquiler / 실례합니다=atención educada", id: "출구=jalan keluar / 지하철역=kereta bawah tanah / 택시=mobil sewaan / 실례합니다=perhatian sopan" },
               spanish: { ko: "salida=나가는 곳 / estación de metro=기차 정거장 / taxi=유료 차 / disculpe=정중한 표현", en: "salida=way out / estación de metro=underground train / taxi=car for hire / disculpe=polite attention", es: "salida=salida / estación de metro=tren subterráneo / taxi=coche de alquiler / disculpe=atención educada", id: "salida=jalan keluar / estación de metro=kereta bawah tanah / taxi=mobil sewaan / disculpe=perhatian sopan" },
+              english: { ko: "exit=나가는 곳 / subway station=기차 정거장 / taxi=유료 차 / excuse me=정중한 표현", en: "exit=way out / subway station=underground train / taxi=car for hire / excuse me=polite attention", es: "exit=salida / subway station=tren subterráneo / taxi=coche de alquiler / excuse me=atención educada", id: "exit=jalan keluar / subway station=kereta bawah tanah / taxi=mobil sewaan / excuse me=perhatian sopan" },
+              indonesian: { ko: "pintu keluar=나가는 곳 / stasiun kereta bawah tanah=기차 정거장 / taksi=유료 차 / permisi=정중한 표현", en: "pintu keluar=way out / stasiun kereta bawah tanah=underground train / taksi=car for hire / permisi=polite attention", es: "pintu keluar=salida / stasiun kereta bawah tanah=tren subterráneo / taksi=coche de alquiler / permisi=atención educada", id: "pintu keluar=jalan keluar / stasiun kereta bawah tanah=kereta bawah tanah / taksi=mobil sewaan / permisi=perhatian sopan" },
             },
           },
         },
@@ -2167,6 +2195,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               korean: { ko: "택시에서는 장소 + 주세요 + 가격을 물어야 해. 경비원에게는 자기소개를 해야 해", en: "In a taxi, use place + 주세요 + ask the price. For the guard, introduce yourself", es: "En un taxi, usa lugar + 주세요 + pregunta el precio. Al guardia, preséntate", id: "Di taksi, gunakan tempat + 주세요 + tanyakan harganya. Pada penjaga, perkenalkan dirimu" },
               spanish: { ko: "택시에서는 장소 + por favor + 가격을 물어야 해. 경비원에게는 자기소개를 해야 해", en: "In a taxi, use place + por favor + ask the price. For the guard, introduce yourself", es: "En un taxi, usa lugar + por favor + pregunta el precio. Al guardia, preséntate", id: "Di taksi, gunakan tempat + por favor + tanyakan harganya. Pada penjaga, perkenalkan dirimu" },
+              english: { ko: "택시에서는 장소 + please + 가격을 물어야 해. 경비원에게는 자기소개를 해야 해", en: "In a taxi, use place + please + ask the price. For the guard, introduce yourself", es: "En un taxi, usa lugar + please + pregunta el precio. Al guardia, preséntate", id: "Di taksi, gunakan tempat + please + tanyakan harganya. Pada penjaga, perkenalkan dirimu" },
+              indonesian: { ko: "택시에서는 장소 + tolong + 가격을 물어야 해. 경비원에게는 자기소개를 해야 해", en: "In a taxi, use place + tolong + ask the price. For the guard, introduce yourself", es: "En un taxi, usa lugar + tolong + pregunta el precio. Al guardia, preséntate", id: "Di taksi, gunakan tempat + tolong + tanyakan harganya. Pada penjaga, perkenalkan dirimu" },
             },
           },
           h2: {
@@ -2177,6 +2207,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               korean: { ko: "실례합니다로 시작, 장소 + 가 주세요, 그리고 얼마예요? / 안녕하세요 + 이름 + 찾는 사람", en: "Start with 실례합니다, place + 가 주세요, and 얼마예요? / 안녕하세요 + name + person you seek", es: "Empieza con 실례합니다, lugar + 가 주세요, y 얼마예요? / 안녕하세요 + nombre + a quién buscas", id: "Mulai dengan 실례합니다, tempat + 가 주세요, lalu 얼마예요? / 안녕하세요 + nama + orang yang dicari" },
               spanish: { ko: "Disculpe로 시작, 장소 + por favor, 그리고 ¿Cuánto cuesta? / Hola + 이름 + 찾는 사람", en: "Start with Disculpe, place + por favor, and ¿Cuánto cuesta? / Hola + name + person you seek", es: "Empieza con Disculpe, lugar + por favor, y ¿Cuánto cuesta? / Hola + nombre + a quién buscas", id: "Mulai dengan Disculpe, tempat + por favor, lalu ¿Cuánto cuesta? / Hola + nama + orang yang dicari" },
+              english: { ko: "Excuse me로 시작, 장소 + please go, 그리고 How much? / Hello + 이름 + 찾는 사람", en: "Start with Excuse me, place + please go, and How much? / Hello + name + person you seek", es: "Empieza con Excuse me, lugar + please go, y How much? / Hello + nombre + a quién buscas", id: "Mulai dengan Excuse me, tempat + please go, lalu How much? / Hello + nama + orang yang dicari" },
+              indonesian: { ko: "Permisi로 시작, 장소 + tolong antar, 그리고 Berapa harganya? / Halo + 이름 + 찾는 사람", en: "Start with Permisi, place + tolong antar, and Berapa harganya? / Halo + name + person you seek", es: "Empieza con Permisi, lugar + tolong antar, y Berapa harganya? / Halo + nombre + a quién buscas", id: "Mulai dengan Permisi, tempat + tolong antar, lalu Berapa harganya? / Halo + nama + orang yang dicari" },
             },
           },
           h3: {
@@ -2187,6 +2219,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               korean: { ko: "Q1: 실례합니다 + 남산으로 가 주세요 + 얼마예요 / Q2: 안녕하세요 + 이름 + 수진 + 친구", en: "Q1: 실례합니다 + 남산으로 가 주세요 + 얼마예요 / Q2: 안녕하세요 + name + 수진 + 친구", es: "P1: 실례합니다 + 남산 주세요 + 얼마예요 / P2: 안녕하세요 + nombre + 수진 + 친구", id: "S1: 실례합니다 + 남산으로 가 주세요 + 얼마예요 / S2: 안녕하세요 + nama + 수진 + teman" },
               spanish: { ko: "Q1: Disculpe + Namsan por favor + cuánto / Q2: Hola + 이름 + Sujin + amigo", en: "Q1: Disculpe + Namsan por favor + cuánto / Q2: Hola + name + Sujin + amigo", es: "P1: Disculpe + Namsan por favor + cuánto / P2: Hola + nombre + busco Sujin + amigo", id: "S1: Disculpe + Namsan por favor + cuánto / S2: Hola + nama + Sujin + teman" },
+              english: { ko: "Q1: Excuse me + go to Namsan please + how much / Q2: Hello + 이름 + looking for Sujin + friend", en: "Q1: Excuse me + go to Namsan please + how much / Q2: Hello + name + looking for Sujin + friend", es: "P1: Excuse me + go to Namsan please + how much / P2: Hello + nombre + looking for Sujin + friend", id: "S1: Excuse me + go to Namsan please + how much / S2: Hello + nama + looking for Sujin + friend" },
+              indonesian: { ko: "Q1: Permisi + tolong antar ke Namsan + berapa harganya / Q2: Halo + 이름 + mencari Sujin + teman", en: "Q1: Permisi + tolong antar ke Namsan + berapa harganya / Q2: Halo + name + mencari Sujin + teman", es: "P1: Permisi + tolong antar ke Namsan + berapa harganya / P2: Halo + nombre + mencari Sujin + teman", id: "S1: Permisi + tolong antar ke Namsan + berapa harganya / S2: Halo + nama + mencari Sujin + teman" },
             },
           },
         },
@@ -2387,6 +2421,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "문장은 'Disculpe'로 시작해", en: "The sentence starts with 'Disculpe'", es: "La frase empieza con 'Disculpe'", id: "Kalimat dimulai dengan 'Disculpe'" },
               korean:  { ko: "문장은 '실례합니다'로 시작해", en: "The sentence starts with '실례합니다'", es: "La frase empieza con '실례합니다'", id: "Kalimat dimulai dengan '실례합니다'" },
+              english: { ko: "문장은 'Excuse me'로 시작해", en: "The sentence starts with 'Excuse me'", es: "La frase empieza con 'Excuse me'", id: "Kalimat dimulai dengan 'Excuse me'" },
+              indonesian: { ko: "문장은 'Permisi'로 시작해", en: "The sentence starts with 'Permisi'", es: "La frase empieza con 'Permisi'", id: "Kalimat dimulai dengan 'Permisi'" },
             },
           },
           h2: {
@@ -2397,6 +2433,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "먼저 장소를 물어 (dónde está la vieja puerta), 그다음 방향 (gire a la izquierda)", en: "First the place (dónde está la vieja puerta), then direction (gire a la izquierda)", es: "Primero el lugar (dónde está la vieja puerta), luego dirección (gire a la izquierda)", id: "Pertama tanyakan tempatnya (dónde está la vieja puerta), lalu arahnya (gire a la izquierda)" },
               korean:  { ko: "먼저 장소를 물어 (오래된 문이 어디에), 그다음 방향 (왼쪽으로 주세요)", en: "First the place (오래된 문이 어디에), then direction (왼쪽으로 주세요)", es: "Primero el lugar (오래된 문이 어디에), luego dirección (왼쪽으로 주세요)", id: "Pertama tanyakan tempatnya (오래된 문이 어디에), lalu arahnya (왼쪽으로 주세요)" },
+              english: { ko: "먼저 장소를 물어 (where is the old door), 그다음 방향 (turn left please)", en: "First the place (where is the old door), then direction (turn left please)", es: "Primero el lugar (where is the old door), luego dirección (turn left please)", id: "Pertama tanyakan tempatnya (where is the old door), lalu arahnya (turn left please)" },
+              indonesian: { ko: "먼저 장소를 물어 (di mana pintu yang tua), 그다음 방향 (belok kiri tolong)", en: "First the place (di mana pintu yang tua), then direction (belok kiri tolong)", es: "Primero el lugar (di mana pintu yang tua), luego dirección (belok kiri tolong)", id: "Pertama tanyakan tempatnya (di mana pintu yang tua), lalu arahnya (belok kiri tolong)" },
             },
           },
           h3: {
@@ -2407,6 +2445,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "구조: Disculpe → dónde está → la vieja → puerta → gire a → la izquierda", en: "Structure: Disculpe → dónde está → la vieja → puerta → gire a → la izquierda", es: "Estructura: Disculpe → dónde está → la vieja → puerta → gire a → la izquierda", id: "Struktur: Disculpe → dónde está → la vieja → puerta → gire a → la izquierda" },
               korean:  { ko: "구조: 실례합니다 → 어디에 → 오래된 → 문이 → 왼쪽으로 → 주세요", en: "Structure: 실례합니다 → 어디에 → 오래된 → 문이 → 왼쪽으로 → 주세요", es: "Estructura: 실례합니다 → 어디에 → 오래된 → 문이 → 왼쪽으로 → 주세요", id: "Struktur: 실례합니다 → 어디에 → 오래된 → 문이 → 왼쪽으로 → 주세요" },
+              english: { ko: "구조: Excuse me → where is → the old → door → turn left → please", en: "Structure: Excuse me → where is → the old → door → turn left → please", es: "Estructura: Excuse me → where is → the old → door → turn left → please", id: "Struktur: Excuse me → where is → the old → door → turn left → please" },
+              indonesian: { ko: "구조: Permisi → di mana → yang tua → pintu → belok kiri → tolong", en: "Structure: Permisi → di mana → yang tua → pintu → belok kiri → tolong", es: "Estructura: Permisi → di mana → yang tua → pintu → belok kiri → tolong", id: "Struktur: Permisi → di mana → yang tua → pintu → belok kiri → tolong" },
             },
           },
         },
@@ -3088,6 +3128,8 @@ const STORIES: Record<string, Story> = {
             byLearning: {
               spanish: { ko: "Hola = 모든 대화의 시작 / Gracias = 감사 표현 / ¿Estás bien? = 관심과 걱정", en: "Hola = start of every conversation / Gracias = gratitude / ¿Estás bien? = caring and concern", es: "Hola = inicio de conversación / Gracias = gratitud / ¿Estás bien? = cuidado y preocupación", id: "Hola = awal setiap percakapan / Gracias = rasa terima kasih / ¿Estás bien? = perhatian dan kepedulian" },
               korean: { ko: "안녕하세요 = 모든 대화의 시작 / 감사합니다 = 감사 표현 / 괜찮으세요? = 관심과 걱정", en: "안녕하세요 = start of every conversation / 감사합니다 = gratitude / 괜찮으세요? = caring and concern", es: "안녕하세요 = inicio de conversación / 감사합니다 = gratitud / 괜찮으세요? = cuidado y preocupación", id: "안녕하세요 = awal setiap percakapan / 감사합니다 = rasa terima kasih / 괜찮으세요? = perhatian dan kepedulian" },
+              english: { ko: "Hello = 모든 대화의 시작 / Thank you = 감사 표현 / Are you okay? = 관심과 걱정", en: "Hello = start of every conversation / Thank you = gratitude / Are you okay? = caring and concern", es: "Hello = inicio de conversación / Thank you = gratitud / Are you okay? = cuidado y preocupación", id: "Hello = awal setiap percakapan / Thank you = rasa terima kasih / Are you okay? = perhatian dan kepedulian" },
+              indonesian: { ko: "Halo = 모든 대화의 시작 / Terima kasih = 감사 표현 / Kamu baik-baik saja? = 관심과 걱정", en: "Halo = start of every conversation / Terima kasih = gratitude / Kamu baik-baik saja? = caring and concern", es: "Halo = inicio de conversación / Terima kasih = gratitud / Kamu baik-baik saja? = cuidado y preocupación", id: "Halo = awal setiap percakapan / Terima kasih = rasa terima kasih / Kamu baik-baik saja? = perhatian dan kepedulian" },
             },
           },
         },
