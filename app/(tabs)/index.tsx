@@ -320,16 +320,23 @@ export default function HomeScreen() {
 
   useFocusEffect(maybeShowGuideDrip);
 
-  useEffect(() => {
-    let cancelActive: (() => void) | undefined;
-    const sub = AppState.addEventListener("change", (next) => {
-      if (next === "active") {
-        cancelActive?.();
-        cancelActive = maybeShowGuideDrip();
-      }
-    });
-    return () => { cancelActive?.(); sub.remove(); };
-  }, [maybeShowGuideDrip]);
+  // Foreground (AppState 'active') re-check, registered INSIDE a focus effect so
+  // the listener only lives while Home is the focused tab. Tab screens stay
+  // mounted under the tab navigator, so a globally-mounted listener would pop
+  // Home's <Modal> over whatever tab (Story/NPC/Training) the user is actually on
+  // when they return from background. Scoping it to focus prevents that overlay.
+  useFocusEffect(
+    React.useCallback(() => {
+      let cancelActive: (() => void) | undefined;
+      const sub = AppState.addEventListener("change", (next) => {
+        if (next === "active") {
+          cancelActive?.();
+          cancelActive = maybeShowGuideDrip();
+        }
+      });
+      return () => { cancelActive?.(); sub.remove(); };
+    }, [maybeShowGuideDrip])
+  );
 
   useEffect(() => {
     const shimmer = Animated.loop(

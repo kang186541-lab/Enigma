@@ -49,8 +49,16 @@ export default function RudyCourseScreen() {
     try {
       const seen = await AsyncStorage.getItem("@first_camp_opened");
       if (!seen) {
-        await AsyncStorage.setItem("@first_camp_opened", "1");
-        await showGuideCardByMilestone(8);
+        // Only consume the one-time marker once the fast-forward ACTUALLY fired.
+        // showGuideCardByMilestone is a no-op (returns null) when the learner has
+        // not yet cleared the philosophy block (idx < 7). Stamping the marker
+        // unconditionally would burn it on an early camp open, so the camp
+        // milestone card would never be delivered. Leave it unset to retry on a
+        // later camp visit once cards 0-6 are seen.
+        const surfaced = await showGuideCardByMilestone(8);
+        if (surfaced !== null) {
+          await AsyncStorage.setItem("@first_camp_opened", "1");
+        }
       }
     } catch (err) {
       console.warn("[RudyCourse] milestone guide card failed:", err);
