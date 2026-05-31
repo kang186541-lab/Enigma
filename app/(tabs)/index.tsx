@@ -8,6 +8,7 @@ import {
   Platform,
   Dimensions,
   Animated,
+  AppState,
   type GestureResponderEvent,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -298,12 +299,14 @@ export default function HomeScreen() {
     refreshHomeProgress();
   }, [user?.id, refreshHomeProgress]);
 
-  // guide-drip-on-open: Rudy's philosophy card shows on app open (Home), one NEW
-  // card per day, NOT gated behind speaking (product-owner directed). The
-  // once-per-day throttle + end-of-deck stop live in getNextGuideIndex; the
-  // exact resolved index is passed to the modal so the shown card and the
-  // advanced card never diverge.
-  useEffect(() => {
+  // guide-drip-on-open: Rudy's philosophy card shows on app open / Home focus /
+  // app foreground — one NEW card per day, NOT gated behind speaking
+  // (product-owner directed). The once-per-day throttle + end-of-deck stop live
+  // in getNextGuideIndex; the resolved index is passed to the modal so the shown
+  // card and the advanced card never diverge. Wired to focus + foreground (not
+  // just first mount) so the daily card still appears after a midnight rollover
+  // or a background->foreground return while Home stays mounted.
+  const maybeShowGuideDrip = React.useCallback(() => {
     let cancelled = false;
     migrateGuideIfStale()
       .then(() => getNextGuideIndex())
@@ -314,6 +317,15 @@ export default function HomeScreen() {
       });
     return () => { cancelled = true; };
   }, []);
+
+  useFocusEffect(maybeShowGuideDrip);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next) => {
+      if (next === "active") maybeShowGuideDrip();
+    });
+    return () => sub.remove();
+  }, [maybeShowGuideDrip]);
 
   useEffect(() => {
     const shimmer = Animated.loop(

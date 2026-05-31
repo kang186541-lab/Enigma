@@ -32,6 +32,14 @@ function todayKey(): string {
   return `${y}-${m}-${day}`;
 }
 
+// Defensive parse: a corrupt/stale rudy_guide_index (NaN, negative, non-integer)
+// must never propagate — NaN would slip past the modal's bounds guard (every NaN
+// comparison is false) and crash on GUIDE_CARDS[NaN].title. Fall back to 0.
+function parseGuideIndex(raw: string | null): number {
+  const n = raw ? parseInt(raw, 10) : 0;
+  return Number.isInteger(n) && n >= 0 ? n : 0;
+}
+
 /**
  * Returns the next guide card index to show.
  * Returns null if either:
@@ -44,8 +52,7 @@ function todayKey(): string {
 export async function getNextGuideIndex(): Promise<number | null> {
   const lastShown = await AsyncStorage.getItem(GUIDE_LAST_SHOWN_KEY);
   if (lastShown === todayKey()) return null; // already shown today
-  const raw = await AsyncStorage.getItem(GUIDE_KEY);
-  const idx = raw ? parseInt(raw, 10) : 0;
+  const idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
   if (idx >= GUIDE_CARDS.length) return null;
   return idx;
 }
@@ -59,8 +66,7 @@ export async function advanceGuideIndex(shownIndex?: number): Promise<void> {
   if (typeof shownIndex === "number") {
     idx = shownIndex;
   } else {
-    const raw = await AsyncStorage.getItem(GUIDE_KEY);
-    idx = raw ? parseInt(raw, 10) : 0;
+    idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
   }
   await AsyncStorage.setItem(GUIDE_KEY, String(idx + 1));
   // Mark today so we don't show another card until tomorrow
@@ -101,8 +107,7 @@ export async function resetGuideForDrip(): Promise<void> {
  */
 export async function showGuideCardByMilestone(targetIndex: number): Promise<number | null> {
   if (targetIndex < 0 || targetIndex >= GUIDE_CARDS.length) return null;
-  const raw = await AsyncStorage.getItem(GUIDE_KEY);
-  const idx = raw ? parseInt(raw, 10) : 0;
+  const idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
   // Philosophy-first + forward-only: only fast-forward learners who have cleared
   // the locked philosophy block and are still behind the milestone card.
   const PHILOSOPHY_BLOCK_END = 7; // indices 0-6 are the locked philosophy cards
@@ -118,8 +123,7 @@ export async function showGuideCardByMilestone(targetIndex: number): Promise<num
 export async function migrateGuideIfStale(): Promise<void> {
   const MIGRATION_KEY = "rudy_guide_drip_v2";
   if (await AsyncStorage.getItem(MIGRATION_KEY)) return;
-  const raw = await AsyncStorage.getItem(GUIDE_KEY);
-  const idx = raw ? parseInt(raw, 10) : 0;
+  const idx = parseGuideIndex(await AsyncStorage.getItem(GUIDE_KEY));
   if (idx >= 8 && idx < GUIDE_CARDS.length) {
     await AsyncStorage.setItem(GUIDE_KEY, "8");
   }
@@ -154,7 +158,7 @@ export function RudyGuideModal({
   // Render only once Home has resolved the exact card index — no useState(0)
   // flash of card 0, and the card shown is the single source of truth for the
   // advance on dismiss.
-  if (!visible || cardIndex === null || cardIndex < 0 || cardIndex >= GUIDE_CARDS.length) return null;
+  if (!visible || cardIndex === null || !Number.isInteger(cardIndex) || cardIndex < 0 || cardIndex >= GUIDE_CARDS.length) return null;
 
   const card = GUIDE_CARDS[cardIndex];
   const title = card.title[lang] ?? card.title.english;

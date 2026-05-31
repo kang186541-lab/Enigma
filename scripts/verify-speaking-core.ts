@@ -221,16 +221,20 @@ assert.ok(
   guideModalSource.includes("lastShown === todayKey()") &&
   guideModalSource.includes("export async function resetGuideForDrip") &&
   guideModalSource.includes("export async function migrateGuideIfStale") &&
-  guideModalSource.includes("advanceGuideIndex(cardIndex)"),
-  "RudyGuideModal should keep the once-per-day drip throttle + reset + migration, and advance by the card actually shown (cardIndex) so the displayed and advanced cards never diverge"
+  guideModalSource.includes("advanceGuideIndex(cardIndex)") &&
+  guideModalSource.includes("function parseGuideIndex") &&
+  guideModalSource.includes("Number.isInteger(cardIndex)"),
+  "RudyGuideModal: once-per-day throttle + reset + migration, advance by shown cardIndex, and corrupt-index hardening (parseGuideIndex normalizes NaN/negative; the render guard rejects non-integer cardIndex so a stale rudy_guide_index cannot crash GUIDE_CARDS[NaN].title)"
 );
 assert.ok(
   homeSource.includes("guide-drip-on-open") &&
   homeSource.includes("migrateGuideIfStale") &&
   homeSource.includes("getNextGuideIndex") &&
   homeSource.includes("setGuideIndex") &&
-  homeSource.includes("cardIndex={guideIndex}"),
-  "Home must show the Rudy guide drip on app open (one card/day, not gated behind speaking): migrate -> compute next index -> pass cardIndex to the modal"
+  homeSource.includes("cardIndex={guideIndex}") &&
+  homeSource.includes("useFocusEffect(maybeShowGuideDrip)") &&
+  homeSource.includes('next === "active"'),
+  "Home must show the Rudy guide drip on app open / focus / foreground (one card/day, not gated behind speaking; NOT mount-only): migrate -> next index -> pass cardIndex, wired via useFocusEffect + AppState active so the daily card still appears after a midnight rollover or a background->foreground return"
 );
 assert.ok(
   speakSource.includes("missionIndex?: string | string[]") &&
