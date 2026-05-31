@@ -174,7 +174,7 @@ export const RUDY_GUIDE_CARDS: RudyGuideCard[] = [
     },
   },
   {
-    emoji: "💬",
+    emoji: "🤖",
     title: {
       korean: "AI 튜터와 자유롭게 대화",
       english: "Chat freely with AI tutors",
