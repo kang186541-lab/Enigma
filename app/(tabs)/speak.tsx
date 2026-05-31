@@ -1974,6 +1974,22 @@ export default function SpeakScreen() {
         }
       };
 
+      recorder.onerror = (e: any) => {
+        // An abnormal recorder death (mic yanked / grabbed by another app) can
+        // fire 'error' WITHOUT a following 'onstop', which would leak the mic
+        // stream and leave the UI mid-record (the 250ms warmup widened this
+        // window). Release the stream and reset so the learner can retry.
+        console.warn("[Speak] MediaRecorder error:", (e && e.error) || e);
+        try { stream.getTracks().forEach((t: any) => t.stop()); } catch {}
+        recordStartPendingRef.current = false;
+        if (!isCurrentPracticeAttempt(attemptGeneration)) return;
+        stopPulse();
+        stopCountdown();
+        setSttError(nativeLang === "korean" ? "녹음 중 오류가 발생했어요. 다시 시도해 주세요." : nativeLang === "spanish" ? "Error de grabación. Inténtalo de nuevo." : nativeLang === "indonesian" ? "Terjadi kesalahan rekaman. Silakan coba lagi." : "Recording error. Please try again.");
+        setRecordState("done");
+        recordStateRef.current = "done";
+      };
+
       try {
         recorder.start(100); // collect chunks every 100ms
       } catch (e) {

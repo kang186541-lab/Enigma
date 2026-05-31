@@ -967,14 +967,16 @@ assert.ok(
 assert.ok(
   speakSource.includes("const RECORD_READY_DELAY_MS = 250") &&
   speakSource.includes("await new Promise((resolve) => setTimeout(resolve, RECORD_READY_DELAY_MS))") &&
-  speakSource.includes("}, RECORD_READY_DELAY_MS);"),
-  "Speak recording should warm up before telling the learner to start speaking"
+  speakSource.includes("}, RECORD_READY_DELAY_MS);") &&
+  speakSource.includes("recorder.onerror"),
+  "Speak recording should warm up before telling the learner to start speaking, and release the mic stream on a recorder error"
 );
 assert.ok(
   rudyStep1Source.includes("const RUDY_RECORD_READY_DELAY_MS = 250") &&
   rudyStep1Source.includes("recordingStartPendingRef.current") &&
-  rudyStep1Source.includes("}, RUDY_RECORD_READY_DELAY_MS);"),
-  "Rudy Step1 recording should warm up before showing the active recording state"
+  rudyStep1Source.includes("}, RUDY_RECORD_READY_DELAY_MS);") &&
+  rudyStep1Source.includes("recorder.onerror"),
+  "Rudy Step1 recording should warm up before showing the active recording state, and release the mic stream on a recorder error"
 );
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);

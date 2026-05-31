@@ -286,6 +286,17 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       mediaRecRef.current = recorder;
       recorder.ondataavailable = (e: any) => { if (e.data?.size > 0) audioChunks.current.push(e.data); };
       recorder.onstop = () => handleWebRecordingStop(recorder.mimeType || mimeType || "audio/webm", stream);
+      recorder.onerror = (e: any) => {
+        // 'error' can fire without a following 'onstop' (mic yanked / grabbed),
+        // which would leak the stream and wedge the recording phase (the 250ms
+        // warmup widened this window). Release the stream and reset to idle.
+        console.warn('[Step1] MediaRecorder error:', (e && e.error) || e);
+        try { stream.getTracks().forEach((t: any) => t.stop()); } catch {}
+        recordingStartPendingRef.current = false;
+        if (autoStopRef.current) { clearTimeout(autoStopRef.current); autoStopRef.current = null; }
+        stopPulse();
+        setPhase("idle");
+      };
       try {
         recorder.start();
       } catch (e) {
