@@ -5672,10 +5672,13 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
 
   const q = puzzle.questions[idx];
   // encodedWord is the cipher text for the learning language
+  // encoded only carries en/es ciphers; korean/indonesian learners decode the
+  // English cipher (their answer below is still shown in their learning lang).
   const encodedWord = learningLang === "spanish" ? q.encoded.es : q.encoded.en;
   // correctAnswer is the decoded answer in the learning language
   const correctAnswer = learningLang === "spanish" ? q.answer.es
     : learningLang === "korean" ? q.answer.ko
+    : learningLang === "indonesian" ? (q.answer.id ?? q.answer.en)
     : q.answer.en;
   // nativeTranslation shows the same answer in the UI language (for understanding)
   const nativeTranslation = lang === "korean" ? q.answer.ko
@@ -5689,6 +5692,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
       const opts = qq.opts.map((o) =>
         learningLang === "spanish" ? o.es
         : learningLang === "korean" ? o.ko
+        : learningLang === "indonesian" ? (o.id ?? o.en)
         : o.en
       );
       return shuffle(opts);
@@ -6067,6 +6071,7 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
   const q = puzzle.questions[idx];
   const targetWord = learningLang === "spanish" ? q.word.es
                    : learningLang === "korean"  ? q.word.ko
+                   : learningLang === "indonesian" ? (q.word.id ?? q.word.en)
                    : q.word.en;
   const targetLangLabel = learningLang === "spanish"
     ? (lang === "korean" ? "스페인어" : lang === "spanish" ? "español" : lang === "indonesian" ? "bahasa Spanyol" : "Spanish")
@@ -6209,6 +6214,7 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
   const targetWord =
     learningLang === "korean" ? q.word.ko
     : learningLang === "spanish" ? q.word.es
+    : learningLang === "indonesian" ? (q.word.id ?? q.word.en)
     : q.word.en;
 
   const allPaths = [...paths, ...(currentPath.length > 0 ? [currentPath] : [])];
@@ -6470,7 +6476,7 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
   useEffect(() => { onResetHints?.(); }, [idx]);
 
   const q = puzzle.questions[idx];
-  const targetWord = learningLang === "korean" ? q.word.ko : learningLang === "spanish" ? q.word.es : q.word.en;
+  const targetWord = learningLang === "korean" ? q.word.ko : learningLang === "spanish" ? q.word.es : learningLang === "indonesian" ? (q.word.id ?? q.word.en) : q.word.en;
   const displayWord = lang === "korean" ? q.word.ko : lang === "spanish" ? q.word.es : lang === "indonesian" ? (q.word.id ?? q.word.en) : q.word.en;
   const hintText = q.hint ? (lang === "korean" ? q.hint.ko : lang === "spanish" ? q.hint.es : lang === "indonesian" ? (q.hint.id ?? q.hint.en) : q.hint.en) : null;
 
@@ -6574,8 +6580,8 @@ function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
   useEffect(() => { onResetHints?.(); }, [idx]);
 
   const q = puzzle.questions[idx];
-  const scrambledText = learningLang === "korean" ? q.scrambled.ko : learningLang === "spanish" ? q.scrambled.es : q.scrambled.en;
-  const correctWord = learningLang === "korean" ? q.word.ko : learningLang === "spanish" ? q.word.es : q.word.en;
+  const scrambledText = learningLang === "korean" ? q.scrambled.ko : learningLang === "spanish" ? q.scrambled.es : learningLang === "indonesian" ? (q.scrambled.id ?? q.scrambled.en) : q.scrambled.en;
+  const correctWord = learningLang === "korean" ? q.word.ko : learningLang === "spanish" ? q.word.es : learningLang === "indonesian" ? (q.word.id ?? q.word.en) : q.word.en;
   const letters = scrambledText.split("");
 
   const assembled = tapped.map((ti) => letters[ti]).join("");
