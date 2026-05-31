@@ -202,6 +202,7 @@ export default function HomeScreen() {
   const [dailyProgress, setDailyProgress] = React.useState<DailyCourseProgress | null>(null);
   const [showLangModal, setShowLangModal] = React.useState(false);
   const [showGuide, setShowGuide] = React.useState(false);
+  const [guideIndex, setGuideIndex] = React.useState<number | null>(null);
   const [srsDueCount, setSrsDueCount] = React.useState(0);
   const [primaryGoal, setPrimaryGoal] = React.useState<LearningGoal | null>(null);
   const [spokenToday, setSpokenToday] = React.useState(0);
@@ -297,17 +298,22 @@ export default function HomeScreen() {
     refreshHomeProgress();
   }, [user?.id, refreshHomeProgress]);
 
+  // guide-drip-on-open: Rudy's philosophy card shows on app open (Home), one NEW
+  // card per day, NOT gated behind speaking (product-owner directed). The
+  // once-per-day throttle + end-of-deck stop live in getNextGuideIndex; the
+  // exact resolved index is passed to the modal so the shown card and the
+  // advanced card never diverge.
   useEffect(() => {
-    if (spokenToday <= 0) {
-      setShowGuide(false);
-      return;
-    }
     let cancelled = false;
-    migrateGuideIfStale().then(() => getNextGuideIndex()).then((idx) => {
-      if (!cancelled && idx !== null) setShowGuide(true);
-    });
+    migrateGuideIfStale()
+      .then(() => getNextGuideIndex())
+      .then((idx) => {
+        if (cancelled || idx === null) return;
+        setGuideIndex(idx);
+        setShowGuide(true);
+      });
     return () => { cancelled = true; };
-  }, [spokenToday]);
+  }, []);
 
   useEffect(() => {
     const shimmer = Animated.loop(
@@ -1068,7 +1074,7 @@ export default function HomeScreen() {
       onClose={clearLevelUp}
     />
     <LanguageChangeModal visible={showLangModal} onClose={() => setShowLangModal(false)} />
-    <RudyGuideModal visible={showGuide} lang={nativeLang} onClose={() => setShowGuide(false)} />
+    <RudyGuideModal visible={showGuide} lang={nativeLang} cardIndex={guideIndex} onClose={() => setShowGuide(false)} />
     </>
   );
 }

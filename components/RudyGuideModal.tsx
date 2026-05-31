@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -50,9 +50,18 @@ export async function getNextGuideIndex(): Promise<number | null> {
   return idx;
 }
 
-export async function advanceGuideIndex(): Promise<void> {
-  const raw = await AsyncStorage.getItem(GUIDE_KEY);
-  const idx = raw ? parseInt(raw, 10) : 0;
+export async function advanceGuideIndex(shownIndex?: number): Promise<void> {
+  // Advance past the card the user ACTUALLY saw (shownIndex), not whatever is
+  // currently in storage. Re-reading storage here could skip a card if a
+  // milestone write or the initial async load changed the stored index between
+  // render and dismiss. Falls back to storage only when no index is provided.
+  let idx: number;
+  if (typeof shownIndex === "number") {
+    idx = shownIndex;
+  } else {
+    const raw = await AsyncStorage.getItem(GUIDE_KEY);
+    idx = raw ? parseInt(raw, 10) : 0;
+  }
   await AsyncStorage.setItem(GUIDE_KEY, String(idx + 1));
   // Mark today so we don't show another card until tomorrow
   await AsyncStorage.setItem(GUIDE_LAST_SHOWN_KEY, todayKey());
@@ -120,21 +129,19 @@ export async function migrateGuideIfStale(): Promise<void> {
 export function RudyGuideModal({
   visible,
   lang,
+  cardIndex,
   onClose,
 }: {
   visible: boolean;
   lang: NativeLanguage;
+  cardIndex: number | null;
   onClose: () => void;
 }) {
-  const [cardIdx, setCardIdx] = useState<number>(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
 
   useEffect(() => {
-    if (visible) {
-      getNextGuideIndex().then((idx) => {
-        if (idx !== null) setCardIdx(idx);
-      });
+    if (visible && cardIndex !== null) {
       fadeAnim.setValue(0);
       scaleAnim.setValue(0.9);
       Animated.parallel([
@@ -142,17 +149,20 @@ export function RudyGuideModal({
         Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, tension: 60, friction: 8 }),
       ]).start();
     }
-  }, [visible]);
+  }, [visible, cardIndex]);
 
-  if (!visible) return null;
+  // Render only once Home has resolved the exact card index — no useState(0)
+  // flash of card 0, and the card shown is the single source of truth for the
+  // advance on dismiss.
+  if (!visible || cardIndex === null || cardIndex < 0 || cardIndex >= GUIDE_CARDS.length) return null;
 
-  const card = GUIDE_CARDS[cardIdx] ?? GUIDE_CARDS[0];
+  const card = GUIDE_CARDS[cardIndex];
   const title = card.title[lang] ?? card.title.english;
   const body = card.body[lang] ?? card.body.english;
 
   const dismiss = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    await advanceGuideIndex();
+    await advanceGuideIndex(cardIndex);
     Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
       onClose();
     });

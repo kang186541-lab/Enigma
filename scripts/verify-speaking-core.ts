@@ -154,12 +154,17 @@ function collectDayOneToSixText(lang: LearningLangKey): string {
   return normalizeContentText(lines.join(" "));
 }
 
-assert.ok(RUDY_GUIDE_CARDS.length >= 13, "Rudy's Language Guide should restore the full daily-drip set (>=13 cards)");
+assert.equal(RUDY_GUIDE_CARDS.length, 13, "Rudy's Language Guide must stay exactly 13 cards: 7 philosophy + 5 app-usage/curriculum + 1 closer (daily drip)");
 const guideTitlesKo = RUDY_GUIDE_CARDS.map((card) => card.title.korean);
 assert.deepEqual(
   guideTitlesKo.slice(0, 7),
   ["언어는 공부가 아니야","불편해져야 배울 수 있어","하루 10분이면 충분해","틀려도 일단 말해!","네가 쓸 말부터 배워","좋아하는 걸로 배워봐","습관을 만들어봐"],
   "Rudy's Language Guide should keep the locked philosophy cards first"
+);
+assert.deepEqual(
+  guideTitlesKo.slice(7, 12),
+  ["처음이라면 기초 과정부터","루디의 훈련소가 핵심이야","훈련소 후 스토리 모드 도전","NPC와 실전 연습해봐","AI 튜터와 자유롭게 대화"],
+  "Rudy's Language Guide should keep the 5 app-usage/curriculum cards (기초→훈련소→스토리→NPC→AI튜터) in order after the philosophy block"
 );
 assert.equal(guideTitlesKo[guideTitlesKo.length - 1], "자, 이제 시작하자!", "Rudy's guide closer should stay last");
 
@@ -215,12 +220,17 @@ assert.ok(
   guideModalSource.includes("GUIDE_LAST_SHOWN_KEY") &&
   guideModalSource.includes("lastShown === todayKey()") &&
   guideModalSource.includes("export async function resetGuideForDrip") &&
-  guideModalSource.includes("export async function migrateGuideIfStale"),
-  "RudyGuideModal should keep the once-per-day drip throttle plus drip reset + stale migration"
+  guideModalSource.includes("export async function migrateGuideIfStale") &&
+  guideModalSource.includes("advanceGuideIndex(cardIndex)"),
+  "RudyGuideModal should keep the once-per-day drip throttle + reset + migration, and advance by the card actually shown (cardIndex) so the displayed and advanced cards never diverge"
 );
 assert.ok(
-  homeSource.includes("migrateGuideIfStale"),
-  "Home should run the guide drip migration before computing the next card"
+  homeSource.includes("guide-drip-on-open") &&
+  homeSource.includes("migrateGuideIfStale") &&
+  homeSource.includes("getNextGuideIndex") &&
+  homeSource.includes("setGuideIndex") &&
+  homeSource.includes("cardIndex={guideIndex}"),
+  "Home must show the Rudy guide drip on app open (one card/day, not gated behind speaking): migrate -> compute next index -> pass cardIndex to the modal"
 );
 assert.ok(
   speakSource.includes("missionIndex?: string | string[]") &&
