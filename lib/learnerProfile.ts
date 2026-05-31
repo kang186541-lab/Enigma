@@ -969,7 +969,7 @@ export async function recordSessionSummary(tutorId: string, summary: SessionSumm
 export function buildTutorMemorySummary(
   profile: LearnerProfile,
   tutorId: string,
-  nativeLang: "ko" | "en" | "es",
+  nativeLang: "ko" | "en" | "es" | "id",
 ): string {
   const mem = profile.tutorMemory?.[tutorId];
   if (!mem || mem.sessionCount === 0) return "";

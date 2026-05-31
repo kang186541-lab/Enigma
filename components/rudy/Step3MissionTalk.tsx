@@ -40,7 +40,7 @@ interface WordLookupData {
 interface Props {
   data: MissionTalkLangData;
   nativeLang: string;
-  lc: "ko" | "en" | "es";
+  lc: "ko" | "en" | "es" | "id";
   learningLang: string;
   onComplete: (sentenceCount: number, usedVoiceOnly: boolean, grammarNotes: string[]) => void;
 }
@@ -89,7 +89,7 @@ function sanitizeForTTS(text: string): string {
 
 // ── Helper ────────────────────────────────────────────────────────────────────
 
-function getMeaning(t: Tri, lc: "ko" | "en" | "es"): string {
+function getMeaning(t: Tri, lc: "ko" | "en" | "es" | "id"): string {
   return t[lc] ?? t.en;
 }
 

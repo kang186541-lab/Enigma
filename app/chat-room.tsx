@@ -550,12 +550,14 @@ export default function ChatRoomScreen() {
     //           then UPGRADE the greeting if server responds in time. ─────────
     (async () => {
       const learnLangRaw = (learningLanguage ?? tutor.language ?? "english").toLowerCase();
-      const learnKey: "ko" | "en" | "es" =
+      const learnKey: "ko" | "en" | "es" | "id" =
         learnLangRaw === "korean" ? "ko" :
-        learnLangRaw === "spanish" ? "es" : "en";
-      const nativeKey: "ko" | "en" | "es" =
+        learnLangRaw === "spanish" ? "es" :
+        learnLangRaw === "indonesian" ? "id" : "en";
+      const nativeKey: "ko" | "en" | "es" | "id" =
         userNativeLang === "korean" ? "ko" :
-        userNativeLang === "spanish" ? "es" : "en";
+        userNativeLang === "spanish" ? "es" :
+        userNativeLang === "indonesian" ? "id" : "en";
 
       // ── Load learner profile (for summary injection + diagnosis trigger) ──
       let profile: LearnerProfile | null = null;
@@ -911,9 +913,10 @@ export default function ChatRoomScreen() {
     setIsTyping(true);
 
     try {
-      const nativeKey: "ko" | "en" | "es" =
+      const nativeKey: "ko" | "en" | "es" | "id" =
         userNativeLang === "korean" ? "ko" :
-        userNativeLang === "spanish" ? "es" : "en";
+        userNativeLang === "spanish" ? "es" :
+        userNativeLang === "indonesian" ? "id" : "en";
       const learnLangRaw = (learningLanguage ?? tutor.language ?? "english").toLowerCase();
       // Always load the freshest profile so burst-sends use up-to-date error
       // patterns / level / interests rather than a stale ref from last turn.

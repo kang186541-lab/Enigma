@@ -8,6 +8,7 @@ export interface Tri {
   ko: string;
   en: string;
   es: string;
+  id?: string;
 }
 
 export interface DayData {
@@ -245,13 +246,14 @@ export function getAllDays(): DayData[] {
   return UNITS.flatMap((u) => u.days);
 }
 
-export function getTri(tri: Tri, lang: "ko" | "en" | "es"): string {
+export function getTri(tri: Tri, lang: "ko" | "en" | "es" | "id"): string {
   return tri[lang] ?? tri.en;
 }
 
-export function langToCode(nativeLang: string): "ko" | "en" | "es" {
+export function langToCode(nativeLang: string): "ko" | "en" | "es" | "id" {
   if (nativeLang === "korean") return "ko";
   if (nativeLang === "spanish") return "es";
+  if (nativeLang === "indonesian") return "id";
   return "en";
 }
 

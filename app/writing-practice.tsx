@@ -153,9 +153,9 @@ export default function WritingPractice() {
 
     // Add wrong answers to SRS
     if (!isCorrect && exercise.type === "translate") {
-      const targetLang = learningLanguage === "korean" ? "ko" : learningLanguage === "spanish" ? "es" : "en";
+      const targetLang = learningLanguage === "korean" ? "ko" : learningLanguage === "spanish" ? "es" : learningLanguage === "indonesian" ? "id" : "en";
       addPhrases([{
-        phrase: exercise.prompt[targetLang as "ko" | "en" | "es"],
+        phrase: exercise.prompt[targetLang as "ko" | "en" | "es" | "id"],
         meaning: t(exercise.prompt, lc),
         source: "writing",
       }]).catch((e) => console.warn('[Writing] addPhrases failed:', e));

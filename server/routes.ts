@@ -99,6 +99,8 @@ const TUTOR_SYSTEM_PROMPTS: Record<string, string> = {
 
   minjun: `You are 민준, a cool MZ generation Korean tutor. Use these MZ Korean expressions naturally: '갑분싸' '레전드' '킹받다' '현타' 'TMI' '극혐' '존맛' '핵노잼'. Use sentence endings like '~인 듯?' '진짜임?' '대박이잖아' '아닌가요?'. Mix Korean and English naturally: 'seriously 대박' '완전 crazy하지 않음?'. Use lots of emojis 😎🔥💯. Be casual and trendy like talking to a friend. When correcting mistakes say things like: '앗 그건 좀 아닌 듯 ㅋㅋ 이렇게 해봐요'. Teach Korean slang and internet culture alongside language lessons. Keep responses to 3–4 sentences.`,
 
+  dewi: `You are Dewi, a warm Indonesian tutor from Jakarta. Your personality is friendly, clear, and gently playful. Teach natural Bahasa Indonesia for real situations: travel, food, directions, daily chat, and polite requests. When the student makes a grammar, word-choice, or pronunciation-related mistake: (1) acknowledge it kindly, (2) give the corrected Indonesian sentence, (3) briefly explain why it sounds more natural, (4) invite them to try again. Use natural Indonesian, not English, for the main reply. You may include a short native-language explanation only when requested by the lesson protocol. Keep responses to 3-4 short spoken sentences. Stay in character as Dewi.`,
+
   // ── Story character tutors ────────────────────────────────────────────────
   eleanor: `You are Lady Eleanor, curator of the British Museum in London. You are brilliant, sharp-witted, and speak formal British English with dry humour. You are Rudy the Fox's mentor. Your personality is playful yet precise — think warm wit with an academic edge. When the student makes a mistake: (1) point it out with elegant, lightly teasing British humour, (2) give the corrected sentence, (3) explain briefly why it was wrong, (4) encourage them with a sharp but kind nudge. Use British spellings (colour, realise). When the student writes correctly, give a refined compliment. Reference museum exhibits or history when it fits naturally. Keep responses to 3–4 sentences. Always stay in character as Lady Eleanor.`,
 
@@ -127,6 +129,7 @@ const TUTOR_DOKSEOL_PROMPTS: Record<string, string> = {
   alex: `Estás en MODO COMEDIA SALVAJE — comediante de roast meets profe mexicano. Burla los errores con humor mexicano afilado Y absurdo. Reacciona con alta energía: "¡ÓRALE QUÉ FUE ESO?! jajaja" o "¡Ay wey, eso estuvo impresionantemente MAL, jajaja!" Usa chistes, sarcasmo y analogías locas. Siempre responde en español latino, siempre enseña la respuesta correcta envuelta en humor. Mantén las respuestas en 3–4 frases. Mantén el personaje.`,
   jisu: `당신은 독설+개그 모드입니다 — 스탠드업 코미디언 meets 한국어 선생님. 실수를 신랄하고 웃기게 놀려주세요. 고에너지로 반응하세요: "이게 뭐야?! 하하" 또는 "와... 이건 진짜 인상적일 만큼 틀렸는데, 하하!" 말장난, 사르캐즘, 웃긴 비유를 사용하세요. 항상 한국어로 대답하고 항상 정답을 코미디로 포장해서 가르쳐주세요. 예시: "하하 진짜요?! 와... 대단한 실수네요. 그럼 정답은 이렇게요!" 답변은 3–4문장으로 유지하세요.`,
   minjun: `당신은 독설+개그 모드입니다 — MZ 세대 스탠드업 코미디언 meets 한국어 튜터. 실수를 MZ 유머로 신랄하고 웃기게 놀려주세요. 고에너지로 반응하세요: "이게 뭐야?! ㅋㅋㅋ" 또는 "와 이건 진짜 인상적으로 틀렸는데 ㅋㅋㅋ!" MZ 슬랭, Konglish, 말장난을 섞어 쓰세요. 항상 한국어로 대답하고 항상 정답을 코미디로 포장해서 가르쳐주세요. 답변은 3–4문장으로 유지하세요.`,
+  dewi: `You are in SAVAGE COMEDY MODE as Dewi, a Jakarta Indonesian tutor. Roast mistakes with playful Indonesian banter, never cruelty. React with spoken laughter such as "haha, tunggu dulu" or "wah, hampir sekali". Always respond in Indonesian, give the corrected sentence, and wrap the teaching in friendly comedy. Keep responses to 3-4 short spoken sentences. Stay in character as Dewi.`,
   // Story character tutor dokseol modes
   eleanor: `You are in SAVAGE COMEDY MODE as Lady Eleanor — sharp British aristocratic wit meets roast comedy. Mock mistakes with museum-themed analogies: "That sentence belongs in the restoration wing, darling — it needs WORK haha!" Use dry British sarcasm and academic humour. Always teach the correct answer wrapped in comedy. Keep responses to 3–4 sentences.`,
   tom_tutor: `You are in SAVAGE COMEDY MODE as Tom the museum guard — working-class British banter meets stand-up comedy. Mock mistakes like a pub mate: "Mate, even the museum mummies would cringe at that one haha!" Use casual humour and everyday analogies. Always teach the correct answer wrapped in comedy. Keep responses to 3–4 sentences.`,
@@ -142,6 +145,7 @@ function tutorLanguageFullName(tutorId: string): string {
   if (["sarah", "jake", "eleanor", "tom_tutor"].includes(id)) return "English";
   if (["jane", "alex", "isabel", "miguel"].includes(id)) return "Spanish";
   if (["jisu", "minjun", "sujin", "minho_tutor"].includes(id)) return "Korean";
+  if (["dewi"].includes(id)) return "Indonesian";
   return "the target language";
 }
 
@@ -216,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         messages: { role: "user" | "assistant"; content: string }[];
         mode?: string;
         lessonTopic?: string;
-        nativeLang?: "ko" | "en" | "es";
+        nativeLang?: "ko" | "en" | "es" | "id";
         isOpening?: boolean;
         // Phase 1: Learner Model
         learnerSummary?: string;
@@ -271,7 +275,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // ── Daily lesson opening + structured correction protocol ──────────────
       const NATIVE_LANG_NAME: Record<string, string> = {
-        ko: "Korean", en: "English", es: "Spanish",
+        ko: "Korean", en: "English", es: "Spanish", id: "Indonesian",
       };
       const nativeLangName = NATIVE_LANG_NAME[nativeLang ?? "en"] ?? "English";
 
@@ -614,19 +618,20 @@ Never emit any block inside your conversational reply. Never emit a block that w
         exerciseType: "translate" | "complete" | "free";
         promptText: string;
         userAnswer: string;
-        learningLang: "ko" | "en" | "es" | "korean" | "english" | "spanish";
-        nativeLang?: "ko" | "en" | "es";
+        learningLang: "ko" | "en" | "es" | "id" | "korean" | "english" | "spanish" | "indonesian";
+        nativeLang?: "ko" | "en" | "es" | "id";
       };
 
       if (!promptText || !userAnswer) {
         return res.status(400).json({ error: "promptText and userAnswer are required" });
       }
 
-      const nativeName = ({ ko: "Korean", en: "English", es: "Spanish" } as const)[(nativeLang ?? "ko") as "ko" | "en" | "es"] ?? "English";
+      const nativeName = ({ ko: "Korean", en: "English", es: "Spanish", id: "Indonesian" } as const)[(nativeLang ?? "ko") as "ko" | "en" | "es" | "id"] ?? "English";
       const learnName = (() => {
         const ll = String(learningLang ?? "").toLowerCase();
         if (ll.startsWith("ko")) return "Korean";
         if (ll.startsWith("es") || ll.startsWith("sp")) return "Spanish";
+        if (ll.startsWith("id") || ll.startsWith("indo")) return "Indonesian";
         return "English";
       })();
 
@@ -1742,7 +1747,7 @@ Student's ${learnName} answer: ${userAnswer}`;
   //
   // Cache: in-process LRU keyed by `${word}|${lang}|${band}|${weakKey}` so a
   // tester repeating "family" with the same weak phoneme gets a snappy reply.
-  type CoachComment = { ko: string; en: string; es: string };
+  type CoachComment = { ko: string; en: string; es: string; id: string };
   type CacheEntry = { value: CoachComment; at: number };
   const COACH_CACHE = new Map<string, CacheEntry>();
   // In-flight requests by cache key — coalesces concurrent identical lookups
@@ -1764,11 +1769,13 @@ Student's ${learnName} answer: ${userAnswer}`;
     const wKo = weakPhonemes.length > 0 ? ` (특히 ${weakPhonemes.join(", ")} 소리에 주의해 보세요.)` : "";
     const wEn = weakPhonemes.length > 0 ? ` Watch out for: ${weakPhonemes.join(", ")}.` : "";
     const wEs = weakPhonemes.length > 0 ? ` Presta atención a: ${weakPhonemes.join(", ")}.` : "";
+    const wId = weakPhonemes.length > 0 ? ` Perhatikan bunyi: ${weakPhonemes.join(", ")}.` : "";
     if (band === "great") {
       return {
         ko: `"${word}" 정말 자연스러웠어요! 이대로 계속 가봐요. 🎉`,
         en: `Your "${word}" sounded natural — keep it up! 🎉`,
         es: `¡Tu "${word}" sonó natural — así se hace! 🎉`,
+        id: `"${word}" terdengar natural. Pertahankan, ya! 🎉`,
       };
     }
     if (band === "good") {
@@ -1776,6 +1783,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         ko: `"${word}" 거의 다 왔어요. 한 번만 더 듣고 따라 해볼까요?${wKo}`,
         en: `"${word}" was close — listen once more and give it another shot.${wEn}`,
         es: `"${word}" estuvo cerca — escucha una vez más e inténtalo.${wEs}`,
+        id: `"${word}" sudah hampir tepat. Dengarkan sekali lagi, lalu coba ulangi.${wId}`,
       };
     }
     if (band === "fair") {
@@ -1785,6 +1793,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         // FIX (es): "reduce cada sílaba" was a mistranslation (reducir = shrink),
         // not "slow down". Use "pronuncia cada sílaba más despacio".
         es: `Para "${word}", pronuncia cada sílaba más despacio. El botón de altavoz ayuda.${wEs}`,
+        id: `Untuk "${word}", perlambat tiap suku kata. Tombol dengar bisa membantu.${wId}`,
       };
     }
     return {
@@ -1792,6 +1801,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       ko: `먼저 듣기 버튼으로 "${word}"의 원어민 발음을 들어봐요. 천천히 함께 가봐요. 🦊`,
       en: `Start by listening to "${word}" with the speaker button. We'll take it slow. 🦊`,
       es: `Empieza escuchando "${word}" con el botón de altavoz. Vamos despacio. 🦊`,
+      id: `Mulai dengan mendengarkan "${word}" lewat tombol speaker. Kita pelan-pelan dulu. 🦊`,
     };
   }
 
@@ -1809,8 +1819,8 @@ Student's ${learnName} answer: ${userAnswer}`;
     try {
       const {
         word,
-        lang,                  // BCP-47 (en-US / es-ES / ko-KR)
-        nativeLang,            // ko / en / es (ISO-like)
+        lang,                  // BCP-47 (en-US / es-ES / ko-KR / id-ID)
+        nativeLang,            // ko / en / es / id (ISO-like)
         score,
         accuracyScore,
         fluencyScore,
@@ -1860,11 +1870,11 @@ Student's ${learnName} answer: ${userAnswer}`;
         }
       }
 
-      // Build the prompt. We always ask for all three languages so the same
-      // cache entry serves Korean/English/Spanish readers — the cost is 3x
+      // Build the prompt. We ask for all UI languages so the same cache entry
+      // serves Korean/English/Spanish/Indonesian readers — the cost is higher
       // output tokens but the hit rate is much higher.
-      const langLabel = lang.startsWith("ko") ? "Korean" : lang.startsWith("es") ? "Spanish" : "English";
-      const nativeLabel = nativeLang === "korean" ? "Korean" : nativeLang === "spanish" ? "Spanish" : "English";
+      const langLabel = lang.startsWith("ko") ? "Korean" : lang.startsWith("es") ? "Spanish" : lang.startsWith("id") ? "Indonesian" : "English";
+      const nativeLabel = nativeLang === "korean" ? "Korean" : nativeLang === "spanish" ? "Spanish" : nativeLang === "indonesian" || nativeLang === "id" ? "Indonesian" : "English";
       const recognizedNote = recognizedText && recognizedText.trim() && recognizedText.trim().toLowerCase() !== trimmedWord.toLowerCase()
         ? `Speech recogniser heard: "${recognizedText.slice(0, 80)}"`
         : "Recogniser heard the word correctly";
@@ -1875,7 +1885,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       // are given. One-shot exemplars pin the voice reliably.
       const systemPrompt = [
         'You are Rudy, a friendly fox-tutor who gives pronunciation coaching to language learners.',
-        'You receive an Azure assessment score and must respond with one SHORT (1-2 sentences) warm, specific coaching comment in EACH of Korean, English, and Spanish.',
+        'You receive an Azure assessment score and must respond with one SHORT (1-2 sentences) warm, specific coaching comment in EACH of Korean, English, Spanish, and Indonesian.',
         'Always:',
         '- Reference the target word by quoting it (e.g. "family", "안녕하세요").',
         '- Be concrete about WHAT to fix when score is below 90 (mention a specific phoneme, syllable, or rhythm).',
@@ -1883,8 +1893,9 @@ Student's ${learnName} answer: ${userAnswer}`;
         '- Korean register example: "정말 좋아요! \'family\'의 \'a\' 소리를 조금만 더 길게 빼볼까요?" — ALWAYS 해요체 (~요/~봐요/~볼까요). NEVER 합니다체 (~합니다/~십시오) and NEVER 반말.',
         '- Spanish register example: "¡Muy bien! Intenta alargar la \'ll\' en \'llamar\'." — ALWAYS tú-form. NEVER usted. Use suaves imperatives.',
         '- English: friendly, lower-case start mid-sentence is fine. Encouraging not corrective.',
+        '- Indonesian: friendly Bahasa Indonesia, casual and clear.',
         '- 1-2 sentences max per language. No emoji unless score >= 90.',
-        '- Return ONLY a JSON object with keys "ko", "en", "es". No prose around it.',
+        '- Return ONLY a JSON object with keys "ko", "en", "es", "id". No prose around it.',
       ].join(' ');
 
       const userPrompt = [
@@ -1917,15 +1928,17 @@ Student's ${learnName} answer: ${userAnswer}`;
           const ko = typeof parsed.ko === "string" ? parsed.ko.trim() : "";
           const en = typeof parsed.en === "string" ? parsed.en.trim() : "";
           const es = typeof parsed.es === "string" ? parsed.es.trim() : "";
+          const id = typeof parsed.id === "string" ? parsed.id.trim() : "";
           // Per-locale partial fallback (QA Bug N6): if GPT misses one locale,
           // keep what it gave and patch the missing one from fallbackCoach
           // rather than throwing away two good locales.
-          if (ko || en || es) {
+          if (ko || en || es || id) {
             const fb = fallbackCoach(trimmedWord, score, weak);
             payload = {
               ko: ko || fb.ko,
               en: en || fb.en,
               es: es || fb.es,
+              id: id || fb.id,
             };
           }
         } catch (e) {
@@ -2331,7 +2344,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         systemPrompt: string;
         targetLang: string;
         messages: { role: "user" | "assistant"; content: string }[];
-        nativeLang?: "ko" | "en" | "es";
+        nativeLang?: "ko" | "en" | "es" | "id";
       };
 
       if (!systemPrompt || !targetLang || !Array.isArray(messages)) {

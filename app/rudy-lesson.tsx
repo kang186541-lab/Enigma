@@ -249,7 +249,7 @@ export default function RudyLessonScreen() {
 function BriefingScreen({
   day, nativeLang, lc, briefingMsg, insets, onStart,
 }: {
-  day: DayData; nativeLang: string; lc: "ko" | "en" | "es";
+  day: DayData; nativeLang: string; lc: "ko" | "en" | "es" | "id";
   briefingMsg: string; insets: ReturnType<typeof useSafeAreaInsets>;
   onStart: () => void;
 }) {
@@ -321,7 +321,7 @@ function LessonScreen({
   day, nativeLang, lc, learningLang, currentStep, totalSteps, stepLabels, stepAnim,
   sentenceCount, speakingGoalNudge, onSentenceSpoken, onStepComplete, onMissionComplete, onReviewComplete, insets,
 }: {
-  day: DayData; nativeLang: string; lc: "ko" | "en" | "es"; learningLang: string;
+  day: DayData; nativeLang: string; lc: "ko" | "en" | "es" | "id"; learningLang: string;
   currentStep: number; totalSteps: number;
   stepLabels: string[]; stepAnim: Animated.Value;
   sentenceCount: number;
@@ -581,7 +581,7 @@ function StepContent({
   stepIndex, day, nativeLang, lc, learningLang, stepLabels,
   onStepComplete, onSentenceSpoken, onMissionComplete, onReviewComplete,
 }: {
-  stepIndex: number; day: DayData; nativeLang: string; lc: "ko" | "en" | "es";
+  stepIndex: number; day: DayData; nativeLang: string; lc: "ko" | "en" | "es" | "id";
   learningLang: string;
   stepLabels: string[]; onStepComplete: () => void;
   onSentenceSpoken: (n: number) => void;
@@ -748,7 +748,7 @@ function NoContentCard({
 function CompleteScreen({
   day, nativeLang, lc, sentenceCount, pronScores, usedVoiceOnly, grammarNotes, insets, wasFirstClear,
 }: {
-  day: DayData; nativeLang: string; lc: "ko" | "en" | "es";
+  day: DayData; nativeLang: string; lc: "ko" | "en" | "es" | "id";
   sentenceCount: number; pronScores: number[]; usedVoiceOnly: boolean;
   grammarNotes: string[]; insets: ReturnType<typeof useSafeAreaInsets>;
   /** True only when the learner cleared this day for the first time — gates the global XP grant. */

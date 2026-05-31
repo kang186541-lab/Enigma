@@ -81,19 +81,20 @@ export async function moderateText(text: string): Promise<ModerationResult> {
 }
 
 /**
- * Localised "please keep it appropriate" reply for the three UI languages.
- * The chat endpoints select by `nativeLang` (ko/en/es); anything else falls
+ * Localised "please keep it appropriate" reply for the UI languages.
+ * The chat endpoints select by `nativeLang` (ko/en/es/id); anything else falls
  * back to English.
  */
-export const MODERATION_SAFE_REPLY: Record<"ko" | "en" | "es", string> = {
+export const MODERATION_SAFE_REPLY: Record<"ko" | "en" | "es" | "id", string> = {
   ko: "대화는 적절하게 유지해 주세요. 다시 시도해 보세요!",
   en: "Let's keep the conversation appropriate. Try again!",
   es: "Mantengamos la conversación apropiada. ¡Inténtalo de nuevo!",
+  id: "Jaga percakapan tetap sopan. Coba lagi!",
 };
 
 /** Pick the localised reply for a `nativeLang` code, defaulting to English. */
 export function safeReplyFor(nativeLang: string | undefined): string {
-  if (nativeLang === "ko" || nativeLang === "en" || nativeLang === "es") {
+  if (nativeLang === "ko" || nativeLang === "en" || nativeLang === "es" || nativeLang === "id") {
     return MODERATION_SAFE_REPLY[nativeLang];
   }
   return MODERATION_SAFE_REPLY.en;

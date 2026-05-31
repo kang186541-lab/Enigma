@@ -18,9 +18,9 @@ type WordScore = {
 
 interface Props {
   wordScores: WordScore[];
-  nativeLang: string;       // "korean" | "spanish" | "english"
-  targetLang: string;       // "korean" | "spanish" | "english"
-  speechLang: string;       // "ko-KR" | "es-ES" | "en-US" etc.
+  nativeLang: string;       // "korean" | "spanish" | "english" | "indonesian"
+  targetLang: string;       // "korean" | "spanish" | "english" | "indonesian"
+  speechLang: string;       // "ko-KR" | "es-ES" | "en-US" | "id-ID" etc.
   onRetry?: () => void;     // retry recording callback
 }
 
@@ -202,6 +202,26 @@ const IPA_READABLE_BY_LANG: Record<string, ReadableMap> = {
     i: { display: "ㅣ", example: "이" },
     o: { display: "ㅗ", example: "오" },
     u: { display: "ㅜ", example: "우" },
+  },
+  indonesian: {
+    a: { display: "a", example: "saya" },
+    e: { display: "e", example: "enak" },
+    i: { display: "i", example: "ini" },
+    o: { display: "o", example: "tolong" },
+    u: { display: "u", example: "ulang" },
+    r: { display: "r", example: "terima" },
+    ng: { display: "ng", example: "dengan" },
+    p: { display: "p", example: "pagi" },
+    b: { display: "b", example: "bisa" },
+    t: { display: "t", example: "tolong" },
+    d: { display: "d", example: "di" },
+    k: { display: "k", example: "kamar" },
+    g: { display: "g", example: "guru" },
+    s: { display: "s", example: "saya" },
+    m: { display: "m", example: "makan" },
+    n: { display: "n", example: "nama" },
+    l: { display: "l", example: "lagi" },
+    h: { display: "h", example: "halo" },
   },
 };
 

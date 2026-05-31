@@ -26,7 +26,7 @@ interface Props {
   sentences: LessonSentence[];
   step1Config?: Step1Config;
   nativeLang: string;
-  lc: "ko" | "en" | "es";
+  lc: "ko" | "en" | "es" | "id";
   onComplete: (spokeSentences: number) => void;
 }
 
@@ -43,7 +43,7 @@ function getStars(score: number): number {
   return 1;
 }
 
-function getMeaning(meaning: Tri, lc: "ko" | "en" | "es"): string {
+function getMeaning(meaning: Tri, lc: "ko" | "en" | "es" | "id"): string {
   return meaning[lc] ?? meaning.en;
 }
 
@@ -607,7 +607,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
           <PhonemeCoaching
             wordScores={wordScores}
             nativeLang={nativeLang}
-            targetLang={sentence.speechLang.startsWith("ko") ? "korean" : sentence.speechLang.startsWith("es") ? "spanish" : "english"}
+            targetLang={sentence.speechLang.startsWith("ko") ? "korean" : sentence.speechLang.startsWith("es") ? "spanish" : sentence.speechLang.startsWith("id") ? "indonesian" : "english"}
             speechLang={sentence.speechLang}
           />
 

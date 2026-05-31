@@ -27,9 +27,6 @@ import { registerGlobalSound, registerGlobalWebAudio } from "@/lib/ttsManager";
 
 const rudyBadge = require("@/assets/rudy_badge.png");
 
-// Indonesian is a native/UI language (Phase 1). The copy helpers below
-// (L / fallbackText) default any non-korean/non-spanish value to the English
-// branch, so indonesian transparently falls back to English coach copy.
 type NativeLang = "korean" | "english" | "spanish" | "indonesian";
 
 interface CoachRequest {
@@ -52,11 +49,11 @@ interface Props extends CoachRequest {
 
 // All copy lives here so each locale string is auditable in one place.
 const L = (nl: NativeLang) => ({
-  header: nl === "korean" ? "코치 한마디" : nl === "spanish" ? "Consejo del coach" : "Coach tip",
-  failed: nl === "korean" ? "루디의 한 마디를 불러오지 못했어요." : nl === "spanish" ? "No se pudo cargar el comentario de Rudy." : "Couldn't load Rudy's note.",
-  retry: nl === "korean" ? "다시 받기" : nl === "spanish" ? "Reintentar" : "Try again",
-  hearWord: nl === "korean" ? "원어민 발음 듣기" : nl === "spanish" ? "Escuchar palabra" : "Hear it",
-  weakLabel: nl === "korean" ? "약한 소리" : nl === "spanish" ? "Sonidos débiles" : "Weak sounds",
+  header: nl === "korean" ? "코치 한마디" : nl === "spanish" ? "Consejo del coach" : nl === "indonesian" ? "Tips pelatih" : "Coach tip",
+  failed: nl === "korean" ? "루디의 한 마디를 불러오지 못했어요." : nl === "spanish" ? "No se pudo cargar el comentario de Rudy." : nl === "indonesian" ? "Catatan Rudy belum bisa dimuat." : "Couldn't load Rudy's note.",
+  retry: nl === "korean" ? "다시 받기" : nl === "spanish" ? "Reintentar" : nl === "indonesian" ? "Coba lagi" : "Try again",
+  hearWord: nl === "korean" ? "원어민 발음 듣기" : nl === "spanish" ? "Escuchar palabra" : nl === "indonesian" ? "Dengar kata" : "Hear it",
+  weakLabel: nl === "korean" ? "약한 소리" : nl === "spanish" ? "Sonidos débiles" : nl === "indonesian" ? "Bunyi lemah" : "Weak sounds",
 });
 
 // Slow target-word TTS so the learner can re-listen as part of the coaching
@@ -100,6 +97,7 @@ function fallbackText(word: string, score: number, nl: NativeLang, weak: string[
   const wKo = weak.length > 0 ? ` (특히 ${weak.join(", ")} 소리.)` : "";
   const wEn = weak.length > 0 ? ` Watch out for: ${weak.join(", ")}.` : "";
   const wEs = weak.length > 0 ? ` Atento a: ${weak.join(", ")}.` : "";
+  const wId = weak.length > 0 ? ` Perhatikan: ${weak.join(", ")}.` : "";
   if (nl === "korean") {
     if (band === "great") return `"${word}" 정말 자연스러웠어요! 🎉`;
     if (band === "good") return `"${word}" 거의 다 왔어요. 한 번만 더 따라 해볼까요?${wKo}`;
@@ -111,6 +109,12 @@ function fallbackText(word: string, score: number, nl: NativeLang, weak: string[
     if (band === "good") return `"${word}" estuvo cerca — escucha una vez más e inténtalo.${wEs}`;
     if (band === "fair") return `Para "${word}", pronuncia cada sílaba más despacio.${wEs}`;
     return `Empieza escuchando "${word}" con el botón de altavoz. 🦊`;
+  }
+  if (nl === "indonesian") {
+    if (band === "great") return `"${word}" terdengar natural! 🎉`;
+    if (band === "good") return `"${word}" sudah hampir tepat — dengarkan sekali lagi dan coba ulangi.${wId}`;
+    if (band === "fair") return `Untuk "${word}", perlambat tiap suku kata.${wId}`;
+    return `Mulai dengan mendengarkan "${word}" lewat tombol speaker. 🦊`;
   }
   if (band === "great") return `Your "${word}" sounded natural! 🎉`;
   if (band === "good") return `"${word}" was close — listen once more and give it another shot.${wEn}`;
@@ -175,10 +179,10 @@ export function CoachingCard(props: Props) {
         return;
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json() as { ko?: string; en?: string; es?: string };
+      const data = await res.json() as { ko?: string; en?: string; es?: string; id?: string };
       if (signal.aborted) return;
       const nl = requestRef.current.nativeLang;
-      const text = nl === "korean" ? data.ko : nl === "spanish" ? data.es : data.en;
+      const text = nl === "korean" ? data.ko : nl === "spanish" ? data.es : nl === "indonesian" ? data.id : data.en;
       if (!text || text.trim() === "") return; // keep placeholder; nothing to upgrade
       setGptComment(text);
       // Cross-fade: placeholder out, GPT in, with a tiny upward slide.

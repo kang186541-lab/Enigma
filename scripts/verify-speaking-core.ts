@@ -49,7 +49,12 @@ const rudyStep1Source = readFileSync("components/rudy/Step1ListenRepeat.tsx", "u
 const rudyStep2Source = readFileSync("components/rudy/Step2KeyPoint.tsx", "utf8");
 const rudyStep3Source = readFileSync("components/rudy/Step3MissionTalk.tsx", "utf8");
 const rudyStep4Source = readFileSync("components/rudy/Step4QuickReview.tsx", "utf8");
+const coachingCardSource = readFileSync("components/rudy/CoachingCard.tsx", "utf8");
+const phonemeCoachingSource = readFileSync("components/rudy/PhonemeCoaching.tsx", "utf8");
+const phonemeCoachingDataSource = readFileSync("data/phonemeCoaching.ts", "utf8");
 const apiFetchWithAuthSource = readFileSync("lib/apiFetchWithAuth.ts", "utf8");
+const chatRoomSource = readFileSync("app/chat-room.tsx", "utf8");
+const moderationSource = readFileSync("server/moderation.ts", "utf8");
 const routesSource = readFileSync("server/routes.ts", "utf8");
 
 const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string[]>> = {
@@ -979,10 +984,22 @@ assert.ok(
   "Rudy Step1 recording should warm up before showing the active recording state, and release the mic stream on a recorder error"
 );
 assert.ok(
-  routesSource.includes("dewi:") &&
+  routesSource.includes("dewi: `You are Dewi, a warm Indonesian tutor") &&
+  routesSource.includes('if (["dewi"].includes(id)) return "Indonesian";') &&
+  routesSource.includes('id: "Indonesian"') &&
+  chatRoomSource.includes('userNativeLang === "indonesian" ? "id"') &&
+  moderationSource.includes('id: "Jaga percakapan tetap sopan. Coba lagi!"') &&
   rudyStep3Source.includes('indonesian: "id-ID"') &&
-  rudyStep3Source.includes('indonesian: "id-ID-ArdiNeural"'),
-  "Indonesian listening must be wired end-to-end: the Dewi tutor needs a server TTS voice (TUTOR_AZURE_VOICES), and Rudy Step3 STT_LANG + RUDY_VOICE must map indonesian to id-ID, otherwise Indonesian audio is read in an English voice or recognized as English"
+  rudyStep3Source.includes('indonesian: "id-ID-ArdiNeural"') &&
+  rudyStep2Source.includes('indonesian: "id-ID"') &&
+  rudyStep4Source.includes('indonesian: "id-ID"') &&
+  rudyStep1Source.includes('sentence.speechLang.startsWith("id") ? "indonesian"') &&
+  dailyCourseDataSource.includes('if (nativeLang === "indonesian") return "id";') &&
+  routesSource.includes('"ko", "en", "es", "id"') &&
+  coachingCardSource.includes('nl === "indonesian" ? data.id') &&
+  phonemeCoachingSource.includes("indonesian: {") &&
+  phonemeCoachingDataSource.includes("const INDONESIAN_PHONEMES"),
+  "Indonesian listening/pronunciation must be wired end-to-end: Dewi needs chat+TTS, all Rudy voice/STT steps need id-ID, native-language routing must send id, and pronunciation coaching must not fall back to English"
 );
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);

@@ -26,18 +26,18 @@ type WordScore = { word: string; score: number; errorType: string; phonemes?: { 
 interface Props {
   data: Step2Data;
   nativeLang: string;
-  lc: "ko" | "en" | "es";
+  lc: "ko" | "en" | "es" | "id";
   learningLang: string;
   onComplete: (spokenAttempts: number) => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function getMeaning(meaning: Tri, lc: "ko" | "en" | "es"): string {
+function getMeaning(meaning: Tri, lc: "ko" | "en" | "es" | "id"): string {
   return meaning[lc] ?? meaning.en;
 }
 
-function getExplanation(explanation: Tri, lc: "ko" | "en" | "es"): string {
+function getExplanation(explanation: Tri, lc: "ko" | "en" | "es" | "id"): string {
   return explanation[lc] ?? explanation.en;
 }
 
@@ -49,6 +49,7 @@ const SPEECH_LANG_MAP: Record<string, string> = {
   english: "en-US",
   spanish: "es-ES",
   korean:  "ko-KR",
+  indonesian: "id-ID",
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────

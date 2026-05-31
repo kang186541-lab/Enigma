@@ -369,17 +369,57 @@ const KOREAN_PHONEMES: PhonemeMap = {
 
 // ── Master lookup ────────────────────────────────────────────────────────
 
+const INDONESIAN_PHONEMES: PhonemeMap = {
+  r: {
+    ko: "인도네시아어 r은 혀끝을 가볍게 굴리는 소리예요. 너무 영어 r처럼 뒤로 당기지 마세요.",
+    en: "Indonesian r is a light tongue tap or roll. Don't pull it back like English r.",
+    es: "La r indonesia vibra o se toca con la punta de la lengua. No la pronuncies como la r inglesa.",
+    id: "Bunyikan r dengan getaran ringan di ujung lidah, jangan ditarik ke belakang seperti r Inggris.",
+  },
+  ng: {
+    ko: "ng는 목 뒤쪽에서 나는 콧소리예요. 한국어 받침 ㅇ처럼 코로 울려 보세요.",
+    en: "Make ng from the back of the mouth, like the final sound in 'sing'.",
+    es: "Haz ng desde la parte posterior de la boca, como el sonido final de 'sing'.",
+    id: "Bunyikan ng dari belakang mulut, seperti bunyi akhir pada kata Inggris 'sing'.",
+  },
+  e: {
+    ko: "e는 너무 길게 끌지 말고 짧고 또렷하게 말해 보세요.",
+    en: "Keep e short and clear. Avoid stretching it into a long English-style vowel.",
+    es: "Mantén la e corta y clara. No la alargues como una vocal inglesa.",
+    id: "Ucapkan e dengan pendek dan jelas. Jangan terlalu dipanjangkan.",
+  },
+  a: {
+    ko: "a는 입을 편하게 열고 한국어 '아'처럼 밝게 내면 좋아요.",
+    en: "Open your mouth comfortably for a, like a clear 'ah'.",
+    es: "Abre la boca de forma natural para la a, como una 'a' clara.",
+    id: "Buka mulut dengan nyaman untuk bunyi a, seperti 'ah' yang jelas.",
+  },
+  t: {
+    ko: "t는 짧고 깨끗하게 끊어 주세요. 영어처럼 숨을 세게 터뜨릴 필요는 없어요.",
+    en: "Keep t short and clean. You do not need the strong English puff of air.",
+    es: "Haz la t breve y limpia. No hace falta aspirarla como en inglés.",
+    id: "Ucapkan t dengan pendek dan jelas. Tidak perlu hembusan udara kuat seperti bahasa Inggris.",
+  },
+  k: {
+    ko: "k는 짧게 닫았다가 열어 주세요. 문장 끝에서는 너무 세게 터뜨리지 않아도 됩니다.",
+    en: "Make k short and crisp. At the end of a word, it can be unreleased and gentle.",
+    es: "Haz la k breve y clara. Al final de palabra puede ser suave, sin explosión fuerte.",
+    id: "Ucapkan k dengan pendek dan jelas. Di akhir kata, bunyinya boleh lembut.",
+  },
+};
+
 const DB: Record<string, PhonemeMap> = {
   english: ENGLISH_PHONEMES,
   spanish: SPANISH_PHONEMES,
   korean: KOREAN_PHONEMES,
+  indonesian: INDONESIAN_PHONEMES,
 };
 
 /**
  * Get a coaching tip for a specific phoneme.
- * @param targetLang - The language being learned (english/spanish/korean)
+ * @param targetLang - The language being learned (english/spanish/korean/indonesian)
  * @param phoneme - The IPA phoneme string from Azure
- * @param nativeLang - The learner's native language (korean/spanish/english)
+ * @param nativeLang - The learner's native language (korean/spanish/english/indonesian)
  * @returns Coaching tip string, or null if no tip found
  */
 export function getCoachingTip(
@@ -389,7 +429,7 @@ export function getCoachingTip(
 ): string | null {
   const tl = targetLang.toLowerCase();
   const nl = nativeLang.toLowerCase();
-  const nlCode = nl === "korean" ? "ko" : nl === "spanish" ? "es" : "en";
+  const nlCode = nl === "korean" ? "ko" : nl === "spanish" ? "es" : nl === "indonesian" || nl === "id" ? "id" : "en";
   const map = DB[tl];
   if (!map) return null;
 
@@ -421,11 +461,11 @@ export function getErrorLabel(
   const nl = nativeLang.toLowerCase();
   switch (errorType.toLowerCase()) {
     case "mispronunciation":
-      return nl === "korean" ? "발음 오류" : nl === "spanish" ? "Error de pronunciación" : "Mispronunciation";
+      return nl === "korean" ? "발음 오류" : nl === "spanish" ? "Error de pronunciación" : nl === "indonesian" ? "Kesalahan pelafalan" : "Mispronunciation";
     case "omission":
-      return nl === "korean" ? "생략됨" : nl === "spanish" ? "Omitido" : "Omitted";
+      return nl === "korean" ? "생략됨" : nl === "spanish" ? "Omitido" : nl === "indonesian" ? "Terlewat" : "Omitted";
     case "insertion":
-      return nl === "korean" ? "추가 발음" : nl === "spanish" ? "Inserción" : "Inserted extra sound";
+      return nl === "korean" ? "추가 발음" : nl === "spanish" ? "Inserción" : nl === "indonesian" ? "Bunyi tambahan" : "Inserted extra sound";
     default:
       return "";
   }

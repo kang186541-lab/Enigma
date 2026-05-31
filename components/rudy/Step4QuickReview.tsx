@@ -24,14 +24,14 @@ type WordScore = { word: string; score: number; errorType: string; phonemes?: { 
 interface Props {
   questions: ReviewQuestion[];
   nativeLang: string;
-  lc: "ko" | "en" | "es";
+  lc: "ko" | "en" | "es" | "id";
   learningLang: string;
   onComplete: (pronScores: number[], spokenAttempts: number) => void;
 }
 
 // ── Helper ────────────────────────────────────────────────────────────────────
 
-function getMeaning(t?: Tri, lc?: "ko" | "en" | "es"): string {
+function getMeaning(t?: Tri, lc?: "ko" | "en" | "es" | "id"): string {
   if (!t || !lc) return "";
   return t[lc] ?? t.en;
 }
@@ -105,7 +105,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   const total   = questions.length;
 
   const STT_LANG: Record<string, string> = {
-    english: "en-US", spanish: "es-ES", korean: "ko-KR",
+    english: "en-US", spanish: "es-ES", korean: "ko-KR", indonesian: "id-ID",
   };
   const sttLang = STT_LANG[learningLang] ?? "en-US";
 
