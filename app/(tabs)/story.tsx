@@ -296,8 +296,12 @@ export default function StoryTab() {
         </Text>
       </LinearGradient>
 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: bottomPad + 16 }}
+      >
       <View style={styles.lingoBanner}>
-        <RudyMascot size={100} mood="excited" />
+        <RudyMascot size={64} mood="excited" />
         <View style={styles.lingoSpeech}>
           <Text style={styles.lingoSpeechText}>{lingoMsg}</Text>
         </View>
@@ -345,13 +349,7 @@ export default function StoryTab() {
         </Pressable>
       )}
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.scroll,
-          { paddingBottom: bottomPad + 16 },
-        ]}
-      >
+      <View style={styles.scroll}>
         {CHAPTERS.map((ch) => {
           const status = getStatus(ch);
           const isLocked = status === "locked";
@@ -592,6 +590,7 @@ export default function StoryTab() {
             </Pressable>
           );
         })}
+      </View>
       </ScrollView>
     </View>
   );
@@ -701,7 +700,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontStyle: "italic",
   },
-  scroll: { paddingHorizontal: 16, paddingTop: 16, gap: 16 },
+  scroll: { paddingHorizontal: 16, paddingTop: 16, gap: 14 },
   card: {
     borderRadius: 24,
     overflow: "hidden",
@@ -713,7 +712,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(201,162,39,0.3)",
   },
-  cardGradient: { padding: 20 },
+  cardGradient: { padding: 18 },
   chapterRow: {
     flexDirection: "row",
     alignItems: "center",
