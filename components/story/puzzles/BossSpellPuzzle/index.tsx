@@ -291,15 +291,28 @@ export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }
   }, [completionGlow, filled, flashOpacity, isComplete, onSolved, playCue, question.spellChunks]);
 
   const hintText = useMemo(() => {
-    if (mistakes >= 5) return tri(question.hints.h3, lang);
+    // The final hint (h3) reveals the answer. Generate it from the actual
+    // spellText (single source of truth) instead of a hand-copied string, so it
+    // can never drift out of sync with the puzzle answer (see the period-mismatch
+    // bug that a hardcoded h3 previously caused) and is correct in every UI lang.
+    if (mistakes >= 5) {
+      const frame =
+        lang === "korean" ? `정답 문장: ${spellText}`
+        : lang === "spanish" ? `Frase correcta: ${spellText}`
+        : lang === "indonesian" ? `Kalimat jawaban: ${spellText}`
+        : `Answer sentence: ${spellText}`;
+      return frame;
+    }
     if (mistakes >= 2) return tri(question.hints.h2, lang);
     if (mistakes >= 1) return tri(question.hints.h1, lang);
     return lang === "korean"
       ? "문이 네 목소리를 기다리고 있어요."
       : lang === "spanish"
         ? "La puerta espera tu voz."
+        : lang === "indonesian"
+        ? "Pintu sedang menunggu suaramu."
         : "The door is waiting for your voice.";
-  }, [lang, mistakes, question.hints]);
+  }, [lang, mistakes, question.hints, spellText]);
 
   const header = lang === "korean"
     ? "보스 주문"

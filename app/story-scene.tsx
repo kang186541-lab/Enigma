@@ -99,7 +99,7 @@ interface FillBlankQ {
   sentence: Tri;
   answer: Tri;
   opts: [Tri, Tri];
-  hints?: { h1: Tri; h2?: Tri; h3?: Tri };
+  hints?: { h1: HintTri; h2?: HintTri; h3?: HintTri };
 }
 interface DialogueChoiceQ {
   prompt: Tri;
@@ -2861,7 +2861,7 @@ const STORIES: Record<string, Story> = {
             hints: {
               h1: { ko: "파라오가 '하늘을 향해 올라가는' 장소는 무엇일까? 수호석은 그 장소 가까이에 숨겨져 있어", en: "What place has pharaohs 'climbing toward the sky'? The stone is hidden close to that place", es: "¿Qué lugar tiene a los faraones 'subiendo hacia el cielo'? La piedra está escondida cerca de ese lugar", id: "Tempat apa yang menggambarkan para firaun 'mendaki menuju langit'? Batu itu tersembunyi dekat tempat tersebut" },
               h2: { ko: "사카라 계단 피라미드 — 수호석은 멀리 있는 게 아니라 바로 근처에 있어", en: "Saqqara step pyramid — the stone isn't far away, it's right nearby", es: "Pirámide escalonada de Saqqara — la piedra no está lejos, está justo cerca", id: "Piramida tangga Saqqara — batu itu tidak jauh, justru ada di dekatnya" },
-              h3: { ko: "답: near (근처에). 수호석은 사카라 피라미드 근처에 숨겨져 있어", en: "Answer: near. The stone is hidden near Saqqara's pyramid", es: "Respuesta: near (cerca de). La piedra está escondida cerca de la pirámide de Saqqara", id: "Jawaban: near (dekat). Batu itu tersembunyi dekat piramida Saqqara" },
+              h3: { ko: "답: near (근처에). 수호석은 사카라 피라미드 근처에 숨겨져 있어", en: "Answer: near. The stone is hidden near Saqqara's pyramid", es: "Respuesta: near (cerca de). La piedra está escondida cerca de la pirámide de Saqqara", id: "Jawaban: near (dekat). Batu itu tersembunyi dekat piramida Saqqara", byLearning: { korean: { ko: "답: 근처에. 수호석은 사카라 피라미드 근처에 숨겨져 있어", en: "Answer: 근처에 (near). The stone is hidden near Saqqara's pyramid", es: "Respuesta: 근처에 (cerca de). La piedra está escondida cerca de la pirámide de Saqqara", id: "Jawaban: 근처에 (dekat). Batu itu tersembunyi dekat piramida Saqqara" }, spanish: { ko: "답: cerca de (근처에). 수호석은 사카라 피라미드 근처에 숨겨져 있어", en: "Answer: cerca de. The stone is hidden near Saqqara's pyramid", es: "Respuesta: cerca de. La piedra está escondida cerca de la pirámide de Saqqara", id: "Jawaban: cerca de (dekat). Batu itu tersembunyi dekat piramida Saqqara" }, indonesian: { ko: "답: dekat (근처에). 수호석은 사카라 피라미드 근처에 숨겨져 있어", en: "Answer: dekat. The stone is hidden near Saqqara's pyramid", es: "Respuesta: dekat (cerca de). La piedra está escondida cerca de la pirámide de Saqqara", id: "Jawaban: dekat. Batu itu tersembunyi dekat piramida Saqqara" } } },
             },
           },
           {
@@ -2874,7 +2874,7 @@ const STORIES: Record<string, Story> = {
             hints: {
               h1: { ko: "미스터 블랙은 모두가 잠든 시간에 계획을 실행하려 해 — 가장 늦은 시간을 생각해봐", en: "Mr. Black plans to act when everyone is asleep — think of the latest time", es: "Mr. Black planea actuar cuando todos duermen — piensa en la hora más tarde", id: "Mr. Black berencana bertindak saat semua orang tidur — pikirkan waktu paling larut" },
               h2: { ko: "밤 12시, 하루가 끝나고 새로운 날이 시작되는 시간", en: "12 AM, when the day ends and a new day begins", es: "Las 12 de la noche, cuando el día termina y uno nuevo empieza", id: "Pukul 12 malam, saat hari berakhir dan hari baru dimulai" },
-              h3: { ko: "답: midnight (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: midnight. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: midnight (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: midnight (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam" },
+              h3: { ko: "답: midnight (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: midnight. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: midnight (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: midnight (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam", byLearning: { korean: { ko: "답: 자정. 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: 자정 (midnight). Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: 자정 (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: 자정 (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam" }, spanish: { ko: "답: medianoche (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: medianoche. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: medianoche. Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: medianoche (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam" }, indonesian: { ko: "답: tengah malam (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: tengah malam. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: tengah malam (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: tengah malam. Mr. Black berencana mengaktifkan Universal Code pada tengah malam" } } },
             },
           },
         ],
@@ -5332,9 +5332,9 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
   const display = confirmed ? sentence.replace("___", `[${selected}]`) : sentence;
 
   const qHints = q.hints;
-  const h1 = qHints ? tri(qHints.h1, lang) : null;
-  const h2 = qHints?.h2 ? tri(qHints.h2, lang) : null;
-  const h3 = qHints?.h3 ? tri(qHints.h3, lang) : null;
+  const h1 = qHints ? resolveHint(qHints.h1, lang, learningLang) : null;
+  const h2 = qHints?.h2 ? resolveHint(qHints.h2, lang, learningLang) : null;
+  const h3 = qHints?.h3 ? resolveHint(qHints.h3, lang, learningLang) : null;
   const allQHints = [h1, h2, h3].filter(Boolean) as string[];
   const hasQHints = allQHints.length > 0;
 
