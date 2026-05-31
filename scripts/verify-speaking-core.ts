@@ -55,6 +55,7 @@ const phonemeCoachingDataSource = readFileSync("data/phonemeCoaching.ts", "utf8"
 const apiFetchWithAuthSource = readFileSync("lib/apiFetchWithAuth.ts", "utf8");
 const chatRoomSource = readFileSync("app/chat-room.tsx", "utf8");
 const moderationSource = readFileSync("server/moderation.ts", "utf8");
+const rateLimitsSource = readFileSync("server/rateLimits.ts", "utf8");
 const routesSource = readFileSync("server/routes.ts", "utf8");
 
 const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string[]>> = {
@@ -994,6 +995,8 @@ assert.ok(
   moderationSource.includes('id: "Jaga percakapan tetap sopan. Coba lagi!"') &&
   moderationSource.includes("function summarizeProviderFailure") &&
   !moderationSource.includes('console.warn("[moderation] omni-moderation-latest call failed; failing open:", err)') &&
+  rateLimitsSource.includes("ipKeyGenerator") &&
+  rateLimitsSource.includes("return `ip:${ipKeyGenerator(ip)}`;") &&
   rudyStep3Source.includes('indonesian: "id-ID"') &&
   rudyStep3Source.includes('indonesian: "id-ID-ArdiNeural"') &&
   rudyStep2Source.includes('indonesian: "id-ID"') &&

@@ -54,7 +54,7 @@
  */
 
 import type { Request, Response, NextFunction, RequestHandler } from "express";
-import rateLimit, { type Options } from "express-rate-limit";
+import rateLimit, { ipKeyGenerator, type Options } from "express-rate-limit";
 
 /**
  * Bucket key for a request. Always returns a non-empty string.
@@ -71,8 +71,10 @@ export function keyFromReq(req: Request): string {
     return `u:${req.userId}`;
   }
   // Express exposes a normalised string in `req.ip` (respects `trust proxy`).
-  // Fall back to a stable placeholder so the limiter never NULL-keys.
-  return `ip:${req.ip || req.socket?.remoteAddress || "unknown"}`;
+  // `ipKeyGenerator` collapses IPv6 subnets so clients cannot rotate within a
+  // /64 and sidestep anonymous limits.
+  const ip = req.ip || req.socket?.remoteAddress || "unknown";
+  return `ip:${ipKeyGenerator(ip)}`;
 }
 
 /** True iff the request carries a verified user identity. */
