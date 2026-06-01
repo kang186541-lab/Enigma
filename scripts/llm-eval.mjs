@@ -127,7 +127,7 @@ async function callOpenAICompatible(provider, key, sys, user, json) {
       { role: "system", content: sys },
       { role: "user", content: user },
     ],
-    max_tokens: 400,
+    max_tokens: 2000,
     temperature: 0.4,
   };
   if (json) body.response_format = { type: "json_object" };
@@ -207,7 +207,7 @@ async function run() {
     }
   }
 
-  const outPath = "scripts/llm-eval-gemini.md";
+  const outPath = "scripts/llm-eval-gemini-fair.md";
   writeFileSync(outPath, out.join("\n"), "utf8");
   console.log(`\nWrote ${outPath}`);
 }
