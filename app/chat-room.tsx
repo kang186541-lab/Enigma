@@ -961,7 +961,12 @@ export default function ChatRoomScreen() {
       });
 
       const data = await res.json();
-      if (res.ok) {
+      // A provider-outage fallback is an HTTP 200 carrying aiUnavailable:true.
+      // It is NOT a real tutor turn — don't award XP, advance the lesson arc, or
+      // pollute the replayed history with the apology (handled by the early
+      // return below). Only genuine AI replies count.
+      const aiUnavailable = res.ok && data?.aiUnavailable === true;
+      if (res.ok && !aiUnavailable) {
         setXpGain(5);
         sessionXpRef.current += 5;
         awardXp(5);
@@ -969,6 +974,16 @@ export default function ChatRoomScreen() {
       const responseText: string = res.ok
         ? (data.reply ?? "...")
         : (tutor.responses[Math.floor(Math.random() * tutor.responses.length)]);
+
+      if (aiUnavailable) {
+        // Show the apology bubble but skip all graded-turn bookkeeping (XP,
+        // correction, history append, turn/phase advance, summary). The finally
+        // block still resets the typing state. We also skip TTS — the message is
+        // in the learner's native language, not the tutor's voice language.
+        const offlineId = Date.now().toString() + "a";
+        setMessages((prev) => [{ id: offlineId, text: responseText, isUser: false }, ...prev]);
+        return;
+      }
 
       // ── Attach correction (if any) to the user message that contained the mistake ──
       const correction = (res.ok && data?.correction && typeof data.correction === "object")

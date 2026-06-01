@@ -1010,6 +1010,10 @@ assert.ok(
   phonemeCoachingDataSource.includes("const INDONESIAN_PHONEMES"),
   "Indonesian listening/pronunciation must be wired end-to-end: Dewi needs chat+TTS, all Rudy voice/STT steps need id-ID, native-language routing must send id, and pronunciation coaching must not fall back to English"
 );
+assert.ok(
+  chatRoomSource.includes("data?.aiUnavailable === true"),
+  "Chat client must honor the aiUnavailable provider-outage flag — a fallback turn must NOT award XP, advance the lesson arc, or be saved into the replayed conversation history"
+);
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);
 assert.equal(completedHomeMission.dailyGoalMet, true);

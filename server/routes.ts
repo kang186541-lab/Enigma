@@ -157,11 +157,17 @@ function shouldReturnChatFallback(err: unknown): boolean {
     (err as { message?: unknown })?.message,
     (err as { error?: { message?: unknown } })?.error?.message,
   ].filter((value): value is string => typeof value === "string").join(" ").toLowerCase();
+  // Match the PROVIDER-UNAVAILABLE shape only (mirror shouldFallbackToClaude in
+  // aiText.ts) — NOT a bare 400, which OpenAI throws for genuine app bugs
+  // (content_policy_violation, context_length_exceeded, malformed request).
+  // Anthropic credit exhaustion is a 400 but carries "credit balance", so the
+  // substring still catches it without masking real 400-class failures.
   return (
-    status === 400 ||
     status === 429 ||
+    (typeof status === "number" && status >= 500) ||
     text.includes("insufficient_quota") ||
     text.includes("credit balance") ||
+    text.includes("rate_limit") ||
     text.includes("too many requests")
   );
 }
@@ -177,20 +183,26 @@ function summarizeAiProviderFailure(err: unknown): string {
 }
 
 function offlineChatReplyFor(tutorId: string | undefined, nativeLang: string | undefined): string {
-  const id = (tutorId ?? "").toLowerCase();
-  if (id === "dewi") {
-    return "Maaf, koneksi AI sedang bermasalah. Kita tetap bisa latihan: coba ucapkan satu kalimat pendek dalam bahasa Indonesia.";
+  // The learner READS this message, so prefer their NATIVE language; only fall
+  // back to the tutor's taught language when the native language is unknown.
+  const nl = (nativeLang ?? "").toLowerCase();
+  if (nl === "ko" || nl === "korean") {
+    return "죄송해요, 지금 AI 연결이 불안정해요. 그래도 짧은 문장 하나로 계속 연습해 볼까요?";
   }
-  const lang = tutorLanguageFullName(id);
-  if (lang === "Spanish") {
-    return "Perdón, la conexión de IA está fallando. Sigamos con una frase corta: escribe o di una oración sencilla en español.";
+  if (nl === "es" || nl === "spanish") {
+    return "Perdón, la conexión de IA está fallando. Sigamos: di o escribe una frase corta y vuelve a tocar.";
   }
-  if (lang === "Korean") {
-    return "죄송해요, 지금 AI 연결이 불안정해요. 그래도 짧은 한국어 문장 하나로 계속 연습해 볼까요?";
+  if (nl === "id" || nl === "indonesian") {
+    return "Maaf, koneksi AI sedang bermasalah. Kita tetap bisa latihan: coba ucapkan satu kalimat pendek lalu ketuk lagi.";
   }
-  if (nativeLang === "id") {
-    return "Maaf, koneksi AI sedang bermasalah. Coba lagi sebentar lagi, atau latih satu kalimat pendek dulu.";
+  if (nl === "en" || nl === "english") {
+    return "Sorry, the AI connection is having trouble. We can still practice: try one short sentence and then tap again.";
   }
+  // Unknown native language → tiebreak on the tutor's taught language.
+  const lang = tutorLanguageFullName((tutorId ?? "").toLowerCase());
+  if (lang === "Korean") return "죄송해요, 지금 AI 연결이 불안정해요. 그래도 짧은 문장 하나로 계속 연습해 볼까요?";
+  if (lang === "Spanish") return "Perdón, la conexión de IA está fallando. Sigamos con una frase corta.";
+  if (lang === "Indonesian") return "Maaf, koneksi AI sedang bermasalah. Coba satu kalimat pendek dulu.";
   return "Sorry, the AI connection is having trouble. We can still practice: try one short sentence and then tap again.";
 }
 
