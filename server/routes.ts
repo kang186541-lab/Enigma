@@ -771,7 +771,7 @@ Student's ${learnName} answer: ${userAnswer}`;
           parsed = JSON.parse(jsonStr);
           source = "claude-sonnet-4-5";
         } catch (e) {
-          console.warn("[/api/writing-eval] Claude call failed, falling back to GPT-4o:", e);
+          console.warn("[/api/writing-eval] Claude call failed, falling back to GPT-4o:", summarizeAiProviderFailure(e));
           parsed = null;
         }
       }

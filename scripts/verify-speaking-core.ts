@@ -1014,6 +1014,11 @@ assert.ok(
   (chatRoomSource.split("data?.aiUnavailable === true").length - 1) >= 2,
   "BOTH chat paths must honor the aiUnavailable provider-outage flag: (1) the opening-greeting fetch must early-return so the static greeting stays — no history write, no TTS of the native-language apology; (2) sendMessage must skip XP / correction / history append / turn+phase advance. Each path needs its own `data?.aiUnavailable === true` guard."
 );
+assert.ok(
+  routesSource.includes('Claude call failed, falling back to GPT-4o:", summarizeAiProviderFailure(e)') &&
+  !routesSource.includes('Claude call failed, falling back to GPT-4o:", e)'),
+  "writing-eval's direct Claude fallback path must not log the raw provider error object"
+);
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);
 assert.equal(completedHomeMission.dailyGoalMet, true);
