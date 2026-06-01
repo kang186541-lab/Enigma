@@ -1,5 +1,6 @@
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { anthropic, hasAnthropic } from "./anthropic";
+import { deepseek, hasDeepSeek, DEEPSEEK_MODEL } from "./deepseek";
 import { openai } from "./openai";
 
 type TextRole = "system" | "user" | "assistant";
@@ -22,6 +23,12 @@ function openAiErrorCode(error: unknown): string | undefined {
   return err.code ?? err.error?.code ?? err.error?.type ?? (err.status ? String(err.status) : undefined);
 }
 
+/**
+ * True when a provider error is transient / capacity-related (quota, rate
+ * limit, 5xx, timeout, network) and we should try the NEXT provider in the
+ * chain (DeepSeek → OpenAI → Claude). A bare 400 (real request bug) is
+ * deliberately excluded so genuine bugs surface instead of being masked.
+ */
 function shouldFallbackToClaude(error: unknown): boolean {
   const err = error as {
     status?: number;
@@ -92,6 +99,25 @@ function imageSourceFromDataUrl(imageBase64: string): { mediaType: string; data:
   return { mediaType: "image/png", data: imageBase64 };
 }
 
+async function callDeepSeek(
+  messages: TextMessage[],
+  maxTokens: number,
+  temperature: number | undefined,
+  responseFormat: { type: "json_object" } | undefined,
+): Promise<string> {
+  if (!deepseek) throw new Error("DeepSeek is not configured.");
+  const request: Parameters<typeof deepseek.chat.completions.create>[0] = {
+    model: DEEPSEEK_MODEL,
+    messages: messages as ChatCompletionMessageParam[],
+    max_tokens: maxTokens,
+  };
+  if (temperature !== undefined) request.temperature = temperature;
+  if (responseFormat) request.response_format = responseFormat;
+
+  const completion = (await deepseek.chat.completions.create(request as any)) as any;
+  return completion.choices[0]?.message?.content?.trim() ?? "";
+}
+
 export async function completeText(options: CompleteTextOptions): Promise<string> {
   const {
     taskLabel,
@@ -102,7 +128,24 @@ export async function completeText(options: CompleteTextOptions): Promise<string
     responseFormat,
   } = options;
 
-  let openAiError: unknown;
+  // ── 1. DeepSeek-V3 — PRIMARY when DEEPSEEK_API_KEY is set ────────────────
+  // ~10x cheaper than gpt-4o with comparable tutor-task quality (KO/EN/ES/ID),
+  // and the only provider with live credit when OpenAI/Anthropic are exhausted
+  // — so the tutor keeps working. On a transient error we fall through to the
+  // OpenAI → Claude chain; a real 400 still throws (surfaces the bug).
+  let primaryError: unknown;
+  if (hasDeepSeek()) {
+    try {
+      return await callDeepSeek(messages, maxTokens, temperature, responseFormat);
+    } catch (error) {
+      primaryError = error;
+      if (!shouldFallbackToClaude(error)) throw error;
+      console.warn(`[aiText] DeepSeek unavailable for ${taskLabel} (${openAiErrorCode(error)}); trying OpenAI/Claude.`);
+    }
+  }
+
+  // ── 2. OpenAI ────────────────────────────────────────────────────────────
+  let openAiError: unknown = primaryError;
   const canTryOpenAi = Date.now() >= openAiBlockedUntil;
 
   if (canTryOpenAi) {
