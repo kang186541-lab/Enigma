@@ -1567,7 +1567,7 @@ Student's ${learnName} answer: ${userAnswer}`;
           feedback = note || templatedFeedbackId(score);
         }
       } catch (e) {
-        console.warn("[assess-id] GPT judgment failed, using formula score:", (e as Error)?.message ?? e);
+        console.warn("[assess-id] GPT judgment failed, using formula score:", summarizeAiProviderFailure(e));
         // feedback / score already hold the formula-based values.
       }
     }
@@ -2047,7 +2047,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         COACH_IN_FLIGHT.delete(cacheKey);
       }
     } catch (err) {
-      console.error("Coach endpoint error:", err);
+      if (!logAiProviderOutage("[/api/pronunciation-coach]", err)) console.error("[/api/pronunciation-coach] unexpected error:", err);
       return res.status(500).json({ error: "Coaching failed" });
     }
   });
@@ -2093,7 +2093,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         feedback: parsed.feedback ?? "",
       });
     } catch (err) {
-      console.error("GPT score error:", err);
+      if (!logAiProviderOutage("[/api/gpt-score]", err)) console.error("[/api/gpt-score] unexpected error:", err);
       res.status(500).json({ error: "Scoring failed" });
     }
   });
@@ -2611,7 +2611,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       });
       res.json({ recognized });
     } catch (err) {
-      console.error("Handwriting recognize error:", err);
+      if (!logAiProviderOutage("[/api/handwriting-recognize]", err)) console.error("[/api/handwriting-recognize] unexpected error:", err);
       res.status(500).json({ error: "Recognition failed" });
     }
   });
@@ -2638,7 +2638,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       });
       res.json({ reply: raw });
     } catch (err) {
-      console.error("Quiz evaluate error:", err);
+      if (!logAiProviderOutage("[/api/quiz-evaluate]", err)) console.error("[/api/quiz-evaluate] unexpected error:", err);
       res.status(500).json({ error: "Evaluation failed" });
     }
   });
@@ -2678,7 +2678,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       } catch { /* not JSON, use raw */ }
       res.json({ reply: parsedReply, ...extra });
     } catch (err) {
-      console.error("Quiz roleplay error:", err);
+      if (!logAiProviderOutage("[/api/quiz-roleplay]", err)) console.error("[/api/quiz-roleplay] unexpected error:", err);
       res.status(500).json({ error: "Roleplay failed" });
     }
   });
