@@ -25,31 +25,31 @@ import { writeFileSync } from "node:fs";
 const PROVIDERS = [
   {
     id: "deepseek-v3",
-    label: "DeepSeek-V3",
+    label: "DeepSeek-V3 (incumbent, direct)",
     kind: "openai",
     baseUrl: "https://api.deepseek.com/v1",
     model: "deepseek-chat",
     keyEnv: "DEEPSEEK_API_KEY",
   },
   {
-    id: "qwen-2.5-72b",
-    label: "Qwen2.5-72B (OpenRouter)",
+    id: "gemini-2.5-flash",
+    label: "Gemini 2.5 Flash (OpenRouter)",
     kind: "openai",
     baseUrl: "https://openrouter.ai/api/v1",
-    model: "qwen/qwen-2.5-72b-instruct",
+    model: "google/gemini-2.5-flash",
     keyEnv: "OPENROUTER_API_KEY",
   },
   {
-    id: "gpt-4o",
-    label: "GPT-4o — premium baseline (OpenRouter)",
+    id: "gemini-2.5-pro",
+    label: "Gemini 2.5 Pro (OpenRouter)",
     kind: "openai",
     baseUrl: "https://openrouter.ai/api/v1",
-    model: "openai/gpt-4o",
+    model: "google/gemini-2.5-pro",
     keyEnv: "OPENROUTER_API_KEY",
   },
   {
     id: "claude",
-    label: "Claude Sonnet 4.5 — premium baseline (OpenRouter)",
+    label: "Claude Sonnet 4.5 — quality anchor (OpenRouter)",
     kind: "openai",
     baseUrl: "https://openrouter.ai/api/v1",
     model: "anthropic/claude-sonnet-4.5",
@@ -207,7 +207,7 @@ async function run() {
     }
   }
 
-  const outPath = "scripts/llm-eval-output.md";
+  const outPath = "scripts/llm-eval-gemini.md";
   writeFileSync(outPath, out.join("\n"), "utf8");
   console.log(`\nWrote ${outPath}`);
 }
