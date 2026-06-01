@@ -1,6 +1,7 @@
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { anthropic, hasAnthropic } from "./anthropic";
 import { deepseek, hasDeepSeek, DEEPSEEK_MODEL } from "./deepseek";
+import { gemini, hasGemini, GEMINI_VISION_MODEL } from "./gemini";
 import { openai } from "./openai";
 
 type TextRole = "system" | "user" | "assistant";
@@ -97,6 +98,31 @@ function imageSourceFromDataUrl(imageBase64: string): { mediaType: string; data:
     return { mediaType: match[1], data: match[2] };
   }
   return { mediaType: "image/png", data: imageBase64 };
+}
+
+async function callGeminiImageText(
+  imageBase64: string,
+  prompt: string,
+  maxTokens: number,
+): Promise<string> {
+  if (!gemini) throw new Error("Gemini is not configured.");
+  const imageUrl = imageBase64.startsWith("data:")
+    ? imageBase64
+    : `data:image/png;base64,${imageBase64}`;
+  const completion = await gemini.chat.completions.create({
+    model: GEMINI_VISION_MODEL,
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "image_url", image_url: { url: imageUrl } },
+          { type: "text", text: prompt },
+        ],
+      },
+    ],
+    max_tokens: maxTokens,
+  } as any) as any;
+  return completion.choices[0]?.message?.content?.trim() ?? "";
 }
 
 async function callDeepSeek(
@@ -206,6 +232,20 @@ export async function completeImageText(options: {
     maxTokens = 300,
   } = options;
 
+  // Gemini 2.5 Flash is the primary vision provider when configured. This is
+  // intentionally scoped to image/handwriting recognition only; text tutoring
+  // remains on DeepSeek. If Gemini has a quota/network/config hiccup, fall back
+  // to the previous OpenAI -> Claude vision path so handwriting still works.
+  let visionError: unknown;
+  if (hasGemini()) {
+    try {
+      return await callGeminiImageText(imageBase64, prompt, maxTokens);
+    } catch (error) {
+      visionError = error;
+      console.warn(`[aiText] Gemini vision unavailable for ${taskLabel} (${openAiErrorCode(error)}); trying OpenAI/Claude vision.`);
+    }
+  }
+
   let openAiError: unknown;
   const canTryOpenAi = Date.now() >= openAiBlockedUntil;
 
@@ -234,11 +274,11 @@ export async function completeImageText(options: {
       console.warn(`[aiText] OpenAI unavailable for ${taskLabel} (${openAiErrorCode(error)}); falling back to Claude vision.`);
     }
   } else if (!hasAnthropic() || !anthropic) {
-    throw openAiError ?? new Error("OpenAI is temporarily unavailable and Claude fallback is not configured.");
+    throw openAiError ?? visionError ?? new Error("OpenAI is temporarily unavailable and Claude fallback is not configured.");
   }
 
   if (!anthropic) {
-    throw openAiError ?? new Error("Claude fallback is not configured.");
+    throw openAiError ?? visionError ?? new Error("Claude fallback is not configured.");
   }
 
   const image = imageSourceFromDataUrl(imageBase64);

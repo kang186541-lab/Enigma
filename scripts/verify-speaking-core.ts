@@ -57,6 +57,8 @@ const chatRoomSource = readFileSync("app/chat-room.tsx", "utf8");
 const moderationSource = readFileSync("server/moderation.ts", "utf8");
 const rateLimitsSource = readFileSync("server/rateLimits.ts", "utf8");
 const routesSource = readFileSync("server/routes.ts", "utf8");
+const aiTextSource = readFileSync("server/aiText.ts", "utf8");
+const geminiSource = readFileSync("server/gemini.ts", "utf8");
 
 const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string[]>> = {
   english: {
@@ -1018,6 +1020,16 @@ assert.ok(
   routesSource.includes('Claude call failed, falling back to GPT-4o:", summarizeAiProviderFailure(e)') &&
   !routesSource.includes('Claude call failed, falling back to GPT-4o:", e)'),
   "writing-eval's direct Claude fallback path must not log the raw provider error object"
+);
+assert.ok(
+  geminiSource.includes('baseURL: process.env.GEMINI_BASE_URL ?? "https://generativelanguage.googleapis.com/v1beta/openai/"') &&
+  geminiSource.includes('process.env.GEMINI_VISION_MODEL ?? "gemini-2.5-flash"') &&
+  aiTextSource.includes("import { gemini, hasGemini, GEMINI_VISION_MODEL } from \"./gemini\"") &&
+  aiTextSource.includes("async function callGeminiImageText") &&
+  aiTextSource.includes("if (hasGemini())") &&
+  aiTextSource.includes("Gemini vision unavailable") &&
+  aiTextSource.includes("trying OpenAI/Claude vision"),
+  "Handwriting/image recognition should use Gemini 2.5 Flash first when GEMINI_API_KEY is configured, with the existing OpenAI/Claude vision fallback preserved"
 );
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);

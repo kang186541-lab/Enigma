@@ -11,8 +11,9 @@ import OpenAI from "openai";
  * Korean production), and it keeps live credit when the OpenAI / Anthropic
  * quotas are exhausted — so the tutor keeps actually working.
  *
- * Vision (completeImageText) and moderation stay on OpenAI: `deepseek-chat`
- * is text-only.
+ * Vision (completeImageText) uses Gemini first when configured, then the
+ * existing OpenAI/Claude vision fallback. Moderation stays on OpenAI:
+ * `deepseek-chat` is text-only.
  *
  * Safe to import when DEEPSEEK_API_KEY is unset — gate calls behind
  * hasDeepSeek(); completeText() then falls back to its prior OpenAI-first path
