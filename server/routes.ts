@@ -182,6 +182,24 @@ function summarizeAiProviderFailure(err: unknown): string {
   return `${name} ${status}`;
 }
 
+/**
+ * Redacted error logging for an AI-provider failure in any endpoint. Mirrors
+ * logProviderError's philosophy: never write the raw provider error (which can
+ * carry response-body fragments, quota details, or echoed request content) into
+ * the ~30-day server logs. A provider-outage shape logs a one-line redacted
+ * summary; the caller re-logs genuinely unexpected errors in full for debugging.
+ * Status codes are intentionally left unchanged (the clients already degrade
+ * gracefully on !res.ok), so this is a pure log-hygiene helper.
+ * Returns true when it recognised + logged a provider outage.
+ */
+function logAiProviderOutage(scope: string, err: unknown): boolean {
+  if (shouldReturnChatFallback(err)) {
+    console.warn(`${scope} AI provider unavailable:`, summarizeAiProviderFailure(err));
+    return true;
+  }
+  return false;
+}
+
 function offlineChatReplyFor(tutorId: string | undefined, nativeLang: string | undefined): string {
   // The learner READS this message, so prefer their NATIVE language; only fall
   // back to the tutor's taught language when the native language is unknown.
@@ -774,7 +792,7 @@ Student's ${learnName} answer: ${userAnswer}`;
           parsed = JSON.parse(raw);
           source = source === "claude-sonnet-4-5" ? "claude-failed-gpt-fallback" : "gpt-4o";
         } catch (e) {
-          console.error("[/api/writing-eval] Both Claude and GPT failed:", e);
+          if (!logAiProviderOutage("[/api/writing-eval]", e)) console.error("[/api/writing-eval] Both Claude and GPT failed:", e);
           return res.status(500).json({ error: "Failed to evaluate writing" });
         }
       }
@@ -831,7 +849,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       console.log(`[/api/writing-eval] ${source} · ${nativeName}→${learnName} · score=${score}`);
       res.json({ score, feedback, corrections });
     } catch (err) {
-      console.error("[/api/writing-eval] error:", err);
+      if (!logAiProviderOutage("[/api/writing-eval]", err)) console.error("[/api/writing-eval] error:", err);
       res.status(500).json({ error: "Failed to evaluate writing" });
     }
   });
@@ -861,7 +879,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       });
       res.json({ translation });
     } catch (err) {
-      console.error("Translation error:", err);
+      if (!logAiProviderOutage("[/api/translate]", err)) console.error("[/api/translate] unexpected error:", err);
       res.status(500).json({ error: "Failed to translate" });
     }
   });
@@ -2404,7 +2422,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         choices,
       });
     } catch (err) {
-      console.error("NPC chat error:", err);
+      if (!logAiProviderOutage("[/api/npc-chat]", err)) console.error("[/api/npc-chat] unexpected error:", err);
       res.status(500).json({ error: "NPC chat failed" });
     }
   });
@@ -2494,7 +2512,7 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       res.json({ reply, sentenceCount, grammarNote, shouldEnd });
     } catch (err) {
-      console.error("Mission chat error:", err);
+      if (!logAiProviderOutage("[/api/mission-chat]", err)) console.error("[/api/mission-chat] unexpected error:", err);
       res.status(500).json({ error: "Mission chat failed" });
     }
   });
@@ -2569,7 +2587,7 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       res.json({ word, meaning, partOfSpeech, example, sentenceTranslation });
     } catch (err) {
-      console.error("Word lookup error:", err);
+      if (!logAiProviderOutage("[/api/word-lookup]", err)) console.error("[/api/word-lookup] unexpected error:", err);
       res.status(500).json({ error: "Word lookup failed" });
     }
   });

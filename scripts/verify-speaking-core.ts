@@ -1011,8 +1011,8 @@ assert.ok(
   "Indonesian listening/pronunciation must be wired end-to-end: Dewi needs chat+TTS, all Rudy voice/STT steps need id-ID, native-language routing must send id, and pronunciation coaching must not fall back to English"
 );
 assert.ok(
-  chatRoomSource.includes("data?.aiUnavailable === true"),
-  "Chat client must honor the aiUnavailable provider-outage flag — a fallback turn must NOT award XP, advance the lesson arc, or be saved into the replayed conversation history"
+  (chatRoomSource.split("data?.aiUnavailable === true").length - 1) >= 2,
+  "BOTH chat paths must honor the aiUnavailable provider-outage flag: (1) the opening-greeting fetch must early-return so the static greeting stays — no history write, no TTS of the native-language apology; (2) sendMessage must skip XP / correction / history append / turn+phase advance. Each path needs its own `data?.aiUnavailable === true` guard."
 );
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);

@@ -647,6 +647,13 @@ export default function ChatRoomScreen() {
         if (cancelled) return;
         if (!res.ok) return;
         const data = await res.json();
+        // A provider-outage fallback is HTTP 200 + aiUnavailable:true — a native-
+        // language apology, NOT a real tutor greeting. Don't upgrade the static
+        // greeting with it, don't store it in conversationHistoryRef (would poison
+        // the replayed context), and don't speakMsg it (it's in the learner's
+        // native language, not the tutor's voice language). Keep the static
+        // greeting already shown + seeded + spoken in STEP 1 above.
+        if (data?.aiUnavailable === true) return;
         const reply: string = (typeof data?.reply === "string" && data.reply.trim()) ? data.reply : "";
         if (!reply || cancelled) return;
         // Upgrade the existing static greeting with the API-generated one.
