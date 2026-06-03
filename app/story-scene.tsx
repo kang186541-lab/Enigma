@@ -51,6 +51,7 @@ const ch2IsabelPortraitImg = require("@/assets/story/dialogue_sprites/ch2_isabel
 const ch2MiguelPortraitImg = require("@/assets/story/dialogue_sprites/ch2_miguel_sprite.png");
 const miguelFestivalMemoryImg = require("@/assets/story/characters/miguel/miguel_festival_memory.png");
 const ch2CarlosPortraitImg = require("@/assets/story/dialogue_sprites/ch2_carlos_sprite.png");
+const carlosColorReturningRestorerImg = require("@/assets/story/characters/carlos/carlos_color_returning_restorer.png");
 const ch3BossPalaceImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace.png");
 const ch3MinhoPortraitImg = require("@/assets/story/dialogue_sprites/ch3_minho_sprite.png");
 const minhoStreetwiseGuideImg = require("@/assets/story/characters/minho/minho_streetwise_guide.png");
@@ -112,6 +113,10 @@ const isabelExpressionSprites = {
 
 const miguelExpressionSprites = {
   festival_memory: miguelFestivalMemoryImg,
+};
+
+const carlosExpressionSprites = {
+  color_returning_restorer: carlosColorReturningRestorerImg,
 };
 
 const minhoExpressionSprites = {
@@ -339,7 +344,7 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "gruff_guard" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "festival_memory" | "streetwise_guide" | "storyteller" | "diagnostic_focus" | "warm_wisdom" | "flat_delivery" | "protective_archivist";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "gruff_guard" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "festival_memory" | "color_returning_restorer" | "streetwise_guide" | "storyteller" | "diagnostic_focus" | "warm_wisdom" | "flat_delivery" | "protective_archivist";
 
 const characterExpressionFallbacks: Partial<Record<string, Partial<Record<StoryCharacterExpression, ImageSourcePropType>>>> = {
   tom: tomExpressionSprites,
@@ -3542,7 +3547,7 @@ const MADRID_V21_STORY: Story = {
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#C8232C", portrait: ch2IsabelPortraitImg, portraitVariants: isabelExpressionSprites },
     { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", nameId: "Don Miguel", side: "right", avatarBg: "#8B5A2B", portrait: ch2MiguelPortraitImg, portraitVariants: miguelExpressionSprites },
-    { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", nameId: "Carlos", side: "right", avatarBg: "#6E4A35", portrait: ch2CarlosPortraitImg },
+    { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", nameId: "Carlos", side: "right", avatarBg: "#6E4A35", portrait: ch2CarlosPortraitImg, portraitVariants: carlosExpressionSprites },
     { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg, portraitVariants: eleanorExpressionSprites },
   ],
   sequence: [
@@ -3839,6 +3844,7 @@ const MADRID_V21_STORY: Story = {
       kind: "scene",
       charId: "carlos",
       backdrop: "madrid-restored",
+      expression: "color_returning_restorer",
       text: "*breathing hard* I could hear everyone, but every word came back polished, smooth, empty. Isabel. Thank you. I thought nobody would find the color.",
       textKo: "*거칠게 숨을 쉬며* 모두의 목소리가 들렸지만, 모든 단어가 매끈하고 비어 있는 말로 돌아왔어요. 이사벨. 고마워요. 아무도 그 색을 찾지 못할 줄 알았어요.",
       textKoMix: "*거칠게 숨을 쉬며* 모두의 voice가 들렸지만, 모든 word가 smooth하고 empty하게 돌아왔어요. Isabel. Thank you. 아무도 color를 찾지 못할 줄 알았어요.",

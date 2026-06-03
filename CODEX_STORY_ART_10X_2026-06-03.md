@@ -248,6 +248,7 @@ assets/story/characters/mira/mira_flat_delivery.png
 assets/story/characters/amira/amira_protective_archivist.png
 assets/story/characters/youngsook/youngsook_warm_wisdom.png
 assets/story/characters/miguel/miguel_festival_memory.png
+assets/story/characters/carlos/carlos_color_returning_restorer.png
 assets/story/characters/tom/tom_gruff_guard.png
 assets/story/characters/minho/minho_streetwise_guide.png
 ```
@@ -282,14 +283,16 @@ Visual verification:
 - Amira now has an authored `protective_archivist` sprite. It is wired to Cairo's archive-loss warning, Ellis journal reveal, and restored-fragment proof beat, so her role reads as an active guardian of records rather than a static explainer.
 - Youngsook now has an authored `warm_wisdom` sprite. It is wired only to active Seoul food-as-teaching beats: the first soup welcome, the stew/sentence-order metaphor, and the final "one more bite" farewell. Story text, quiz prompts, answer data, and sequence order remain unchanged.
 - Don Miguel now has an authored `festival_memory` sprite. It is wired only to active Madrid beats where he remembers the imperfect plaza, points toward the sealed stage, and defines festival as mistakes, accent, and repainted red. Story text, quiz prompts, answer data, and sequence order remain unchanged.
+- Sidecar reviewer Turing ranked Carlos's restored-plaza recovery as the safest single-use Madrid payoff. Carlos now has an authored `color_returning_restorer` sprite wired only to the active post-boss line where he is breathing hard and realizes the color has returned. Story text, quiz prompts, answer data, and sequence order remain unchanged.
 - Sidecar reviewer Gibbs ranked Tom as the next highest-value recurring character, because he anchors the first playable gatekeeper scene and returns for Babel's connection callback. Tom now has an authored `gruff_guard` sprite wired to the London entrance challenge, London reluctant approval / "Break a leg" beat, and Babel connection-gate callback. Story text, quiz prompts, answer data, and sequence order remain unchanged.
 - Sidecar reviewer Turing ranked Minho ahead of Carlos for this pass, because Minho anchors Seoul's first human contact and the post-puzzle route handoff while Carlos currently has one active speaking payoff after the Madrid boss. Minho now has an authored `streetwise_guide` sprite wired only to those two active Seoul guide beats. Story text, quiz prompts, answer data, and sequence order remain unchanged.
 - Local web capture confirmed Seoul 3/27 renders `minho_streetwise_guide` over the Seoul palace/subway backdrop: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\minho-streetwise-guide-seoul.png`.
-- Latest asset audit: 105 story PNGs, 218,192,985 bytes total, 35 character assets, warnings 0.
+- Local web autoplay confirmed Madrid 14/21 renders `carlos_color_returning_restorer` over the restored-festival backdrop after solving the four Madrid active-route puzzles: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\carlos-color-returning-restorer-madrid.png`.
+- Latest asset audit: 106 story PNGs, 220,445,163 bytes total, 36 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, Don Miguel, and Minho now each have authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast. Next likely target: Carlos.
+- Most dialogue sprites are still cutouts from the current portrait set, not full expression sheets. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, Don Miguel, Carlos, and Minho now each have at least one authored emotional/action pose, but true Ace Attorney-quality integration still needs broader expression sheets and more scene-specific staging for secondary beats.
 
 ## QA Command
 
@@ -301,12 +304,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 105 PNG files.
-- 218.19 MB total.
+- 106 PNG files.
+- 220.45 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 35 files, 59.14 MB, 25.6% average brightness.
+- character: 36 files, 61.29 MB, 25.7% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.
