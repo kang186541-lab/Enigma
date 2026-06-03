@@ -41,31 +41,35 @@ import { EmojiText } from "@/components/EmojiText";
 
 const rudyStoryImg = require("@/assets/rudy_story.png");
 const ch1BossDoorImg = require("@/assets/story/chapter1_motion_comic/ch1_boss_door.png");
-const ch1TomPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_tom.png");
-const ch1EleanorPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_eleanor.png");
-const ch1EllisPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_ellis.png");
-const ch1BlackCctvImg = require("@/assets/story/chapter1_motion_comic/ch1_intro_black_cctv.png");
+const ch1TomPortraitImg = require("@/assets/story/dialogue_sprites/ch1_tom_sprite.png");
+const ch1EleanorPortraitImg = require("@/assets/story/dialogue_sprites/ch1_eleanor_sprite.png");
+const ch1EllisPortraitImg = require("@/assets/story/dialogue_sprites/ch1_ellis_sprite.png");
+const ch1BlackCctvImg = require("@/assets/story/dialogue_sprites/ch1_black_cctv_sprite.png");
 const ch2BossStageImg = require("@/assets/story/chapter2_motion_comic/ch2_boss_stage.png");
-const ch2IsabelPortraitImg = require("@/assets/story/chapter2_motion_comic/ch2_portrait_isabel.png");
-const ch2MiguelPortraitImg = require("@/assets/story/chapter2_motion_comic/ch2_portrait_miguel.png");
-const ch2CarlosPortraitImg = require("@/assets/story/chapter2_motion_comic/ch2_portrait_carlos.png");
+const ch2IsabelPortraitImg = require("@/assets/story/dialogue_sprites/ch2_isabel_sprite.png");
+const ch2MiguelPortraitImg = require("@/assets/story/dialogue_sprites/ch2_miguel_sprite.png");
+const ch2CarlosPortraitImg = require("@/assets/story/dialogue_sprites/ch2_carlos_sprite.png");
 const ch3BossPalaceImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace.png");
-const ch3MinhoPortraitImg = require("@/assets/story/chapter3_motion_comic/ch3_portrait_minho.png");
-const ch3YoungsookPortraitImg = require("@/assets/story/chapter3_motion_comic/ch3_portrait_youngsook.png");
-const ch3SujinPortraitImg = require("@/assets/story/chapter3_motion_comic/ch3_portrait_sujin.png");
+const ch3MinhoPortraitImg = require("@/assets/story/dialogue_sprites/ch3_minho_sprite.png");
+const ch3YoungsookPortraitImg = require("@/assets/story/dialogue_sprites/ch3_youngsook_sprite.png");
+const ch3SujinPortraitImg = require("@/assets/story/dialogue_sprites/ch3_sujin_sprite.png");
 const ch4BossArchiveImg = require("@/assets/story/chapter4_motion_comic/ch4_boss_archive.png");
-const ch4MiraPortraitImg = require("@/assets/story/chapter4_motion_comic/ch4_portrait_mira.png");
-const ch4AmiraPortraitImg = require("@/assets/story/chapter4_motion_comic/ch4_portrait_amira.png");
-const ch4HassanPortraitImg = require("@/assets/story/chapter4_motion_comic/ch4_portrait_hassan.png");
-const ch4BlackPartialPortraitImg = require("@/assets/story/chapter4_motion_comic/ch4_portrait_black_partial.png");
+const ch4MiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_mira_sprite.png");
+const ch4AmiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_amira_sprite.png");
+const ch4HassanPortraitImg = require("@/assets/story/dialogue_sprites/ch4_hassan_sprite.png");
+const ch4BlackPartialPortraitImg = require("@/assets/story/dialogue_sprites/ch4_black_partial_sprite.png");
 const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
-const ch5PennyPortraitImg = require("@/assets/story/chapter5_motion_comic/ch5_portrait_penny.png");
-const ch5BlackFaceImg = require("@/assets/story/chapter5_motion_comic/ch5_intro_black_face.png");
+const ch5PennyPortraitImg = require("@/assets/story/dialogue_sprites/ch5_penny_sprite.png");
+const ch5BlackFaceImg = require("@/assets/story/dialogue_sprites/ch5_black_face_sprite.png");
 const bgLondonMuseumHallImg = require("@/assets/story/dialogue_backgrounds/london_museum_hall.png");
 const bgMadridFestivalPlazaImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_plaza.png");
+const bgMadridFestivalDrainedImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_drained.png");
+const bgMadridSealedStageImg = require("@/assets/story/dialogue_backgrounds/madrid_sealed_stage.png");
 const bgSeoulPalaceSubwayImg = require("@/assets/story/dialogue_backgrounds/seoul_palace_subway.png");
 const bgCairoArchiveRoomImg = require("@/assets/story/dialogue_backgrounds/cairo_archive_room.png");
+const bgCairoHospitalRecordImg = require("@/assets/story/dialogue_backgrounds/cairo_hospital_record.png");
 const bgBabelTowerCoreImg = require("@/assets/story/dialogue_backgrounds/babel_tower_core.png");
+const bgBabelLanguageGatesImg = require("@/assets/story/dialogue_backgrounds/babel_language_gates.png");
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
 // Keyed by "text::lang". Sounds are loaded in advance; on press we just replay.
@@ -246,6 +250,17 @@ interface ChapterMeta {
   languageNote: string;
 }
 
+type StoryBackdropId =
+  | "london-museum"
+  | "madrid-drained"
+  | "madrid-sealed-stage"
+  | "madrid-restored"
+  | "seoul-palace-subway"
+  | "cairo-archive"
+  | "cairo-hospital-record"
+  | "babel-core"
+  | "babel-language-gates";
+
 /* Sequence items */
 type SeqScene = {
   kind: "scene";
@@ -262,6 +277,8 @@ type SeqScene = {
   /** Mixed-language Indonesian: mostly Indonesian with learned English expressions inline */
   textIdMix?: string;
   isNarration?: boolean;
+  /** Scene-specific illustrated backdrop. Falls back to the chapter hub backdrop. */
+  backdrop?: StoryBackdropId;
   /** Reference to an entry in IDIOM_COLLECTION — links this dialogue to a targetLang-adaptive idiom */
   idiomRef?: string;
 };
@@ -330,21 +347,49 @@ function tri(t: Tri, lang: string) {
   return t.en;
 }
 
-function getAdventureBackdrop(storyId: string): ImageSourcePropType {
+function getAdventureBackdropById(backdrop: StoryBackdropId): ImageSourcePropType {
+  switch (backdrop) {
+    case "london-museum":
+      return bgLondonMuseumHallImg;
+    case "madrid-drained":
+      return bgMadridFestivalDrainedImg;
+    case "madrid-sealed-stage":
+      return bgMadridSealedStageImg;
+    case "madrid-restored":
+      return bgMadridFestivalPlazaImg;
+    case "seoul-palace-subway":
+      return bgSeoulPalaceSubwayImg;
+    case "cairo-archive":
+      return bgCairoArchiveRoomImg;
+    case "cairo-hospital-record":
+      return bgCairoHospitalRecordImg;
+    case "babel-core":
+      return bgBabelTowerCoreImg;
+    case "babel-language-gates":
+      return bgBabelLanguageGatesImg;
+  }
+}
+
+function getDefaultAdventureBackdrop(storyId: string): StoryBackdropId {
   switch (storyId) {
     case "london":
-      return bgLondonMuseumHallImg;
+      return "london-museum";
     case "madrid":
-      return bgMadridFestivalPlazaImg;
+      return "madrid-drained";
     case "seoul":
-      return bgSeoulPalaceSubwayImg;
+      return "seoul-palace-subway";
     case "cairo":
-      return bgCairoArchiveRoomImg;
+      return "cairo-archive";
     case "babel":
-      return bgBabelTowerCoreImg;
+      return "babel-core";
     default:
-      return bgLondonMuseumHallImg;
+      return "london-museum";
   }
+}
+
+function getSceneBackdrop(storyId: string, item: SeqItem): ImageSourcePropType | null {
+  if (item.kind !== "scene") return null;
+  return getAdventureBackdropById(item.backdrop ?? getDefaultAdventureBackdrop(storyId));
 }
 
 /* ─────────────────── IDIOM COLLECTION ─────────────────── */
@@ -3559,6 +3604,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "miguel",
+      backdrop: "madrid-sealed-stage",
       text: "The stage is behind the fountain. It used to pull every color toward it. Now it eats color instead.",
       textKo: "무대는 분수 뒤에 있소. 예전에는 모든 색을 끌어당겼지. 지금은 색을 먹어치우고 있소.",
       textKoMix: "stage는 fountain 뒤에 있소. 예전에는 모든 color를 끌어당겼지. 지금은 color를 먹어치우고 있소.",
@@ -3604,6 +3650,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "isabel",
+      backdrop: "madrid-sealed-stage",
       text: "Carlos was here. The speaker took his voice, and the stage sealed around the last color he touched.",
       textKo: "카를로스가 여기 있었어요. 스피커가 그의 목소리를 빼앗았고, 그가 마지막으로 만진 색을 중심으로 무대가 봉인됐어요.",
       textKoMix: "Carlos가 여기 있었어요. speaker가 그의 voice를 빼앗았고, 그가 마지막으로 만진 color를 중심으로 stage가 봉인됐어요.",
@@ -3615,6 +3662,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "lingo",
+      backdrop: "madrid-sealed-stage",
       text: "The seal is not asking for a key. It is asking for a feeling, a place, and a promise that beauty still means something. Put the pieces in order.",
       textKo: "봉인은 열쇠를 요구하는 게 아니에요. 감정, 장소, 그리고 아름다움이 아직 의미 있다는 약속을 요구하고 있어요. 조각을 순서대로 놓아봐요.",
       textKoMix: "seal은 key를 요구하는 게 아니에요. feeling, place, 그리고 beautiful이라는 약속을 요구해요. pieces를 순서대로 놓아봐요.",
@@ -3662,6 +3710,7 @@ const MADRID_V21_STORY: Story = {
       kind: "scene",
       charId: "lingo",
       isNarration: true,
+      backdrop: "madrid-restored",
       text: "(The sentence climbs the cracks. The stage exhales red. A flamenco dancer, frozen in gray, moves one hand, then one heel, then the whole plaza remembers how to clap.)",
       textKo: "(문장이 금 간 틈을 타고 올라간다. 무대가 빨간 숨을 내쉰다. 회색으로 멈춰 있던 플라멩코 댄서가 한 손을 움직이고, 한 발꿈치를 울리고, 마침내 광장 전체가 박수를 기억해낸다.)",
       textEs: "(La frase trepa por las grietas. El escenario exhala rojo. Una bailaora congelada en gris mueve una mano, luego un tacón, y por fin toda la plaza recuerda cómo aplaudir.)",
@@ -3670,6 +3719,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "carlos",
+      backdrop: "madrid-restored",
       text: "*breathing hard* I could hear everyone, but every word came back polished, smooth, empty. Isabel. Thank you. I thought nobody would find the color.",
       textKo: "*거칠게 숨을 쉬며* 모두의 목소리가 들렸지만, 모든 단어가 매끈하고 비어 있는 말로 돌아왔어요. 이사벨. 고마워요. 아무도 그 색을 찾지 못할 줄 알았어요.",
       textKoMix: "*거칠게 숨을 쉬며* 모두의 voice가 들렸지만, 모든 word가 smooth하고 empty하게 돌아왔어요. Isabel. Thank you. 아무도 color를 찾지 못할 줄 알았어요.",
@@ -3681,6 +3731,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "miguel",
+      backdrop: "madrid-restored",
       text: "A festival is not a schedule. It is the mistakes in the song, the accent in the shout, the red where someone loved it enough to repaint it.",
       textKo: "축제는 일정표가 아니오. 노래 속 실수, 외침 속 억양, 누군가 사랑해서 다시 칠한 빨간색이 바로 축제요.",
       textKoMix: "festival은 schedule이 아니오. 노래 속 mistake, 외침 속 accent, 누군가 사랑해서 다시 칠한 red가 바로 festival이오.",
@@ -3693,6 +3744,7 @@ const MADRID_V21_STORY: Story = {
       kind: "scene",
       charId: "lingo",
       isNarration: true,
+      backdrop: "madrid-restored",
       text: "(The plaza speakers crackle. No face appears. Only a calm voice, too clean for the noise around it.)",
       textKo: "(광장 스피커가 지직거린다. 얼굴은 나타나지 않는다. 주변의 소음과 어울리지 않을 만큼 매끈한 목소리만 들린다.)",
       textEs: "(Los altavoces de la plaza chisporrotean. No aparece ningún rostro. Solo una voz tranquila, demasiado limpia para el ruido que la rodea.)",
@@ -3733,6 +3785,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "isabel",
+      backdrop: "madrid-restored",
       text: "Then go. Carlos and I will keep the festival loud until you come back. Goodbye, Detective. And thank you.",
       textKo: "그럼 가요. 당신이 돌아올 때까지 카를로스와 제가 축제를 크게 울리게 할게요. 안녕히 가요, 탐정님. 그리고 고마워요.",
       textKoMix: "그럼 가요. 당신이 돌아올 때까지 Carlos와 제가 festival을 크게 울리게 할게요. Goodbye, Detective. 그리고 Thank you.",
@@ -4388,6 +4441,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "hassan",
+      backdrop: "cairo-hospital-record",
       text: "My mother's mother sang a lullaby in Nubian, Arabic, and French. I remember only one line. My son remembers the tune. My granddaughter remembers the hand motion. Together, we still have the song.",
       textKo: "제 어머니의 어머니는 누비아어, 아랍어, 프랑스어로 자장가를 불렀습니다. 저는 한 줄만 기억해요. 제 아들은 멜로디를 기억하고, 제 손녀는 손동작을 기억하죠. 함께라면 아직 그 노래가 남아 있습니다.",
       textEs: "La madre de mi madre cantaba una nana en nubio, árabe y francés. Yo recuerdo solo una línea. Mi hijo recuerda la melodía. Mi nieta recuerda el gesto de la mano. Juntos, todavía tenemos la canción.",
@@ -4396,6 +4450,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "hassan",
+      backdrop: "cairo-hospital-record",
       text: "A record is paper. Wisdom is what people carry when the paper burns. But if both disappear, even the dead become lonely.",
       textKo: "기록은 종이입니다. 지혜는 그 종이가 타버린 뒤에도 사람들이 들고 가는 것이죠. 하지만 둘 다 사라지면, 죽은 사람들마저 외로워집니다.",
       textEs: "Un registro es papel. La sabiduría es lo que la gente lleva cuando el papel se quema. Pero si ambos desaparecen, hasta los muertos se quedan solos.",
@@ -4457,6 +4512,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "amira",
+      backdrop: "cairo-hospital-record",
       text: "Here. Ellis's journal. The ink keeps trying to leave the page, but one line is still holding on.",
       textKo: "여기요. 엘리스의 일지입니다. 잉크가 계속 페이지를 떠나려 하지만, 한 줄은 아직 버티고 있어요.",
       textEs: "Aquí. El diario de Ellis. La tinta sigue intentando abandonar la página, pero una línea aún resiste.",
@@ -4499,6 +4555,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "lingo",
+      backdrop: "cairo-hospital-record",
       text: "She left this for us. Not a message to be translated. A proof that she was here.",
       textKo: "엘리스가 우리에게 남긴 거예요. 번역하라고 남긴 메시지가 아니에요. 그녀가 여기 있었다는 증거예요.",
       textEs: "Ella dejó esto para nosotros. No un mensaje para traducir. Una prueba de que estuvo aquí.",
@@ -4508,6 +4565,7 @@ const CAIRO_V21_STORY: Story = {
       kind: "scene",
       charId: "lingo",
       isNarration: true,
+      backdrop: "cairo-hospital-record",
       text: "(The oil lamps dim. In the reflection of the cracked stone wall, a black coat stops behind you. Not a face. Not yet. Only a hand, a shard of gold, and a mouth half-hidden by shadow.)",
       textKo: "(기름등이 어두워진다. 금이 간 돌벽의 반사 속에서 검은 코트가 뒤에 멈춘다. 얼굴은 아니다. 아직은. 손, 금빛 파편, 그리고 그림자에 반쯤 숨은 입가뿐이다.)",
       textEs: "(Las lámparas de aceite se apagan un poco. En el reflejo del muro agrietado, un abrigo negro se detiene detrás de ti. No es un rostro. Todavía no. Solo una mano, un fragmento dorado y una boca medio oculta por la sombra.)",
@@ -4516,6 +4574,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "black_partial",
+      backdrop: "cairo-hospital-record",
       text: "I'm not erasing your grandmother's lullaby. I'm making sure her great-grandchild understands every word of it.",
       textKo: "나는 당신 할머니의 자장가를 지우는 게 아닙니다. 그분의 증손주가 그 모든 단어를 이해하게 만들고 있는 겁니다.",
       textEs: "No estoy borrando la nana de tu abuela. Estoy asegurándome de que su bisnieto entienda cada palabra.",
@@ -4524,6 +4583,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "black_partial",
+      backdrop: "cairo-hospital-record",
       text: "Find the record before I do, Detective. Or let me make it useful.",
       textKo: "내가 찾기 전에 그 기록을 찾으세요, 탐정. 아니면 내가 그것을 쓸모 있게 만들게 두세요.",
       textEs: "Encuentra el registro antes que yo, Detective. O deja que yo lo haga útil.",
@@ -4741,6 +4801,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "penny",
+      backdrop: "babel-language-gates",
       text: "Five language gates protect the tower core. The four city stones open the path, but the last three stones are already inside: Connection, Memory, and Beginning. He built Babel around them.",
       textKo: "탑 중심부는 다섯 개의 언어 관문이 지키고 있어요. 네 도시의 수호석은 길을 열지만, 마지막 세 개의 돌은 이미 안에 있어요: Connection, Memory, Beginning. 그는 그 돌들을 중심으로 Babel을 지었어요.",
       textKoMix: "탑 중심부는 five language gates가 지키고 있어요. 네 city stones는 길을 열지만, 마지막 세 개는 이미 안에 있어요: Connection, Memory, Beginning.",
@@ -4752,6 +4813,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "lingo",
+      backdrop: "babel-language-gates",
       text: "Then we do not go in as one language. We go in as everyone who helped us.",
       textKo: "그럼 하나의 언어로 들어가지 않아요. 우리를 도와준 모두의 언어로 들어가는 거예요.",
       textEs: "Entonces no entramos como un solo idioma. Entramos como todas las personas que nos ayudaron.",
@@ -4834,6 +4896,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "tom",
+      backdrop: "babel-language-gates",
       text: "Blimey. That thing opened because we all sounded different.",
       textKo: "세상에. 우리가 전부 다르게 들렸기 때문에 저게 열린 거네.",
       textEs: "Caray. Esa cosa se abrió porque todos sonábamos distinto.",
@@ -4842,6 +4905,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "isabel",
+      backdrop: "babel-language-gates",
       text: "Good. A festival with one voice is not a festival.",
       textKo: "좋아. 목소리가 하나뿐인 축제는 축제가 아니니까.",
       textEs: "Bien. Un festival con una sola voz no es un festival.",
@@ -4903,6 +4967,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "mr_black",
+      backdrop: "babel-language-gates",
       text: "Tell me, Detective. When you could not speak the language, did anyone ever look at you like you mattered?",
       textKo: "말해 보세요, 탐정. 당신이 그 언어를 말하지 못했을 때, 누군가 당신을 중요한 사람처럼 바라봐 준 적이 있습니까?",
       textEs: "Dime, Detective. Cuando no podías hablar el idioma, ¿alguien te miró alguna vez como si importaras?",
@@ -4912,6 +4977,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "lingo",
       isNarration: true,
+      backdrop: "babel-language-gates",
       text: "(For the first time, he steps fully into the light. Not a monster. Not a shadow. An old man carrying a stone in one hand and a wound in the other.)",
       textKo: "(처음으로 그가 빛 속으로 완전히 걸어 나온다. 괴물이 아니다. 그림자도 아니다. 한 손에는 돌을, 다른 한 손에는 상처를 들고 있는 늙은 남자.)",
       textEs: "(Por primera vez, entra por completo en la luz. No es un monstruo. No es una sombra. Un hombre viejo que lleva una piedra en una mano y una herida en la otra.)",
@@ -4920,6 +4986,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "penny",
+      backdrop: "babel-language-gates",
       text: "I was your student. I believed one shared language would save people from humiliation, from panic, from grief. But I watched what it did to Mira. It gave her every word and took away the reason to say them.",
       textKo: "저는 당신의 학생이었어요. 하나의 공유 언어가 사람들을 모욕과 공포와 슬픔에서 구할 거라고 믿었어요. 하지만 Mira에게 무슨 일이 일어났는지 봤어요. 모든 단어를 주고, 그 단어를 말해야 하는 이유를 빼앗았죠.",
       textKoMix: "저는 당신의 student였어요. 하나의 shared language가 사람들을 구할 거라고 믿었어요. 하지만 Mira를 봤어요. 모든 words를 주고, 그 말을 해야 하는 reason을 빼앗았죠.",
@@ -4931,6 +4998,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "lingo",
+      backdrop: "babel-language-gates",
       text: "Ellis wrote about you. Not your name, not all of it. A translator who lost everything and tried to build a world where no one would ever be unheard again.",
       textKo: "Ellis가 당신에 대해 적었어요. 이름은 아니고, 전부도 아니지만. 모든 것을 잃고, 다시는 아무도 들리지 못한 채 남지 않는 세상을 만들려 했던 통역사에 대해.",
       textEs: "Ellis escribió sobre ti. No tu nombre, no todo. Un traductor que lo perdió todo e intentó construir un mundo donde nadie volviera a quedar sin ser escuchado.",
@@ -4986,6 +5054,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "mr_black",
+      backdrop: "babel-language-gates",
       text: "My mother sang one line when the pain became too much. The nurse smiled and said she did not understand. The doctor smiled and said it in three languages. None of them were hers.",
       textKo: "어머니는 고통이 너무 심해질 때 한 줄의 노래를 불렀습니다. 간호사는 웃으며 이해하지 못한다고 했죠. 의사는 세 가지 언어로 미안하다고 했습니다. 그중 어느 것도 어머니의 언어가 아니었어요.",
       textEs: "Mi madre cantaba una línea cuando el dolor era demasiado. La enfermera sonrió y dijo que no entendía. El médico sonrió y lo dijo en tres idiomas. Ninguno era el suyo.",
@@ -4994,6 +5063,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "hassan",
+      backdrop: "babel-language-gates",
       text: "A lullaby is not information. It is a hand on a forehead.",
       textKo: "자장가는 정보가 아닙니다. 이마 위에 얹힌 손이에요.",
       textEs: "Una nana no es información. Es una mano sobre la frente.",
@@ -5014,6 +5084,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "lingo",
+      backdrop: "babel-language-gates",
       text: "Partner. The final spell is not a translation. It is the thing translation missed.",
       textKo: "파트너. 마지막 주문은 번역이 아니에요. 번역이 놓친 바로 그거예요.",
       textEs: "Compa. El hechizo final no es una traducción. Es aquello que la traducción no alcanzó.",
@@ -5100,6 +5171,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "mr_black",
+      backdrop: "babel-language-gates",
       text: "*a very long silence* Mae'r iaith yn fyw. *Welsh: The language lives.* I never wanted to destroy language. I wanted... I just wanted my mother to be heard.",
       textKo: "*아주 긴 침묵* Mae'r iaith yn fyw. *웨일스어: 언어는 살아 있다.* 언어를 파괴하고 싶었던 게 아니야. 원한 건... 어머니의 말이 들려지기를 원했을 뿐이야.",
       textEs: "*un silencio muy largo* Mae'r iaith yn fyw. *Galés: El idioma vive.* Nunca quise destruir el idioma. Quería... solo quería que escucharan a mi madre.",
@@ -5109,6 +5181,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "lingo",
       isNarration: true,
+      backdrop: "babel-language-gates",
       text: "(The Universal Code shuts down. One by one, the seven Guardian Stones release from their pedestals. Voices return from everywhere at once: Tom on the radio, Isabel from Madrid, Sujin from Seoul, Youngsook from Gwangjang Market, Amira in Arabic, Hassan in four languages, and Mira's voice, no longer smooth, trembling as she says thank you.)",
       textKo: "(Universal Code가 종료된다. 하나씩, 7개의 수호석이 받침대에서 풀려난다. 사방에서 목소리가 돌아온다. 무선에서 톰, 마드리드에서 이사벨, 서울에서 수진, 광장시장에서 영숙 할머니, 아랍어로 말하는 아미라, 네 언어로 말하는 하산, 그리고 Mira의 목소리. 더 이상 매끈하지 않고, 떨리는 목소리로 thank you를 말한다.)",
       textEs: "(El Código Universal se apaga. Una por una, las siete Piedras Guardianas se liberan de sus pedestales. Las voces vuelven desde todas partes: Tom en la radio, Isabel desde Madrid, Sujin desde Seúl, Youngsook desde el mercado Gwangjang, Amira en árabe, Hassan en cuatro idiomas, y la voz de Mira, ya no pulida, temblando mientras dice thank you.)",
@@ -5117,6 +5190,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "mira",
+      backdrop: "babel-language-gates",
       text: "Th-thank you. I mean it this time. I can feel it shake.",
       textKo: "Th-thank you. 이번엔 진심이에요. 떨리는 게 느껴져요.",
       textEs: "Th-thank you. Esta vez lo digo de verdad. Puedo sentir cómo tiembla.",
@@ -5125,6 +5199,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "lingo",
+      backdrop: "babel-language-gates",
       text: "Mr. Black. I remember now. I was part of you. The part that loved every language before grief taught you to fear them.",
       textKo: "Mr. Black. 이제 기억나요. 나는 당신의 일부였어요. 슬픔이 언어를 두려워하게 만들기 전, 모든 언어를 사랑하던 부분.",
       textEs: "Mr. Black. Ahora lo recuerdo. Yo era parte de ti. La parte que amaba cada idioma antes de que el dolor te enseñara a temerlos.",
@@ -5134,6 +5209,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "lingo",
       isNarration: true,
+      backdrop: "babel-language-gates",
       text: "(For one breath, Rudy's detective coat flickers into golden particles. The hat, the glasses, the bow tie, all become light. The tiny fox spirit from the first night looks back at the old man. Then the coat returns. Rudy is still Rudy. But now he knows why.)",
       textKo: "(한 번의 숨 동안, 루디의 탐정 코트가 금빛 입자로 깜빡인다. 모자, 안경, 나비넥타이, 전부 빛이 된다. 첫날 밤의 작은 여우 정령이 늙은 남자를 바라본다. 그리고 코트가 돌아온다. 루디는 여전히 루디다. 하지만 이제 이유를 안다.)",
       textEs: "(Durante un respiro, el abrigo de detective de Rudy se vuelve partículas doradas. El sombrero, las gafas, la pajarita, todo se vuelve luz. El pequeño espíritu zorro de la primera noche mira al viejo. Luego vuelve el abrigo. Rudy sigue siendo Rudy. Pero ahora sabe por qué.)",
@@ -5142,6 +5218,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "lingo",
+      backdrop: "babel-language-gates",
       text: "I was part of you. I am no longer you. I am the part you saved by failing to erase it.",
       textKo: "나는 당신의 일부였어요. 하지만 이제 당신은 아니에요. 지우지 못했기 때문에 당신이 살려낸 부분이에요.",
       textEs: "Fui parte de ti. Ya no soy tú. Soy la parte que salvaste al no poder borrarla.",
@@ -5150,6 +5227,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "penny",
+      backdrop: "babel-language-gates",
       text: "The stones are returning to their keepers. Mr. Black will answer for what he did. But not as a monster. As a man who finally heard the sentence he could not translate.",
       textKo: "수호석들은 각자의 보호자에게 돌아가고 있어요. Mr. Black은 자신이 한 일에 책임을 질 거예요. 하지만 괴물로서가 아니에요. 자신이 번역하지 못했던 문장을 마침내 들은 사람으로서.",
       textEs: "Las piedras vuelven a sus guardianes. Mr. Black responderá por lo que hizo. Pero no como un monstruo. Como un hombre que por fin oyó la frase que no pudo traducir.",
@@ -5170,6 +5248,7 @@ const BABEL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "lingo",
+      backdrop: "babel-language-gates",
       text: "Partner, we did not save language because it is useful. We saved it because every word is someone reaching for someone else.",
       textKo: "파트너, 우리는 언어가 유용해서 구한 게 아니에요. 모든 단어가 누군가가 다른 누군가에게 손을 뻗는 일이기 때문에 구한 거예요.",
       textEs: "Compa, no salvamos el idioma porque sea útil. Lo salvamos porque cada palabra es alguien intentando alcanzar a otra persona.",
@@ -6858,6 +6937,9 @@ export default function StoryScene() {
   const [introStatus, setIntroStatus] = useState<"checking" | "visible" | "hidden">("checking");
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const stageEnterAnim = useRef(new Animated.Value(1)).current;
+  const stageFloatAnim = useRef(new Animated.Value(0)).current;
+  const backdropDriftAnim = useRef(new Animated.Value(0)).current;
   const bgmRef = useRef<Audio.Sound | null>(null);
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -6876,6 +6958,38 @@ export default function StoryScene() {
       console.warn(`[Story] ${source} XP update failed:`, e);
     }
   }
+
+  useEffect(() => {
+    const characterLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(stageFloatAnim, { toValue: 1, duration: 1800, useNativeDriver: true }),
+        Animated.timing(stageFloatAnim, { toValue: 0, duration: 1800, useNativeDriver: true }),
+      ])
+    );
+    const backdropLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(backdropDriftAnim, { toValue: 1, duration: 7600, useNativeDriver: true }),
+        Animated.timing(backdropDriftAnim, { toValue: 0, duration: 7600, useNativeDriver: true }),
+      ])
+    );
+
+    characterLoop.start();
+    backdropLoop.start();
+    return () => {
+      characterLoop.stop();
+      backdropLoop.stop();
+    };
+  }, [backdropDriftAnim, stageFloatAnim]);
+
+  useEffect(() => {
+    stageEnterAnim.setValue(0);
+    Animated.spring(stageEnterAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 58,
+      friction: 10,
+    }).start();
+  }, [seqIdx, stageEnterAnim]);
 
   const completeIntro = useCallback(async () => {
     try {
@@ -7179,7 +7293,31 @@ export default function StoryScene() {
   }
 
   const titleLabel = lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : lang === "indonesian" ? (story.titleId ?? story.title) : story.title;
-  const sceneBackdrop = item.kind === "scene" ? getAdventureBackdrop(story.id) : null;
+  const sceneBackdrop = getSceneBackdrop(story.id, item);
+  const characterEntryX = stageEnterAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [character.side === "left" ? -42 : 42, 0],
+  });
+  const characterEntryOpacity = stageEnterAnim.interpolate({
+    inputRange: [0, 0.35, 1],
+    outputRange: [0, 0.65, 1],
+  });
+  const characterEntryScale = stageEnterAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.96, 1],
+  });
+  const characterFloatY = stageFloatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -6],
+  });
+  const backdropScale = backdropDriftAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1.02, 1.055],
+  });
+  const backdropTranslateX = backdropDriftAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-5, 5],
+  });
 
   if (introSupported && introStatus === "checking") {
     return (
@@ -7246,7 +7384,14 @@ export default function StoryScene() {
       <Animated.View style={[styles.contentArea, { opacity: fadeAnim }]}>
         {sceneBackdrop && (
           <>
-            <Image source={sceneBackdrop} style={styles.sceneBackdropImage} resizeMode="cover" />
+            <Animated.Image
+              source={sceneBackdrop}
+              style={[
+                styles.sceneBackdropImage,
+                { transform: [{ scale: backdropScale }, { translateX: backdropTranslateX }] },
+              ]}
+              resizeMode="cover"
+            />
             <LinearGradient
               colors={["rgba(8,7,6,0.18)", "rgba(8,7,6,0.2)", "rgba(8,7,6,0.78)"]}
               locations={[0, 0.48, 1]}
@@ -7285,28 +7430,39 @@ export default function StoryScene() {
         {/* DIALOGUE SCENE */}
         {item.kind === "scene" && !item.isNarration && (
           <View style={styles.sceneContainer}>
-            <View style={styles.characterArea}>
+            <Animated.View
+              style={[
+                styles.characterArea,
+                character.side === "left" ? styles.characterAreaLeft : styles.characterAreaRight,
+                {
+                  opacity: characterEntryOpacity,
+                  transform: [
+                    { translateX: characterEntryX },
+                    { translateY: characterFloatY },
+                    { scale: characterEntryScale },
+                  ],
+                },
+              ]}
+            >
               {character.isLingo ? (
-                <Image
+                <Animated.Image
                   source={rudyStoryImg}
-                  style={[styles.rudyStoryChar, compactStoryLayout && styles.rudyStoryCharCompact]}
+                  style={[styles.rudyStoryChar, compactStoryLayout && styles.rudyStoryCharCompact, styles.stageCharacterShadow]}
                   resizeMode="contain"
                 />
               ) : character.portrait ? (
-                <>
-                  <View style={[styles.portraitCard, compactStoryLayout && styles.portraitCardCompact, { shadowColor: story.accentColor }]}>
-                    <Image
-                      source={character.portrait}
-                      style={styles.characterPortrait}
-                      resizeMode="cover"
-                    />
-                    <LinearGradient
-                      colors={["transparent", "rgba(13,17,23,0.72)"]}
-                      style={styles.portraitFade}
-                    />
-                    <View style={[styles.avatarRing, styles.portraitRing, compactStoryLayout && styles.portraitRingCompact, { borderColor: story.accentColor }]} />
-                  </View>
-                </>
+                <View style={[styles.stagePortraitWrap, compactStoryLayout && styles.stagePortraitWrapCompact, { shadowColor: story.accentColor }]}>
+                  <Image
+                    source={character.portrait}
+                    style={styles.characterPortrait}
+                    resizeMode="cover"
+                  />
+                  <LinearGradient
+                    colors={["transparent", "rgba(5,6,10,0.04)", "rgba(5,6,10,0.58)"]}
+                    locations={[0, 0.68, 1]}
+                    style={styles.stagePortraitFade}
+                  />
+                </View>
               ) : (
                 <>
                   <View style={[styles.avatarOuter, { shadowColor: story.accentColor }]}>
@@ -7317,7 +7473,7 @@ export default function StoryScene() {
                   </View>
                 </>
               )}
-            </View>
+            </Animated.View>
 
             <Pressable style={styles.dialogueBox} onPress={advance}>
               <View style={styles.speakerTag}>
@@ -7592,9 +7748,17 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   characterArea: {
-    alignItems: "center",
-    paddingBottom: 4,
-    gap: 10,
+    minHeight: 300,
+    justifyContent: "flex-end",
+    paddingHorizontal: 18,
+    marginBottom: -34,
+    zIndex: 1,
+  },
+  characterAreaLeft: {
+    alignItems: "flex-start",
+  },
+  characterAreaRight: {
+    alignItems: "flex-end",
   },
   avatarOuter: {
     shadowOffset: { width: 0, height: 0 },
@@ -7616,12 +7780,18 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   rudyStoryChar: {
-    width: 220,
-    height: 280,
+    width: 286,
+    height: 352,
   },
   rudyStoryCharCompact: {
-    width: 190,
-    height: 238,
+    width: 238,
+    height: 294,
+  },
+  stageCharacterShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.42,
+    shadowRadius: 20,
   },
   portraitCard: {
     width: 206,
@@ -7643,6 +7813,28 @@ const styles = StyleSheet.create({
   characterPortrait: {
     width: "100%",
     height: "100%",
+  },
+  stagePortraitWrap: {
+    width: 276,
+    height: 414,
+    borderRadius: 4,
+    overflow: "hidden",
+    backgroundColor: "rgba(7,8,12,0.32)",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.45,
+    shadowRadius: 28,
+    elevation: 9,
+  },
+  stagePortraitWrapCompact: {
+    width: 224,
+    height: 336,
+  },
+  stagePortraitFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 148,
   },
   portraitFade: {
     position: "absolute",
@@ -7683,34 +7875,33 @@ const styles = StyleSheet.create({
     textShadowRadius: 10,
   },
   dialogueBox: {
-    backgroundColor: "rgba(15,18,24,0.9)",
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
+    backgroundColor: "rgba(8,8,10,0.82)",
     borderTopWidth: 1,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderColor: C.border,
-    paddingTop: 18,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    gap: 12,
+    borderBottomWidth: 1,
+    borderColor: "rgba(255,226,144,0.24)",
+    paddingTop: 14,
+    paddingHorizontal: 18,
+    paddingBottom: 16,
+    gap: 10,
     shadowColor: C.gold,
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.16,
+    shadowRadius: 22,
     elevation: 10,
+    zIndex: 2,
   },
   speakerTag: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "rgba(201,162,39,0.18)",
+    backgroundColor: "rgba(65,50,117,0.72)",
     borderWidth: 1,
-    borderColor: C.border,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    borderColor: "rgba(255,226,144,0.22)",
+    borderRadius: 2,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
     alignSelf: "flex-start",
+    minWidth: 112,
   },
   speakerMark: {
     width: 9,
@@ -7719,13 +7910,12 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "45deg" }],
   },
   speakerEmoji: { fontSize: 14 },
-  speakerName: { fontSize: 12, fontFamily: F.bodySemi, color: C.gold },
+  speakerName: { fontSize: 12, fontFamily: F.bodySemi, color: C.parchmentDark },
   dialogueText: {
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: F.body,
-    lineHeight: 26,
+    lineHeight: 27,
     color: C.parchment,
-    fontStyle: "italic",
   },
   dotsRow: { flexDirection: "row", gap: 5, justifyContent: "center" },
   dot: { height: 5, width: 5, borderRadius: 3, backgroundColor: C.gold },

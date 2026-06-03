@@ -122,6 +122,9 @@ function classifyAsset(relativeToAssetRoot) {
   if (/^dialogue_backgrounds\//.test(normalized)) {
     return { group: "background", chapter: "shared" };
   }
+  if (/^dialogue_sprites\//.test(normalized)) {
+    return { group: "character", chapter };
+  }
   if (/^characters\/_sheets\//.test(normalized)) {
     return { group: "sheet", chapter };
   }

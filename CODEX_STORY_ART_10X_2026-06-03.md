@@ -185,6 +185,67 @@ After this pass, the app should move from "good learning-app story visuals" towa
 
 Next highest-value work: generate and wire Rudy/Mr. Black/Eleanor/Penny/Isabel expression variants, then use scene emotion to select the right portrait.
 
+## Post-Pass: Dialogue Stage Presentation
+
+User reference: Ace Attorney-style dialogue where the background, character art, text box, and subtle motion feel like one authored game scene.
+
+Implemented direction:
+
+- Dialogue scenes now use a visual-novel stage layout instead of a small portrait-card presentation.
+- Backgrounds subtly drift/zoom through `Animated.Image`, so scenes do not feel static.
+- Characters slide/fade in per scene and keep a small idle float.
+- Rudy uses his transparent story sprite as a true cutout on the scene.
+- NPC portraits are converted into dialogue-only transparent sprites and rendered as larger standees over the background, with the old heavy border/card treatment removed.
+- The dialogue panel is now a lower black translucent overlay with a compact speaker tag, closer to courtroom/adventure-game dialogue.
+
+New scene-specific backgrounds:
+
+```text
+assets/story/dialogue_backgrounds/madrid_festival_drained.png
+assets/story/dialogue_backgrounds/madrid_sealed_stage.png
+assets/story/dialogue_backgrounds/cairo_hospital_record.png
+assets/story/dialogue_backgrounds/babel_language_gates.png
+```
+
+New dialogue sprite cutouts:
+
+```text
+assets/story/dialogue_sprites/ch1_tom_sprite.png
+assets/story/dialogue_sprites/ch1_eleanor_sprite.png
+assets/story/dialogue_sprites/ch1_ellis_sprite.png
+assets/story/dialogue_sprites/ch1_black_cctv_sprite.png
+assets/story/dialogue_sprites/ch2_isabel_sprite.png
+assets/story/dialogue_sprites/ch2_miguel_sprite.png
+assets/story/dialogue_sprites/ch2_carlos_sprite.png
+assets/story/dialogue_sprites/ch3_minho_sprite.png
+assets/story/dialogue_sprites/ch3_youngsook_sprite.png
+assets/story/dialogue_sprites/ch3_sujin_sprite.png
+assets/story/dialogue_sprites/ch4_mira_sprite.png
+assets/story/dialogue_sprites/ch4_amira_sprite.png
+assets/story/dialogue_sprites/ch4_hassan_sprite.png
+assets/story/dialogue_sprites/ch4_black_partial_sprite.png
+assets/story/dialogue_sprites/ch5_penny_sprite.png
+assets/story/dialogue_sprites/ch5_black_face_sprite.png
+```
+
+Backdrops are now selected by optional `SeqScene.backdrop`; if omitted, the chapter hub background is used. This keeps broad chapter art as the default while allowing major beats to change location:
+
+- Madrid default: color-drained plaza.
+- Madrid sealed-stage investigation/boss setup: fountain, speaker, red brush clue.
+- Madrid post-boss: restored plaza.
+- Cairo archive default, then hospital-record/lullaby/journal scenes.
+- Babel tower-core default, then language-gate chamber for final confrontation.
+
+Visual verification:
+
+- Local web capture confirmed Babel's language-gate scene renders Penny over the background with no checkerboard card.
+- Local web capture confirmed Madrid's first character scene renders Rudy over the drained-plaza background.
+- Two Babel frames captured 2.6s apart changed 435,605 pixels out of 1,024,000, confirming the background/character idle motion is active.
+
+Remaining visual gap:
+
+- The dialogue sprites are cutouts from the current portrait set, not purpose-built action poses. True Ace Attorney-quality integration still needs transparent expression/action sheets for the main cast.
+
 ## QA Command
 
 Run this whenever new story images are added:
@@ -195,12 +256,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 66 PNG files.
-- 139.81 MB total.
+- 86 PNG files.
+- 183.70 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
-- background: 5 files, 10.68 MB, 17.2% average brightness.
+- background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 0 files.
+- character: 16 files, 34.76 MB, 32.5% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.
