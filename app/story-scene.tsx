@@ -71,6 +71,7 @@ const mrBlackFragileRemorseImg = require("@/assets/story/characters/mr_black/mr_
 const mrBlackTiredRevealImg = require("@/assets/story/characters/mr_black/mr_black_tired_reveal.png");
 const isabelShockedConcernImg = require("@/assets/story/characters/isabel/isabel_shocked_concern.png");
 const isabelRallyingEnergyImg = require("@/assets/story/characters/isabel/isabel_rallying_energy.png");
+const isabelPlayfulConfidenceImg = require("@/assets/story/characters/isabel/isabel_playful_confidence.png");
 const bgLondonMuseumHallImg = require("@/assets/story/dialogue_backgrounds/london_museum_hall.png");
 const bgMadridFestivalPlazaImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_plaza.png");
 const bgMadridFestivalDrainedImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_drained.png");
@@ -92,6 +93,7 @@ const eleanorExpressionSprites = {
 };
 
 const isabelExpressionSprites = {
+  playful: isabelPlayfulConfidenceImg,
   shocked: isabelShockedConcernImg,
   rallying: isabelRallyingEnergyImg,
 };
@@ -297,7 +299,7 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful";
 
 /* Sequence items */
 type SeqScene = {
@@ -3589,7 +3591,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "isabel",
-      expression: "rallying",
+      expression: "playful",
       text: "There. That flag was red. Carlos painted it every year because he said the festival needed a heartbeat.",
       textKo: "저기요. 저 깃발은 원래 빨간색이었어요. 카를로스는 매년 저걸 칠했죠. 축제에는 심장 박동이 필요하다고 했거든요.",
       textKoMix: "저기요. 저 flag는 원래 red였어요. Carlos는 festival에는 heartbeat가 필요하다고 했어요.",
@@ -3849,7 +3851,7 @@ const MADRID_V21_STORY: Story = {
       kind: "scene",
       charId: "isabel",
       backdrop: "madrid-restored",
-      expression: "rallying",
+      expression: "playful",
       text: "Then go. Carlos and I will keep the festival loud until you come back. Goodbye, Detective. And thank you.",
       textKo: "그럼 가요. 당신이 돌아올 때까지 카를로스와 제가 축제를 크게 울리게 할게요. 안녕히 가요, 탐정님. 그리고 고마워요.",
       textKoMix: "그럼 가요. 당신이 돌아올 때까지 Carlos와 제가 festival을 크게 울리게 할게요. Goodbye, Detective. 그리고 Thank you.",

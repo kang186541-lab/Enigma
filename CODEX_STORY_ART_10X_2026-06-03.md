@@ -109,7 +109,7 @@ Generate these before replacing broad chapter art:
 - Mr. Black: silhouette menace, tired reveal, fragile remorse. `[DONE: tired reveal + fragile remorse runtime sprites]`
 - Eleanor: calm mentor, urgent warning, analytical discovery. `[DONE: urgent warning + analytical discovery runtime sprites]`
 - Penny: warm guide, anxious final clue, brave resolve. `[DONE: anxious final clue + brave resolve runtime sprites]`
-- Isabel: playful confidence, shocked concern, rallying energy. `[DONE: shocked concern + rallying runtime sprites]`
+- Isabel: playful confidence, shocked concern, rallying energy. `[DONE: playful confidence + shocked concern + rallying runtime sprites]`
 
 Recommended file layout:
 
@@ -240,6 +240,7 @@ assets/story/characters/eleanor/eleanor_urgent_warning.png
 assets/story/characters/eleanor/eleanor_analytical_discovery.png
 assets/story/characters/isabel/isabel_shocked_concern.png
 assets/story/characters/isabel/isabel_rallying_energy.png
+assets/story/characters/isabel/isabel_playful_confidence.png
 assets/story/characters/penny/penny_brave_resolve.png
 ```
 
@@ -264,14 +265,14 @@ Visual verification:
 - Local web capture confirmed Madrid 2/21 renders `rudy_worried_detective` over the drained-plaza backdrop: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\rudy-worried-madrid.png`.
 - Web bundle verification confirmed both Rudy expression assets are emitted: `rudy_worried_detective.af3781...png` and `rudy_celebratory_coach.79b8...png`.
 - Eleanor now has authored `urgent` and `analytical` sprites. `urgent` remains wired to danger/warning beats; `analytical` is wired to the verbal-lock explanation, London shard interpretation, and Seoul hospital-record synthesis.
-- Isabel now has authored `shocked` and `rallying` sprites. In the active Madrid route, `shocked` is wired to the Carlos disappearance report and sealed-stage reveal, while `rallying` is wired to the red-flag heartbeat beat and restored-festival goodbye. Babel's "one voice is not a festival" callback also uses `rallying`. The legacy Madrid block still uses `shocked` for the Carlos phone account and unknown-basic-phrases line.
+- Isabel now has authored `playful`, `shocked`, and `rallying` sprites. In the active Madrid route, `shocked` is wired to the Carlos disappearance report and sealed-stage reveal, `playful` is wired to the red-flag heartbeat beat and restored-festival goodbye, and Babel's "one voice is not a festival" callback keeps `rallying`. The legacy Madrid block still uses `shocked` for the Carlos phone account and unknown-basic-phrases line.
 - Mr. Black now has authored `tired` and `remorse` sprites. Babel's first direct confrontation uses `tired` for the "did anyone ever look at you like you mattered?" reveal, while the mother/lullaby scenes keep `remorse`.
 - Penny now has authored `anxious` and `brave` sprites. `anxious` remains wired to her confession that she believed the Universal Code would help; `brave` is wired to her final moral-resolution line that Mr. Black must answer, but not as a monster.
-- Latest asset audit: 96 story PNGs, 204,650,212 bytes total, 26 character assets, warnings 0.
+- Latest asset audit: 97 story PNGs, 206,183,635 bytes total, 27 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Eleanor, Isabel, Mr. Black, and Penny now each have at least two authored emotional poses, but true Ace Attorney-quality integration still needs playful Isabel plus transparent expression/action sheets for the remaining recurring cast.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Eleanor, Isabel, Mr. Black, and Penny now each have multiple authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast. Goodall's next recommended high-impact active-route target is Hassan's Cairo/Babel memory-storyteller pose.
 
 ## QA Command
 
@@ -283,12 +284,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 96 PNG files.
-- 195.17 MB total.
+- 97 PNG files.
+- 196.63 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 26 files, 46.23 MB, 27.3% average brightness.
+- character: 27 files, 47.69 MB, 26.8% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.
