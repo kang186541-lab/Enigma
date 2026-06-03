@@ -48,6 +48,7 @@ const ch1BlackCctvImg = require("@/assets/story/dialogue_sprites/ch1_black_cctv_
 const ch2BossStageImg = require("@/assets/story/chapter2_motion_comic/ch2_boss_stage.png");
 const ch2IsabelPortraitImg = require("@/assets/story/dialogue_sprites/ch2_isabel_sprite.png");
 const ch2MiguelPortraitImg = require("@/assets/story/dialogue_sprites/ch2_miguel_sprite.png");
+const miguelFestivalMemoryImg = require("@/assets/story/characters/miguel/miguel_festival_memory.png");
 const ch2CarlosPortraitImg = require("@/assets/story/dialogue_sprites/ch2_carlos_sprite.png");
 const ch3BossPalaceImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace.png");
 const ch3MinhoPortraitImg = require("@/assets/story/dialogue_sprites/ch3_minho_sprite.png");
@@ -101,6 +102,10 @@ const isabelExpressionSprites = {
   playful: isabelPlayfulConfidenceImg,
   shocked: isabelShockedConcernImg,
   rallying: isabelRallyingEnergyImg,
+};
+
+const miguelExpressionSprites = {
+  festival_memory: miguelFestivalMemoryImg,
 };
 
 const hassanExpressionSprites = {
@@ -324,9 +329,10 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller" | "diagnostic_focus" | "warm_wisdom" | "flat_delivery" | "protective_archivist";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "festival_memory" | "storyteller" | "diagnostic_focus" | "warm_wisdom" | "flat_delivery" | "protective_archivist";
 
 const characterExpressionFallbacks: Partial<Record<string, Partial<Record<StoryCharacterExpression, ImageSourcePropType>>>> = {
+  miguel: miguelExpressionSprites,
   hassan: hassanExpressionSprites,
   sujin: sujinExpressionSprites,
   youngsook: youngsookExpressionSprites,
@@ -3521,7 +3527,7 @@ const MADRID_V21_STORY: Story = {
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#C8232C", portrait: ch2IsabelPortraitImg, portraitVariants: isabelExpressionSprites },
-    { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", nameId: "Don Miguel", side: "right", avatarBg: "#8B5A2B", portrait: ch2MiguelPortraitImg },
+    { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", nameId: "Don Miguel", side: "right", avatarBg: "#8B5A2B", portrait: ch2MiguelPortraitImg, portraitVariants: miguelExpressionSprites },
     { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", nameId: "Carlos", side: "right", avatarBg: "#6E4A35", portrait: ch2CarlosPortraitImg },
     { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg, portraitVariants: eleanorExpressionSprites },
   ],
@@ -3636,6 +3642,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "miguel",
+      expression: "festival_memory",
       text: "I remember the plaza before the broadcast. People argued, sang badly, laughed too loudly. It was not perfect. That is why it was alive.",
       textKo: "방송 전의 광장을 기억하오. 사람들은 다투고, 음정이 틀린 노래를 부르고, 너무 크게 웃었지. 완벽하지 않았소. 그래서 살아 있었소.",
       textKoMix: "broadcast 전의 plaza를 기억하오. 사람들은 다투고, 노래하고, 크게 웃었지. perfect하지 않았소. 그래서 살아 있었소.",
@@ -3701,6 +3708,7 @@ const MADRID_V21_STORY: Story = {
       kind: "scene",
       charId: "miguel",
       backdrop: "madrid-sealed-stage",
+      expression: "festival_memory",
       text: "The stage is behind the fountain. It used to pull every color toward it. Now it eats color instead.",
       textKo: "무대는 분수 뒤에 있소. 예전에는 모든 색을 끌어당겼지. 지금은 색을 먹어치우고 있소.",
       textKoMix: "stage는 fountain 뒤에 있소. 예전에는 모든 color를 끌어당겼지. 지금은 color를 먹어치우고 있소.",
@@ -3829,6 +3837,7 @@ const MADRID_V21_STORY: Story = {
       kind: "scene",
       charId: "miguel",
       backdrop: "madrid-restored",
+      expression: "festival_memory",
       text: "A festival is not a schedule. It is the mistakes in the song, the accent in the shout, the red where someone loved it enough to repaint it.",
       textKo: "축제는 일정표가 아니오. 노래 속 실수, 외침 속 억양, 누군가 사랑해서 다시 칠한 빨간색이 바로 축제요.",
       textKoMix: "festival은 schedule이 아니오. 노래 속 mistake, 외침 속 accent, 누군가 사랑해서 다시 칠한 red가 바로 festival이오.",
