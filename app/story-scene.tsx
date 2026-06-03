@@ -53,6 +53,7 @@ const miguelFestivalMemoryImg = require("@/assets/story/characters/miguel/miguel
 const ch2CarlosPortraitImg = require("@/assets/story/dialogue_sprites/ch2_carlos_sprite.png");
 const ch3BossPalaceImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace.png");
 const ch3MinhoPortraitImg = require("@/assets/story/dialogue_sprites/ch3_minho_sprite.png");
+const minhoStreetwiseGuideImg = require("@/assets/story/characters/minho/minho_streetwise_guide.png");
 const ch3YoungsookPortraitImg = require("@/assets/story/dialogue_sprites/ch3_youngsook_sprite.png");
 const youngsookWarmWisdomImg = require("@/assets/story/characters/youngsook/youngsook_warm_wisdom.png");
 const ch3SujinPortraitImg = require("@/assets/story/dialogue_sprites/ch3_sujin_sprite.png");
@@ -111,6 +112,10 @@ const isabelExpressionSprites = {
 
 const miguelExpressionSprites = {
   festival_memory: miguelFestivalMemoryImg,
+};
+
+const minhoExpressionSprites = {
+  streetwise_guide: minhoStreetwiseGuideImg,
 };
 
 const hassanExpressionSprites = {
@@ -334,7 +339,7 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "gruff_guard" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "festival_memory" | "storyteller" | "diagnostic_focus" | "warm_wisdom" | "flat_delivery" | "protective_archivist";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "gruff_guard" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "festival_memory" | "streetwise_guide" | "storyteller" | "diagnostic_focus" | "warm_wisdom" | "flat_delivery" | "protective_archivist";
 
 const characterExpressionFallbacks: Partial<Record<string, Partial<Record<StoryCharacterExpression, ImageSourcePropType>>>> = {
   tom: tomExpressionSprites,
@@ -3951,7 +3956,7 @@ const SEOUL_V21_STORY: Story = {
   },
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
-    { id: "minho", emoji: "🚕", name: "Minho", nameKo: "민호", nameId: "Minho", side: "right", avatarBg: "#1F6F8B", portrait: ch3MinhoPortraitImg },
+    { id: "minho", emoji: "🚕", name: "Minho", nameKo: "민호", nameId: "Minho", side: "right", avatarBg: "#1F6F8B", portrait: ch3MinhoPortraitImg, portraitVariants: minhoExpressionSprites },
     { id: "youngsook", emoji: "🍲", name: "Youngsook", nameKo: "영숙", nameId: "Youngsook", side: "right", avatarBg: "#A15C38", portrait: ch3YoungsookPortraitImg, portraitVariants: youngsookExpressionSprites },
     { id: "sujin", emoji: "🔬", name: "Dr. Sujin Han", nameKo: "한수진 박사", nameId: "Dr. Sujin Han", side: "right", avatarBg: "#4C6B4F", portrait: ch3SujinPortraitImg },
     { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg, portraitVariants: eleanorExpressionSprites },
@@ -3977,6 +3982,7 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "minho",
+      expression: "streetwise_guide",
       text: "You look lost. Tourist? Detective? Either way, first rule in Seoul: start politely. 안녕하세요.",
       textKo: "길 잃은 것 같은데요. 관광객? 탐정? 어느 쪽이든 서울의 첫 번째 규칙은 정중하게 시작하는 거예요. 안녕하세요.",
       textEs: "Pareces perdido. ¿Turista? ¿Detective? Da igual: la primera regla en Seúl es empezar con cortesía. 안녕하세요.",
@@ -4047,6 +4053,7 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "minho",
+      expression: "streetwise_guide",
       text: "Better. My taxi app is broken, but my grandmother's market is not. If Seoul is losing order, Youngsook will feel it before any machine does.",
       textKo: "좋아요. 제 택시 앱은 망가졌지만, 우리 할머니 시장은 아직 살아 있어요. 서울의 순서가 무너진다면 영숙 할머니가 기계보다 먼저 느낄 거예요.",
       textEs: "Mejor. Mi app de taxi está rota, pero el mercado de mi abuela no. Si Seúl pierde el orden, Youngsook lo sentirá antes que cualquier máquina.",

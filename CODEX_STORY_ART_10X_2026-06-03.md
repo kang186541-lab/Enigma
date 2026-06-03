@@ -249,6 +249,7 @@ assets/story/characters/amira/amira_protective_archivist.png
 assets/story/characters/youngsook/youngsook_warm_wisdom.png
 assets/story/characters/miguel/miguel_festival_memory.png
 assets/story/characters/tom/tom_gruff_guard.png
+assets/story/characters/minho/minho_streetwise_guide.png
 ```
 
 `SeqScene.expression` now lets a story beat choose a character sprite variant. `Character.portraitVariants` maps those authored expressions to runtime images.
@@ -282,11 +283,13 @@ Visual verification:
 - Youngsook now has an authored `warm_wisdom` sprite. It is wired only to active Seoul food-as-teaching beats: the first soup welcome, the stew/sentence-order metaphor, and the final "one more bite" farewell. Story text, quiz prompts, answer data, and sequence order remain unchanged.
 - Don Miguel now has an authored `festival_memory` sprite. It is wired only to active Madrid beats where he remembers the imperfect plaza, points toward the sealed stage, and defines festival as mistakes, accent, and repainted red. Story text, quiz prompts, answer data, and sequence order remain unchanged.
 - Sidecar reviewer Gibbs ranked Tom as the next highest-value recurring character, because he anchors the first playable gatekeeper scene and returns for Babel's connection callback. Tom now has an authored `gruff_guard` sprite wired to the London entrance challenge, London reluctant approval / "Break a leg" beat, and Babel connection-gate callback. Story text, quiz prompts, answer data, and sequence order remain unchanged.
-- Latest asset audit: 104 story PNGs, 216,520,564 bytes total, 34 character assets, warnings 0.
+- Sidecar reviewer Turing ranked Minho ahead of Carlos for this pass, because Minho anchors Seoul's first human contact and the post-puzzle route handoff while Carlos currently has one active speaking payoff after the Madrid boss. Minho now has an authored `streetwise_guide` sprite wired only to those two active Seoul guide beats. Story text, quiz prompts, answer data, and sequence order remain unchanged.
+- Local web capture confirmed Seoul 3/27 renders `minho_streetwise_guide` over the Seoul palace/subway backdrop: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\minho-streetwise-guide-seoul.png`.
+- Latest asset audit: 105 story PNGs, 218,192,985 bytes total, 35 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, and Don Miguel now each have authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast. Next likely targets: Minho and Carlos.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, Don Miguel, and Minho now each have authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast. Next likely target: Carlos.
 
 ## QA Command
 
@@ -298,12 +301,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 97 PNG files.
-- 196.63 MB total.
+- 105 PNG files.
+- 218.19 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 27 files, 47.69 MB, 26.8% average brightness.
+- character: 35 files, 59.14 MB, 25.6% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.
