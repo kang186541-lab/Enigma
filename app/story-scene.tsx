@@ -52,6 +52,7 @@ const ch2CarlosPortraitImg = require("@/assets/story/dialogue_sprites/ch2_carlos
 const ch3BossPalaceImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace.png");
 const ch3MinhoPortraitImg = require("@/assets/story/dialogue_sprites/ch3_minho_sprite.png");
 const ch3YoungsookPortraitImg = require("@/assets/story/dialogue_sprites/ch3_youngsook_sprite.png");
+const youngsookWarmWisdomImg = require("@/assets/story/characters/youngsook/youngsook_warm_wisdom.png");
 const ch3SujinPortraitImg = require("@/assets/story/dialogue_sprites/ch3_sujin_sprite.png");
 const sujinDiagnosticFocusImg = require("@/assets/story/characters/sujin/sujin_diagnostic_focus.png");
 const ch4BossArchiveImg = require("@/assets/story/chapter4_motion_comic/ch4_boss_archive.png");
@@ -108,6 +109,10 @@ const hassanExpressionSprites = {
 
 const sujinExpressionSprites = {
   diagnostic_focus: sujinDiagnosticFocusImg,
+};
+
+const youngsookExpressionSprites = {
+  warm_wisdom: youngsookWarmWisdomImg,
 };
 
 const miraExpressionSprites = {
@@ -319,11 +324,12 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller" | "diagnostic_focus" | "flat_delivery" | "protective_archivist";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller" | "diagnostic_focus" | "warm_wisdom" | "flat_delivery" | "protective_archivist";
 
 const characterExpressionFallbacks: Partial<Record<string, Partial<Record<StoryCharacterExpression, ImageSourcePropType>>>> = {
   hassan: hassanExpressionSprites,
   sujin: sujinExpressionSprites,
+  youngsook: youngsookExpressionSprites,
   mira: miraExpressionSprites,
   amira: amiraExpressionSprites,
 };
@@ -3928,7 +3934,7 @@ const SEOUL_V21_STORY: Story = {
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
     { id: "minho", emoji: "🚕", name: "Minho", nameKo: "민호", nameId: "Minho", side: "right", avatarBg: "#1F6F8B", portrait: ch3MinhoPortraitImg },
-    { id: "youngsook", emoji: "🍲", name: "Youngsook", nameKo: "영숙", nameId: "Youngsook", side: "right", avatarBg: "#A15C38", portrait: ch3YoungsookPortraitImg },
+    { id: "youngsook", emoji: "🍲", name: "Youngsook", nameKo: "영숙", nameId: "Youngsook", side: "right", avatarBg: "#A15C38", portrait: ch3YoungsookPortraitImg, portraitVariants: youngsookExpressionSprites },
     { id: "sujin", emoji: "🔬", name: "Dr. Sujin Han", nameKo: "한수진 박사", nameId: "Dr. Sujin Han", side: "right", avatarBg: "#4C6B4F", portrait: ch3SujinPortraitImg },
     { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg, portraitVariants: eleanorExpressionSprites },
   ],
@@ -4031,6 +4037,7 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "youngsook",
+      expression: "warm_wisdom",
       text: "아이고, 먼 길 왔네. Sit. Eat first. Words come back better when people are fed.",
       textKo: "아이고, 먼 길 왔네. 앉아. 먼저 먹어. 사람은 배가 차야 말도 제대로 돌아오는 법이야.",
       textEs: "Ay, viniste de muy lejos. Siéntate. Come primero. Las palabras vuelven mejor cuando la gente está alimentada.",
@@ -4083,6 +4090,7 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "youngsook",
+      expression: "warm_wisdom",
       text: "A sentence is like stew. Put the last thing first and the taste changes. Go to Dr. Han. She studies that sort of broken order.",
       textKo: "문장은 찌개 같아. 마지막에 넣을 걸 처음에 넣으면 맛이 달라지지. 한 박사에게 가봐. 그 사람은 그런 무너진 순서를 연구해.",
       textEs: "Una frase es como un guiso. Si pones primero lo que va al final, cambia el sabor. Ve con la Dra. Han. Ella estudia ese orden roto.",
@@ -4365,6 +4373,7 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "youngsook",
+      expression: "warm_wisdom",
       text: "가야지. But eat one more bite before you go. Goodbye, Detective. And 감사합니다 for bringing the order back.",
       textKo: "가야지. 그래도 가기 전에 한 입 더 먹고 가. Goodbye, 탐정. 그리고 순서를 되돌려줘서 감사합니다.",
       textEs: "Tienes que ir. Pero come un bocado más antes. Goodbye, Detective. Y 감사합니다 por devolver el orden.",
