@@ -41,7 +41,12 @@ export const ch1Timeline: IntroTimeline = {
           ],
         },
       },
-      accessibilityLabel: "A phone message loses its words in the dark.",
+      accessibilityLabel: {
+        english: "A phone message loses its words in the dark.",
+        korean: "어둠 속에서 휴대폰 메시지의 단어들이 사라집니다.",
+        spanish: "Un mensaje de teléfono pierde sus palabras en la oscuridad.",
+        indonesian: "Pesan ponsel kehilangan kata-katanya dalam gelap.",
+      },
     },
     {
       id: "open",
@@ -50,7 +55,12 @@ export const ch1Timeline: IntroTimeline = {
       motion: "drift-left",
       cue: "open",
       overlay: "open",
-      accessibilityLabel: "A London cafe sign restores with golden language light.",
+      accessibilityLabel: {
+        english: "A London cafe sign restores with golden language light.",
+        korean: "런던 카페 간판이 황금빛 언어의 빛으로 복원됩니다.",
+        spanish: "Un letrero de café en Londres se restaura con luz dorada de lenguaje.",
+        indonesian: "Papan kafe London pulih dengan cahaya bahasa berwarna emas.",
+      },
     },
     {
       id: "ellis",
@@ -59,7 +69,12 @@ export const ch1Timeline: IntroTimeline = {
       motion: "push",
       cue: "gasp",
       overlay: "find",
-      accessibilityLabel: "A cafe employee shows Dr Ellis leaving one clue behind.",
+      accessibilityLabel: {
+        english: "A cafe employee shows Dr Ellis leaving one clue behind.",
+        korean: "카페 직원이 단서 하나를 남기고 떠나는 엘리스 박사를 보여 줍니다.",
+        spanish: "Una empleada del café muestra a la doctora Ellis dejando una pista.",
+        indonesian: "Pegawai kafe memperlihatkan Dr. Ellis meninggalkan satu petunjuk.",
+      },
     },
     {
       id: "rudy",
@@ -67,7 +82,12 @@ export const ch1Timeline: IntroTimeline = {
       source: SHOT_IMAGES.rudySpirit,
       motion: "drift-right",
       cue: "chime",
-      accessibilityLabel: "A golden fox spirit wakes above the phone.",
+      accessibilityLabel: {
+        english: "A golden fox spirit wakes above the phone.",
+        korean: "황금빛 여우 영혼이 휴대폰 위에서 깨어납니다.",
+        spanish: "Un espíritu de zorro dorado despierta sobre el teléfono.",
+        indonesian: "Roh rubah emas terbangun di atas ponsel.",
+      },
     },
     {
       id: "rudy-react",
@@ -76,7 +96,12 @@ export const ch1Timeline: IntroTimeline = {
       motion: "drift-left",
       cue: "sense",
       overlay: "rudy-react",
-      accessibilityLabel: "Rudy senses a cold threat off-frame.",
+      accessibilityLabel: {
+        english: "Rudy senses a cold threat off-frame.",
+        korean: "루디가 화면 밖의 차가운 위협을 감지합니다.",
+        spanish: "Rudy percibe una amenaza fría fuera de cuadro.",
+        indonesian: "Rudy merasakan ancaman dingin di luar bingkai.",
+      },
     },
     {
       id: "black",
@@ -85,7 +110,12 @@ export const ch1Timeline: IntroTimeline = {
       motion: "pull",
       cue: "steps",
       overlay: "black",
-      accessibilityLabel: "Mr Black walks away through a CCTV museum corridor.",
+      accessibilityLabel: {
+        english: "Mr Black walks away through a CCTV museum corridor.",
+        korean: "미스터 블랙이 CCTV 속 박물관 복도를 걸어 사라집니다.",
+        spanish: "Mr. Black se aleja por un pasillo de museo visto por CCTV.",
+        indonesian: "Mr. Black berjalan menjauh melalui koridor museum di CCTV.",
+      },
     },
     {
       id: "naming",
@@ -94,7 +124,12 @@ export const ch1Timeline: IntroTimeline = {
       motion: "push",
       cue: "chime",
       overlay: "naming",
-      accessibilityLabel: "Rudy's name restores his detective form.",
+      accessibilityLabel: {
+        english: "Rudy's name restores his detective form.",
+        korean: "루디의 이름이 돌아오며 탐정의 모습이 복원됩니다.",
+        spanish: "El nombre de Rudy restaura su forma de detective.",
+        indonesian: "Nama Rudy memulihkan wujud detektifnya.",
+      },
     },
   ],
   finalDialogue: {

@@ -42,7 +42,12 @@ export const ch3Timeline: IntroTimeline = {
           ],
         },
       },
-      accessibilityLabel: "A dead phone in Incheon airport leaks golden language particles.",
+      accessibilityLabel: {
+        english: "A dead phone in Incheon airport leaks golden language particles.",
+        korean: "인천공항의 꺼진 휴대폰에서 황금빛 언어 입자가 새어 나옵니다.",
+        spanish: "Un teléfono apagado en el aeropuerto de Incheon filtra partículas doradas de lenguaje.",
+        indonesian: "Ponsel mati di bandara Incheon memancarkan partikel bahasa berwarna emas.",
+      },
     },
     {
       id: "subway-restore",
@@ -54,7 +59,12 @@ export const ch3Timeline: IntroTimeline = {
       overlayCopy: {
         word: "출구",
       },
-      accessibilityLabel: "A Seoul subway sign restores with golden Korean word light.",
+      accessibilityLabel: {
+        english: "A Seoul subway sign restores with golden Korean word light.",
+        korean: "서울 지하철 표지판이 황금빛 한국어 단어의 빛으로 복원됩니다.",
+        spanish: "Un letrero del metro de Seúl se restaura con luz dorada de palabras coreanas.",
+        indonesian: "Papan subway Seoul pulih dengan cahaya kata Korea berwarna emas.",
+      },
     },
     {
       id: "sujin-lab",
@@ -66,7 +76,12 @@ export const ch3Timeline: IntroTimeline = {
       overlayCopy: {
         word: "순서",
       },
-      accessibilityLabel: "Sujin studies broken sentence order in her linguistics lab.",
+      accessibilityLabel: {
+        english: "Sujin studies broken sentence order in her linguistics lab.",
+        korean: "수진이 언어학 연구실에서 무너진 문장 순서를 연구합니다.",
+        spanish: "Sujin estudia el orden roto de las frases en su laboratorio de lingüística.",
+        indonesian: "Sujin meneliti urutan kalimat yang rusak di laboratorium linguistiknya.",
+      },
     },
     {
       id: "rudy-palace",
@@ -74,7 +89,12 @@ export const ch3Timeline: IntroTimeline = {
       source: SHOT_IMAGES.rudyPalace,
       motion: "drift-right",
       cue: "chime",
-      accessibilityLabel: "Rudy hovers above a dissolving Gyeongbokgung palace gate.",
+      accessibilityLabel: {
+        english: "Rudy hovers above a dissolving Gyeongbokgung palace gate.",
+        korean: "루디가 녹아내리는 경복궁 문 위를 떠다닙니다.",
+        spanish: "Rudy flota sobre una puerta de Gyeongbokgung que se disuelve.",
+        indonesian: "Rudy melayang di atas gerbang Gyeongbokgung yang memudar.",
+      },
     },
     {
       id: "rudy-react",
@@ -83,7 +103,12 @@ export const ch3Timeline: IntroTimeline = {
       motion: "drift-left",
       cue: "sense",
       overlay: "festival-threat",
-      accessibilityLabel: "Rudy senses a familiar cold signal above the palace.",
+      accessibilityLabel: {
+        english: "Rudy senses a familiar cold signal above the palace.",
+        korean: "루디가 궁 위에서 익숙한 차가운 신호를 감지합니다.",
+        spanish: "Rudy percibe una señal fría y familiar sobre el palacio.",
+        indonesian: "Rudy merasakan sinyal dingin yang familier di atas istana.",
+      },
     },
     {
       id: "black-intercept",
@@ -92,7 +117,12 @@ export const ch3Timeline: IntroTimeline = {
       motion: "pull",
       cue: "wind",
       overlay: "black",
-      accessibilityLabel: "Mr Black's voice is intercepted through a radio receiver.",
+      accessibilityLabel: {
+        english: "Mr Black's voice is intercepted through a radio receiver.",
+        korean: "라디오 수신기를 통해 미스터 블랙의 목소리가 포착됩니다.",
+        spanish: "La voz de Mr. Black es interceptada por un receptor de radio.",
+        indonesian: "Suara Mr. Black tertangkap melalui penerima radio.",
+      },
     },
     {
       id: "cairo-record",
@@ -100,7 +130,12 @@ export const ch3Timeline: IntroTimeline = {
       source: SHOT_IMAGES.cairoRecord,
       motion: "push",
       cue: "drum",
-      accessibilityLabel: "An old record and sealed note point from Seoul toward Cairo.",
+      accessibilityLabel: {
+        english: "An old record and sealed note point from Seoul toward Cairo.",
+        korean: "오래된 기록과 봉인된 쪽지가 서울에서 카이로를 가리킵니다.",
+        spanish: "Un viejo registro y una nota sellada apuntan de Seúl hacia El Cairo.",
+        indonesian: "Catatan tua dan pesan tersegel menunjuk dari Seoul menuju Kairo.",
+      },
     },
   ],
   finalDialogue: {

@@ -331,7 +331,7 @@ export default function StoryIntroMotionComic({
         )}
 
         {phase === "playing" && (
-          <ShotFrame key={currentShot.id} shot={currentShot}>
+          <ShotFrame key={currentShot.id} nativeLang={nativeLang} shot={currentShot}>
             {renderOverlay(currentShot, timeline, nativeLang)}
           </ShotFrame>
         )}
@@ -414,9 +414,11 @@ export default function StoryIntroMotionComic({
 }
 
 function ShotFrame({
+  nativeLang,
   shot,
   children,
 }: {
+  nativeLang: NativeLanguage;
   shot: StoryIntroShot;
   children?: React.ReactNode;
 }) {
@@ -456,7 +458,7 @@ function ShotFrame({
     <Animated.View style={[styles.shot, { opacity }]}>
       <Animated.Image
         accessibilityIgnoresInvertColors
-        accessibilityLabel={shot.accessibilityLabel}
+        accessibilityLabel={localizeText(shot.accessibilityLabel, nativeLang)}
         resizeMode="cover"
         source={shot.source}
         style={[

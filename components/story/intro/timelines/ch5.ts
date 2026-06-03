@@ -31,7 +31,12 @@ export const ch5Timeline: IntroTimeline = {
           indonesian: "BABEL",
         },
       },
-      accessibilityLabel: "Four city stones project the final Babel coordinates.",
+      accessibilityLabel: {
+        english: "Four city stones project the final Babel coordinates.",
+        korean: "네 도시의 돌이 마지막 바벨 좌표를 비춥니다.",
+        spanish: "Cuatro piedras de ciudad proyectan las coordenadas finales de Babel.",
+        indonesian: "Empat batu kota memproyeksikan koordinat Babel terakhir.",
+      },
     },
     {
       id: "tower-approach",
@@ -39,7 +44,12 @@ export const ch5Timeline: IntroTimeline = {
       source: SHOT_IMAGES.towerApproach,
       motion: "drift-left",
       cue: "wind",
-      accessibilityLabel: "The party approaches the modern Babel Tower in the desert.",
+      accessibilityLabel: {
+        english: "The party approaches the modern Babel Tower in the desert.",
+        korean: "일행이 사막의 현대적인 바벨 탑에 다가갑니다.",
+        spanish: "El grupo se acerca a la moderna Torre de Babel en el desierto.",
+        indonesian: "Rombongan mendekati Menara Babel modern di gurun.",
+      },
     },
     {
       id: "language-gates",
@@ -56,7 +66,12 @@ export const ch5Timeline: IntroTimeline = {
           indonesian: "GERBANG",
         },
       },
-      accessibilityLabel: "Five language gates stack upward inside Babel Tower.",
+      accessibilityLabel: {
+        english: "Five language gates stack upward inside Babel Tower.",
+        korean: "바벨 탑 안에서 다섯 언어 관문이 위로 이어집니다.",
+        spanish: "Cinco puertas de lenguaje se apilan hacia arriba dentro de la Torre de Babel.",
+        indonesian: "Lima gerbang bahasa tersusun ke atas di dalam Menara Babel.",
+      },
     },
     {
       id: "rudy-allies",
@@ -64,7 +79,12 @@ export const ch5Timeline: IntroTimeline = {
       source: SHOT_IMAGES.rudyAllies,
       motion: "drift-right",
       cue: "chime",
-      accessibilityLabel: "Spirit Rudy and the allies gather before the final gate.",
+      accessibilityLabel: {
+        english: "Spirit Rudy and the allies gather before the final gate.",
+        korean: "영혼 모습의 루디와 동료들이 마지막 관문 앞에 모입니다.",
+        spanish: "El espíritu Rudy y los aliados se reúnen ante la puerta final.",
+        indonesian: "Roh Rudy dan para sekutu berkumpul di depan gerbang terakhir.",
+      },
     },
     {
       id: "black-silhouette",
@@ -73,7 +93,12 @@ export const ch5Timeline: IntroTimeline = {
       motion: "pull",
       cue: "steps",
       overlay: "black",
-      accessibilityLabel: "Mr Black appears as a full silhouette above the Babel gates.",
+      accessibilityLabel: {
+        english: "Mr Black appears as a full silhouette above the Babel gates.",
+        korean: "미스터 블랙이 바벨 관문 위에 완전한 실루엣으로 나타납니다.",
+        spanish: "Mr. Black aparece como una silueta completa sobre las puertas de Babel.",
+        indonesian: "Mr. Black muncul sebagai siluet penuh di atas gerbang Babel.",
+      },
     },
     {
       id: "black-face",
@@ -81,7 +106,12 @@ export const ch5Timeline: IntroTimeline = {
       source: SHOT_IMAGES.blackFace,
       motion: "push",
       cue: "sense",
-      accessibilityLabel: "Mr Black's tired face is finally revealed in the Babel chamber.",
+      accessibilityLabel: {
+        english: "Mr Black's tired face is finally revealed in the Babel chamber.",
+        korean: "바벨 방 안에서 미스터 블랙의 지친 얼굴이 마침내 드러납니다.",
+        spanish: "El rostro cansado de Mr. Black se revela por fin en la cámara de Babel.",
+        indonesian: "Wajah lelah Mr. Black akhirnya terungkap di ruang Babel.",
+      },
     },
     {
       id: "lullaby-journal",
@@ -98,7 +128,12 @@ export const ch5Timeline: IntroTimeline = {
           indonesian: "INGAT",
         },
       },
-      accessibilityLabel: "Ellis's journal and the seven stones carry the Welsh lullaby back into the room.",
+      accessibilityLabel: {
+        english: "Ellis's journal and the seven stones carry the Welsh lullaby back into the room.",
+        korean: "엘리스의 일지와 일곱 돌이 웨일스 자장가를 방 안으로 되돌립니다.",
+        spanish: "El diario de Ellis y las siete piedras devuelven la nana galesa a la habitación.",
+        indonesian: "Jurnal Ellis dan tujuh batu membawa lagu nina bobo Wales kembali ke ruangan.",
+      },
     },
   ],
   finalDialogue: {

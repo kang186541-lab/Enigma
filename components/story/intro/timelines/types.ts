@@ -45,7 +45,7 @@ export type StoryIntroShot = {
     phoneLines?: LocalizedTextList;
     word?: LocalizedText;
   };
-  accessibilityLabel: string;
+  accessibilityLabel: LocalizedText;
 };
 
 export interface IntroTimeline {

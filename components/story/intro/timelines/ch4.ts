@@ -42,7 +42,12 @@ export const ch4Timeline: IntroTimeline = {
           ],
         },
       },
-      accessibilityLabel: "A Cairo hospital record loses its words from a phone screen.",
+      accessibilityLabel: {
+        english: "A Cairo hospital record loses its words from a phone screen.",
+        korean: "휴대폰 화면 속 카이로 병원 기록에서 단어들이 사라집니다.",
+        spanish: "Un registro de hospital de El Cairo pierde sus palabras en la pantalla del teléfono.",
+        indonesian: "Catatan rumah sakit Kairo kehilangan kata-katanya dari layar ponsel.",
+      },
     },
     {
       id: "hieroglyph-restore",
@@ -59,7 +64,12 @@ export const ch4Timeline: IntroTimeline = {
           indonesian: "CATATAN",
         },
       },
-      accessibilityLabel: "One abstract inscription mark restores on a Cairo chamber wall.",
+      accessibilityLabel: {
+        english: "One abstract inscription mark restores on a Cairo chamber wall.",
+        korean: "카이로 석실 벽에서 추상적인 비문 표식 하나가 복원됩니다.",
+        spanish: "Una marca abstracta de inscripción se restaura en la pared de una cámara de El Cairo.",
+        indonesian: "Satu tanda prasasti abstrak pulih di dinding ruang Kairo.",
+      },
     },
     {
       id: "amira-records",
@@ -76,7 +86,12 @@ export const ch4Timeline: IntroTimeline = {
           indonesian: "MENULIS",
         },
       },
-      accessibilityLabel: "Professor Amira watches a hospital record crumble into golden sand.",
+      accessibilityLabel: {
+        english: "Professor Amira watches a hospital record crumble into golden sand.",
+        korean: "아미라 교수가 병원 기록이 황금빛 모래로 부서지는 것을 바라봅니다.",
+        spanish: "La profesora Amira ve cómo un registro de hospital se deshace en arena dorada.",
+        indonesian: "Profesor Amira melihat catatan rumah sakit hancur menjadi pasir emas.",
+      },
     },
     {
       id: "rudy-archive",
@@ -84,7 +99,12 @@ export const ch4Timeline: IntroTimeline = {
       source: SHOT_IMAGES.rudyArchive,
       motion: "drift-right",
       cue: "chime",
-      accessibilityLabel: "Rudy hovers before a sealed Egyptian inscription archive.",
+      accessibilityLabel: {
+        english: "Rudy hovers before a sealed Egyptian inscription archive.",
+        korean: "루디가 봉인된 이집트 비문 보관소 앞을 떠다닙니다.",
+        spanish: "Rudy flota ante un archivo sellado de inscripciones egipcias.",
+        indonesian: "Rudy melayang di depan arsip prasasti Mesir yang tersegel.",
+      },
     },
     {
       id: "rudy-hand-shadow",
@@ -93,7 +113,12 @@ export const ch4Timeline: IntroTimeline = {
       motion: "drift-left",
       cue: "sense",
       overlay: "festival-threat",
-      accessibilityLabel: "Rudy senses a hand holding a golden stone fragment in shadow.",
+      accessibilityLabel: {
+        english: "Rudy senses a hand holding a golden stone fragment in shadow.",
+        korean: "루디가 그림자 속에서 황금빛 돌 조각을 든 손을 감지합니다.",
+        spanish: "Rudy percibe una mano que sostiene un fragmento de piedra dorada en la sombra.",
+        indonesian: "Rudy merasakan tangan yang memegang pecahan batu emas dalam bayangan.",
+      },
     },
     {
       id: "black-partial",
@@ -102,7 +127,12 @@ export const ch4Timeline: IntroTimeline = {
       motion: "pull",
       cue: "wind",
       overlay: "black",
-      accessibilityLabel: "Mr Black is partially revealed through a hand, mouth, and stone reflection.",
+      accessibilityLabel: {
+        english: "Mr Black is partially revealed through a hand, mouth, and stone reflection.",
+        korean: "손과 입, 돌의 반사를 통해 미스터 블랙의 일부가 드러납니다.",
+        spanish: "Mr. Black se revela parcialmente a través de una mano, una boca y el reflejo de la piedra.",
+        indonesian: "Mr. Black terlihat sebagian melalui tangan, mulut, dan pantulan batu.",
+      },
     },
     {
       id: "babel-hook",
@@ -119,7 +149,12 @@ export const ch4Timeline: IntroTimeline = {
           indonesian: "BABEL",
         },
       },
-      accessibilityLabel: "Ellis's journal and an old papyrus point toward Babel.",
+      accessibilityLabel: {
+        english: "Ellis's journal and an old papyrus point toward Babel.",
+        korean: "엘리스의 일지와 오래된 파피루스가 바벨을 가리킵니다.",
+        spanish: "El diario de Ellis y un viejo papiro apuntan hacia Babel.",
+        indonesian: "Jurnal Ellis dan papirus tua menunjuk ke Babel.",
+      },
     },
   ],
   finalDialogue: {

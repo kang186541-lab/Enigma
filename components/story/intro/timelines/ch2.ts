@@ -42,7 +42,12 @@ export const ch2Timeline: IntroTimeline = {
           ],
         },
       },
-      accessibilityLabel: "Madrid plaza colors drain from a phone screen.",
+      accessibilityLabel: {
+        english: "Madrid plaza colors drain from a phone screen.",
+        korean: "휴대폰 화면 속 마드리드 광장에서 색이 빠져나갑니다.",
+        spanish: "Los colores de la plaza de Madrid se vacían desde la pantalla del teléfono.",
+        indonesian: "Warna plaza Madrid memudar dari layar ponsel.",
+      },
     },
     {
       id: "color-restore",
@@ -51,7 +56,12 @@ export const ch2Timeline: IntroTimeline = {
       motion: "drift-left",
       cue: "open",
       overlay: "color-restore",
-      accessibilityLabel: "A red festival flag returns to a colorless plaza.",
+      accessibilityLabel: {
+        english: "A red festival flag returns to a colorless plaza.",
+        korean: "색이 사라진 광장에 붉은 축제 깃발이 돌아옵니다.",
+        spanish: "Una bandera roja de festival vuelve a una plaza sin color.",
+        indonesian: "Bendera festival merah kembali ke plaza tanpa warna.",
+      },
     },
     {
       id: "carlos-call",
@@ -68,7 +78,12 @@ export const ch2Timeline: IntroTimeline = {
           indonesian: "TOLONG",
         },
       },
-      accessibilityLabel: "Isabel's phone replays Carlos's last call.",
+      accessibilityLabel: {
+        english: "Isabel's phone replays Carlos's last call.",
+        korean: "이사벨의 휴대폰이 카를로스의 마지막 통화를 재생합니다.",
+        spanish: "El teléfono de Isabel reproduce la última llamada de Carlos.",
+        indonesian: "Ponsel Isabel memutar ulang panggilan terakhir Carlos.",
+      },
     },
     {
       id: "rudy-festival",
@@ -76,7 +91,12 @@ export const ch2Timeline: IntroTimeline = {
       source: SHOT_IMAGES.rudyFestival,
       motion: "drift-right",
       cue: "guitar",
-      accessibilityLabel: "Rudy hovers over a colorless Madrid festival stage.",
+      accessibilityLabel: {
+        english: "Rudy hovers over a colorless Madrid festival stage.",
+        korean: "루디가 색을 잃은 마드리드 축제 무대 위를 떠다닙니다.",
+        spanish: "Rudy flota sobre un escenario de festival madrileño sin color.",
+        indonesian: "Rudy melayang di atas panggung festival Madrid yang kehilangan warna.",
+      },
     },
     {
       id: "rudy-react",
@@ -85,7 +105,12 @@ export const ch2Timeline: IntroTimeline = {
       motion: "drift-left",
       cue: "sense",
       overlay: "festival-threat",
-      accessibilityLabel: "Rudy senses a familiar threat from the plaza speakers.",
+      accessibilityLabel: {
+        english: "Rudy senses a familiar threat from the plaza speakers.",
+        korean: "루디가 광장 스피커에서 익숙한 위협을 감지합니다.",
+        spanish: "Rudy percibe una amenaza familiar desde los altavoces de la plaza.",
+        indonesian: "Rudy merasakan ancaman yang familier dari pengeras suara plaza.",
+      },
     },
     {
       id: "black-broadcast",
@@ -94,7 +119,12 @@ export const ch2Timeline: IntroTimeline = {
       motion: "pull",
       cue: "wind",
       overlay: "black",
-      accessibilityLabel: "Mr Black's voice echoes over Madrid plaza speakers.",
+      accessibilityLabel: {
+        english: "Mr Black's voice echoes over Madrid plaza speakers.",
+        korean: "미스터 블랙의 목소리가 마드리드 광장 스피커에 울립니다.",
+        spanish: "La voz de Mr. Black resuena en los altavoces de la plaza de Madrid.",
+        indonesian: "Suara Mr. Black bergema dari pengeras suara plaza Madrid.",
+      },
     },
     {
       id: "color-recall",
@@ -102,7 +132,12 @@ export const ch2Timeline: IntroTimeline = {
       source: SHOT_IMAGES.colorRecall,
       motion: "push",
       cue: "chime",
-      accessibilityLabel: "Rudy remembers the first returning color.",
+      accessibilityLabel: {
+        english: "Rudy remembers the first returning color.",
+        korean: "루디가 처음 돌아온 색을 기억합니다.",
+        spanish: "Rudy recuerda el primer color que volvió.",
+        indonesian: "Rudy mengingat warna pertama yang kembali.",
+      },
     },
   ],
   finalDialogue: {
