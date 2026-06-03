@@ -107,7 +107,7 @@ Generate these before replacing broad chapter art:
 
 - Rudy: neutral guide, worried detective, celebratory coach. `[DONE: worried + celebratory runtime sprites]`
 - Mr. Black: silhouette menace, tired reveal, fragile remorse. `[DONE: tired reveal + fragile remorse runtime sprites]`
-- Eleanor: calm mentor, urgent warning, analytical discovery. `[DONE: urgent warning runtime sprite]`
+- Eleanor: calm mentor, urgent warning, analytical discovery. `[DONE: urgent warning + analytical discovery runtime sprites]`
 - Penny: warm guide, anxious final clue, brave resolve.
 - Isabel: playful confidence, shocked concern, rallying energy. `[DONE: shocked concern + rallying runtime sprites]`
 
@@ -237,6 +237,7 @@ assets/story/characters/mr_black/mr_black_tired_reveal.png
 assets/story/characters/rudy/rudy_worried_detective.png
 assets/story/characters/rudy/rudy_celebratory_coach.png
 assets/story/characters/eleanor/eleanor_urgent_warning.png
+assets/story/characters/eleanor/eleanor_analytical_discovery.png
 assets/story/characters/isabel/isabel_shocked_concern.png
 assets/story/characters/isabel/isabel_rallying_energy.png
 ```
@@ -261,14 +262,14 @@ Visual verification:
 - Rudy now has authored `worried` and `celebratory` sprites wired through the same expression system; Madrid's first Rudy scene uses `worried`, London reward beats and Babel's final reflection use `celebratory`.
 - Local web capture confirmed Madrid 2/21 renders `rudy_worried_detective` over the drained-plaza backdrop: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\rudy-worried-madrid.png`.
 - Web bundle verification confirmed both Rudy expression assets are emitted: `rudy_worried_detective.af3781...png` and `rudy_celebratory_coach.79b8...png`.
-- Eleanor now has an authored `urgent` warning sprite wired to the FIND reveal, black-coat/language-obedience warning, clue-seal risk, Seoul phone warning, and Cairo-to-Babel warning.
+- Eleanor now has authored `urgent` and `analytical` sprites. `urgent` remains wired to danger/warning beats; `analytical` is wired to the verbal-lock explanation, London shard interpretation, and Seoul hospital-record synthesis.
 - Isabel now has authored `shocked` and `rallying` sprites. In the active Madrid route, `shocked` is wired to the Carlos disappearance report and sealed-stage reveal, while `rallying` is wired to the red-flag heartbeat beat and restored-festival goodbye. Babel's "one voice is not a festival" callback also uses `rallying`. The legacy Madrid block still uses `shocked` for the Carlos phone account and unknown-basic-phrases line.
 - Mr. Black now has authored `tired` and `remorse` sprites. Babel's first direct confrontation uses `tired` for the "did anyone ever look at you like you mattered?" reveal, while the mother/lullaby scenes keep `remorse`.
-- Latest asset audit: 94 story PNGs, 202,452,455 bytes total, 24 character assets, warnings 0.
+- Latest asset audit: 95 story PNGs, 203,529,902 bytes total, 25 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy has two authored emotional poses, Isabel has shocked concern and rallying energy, Mr. Black has tired reveal and fragile remorse, and Eleanor/Penny have one each, but true Ace Attorney-quality integration still needs playful Isabel plus transparent expression/action sheets for the remaining recurring cast.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Eleanor, Isabel, and Mr. Black now each have two authored emotional poses, and Penny has one, but true Ace Attorney-quality integration still needs playful Isabel, Penny brave resolve, and transparent expression/action sheets for the remaining recurring cast.
 
 ## QA Command
 
@@ -280,12 +281,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 94 PNG files.
-- 193.07 MB total.
+- 95 PNG files.
+- 194.10 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 24 files, 44.13 MB, 27.9% average brightness.
+- character: 25 files, 45.16 MB, 27.8% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.

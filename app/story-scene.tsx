@@ -64,6 +64,7 @@ const ch5BlackFaceImg = require("@/assets/story/dialogue_sprites/ch5_black_face_
 const rudyWorriedDetectiveImg = require("@/assets/story/characters/rudy/rudy_worried_detective.png");
 const rudyCelebratoryCoachImg = require("@/assets/story/characters/rudy/rudy_celebratory_coach.png");
 const eleanorUrgentWarningImg = require("@/assets/story/characters/eleanor/eleanor_urgent_warning.png");
+const eleanorAnalyticalDiscoveryImg = require("@/assets/story/characters/eleanor/eleanor_analytical_discovery.png");
 const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
 const mrBlackFragileRemorseImg = require("@/assets/story/characters/mr_black/mr_black_fragile_remorse.png");
 const mrBlackTiredRevealImg = require("@/assets/story/characters/mr_black/mr_black_tired_reveal.png");
@@ -86,6 +87,7 @@ const rudyExpressionSprites = {
 
 const eleanorExpressionSprites = {
   urgent: eleanorUrgentWarningImg,
+  analytical: eleanorAnalyticalDiscoveryImg,
 };
 
 const isabelExpressionSprites = {
@@ -289,7 +291,7 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "shocked" | "rallying";
+type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying";
 
 /* Sequence items */
 type SeqScene = {
@@ -995,6 +997,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "eleanor",
+        expression: "analytical",
         text: "That door has no keyhole. Ellis called it a verbal lock. It opens only when a speaker gives it a sentence with need, direction, and a name. A little dramatic, yes. She was always like that.",
         textKo: "저 문에는 열쇠구멍이 없어요. 엘리스 박사는 저걸 verbal lock이라고 불렀죠. 필요, 방향, 이름이 들어간 문장을 말해야만 열립니다. 조금 극적이죠. 네, 박사님은 늘 저랬어요.",
         textKoMix: "저 문에는 열쇠구멍이 없어요. Ellis는 저걸 verbal lock이라고 불렀죠. need, direction, name이 들어간 sentence가 필요해요.",
@@ -1108,6 +1111,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "eleanor",
+        expression: "analytical",
         text: "Thank you. Truly. If Ellis left this for anyone, she left it for a beginner brave enough to say the first sentence. But the figure who signs as B left one thing on purpose. Tom found it under the case.",
         textKo: "감사합니다. 진심으로요. 엘리스 박사가 이걸 누군가에게 남겼다면, 첫 문장을 말할 만큼 용감한 초보자에게 남긴 거예요. 하지만 B라고 서명한 인물도 일부러 남긴 게 하나 있어요. 톰이 진열장 아래에서 찾았습니다.",
         textKoMix: "Thank you. 진심이에요. Ellis가 이걸 남겼다면 첫 sentence를 말할 만큼 용감한 beginner에게 남긴 거예요. 하지만 B라고 서명한 사람이 일부러 남긴 게 있어요.",
@@ -4314,6 +4318,7 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "eleanor",
+      expression: "analytical",
       text: "*from London* A hospital record? Send it to me. Ellis studied emergency translation before she disappeared. Detective, Cairo may be where Black's wound began.",
       textKo: "*런던에서* 병원 기록이라고요? 제게 보내주세요. 엘리스는 사라지기 전 응급 통역을 연구하고 있었어요. 탐정님, 카이로가 블랙의 상처가 시작된 곳일지도 모릅니다.",
       textEs: "*desde Londres* ¿Un registro de hospital? Envíamelo. Ellis estudiaba traducción de emergencia antes de desaparecer. Detective, quizá El Cairo sea donde empezó la herida de Black.",
