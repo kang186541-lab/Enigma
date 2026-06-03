@@ -288,11 +288,13 @@ Visual verification:
 - Sidecar reviewer Turing ranked Minho ahead of Carlos for this pass, because Minho anchors Seoul's first human contact and the post-puzzle route handoff while Carlos currently has one active speaking payoff after the Madrid boss. Minho now has an authored `streetwise_guide` sprite wired only to those two active Seoul guide beats. Story text, quiz prompts, answer data, and sequence order remain unchanged.
 - Local web capture confirmed Seoul 3/27 renders `minho_streetwise_guide` over the Seoul palace/subway backdrop: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\minho-streetwise-guide-seoul.png`.
 - Local web autoplay confirmed Madrid 14/21 renders `carlos_color_returning_restorer` over the restored-festival backdrop after solving the four Madrid active-route puzzles: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\carlos-color-returning-restorer-madrid.png`.
+- Common dialogue staging now adds a soft side-aware character backlight, a ground/contact shadow, and a bottom occlusion gradient so authored sprites feel seated inside the illustrated background and tucked behind the dialogue panel. This is renderer-only polish; story text, quiz prompts, answer data, language support, and sequence order remain unchanged.
+- Local web capture confirmed Seoul 3/27 renders Minho with the new grounding pass over the Seoul palace/subway backdrop: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\minho-grounded-staging-seoul.png`.
 - Latest asset audit: 106 story PNGs, 220,445,163 bytes total, 36 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not full expression sheets. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, Don Miguel, Carlos, and Minho now each have at least one authored emotional/action pose, but true Ace Attorney-quality integration still needs broader expression sheets and more scene-specific staging for secondary beats.
+- Most dialogue sprites are still cutouts from the current portrait set, not full expression sheets. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, Don Miguel, Carlos, and Minho now each have at least one authored emotional/action pose, and the common grounding/occlusion pass improves integration, but true Ace Attorney-quality production still needs broader expression sheets and more scene-specific staging for secondary beats.
 
 ## QA Command
 

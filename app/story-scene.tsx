@@ -7466,6 +7466,7 @@ export default function StoryScene() {
     inputRange: [0, 1],
     outputRange: [0, -6],
   });
+  const hasStageCharacterArt = Boolean(character.isLingo || activePortrait);
   const backdropScale = backdropDriftAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [1.02, 1.055],
@@ -7600,6 +7601,28 @@ export default function StoryScene() {
                 },
               ]}
             >
+              {hasStageCharacterArt && (
+                <>
+                  <LinearGradient
+                    pointerEvents="none"
+                    colors={["rgba(255,226,144,0.2)", "rgba(255,226,144,0.07)", "transparent"]}
+                    locations={[0, 0.52, 1]}
+                    style={[
+                      styles.characterBacklight,
+                      compactStoryLayout && styles.characterBacklightCompact,
+                      character.side === "left" ? styles.characterBacklightLeft : styles.characterBacklightRight,
+                    ]}
+                  />
+                  <View
+                    pointerEvents="none"
+                    style={[
+                      styles.characterGroundShadow,
+                      compactStoryLayout && styles.characterGroundShadowCompact,
+                      character.side === "left" ? styles.characterGroundShadowLeft : styles.characterGroundShadowRight,
+                    ]}
+                  />
+                </>
+              )}
               {character.isLingo ? (
                 <Animated.Image
                   source={activePortrait ?? rudyStoryImg}
@@ -7623,6 +7646,14 @@ export default function StoryScene() {
                     <View style={[styles.avatarRing, { borderColor: story.accentColor }]} />
                   </View>
                 </>
+              )}
+              {hasStageCharacterArt && (
+                <LinearGradient
+                  pointerEvents="none"
+                  colors={["transparent", "rgba(8,8,10,0.32)", "rgba(8,8,10,0.68)"]}
+                  locations={[0, 0.62, 1]}
+                  style={styles.stagePortraitFade}
+                />
               )}
             </Animated.View>
 
@@ -7903,6 +7934,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     paddingHorizontal: 18,
     marginBottom: -34,
+    position: "relative",
     zIndex: 1,
   },
   characterAreaLeft: {
@@ -7933,6 +7965,7 @@ const styles = StyleSheet.create({
   rudyStoryChar: {
     width: 286,
     height: 352,
+    zIndex: 2,
   },
   rudyStoryCharCompact: {
     width: 238,
@@ -7943,6 +7976,48 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.42,
     shadowRadius: 20,
+    zIndex: 2,
+  },
+  characterBacklight: {
+    position: "absolute",
+    bottom: 58,
+    width: 300,
+    height: 370,
+    borderRadius: 190,
+    opacity: 0.72,
+    zIndex: 0,
+  },
+  characterBacklightCompact: {
+    bottom: 48,
+    width: 238,
+    height: 306,
+  },
+  characterBacklightLeft: {
+    left: 0,
+  },
+  characterBacklightRight: {
+    right: 0,
+  },
+  characterGroundShadow: {
+    position: "absolute",
+    bottom: 24,
+    width: 238,
+    height: 42,
+    borderRadius: 999,
+    backgroundColor: "rgba(0,0,0,0.34)",
+    transform: [{ scaleX: 1.18 }],
+    zIndex: 0,
+  },
+  characterGroundShadowCompact: {
+    bottom: 22,
+    width: 190,
+    height: 34,
+  },
+  characterGroundShadowLeft: {
+    left: 44,
+  },
+  characterGroundShadowRight: {
+    right: 36,
   },
   portraitCard: {
     width: 206,
@@ -7973,6 +8048,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.36,
     shadowRadius: 28,
     elevation: 9,
+    zIndex: 2,
   },
   stagePortraitWrapCompact: {
     width: 224,
