@@ -66,6 +66,7 @@ const rudyCelebratoryCoachImg = require("@/assets/story/characters/rudy/rudy_cel
 const eleanorUrgentWarningImg = require("@/assets/story/characters/eleanor/eleanor_urgent_warning.png");
 const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
 const mrBlackFragileRemorseImg = require("@/assets/story/characters/mr_black/mr_black_fragile_remorse.png");
+const isabelShockedConcernImg = require("@/assets/story/characters/isabel/isabel_shocked_concern.png");
 const bgLondonMuseumHallImg = require("@/assets/story/dialogue_backgrounds/london_museum_hall.png");
 const bgMadridFestivalPlazaImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_plaza.png");
 const bgMadridFestivalDrainedImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_drained.png");
@@ -83,6 +84,10 @@ const rudyExpressionSprites = {
 
 const eleanorExpressionSprites = {
   urgent: eleanorUrgentWarningImg,
+};
+
+const isabelExpressionSprites = {
+  shocked: isabelShockedConcernImg,
 };
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
@@ -276,7 +281,7 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "worried" | "celebratory" | "urgent";
+type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "worried" | "celebratory" | "urgent" | "shocked";
 
 /* Sequence items */
 type SeqScene = {
@@ -1205,6 +1210,8 @@ const STORIES: Record<string, Story> = {
         nameId: "Isabel",
         side: "right",
         avatarBg: "#3A1A0A",
+        portrait: ch2IsabelPortraitImg,
+        portraitVariants: isabelExpressionSprites,
       },
       {
         id: "miguel",
@@ -1270,6 +1277,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "isabel",
+        expression: "shocked",
         text: "Eleanor said you were funny. She was wrong. Listen, detective. Carlos disappeared three nights ago from the Prado. He was restoring a medieval fresco. I got his call at ten o'clock. He was screaming.",
         textKo: "엘리너가 재밌는 사람이라고 했는데. 틀렸네. 들어, 탐정. 카를로스가 3일 전에 프라도에서 사라졌어. 중세 프레스코화를 복원하고 있었어. 밤 10시에 전화가 왔어. 소리를 지르고 있었어.",
         textKoMix: "Eleanor가 재밌는 사람이라고 했는데. She was wrong. Listen, detective. 카를로스가 3일 전에 Prado에서 disappeared. 중세 fresco를 복원하고 있었어. 밤 10시에 전화가 왔어. He was screaming.",
@@ -1282,6 +1290,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "isabel",
+        expression: "shocked",
         text: "Simple words. Not in Spanish. Not in English. Things like 'Hello! Help! Where is the door? Please! Sorry!', basic phrases, like a textbook. In a language I didn't recognize. Over and over. Then the line went dead.",
         textKo: "간단한 단어들. 스페인어가 아니었어. 영어도 아니고. '안녕하세요! 도와주세요! 문이 어디예요? 제발! 죄송합니다!', 교과서 같은 기초 표현을. 내가 모르는 언어로. 계속 반복하다가, 전화가 끊겼어.",
         textKoMix: "간단한 단어들. 스페인어가 아니었어. 영어도 아니고. 'Hello! Help! Where is the door? Please! Sorry!', 교과서 같은 basic phrases. 내가 모르는 언어로. 계속 반복하다가, 전화가 끊겼어.",
@@ -3458,7 +3467,7 @@ const MADRID_V21_STORY: Story = {
   },
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
-    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#C8232C", portrait: ch2IsabelPortraitImg },
+    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#C8232C", portrait: ch2IsabelPortraitImg, portraitVariants: isabelExpressionSprites },
     { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", nameId: "Don Miguel", side: "right", avatarBg: "#8B5A2B", portrait: ch2MiguelPortraitImg },
     { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", nameId: "Carlos", side: "right", avatarBg: "#6E4A35", portrait: ch2CarlosPortraitImg },
     { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg, portraitVariants: eleanorExpressionSprites },
@@ -3488,6 +3497,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "isabel",
+      expression: "shocked",
       text: "You are the detective from London? Good. Carlos vanished while restoring the festival backdrop. One second he was calling me. The next, his words turned to gold dust and the whole plaza lost its color.",
       textKo: "런던에서 온 탐정이죠? 좋아요. 카를로스는 축제 무대 배경을 복원하다가 사라졌어요. 방금 전까지 저와 통화하고 있었는데, 다음 순간 그의 말이 금빛 먼지가 되고 광장 전체가 색을 잃었어요.",
       textKoMix: "런던에서 온 detective죠? 좋아요. Carlos는 festival 무대 배경을 복원하다가 사라졌어요. 그의 words가 gold dust가 되고 plaza 전체가 color를 잃었어요.",
@@ -3683,6 +3693,7 @@ const MADRID_V21_STORY: Story = {
       kind: "scene",
       charId: "isabel",
       backdrop: "madrid-sealed-stage",
+      expression: "shocked",
       text: "Carlos was here. The speaker took his voice, and the stage sealed around the last color he touched.",
       textKo: "카를로스가 여기 있었어요. 스피커가 그의 목소리를 빼앗았고, 그가 마지막으로 만진 색을 중심으로 무대가 봉인됐어요.",
       textKoMix: "Carlos가 여기 있었어요. speaker가 그의 voice를 빼앗았고, 그가 마지막으로 만진 color를 중심으로 stage가 봉인됐어요.",
@@ -4815,7 +4826,7 @@ const BABEL_V21_STORY: Story = {
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
     { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", nameId: "Miss Penny", side: "right", avatarBg: "#1A0A2A", portrait: ch5PennyPortraitImg, portraitVariants: { anxious: pennyAnxiousFinalClueImg } },
     { id: "tom", emoji: "💂", name: "Tom", nameKo: "톰", nameId: "Tom", side: "left", avatarBg: "#1E2A3A", portrait: ch1TomPortraitImg },
-    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#3A1A0A", portrait: ch2IsabelPortraitImg },
+    { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#3A1A0A", portrait: ch2IsabelPortraitImg, portraitVariants: isabelExpressionSprites },
     { id: "sujin", emoji: "👩‍🔬", name: "Sujin", nameKo: "수진", nameId: "Sujin", side: "left", avatarBg: "#1A2A3A", portrait: ch3SujinPortraitImg },
     { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", nameId: "Profesor Amira", side: "right", avatarBg: "#7A4D19", portrait: ch4AmiraPortraitImg },
     { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", nameId: "Hassan", side: "right", avatarBg: "#2A1A0A", portrait: ch4HassanPortraitImg },

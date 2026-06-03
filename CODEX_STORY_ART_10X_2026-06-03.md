@@ -109,7 +109,7 @@ Generate these before replacing broad chapter art:
 - Mr. Black: silhouette menace, tired reveal, fragile remorse.
 - Eleanor: calm mentor, urgent warning, analytical discovery. `[DONE: urgent warning runtime sprite]`
 - Penny: warm guide, anxious final clue, brave resolve.
-- Isabel: playful confidence, shocked concern, rallying energy.
+- Isabel: playful confidence, shocked concern, rallying energy. `[DONE: shocked concern runtime sprite]`
 
 Recommended file layout:
 
@@ -236,6 +236,7 @@ assets/story/characters/mr_black/mr_black_fragile_remorse.png
 assets/story/characters/rudy/rudy_worried_detective.png
 assets/story/characters/rudy/rudy_celebratory_coach.png
 assets/story/characters/eleanor/eleanor_urgent_warning.png
+assets/story/characters/isabel/isabel_shocked_concern.png
 ```
 
 `SeqScene.expression` now lets a story beat choose a character sprite variant. `Character.portraitVariants` maps those authored expressions to runtime images.
@@ -259,11 +260,12 @@ Visual verification:
 - Local web capture confirmed Madrid 2/21 renders `rudy_worried_detective` over the drained-plaza backdrop: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\rudy-worried-madrid.png`.
 - Web bundle verification confirmed both Rudy expression assets are emitted: `rudy_worried_detective.af3781...png` and `rudy_celebratory_coach.79b8...png`.
 - Eleanor now has an authored `urgent` warning sprite wired to the FIND reveal, black-coat/language-obedience warning, clue-seal risk, Seoul phone warning, and Cairo-to-Babel warning.
-- Latest asset audit: 91 story PNGs, 198,426,791 bytes total, 21 character assets, warnings 0.
+- Isabel now has an authored `shocked` concern sprite. In the active Madrid route it is wired to the Carlos disappearance report and the sealed-stage reveal; the legacy Madrid block also uses it for the Carlos phone account and unknown-basic-phrases line. The agent review recommends `rallying` as her next high-value sprite for restored-festival/Babel resolve scenes.
+- Latest asset audit: 92 story PNGs, 199,859,897 bytes total, 22 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy now has two authored emotional poses, Eleanor/Penny/Mr. Black have one each, but true Ace Attorney-quality integration still needs transparent expression/action sheets for Isabel and the remaining recurring cast.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy now has two authored emotional poses, Isabel has shocked concern, Eleanor/Penny/Mr. Black have one each, but true Ace Attorney-quality integration still needs transparent expression/action sheets for Isabel rallying/playful states and the remaining recurring cast.
 
 ## QA Command
 
@@ -275,12 +277,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 88 PNG files.
-- 185.81 MB total.
+- 92 PNG files.
+- 190.60 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 18 files, 36.87 MB, 30.5% average brightness.
+- character: 22 files, 41.66 MB, 29.0% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.
