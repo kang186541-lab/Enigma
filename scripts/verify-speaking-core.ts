@@ -59,6 +59,7 @@ const rateLimitsSource = readFileSync("server/rateLimits.ts", "utf8");
 const routesSource = readFileSync("server/routes.ts", "utf8");
 const aiTextSource = readFileSync("server/aiText.ts", "utf8");
 const geminiSource = readFileSync("server/gemini.ts", "utf8");
+const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as { dependencies?: Record<string, string> };
 
 const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string[]>> = {
   english: {
@@ -1030,6 +1031,11 @@ assert.ok(
   aiTextSource.includes("Gemini vision unavailable") &&
   aiTextSource.includes("trying OpenAI/Claude vision"),
   "Handwriting/image recognition should use Gemini 2.5 Flash first when GEMINI_API_KEY is configured, with the existing OpenAI/Claude vision fallback preserved"
+);
+assert.equal(
+  packageJson.dependencies?.["expo-asset"],
+  "12.0.12",
+  "Story image prefetch imports expo-asset directly, so the app must own expo-asset as a root dependency instead of relying on Expo's transitive dependency"
 );
 
 const completedHomeMission = getTodaySpeakingMission("english", "korean", "travel", SPEAKING_DAILY_GOAL);

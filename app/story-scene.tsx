@@ -14,6 +14,7 @@ import {
   AppState,
   ActivityIndicator,
   ImageSourcePropType,
+  LayoutChangeEvent,
   useWindowDimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -7359,7 +7360,7 @@ export default function StoryScene() {
       currentItem?.kind === "puzzle" &&
       (currentItem.pType === "pronunciation" || currentItem.pType === "voice-power" || currentItem.pType === "npc-rescue");
     bgmRef.current?.setVolumeAsync(isSpeakingQuiz ? BGM_DIM : BGM_FULL).catch((e: unknown) => console.warn('[Audio] BGM volume change failed:', e));
-  }, [seqIdx]);
+  }, [seq, seqIdx]);
 
   function fadeTransition(cb: () => void, onFullyDone?: () => void) {
     // Fade-out 100ms (was 180) + fade-in 120ms (was 250) = ~220ms total transition.
@@ -7381,6 +7382,8 @@ export default function StoryScene() {
   // second press (or press when already done) → actually advance to next scene.
   const typewriterRef = useRef<TypewriterHandle | null>(null);
   const [typingDone, setTypingDone] = useState(false);
+  const [dialogueViewportHeight, setDialogueViewportHeight] = useState(0);
+  const [dialogueContentHeight, setDialogueContentHeight] = useState(0);
 
   // Reentrancy guard for advance(). Without this, rapid taps queue multiple
   // fadeTransition callbacks each calling setSeqIdx(i => i + 1), so the user
@@ -7405,8 +7408,22 @@ export default function StoryScene() {
   // parent needs this for the ▼ blink indicator.
   useEffect(() => {
     setTypingDone(false);
+    setDialogueViewportHeight(0);
+    setDialogueContentHeight(0);
     puzzleSolvingRef.current = false;
   }, [seqIdx]);
+
+  const handleDialogueViewportLayout = useCallback((event: LayoutChangeEvent) => {
+    const nextHeight = Math.round(event.nativeEvent.layout.height);
+    setDialogueViewportHeight((current) => (current === nextHeight ? current : nextHeight));
+  }, []);
+
+  const handleDialogueContentSizeChange = useCallback((_width: number, height: number) => {
+    const nextHeight = Math.round(height);
+    setDialogueContentHeight((current) => (current === nextHeight ? current : nextHeight));
+  }, []);
+
+  const dialogueNeedsScroll = dialogueViewportHeight > 0 && dialogueContentHeight > dialogueViewportHeight + 6;
 
   useEffect(() => {
     const currentItem = seq[seqIdx];
@@ -7842,15 +7859,30 @@ export default function StoryScene() {
                 )}
                 <Text style={styles.speakerName}>{getCharName(character)}</Text>
               </View>
-              <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: dialogueMaxHeight }}>
-                <Typewriter
-                  ref={typewriterRef}
-                  text={getSceneText(item)}
-                  speedMs={25}
-                  textStyle={styles.dialogueText}
-                  onComplete={() => setTypingDone(true)}
-                />
-              </ScrollView>
+              <View style={styles.dialogueTextViewport} onLayout={handleDialogueViewportLayout}>
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  style={[styles.dialogueScroll, { maxHeight: dialogueMaxHeight }]}
+                  onContentSizeChange={handleDialogueContentSizeChange}
+                >
+                  <Typewriter
+                    ref={typewriterRef}
+                    text={getSceneText(item)}
+                    speedMs={25}
+                    textStyle={styles.dialogueText}
+                    onComplete={() => setTypingDone(true)}
+                  />
+                </ScrollView>
+                {dialogueNeedsScroll && (
+                  <LinearGradient
+                    pointerEvents="none"
+                    colors={["rgba(8,8,10,0)", "rgba(8,8,10,0.92)"]}
+                    style={styles.dialogueScrollFade}
+                  >
+                    <View style={styles.dialogueScrollCue} />
+                  </LinearGradient>
+                )}
+              </View>
               <View style={styles.dotsRow}>
                 {seq.slice(0, 5).map((_, i) => (
                   <View key={i} style={[styles.dot, { opacity: i === seqIdx % 5 ? 1 : 0.3 }]} />
@@ -8318,11 +8350,34 @@ const styles = StyleSheet.create({
   },
   speakerEmoji: { fontSize: 14 },
   speakerName: { fontSize: 12, fontFamily: F.bodySemi, color: C.parchmentDark },
+  dialogueTextViewport: {
+    position: "relative",
+    overflow: "hidden",
+  },
+  dialogueScroll: {
+    flexGrow: 0,
+  },
   dialogueText: {
     fontSize: 17,
     fontFamily: F.body,
     lineHeight: 27,
     color: C.parchment,
+  },
+  dialogueScrollFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 28,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingBottom: 2,
+  },
+  dialogueScrollCue: {
+    width: 24,
+    height: 2,
+    borderRadius: 2,
+    backgroundColor: "rgba(255,226,144,0.62)",
   },
   dotsRow: { flexDirection: "row", gap: 5, justifyContent: "center" },
   dot: { height: 5, width: 5, borderRadius: 3, backgroundColor: C.gold },
