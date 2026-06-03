@@ -499,7 +499,7 @@ export default function FirstSentenceIntroScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Eyebrow + progress dots */}
-        <Text style={styles.eyebrow}>🦊 {ui.eyebrow}</Text>
+        <EmojiText style={styles.eyebrow}>🦊 {ui.eyebrow}</EmojiText>
         <View style={styles.progressRow}>
           {[1, 2, 3].map((n) => (
             <View key={n} style={styles.progressItem}>

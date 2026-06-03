@@ -1722,7 +1722,7 @@ export default function CardsScreen() {
           contentContainerStyle={styles.completedContainer}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.completedEmoji}>📭</Text>
+          <EmojiText style={styles.completedEmoji}>📭</EmojiText>
           <Text style={styles.completedTitle}>
             {srsQueueEmpty
               ? nativeLang === "korean" ? "오늘 복습 대기열을 비웠어요" : nativeLang === "spanish" ? "Repaso al día" : nativeLang === "indonesian" ? "Antrean ulasan sudah kosong" : "Review queue clear"
@@ -1785,7 +1785,7 @@ export default function CardsScreen() {
           contentContainerStyle={styles.completedContainer}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.completedEmoji}>🏆</Text>
+          <EmojiText style={styles.completedEmoji}>🏆</EmojiText>
           <Text style={styles.completedTitle}>
             {nativeLang === "korean" ? "오늘 목표 달성!" : nativeLang === "spanish" ? "¡Meta diaria completada!" : nativeLang === "indonesian" ? "Target Harian Tercapai!" : "Daily Goal Complete!"}
           </Text>
@@ -1800,14 +1800,14 @@ export default function CardsScreen() {
           </Text>
           <View style={styles.scoreRow}>
             <View style={[styles.scoreCard, { backgroundColor: "rgba(90,153,90,0.15)" }]}>
-              <Text style={styles.scoreEmoji}>✅</Text>
+              <EmojiText style={styles.scoreEmoji}>✅</EmojiText>
               <Text style={[styles.scoreNum, { color: "#5a9" }]}>{gotIt}</Text>
               <Text style={styles.scoreLabel}>
                 {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : nativeLang === "indonesian" ? "Sudah tahu!" : "Got it!"}
               </Text>
             </View>
             <View style={styles.scoreCard}>
-              <Text style={styles.scoreEmoji}>😅</Text>
+              <EmojiText style={styles.scoreEmoji}>😅</EmojiText>
               <Text style={styles.scoreNum}>{again}</Text>
               <Text style={styles.scoreLabel}>
                 {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : nativeLang === "indonesian" ? "Lagi" : "Again"}
@@ -2017,7 +2017,7 @@ export default function CardsScreen() {
                   rippleColor="rgba(255,152,0,0.35)"
                 >
                   <View style={styles.actionBtnInner}>
-                    <Text style={styles.againBtnEmoji}>😅</Text>
+                    <EmojiText style={styles.againBtnEmoji}>😅</EmojiText>
                     <Text style={[styles.actionLabel, { color: C.gold }]}>
                       {nativeLang === "korean" ? "다시" : nativeLang === "spanish" ? "Otra vez" : nativeLang === "indonesian" ? "Lagi" : "Again"}
                     </Text>
@@ -2044,7 +2044,7 @@ export default function CardsScreen() {
                   rippleColor="rgba(76,175,80,0.35)"
                 >
                   <View style={styles.actionBtnInner}>
-                    <Text style={styles.gotItBtnEmoji}>✅</Text>
+                    <EmojiText style={styles.gotItBtnEmoji}>✅</EmojiText>
                     <Text style={[styles.actionLabel, { color: "#5a9" }]}>
                       {nativeLang === "korean" ? "알아요!" : nativeLang === "spanish" ? "¡Lo sé!" : nativeLang === "indonesian" ? "Sudah tahu!" : "Got it!"}
                     </Text>
@@ -2070,12 +2070,12 @@ export default function CardsScreen() {
 
           <View style={[styles.miniStats, { paddingBottom: Platform.OS === "web" ? 100 : Math.max(insets.bottom + 16, 34) }]}>
             <View style={styles.miniStat}>
-              <Text style={styles.miniStatEmoji}>✅</Text>
+              <EmojiText style={styles.miniStatEmoji}>✅</EmojiText>
               <Text style={[styles.miniStatText, { color: "#5a9" }]}>{gotIt}</Text>
             </View>
             <View style={styles.miniDivider} />
             <View style={styles.miniStat}>
-              <Text style={styles.miniStatEmoji}>😅</Text>
+              <EmojiText style={styles.miniStatEmoji}>😅</EmojiText>
               <Text style={[styles.miniStatText, { color: "#FF9800" }]}>{again}</Text>
             </View>
           </View>

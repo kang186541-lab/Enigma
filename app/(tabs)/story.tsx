@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
+import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
 import { getIORatioData, type IORatioData } from "@/lib/storyUtils";
 import { loadProgress as loadDailyCourseProgress } from "@/lib/dailyCourseData";
@@ -275,7 +276,7 @@ export default function StoryTab() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.headerEyebrow}>🦊 {lang === "korean" ? "루디 탐정의" : lang === "spanish" ? "Detective Rudy presenta" : lang === "indonesian" ? "Detektif Rudy mempersembahkan" : "Detective Rudy presents"}</Text>
+        <EmojiText style={styles.headerEyebrow}>🦊 {lang === "korean" ? "루디 탐정의" : lang === "spanish" ? "Detective Rudy presenta" : lang === "indonesian" ? "Detektif Rudy mempersembahkan" : "Detective Rudy presents"}</EmojiText>
         <Text style={styles.headerTitle}>
           {lang === "korean"
             ? "언어 음모"
@@ -483,7 +484,7 @@ export default function StoryTab() {
                 {/* Emotional Arc + Language Ratio */}
                 {!isLocked && (
                   <View style={styles.arcRow}>
-                    <Text style={styles.arcText}>🎭 {getArc(ch)}</Text>
+                    <EmojiText style={styles.arcText}>🎭 {getArc(ch)}</EmojiText>
                     <View style={styles.langRatioPill}>
                       <Text style={styles.langRatioText}>
                         {lang === "korean" ? "목표어" : lang === "indonesian" ? "Bahasa target" : "Target"} {Math.round(ch.npcLangRatio * 100)}%

@@ -23,6 +23,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getTutor, TUTOR_IMAGES, Tutor } from "@/constants/tutors";
 import { useLanguage } from "@/context/LanguageContext";
 import { XPToast } from "@/components/XPToast";
+import { EmojiText } from "@/components/EmojiText";
 import { getApiUrl } from "@/lib/query-client";
 import { recordAudio } from "@/lib/audio";
 import { C, F } from "@/constants/theme";
@@ -1239,14 +1240,14 @@ export default function ChatRoomScreen() {
                   }}
                 >
                   <View style={styles.correctionRecastHeader}>
-                    <Text style={styles.correctionRecastIcon}>💬</Text>
+                      <EmojiText style={styles.correctionRecastIcon}>💬</EmojiText>
                     <Text style={styles.correctionRecastLabel}>{RECAST_LABEL}</Text>
                     <View style={{ flex: 1 }} />
                     <Ionicons name={expanded ? "chevron-up" : "chevron-down"} size={14} color={C.goldDim} />
                   </View>
                   {expanded && (
                     <>
-                      <Text style={styles.correctionRecastFixedExpanded}>✅ {c.corrected}</Text>
+                      <EmojiText style={styles.correctionRecastFixedExpanded}>✅ {c.corrected}</EmojiText>
                       <Text style={styles.correctionRecastExplain}>{c.explanation}</Text>
                     </>
                   )}
@@ -1263,12 +1264,12 @@ export default function ChatRoomScreen() {
               return (
                 <View style={styles.correctionElicit}>
                   <View style={styles.correctionHeader}>
-                    <Text style={styles.correctionHeaderIcon}>🤔</Text>
+                    <EmojiText style={styles.correctionHeaderIcon}>🤔</EmojiText>
                     <Text style={[styles.correctionHeaderText, { color: "#E5A940" }]}>{ELICIT_LABEL}</Text>
                   </View>
                   <Text style={styles.correctionElicitHint}>{c.explanation}</Text>
                   {revealed && (
-                    <Text style={styles.correctionElicitReveal}>✅ {c.corrected}</Text>
+                    <EmojiText style={styles.correctionElicitReveal}>✅ {c.corrected}</EmojiText>
                   )}
                   <Pressable
                     style={({ pressed }) => [styles.correctionRevealBtn, pressed && { opacity: 0.8 }]}
@@ -1295,19 +1296,19 @@ export default function ChatRoomScreen() {
             return (
               <View style={styles.correctionMiniLesson}>
                 <View style={styles.correctionHeader}>
-                  <Text style={styles.correctionHeaderIcon}>📚</Text>
+                  <EmojiText style={styles.correctionHeaderIcon}>📚</EmojiText>
                   <Text style={[styles.correctionHeaderText, { color: "#C47A7A" }]}>{MINI_LESSON_LABEL}</Text>
                 </View>
                 <View style={styles.correctionRow}>
-                  <Text style={styles.correctionMark}>❌</Text>
+                  <EmojiText style={styles.correctionMark}>❌</EmojiText>
                   <Text style={styles.correctionOriginal}>{c.original}</Text>
                 </View>
                 <View style={styles.correctionRow}>
-                  <Text style={styles.correctionMark}>✅</Text>
+                  <EmojiText style={styles.correctionMark}>✅</EmojiText>
                   <Text style={styles.correctionFixed}>{c.corrected}</Text>
                 </View>
                 <View style={styles.correctionExplainRow}>
-                  <Text style={styles.correctionMark}>💡</Text>
+                  <EmojiText style={styles.correctionMark}>💡</EmojiText>
                   <Text style={styles.correctionExplain}>
                     <Text style={styles.correctionExplainLabel}>{EXPLAIN_LABEL}: </Text>
                     {c.explanation}
@@ -1321,7 +1322,7 @@ export default function ChatRoomScreen() {
           {!item.isUser && canTranslate && (
             isTranslating && !translationText ? (
               <View style={styles.translBubble}>
-                <Text style={styles.translGlobe}>🌐</Text>
+            <EmojiText style={styles.translGlobe}>🌐</EmojiText>
                 <ActivityIndicator size="small" color="#C4A8BE" style={{ marginLeft: 2 }} />
               </View>
             ) : translationText ? (
@@ -1337,7 +1338,7 @@ export default function ChatRoomScreen() {
                 }}
                 style={({ pressed }) => [styles.translBubble, pressed && { opacity: 0.75 }]}
               >
-                <Text style={styles.translGlobe}>🌐</Text>
+                <EmojiText style={styles.translGlobe}>🌐</EmojiText>
                 {!hiddenTranslationIds.has(item.id) && (
                   <Text style={styles.translText}>{translationText}</Text>
                 )}
@@ -1471,7 +1472,7 @@ export default function ChatRoomScreen() {
 
         {canTranslate && (
           <View style={styles.translateHint}>
-            <Text style={styles.translateHintText}>🌐 Auto-translation on</Text>
+          <EmojiText style={styles.translateHintText}>🌐 Auto-translation on</EmojiText>
           </View>
         )}
       </View>
@@ -1518,7 +1519,7 @@ export default function ChatRoomScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.lessonReportCard}>
-            <Text style={styles.lessonReportEmoji}>🎓</Text>
+          <EmojiText style={styles.lessonReportEmoji}>🎓</EmojiText>
             <Text style={styles.lessonReportTitle}>
               {userNativeLang === "korean"
                 ? "오늘의 수업 완료!"

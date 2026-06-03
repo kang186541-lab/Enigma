@@ -7,6 +7,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 import { getApiUrl } from "@/lib/query-client";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import { type LessonSentence, type Step1Config, getRandomFeedback } from "@/lib/lessonContent";
@@ -528,7 +529,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
     <View style={s.container}>
       {/* Rudy tip */}
       <View style={s.rudyRow}>
-        <Text style={s.rudyEmoji}>🦊</Text>
+        <EmojiText style={s.rudyEmoji}>🦊</EmojiText>
         <View style={s.rudySpeech}>
           <Text style={s.rudySpeechText}>{roundLabel}</Text>
         </View>

@@ -8,6 +8,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 import { getApiUrl } from "@/lib/query-client";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
@@ -863,7 +864,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
 
         {(phase === "processing" || phase === "loading") && (
           <View style={[s.bubble, s.rudyBubble]}>
-            <Text style={s.rudyLabel}>🦊 RUDY</Text>
+            <EmojiText style={s.rudyLabel}>🦊 RUDY</EmojiText>
             <Text style={[s.bubbleText, { color: C.goldDim }]}>{processingLabel}</Text>
           </View>
         )}
@@ -871,7 +872,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         {/* Inline mission-complete card (inside chat scroll, bottom) */}
         {step3Done && (
           <View style={s.inlineDoneCard}>
-            <Text style={s.inlineDoneEmoji}>✅</Text>
+            <EmojiText style={s.inlineDoneEmoji}>✅</EmojiText>
             <Text style={s.inlineDoneTitle}>{doneMsg}</Text>
             <Text style={s.inlineDoneStat}>
               {spokenStatLabel}

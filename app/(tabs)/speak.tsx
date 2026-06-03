@@ -20,6 +20,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { XPToast } from "@/components/XPToast";
+import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
 import { PhonemeCoaching } from "@/components/rudy/PhonemeCoaching";
 import { CoachingCard } from "@/components/rudy/CoachingCard";
@@ -2226,7 +2227,7 @@ export default function SpeakScreen() {
           contentContainerStyle={[styles.completeWrap, { paddingBottom: TAB_BAR_HEIGHT + bottomPad }]}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.completeTrophy}>🏆</Text>
+          <EmojiText style={styles.completeTrophy}>🏆</EmojiText>
           <Text style={styles.completeTitle}>
             {isFirstSpeakingMission
               ? nativeLang === "korean" ? "오늘의 말하기 목표\n완료!" : nativeLang === "spanish" ? "¡Meta oral de hoy\ncompleta!" : nativeLang === "indonesian" ? "Target berbicara hari ini\nselesai!" : "Today's speaking goal\ncomplete!"
@@ -2387,7 +2388,7 @@ export default function SpeakScreen() {
             onPress={() => { setLevelUpShow(false); loadSession(activeLang); }}
           >
             <View style={styles.levelUpCard}>
-              <Text style={styles.levelUpEmoji}>🎉</Text>
+              <EmojiText style={styles.levelUpEmoji}>🎉</EmojiText>
               <Text style={styles.levelUpTitle}>
                 {nativeLang === "korean" ? "레벨 업!" : nativeLang === "spanish" ? "¡Subiste de nivel!" : nativeLang === "indonesian" ? "Naik Level!" : "Level Up!"}
               </Text>
@@ -2431,7 +2432,7 @@ export default function SpeakScreen() {
                         {prog.done}/{prog.total} → {getCefrTierLabel(prog.next as "A1"|"A2"|"B1"|"B2", nativeLang)}
                       </Text>
                     ) : (
-                      <Text style={styles.pronLevelHint}>{nativeLang === "korean" ? "최고 단계 🏆" : nativeLang === "spanish" ? "Nivel máximo 🏆" : nativeLang === "indonesian" ? "Level Maks 🏆" : "Max Level 🏆"}</Text>
+                      <EmojiText style={styles.pronLevelHint}>{nativeLang === "korean" ? "최고 단계 🏆" : nativeLang === "spanish" ? "Nivel máximo 🏆" : nativeLang === "indonesian" ? "Level Maks 🏆" : "Max Level 🏆"}</EmojiText>
                     )}
                   </View>
                 );

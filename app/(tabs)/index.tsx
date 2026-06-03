@@ -759,7 +759,7 @@ export default function HomeScreen() {
         <GoldDivider label={nextStepEyebrow} />
         <View style={[styles.pad, { marginTop: 0 }]}>
           <Text style={styles.nextStepLine}>
-            <Text style={styles.nextStepCheck}>✅ </Text>
+            <EmojiText style={styles.nextStepCheck}>✅ </EmojiText>
             {nextStepIsReview ? nextStepReviewLine : nextStepCampLine}
           </Text>
           {nextStepIsReview ? (

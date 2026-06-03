@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
+import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
 
 // ─── Storage Key ─────────────────────────────────────────────────────────────
@@ -139,7 +140,7 @@ export default function ExpressionBookScreen() {
       >
         {totalExpressions === 0 ? (
           <View style={styles.emptyBox}>
-            <Text style={styles.emptyEmoji}>📖</Text>
+            <EmojiText style={styles.emptyEmoji}>📖</EmojiText>
             <Text style={styles.emptyText}>
               {native === "korean"
                 ? "아직 배운 표현이 없어요.\n스토리 모드를 진행하면 자동으로 수집됩니다!"
@@ -185,7 +186,7 @@ export default function ExpressionBookScreen() {
                   <View key={i} style={[styles.exprCard, expr.mastered && styles.exprCardMastered]}>
                     <View style={styles.exprRow}>
                       <Text style={styles.exprPhrase}>{expr.phrase}</Text>
-                      {expr.mastered && <Text style={styles.exprCheck}>✅</Text>}
+                      {expr.mastered && <EmojiText style={styles.exprCheck}>✅</EmojiText>}
                     </View>
                     <Text style={styles.exprMeaning}>{expr.meaning}</Text>
                     <View style={styles.exprMeta}>

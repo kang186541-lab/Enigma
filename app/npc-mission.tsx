@@ -25,6 +25,7 @@ import { getNPC, NPC, NPC_EMOTIONS, NPC_REL_LEVELS, getRelTier, getRelLabel, Rel
 import { getApiUrl } from "@/lib/query-client";
 import { queueProgressPush } from "@/lib/progressSync";
 import { recordAudio } from "@/lib/audio";
+import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -1115,13 +1116,13 @@ export default function NpcMissionScreen() {
                 style={({ pressed }) => [styles.popupCancelBtn, pressed && { opacity: 0.8 }]}
                 onPress={handlePopupCancel}
               >
-                <Text style={styles.popupCancelLabel}>❌ {reselectLabel}</Text>
+                <EmojiText style={styles.popupCancelLabel}>❌ {reselectLabel}</EmojiText>
               </Pressable>
               <Pressable
                 style={({ pressed }) => [styles.popupSendBtn, pressed && { opacity: 0.8 }]}
                 onPress={handlePopupSend}
               >
-                <Text style={styles.popupSendLabel}>✅ {sendLabel}</Text>
+                <EmojiText style={styles.popupSendLabel}>✅ {sendLabel}</EmojiText>
               </Pressable>
             </View>
           </View>

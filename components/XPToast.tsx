@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Animated, Text, StyleSheet, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 
 interface Props {
   amount: number;
@@ -48,7 +49,7 @@ export function XPToast({ amount, onDone }: Props) {
           end={{ x: 1, y: 0 }}
           style={styles.badge}
         >
-          <Text style={styles.icon}>🔍</Text>
+          <EmojiText style={styles.icon}>🔍</EmojiText>
           <Text style={styles.text}>+{amount} XP</Text>
           <Text style={styles.star}>✦</Text>
         </LinearGradient>

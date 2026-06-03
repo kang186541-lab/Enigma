@@ -7,6 +7,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 import { getApiUrl } from "@/lib/query-client";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import type { ReviewQuestion } from "@/lib/lessonContent";
@@ -564,7 +565,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       <View style={s.completeCard}>
         <Text style={s.completeTitle}>{L.complete}</Text>
         <Text style={s.completeScore}>{averageScoreLabel}</Text>
-        <Text style={s.completeStars}>{"⭐".repeat(Math.round(averageScore / 33) + 1).slice(0, 3)}</Text>
+        <EmojiText style={s.completeStars}>{"⭐".repeat(Math.round(averageScore / 33) + 1).slice(0, 3)}</EmojiText>
       </View>
     );
   }
@@ -658,7 +659,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       {/* Result */}
       {qPhase === "revealed" && pronScore !== null && isSpeakQ && (
         <View style={s.resultCard}>
-          <Text style={s.resultStars}>{"⭐".repeat(stars).padEnd(3, "☆")}</Text>
+          <EmojiText style={s.resultStars}>{"⭐".repeat(stars).padEnd(3, "☆")}</EmojiText>
           <Text style={s.resultScore}>{pronScore}{pointsSuffix}</Text>
           <View style={s.resultSentence}>
             <Text style={s.resultSentenceText}>{sentence}</Text>

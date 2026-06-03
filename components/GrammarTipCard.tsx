@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 
 interface GrammarTip {
   pattern: { ko: string; en: string; es: string };
@@ -54,7 +55,7 @@ export function GrammarTipCard({ visible, tip, lang, onClose }: Props) {
             <LinearGradient colors={[C.bg2, C.bg3]} style={styles.card}>
               {/* Header */}
               <View style={styles.headerRow}>
-                <Text style={styles.headerIcon}>📖</Text>
+                <EmojiText style={styles.headerIcon}>📖</EmojiText>
                 <Text style={styles.headerTitle}>{L("문법 팁", "Grammar Tip", "Consejo Gramatical")}</Text>
                 <Pressable onPress={onClose} style={styles.closeBtn}>
                   <Ionicons name="close" size={20} color={C.goldDim} />
@@ -97,7 +98,7 @@ export function GrammarTipCard({ visible, tip, lang, onClose }: Props) {
                 {/* Rudy's Tip */}
                 {tip.rudyTip && (
                   <View style={[styles.section, styles.rudySection]}>
-                    <Text style={styles.rudyLabel}>🦊 {L("루디의 팁", "Rudy's Tip", "Consejo de Rudy")}</Text>
+                    <EmojiText style={styles.rudyLabel}>🦊 {L("루디의 팁", "Rudy's Tip", "Consejo de Rudy")}</EmojiText>
                     <Text style={styles.rudyText}>{g(tip.rudyTip)}</Text>
                   </View>
                 )}

@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
 import { Ionicons } from "@expo/vector-icons";
+import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
 import { resetGuideForDrip } from "@/components/RudyGuideModal";
 import { trackLearningEvent } from "@/lib/learningEvents";
@@ -37,7 +38,7 @@ function RudySplashPlaceholder() {
     <View style={{ width: SPLASH_SIZE, height: SPLASH_SIZE, borderRadius: 14, overflow: "hidden" }}>
       {!loaded && (
         <View style={[StyleSheet.absoluteFillObject, { backgroundColor: "rgba(201,162,39,0.12)", justifyContent: "center", alignItems: "center", borderRadius: 14 }]}>
-          <Text style={{ fontSize: 60 }}>🦊</Text>
+          <EmojiText style={{ fontSize: 60 }}>🦊</EmojiText>
         </View>
       )}
       <Animated.Image source={rudySplashImg} style={{ width: SPLASH_SIZE, height: SPLASH_SIZE, borderRadius: 14, opacity }} resizeMode="contain" onLoad={onLoad} />

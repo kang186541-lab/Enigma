@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLanguage } from "@/context/LanguageContext";
+import { EmojiText } from "@/components/EmojiText";
 import { NPCS, NPC, NPC_REL_LEVELS, NPC_EMOTIONS, getRelTier, getRelLabel, RelationshipTier, NPC_UNLOCK_CHAPTER, CHAPTER_ID_MAP } from "@/constants/npcs";
 import { C, F } from "@/constants/theme";
 import { loadProgress as loadDailyCourseProgress } from "@/lib/dailyCourseData";
@@ -219,7 +220,7 @@ export default function NpcListScreen() {
               }}
             >
               <View style={[styles.emojiCircle, { backgroundColor: npc.color + "33", borderColor: npc.color + "88" }]}>
-                <Text style={styles.emojiText}>{unlocked ? npc.emoji : "🔒"}</Text>
+                <EmojiText style={styles.emojiText}>{unlocked ? npc.emoji : "🔒"}</EmojiText>
                 {unlocked && <Text style={styles.emotionBadge}>{emojiIcon}</Text>}
               </View>
 
@@ -308,7 +309,7 @@ export default function NpcListScreen() {
                   }}
                 >
                   <View style={styles.woundHeader}>
-                    <Text style={styles.woundEmoji}>{unlocked ? w.emoji : "🔒"}</Text>
+                    <EmojiText style={styles.woundEmoji}>{unlocked ? w.emoji : "🔒"}</EmojiText>
                     <View style={styles.woundInfo}>
                       <Text style={styles.woundName}>{npcName}</Text>
                       <Text style={styles.woundChapter}>{chapterLabel}</Text>

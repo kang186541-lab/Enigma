@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
 import { getEffectiveLearningLanguage, useLanguage, type NativeLanguage } from "@/context/LanguageContext";
+import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
 import { stopAllTTSSync } from "@/lib/ttsManager";
 import {
@@ -282,7 +283,7 @@ function BriefingScreen({
       <Animated.View style={[styles.briefingContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
         {/* Rudy avatar */}
         <View style={styles.rudyAvatarWrap}>
-          <Text style={styles.rudyEmoji}>🦊</Text>
+          <EmojiText style={styles.rudyEmoji}>🦊</EmojiText>
           <View style={styles.rudyNameBadge}>
             <Text style={styles.rudyNameText}>Rudy</Text>
           </View>
@@ -525,7 +526,7 @@ function LessonScreen({
             styles.stepCompleteCard,
             { opacity: completeAnim, transform: [{ scale: completeAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] }) }] },
           ]}>
-            <Text style={styles.stepCompleteEmoji}>✅</Text>
+            <EmojiText style={styles.stepCompleteEmoji}>✅</EmojiText>
             <Text style={styles.stepCompleteTitle}>
               {nativeLang === "korean" ? `${stepLabels[currentStep]} 완료! 🎉`
                 : nativeLang === "spanish" ? `¡${stepLabels[currentStep]} Completado! 🎉`
@@ -533,7 +534,7 @@ function LessonScreen({
                 : `${stepLabels[currentStep]} Complete! 🎉`}
             </Text>
             <View style={styles.stepCompleteRudy}>
-              <Text style={styles.stepCompleteRudyTag}>🦊 루디</Text>
+              <EmojiText style={styles.stepCompleteRudyTag}>🦊 루디</EmojiText>
               <Text style={styles.stepCompleteRudyMsg}>{completeMsgs[currentStep] ?? completeMsgs[0]}</Text>
             </View>
             <Pressable
@@ -730,7 +731,7 @@ function NoContentCard({
   return (
     <View style={stepContentStyles.container}>
       <View style={stepContentStyles.placeholder}>
-        <Text style={stepContentStyles.placeholderEmoji}>🦊</Text>
+        <EmojiText style={stepContentStyles.placeholderEmoji}>🦊</EmojiText>
         <Text style={stepContentStyles.placeholderText}>{msg}</Text>
       </View>
       <Pressable
@@ -810,7 +811,7 @@ function CompleteScreen({
       <ScrollView contentContainerStyle={[completeStyles.scroll, { paddingBottom: insets.bottom + 32 }]}>
         <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
           {/* Title */}
-          <Text style={completeStyles.titleEmoji}>🎉</Text>
+          <EmojiText style={completeStyles.titleEmoji}>🎉</EmojiText>
           <Text style={completeStyles.title}>
             {nativeLang === "korean" ? "미션 완료!" : nativeLang === "spanish" ? "¡Misión Completada!" : nativeLang === "indonesian" ? "Misi Selesai!" : "Mission Complete!"}
           </Text>
@@ -852,7 +853,7 @@ function CompleteScreen({
 
           {/* Rudy message */}
           <View style={completeStyles.rudySpeech}>
-            <Text style={completeStyles.rudySpeechEmoji}>🦊</Text>
+            <EmojiText style={completeStyles.rudySpeechEmoji}>🦊</EmojiText>
             <View style={completeStyles.rudySpeechBubble}>
               <Text style={completeStyles.rudySpeechText}>{rudyMsg}</Text>
             </View>

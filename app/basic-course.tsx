@@ -1217,7 +1217,7 @@ export default function BasicCourseScreen() {
           accessibilityRole="button"
           accessibilityLabel={startLabel}
         >
-          <Text style={intro.startBtnTxt}>✅  {startLabel}</Text>
+          <EmojiText style={intro.startBtnTxt}>✅  {startLabel}</EmojiText>
         </Pressable>
 
         {/* ⏭️ Skip button */}
@@ -1227,7 +1227,7 @@ export default function BasicCourseScreen() {
           accessibilityRole="button"
           accessibilityLabel={skipLabel}
         >
-          <Text style={intro.skipBtnTxt}>⏭️  {skipLabel}</Text>
+          <EmojiText style={intro.skipBtnTxt}>⏭️  {skipLabel}</EmojiText>
         </Pressable>
 
         <Text style={intro.skipNote}>{skipNote}</Text>
@@ -1294,7 +1294,7 @@ export default function BasicCourseScreen() {
           <Text style={s.stepLabel}>{course.stepNames[step]}</Text>
         )}
         <View style={s.lingoStrip}>
-          <Text style={s.lingoStripFox}>🦊</Text>
+          <EmojiText style={s.lingoStripFox}>🦊</EmojiText>
           <Text style={s.lingoStripText}>{course.lingoTips[step]}</Text>
         </View>
         {isReviewMode ? (
@@ -1585,7 +1585,7 @@ export default function BasicCourseScreen() {
                   {/* Phase: done */}
                   {greetPhase === "done" && (
                     <View style={s.scoreDone}>
-                      <Text style={s.scoreDoneEmoji}>🎉</Text>
+                      <EmojiText style={s.scoreDoneEmoji}>🎉</EmojiText>
                       <Text style={s.scoreDoneTxt}>
                         {native === "korean" ? "시도 완료! +5 XP" : native === "spanish" ? "¡Intento contado! +5 XP" : native === "indonesian" ? "Percobaan dihitung! +5 XP" : "Attempt counted! +5 XP"}
                       </Text>
@@ -1608,7 +1608,7 @@ export default function BasicCourseScreen() {
             {/* ── STEP 3: COMPLETION ── */}
             {step === 3 && (
               <View style={s.completionCard}>
-                <Text style={s.bigEmoji}>🎉</Text>
+                <EmojiText style={s.bigEmoji}>🎉</EmojiText>
                 <Text style={s.completionTitle}>
                   {native === "korean" ? "기초 과정 완료!" : native === "spanish" ? "¡Curso Básico Completado!" : native === "indonesian" ? "Kursus Dasar Selesai!" : "Basic Course Complete!"}
                 </Text>

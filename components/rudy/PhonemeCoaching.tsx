@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable, Platform } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 import { getApiUrl } from "@/lib/query-client";
 import { getCoachingTip, getErrorLabel } from "@/data/phonemeCoaching";
 import { registerGlobalSound, registerGlobalWebAudio } from "@/lib/ttsManager";
@@ -277,7 +278,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                 playWordTTS(w.word, speechLang);
               }}
             >
-              <Text style={s.wordIcon}>{w.score >= WEAK_THRESHOLD ? "✅" : "⚠️"}</Text>
+              <EmojiText style={s.wordIcon}>{w.score >= WEAK_THRESHOLD ? "✅" : "⚠️"}</EmojiText>
               <Text style={[s.wordText, isWeak && s.wordTextWeak]}>{w.word}</Text>
               <Text style={[s.wordScore, isWeak && s.wordScoreWeak]}>{w.score}%</Text>
               {isWeak ? (
@@ -358,7 +359,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                   return (
                     <View key={wpi} style={s.coachingBox}>
                       <View style={s.coachingHeader}>
-                        <Text style={s.coachingIcon}>{wpi === 0 ? "💡" : "📌"}</Text>
+                        <EmojiText style={s.coachingIcon}>{wpi === 0 ? "💡" : "📌"}</EmojiText>
                         <Text style={s.coachingTitle}>
                           {L(nativeLang, "발음 코칭", "Consejo", "Coaching Tip")}
                         </Text>

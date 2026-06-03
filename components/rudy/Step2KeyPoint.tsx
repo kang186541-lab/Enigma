@@ -7,6 +7,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 import { getApiUrl } from "@/lib/query-client";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import { type Step2Data, type FillBlankQuiz, type GrammarExplanation } from "@/lib/lessonContent";
@@ -473,7 +474,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     return (
       <View style={s.container}>
         <View style={s.rudyRow}>
-          <Text style={s.rudyEmoji}>🦊</Text>
+          <EmojiText style={s.rudyEmoji}>🦊</EmojiText>
           <View style={s.rudySpeech}>
             <Text style={s.rudySpeechText}>
               {lessonIntroLabel}
@@ -491,19 +492,19 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
 
             {/* Examples */}
             <View style={s.exSection}>
-              <Text style={s.exLabel}>{nativeLang === "korean" ? "📝 실전 예문" : nativeLang === "spanish" ? "📝 Ejemplos reales" : "📝 Real examples"}</Text>
+              <EmojiText style={s.exLabel}>{nativeLang === "korean" ? "📝 실전 예문" : nativeLang === "spanish" ? "📝 Ejemplos reales" : "📝 Real examples"}</EmojiText>
               <Text style={s.exText}>{getExplanation(rich.examples, lc)}</Text>
             </View>
 
             {/* Mistakes */}
             <View style={s.mistakeSection}>
-              <Text style={s.mistakeLabel}>{nativeLang === "korean" ? "🚫 흔한 실수" : nativeLang === "spanish" ? "🚫 Errores comunes" : "🚫 Common mistakes"}</Text>
+              <EmojiText style={s.mistakeLabel}>{nativeLang === "korean" ? "🚫 흔한 실수" : nativeLang === "spanish" ? "🚫 Errores comunes" : "🚫 Common mistakes"}</EmojiText>
               <Text style={s.mistakeText}>{getExplanation(rich.mistakes, lc)}</Text>
             </View>
 
             {/* Rudy tip */}
             <View style={s.rudyTipBox}>
-              <Text style={s.rudyTipText}>🦊 {getExplanation(rich.rudyTip, lc)}</Text>
+              <EmojiText style={s.rudyTipText}>🦊 {getExplanation(rich.rudyTip, lc)}</EmojiText>
             </View>
           </View>
         ) : (

@@ -14,6 +14,7 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 import { useLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { addPhrases } from "@/lib/srsManager";
@@ -191,7 +192,7 @@ export default function WritingPractice() {
         {/* Exercise Type Badge */}
         <View style={styles.typeBadge}>
           <Text style={styles.typeText}>
-            <Text style={{ fontFamily: "System" }}>{exercise.type === "translate" ? "📝" : exercise.type === "complete" ? "✏️" : "📖"}</Text>{" "}
+            <EmojiText style={{ fontFamily: "System" }}>{exercise.type === "translate" ? "📝" : exercise.type === "complete" ? "✏️" : "📖"}</EmojiText>{" "}
             {t(typeLabels[exercise.type], lc)}
           </Text>
         </View>
@@ -203,7 +204,7 @@ export default function WritingPractice() {
             <Text style={styles.promptHint}>{t(T.prompt, lc)}</Text>
           )}
           {exercise.hint && (
-            <Text style={styles.promptHint}><Text style={{ fontFamily: "System" }}>💡</Text> {t(exercise.hint, lc)}</Text>
+            <EmojiText style={styles.promptHint}>💡 {t(exercise.hint, lc)}</EmojiText>
           )}
         </View>
 
