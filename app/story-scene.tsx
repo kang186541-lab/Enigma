@@ -21,6 +21,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Audio } from "expo-av";
+import { Asset } from "expo-asset";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
@@ -487,6 +488,35 @@ function getDefaultAdventureBackdrop(storyId: string): StoryBackdropId {
 function getSceneBackdropId(storyId: string, item: SeqItem): StoryBackdropId | null {
   if (item.kind !== "scene") return null;
   return item.backdrop ?? getDefaultAdventureBackdrop(storyId);
+}
+
+function prefetchStoryImageSource(source: ImageSourcePropType | null | undefined) {
+  if (!source) return;
+
+  try {
+    if (Array.isArray(source)) {
+      source.forEach(prefetchStoryImageSource);
+      return;
+    }
+    if (typeof source === "object" && typeof source.uri === "string") {
+      Image.prefetch(source.uri).catch(() => {});
+      return;
+    }
+    Asset.fromModule(source as number).downloadAsync().catch(() => {});
+  } catch {
+    // Prefetch is only a performance hint; story playback must never depend on it.
+  }
+}
+
+function getSceneCharacterImageSource(story: Story, item: SeqItem): ImageSourcePropType | null {
+  if (item.kind !== "scene") return null;
+
+  const character = story.characters.find((c) => c.id === item.charId) ?? story.characters[0];
+  const portrait = item.expression
+    ? character.portraitVariants?.[item.expression] ?? characterExpressionFallbacks[character.id]?.[item.expression] ?? character.portrait
+    : character.portrait;
+
+  return character.isLingo ? (portrait ?? rudyStoryImg) : (portrait ?? null);
 }
 
 type BackdropLighting = {
@@ -7305,6 +7335,20 @@ export default function StoryScene() {
   }, [audioMuted, introStatus]);
 
   const seq = story.sequence;
+
+  useEffect(() => {
+    const prefetchSceneItem = (candidate: SeqItem | undefined) => {
+      if (!candidate || candidate.kind !== "scene") return;
+
+      const backdropId = getSceneBackdropId(story.id, candidate);
+      if (backdropId) prefetchStoryImageSource(getAdventureBackdropById(backdropId));
+      prefetchStoryImageSource(getSceneCharacterImageSource(story, candidate));
+    };
+
+    prefetchSceneItem(seq[seqIdx]);
+    prefetchSceneItem(seq[seqIdx + 1]);
+    prefetchSceneItem(seq[seqIdx + 2]);
+  }, [seq, seqIdx, story]);
 
   const BGM_FULL = 0.4;
   const BGM_DIM  = 0.08;   // dimmed during pronunciation / speaking quizzes
