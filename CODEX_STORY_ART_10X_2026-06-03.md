@@ -181,9 +181,9 @@ Palette: [chapter-specific colors]
 
 ## Current Verdict
 
-After this pass, the app should move from "good learning-app story visuals" toward "more premium character story presentation." It is not 10/10 yet because the underlying character art still needs expression sheets and stronger silhouettes.
+After this pass, the app should move from "good learning-app story visuals" toward "more premium character story presentation." It is not 10/10 yet because the full cast still needs expression sheets and stronger silhouettes.
 
-Next highest-value work: generate and wire Rudy/Mr. Black/Eleanor/Penny/Isabel expression variants, then use scene emotion to select the right portrait.
+Next highest-value work: continue the expression system for Rudy/Eleanor/Isabel, then add scene emotion metadata broadly enough that major story beats always choose an authored pose.
 
 ## Post-Pass: Dialogue Stage Presentation
 
@@ -228,6 +228,15 @@ assets/story/dialogue_sprites/ch5_penny_sprite.png
 assets/story/dialogue_sprites/ch5_black_face_sprite.png
 ```
 
+New authored expression sprites:
+
+```text
+assets/story/characters/penny/penny_anxious_final_clue.png
+assets/story/characters/mr_black/mr_black_fragile_remorse.png
+```
+
+`SeqScene.expression` now lets a story beat choose a character sprite variant. `Character.portraitVariants` maps those authored expressions to runtime images.
+
 Backdrops are now selected by optional `SeqScene.backdrop`; if omitted, the chapter hub background is used. This keeps broad chapter art as the default while allowing major beats to change location:
 
 - Madrid default: color-drained plaza.
@@ -241,10 +250,12 @@ Visual verification:
 - Local web capture confirmed Babel's language-gate scene renders Penny over the background with no checkerboard card.
 - Local web capture confirmed Madrid's first character scene renders Rudy over the drained-plaza background.
 - Two Babel frames captured 2.6s apart changed 435,605 pixels out of 1,024,000, confirming the background/character idle motion is active.
+- Local web capture confirmed Penny's `anxious` sprite in her "I was your student" confession scene.
+- Local web capture confirmed Mr. Black's `remorse` sprite in his mother/lullaby reveal scene.
 
 Remaining visual gap:
 
-- The dialogue sprites are cutouts from the current portrait set, not purpose-built action poses. True Ace Attorney-quality integration still needs transparent expression/action sheets for the main cast.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Penny and Mr. Black now have one authored expression each, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the main cast.
 
 ## QA Command
 
@@ -256,12 +267,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 86 PNG files.
-- 183.70 MB total.
+- 88 PNG files.
+- 185.81 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 16 files, 34.76 MB, 32.5% average brightness.
+- character: 18 files, 36.87 MB, 30.5% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.

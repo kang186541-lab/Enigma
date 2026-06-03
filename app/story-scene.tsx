@@ -61,6 +61,8 @@ const ch4BlackPartialPortraitImg = require("@/assets/story/dialogue_sprites/ch4_
 const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
 const ch5PennyPortraitImg = require("@/assets/story/dialogue_sprites/ch5_penny_sprite.png");
 const ch5BlackFaceImg = require("@/assets/story/dialogue_sprites/ch5_black_face_sprite.png");
+const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
+const mrBlackFragileRemorseImg = require("@/assets/story/characters/mr_black/mr_black_fragile_remorse.png");
 const bgLondonMuseumHallImg = require("@/assets/story/dialogue_backgrounds/london_museum_hall.png");
 const bgMadridFestivalPlazaImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_plaza.png");
 const bgMadridFestivalDrainedImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_drained.png");
@@ -89,6 +91,7 @@ interface Character {
   avatarBg: string;
   isLingo?: boolean;
   portrait?: ImageSourcePropType;
+  portraitVariants?: Partial<Record<StoryCharacterExpression, ImageSourcePropType>>;
 }
 
 interface Tri {
@@ -261,6 +264,8 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
+type StoryCharacterExpression = "neutral" | "anxious" | "remorse";
+
 /* Sequence items */
 type SeqScene = {
   kind: "scene";
@@ -279,6 +284,8 @@ type SeqScene = {
   isNarration?: boolean;
   /** Scene-specific illustrated backdrop. Falls back to the chapter hub backdrop. */
   backdrop?: StoryBackdropId;
+  /** Character sprite variant for authored emotional beats. */
+  expression?: StoryCharacterExpression;
   /** Reference to an entry in IDIOM_COLLECTION — links this dialogue to a targetLang-adaptive idiom */
   idiomRef?: string;
 };
@@ -4779,14 +4786,14 @@ const BABEL_V21_STORY: Story = {
   },
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
-    { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", nameId: "Miss Penny", side: "right", avatarBg: "#1A0A2A", portrait: ch5PennyPortraitImg },
+    { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", nameId: "Miss Penny", side: "right", avatarBg: "#1A0A2A", portrait: ch5PennyPortraitImg, portraitVariants: { anxious: pennyAnxiousFinalClueImg } },
     { id: "tom", emoji: "💂", name: "Tom", nameKo: "톰", nameId: "Tom", side: "left", avatarBg: "#1E2A3A", portrait: ch1TomPortraitImg },
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#3A1A0A", portrait: ch2IsabelPortraitImg },
     { id: "sujin", emoji: "👩‍🔬", name: "Sujin", nameKo: "수진", nameId: "Sujin", side: "left", avatarBg: "#1A2A3A", portrait: ch3SujinPortraitImg },
     { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", nameId: "Profesor Amira", side: "right", avatarBg: "#7A4D19", portrait: ch4AmiraPortraitImg },
     { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", nameId: "Hassan", side: "right", avatarBg: "#2A1A0A", portrait: ch4HassanPortraitImg },
     { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", nameId: "Mira", side: "right", avatarBg: "#2F4A34", portrait: ch4MiraPortraitImg },
-    { id: "mr_black", emoji: "🕴️", name: "Mr. Black", nameKo: "미스터 블랙", nameId: "Mr. Black", side: "right", avatarBg: "#050505", portrait: ch5BlackFaceImg },
+    { id: "mr_black", emoji: "🕴️", name: "Mr. Black", nameKo: "미스터 블랙", nameId: "Mr. Black", side: "right", avatarBg: "#050505", portrait: ch5BlackFaceImg, portraitVariants: { remorse: mrBlackFragileRemorseImg } },
   ],
   sequence: [
     {
@@ -4987,6 +4994,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "penny",
       backdrop: "babel-language-gates",
+      expression: "anxious",
       text: "I was your student. I believed one shared language would save people from humiliation, from panic, from grief. But I watched what it did to Mira. It gave her every word and took away the reason to say them.",
       textKo: "저는 당신의 학생이었어요. 하나의 공유 언어가 사람들을 모욕과 공포와 슬픔에서 구할 거라고 믿었어요. 하지만 Mira에게 무슨 일이 일어났는지 봤어요. 모든 단어를 주고, 그 단어를 말해야 하는 이유를 빼앗았죠.",
       textKoMix: "저는 당신의 student였어요. 하나의 shared language가 사람들을 구할 거라고 믿었어요. 하지만 Mira를 봤어요. 모든 words를 주고, 그 말을 해야 하는 reason을 빼앗았죠.",
@@ -5055,6 +5063,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "mr_black",
       backdrop: "babel-language-gates",
+      expression: "remorse",
       text: "My mother sang one line when the pain became too much. The nurse smiled and said she did not understand. The doctor smiled and said it in three languages. None of them were hers.",
       textKo: "어머니는 고통이 너무 심해질 때 한 줄의 노래를 불렀습니다. 간호사는 웃으며 이해하지 못한다고 했죠. 의사는 세 가지 언어로 미안하다고 했습니다. 그중 어느 것도 어머니의 언어가 아니었어요.",
       textEs: "Mi madre cantaba una línea cuando el dolor era demasiado. La enfermera sonrió y dijo que no entendía. El médico sonrió y lo dijo en tres idiomas. Ninguno era el suyo.",
@@ -5172,6 +5181,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "mr_black",
       backdrop: "babel-language-gates",
+      expression: "remorse",
       text: "*a very long silence* Mae'r iaith yn fyw. *Welsh: The language lives.* I never wanted to destroy language. I wanted... I just wanted my mother to be heard.",
       textKo: "*아주 긴 침묵* Mae'r iaith yn fyw. *웨일스어: 언어는 살아 있다.* 언어를 파괴하고 싶었던 게 아니야. 원한 건... 어머니의 말이 들려지기를 원했을 뿐이야.",
       textEs: "*un silencio muy largo* Mae'r iaith yn fyw. *Galés: El idioma vive.* Nunca quise destruir el idioma. Quería... solo quería que escucharan a mi madre.",
@@ -7266,6 +7276,9 @@ export default function StoryScene() {
   const character = item.kind === "scene"
     ? story.characters.find((c) => c.id === item.charId) ?? story.characters[0]
     : story.characters[0];
+  const activePortrait = item.kind === "scene" && item.expression
+    ? character.portraitVariants?.[item.expression] ?? character.portrait
+    : character.portrait;
 
   function getSceneText(it: SeqScene) {
     // For non-narration dialogue, prefer mixed-language versions (textKoMix/textEsMix)
@@ -7450,17 +7463,12 @@ export default function StoryScene() {
                   style={[styles.rudyStoryChar, compactStoryLayout && styles.rudyStoryCharCompact, styles.stageCharacterShadow]}
                   resizeMode="contain"
                 />
-              ) : character.portrait ? (
+              ) : activePortrait ? (
                 <View style={[styles.stagePortraitWrap, compactStoryLayout && styles.stagePortraitWrapCompact, { shadowColor: story.accentColor }]}>
                   <Image
-                    source={character.portrait}
+                    source={activePortrait}
                     style={styles.characterPortrait}
-                    resizeMode="cover"
-                  />
-                  <LinearGradient
-                    colors={["transparent", "rgba(5,6,10,0.04)", "rgba(5,6,10,0.58)"]}
-                    locations={[0, 0.68, 1]}
-                    style={styles.stagePortraitFade}
+                    resizeMode="contain"
                   />
                 </View>
               ) : (
@@ -7477,7 +7485,7 @@ export default function StoryScene() {
 
             <Pressable style={styles.dialogueBox} onPress={advance}>
               <View style={styles.speakerTag}>
-                {character.portrait || character.isLingo ? (
+                {activePortrait || character.isLingo ? (
                   <View style={[styles.speakerMark, { backgroundColor: story.accentColor }]} />
                 ) : (
                   <EmojiText style={styles.speakerEmoji}>{character.emoji}</EmojiText>
@@ -7817,11 +7825,9 @@ const styles = StyleSheet.create({
   stagePortraitWrap: {
     width: 276,
     height: 414,
-    borderRadius: 4,
-    overflow: "hidden",
-    backgroundColor: "rgba(7,8,12,0.32)",
+    overflow: "visible",
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.45,
+    shadowOpacity: 0.36,
     shadowRadius: 28,
     elevation: 9,
   },
