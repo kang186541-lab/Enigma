@@ -58,6 +58,7 @@ const ch4BossArchiveImg = require("@/assets/story/chapter4_motion_comic/ch4_boss
 const ch4MiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_mira_sprite.png");
 const miraFlatDeliveryImg = require("@/assets/story/characters/mira/mira_flat_delivery.png");
 const ch4AmiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_amira_sprite.png");
+const amiraProtectiveArchivistImg = require("@/assets/story/characters/amira/amira_protective_archivist.png");
 const ch4HassanPortraitImg = require("@/assets/story/dialogue_sprites/ch4_hassan_sprite.png");
 const ch4BlackPartialPortraitImg = require("@/assets/story/dialogue_sprites/ch4_black_partial_sprite.png");
 const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
@@ -111,6 +112,10 @@ const sujinExpressionSprites = {
 
 const miraExpressionSprites = {
   flat_delivery: miraFlatDeliveryImg,
+};
+
+const amiraExpressionSprites = {
+  protective_archivist: amiraProtectiveArchivistImg,
 };
 
 const mrBlackExpressionSprites = {
@@ -314,12 +319,13 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller" | "diagnostic_focus" | "flat_delivery";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller" | "diagnostic_focus" | "flat_delivery" | "protective_archivist";
 
 const characterExpressionFallbacks: Partial<Record<string, Partial<Record<StoryCharacterExpression, ImageSourcePropType>>>> = {
   hassan: hassanExpressionSprites,
   sujin: sujinExpressionSprites,
   mira: miraExpressionSprites,
+  amira: amiraExpressionSprites,
 };
 
 /* Sequence items */
@@ -4455,6 +4461,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "amira",
+      expression: "protective_archivist",
       text: "Eleanor said you would come. I wish it were under kinder circumstances. Records are disappearing from my archive. Not stolen. Not burned. Forgotten while still on the page.",
       textKo: "엘리너가 당신이 올 거라고 했어요. 더 좋은 상황이었다면 좋았겠지만요. 제 기록실에서 기록들이 사라지고 있어요. 도난도 아니고, 불탄 것도 아니에요. 종이 위에 남아 있는 채로 잊혀지고 있습니다.",
       textEs: "Eleanor dijo que vendrías. Ojalá fuera en mejores circunstancias. Los registros están desapareciendo de mi archivo. No robados. No quemados. Olvidados mientras siguen en la página.",
@@ -4606,6 +4613,7 @@ const CAIRO_V21_STORY: Story = {
       kind: "scene",
       charId: "amira",
       backdrop: "cairo-hospital-record",
+      expression: "protective_archivist",
       text: "Here. Ellis's journal. The ink keeps trying to leave the page, but one line is still holding on.",
       textKo: "여기요. 엘리스의 일지입니다. 잉크가 계속 페이지를 떠나려 하지만, 한 줄은 아직 버티고 있어요.",
       textEs: "Aquí. El diario de Ellis. La tinta sigue intentando abandonar la página, pero una línea aún resiste.",
@@ -4774,6 +4782,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "amira",
+      expression: "protective_archivist",
       text: "The fragment is here. Ellis knew this would happen. She left us a path, and she left proof that she walked it first.",
       textKo: "파편이 여기 있어요. 엘리스는 이런 일이 일어날 걸 알고 있었어요. 그녀는 우리에게 길을 남겼고, 자신이 먼저 걸었다는 증거도 남겼습니다.",
       textEs: "El fragmento está aquí. Ellis sabía que esto pasaría. Nos dejó un camino, y dejó prueba de que ella lo recorrió primero.",
