@@ -63,6 +63,7 @@ const ch5PennyPortraitImg = require("@/assets/story/dialogue_sprites/ch5_penny_s
 const ch5BlackFaceImg = require("@/assets/story/dialogue_sprites/ch5_black_face_sprite.png");
 const rudyWorriedDetectiveImg = require("@/assets/story/characters/rudy/rudy_worried_detective.png");
 const rudyCelebratoryCoachImg = require("@/assets/story/characters/rudy/rudy_celebratory_coach.png");
+const eleanorUrgentWarningImg = require("@/assets/story/characters/eleanor/eleanor_urgent_warning.png");
 const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
 const mrBlackFragileRemorseImg = require("@/assets/story/characters/mr_black/mr_black_fragile_remorse.png");
 const bgLondonMuseumHallImg = require("@/assets/story/dialogue_backgrounds/london_museum_hall.png");
@@ -78,6 +79,10 @@ const bgBabelLanguageGatesImg = require("@/assets/story/dialogue_backgrounds/bab
 const rudyExpressionSprites = {
   worried: rudyWorriedDetectiveImg,
   celebratory: rudyCelebratoryCoachImg,
+};
+
+const eleanorExpressionSprites = {
+  urgent: eleanorUrgentWarningImg,
 };
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
@@ -271,7 +276,7 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "worried" | "celebratory";
+type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "worried" | "celebratory" | "urgent";
 
 /* Sequence items */
 type SeqScene = {
@@ -662,6 +667,7 @@ const STORIES: Record<string, Story> = {
         side: "right",
         avatarBg: "#2F2A3A",
         portrait: ch1EleanorPortraitImg,
+        portraitVariants: eleanorExpressionSprites,
       },
       {
         id: "ellis",
@@ -890,6 +896,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "eleanor",
+        expression: "urgent",
         text: "You came. Good. I am Eleanor Vale, assistant curator to Dr. Ellis. Or... I was. She is missing. The cafe footage is the last confirmed image we have. No body, no ransom, no clean explanation. Only one word: FIND.",
         textKo: "와주셨군요. 다행이에요. 저는 엘리너 베일, 엘리스 박사의 후배 큐레이터예요. 아니... 그랬다고 해야겠죠. 박사님은 실종됐어요. 카페 영상이 우리가 가진 마지막 확인 장면입니다. 시신도, 협박도, 명확한 설명도 없어요. 단 한 단어만 남았죠. FIND.",
         textKoMix: "와주셨군요. 저는 Eleanor Vale, 엘리스 박사의 후배 큐레이터예요. 박사님은 missing이에요. 카페 영상이 마지막이에요. 설명은 없고, 단 한 단어만 남았죠. FIND.",
@@ -901,6 +908,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "eleanor",
+        expression: "urgent",
         text: "The man in the black coat did not break the case. He spoke to it. That is what terrifies me. Locks can be picked. Glass can be cut. But this? This was language obeying someone it should never have obeyed.",
         textKo: "검은 코트의 남자는 진열장을 부수지 않았어요. 진열장에게 말했어요. 그게 무서운 점이에요. 자물쇠는 딸 수 있고, 유리는 자를 수 있죠. 하지만 이건... 언어가 절대 따라서는 안 될 사람의 명령을 따른 겁니다.",
         textKoMix: "검은 코트의 남자는 진열장을 부수지 않았어요. 진열장에게 말했어요. 그래서 무서워요. 이건 language가 따라서는 안 될 사람의 명령을 따른 거예요.",
@@ -924,6 +932,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "eleanor",
+        expression: "urgent",
         text: "Three things were left behind. A card, a smear of gold dust, and an old note Ellis hid under the case. One of them still contains a sentence. If we choose the wrong clue first, the seal may close around it.",
         textKo: "남겨진 건 세 가지예요. 카드 한 장, 금빛 먼지 자국, 그리고 엘리스 박사가 진열장 아래 숨겨둔 오래된 메모. 그중 하나에는 아직 문장이 남아 있어요. 잘못된 단서부터 건드리면 봉인이 닫혀버릴 수도 있습니다.",
         textKoMix: "남겨진 건 세 가지예요. card, gold dust, 그리고 Ellis의 오래된 note. 그중 하나에는 아직 sentence가 남아 있어요.",
@@ -3452,7 +3461,7 @@ const MADRID_V21_STORY: Story = {
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#C8232C", portrait: ch2IsabelPortraitImg },
     { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", nameId: "Don Miguel", side: "right", avatarBg: "#8B5A2B", portrait: ch2MiguelPortraitImg },
     { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", nameId: "Carlos", side: "right", avatarBg: "#6E4A35", portrait: ch2CarlosPortraitImg },
-    { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg },
+    { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg, portraitVariants: eleanorExpressionSprites },
   ],
   sequence: [
     {
@@ -3797,6 +3806,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "eleanor",
+      expression: "urgent",
       text: "*on the phone from London* I received your images. London and Madrid are compromised. Two city stones remain before Babel reveals the final three. Seoul is next. Be careful, Detective.",
       textKo: "*런던에서 전화로* 사진을 받았어요. 런던과 마드리드는 이미 흔들렸습니다. 바벨의 마지막 세 개가 드러나기 전, 도시 수호석은 두 개 남았어요. 다음은 서울입니다. 조심하세요, 탐정님.",
       textKoMix: "*London에서 phone으로* 사진을 받았어요. London과 Madrid는 이미 흔들렸습니다. Babel의 final three 전, city stones는 두 개 남았어요. 다음은 Seoul입니다. 조심하세요, Detective.",
@@ -3860,7 +3870,7 @@ const SEOUL_V21_STORY: Story = {
     { id: "minho", emoji: "🚕", name: "Minho", nameKo: "민호", nameId: "Minho", side: "right", avatarBg: "#1F6F8B", portrait: ch3MinhoPortraitImg },
     { id: "youngsook", emoji: "🍲", name: "Youngsook", nameKo: "영숙", nameId: "Youngsook", side: "right", avatarBg: "#A15C38", portrait: ch3YoungsookPortraitImg },
     { id: "sujin", emoji: "🔬", name: "Dr. Sujin Han", nameKo: "한수진 박사", nameId: "Dr. Sujin Han", side: "right", avatarBg: "#4C6B4F", portrait: ch3SujinPortraitImg },
-    { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg },
+    { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg, portraitVariants: eleanorExpressionSprites },
   ],
   sequence: [
     {
@@ -4346,7 +4356,7 @@ const CAIRO_V21_STORY: Story = {
     { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", nameId: "Profesor Amira", side: "right", avatarBg: "#7A4D19", portrait: ch4AmiraPortraitImg },
     { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", nameId: "Hassan", side: "right", avatarBg: "#5A3216", portrait: ch4HassanPortraitImg },
     { id: "black_partial", emoji: "◼", name: "A Voice in Shadow", nameKo: "그림자 속 목소리", nameId: "Suara dalam Bayangan", side: "right", avatarBg: "#050505", portrait: ch4BlackPartialPortraitImg },
-    { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg },
+    { id: "eleanor", emoji: "📚", name: "Dr. Eleanor Vale", nameKo: "엘리너 베일 박사", nameId: "Dr. Eleanor Vale", side: "right", avatarBg: "#637081", portrait: ch1EleanorPortraitImg, portraitVariants: eleanorExpressionSprites },
   ],
   sequence: [
     {
@@ -4748,6 +4758,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "eleanor",
+      expression: "urgent",
       text: "*from London* Babel. Ellis wrote that word in the margin of every Cairo note. Detective, if Black is inviting you there, it means he thinks the ending has already been written.",
       textKo: "*런던에서* Babel. 엘리스는 카이로 노트의 모든 여백에 그 단어를 적었어요. 탐정님, 블랙이 당신을 그곳으로 초대한다면, 그는 이미 결말이 쓰였다고 믿는 겁니다.",
       textEs: "*desde Londres* Babel. Ellis escribió esa palabra en el margen de cada nota de El Cairo. Detective, si Black te invita allí, significa que cree que el final ya está escrito.",
