@@ -14,6 +14,7 @@ import {
   AppState,
   ActivityIndicator,
   ImageSourcePropType,
+  useWindowDimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -43,7 +44,7 @@ const ch1BossDoorImg = require("@/assets/story/chapter1_motion_comic/ch1_boss_do
 const ch1TomPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_tom.png");
 const ch1EleanorPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_eleanor.png");
 const ch1EllisPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_portrait_ellis.png");
-const ch1MrBlackPortraitImg = require("@/assets/story/chapter1_motion_comic/mr_black_portrait.png");
+const ch1BlackCctvImg = require("@/assets/story/chapter1_motion_comic/ch1_intro_black_cctv.png");
 const ch2BossStageImg = require("@/assets/story/chapter2_motion_comic/ch2_boss_stage.png");
 const ch2IsabelPortraitImg = require("@/assets/story/chapter2_motion_comic/ch2_portrait_isabel.png");
 const ch2MiguelPortraitImg = require("@/assets/story/chapter2_motion_comic/ch2_portrait_miguel.png");
@@ -597,7 +598,7 @@ const STORIES: Record<string, Story> = {
         nameId: "Pak Black",
         side: "right",
         avatarBg: "#0A0A0A",
-        portrait: ch1MrBlackPortraitImg,
+        portrait: ch1BlackCctvImg,
       },
     ],
     sequence: [
@@ -6819,6 +6820,7 @@ function CompletionScreen({ story, lang, xpEarned }: { story: Story; lang: strin
 
 export default function StoryScene() {
   const insets = useSafeAreaInsets();
+  const { width: viewportWidth, height: viewportHeight } = useWindowDimensions();
   const { id, intro, mute } = useLocalSearchParams<{ id: string; intro?: string; mute?: string }>();
   const { nativeLanguage, learningLanguage, awardXp: grantXp } = useLanguage();
   const lang = nativeLanguage ?? "english";
@@ -6842,6 +6844,8 @@ export default function StoryScene() {
   const introNativeLang = lang === "korean" || lang === "spanish" ? lang : "english";
   const forceIntro = intro === "1" || intro === "true";
   const audioMuted = mute === "1" || mute === "true";
+  const compactStoryLayout = viewportHeight < 720 || viewportWidth < 370;
+  const dialogueMaxHeight = compactStoryLayout ? 116 : 160;
 
   async function awardXp(amount: number, source: string) {
     try {
@@ -7246,12 +7250,12 @@ export default function StoryScene() {
               {character.isLingo ? (
                 <Image
                   source={rudyStoryImg}
-                  style={styles.rudyStoryChar}
+                  style={[styles.rudyStoryChar, compactStoryLayout && styles.rudyStoryCharCompact]}
                   resizeMode="contain"
                 />
               ) : character.portrait ? (
                 <>
-                  <View style={[styles.portraitCard, { shadowColor: story.accentColor }]}>
+                  <View style={[styles.portraitCard, compactStoryLayout && styles.portraitCardCompact, { shadowColor: story.accentColor }]}>
                     <Image
                       source={character.portrait}
                       style={styles.characterPortrait}
@@ -7261,7 +7265,7 @@ export default function StoryScene() {
                       colors={["transparent", "rgba(13,17,23,0.72)"]}
                       style={styles.portraitFade}
                     />
-                    <View style={[styles.avatarRing, styles.portraitRing, { borderColor: story.accentColor }]} />
+                    <View style={[styles.avatarRing, styles.portraitRing, compactStoryLayout && styles.portraitRingCompact, { borderColor: story.accentColor }]} />
                   </View>
                   <Text style={styles.charName}>{getCharName(character)}</Text>
                 </>
@@ -7280,10 +7284,14 @@ export default function StoryScene() {
 
             <Pressable style={styles.dialogueBox} onPress={advance}>
               <View style={styles.speakerTag}>
-                <EmojiText style={styles.speakerEmoji}>{character.emoji}</EmojiText>
+                {character.portrait || character.isLingo ? (
+                  <View style={[styles.speakerMark, { backgroundColor: story.accentColor }]} />
+                ) : (
+                  <EmojiText style={styles.speakerEmoji}>{character.emoji}</EmojiText>
+                )}
                 <Text style={styles.speakerName}>{getCharName(character)}</Text>
               </View>
-              <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 160 }}>
+              <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: dialogueMaxHeight }}>
                 <Typewriter
                   ref={typewriterRef}
                   text={getSceneText(item)}
@@ -7297,7 +7305,7 @@ export default function StoryScene() {
                   <View key={i} style={[styles.dot, { opacity: i === seqIdx % 5 ? 1 : 0.3 }]} />
                 ))}
               </View>
-              <View style={styles.nextBtn}>
+              <View style={[styles.nextBtn, compactStoryLayout && styles.nextBtnCompact]}>
                 <Text style={styles.nextBtnText}>
                   {typingDone
                     ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : lang === "indonesian" ? "Lanjut" : "Next")
@@ -7519,8 +7527,8 @@ const styles = StyleSheet.create({
   },
   characterArea: {
     alignItems: "center",
-    paddingBottom: 16,
-    gap: 8,
+    paddingBottom: 10,
+    gap: 10,
   },
   avatarOuter: {
     shadowOffset: { width: 0, height: 0 },
@@ -7542,21 +7550,29 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   rudyStoryChar: {
-    width: 180,
-    height: 230,
+    width: 220,
+    height: 280,
+  },
+  rudyStoryCharCompact: {
+    width: 190,
+    height: 238,
   },
   portraitCard: {
-    width: 168,
-    height: 228,
-    borderRadius: 22,
+    width: 206,
+    height: 280,
+    borderRadius: 14,
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(201,162,39,0.55)",
+    borderWidth: 2,
+    borderColor: "rgba(255,226,144,0.62)",
     backgroundColor: C.bg2,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.42,
-    shadowRadius: 20,
+    shadowOpacity: 0.56,
+    shadowRadius: 26,
     elevation: 8,
+  },
+  portraitCardCompact: {
+    width: 176,
+    height: 238,
   },
   characterPortrait: {
     width: "100%",
@@ -7567,15 +7583,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 76,
+    height: 56,
   },
   portraitRing: {
-    top: -1,
-    left: -1,
-    width: 170,
-    height: 230,
-    borderRadius: 23,
-    opacity: 0.7,
+    top: -2,
+    left: -2,
+    width: 210,
+    height: 284,
+    borderRadius: 16,
+    opacity: 0.52,
+  },
+  portraitRingCompact: {
+    width: 180,
+    height: 242,
   },
   avatarEmoji: { fontSize: 56 },
   avatarRing: {
@@ -7588,15 +7608,18 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   charName: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: F.header,
-    color: C.parchment,
+    color: "#fff4d0",
     letterSpacing: 0.5,
+    textShadowColor: "rgba(255,209,102,0.38)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
   },
   dialogueBox: {
-    backgroundColor: C.bg2,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    backgroundColor: "rgba(15,18,24,0.94)",
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
     borderTopWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,
@@ -7615,13 +7638,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "rgba(201,162,39,0.12)",
+    backgroundColor: "rgba(201,162,39,0.18)",
     borderWidth: 1,
     borderColor: C.border,
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
     alignSelf: "flex-start",
+  },
+  speakerMark: {
+    width: 9,
+    height: 9,
+    borderRadius: 2,
+    transform: [{ rotate: "45deg" }],
   },
   speakerEmoji: { fontSize: 14 },
   speakerName: { fontSize: 12, fontFamily: F.bodySemi, color: C.gold },
@@ -7641,6 +7670,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+  },
+  nextBtnCompact: {
+    paddingVertical: 10,
   },
   nextBtnText: { fontSize: 14, fontFamily: F.header, color: C.bg1, letterSpacing: 0.5 },
 

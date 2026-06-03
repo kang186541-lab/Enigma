@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { C, F } from "@/constants/theme";
@@ -204,10 +205,42 @@ export default function StoryIntroMotionComic({
   return (
     <View style={styles.root}>
       <View style={styles.stage}>
+        {phase === "ready" && currentShot && (
+          <View pointerEvents="none" style={styles.readyBackdrop}>
+            <Image
+              accessibilityIgnoresInvertColors
+              resizeMode="cover"
+              source={currentShot.source}
+              style={styles.readyBackdropImage}
+            />
+            <LinearGradient
+              colors={["rgba(2,3,6,0.2)", "rgba(2,3,6,0.18)", "rgba(2,3,6,0.76)"]}
+              locations={[0, 0.45, 1]}
+              style={StyleSheet.absoluteFill}
+            />
+          </View>
+        )}
+
         {phase === "playing" && (
           <ShotFrame key={currentShot.id} shot={currentShot}>
             {renderOverlay(currentShot, timeline)}
           </ShotFrame>
+        )}
+
+        {phase === "dialogue" && currentShot && (
+          <View pointerEvents="none" style={styles.dialogueBackdrop}>
+            <Image
+              accessibilityIgnoresInvertColors
+              resizeMode="cover"
+              source={currentShot.source}
+              style={styles.readyBackdropImage}
+            />
+            <LinearGradient
+              colors={["rgba(5,7,11,0.42)", "rgba(5,7,11,0.62)", "rgba(5,7,11,0.92)"]}
+              locations={[0, 0.45, 1]}
+              style={StyleSheet.absoluteFill}
+            />
+          </View>
         )}
 
         {phase === "dialogue" && (
@@ -327,7 +360,20 @@ function ShotFrame({
           },
         ]}
       />
-      <View pointerEvents="none" style={styles.vignette} />
+      <LinearGradient
+        pointerEvents="none"
+        colors={["rgba(2,3,6,0.16)", "rgba(2,3,6,0)", "rgba(2,3,6,0.42)"]}
+        locations={[0, 0.48, 1]}
+        style={styles.vignette}
+      />
+      <LinearGradient
+        pointerEvents="none"
+        colors={["rgba(255,226,144,0.13)", "rgba(255,226,144,0)"]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 0.6 }}
+        style={styles.artGlow}
+      />
+      <View pointerEvents="none" style={styles.panelBorder} />
       <View pointerEvents="none" style={styles.grain} />
       {children}
     </Animated.View>
@@ -670,6 +716,21 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: "hidden",
   },
+  readyBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.92,
+  },
+  dialogueBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.72,
+  },
+  readyBackdropImage: {
+    height: "100%",
+    left: "-5%",
+    position: "absolute",
+    top: 0,
+    width: "110%",
+  },
   shot: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "#020306",
@@ -683,13 +744,23 @@ const styles = StyleSheet.create({
   },
   vignette: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.08)",
-    borderColor: "rgba(0,0,0,0.42)",
-    borderWidth: 0,
+    zIndex: 8,
+  },
+  artGlow: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 9,
+  },
+  panelBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderColor: "rgba(255,226,144,0.18)",
+    borderWidth: 1,
+    margin: 10,
+    zIndex: 9,
   },
   grain: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(255,255,255,0.018)",
+    zIndex: 9,
   },
   phoneCopy: {
     backgroundColor: "rgba(5,7,11,0.24)",
@@ -822,26 +893,28 @@ const styles = StyleSheet.create({
   },
   dialogueLayer: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(5,7,11,0.88)",
+    backgroundColor: "rgba(5,7,11,0.74)",
     justifyContent: "flex-end",
     zIndex: 22,
   },
   portrait: {
     alignSelf: "center",
     borderRadius: 999,
-    height: 220,
+    borderColor: "rgba(255,226,144,0.32)",
+    borderWidth: 1,
+    height: 248,
     marginBottom: 18,
     overflow: "hidden",
     shadowColor: C.gold,
-    shadowOpacity: 0.24,
-    shadowRadius: 40,
-    width: 220,
+    shadowOpacity: 0.34,
+    shadowRadius: 46,
+    width: 248,
   },
   portraitImage: {
-    height: 308,
-    marginLeft: -44,
-    marginTop: -34,
-    width: 308,
+    height: 344,
+    marginLeft: -48,
+    marginTop: -38,
+    width: 344,
   },
   dialogueBox: {
     backgroundColor: "rgba(5,7,11,0.96)",
@@ -881,7 +954,7 @@ const styles = StyleSheet.create({
   startOverlay: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
-    backgroundColor: "rgba(5,7,11,0.78)",
+    backgroundColor: "rgba(5,7,11,0.44)",
     justifyContent: "center",
     padding: 30,
     zIndex: 40,
