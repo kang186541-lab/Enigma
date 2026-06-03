@@ -248,6 +248,7 @@ assets/story/characters/mira/mira_flat_delivery.png
 assets/story/characters/amira/amira_protective_archivist.png
 assets/story/characters/youngsook/youngsook_warm_wisdom.png
 assets/story/characters/miguel/miguel_festival_memory.png
+assets/story/characters/tom/tom_gruff_guard.png
 ```
 
 `SeqScene.expression` now lets a story beat choose a character sprite variant. `Character.portraitVariants` maps those authored expressions to runtime images.
@@ -280,12 +281,12 @@ Visual verification:
 - Amira now has an authored `protective_archivist` sprite. It is wired to Cairo's archive-loss warning, Ellis journal reveal, and restored-fragment proof beat, so her role reads as an active guardian of records rather than a static explainer.
 - Youngsook now has an authored `warm_wisdom` sprite. It is wired only to active Seoul food-as-teaching beats: the first soup welcome, the stew/sentence-order metaphor, and the final "one more bite" farewell. Story text, quiz prompts, answer data, and sequence order remain unchanged.
 - Don Miguel now has an authored `festival_memory` sprite. It is wired only to active Madrid beats where he remembers the imperfect plaza, points toward the sealed stage, and defines festival as mistakes, accent, and repainted red. Story text, quiz prompts, answer data, and sequence order remain unchanged.
-- Sidecar reviewer Gibbs ranked Tom as the next highest-value recurring character after this, because he anchors the first playable gatekeeper scene and returns for Babel's connection callback.
-- Latest asset audit: 103 story PNGs, 215,076,766 bytes total, 33 character assets, warnings 0.
+- Sidecar reviewer Gibbs ranked Tom as the next highest-value recurring character, because he anchors the first playable gatekeeper scene and returns for Babel's connection callback. Tom now has an authored `gruff_guard` sprite wired to the London entrance challenge, London reluctant approval / "Break a leg" beat, and Babel connection-gate callback. Story text, quiz prompts, answer data, and sequence order remain unchanged.
+- Latest asset audit: 104 story PNGs, 216,520,564 bytes total, 34 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, and Don Miguel now each have authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast. Next target: Tom `gruff_guard`.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, and Don Miguel now each have authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast. Next likely targets: Minho and Carlos.
 
 ## QA Command
 

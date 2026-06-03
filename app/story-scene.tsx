@@ -42,6 +42,7 @@ import { EmojiText } from "@/components/EmojiText";
 const rudyStoryImg = require("@/assets/rudy_story.png");
 const ch1BossDoorImg = require("@/assets/story/chapter1_motion_comic/ch1_boss_door.png");
 const ch1TomPortraitImg = require("@/assets/story/dialogue_sprites/ch1_tom_sprite.png");
+const tomGruffGuardImg = require("@/assets/story/characters/tom/tom_gruff_guard.png");
 const ch1EleanorPortraitImg = require("@/assets/story/dialogue_sprites/ch1_eleanor_sprite.png");
 const ch1EllisPortraitImg = require("@/assets/story/dialogue_sprites/ch1_ellis_sprite.png");
 const ch1BlackCctvImg = require("@/assets/story/dialogue_sprites/ch1_black_cctv_sprite.png");
@@ -91,6 +92,10 @@ const bgBabelLanguageGatesImg = require("@/assets/story/dialogue_backgrounds/bab
 const rudyExpressionSprites = {
   worried: rudyWorriedDetectiveImg,
   celebratory: rudyCelebratoryCoachImg,
+};
+
+const tomExpressionSprites = {
+  gruff_guard: tomGruffGuardImg,
 };
 
 const eleanorExpressionSprites = {
@@ -329,9 +334,10 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "festival_memory" | "storyteller" | "diagnostic_focus" | "warm_wisdom" | "flat_delivery" | "protective_archivist";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "gruff_guard" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "festival_memory" | "storyteller" | "diagnostic_focus" | "warm_wisdom" | "flat_delivery" | "protective_archivist";
 
 const characterExpressionFallbacks: Partial<Record<string, Partial<Record<StoryCharacterExpression, ImageSourcePropType>>>> = {
+  tom: tomExpressionSprites,
   miguel: miguelExpressionSprites,
   hassan: hassanExpressionSprites,
   sujin: sujinExpressionSprites,
@@ -719,6 +725,7 @@ const STORIES: Record<string, Story> = {
         side: "right",
         avatarBg: "#1E2A3A",
         portrait: ch1TomPortraitImg,
+        portraitVariants: tomExpressionSprites,
       },
       {
         id: "eleanor",
@@ -776,6 +783,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "tom",
+        expression: "gruff_guard",
         text: "Oi. Museum's closed, yeah? Crime scene. No visitors, no press, no exceptions. I don't care if you're the Queen's cousin, nobody gets past me tonight. So who are you, then?",
         textKo: "야. 박물관 닫았어, 알겠지? 범죄 현장이야. 방문객도 안 돼, 기자도 안 돼, 예외 없어. 여왕 사촌이래도 상관없어. 오늘 밤엔 아무도 나를 지나갈 수 없어. 그래서 누구야, 넌?",
         textKoMix: "야. 박물관 닫았어, 알겠지? No visitors, no exceptions. 여왕 사촌이래도 상관없어. 오늘 밤엔 아무도 못 지나가. My name is Tom. 그래서 넌 누구야?",
@@ -924,6 +932,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "tom",
+        expression: "gruff_guard",
         text: "Huh. Alright then. Didn't expect that, to be honest. Most people who show up at 4 AM can't even string a sentence together. You lot? Not bad. Not bad at all. Go on in, then. Break a leg, mate!",
         textKo: "흠. 그래. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 제대로 못 만들거든. 너희? 나쁘지 않아. 전혀. 들어가, 그럼. Break a leg, mate!",
         textKoMix: "흠. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 못 만들거든. 너희? Not bad. 전혀. 들어가, 그럼. Goodbye는 아직 아니야. Break a leg, mate!",
@@ -4901,7 +4910,7 @@ const BABEL_V21_STORY: Story = {
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
     { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", nameId: "Miss Penny", side: "right", avatarBg: "#1A0A2A", portrait: ch5PennyPortraitImg, portraitVariants: pennyExpressionSprites },
-    { id: "tom", emoji: "💂", name: "Tom", nameKo: "톰", nameId: "Tom", side: "left", avatarBg: "#1E2A3A", portrait: ch1TomPortraitImg },
+    { id: "tom", emoji: "💂", name: "Tom", nameKo: "톰", nameId: "Tom", side: "left", avatarBg: "#1E2A3A", portrait: ch1TomPortraitImg, portraitVariants: tomExpressionSprites },
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#3A1A0A", portrait: ch2IsabelPortraitImg, portraitVariants: isabelExpressionSprites },
     { id: "sujin", emoji: "👩‍🔬", name: "Sujin", nameKo: "수진", nameId: "Sujin", side: "left", avatarBg: "#1A2A3A", portrait: ch3SujinPortraitImg },
     { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", nameId: "Profesor Amira", side: "right", avatarBg: "#7A4D19", portrait: ch4AmiraPortraitImg },
@@ -5018,6 +5027,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "tom",
       backdrop: "babel-language-gates",
+      expression: "gruff_guard",
       text: "Blimey. That thing opened because we all sounded different.",
       textKo: "세상에. 우리가 전부 다르게 들렸기 때문에 저게 열린 거네.",
       textEs: "Caray. Esa cosa se abrió porque todos sonábamos distinto.",
