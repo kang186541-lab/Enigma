@@ -244,6 +244,7 @@ assets/story/characters/isabel/isabel_playful_confidence.png
 assets/story/characters/penny/penny_brave_resolve.png
 assets/story/characters/hassan/hassan_memory_storyteller.png
 assets/story/characters/sujin/sujin_diagnostic_focus.png
+assets/story/characters/mira/mira_flat_delivery.png
 ```
 
 `SeqScene.expression` now lets a story beat choose a character sprite variant. `Character.portraitVariants` maps those authored expressions to runtime images.
@@ -272,11 +273,12 @@ Visual verification:
 - Penny now has authored `anxious` and `brave` sprites. `anxious` remains wired to her confession that she believed the Universal Code would help; `brave` is wired to her final moral-resolution line that Mr. Black must answer, but not as a monster.
 - Hassan now has an authored `storyteller` sprite. It is intentionally limited to two active-route memory beats: Cairo's Nubian/Arabic/French lullaby scene and Babel's "A lullaby is not information" callback, so the pose lands as a thematic reprise rather than a generic replacement.
 - Sujin now has an authored `diagnostic_focus` sprite. It is limited to three Seoul clue-diagnosis beats: the palace-gate-as-sentence explanation, the intercepted-signal reveal, and the fragment responding to voice/meaning/structure.
-- Latest asset audit: 99 story PNGs, 208,816,974 bytes total, 29 character assets, warnings 0.
+- Mira now has an authored `flat_delivery` sprite. It is intentionally limited to her Cairo reappearance, where Universal Code gives her the correct words but removes the human tremble behind "thank you"; Babel's later trembling thank-you beat remains on the base sprite until it gets its own opposite emotional pose.
+- Latest asset audit: 100 story PNGs, 210,018,375 bytes total, 30 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Eleanor, Isabel, Mr. Black, Penny, Hassan, and Sujin now each have authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, and Mira now each have authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast.
 
 ## QA Command
 

@@ -56,6 +56,7 @@ const ch3SujinPortraitImg = require("@/assets/story/dialogue_sprites/ch3_sujin_s
 const sujinDiagnosticFocusImg = require("@/assets/story/characters/sujin/sujin_diagnostic_focus.png");
 const ch4BossArchiveImg = require("@/assets/story/chapter4_motion_comic/ch4_boss_archive.png");
 const ch4MiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_mira_sprite.png");
+const miraFlatDeliveryImg = require("@/assets/story/characters/mira/mira_flat_delivery.png");
 const ch4AmiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_amira_sprite.png");
 const ch4HassanPortraitImg = require("@/assets/story/dialogue_sprites/ch4_hassan_sprite.png");
 const ch4BlackPartialPortraitImg = require("@/assets/story/dialogue_sprites/ch4_black_partial_sprite.png");
@@ -106,6 +107,10 @@ const hassanExpressionSprites = {
 
 const sujinExpressionSprites = {
   diagnostic_focus: sujinDiagnosticFocusImg,
+};
+
+const miraExpressionSprites = {
+  flat_delivery: miraFlatDeliveryImg,
 };
 
 const mrBlackExpressionSprites = {
@@ -309,11 +314,12 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller" | "diagnostic_focus";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller" | "diagnostic_focus" | "flat_delivery";
 
 const characterExpressionFallbacks: Partial<Record<string, Partial<Record<StoryCharacterExpression, ImageSourcePropType>>>> = {
   hassan: hassanExpressionSprites,
   sujin: sujinExpressionSprites,
+  mira: miraExpressionSprites,
 };
 
 /* Sequence items */
@@ -4423,6 +4429,7 @@ const CAIRO_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "mira",
+      expression: "flat_delivery",
       text: "Hello, Detective. I am so happy to see you again. Thank you for saving me that night.",
       textKo: "안녕하세요, 탐정님. 다시 만나서 정말 기쁩니다. 그날 저를 구해주셔서 감사합니다.",
       textEs: "Hola, Detective. Estoy muy feliz de verte de nuevo. Gracias por salvarme esa noche.",
