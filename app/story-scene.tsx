@@ -7157,6 +7157,7 @@ export default function StoryScene() {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const stageEnterAnim = useRef(new Animated.Value(1)).current;
   const stageFloatAnim = useRef(new Animated.Value(0)).current;
+  const speakerPulseAnim = useRef(new Animated.Value(0)).current;
   const backdropDriftAnim = useRef(new Animated.Value(0)).current;
   const bgmRef = useRef<Audio.Sound | null>(null);
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -7347,6 +7348,27 @@ export default function StoryScene() {
     puzzleSolvingRef.current = false;
   }, [seqIdx]);
 
+  useEffect(() => {
+    const currentItem = seq[seqIdx];
+    const isSpeakingScene = currentItem?.kind === "scene" && !currentItem.isNarration && !typingDone;
+    if (!isSpeakingScene) {
+      speakerPulseAnim.stopAnimation();
+      speakerPulseAnim.setValue(0);
+      return;
+    }
+
+    const speakerLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(speakerPulseAnim, { toValue: 1, duration: 460, useNativeDriver: true }),
+        Animated.timing(speakerPulseAnim, { toValue: 0, duration: 540, useNativeDriver: true }),
+      ])
+    );
+    speakerLoop.start();
+    return () => {
+      speakerLoop.stop();
+    };
+  }, [seq, seqIdx, speakerPulseAnim, typingDone]);
+
   function advance() {
     // First-tap behavior: if the current scene's typewriter is still running,
     // skip to full text instead of advancing. This matches Pokemon / VN UX.
@@ -7533,6 +7555,23 @@ export default function StoryScene() {
     inputRange: [0, 1],
     outputRange: [0, -6],
   });
+  const characterSpeakingY = speakerPulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -2],
+  });
+  const characterStageY = Animated.add(characterFloatY, characterSpeakingY);
+  const characterSpeakingScale = speakerPulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.006],
+  });
+  const speakerMarkScale = speakerPulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.22],
+  });
+  const speakerMarkOpacity = speakerPulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.78, 1],
+  });
   const hasStageCharacterArt = Boolean(character.isLingo || activePortrait);
   const backdropScale = backdropDriftAnim.interpolate({
     inputRange: [0, 1],
@@ -7662,8 +7701,9 @@ export default function StoryScene() {
                   opacity: characterEntryOpacity,
                   transform: [
                     { translateX: characterEntryX },
-                    { translateY: characterFloatY },
+                    { translateY: characterStageY },
                     { scale: characterEntryScale },
+                    { scale: characterSpeakingScale },
                   ],
                 },
               ]}
@@ -7727,7 +7767,16 @@ export default function StoryScene() {
             <Pressable style={styles.dialogueBox} onPress={advance}>
               <View style={styles.speakerTag}>
                 {activePortrait || character.isLingo ? (
-                  <View style={[styles.speakerMark, { backgroundColor: story.accentColor }]} />
+                  <Animated.View
+                    style={[
+                      styles.speakerMark,
+                      {
+                        backgroundColor: story.accentColor,
+                        opacity: speakerMarkOpacity,
+                        transform: [{ rotate: "45deg" }, { scale: speakerMarkScale }],
+                      },
+                    ]}
+                  />
                 ) : (
                   <EmojiText style={styles.speakerEmoji}>{character.emoji}</EmojiText>
                 )}
@@ -8206,7 +8255,6 @@ const styles = StyleSheet.create({
     width: 9,
     height: 9,
     borderRadius: 2,
-    transform: [{ rotate: "45deg" }],
   },
   speakerEmoji: { fontSize: 14 },
   speakerName: { fontSize: 12, fontFamily: F.bodySemi, color: C.parchmentDark },

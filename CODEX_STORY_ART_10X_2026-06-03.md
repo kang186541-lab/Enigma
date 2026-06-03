@@ -292,11 +292,13 @@ Visual verification:
 - Local web capture confirmed Seoul 3/27 renders Minho with the new grounding pass over the Seoul palace/subway backdrop: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\minho-grounded-staging-seoul.png`.
 - Sidecar reviewer Turing ranked backdrop-aware stage lighting as the next highest-value renderer-only polish after the grounding pass. Dialogue scenes now derive conservative lighting presets from `StoryBackdropId`, so London, Madrid, Seoul, Cairo, and Babel keep distinct shade/glow/backlight palettes without touching story data or language support. Japanese remains out of scope.
 - The dialogue advance control is now a compact right-side game prompt instead of a full-width app-style button. Local web capture confirmed Seoul 3/27 renders Minho with the Seoul neon lighting preset and compact `Next` chip: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\minho-lighting-next-chip-seoul.png`.
+- Sidecar reviewer Turing then ranked in-panel active-speaker pulse as the safest next motion polish. Dialogue scenes now use a typing-only `speakerPulseAnim` to give the speaking character a tiny breath/lean and pulse the speaker mark, while keeping the readable dialogue text and scroll area static. This remains renderer-only and does not change story text, quiz data, sequence/progression, language support, or add Japanese.
+- Local web capture confirmed Seoul 3/27 renders Minho with the completed line and compact `Next` chip after the speaking pulse pass: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\minho-speaking-pulse-done-seoul.png`. Two typing-state frames differed by 612,770 bytes, confirming visible motion/typing activity during the line.
 - Latest asset audit: 106 story PNGs, 220,445,163 bytes total, 36 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not full expression sheets. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, Don Miguel, Carlos, and Minho now each have at least one authored emotional/action pose, and the common grounding/occlusion plus backdrop-aware lighting pass improves integration, but true Ace Attorney-quality production still needs broader expression sheets and more scene-specific staging for secondary beats.
+- Most dialogue sprites are still cutouts from the current portrait set, not full expression sheets. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, Don Miguel, Carlos, and Minho now each have at least one authored emotional/action pose, and the common grounding/occlusion, backdrop-aware lighting, compact prompt, and active-speaker pulse passes improve integration, but true Ace Attorney-quality production still needs broader expression sheets and more scene-specific staging for secondary beats.
 
 ## QA Command
 
