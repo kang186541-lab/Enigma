@@ -604,11 +604,11 @@ export default function HomeScreen() {
                 )}
               </Animated.View>
             </View>
-            <Text style={styles.xpLabel}>
+            <EmojiText style={styles.xpLabel}>
               {level.num < 5
                 ? `${xpInLvl} / ${xpForLvl} XP`
                 : `${stats.xp} XP · ${getLevelName(level, nativeLang)} ${level.emoji}`}
-            </Text>
+            </EmojiText>
           </View>
         )}
 
@@ -758,10 +758,10 @@ export default function HomeScreen() {
         */}
         <GoldDivider label={nextStepEyebrow} />
         <View style={[styles.pad, { marginTop: 0 }]}>
-          <Text style={styles.nextStepLine}>
+          <EmojiText style={styles.nextStepLine}>
             <EmojiText style={styles.nextStepCheck}>✅ </EmojiText>
             {nextStepIsReview ? nextStepReviewLine : nextStepCampLine}
-          </Text>
+          </EmojiText>
           {nextStepIsReview ? (
             <Pressable
               style={({ pressed }) => [styles.nextStepReviewCard, pressed && { opacity: 0.9, transform: [{ scale: 0.99 }] }]}
@@ -931,11 +931,11 @@ export default function HomeScreen() {
               router.push((courseCompleted ? "/basic-course?review=1&section=full" : "/basic-course") as any);
             }}
           >
-            <Text style={styles.basicCoursePillText}>
+            <EmojiText style={styles.basicCoursePillText}>
               {courseCompleted
                 ? (nativeLang === "korean" ? "📚  기초 과정 복습" : nativeLang === "spanish" ? "📚  Repasar curso" : nativeLang === "indonesian" ? "📚  Ulas Kursus" : "📚  Review Course")
                 : (nativeLang === "korean" ? "📚  선택 기초 연습" : nativeLang === "spanish" ? "📚  Base opcional" : nativeLang === "indonesian" ? "📚  Dasar Opsional" : "📚  Optional Basics")}
-            </Text>
+            </EmojiText>
           </Pressable>
         </View>
       )}

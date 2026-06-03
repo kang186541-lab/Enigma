@@ -1033,11 +1033,11 @@ export default function BasicCourseScreen() {
       {step > 0 && (
         <>
           {!canNext && step < 3 && (
-            <Text style={s.nudge}>
+            <EmojiText style={s.nudge}>
               {step === 1
                 ? (native === "korean" ? "카드를 탭해서 의미를 확인하세요 👆" : native === "spanish" ? "Toca la tarjeta para ver el significado 👆" : native === "indonesian" ? "Ketuk kartu untuk melihat artinya 👆" : "Tap the card to see the meaning 👆")
                 : (native === "korean" ? "발음 듣기를 먼저 눌러보세요 👆" : native === "spanish" ? "Toca el botón de escuchar arriba 👆" : native === "indonesian" ? "Ketuk tombol dengarkan di atas 👆" : "Tap the listen button above 👆")}
-            </Text>
+            </EmojiText>
           )}
           <View style={s.navRow}>
             {step < 3 && subIdx > 0 && (
@@ -1334,9 +1334,9 @@ export default function BasicCourseScreen() {
               <View style={{ alignItems: "center", gap: 8 }}>
                 <Text style={[s.charBig, { fontSize: 100, lineHeight: 120 }]}>{charItem.char}</Text>
                 <Text style={{ fontFamily: F.body, color: C.gold, fontSize: 20 }}>{charItem.roman}</Text>
-                <Text style={{ fontFamily: F.body, color: C.goldDim, fontSize: 14, textAlign: "center" }}>
+                <EmojiText style={{ fontFamily: F.body, color: C.goldDim, fontSize: 14, textAlign: "center" }}>
                   {getCharTip(charItem.char, lang, native)}
-                </Text>
+                </EmojiText>
               </View>
 
               {/* Counter */}
@@ -1350,9 +1350,9 @@ export default function BasicCourseScreen() {
                 accessibilityLabel={a11yListen}
               >
                 <Ionicons name="volume-high-outline" size={24} color={C.bg1} />
-                <Text style={s.listenBtnTxt}>
+                <EmojiText style={s.listenBtnTxt}>
                   {native === "korean" ? "🔊  발음 듣기" : native === "spanish" ? "🔊  Escuchar" : native === "indonesian" ? "🔊  Dengarkan" : "🔊  Listen"}
-                </Text>
+                </EmojiText>
               </Pressable>
 
               {audioPlayed && (
@@ -1399,7 +1399,7 @@ export default function BasicCourseScreen() {
             <Text style={[s.charBig, { fontSize: 56 }]}>{charItem.char}</Text>
             <View style={s.charMeta}>
               <Text style={s.charRoman}>{charItem.roman}</Text>
-              <Text style={s.charTip}>{getCharTip(charItem.char, lang, native)}</Text>
+              <EmojiText style={s.charTip}>{getCharTip(charItem.char, lang, native)}</EmojiText>
             </View>
           </View>
 
@@ -1441,9 +1441,9 @@ export default function BasicCourseScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={native === "korean" ? "다시 해볼게요" : native === "spanish" ? "Otra vez" : native === "indonesian" ? "Coba lagi" : "Try again"}
               >
-                <Text style={s.retryBtnTxt}>
+                <EmojiText style={s.retryBtnTxt}>
                   {native === "korean" ? "🔄  다시 해볼게요" : native === "spanish" ? "🔄  Otra vez" : native === "indonesian" ? "🔄  Coba lagi" : "🔄  Try again"}
-                </Text>
+                </EmojiText>
               </Pressable>
               <Pressable
                 style={({ pressed }) => [s.nextBtn, !traced && s.nextBtnOff, pressed && traced && { opacity: 0.85 }]}
@@ -1453,9 +1453,9 @@ export default function BasicCourseScreen() {
                 accessibilityState={{ disabled: !traced }}
                 accessibilityLabel={native === "korean" ? "잘했어요!" : native === "spanish" ? "¡Bien hecho!" : native === "indonesian" ? "Bagus!" : "Looks good!"}
               >
-                <Text style={s.nextBtnTxt}>
+                <EmojiText style={s.nextBtnTxt}>
                   {native === "korean" ? "✅  잘했어요!" : native === "spanish" ? "✅  ¡Bien hecho!" : native === "indonesian" ? "✅  Bagus!" : "✅  Looks good!"}
-                </Text>
+                </EmojiText>
               </Pressable>
             </View>
             {isReviewMode && (
@@ -1529,9 +1529,9 @@ export default function BasicCourseScreen() {
                     <>
                       <Pressable style={({ pressed }) => [s.listenBtn, s.listenBtnLg, pressed && { opacity: 0.75 }]} onPress={handleGreetListen} accessibilityRole="button" accessibilityLabel={a11yListen}>
                         <Ionicons name="volume-high-outline" size={22} color={C.bg1} />
-                        <Text style={s.listenBtnTxt}>
+                        <EmojiText style={s.listenBtnTxt}>
                           {native === "korean" ? "🔊  듣기" : native === "spanish" ? "🔊  Escuchar" : native === "indonesian" ? "🔊  Dengarkan" : "🔊  Listen"}
-                        </Text>
+                        </EmojiText>
                       </Pressable>
                       {isReviewMode && (
                         <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap} accessibilityRole="button" accessibilityLabel={a11ySkip}>
@@ -1551,9 +1551,9 @@ export default function BasicCourseScreen() {
                       </Text>
                       <Pressable style={({ pressed }) => [s.micBtn, pressed && { opacity: 0.75 }]} onPress={handleGreetRecord} accessibilityRole="button" accessibilityLabel={a11yRecord}>
                         <Ionicons name="mic-outline" size={28} color={C.bg1} />
-                        <Text style={s.listenBtnTxt}>
+                        <EmojiText style={s.listenBtnTxt}>
                           {native === "korean" ? "🎤  따라 말하기" : native === "spanish" ? "🎤  Repetir" : native === "indonesian" ? "🎤  Ucapkan Sekarang" : "🎤  Speak Now"}
-                        </Text>
+                        </EmojiText>
                       </Pressable>
                       {isReviewMode && (
                         <Pressable onPress={goNext} hitSlop={8} style={s.inlineSkipWrap} accessibilityRole="button" accessibilityLabel={a11ySkip}>
@@ -1577,9 +1577,9 @@ export default function BasicCourseScreen() {
 
                   {/* Phase: processing */}
                   {greetPhase === "processing" && (
-                    <Text style={s.processingTxt}>
+                    <EmojiText style={s.processingTxt}>
                       {native === "korean" ? "⏳  평가 중..." : native === "spanish" ? "⏳  Evaluando..." : native === "indonesian" ? "⏳  Menilai..." : "⏳  Evaluating..."}
-                    </Text>
+                    </EmojiText>
                   )}
 
                   {/* Phase: done */}

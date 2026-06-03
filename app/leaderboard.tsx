@@ -53,7 +53,7 @@ export default function LeaderboardScreen() {
 
       {/* League Badge */}
       <View style={styles.leagueBanner}>
-        <Text style={styles.leagueEmoji}>{userTier.emoji}</Text>
+        <EmojiText style={styles.leagueEmoji}>{userTier.emoji}</EmojiText>
         <View>
           <Text style={styles.leagueName}>{t(userTier.name, lc)} {t(T.league, lc)}</Text>
           <Text style={styles.leagueXP}>{weeklyXP} {t(T.weeklyXP, lc)}</Text>

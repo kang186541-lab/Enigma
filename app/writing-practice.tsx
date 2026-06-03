@@ -191,10 +191,10 @@ export default function WritingPractice() {
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {/* Exercise Type Badge */}
         <View style={styles.typeBadge}>
-          <Text style={styles.typeText}>
+          <EmojiText style={styles.typeText}>
             <EmojiText style={{ fontFamily: "System" }}>{exercise.type === "translate" ? "📝" : exercise.type === "complete" ? "✏️" : "📖"}</EmojiText>{" "}
             {t(typeLabels[exercise.type], lc)}
-          </Text>
+          </EmojiText>
         </View>
 
         {/* Prompt */}
@@ -242,9 +242,9 @@ export default function WritingPractice() {
         {phase === "result" && (
           <View style={styles.resultCard}>
             <View style={styles.scoreRow}>
-              <Text style={[styles.scoreEmoji, isCorrect ? {} : { opacity: 0.6 }]}>
+              <EmojiText style={[styles.scoreEmoji, isCorrect ? {} : { opacity: 0.6 }]}>
                 {isCorrect ? "🎉" : "📝"}
-              </Text>
+              </EmojiText>
               <Text style={[styles.scoreText, { color: isCorrect ? C.success : C.gold }]}>
                 {t(T.score, lc)}: {score}/100
               </Text>

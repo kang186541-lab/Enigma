@@ -20,7 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Audio, AVPlaybackStatus } from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLanguage } from "@/context/LanguageContext";
+import { getEffectiveLearningLanguage, useLanguage, type NativeLanguage } from "@/context/LanguageContext";
 import { getNPC, NPC, NPC_EMOTIONS, NPC_REL_LEVELS, getRelTier, getRelLabel, RelationshipTier } from "@/constants/npcs";
 import { getApiUrl } from "@/lib/query-client";
 import { queueProgressPush } from "@/lib/progressSync";
@@ -113,8 +113,8 @@ export default function NpcMissionScreen() {
   const { learningLanguage, nativeLanguage, awardXp } = useLanguage();
 
   const npc = getNPC(npcId ?? "") as NPC | undefined;
-  const language = (learningLanguage ?? "english") as string;
-  const native   = (nativeLanguage ?? "english") as string;
+  const native   = (nativeLanguage ?? "english") as NativeLanguage;
+  const language = getEffectiveLearningLanguage(native, learningLanguage);
 
   const topPad    = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -764,7 +764,7 @@ export default function NpcMissionScreen() {
       <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowNpc]}>
         {!item.isUser && npc && (
           <View style={[styles.npcAvatar, { backgroundColor: npc.color + "33", borderColor: npc.color + "88" }]}>
-            <Text style={styles.npcAvatarEmoji}>{npc.emoji}</Text>
+            <EmojiText style={styles.npcAvatarEmoji}>{npc.emoji}</EmojiText>
           </View>
         )}
         <View style={styles.bubbleCol}>
@@ -847,13 +847,13 @@ export default function NpcMissionScreen() {
         </Pressable>
 
         <View style={[styles.headerAvatar, { backgroundColor: (npc?.color ?? "#888") + "33", borderColor: (npc?.color ?? "#888") + "88" }]}>
-          <Text style={styles.headerAvatarEmoji}>{npc?.emoji ?? "?"}</Text>
+          <EmojiText style={styles.headerAvatarEmoji}>{npc?.emoji ?? "?"}</EmojiText>
         </View>
 
         <View style={styles.headerInfo}>
           <View style={styles.headerNameRow}>
             <Text style={styles.headerName}>{npc?.name ?? "?"}</Text>
-            <Text style={styles.emotionIcon}>{emojiIcon}</Text>
+            <EmojiText style={styles.emotionIcon}>{emojiIcon}</EmojiText>
             <View style={styles.headerMuteBtn}>
               <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); if (!muted) stopAudio(); setMuted(m => !m); }} hitSlop={6}>
                 <Ionicons name={muted ? "volume-mute" : "volume-medium-outline"} size={16} color={muted ? C.goldDark : C.goldDim} />
@@ -865,9 +865,9 @@ export default function NpcMissionScreen() {
             <View style={styles.relTrack}>
               <View style={[styles.relFill, { width: `${Math.min(100, relationship)}%` as any, backgroundColor: level.color }]} />
             </View>
-            <Text style={[styles.relLabel, { color: level.color }]}>
+            <EmojiText style={[styles.relLabel, { color: level.color }]}>
               {level.heart} {getRelLabel(tier, native)} {Math.round(relationship)}/100
-            </Text>
+            </EmojiText>
           </View>
         </View>
       </View>
@@ -888,7 +888,7 @@ export default function NpcMissionScreen() {
           ListHeaderComponent={isTyping ? (
             <View style={[styles.msgRow, styles.msgRowNpc]}>
               <View style={[styles.npcAvatar, { backgroundColor: (npc?.color ?? "#888") + "33", borderColor: (npc?.color ?? "#888") + "88" }]}>
-                <Text style={styles.npcAvatarEmoji}>{npc?.emoji ?? "?"}</Text>
+                <EmojiText style={styles.npcAvatarEmoji}>{npc?.emoji ?? "?"}</EmojiText>
               </View>
               <View style={[styles.bubble, styles.bubbleNpc, styles.typingBubble]}>
                 <View style={styles.typingDots}>
@@ -1089,11 +1089,11 @@ export default function NpcMissionScreen() {
             },
           ]}
         >
-          <Text style={[styles.scoreToastText, { color: scoreDisplay.positive ? "#4ADE80" : "#F87171" }]}>
+          <EmojiText style={[styles.scoreToastText, { color: scoreDisplay.positive ? "#4ADE80" : "#F87171" }]}>
             {scoreDisplay.positive ? `+${scoreDisplay.amount}` : `${scoreDisplay.amount}`}
             {" "}
             {scoreDisplay.positive ? (scoreDisplay.amount >= 5 ? "💝" : "💙") : "💔"}
-          </Text>
+          </EmojiText>
         </Animated.View>
       )}
 
@@ -1107,7 +1107,7 @@ export default function NpcMissionScreen() {
         <View style={styles.popupOverlay}>
           <View style={styles.popupCard}>
             <View style={[styles.popupAvatar, { backgroundColor: (npc?.color ?? "#888") + "33" }]}>
-              <Text style={styles.popupAvatarEmoji}>{npc?.emoji ?? "?"}</Text>
+              <EmojiText style={styles.popupAvatarEmoji}>{npc?.emoji ?? "?"}</EmojiText>
             </View>
             <Text style={styles.popupLabel}>
               {native === "korean" ? "선택한 문장" : native === "spanish" ? "Tu respuesta" : native === "indonesian" ? "Jawabanmu" : "Your response"}

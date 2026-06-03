@@ -1380,17 +1380,17 @@ export default function ChatRoomScreen() {
         <View style={styles.headerCenter}>
           <View style={styles.headerNameRow}>
             <Text style={styles.headerName}>{tutor.name}</Text>
-            <Text style={styles.headerFlag}>{tutor.flag}</Text>
+            <EmojiText style={styles.headerFlag}>{tutor.flag}</EmojiText>
             {/* Phase 4: relationship tier badge — only once beyond stranger */}
             {tutorTier !== "stranger" && (
               <View style={styles.tierBadge}>
-                <Text style={styles.tierBadgeText}>
+                <EmojiText style={styles.tierBadgeText}>
                   {tutorTier === "intimate"
                     ? (userNativeLang === "korean" ? "💛 절친" : userNativeLang === "spanish" ? "💛 Íntimo" : userNativeLang === "indonesian" ? "💛 Sahabat" : "💛 Close friend")
                     : tutorTier === "close"
                     ? (userNativeLang === "korean" ? "🤝 친해짐" : userNativeLang === "spanish" ? "🤝 Cercanos" : userNativeLang === "indonesian" ? "🤝 Akrab" : "🤝 Close")
                     : (userNativeLang === "korean" ? "👋 아는 사이" : userNativeLang === "spanish" ? "👋 Conocidos" : userNativeLang === "indonesian" ? "👋 Kenalan" : "👋 Familiar")}
-                </Text>
+                </EmojiText>
               </View>
             )}
           </View>
@@ -1566,12 +1566,12 @@ export default function ChatRoomScreen() {
             {/* Phase 4: AI-generated strength highlight */}
             {sessionSummaryRef.current?.highlight && (
               <View style={[styles.lessonReportSection, { backgroundColor: "rgba(122,196,136,0.1)", borderColor: "rgba(122,196,136,0.3)" }]}>
-                <Text style={styles.lessonReportSectionTitle}>
+                <EmojiText style={styles.lessonReportSectionTitle}>
                   {userNativeLang === "korean" ? "✨ 오늘의 잘한 점"
                     : userNativeLang === "spanish" ? "✨ Lo que hiciste bien"
                     : userNativeLang === "indonesian" ? "✨ Yang kamu lakukan dengan baik"
                     : "✨ What you did well"}
-                </Text>
+                </EmojiText>
                 <Text style={styles.lessonReportItem}>{sessionSummaryRef.current.highlight}</Text>
               </View>
             )}
@@ -1579,12 +1579,12 @@ export default function ChatRoomScreen() {
             {/* Phase 4: AI-generated focus-next-time advice (from reflect turn) */}
             {sessionSummaryRef.current?.focusNextTime && (
               <View style={styles.lessonReportSection}>
-                <Text style={styles.lessonReportSectionTitle}>
+                <EmojiText style={styles.lessonReportSectionTitle}>
                   {userNativeLang === "korean" ? "🎯 다음에 주목할 점"
                     : userNativeLang === "spanish" ? "🎯 A trabajar la próxima vez"
                     : userNativeLang === "indonesian" ? "🎯 Fokus untuk lain kali"
                     : "🎯 Focus for next time"}
-                </Text>
+                </EmojiText>
                 <Text style={styles.lessonReportItem}>{sessionSummaryRef.current.focusNextTime}</Text>
               </View>
             )}
@@ -1592,12 +1592,12 @@ export default function ChatRoomScreen() {
             {/* Fallback: show top-3 corrections when the AI didn't provide a summary */}
             {!sessionSummaryRef.current?.focusNextTime && lessonMetricsRef.current.corrections.length > 0 && (
               <View style={styles.lessonReportSection}>
-                <Text style={styles.lessonReportSectionTitle}>
+                <EmojiText style={styles.lessonReportSectionTitle}>
                   {userNativeLang === "korean" ? "🎯 다음에 주목할 점"
                     : userNativeLang === "spanish" ? "🎯 A trabajar la próxima vez"
                     : userNativeLang === "indonesian" ? "🎯 Fokus untuk lain kali"
                     : "🎯 Focus for next time"}
-                </Text>
+                </EmojiText>
                 {lessonMetricsRef.current.corrections.slice(0, 3).map((c, i) => (
                   <Text key={i} style={styles.lessonReportItem}>
                     • {c.original} → <Text style={{ color: "#7AC488" }}>{c.corrected}</Text>
@@ -1659,7 +1659,7 @@ export default function ChatRoomScreen() {
                     ]}
                     onPress={() => handleModeChange(m.key)}
                   >
-                    <Text style={styles.modeBtnEmoji}>{m.emoji}</Text>
+                    <EmojiText style={styles.modeBtnEmoji}>{m.emoji}</EmojiText>
                     <Text style={[styles.segmentBtnText, active && styles.segmentBtnTextActive]}>
                       {m.label}
                     </Text>

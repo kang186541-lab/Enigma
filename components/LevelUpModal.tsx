@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Level, NativeLanguage, getLevelName } from "@/context/LanguageContext";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 
 const rudyBadgeImg = require("@/assets/rudy_badge.png");
 const { width: SCREEN_W } = Dimensions.get("window");
@@ -205,7 +206,7 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
             <Text style={styles.title}>{title}</Text>
 
             <View style={styles.badge}>
-              <Text style={styles.badgeEmoji}>{level.emoji}</Text>
+              <EmojiText style={styles.badgeEmoji}>{level.emoji}</EmojiText>
               <Text style={styles.badgeName}>{lName}</Text>
             </View>
 

@@ -1231,6 +1231,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       const inputPath  = join(tmpdir(), `stt-in-${randomUUID()}`);
       const outputPath = join(tmpdir(), `stt-out-${randomUUID()}.wav`);
       let wavBuffer: Buffer;
+      let sttContentType = "audio/wav; codecs=audio/pcm; samplerate=16000";
       try {
         await writeFile(inputPath, rawBuffer);
         await new Promise<void>((resolve, reject) => {
@@ -1245,10 +1246,12 @@ Student's ${learnName} answer: ${userAnswer}`;
           ff.on("error", reject);
         });
         wavBuffer = await readFile(outputPath);
+        sttContentType = "audio/wav; codecs=audio/pcm; samplerate=16000";
         console.log(`[stt] ffmpeg ok → ${wavBuffer.length}B WAV`);
       } catch (convErr) {
-        console.error("[stt] ffmpeg failed, using raw buffer:", convErr);
+        console.error("[stt] ffmpeg failed, sending raw audio with its real content-type:", (convErr as Error).message);
         wavBuffer = rawBuffer;
+        sttContentType = azureContentTypeForMime(mimeType);
       } finally {
         await unlink(inputPath).catch(() => {});
         await unlink(outputPath).catch(() => {});
@@ -1264,7 +1267,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         method: "POST",
         headers: {
           "Ocp-Apim-Subscription-Key": key,
-          "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000",
+          "Content-Type": sttContentType,
         },
         body: wavBuffer as unknown as BodyInit,
         signal: sttController.signal,

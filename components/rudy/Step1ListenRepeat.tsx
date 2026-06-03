@@ -402,7 +402,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       console.warn('[STEP1] Audio too short — user probably said nothing');
       setAcceptedSpokenAttempt(false);
       setScore(0);
-      setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
+      setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : nativeLang === "indonesian" ? "Tidak ada suara terdeteksi" : "No speech detected");
       setPhase("result");
       return;
     }
@@ -423,7 +423,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         console.warn('[STEP1] Azure returned no recognized speech');
         setAcceptedSpokenAttempt(false);
         setScore(0);
-        setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
+        setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : nativeLang === "indonesian" ? "Tidak ada suara terdeteksi" : "No speech detected");
         return;
       }
       const s: number = data.pronunciationScore ?? data.score ?? 0;
@@ -438,7 +438,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       console.warn('[API] pronunciation assessment failed:', e);
       setAcceptedSpokenAttempt(false);
       setScore(0);
-      setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : "No speech detected");
+      setFeedback(nativeLang === "korean" ? "음성이 감지되지 않았어요" : nativeLang === "spanish" ? "No se detectó voz" : nativeLang === "indonesian" ? "Tidak ada suara terdeteksi" : "No speech detected");
     } finally {
       setPhase("result");
       if (isAudioOnlyRound) setTextRevealed(true);
@@ -625,7 +625,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
                   : <Ionicons name="ear-outline" size={15} color="#e5a940" />
                 }
                 <Text style={s.playbackBtnText}>
-                  {nativeLang === "korean" ? "내 발음" : nativeLang === "spanish" ? "Mi voz" : "My voice"}
+                  {nativeLang === "korean" ? "내 발음" : nativeLang === "spanish" ? "Mi voz" : nativeLang === "indonesian" ? "Suara saya" : "My voice"}
                 </Text>
               </Pressable>
             )}

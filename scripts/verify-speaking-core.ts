@@ -54,6 +54,7 @@ const rudyStep4Source = readFileSync("components/rudy/Step4QuickReview.tsx", "ut
 const coachingCardSource = readFileSync("components/rudy/CoachingCard.tsx", "utf8");
 const phonemeCoachingSource = readFileSync("components/rudy/PhonemeCoaching.tsx", "utf8");
 const phonemeCoachingDataSource = readFileSync("data/phonemeCoaching.ts", "utf8");
+const npcMissionSource = readFileSync("app/npc-mission.tsx", "utf8");
 const apiFetchWithAuthSource = readFileSync("lib/apiFetchWithAuth.ts", "utf8");
 const chatRoomSource = readFileSync("app/chat-room.tsx", "utf8");
 const moderationSource = readFileSync("server/moderation.ts", "utf8");
@@ -484,8 +485,9 @@ assert.ok(
   dailyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)") &&
   dailyLessonSource.includes("completed: progress.completedDays.includes(day.id),") &&
   !dailyLessonSource.includes("completed: progress.completedDays.includes(day.id) || progress.todayCompleted") &&
-  rudyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)"),
-  "Shared language selection should prevent native-language courses across Home, Cards, Basic Course, Daily Lesson, and Rudy Lesson; Daily Lesson completion must be day-specific"
+  rudyLessonSource.includes("getEffectiveLearningLanguage(nativeLang, learningLanguage)") &&
+  npcMissionSource.includes("getEffectiveLearningLanguage(native, learningLanguage)"),
+  "Shared language selection should prevent native-language courses across Home, Cards, Basic Course, Daily Lesson, Rudy Lesson, and NPC Mission; Daily Lesson completion must be day-specific"
 );
 assert.ok(
   progressSyncSource.includes("expectedUserId?: string | null") &&
@@ -977,6 +979,13 @@ assert.ok(
   routesSource.includes('"Content-Type": sttContentType') &&
   routesSource.indexOf('m.includes("webm")') < routesSource.indexOf('m.includes("ogg") || m.includes("opus")'),
   "Indonesian pronunciation fallback should send raw webm/opus audio with the real Azure content type"
+);
+assert.ok(
+  routesSource.includes('let sttContentType = "audio/wav; codecs=audio/pcm; samplerate=16000"') &&
+    routesSource.includes("sttContentType = azureContentTypeForMime(mimeType)") &&
+    routesSource.includes("[stt] ffmpeg failed, sending raw audio with its real content-type") &&
+    routesSource.includes('"Content-Type": sttContentType'),
+  "/api/stt fallback should not mislabel raw webm/mp4 recordings as WAV when ffmpeg is unavailable",
 );
 assert.ok(
   routesSource.includes('lang.toLowerCase().startsWith("id") ? `<break time="180ms"/>`') &&

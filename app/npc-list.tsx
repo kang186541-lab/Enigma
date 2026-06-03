@@ -221,7 +221,7 @@ export default function NpcListScreen() {
             >
               <View style={[styles.emojiCircle, { backgroundColor: npc.color + "33", borderColor: npc.color + "88" }]}>
                 <EmojiText style={styles.emojiText}>{unlocked ? npc.emoji : "🔒"}</EmojiText>
-                {unlocked && <Text style={styles.emotionBadge}>{emojiIcon}</Text>}
+                {unlocked && <EmojiText style={styles.emotionBadge}>{emojiIcon}</EmojiText>}
               </View>
 
               <View style={styles.npcInfo}>
@@ -229,7 +229,7 @@ export default function NpcListScreen() {
                   <Text style={[styles.npcName, !unlocked && { color: C.goldDim }]}>{npc.name}</Text>
                   {unlocked ? (
                     <View style={[styles.tierPill, { backgroundColor: level.color + "33", borderColor: level.color + "66" }]}>
-                      <Text style={styles.tierHeart}>{level.heart}</Text>
+                      <EmojiText style={styles.tierHeart}>{level.heart}</EmojiText>
                       <Text style={[styles.tierLabel, { color: level.color }]}>
                         {getRelLabel(tier, native)}
                       </Text>
@@ -269,9 +269,9 @@ export default function NpcListScreen() {
         {LANGUAGE_WOUNDS.length > 0 && (
           <>
             <View style={styles.sectionDivider} />
-            <Text style={styles.sectionTitle}>
+            <EmojiText style={styles.sectionTitle}>
               {native === "korean" ? "🩹 NPC 언어의 상처" : native === "spanish" ? "🩹 Heridas Lingüísticas" : native === "indonesian" ? "🩹 Luka Bahasa" : "🩹 Language Wounds"}
-            </Text>
+            </EmojiText>
             <Text style={styles.sectionSub}>
               {native === "korean"
                 ? "스토리를 진행하며 NPC의 숨겨진 아픔을 발견하세요"

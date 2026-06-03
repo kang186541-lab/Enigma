@@ -155,6 +155,14 @@ assert.ok(
     storyQuizSource.includes('qt("useExpressions", nl)'),
   "story quiz prompts, writing labels, debate labels, target-language maps, and fallback messages must stay localized",
 );
+assert.ok(
+  storyQuizSource.includes('nl === "id" ? "Rudy sedang mendengarkan…"') &&
+    storyQuizSource.includes('nl === "id" ? "Batu itu merespons…"') &&
+    storyQuizSource.includes('setError(qt("evaluationError", nl))') &&
+    storyQuizSource.includes('setError(qt("micStartFailed", nl))') &&
+    storyQuizSource.includes('setError(qt("micUnsupported", nl))'),
+  "story quiz pronunciation/voice/rescue runtime branches must not fall back to English for Indonesian",
+);
 
 assert.doesNotMatch(
   chapterResultSource,

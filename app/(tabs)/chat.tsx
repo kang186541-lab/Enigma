@@ -14,6 +14,7 @@ import * as Haptics from "expo-haptics";
 import { useLanguage } from "@/context/LanguageContext";
 import { TUTORS, TUTOR_GROUPS, TUTOR_IMAGES, Tutor, TutorLanguage } from "@/constants/tutors";
 import { C, F } from "@/constants/theme";
+import { EmojiText } from "@/components/EmojiText";
 
 const TAB_BAR_HEIGHT = 49;
 
@@ -132,7 +133,7 @@ function TutorCard({ tutor, onPress, nativeLang }: { tutor: Tutor; onPress: () =
           importantForAccessibility="no"
         />
         <View style={styles.flagBadge}>
-          <Text style={styles.flagText}>{tutor.flag}</Text>
+          <EmojiText style={styles.flagText}>{tutor.flag}</EmojiText>
         </View>
       </View>
 
@@ -202,7 +203,7 @@ export default function TutorSelectScreen() {
                 <Text style={[styles.groupLabel, { color: langColor }]}>
                   ✦ {GROUP_LABELS[group.language][nativeLang]}
                 </Text>
-                <Text style={styles.groupFlag}>{group.flag}</Text>
+                <EmojiText style={styles.groupFlag}>{group.flag}</EmojiText>
               </View>
               <View style={styles.groupCards}>
                 {groupTutors.map((tutor) => (

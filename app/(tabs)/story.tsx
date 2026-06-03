@@ -457,9 +457,9 @@ export default function StoryTab() {
                 </View>
 
                 <View style={styles.cardMain}>
-                  <Text style={[styles.flag, isLocked && { opacity: 0.3 }]}>
+                  <EmojiText style={[styles.flag, isLocked && { opacity: 0.3 }]}>
                     {ch.flag}
-                  </Text>
+                  </EmojiText>
                   <View style={styles.charsRow}>
                     {ch.characters.map((emoji, i) => (
                       <View
@@ -474,20 +474,20 @@ export default function StoryTab() {
                           },
                         ]}
                       >
-                        <Text
+                        <EmojiText
                           style={[
                             styles.charEmoji,
                             isLocked && { opacity: 0.25 },
                           ]}
                         >
                           {emoji}
-                        </Text>
+                        </EmojiText>
                       </View>
                     ))}
                   </View>
                 </View>
 
-                <Text
+                <EmojiText
                   style={[
                     styles.cardTitle,
                     isLocked && { color: "rgba(255,255,255,0.3)" },
@@ -495,7 +495,7 @@ export default function StoryTab() {
                 >
                   {isLocked ? "🔒 " : ""}
                   {getTitle(ch)}
-                </Text>
+                </EmojiText>
                 <Text
                   style={[
                     styles.cardDesc,
@@ -573,7 +573,7 @@ export default function StoryTab() {
                 </View>
 
                 <View style={styles.xpRow}>
-                  <Text
+                  <EmojiText
                     style={[
                       styles.xpText,
                       isLocked && { color: "rgba(255,255,255,0.18)" },
@@ -587,7 +587,7 @@ export default function StoryTab() {
                       : lang === "indonesian"
                       ? " hadiah"
                       : " reward"}
-                  </Text>
+                  </EmojiText>
                   {(() => {
                     const chKey = `ch${ch.num}`;
                     const io = ioData.chapters[chKey];

@@ -5,6 +5,7 @@ import {
 import * as Haptics from "expo-haptics";
 import { C, F } from "@/constants/theme";
 import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
+import { EmojiText } from "@/components/EmojiText";
 
 // ── Language metadata ──────────────────────────────────────────────────────────
 
@@ -138,7 +139,7 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
               style={({ pressed }) => [s.langCard, selNative === lang && s.langCardSelected, pressed && { opacity: 0.85 }]}
               onPress={() => pickNative(lang)}
             >
-              <Text style={s.langFlag}>{LANG_META[lang].flag}</Text>
+              <EmojiText style={s.langFlag}>{LANG_META[lang].flag}</EmojiText>
               <Text style={[s.langName, selNative === lang && s.langNameSelected]}>
                 {getLangName(lang, nativeLang)}
               </Text>
@@ -154,7 +155,7 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
               style={({ pressed }) => [s.langCard, selLearn === lang && s.langCardSelected, pressed && { opacity: 0.85 }]}
               onPress={() => pickLearn(lang)}
             >
-              <Text style={s.langFlag}>{LANG_META[lang].flag}</Text>
+              <EmojiText style={s.langFlag}>{LANG_META[lang].flag}</EmojiText>
               <Text style={[s.langName, selLearn === lang && s.langNameSelected]}>
                 {getLangName(lang, nativeLang)}
               </Text>

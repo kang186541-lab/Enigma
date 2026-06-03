@@ -30,12 +30,27 @@ assert.ok(emojiTextSource.includes("EMOJI_SPLIT_RE"), "EmojiText must keep emoji
 
 const rawEmojiTextHits: string[] = [];
 for (const file of [...walk("app"), ...walk("components")]) {
-  const lines = readFileSync(file, "utf8").split(/\r?\n/);
+  const source = readFileSync(file, "utf8");
+  const lines = source.split(/\r?\n/);
   lines.forEach((line, index) => {
     if (line.includes("<Text") && EMOJI_RE.test(line)) {
       rawEmojiTextHits.push(`${file}:${index + 1}: ${line.trim()}`);
     }
   });
+
+  const textBlockRe = /<Text(?!Input|Style)\b[\s\S]*?<\/Text>/g;
+  const variableEmojiRe =
+    /\{[^}]*\b(?:flag|emoji|heart)\b[^}]*\}|getCharTip\(|scoreInfo\.emoji|level\.heart|emojiIcon/;
+
+  for (const match of source.matchAll(textBlockRe)) {
+    const block = match[0];
+    if (!EMOJI_RE.test(block) && !variableEmojiRe.test(block)) continue;
+
+    const lineNumber = source.slice(0, match.index ?? 0).split(/\r?\n/).length;
+    rawEmojiTextHits.push(
+      `${file}:${lineNumber}: raw <Text> contains emoji or emoji-like variable; use EmojiText`,
+    );
+  }
 }
 
 assert.equal(

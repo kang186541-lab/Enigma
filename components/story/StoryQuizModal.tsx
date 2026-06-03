@@ -1330,7 +1330,7 @@ function PronunciationQuizView({
   const sentences = resolved?.sentences ?? [];
 
   const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : tl === "id" ? "id-ID" : "en-US";
-  const rudyMsg = nl === "ko" ? "루디가 듣고 있어요…" : nl === "es" ? "Rudy está escuchando…" : "Rudy is listening…";
+  const rudyMsg = nl === "ko" ? "루디가 듣고 있어요…" : nl === "es" ? "Rudy está escuchando…" : nl === "id" ? "Rudy sedang mendengarkan…" : "Rudy is listening…";
 
   const [sIdx, setSIdx] = useState(0);
   const [recordState, setRecordState] = useState<"idle" | "recording" | "processing" | "done">("idle");
@@ -1497,7 +1497,7 @@ function PronunciationQuizView({
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         } catch (e) {
           console.warn('[API] pronunciation assessment failed:', e);
-          setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : "Evaluation error.");
+          setError(qt("evaluationError", nl));
         } finally {
           setRecordState("done");
         }
@@ -1633,7 +1633,7 @@ function VoicePowerQuizView({
   const sentences: VoicePowerContent[] = contentRaw?.sentences ?? [];
 
   const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : tl === "id" ? "id-ID" : "en-US";
-  const rudyMsg = nl === "ko" ? "수호석이 반응하고 있어…" : nl === "es" ? "La piedra reacciona…" : "The stone reacts…";
+  const rudyMsg = nl === "ko" ? "수호석이 반응하고 있어…" : nl === "es" ? "La piedra reacciona…" : nl === "id" ? "Batu itu merespons…" : "The stone reacts…";
 
   const [sIdx, setSIdx] = useState(0);
   const [recordState, setRecordState] = useState<"idle" | "recording" | "processing" | "done">("idle");
@@ -2169,7 +2169,7 @@ function NpcRescueQuizView({
           autoStopRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
         } catch (e) {
           console.warn('[Speech] microphone start failed:', e);
-          setError(nl === "ko" ? "마이크 시작 실패" : "Cannot start microphone.");
+          setError(qt("micStartFailed", nl));
         }
       })();
       return;
@@ -2177,7 +2177,7 @@ function NpcRescueQuizView({
 
     // Web recording
     if (!navigator?.mediaDevices?.getUserMedia) {
-      setError("Microphone not supported.");
+      setError(qt("micUnsupported", nl));
       return;
     }
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {

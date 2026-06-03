@@ -2267,13 +2267,13 @@ export default function SpeakScreen() {
                   <Text style={styles.pronLevelBadgeText}>{prog.current}</Text>
                 </View>
                 {prog.next ? (
-                  <Text style={styles.pronLevelHint}>
+                  <EmojiText style={styles.pronLevelHint}>
                     {nativeLang === "korean" ? `${prog.next}까지 ${prog.done}/${prog.total} 연습` : nativeLang === "spanish" ? `${prog.done}/${prog.total} prácticas hasta ${prog.next}` : nativeLang === "indonesian" ? `${prog.done}/${prog.total} latihan menuju ${prog.next}` : `${prog.done}/${prog.total} practices to ${prog.next}`}
-                  </Text>
+                  </EmojiText>
                 ) : (
-                  <Text style={styles.pronLevelHint}>
+                  <EmojiText style={styles.pronLevelHint}>
                     {nativeLang === "korean" ? "최고 레벨 달성 🏆" : nativeLang === "spanish" ? "¡Nivel máximo alcanzado! 🏆" : nativeLang === "indonesian" ? "Level Maks Tercapai 🏆" : "Max Level Reached 🏆"}
-                  </Text>
+                  </EmojiText>
                 )}
               </View>
             );
@@ -2453,7 +2453,7 @@ export default function SpeakScreen() {
                       ]}
                       onPress={() => switchLang(tab.key)}
                     >
-                      <Text style={styles.langTabFlag}>{tab.flag}</Text>
+                      <EmojiText style={styles.langTabFlag}>{tab.flag}</EmojiText>
                     </Pressable>
                   );
                 })}
@@ -2590,9 +2590,9 @@ export default function SpeakScreen() {
                         </View>
 
                         <View style={styles.resultRight}>
-                          <Text style={[styles.scoreLabel, { color: scoreInfo.color }]}>
+                          <EmojiText style={[styles.scoreLabel, { color: scoreInfo.color }]}>
                             {scoreInfo.emoji ? `${scoreInfo.emoji} ` : ""}{scoreInfo.label}
-                          </Text>
+                          </EmojiText>
 
                           <View style={styles.scoreBarTrack}>
                             <Animated.View

@@ -527,12 +527,12 @@ function LessonScreen({
             { opacity: completeAnim, transform: [{ scale: completeAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] }) }] },
           ]}>
             <EmojiText style={styles.stepCompleteEmoji}>✅</EmojiText>
-            <Text style={styles.stepCompleteTitle}>
+            <EmojiText style={styles.stepCompleteTitle}>
               {nativeLang === "korean" ? `${stepLabels[currentStep]} 완료! 🎉`
                 : nativeLang === "spanish" ? `¡${stepLabels[currentStep]} Completado! 🎉`
                 : nativeLang === "indonesian" ? `${stepLabels[currentStep]} Selesai! 🎉`
                 : `${stepLabels[currentStep]} Complete! 🎉`}
-            </Text>
+            </EmojiText>
             <View style={styles.stepCompleteRudy}>
               <EmojiText style={styles.stepCompleteRudyTag}>🦊 루디</EmojiText>
               <Text style={styles.stepCompleteRudyMsg}>{completeMsgs[currentStep] ?? completeMsgs[0]}</Text>
@@ -890,7 +890,7 @@ function CompleteScreen({
 function StatRow({ emoji, label, value, gold }: { emoji: string; label: string; value: string; gold?: boolean }) {
   return (
     <View style={completeStyles.statRow}>
-      <Text style={completeStyles.statEmoji}>{emoji}</Text>
+      <EmojiText style={completeStyles.statEmoji}>{emoji}</EmojiText>
       <Text style={completeStyles.statLabel}>{label}</Text>
       <Text style={[completeStyles.statValue, gold && { color: C.gold }]}>{value}</Text>
     </View>

@@ -814,9 +814,9 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         {messages.map((msg, i) => (
           <View key={i} style={[s.bubble, msg.role === "rudy" ? s.rudyBubble : s.userBubble, (msg.sttError || msg.connectionError) && s.errorBubble]}>
             {msg.role === "rudy" && (
-              <Text style={[s.rudyLabel, (msg.sttError || msg.connectionError) && s.errorLabel]}>
+              <EmojiText style={[s.rudyLabel, (msg.sttError || msg.connectionError) && s.errorLabel]}>
                 {(msg.sttError || msg.connectionError) && nativeLang === "korean" ? "🦊 루디" : "🦊 RUDY"}
-              </Text>
+              </EmojiText>
             )}
             {msg.role === "rudy" ? (
               <View>

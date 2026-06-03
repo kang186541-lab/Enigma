@@ -165,7 +165,7 @@ export default function ExpressionBookScreen() {
                     setExpandedChapter(isExpanded ? null : chId);
                   }}
                 >
-                  <Text style={styles.chapterEmoji}>{info.emoji}</Text>
+                  <EmojiText style={styles.chapterEmoji}>{info.emoji}</EmojiText>
                   <View style={styles.chapterInfo}>
                     <Text style={styles.chapterName}>{info.name[nl]}</Text>
                     <Text style={styles.chapterCount}>

@@ -1760,9 +1760,9 @@ export default function CardsScreen() {
                 router.push("/rudy-course" as any);
               }}
             >
-              <Text style={{ fontFamily: F.label, color: C.bg1, fontSize: 13 }}>
+              <EmojiText style={{ fontFamily: F.label, color: C.bg1, fontSize: 13 }}>
                 {nativeLang === "korean" ? "🦊 오늘의 훈련 시작" : nativeLang === "spanish" ? "🦊 Comenzar entrenamiento" : nativeLang === "indonesian" ? "🦊 Mulai latihan" : "🦊 Start training"}
-              </Text>
+              </EmojiText>
             </Pressable>
             <Pressable
               style={({ pressed }) => [

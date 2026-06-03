@@ -7,6 +7,7 @@ const storyTab = read("app/(tabs)/story.tsx");
 const lessonContent = read("lib/lessonContent.ts");
 const phonemeCoaching = read("components/rudy/PhonemeCoaching.tsx");
 const step2KeyPoint = read("components/rudy/Step2KeyPoint.tsx");
+const step1ListenRepeat = read("components/rudy/Step1ListenRepeat.tsx");
 const bossSpell = read("components/story/puzzles/BossSpellPuzzle/index.tsx");
 const npcMission = read("app/npc-mission.tsx");
 
@@ -62,6 +63,13 @@ for (const snippet of [
   "Kesalahan umum",
 ]) {
   assert.ok(step2KeyPoint.includes(snippet), `Step2 localization must keep: ${snippet}`);
+}
+
+for (const snippet of [
+  "Tidak ada suara terdeteksi",
+  "Suara saya",
+]) {
+  assert.ok(step1ListenRepeat.includes(snippet), `Step1 audio fallback localization must keep: ${snippet}`);
 }
 
 for (const snippet of [
