@@ -104,6 +104,12 @@ for (const file of timelineFiles) {
     assertLocalizedBlock(block, `${file} phoneLines #${index + 1}`);
   });
 
+  assert.doesNotMatch(
+    source,
+    /overlayCopy:\s*\{[\s\S]*?\bword:\s*["'`]/,
+    `${file} intro word overlays must use localized objects, not one-language strings`,
+  );
+
   const wordBlocks = findAllBalancedBlocks(source, "word:");
   wordBlocks.forEach((block, index) => {
     assertLocalizedBlock(block, `${file} word overlay #${index + 1}`);

@@ -57,7 +57,12 @@ export const ch3Timeline: IntroTimeline = {
       cue: "open",
       overlay: "korean-word",
       overlayCopy: {
-        word: "출구",
+        word: {
+          english: "EXIT",
+          korean: "출구",
+          spanish: "SALIDA",
+          indonesian: "KELUAR",
+        },
       },
       accessibilityLabel: {
         english: "A Seoul subway sign restores with golden Korean word light.",
@@ -74,7 +79,12 @@ export const ch3Timeline: IntroTimeline = {
       cue: "chime",
       overlay: "korean-word",
       overlayCopy: {
-        word: "순서",
+        word: {
+          english: "ORDER",
+          korean: "순서",
+          spanish: "ORDEN",
+          indonesian: "URUTAN",
+        },
       },
       accessibilityLabel: {
         english: "Sujin studies broken sentence order in her linguistics lab.",
