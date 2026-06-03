@@ -71,7 +71,7 @@ const ch4BlackPartialPortraitImg = require("@/assets/story/dialogue_sprites/ch4_
 const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
 const ch5PennyPortraitImg = require("@/assets/story/dialogue_sprites/ch5_penny_sprite.png");
 const ch5BlackFaceImg = require("@/assets/story/dialogue_sprites/ch5_black_face_sprite.png");
-const rudyDialogueNeutralImg = require("@/assets/story/characters/rudy/rudy_dialogue_neutral.png");
+const rudyDialogueNeutralImg = require("@/assets/story/characters/rudy/rudy_dialogue_stage_v2.png");
 const eleanorUrgentWarningImg = require("@/assets/story/characters/eleanor/eleanor_urgent_warning.png");
 const eleanorAnalyticalDiscoveryImg = require("@/assets/story/characters/eleanor/eleanor_analytical_discovery.png");
 const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
@@ -8263,13 +8263,13 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   rudyStoryChar: {
-    width: 286,
-    height: 352,
+    width: 352,
+    height: 432,
     zIndex: 2,
   },
   rudyStoryCharCompact: {
-    width: 238,
-    height: 294,
+    width: 272,
+    height: 336,
   },
   stageCharacterShadow: {
     shadowColor: "#000",
