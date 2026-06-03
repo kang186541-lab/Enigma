@@ -53,6 +53,7 @@ const ch3BossPalaceImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_
 const ch3MinhoPortraitImg = require("@/assets/story/dialogue_sprites/ch3_minho_sprite.png");
 const ch3YoungsookPortraitImg = require("@/assets/story/dialogue_sprites/ch3_youngsook_sprite.png");
 const ch3SujinPortraitImg = require("@/assets/story/dialogue_sprites/ch3_sujin_sprite.png");
+const sujinDiagnosticFocusImg = require("@/assets/story/characters/sujin/sujin_diagnostic_focus.png");
 const ch4BossArchiveImg = require("@/assets/story/chapter4_motion_comic/ch4_boss_archive.png");
 const ch4MiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_mira_sprite.png");
 const ch4AmiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_amira_sprite.png");
@@ -101,6 +102,10 @@ const isabelExpressionSprites = {
 
 const hassanExpressionSprites = {
   storyteller: hassanMemoryStorytellerImg,
+};
+
+const sujinExpressionSprites = {
+  diagnostic_focus: sujinDiagnosticFocusImg,
 };
 
 const mrBlackExpressionSprites = {
@@ -304,10 +309,11 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller" | "diagnostic_focus";
 
 const characterExpressionFallbacks: Partial<Record<string, Partial<Record<StoryCharacterExpression, ImageSourcePropType>>>> = {
   hassan: hassanExpressionSprites,
+  sujin: sujinExpressionSprites,
 };
 
 /* Sequence items */
@@ -4141,6 +4147,7 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "sujin",
+      expression: "diagnostic_focus",
       text: "This is not only a palace gate. It is a sentence. If the order collapses, the building forgets how to stand.",
       textKo: "이건 단순한 궁궐 문이 아니에요. 문장입니다. 순서가 무너지면 건물은 서 있는 법을 잊어요.",
       textEs: "No es solo una puerta de palacio. Es una frase. Si el orden colapsa, el edificio olvida cómo sostenerse.",
@@ -4183,6 +4190,7 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "sujin",
+      expression: "diagnostic_focus",
       text: "I have the signal. It is not live video. It is an intercepted recording, buried inside the gate's static. No face. Only a voice.",
       textKo: "신호를 잡았어요. 실시간 영상이 아니에요. 궁궐 문의 잡음 안에 묻힌 가로챈 녹음입니다. 얼굴은 없어요. 목소리뿐입니다.",
       textEs: "Tengo la señal. No es video en vivo. Es una grabación interceptada, enterrada en la estática de la puerta. Sin rostro. Solo una voz.",
@@ -4307,6 +4315,7 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "sujin",
+      expression: "diagnostic_focus",
       text: "The fragment is responding. Voice, meaning, structure... Seoul's stone remembers harmony.",
       textKo: "파편이 반응하고 있어요. 목소리, 의미, 구조... 서울의 돌은 조화를 기억합니다.",
       textEs: "El fragmento responde. Voz, significado, estructura... la piedra de Seúl recuerda la armonía.",
