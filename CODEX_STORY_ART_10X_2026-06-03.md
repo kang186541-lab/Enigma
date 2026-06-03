@@ -106,7 +106,7 @@ A story asset is 10/10 only if all five are true:
 Generate these before replacing broad chapter art:
 
 - Rudy: neutral guide, worried detective, celebratory coach. `[DONE: worried + celebratory runtime sprites]`
-- Mr. Black: silhouette menace, tired reveal, fragile remorse.
+- Mr. Black: silhouette menace, tired reveal, fragile remorse. `[DONE: tired reveal + fragile remorse runtime sprites]`
 - Eleanor: calm mentor, urgent warning, analytical discovery. `[DONE: urgent warning runtime sprite]`
 - Penny: warm guide, anxious final clue, brave resolve.
 - Isabel: playful confidence, shocked concern, rallying energy. `[DONE: shocked concern + rallying runtime sprites]`
@@ -233,6 +233,7 @@ New authored expression sprites:
 ```text
 assets/story/characters/penny/penny_anxious_final_clue.png
 assets/story/characters/mr_black/mr_black_fragile_remorse.png
+assets/story/characters/mr_black/mr_black_tired_reveal.png
 assets/story/characters/rudy/rudy_worried_detective.png
 assets/story/characters/rudy/rudy_celebratory_coach.png
 assets/story/characters/eleanor/eleanor_urgent_warning.png
@@ -262,11 +263,12 @@ Visual verification:
 - Web bundle verification confirmed both Rudy expression assets are emitted: `rudy_worried_detective.af3781...png` and `rudy_celebratory_coach.79b8...png`.
 - Eleanor now has an authored `urgent` warning sprite wired to the FIND reveal, black-coat/language-obedience warning, clue-seal risk, Seoul phone warning, and Cairo-to-Babel warning.
 - Isabel now has authored `shocked` and `rallying` sprites. In the active Madrid route, `shocked` is wired to the Carlos disappearance report and sealed-stage reveal, while `rallying` is wired to the red-flag heartbeat beat and restored-festival goodbye. Babel's "one voice is not a festival" callback also uses `rallying`. The legacy Madrid block still uses `shocked` for the Carlos phone account and unknown-basic-phrases line.
-- Latest asset audit: 93 story PNGs, 201,498,233 bytes total, 23 character assets, warnings 0.
+- Mr. Black now has authored `tired` and `remorse` sprites. Babel's first direct confrontation uses `tired` for the "did anyone ever look at you like you mattered?" reveal, while the mother/lullaby scenes keep `remorse`.
+- Latest asset audit: 94 story PNGs, 202,452,455 bytes total, 24 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy has two authored emotional poses, Isabel has shocked concern and rallying energy, and Eleanor/Penny/Mr. Black have one each, but true Ace Attorney-quality integration still needs playful Isabel plus transparent expression/action sheets for the remaining recurring cast.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy has two authored emotional poses, Isabel has shocked concern and rallying energy, Mr. Black has tired reveal and fragile remorse, and Eleanor/Penny have one each, but true Ace Attorney-quality integration still needs playful Isabel plus transparent expression/action sheets for the remaining recurring cast.
 
 ## QA Command
 
@@ -278,12 +280,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 93 PNG files.
-- 192.16 MB total.
+- 94 PNG files.
+- 193.07 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 23 files, 43.22 MB, 28.4% average brightness.
+- character: 24 files, 44.13 MB, 27.9% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.

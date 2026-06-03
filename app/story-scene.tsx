@@ -66,6 +66,7 @@ const rudyCelebratoryCoachImg = require("@/assets/story/characters/rudy/rudy_cel
 const eleanorUrgentWarningImg = require("@/assets/story/characters/eleanor/eleanor_urgent_warning.png");
 const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
 const mrBlackFragileRemorseImg = require("@/assets/story/characters/mr_black/mr_black_fragile_remorse.png");
+const mrBlackTiredRevealImg = require("@/assets/story/characters/mr_black/mr_black_tired_reveal.png");
 const isabelShockedConcernImg = require("@/assets/story/characters/isabel/isabel_shocked_concern.png");
 const isabelRallyingEnergyImg = require("@/assets/story/characters/isabel/isabel_rallying_energy.png");
 const bgLondonMuseumHallImg = require("@/assets/story/dialogue_backgrounds/london_museum_hall.png");
@@ -90,6 +91,11 @@ const eleanorExpressionSprites = {
 const isabelExpressionSprites = {
   shocked: isabelShockedConcernImg,
   rallying: isabelRallyingEnergyImg,
+};
+
+const mrBlackExpressionSprites = {
+  remorse: mrBlackFragileRemorseImg,
+  tired: mrBlackTiredRevealImg,
 };
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
@@ -283,7 +289,7 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "worried" | "celebratory" | "urgent" | "shocked" | "rallying";
+type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "shocked" | "rallying";
 
 /* Sequence items */
 type SeqScene = {
@@ -4835,7 +4841,7 @@ const BABEL_V21_STORY: Story = {
     { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", nameId: "Profesor Amira", side: "right", avatarBg: "#7A4D19", portrait: ch4AmiraPortraitImg },
     { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", nameId: "Hassan", side: "right", avatarBg: "#2A1A0A", portrait: ch4HassanPortraitImg },
     { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", nameId: "Mira", side: "right", avatarBg: "#2F4A34", portrait: ch4MiraPortraitImg },
-    { id: "mr_black", emoji: "🕴️", name: "Mr. Black", nameKo: "미스터 블랙", nameId: "Mr. Black", side: "right", avatarBg: "#050505", portrait: ch5BlackFaceImg, portraitVariants: { remorse: mrBlackFragileRemorseImg } },
+    { id: "mr_black", emoji: "🕴️", name: "Mr. Black", nameKo: "미스터 블랙", nameId: "Mr. Black", side: "right", avatarBg: "#050505", portrait: ch5BlackFaceImg, portraitVariants: mrBlackExpressionSprites },
   ],
   sequence: [
     {
@@ -5018,6 +5024,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "mr_black",
       backdrop: "babel-language-gates",
+      expression: "tired",
       text: "Tell me, Detective. When you could not speak the language, did anyone ever look at you like you mattered?",
       textKo: "말해 보세요, 탐정. 당신이 그 언어를 말하지 못했을 때, 누군가 당신을 중요한 사람처럼 바라봐 준 적이 있습니까?",
       textEs: "Dime, Detective. Cuando no podías hablar el idioma, ¿alguien te miró alguna vez como si importaras?",
