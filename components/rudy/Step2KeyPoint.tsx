@@ -45,6 +45,20 @@ function isRichExplanation(exp: Tri | GrammarExplanation): exp is GrammarExplana
   return "pattern" in exp && "examples" in exp;
 }
 
+type NativeCopy = {
+  korean: string;
+  spanish: string;
+  indonesian: string;
+  english: string;
+};
+
+function pickNativeCopy(nativeLang: string, copy: NativeCopy): string {
+  if (nativeLang === "korean") return copy.korean;
+  if (nativeLang === "spanish") return copy.spanish;
+  if (nativeLang === "indonesian") return copy.indonesian;
+  return copy.english;
+}
+
 const SPEECH_LANG_MAP: Record<string, string> = {
   english: "en-US",
   spanish: "es-ES",
@@ -431,15 +445,24 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
 
   // ── Labels ────────────────────────────────────────────────────────────────────
 
-  const okLabel       = nativeLang === "korean" ? "이해했어요 →" : nativeLang === "spanish" ? "Entendido →" : "Got it →";
+  const okLabel       = pickNativeCopy(nativeLang, { korean: "이해했어요 →", spanish: "Entendido →", indonesian: "Mengerti →", english: "Got it →" });
   const speakLabel    = speakPhase === "recording"
-    ? (nativeLang === "korean" ? "탭하여 중지 ■" : nativeLang === "spanish" ? "Toca para parar ■" : "Tap to stop ■")
-    : (nativeLang === "korean" ? "따라 말해봐요 🎤" : nativeLang === "spanish" ? "Repite 🎤" : "Repeat it 🎤");
-  const nextLabel     = nativeLang === "korean" ? "다음 →" : nativeLang === "spanish" ? "Siguiente →" : "Next →";
-  const doneLabel     = nativeLang === "korean" ? "완료! →" : nativeLang === "spanish" ? "¡Listo! →" : "Done! →";
-  const retryLabel    = nativeLang === "korean" ? "다시 시도 🔄" : nativeLang === "spanish" ? "Reintentar 🔄" : "Retry 🔄";
-  const checkLabel    = nativeLang === "korean" ? "확인" : nativeLang === "spanish" ? "Comprobar" : "Check";
-  const listenLabel   = nativeLang === "korean" ? "듣기" : nativeLang === "spanish" ? "Escuchar" : "Listen";
+    ? pickNativeCopy(nativeLang, { korean: "탭하여 중지 ■", spanish: "Toca para parar ■", indonesian: "Ketuk untuk berhenti ■", english: "Tap to stop ■" })
+    : pickNativeCopy(nativeLang, { korean: "따라 말해봐요 🎤", spanish: "Repite 🎤", indonesian: "Ulangi 🎤", english: "Repeat it 🎤" });
+  const nextLabel     = pickNativeCopy(nativeLang, { korean: "다음 →", spanish: "Siguiente →", indonesian: "Lanjut →", english: "Next →" });
+  const doneLabel     = pickNativeCopy(nativeLang, { korean: "완료! →", spanish: "¡Listo! →", indonesian: "Selesai! →", english: "Done! →" });
+  const retryLabel    = pickNativeCopy(nativeLang, { korean: "다시 시도 🔄", spanish: "Reintentar 🔄", indonesian: "Coba lagi 🔄", english: "Retry 🔄" });
+  const checkLabel    = pickNativeCopy(nativeLang, { korean: "확인", spanish: "Comprobar", indonesian: "Periksa", english: "Check" });
+  const listenLabel   = pickNativeCopy(nativeLang, { korean: "듣기", spanish: "Escuchar", indonesian: "Dengarkan", english: "Listen" });
+  const lessonIntroLabel = pickNativeCopy(nativeLang, {
+    korean: "핵심 문법을 알려줄게요!",
+    spanish: "¡Te enseño la gramática clave!",
+    indonesian: "Rudy akan menjelaskan pola pentingnya!",
+    english: "Let me teach you the key grammar point!",
+  });
+  const fillBlankLabel = pickNativeCopy(nativeLang, { korean: "빈칸을 채워보세요", spanish: "Completa el espacio", indonesian: "Lengkapi bagian kosong", english: "Fill in the blank" });
+  const correctLabel = pickNativeCopy(nativeLang, { korean: "정답!", spanish: "¡Correcto!", indonesian: "Benar!", english: "Correct!" });
+  const repeatNowLabel = pickNativeCopy(nativeLang, { korean: "따라 말해봐요! →", spanish: "¡Repítelo! →", indonesian: "Sekarang ulangi! →", english: "Now repeat it! →" });
   const isLast = quizIdx === data.quizzes.length - 1;
 
   // ── Render ────────────────────────────────────────────────────────────────────
@@ -453,7 +476,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
           <Text style={s.rudyEmoji}>🦊</Text>
           <View style={s.rudySpeech}>
             <Text style={s.rudySpeechText}>
-              {nativeLang === "korean" ? "핵심 문법을 알려줄게요!" : nativeLang === "spanish" ? "¡Te enseño la gramática clave!" : "Let me teach you the key grammar point!"}
+              {lessonIntroLabel}
             </Text>
           </View>
         </View>
@@ -524,7 +547,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       {/* Prompt with blank */}
       <Animated.View style={s.promptCard}>
         <Text style={s.promptInstruct}>
-          {nativeLang === "korean" ? "빈칸을 채워보세요" : nativeLang === "spanish" ? "Completa el espacio" : "Fill in the blank"}
+          {fillBlankLabel}
         </Text>
         <View style={s.promptRow}>
           <Text style={s.promptText}>{promptParts[0]}</Text>
@@ -568,7 +591,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
           <View style={s.correctRow}>
             <Ionicons name="checkmark-circle" size={16} color="#4caf50" />
             <Text style={s.correctText}>
-              {nativeLang === "korean" ? "정답!" : nativeLang === "spanish" ? "¡Correcto!" : "Correct!"}
+              {correctLabel}
             </Text>
           </View>
         )}
@@ -619,7 +642,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       {quizPhase === "correct" && (
         <Pressable style={({ pressed }) => [s.okBtn, pressed && { opacity: 0.85 }]} onPress={proceedToSpeak}>
           <Text style={s.okBtnText}>
-            {nativeLang === "korean" ? "따라 말해봐요! →" : nativeLang === "spanish" ? "¡Repítelo! →" : "Now repeat it! →"}
+            {repeatNowLabel}
           </Text>
           <Ionicons name="arrow-forward" size={14} color={C.bg1} />
         </Pressable>

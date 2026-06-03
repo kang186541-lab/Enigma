@@ -414,7 +414,7 @@ export default function HomeScreen() {
     : `Review ${srsDueCount} cards →`;
   const morePracticeTitle = showMorePractice
     ? nativeLang === "korean" ? "다시 말하기에 집중하기" : nativeLang === "spanish" ? "Volver a enfocarme en hablar" : nativeLang === "indonesian" ? "Fokus lagi ke berbicara" : "Refocus on speaking"
-    : nativeLang === "korean" ? "루디 훈련소 · 스토리 · NPC 더 보기" : nativeLang === "spanish" ? "Más: Campamento, Historia y NPC" : nativeLang === "indonesian" ? "Lainnya: Kamp Rudy, Cerita & NPC" : "More: Rudy's Camp, Story & NPC";
+    : nativeLang === "korean" ? "기초 · 루디의 훈련소 · 스토리 · NPC 더 보기" : nativeLang === "spanish" ? "Más: Básicos, Campamento de Rudy, Historia y NPC" : nativeLang === "indonesian" ? "Lainnya: Dasar, Kamp Latihan Rudy, Cerita & NPC" : "More: Basics, Rudy's Training Camp, Story & NPC";
   const morePracticeSub = nativeLang === "korean"
     ? "오늘의 실제 문장을 먼저 입 밖으로 꺼내고, 필요하면 복습과 스토리로 이어가요."
     : nativeLang === "spanish"

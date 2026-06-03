@@ -36,6 +36,20 @@ function getMeaning(t?: Tri, lc?: "ko" | "en" | "es" | "id"): string {
   return t[lc] ?? t.en;
 }
 
+type NativeCopy = {
+  korean: string;
+  spanish: string;
+  indonesian: string;
+  english: string;
+};
+
+function pickNativeCopy(nativeLang: string, copy: NativeCopy): string {
+  if (nativeLang === "korean") return copy.korean;
+  if (nativeLang === "spanish") return copy.spanish;
+  if (nativeLang === "indonesian") return copy.indonesian;
+  return copy.english;
+}
+
 // ── Timer hook ────────────────────────────────────────────────────────────────
 
 function useCountdown(seconds: number, running: boolean, onEnd: () => void) {
@@ -525,26 +539,32 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
 
   // ── Labels ────────────────────────────────────────────────────────────────
 
+  const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
   const L = {
-    speak: nativeLang === "korean" ? "말하기" : nativeLang === "spanish" ? "Hablar" : "Speak",
-    stop: nativeLang === "korean" ? "중지" : nativeLang === "spanish" ? "Parar" : "Stop",
-    next: nativeLang === "korean" ? "다음 →" : nativeLang === "spanish" ? "Siguiente →" : "Next →",
-    yesterday: nativeLang === "korean" ? "어제 복습" : nativeLang === "spanish" ? "Revisión" : "Yesterday",
-    assessing: nativeLang === "korean" ? "채점 중..." : nativeLang === "spanish" ? "Evaluando..." : "Checking...",
-    complete: nativeLang === "korean" ? "🏆 복습 완료!" : nativeLang === "spanish" ? "🏆 ¡Repaso completado!" : "🏆 Review complete!",
-    sentence: nativeLang === "korean" ? "이렇게 말해보세요:" : nativeLang === "spanish" ? "Di esto:" : "Say this sentence:",
-    blank: nativeLang === "korean" ? "빈칸을 채우세요:" : nativeLang === "spanish" ? "Rellena el espacio:" : "Fill in the blank:",
+    speak: pickNativeCopy(nativeLang, { korean: "말하기", spanish: "Hablar", indonesian: "Bicara", english: "Speak" }),
+    stop: pickNativeCopy(nativeLang, { korean: "중지", spanish: "Parar", indonesian: "Berhenti", english: "Stop" }),
+    next: pickNativeCopy(nativeLang, { korean: "다음 →", spanish: "Siguiente →", indonesian: "Lanjut →", english: "Next →" }),
+    yesterday: pickNativeCopy(nativeLang, { korean: "어제 복습", spanish: "Revisión", indonesian: "Ulasan kemarin", english: "Yesterday" }),
+    assessing: pickNativeCopy(nativeLang, { korean: "채점 중...", spanish: "Evaluando...", indonesian: "Menilai...", english: "Checking..." }),
+    complete: pickNativeCopy(nativeLang, { korean: "🏆 복습 완료!", spanish: "🏆 ¡Repaso completado!", indonesian: "🏆 Ulasan selesai!", english: "🏆 Review complete!" }),
+    sentence: pickNativeCopy(nativeLang, { korean: "이렇게 말해보세요:", spanish: "Di esto:", indonesian: "Ucapkan kalimat ini:", english: "Say this sentence:" }),
+    blank: pickNativeCopy(nativeLang, { korean: "빈칸을 채우세요:", spanish: "Rellena el espacio:", indonesian: "Lengkapi bagian kosong:", english: "Fill in the blank:" }),
   };
+  const averageScoreLabel = pickNativeCopy(nativeLang, {
+    korean: `평균 발음 점수: ${averageScore}점`,
+    spanish: `Pronunciación: ${averageScore}`,
+    indonesian: `Skor pelafalan: ${averageScore}`,
+    english: `Avg. Score: ${averageScore}`,
+  });
+  const pointsSuffix = pickNativeCopy(nativeLang, { korean: "점", spanish: "pts", indonesian: "pts", english: "pts" });
+  const skipScoringLabel = pickNativeCopy(nativeLang, { korean: "건너뛰기 →", spanish: "Saltar →", indonesian: "Lewati →", english: "Skip →" });
 
   if (showComplete || !q) {
-    const avg = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
     return (
       <View style={s.completeCard}>
         <Text style={s.completeTitle}>{L.complete}</Text>
-        <Text style={s.completeScore}>
-          {nativeLang === "korean" ? `평균 발음 점수: ${avg}점` : nativeLang === "spanish" ? `Pronunciación: ${avg}` : `Avg. Score: ${avg}`}
-        </Text>
-        <Text style={s.completeStars}>{"⭐".repeat(Math.round(avg / 33) + 1).slice(0, 3)}</Text>
+        <Text style={s.completeScore}>{averageScoreLabel}</Text>
+        <Text style={s.completeStars}>{"⭐".repeat(Math.round(averageScore / 33) + 1).slice(0, 3)}</Text>
       </View>
     );
   }
@@ -639,7 +659,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       {qPhase === "revealed" && pronScore !== null && isSpeakQ && (
         <View style={s.resultCard}>
           <Text style={s.resultStars}>{"⭐".repeat(stars).padEnd(3, "☆")}</Text>
-          <Text style={s.resultScore}>{pronScore}{nativeLang === "korean" ? "점" : "pts"}</Text>
+          <Text style={s.resultScore}>{pronScore}{pointsSuffix}</Text>
           <View style={s.resultSentence}>
             <Text style={s.resultSentenceText}>{sentence}</Text>
             <Pressable onPress={() => playTTS(sentence, speechLang)}>
@@ -679,7 +699,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
           {qPhase === "assessing" && canSkipScoring && (
             <Pressable style={s.skipScoringBtn} onPress={skipScoring}>
               <Text style={s.skipScoringText}>
-                {nativeLang === "korean" ? "건너뛰기 →" : nativeLang === "spanish" ? "Saltar →" : "Skip →"}
+                {skipScoringLabel}
               </Text>
             </Pressable>
           )}

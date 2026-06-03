@@ -6194,7 +6194,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
 
           {/* Fox dialogue */}
           <View style={styles.cipherLingoRow}>
-            <Image source={rudyStoryImg} style={styles.cipherLingoPortrait} resizeMode="cover" />
+            <Image source={rudyDialogueNeutralImg} style={styles.cipherLingoPortrait} resizeMode="cover" />
             <View style={styles.cipherLingoBubble}>
               <Text style={styles.cipherLingoBubbleText}>
                 {ko ? "흠... 뭔가 조금 다른 것 같군요, 파트너." : es ? "Hmm... algo no está bien, compañero." : id ? "Hmm... ada yang kurang pas, partner." : "Hmm... something's not quite right, partner."}
@@ -6280,7 +6280,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
 
         {/* Fox celebration */}
         <View style={styles.cipherLingoRow}>
-          <Image source={rudyStoryImg} style={styles.cipherLingoPortrait} resizeMode="cover" />
+          <Image source={rudyDialogueNeutralImg} style={styles.cipherLingoPortrait} resizeMode="cover" />
           <View style={styles.cipherLingoBubble}>
             <Text style={styles.cipherLingoBubbleText}>
               {ko ? "훌륭하군요, 파트너! 암호를 완벽히 해독했어요." : es ? "¡Brillante, compañero! Has descifrado el código perfectamente." : id ? "Hebat, partner! Kamu memecahkan sandinya dengan sempurna." : "Brilliant, partner! You've decoded the cipher perfectly."}
@@ -6328,7 +6328,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
 
       {/* Fox bubble */}
       <View style={styles.cipherLingoRow}>
-        <Image source={rudyStoryImg} style={styles.cipherLingoPortrait} resizeMode="cover" />
+        <Image source={rudyDialogueNeutralImg} style={styles.cipherLingoPortrait} resizeMode="cover" />
         <View style={styles.cipherLingoBubble}>
           <Text style={styles.cipherLingoBubbleText}>
             {lang === "korean" ? "이 암호를 해독해봐, 파트너!" : lang === "spanish" ? "¡Descifra este código, compañero!" : lang === "indonesian" ? "Pecahkan sandi ini, partner!" : "Decode this cipher, partner!"}

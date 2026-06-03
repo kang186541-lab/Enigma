@@ -93,6 +93,20 @@ function getMeaning(t: Tri, lc: "ko" | "en" | "es" | "id"): string {
   return t[lc] ?? t.en;
 }
 
+type NativeCopy = {
+  korean: string;
+  spanish: string;
+  indonesian: string;
+  english: string;
+};
+
+function pickNativeCopy(nativeLang: string, copy: NativeCopy): string {
+  if (nativeLang === "korean") return copy.korean;
+  if (nativeLang === "spanish") return copy.spanish;
+  if (nativeLang === "indonesian") return copy.indonesian;
+  return copy.english;
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplete }: Props) {
@@ -238,11 +252,12 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     } catch (e) {
       console.warn('[API] mission chat request failed:', e);
       return {
-        text: nativeLang === "korean"
-          ? "잠깐 연결에 문제가 생겼어. 다시 해볼까?"
-          : nativeLang === "spanish"
-          ? "Hubo un problema de conexión. ¿Intentamos de nuevo?"
-          : "There was a connection issue. Let's try again!",
+        text: pickNativeCopy(nativeLang, {
+          korean: "잠깐 연결에 문제가 생겼어. 다시 해볼까?",
+          spanish: "Hubo un problema de conexión. ¿Intentamos de nuevo?",
+          indonesian: "Koneksinya bermasalah sebentar. Coba lagi?",
+          english: "There was a connection issue. Let's try again!",
+        }),
         ok: false,
       };
     }
@@ -562,16 +577,18 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
     const autoKb = sttFailCount.current >= 3;
 
     const text = autoKb
-      ? (nativeLang === "korean"
-          ? "음성 인식에 문제가 있어요. 키보드로 입력해볼까요? 🦊"
-          : nativeLang === "spanish"
-          ? "Hay un problema con el reconocimiento de voz. ¿Intentamos con el teclado? 🦊"
-          : "Voice recognition seems to be having trouble. Let's type instead! 🦊")
-      : (nativeLang === "korean"
-          ? "루디가 잘 못 들었어요. 다시 말해주세요 🦊"
-          : nativeLang === "spanish"
-          ? "No te escuché bien. ¡Inténtalo de nuevo! 🦊"
-          : "Rudy didn't catch that. Please try again! 🦊");
+      ? pickNativeCopy(nativeLang, {
+          korean: "음성 인식에 문제가 있어요. 키보드로 입력해볼까요? 🦊",
+          spanish: "Hay un problema con el reconocimiento de voz. ¿Intentamos con el teclado? 🦊",
+          indonesian: "Pengenalan suara sedang bermasalah. Coba pakai keyboard dulu? 🦊",
+          english: "Voice recognition seems to be having trouble. Let's type instead! 🦊",
+        })
+      : pickNativeCopy(nativeLang, {
+          korean: "루디가 잘 못 들었어요. 다시 말해주세요 🦊",
+          spanish: "No te escuché bien. ¡Inténtalo de nuevo! 🦊",
+          indonesian: "Rudy belum menangkap suaramu. Coba ucapkan lagi! 🦊",
+          english: "Rudy didn't catch that. Please try again! 🦊",
+        });
 
     const errMsg: ChatMsg = { role: "rudy", text, sttError: true };
     setMessages((prev) => [...prev, errMsg]);
@@ -664,23 +681,116 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   // ── Labels ────────────────────────────────────────────────────────────────────
 
   const micLabel = phase === "recording"
-    ? (nativeLang === "korean" ? "탭하여 중지 ■" : nativeLang === "spanish" ? "Toca para parar ■" : "Tap to stop ■")
-    : (nativeLang === "korean" ? "말하기 🎤" : nativeLang === "spanish" ? "Hablar 🎤" : "Speak 🎤");
-  const voiceBonus = nativeLang === "korean" ? "🎤 XP 1.5배!"
-    : nativeLang === "spanish" ? "🎤 ¡XP ×1.5!" : "🎤 XP ×1.5!";
-  const suggLabel = nativeLang === "korean" ? "💡 추천 답변:"
-    : nativeLang === "spanish" ? "💡 Sugerencias:" : "💡 Suggested:";
-  const sendLabel = nativeLang === "korean" ? "전송" : nativeLang === "spanish" ? "Enviar" : "Send";
-  const doneMsg = nativeLang === "korean" ? "🎉 대화 미션 완료!"
-    : nativeLang === "spanish" ? "🎉 ¡Misión de conversación completada!"
-    : "🎉 Conversation mission complete!";
+    ? pickNativeCopy(nativeLang, {
+        korean: "탭하여 중지 ■",
+        spanish: "Toca para parar ■",
+        indonesian: "Ketuk untuk berhenti ■",
+        english: "Tap to stop ■",
+      })
+    : pickNativeCopy(nativeLang, {
+        korean: "말하기 🎤",
+        spanish: "Hablar 🎤",
+        indonesian: "Bicara 🎤",
+        english: "Speak 🎤",
+      });
+  const voiceBonus = pickNativeCopy(nativeLang, {
+    korean: "🎤 XP 1.5배!",
+    spanish: "🎤 ¡XP ×1.5!",
+    indonesian: "🎤 XP ×1.5!",
+    english: "🎤 XP ×1.5!",
+  });
+  const suggLabel = pickNativeCopy(nativeLang, {
+    korean: "💡 추천 답변:",
+    spanish: "💡 Sugerencias:",
+    indonesian: "💡 Saran jawaban:",
+    english: "💡 Suggested:",
+  });
+  const sendLabel = pickNativeCopy(nativeLang, {
+    korean: "전송",
+    spanish: "Enviar",
+    indonesian: "Kirim",
+    english: "Send",
+  });
+  const doneMsg = pickNativeCopy(nativeLang, {
+    korean: "🎉 대화 미션 완료!",
+    spanish: "🎉 ¡Misión de conversación completada!",
+    indonesian: "🎉 Misi percakapan selesai!",
+    english: "🎉 Conversation mission complete!",
+  });
   const situation = getMeaning(data.situation, lc);
 
-  const processingLabel = nativeLang === "korean"
-    ? "루디가 듣고 있어요… 🦊"
-    : nativeLang === "spanish"
-    ? "Rudy está escuchando… 🦊"
-    : "Rudy is listening… 🦊";
+  const processingLabel = pickNativeCopy(nativeLang, {
+    korean: "루디가 듣고 있어요… 🦊",
+    spanish: "Rudy está escuchando… 🦊",
+    indonesian: "Rudy sedang mendengarkan… 🦊",
+    english: "Rudy is listening… 🦊",
+  });
+  const hideTranslationLabel = pickNativeCopy(nativeLang, {
+    korean: "번역 숨기기",
+    spanish: "Ocultar",
+    indonesian: "Sembunyikan",
+    english: "Hide",
+  });
+  const showTranslationLabel = pickNativeCopy(nativeLang, {
+    korean: "번역 보기",
+    spanish: "Traducir",
+    indonesian: "Terjemahkan",
+    english: "Translate",
+  });
+  const spokenStatLabel = pickNativeCopy(nativeLang, {
+    korean: `🗣️ 말한 문장: ${spokenSentences}문장`,
+    spanish: `🗣️ Frases habladas: ${spokenSentences}`,
+    indonesian: `🗣️ Kalimat diucapkan: ${spokenSentences}`,
+    english: `🗣️ Sentences spoken: ${spokenSentences}`,
+  });
+  const reviewLabel = pickNativeCopy(nativeLang, {
+    korean: "복습으로 →",
+    spanish: "A Repasar →",
+    indonesian: "Ke Ulasan →",
+    english: "To Review →",
+  });
+  const inputPlaceholder = pickNativeCopy(nativeLang, {
+    korean: "답변을 입력하세요...",
+    spanish: "Escribe tu respuesta...",
+    indonesian: "Ketik jawabanmu...",
+    english: "Type your answer...",
+  });
+  const rudySpeakingLabel = pickNativeCopy(nativeLang, {
+    korean: "루디 말하는 중...",
+    spanish: "Rudy habla...",
+    indonesian: "Rudy sedang berbicara...",
+    english: "Rudy speaking...",
+  });
+  const voiceHint = pickNativeCopy(nativeLang, {
+    korean: "음성으로 답하면 XP 1.5배!",
+    spanish: "¡Voz = XP ×1.5!",
+    indonesian: "Jawaban suara memberi XP ×1.5!",
+    english: "Voice answers earn XP ×1.5!",
+  });
+  const spokenCounterLabel = pickNativeCopy(nativeLang, {
+    korean: "문장 말함",
+    spanish: "oraciones",
+    indonesian: "kalimat diucapkan",
+    english: "sentences",
+  });
+  const exampleLabel = pickNativeCopy(nativeLang, {
+    korean: "예문",
+    spanish: "Ejemplo",
+    indonesian: "Contoh",
+    english: "Example",
+  });
+  const sentenceLabel = pickNativeCopy(nativeLang, {
+    korean: "문장 번역",
+    spanish: "Frase",
+    indonesian: "Kalimat",
+    english: "Sentence",
+  });
+  const closeLabel = pickNativeCopy(nativeLang, {
+    korean: "닫기",
+    spanish: "Cerrar",
+    indonesian: "Tutup",
+    english: "Close",
+  });
 
   return (
     <KeyboardAvoidingView
@@ -704,7 +814,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
           <View key={i} style={[s.bubble, msg.role === "rudy" ? s.rudyBubble : s.userBubble, (msg.sttError || msg.connectionError) && s.errorBubble]}>
             {msg.role === "rudy" && (
               <Text style={[s.rudyLabel, (msg.sttError || msg.connectionError) && s.errorLabel]}>
-                {(msg.sttError || msg.connectionError) ? "🦊 루디" : "🦊 RUDY"}
+                {(msg.sttError || msg.connectionError) && nativeLang === "korean" ? "🦊 루디" : "🦊 RUDY"}
               </Text>
             )}
             {msg.role === "rudy" ? (
@@ -733,9 +843,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 >
                   <Ionicons name={showTranslation[i] ? "eye-off-outline" : "eye-outline"} size={12} color={C.goldDim} />
                   <Text style={s.transToggleText}>
-                    {showTranslation[i]
-                      ? (nativeLang === "korean" ? "번역 숨기기" : "Hide")
-                      : (nativeLang === "korean" ? "번역 보기" : "Translate")}
+                    {showTranslation[i] ? hideTranslationLabel : showTranslationLabel}
                   </Text>
                 </Pressable>
                 {showTranslation[i] && msg.translation ? (
@@ -766,18 +874,14 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
             <Text style={s.inlineDoneEmoji}>✅</Text>
             <Text style={s.inlineDoneTitle}>{doneMsg}</Text>
             <Text style={s.inlineDoneStat}>
-              {nativeLang === "korean"
-                ? `🗣️ 말한 문장: ${spokenSentences}문장`
-                : nativeLang === "spanish"
-                ? `🗣️ Frases habladas: ${spokenSentences}`
-                : `🗣️ Sentences spoken: ${spokenSentences}`}
+              {spokenStatLabel}
             </Text>
             <Pressable
               style={({ pressed }) => [s.inlineDoneBtn, pressed && { opacity: 0.82 }]}
               onPress={completeMissionTalkOnce}
             >
               <Text style={s.inlineDoneBtnText}>
-                {nativeLang === "korean" ? "복습으로 →" : nativeLang === "spanish" ? "A Repasar →" : "To Review →"}
+                {reviewLabel}
               </Text>
             </Pressable>
           </View>
@@ -812,7 +916,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 style={Platform.OS === "web" ? [s.textInput, { outlineStyle: "none" } as any] : s.textInput}
                 value={inputText}
                 onChangeText={setInputText}
-                placeholder={nativeLang === "korean" ? "답변을 입력하세요..." : nativeLang === "spanish" ? "Escribe tu respuesta..." : "Type your answer..."}
+                placeholder={inputPlaceholder}
                 placeholderTextColor={C.goldDim}
                 multiline
                 autoFocus
@@ -849,7 +953,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 }
                 <Text style={s.micBtnText}>
                   {ttsPlaying
-                    ? (nativeLang === "korean" ? "루디 말하는 중..." : nativeLang === "spanish" ? "Rudy habla..." : "Rudy speaking...")
+                    ? rudySpeakingLabel
                     : micLabel}
                 </Text>
               </Pressable>
@@ -865,7 +969,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
 
           {!showKeyboard && (
             <Text style={s.voiceHint}>
-              {nativeLang === "korean" ? "음성으로 답하면 XP 1.5배!" : nativeLang === "spanish" ? "¡Voz = XP ×1.5!" : "Voice answers earn XP ×1.5!"}
+              {voiceHint}
             </Text>
           )}
         </View>
@@ -875,7 +979,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       <View style={s.counterRow}>
         <Ionicons name="chatbubble-outline" size={13} color={C.goldDim} />
         <Text style={s.counterText}>
-          {spokenSentences} {nativeLang === "korean" ? "문장 말함" : nativeLang === "spanish" ? "oraciones" : "sentences"}
+          {spokenSentences} {spokenCounterLabel}
         </Text>
       </View>
 
@@ -892,18 +996,18 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 <Text style={s.popupMeaning}>{wordPopup.meaning}</Text>
                 {wordPopup.example ? (
                   <View style={s.popupExWrap}>
-                    <Text style={s.popupExLabel}>{nativeLang === "korean" ? "예문" : "Example"}</Text>
+                    <Text style={s.popupExLabel}>{exampleLabel}</Text>
                     <Text style={s.popupEx}>{wordPopup.example}</Text>
                   </View>
                 ) : null}
                 {wordPopup.sentenceTranslation ? (
                   <View style={s.popupExWrap}>
-                    <Text style={s.popupExLabel}>{nativeLang === "korean" ? "문장 번역" : "Sentence"}</Text>
+                    <Text style={s.popupExLabel}>{sentenceLabel}</Text>
                     <Text style={s.popupEx}>{wordPopup.sentenceTranslation}</Text>
                   </View>
                 ) : null}
                 <Pressable style={({ pressed }) => [s.popupClose, pressed && { opacity: 0.8 }]} onPress={() => setWordPopup(null)}>
-                  <Text style={s.popupCloseTxt}>{nativeLang === "korean" ? "닫기" : "Close"}</Text>
+                  <Text style={s.popupCloseTxt}>{closeLabel}</Text>
                 </Pressable>
               </>
             ) : null}
