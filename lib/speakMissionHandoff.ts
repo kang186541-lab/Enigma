@@ -4,7 +4,7 @@ const STORAGE_KEY = "@lingua_speak_mission_handoffs_v1";
 const MAX_HANDOFFS = 10;
 const TTL_MS = 6 * 60 * 60 * 1000;
 
-export type SpeakMissionTargetLanguage = "korean" | "english" | "spanish";
+export type SpeakMissionTargetLanguage = "korean" | "english" | "spanish" | "indonesian";
 export type SpeakMissionReturnDeck = "srs" | "beginner" | "advanced";
 
 export interface SpeakMissionHandoff {
@@ -29,7 +29,7 @@ function isFresh(item: SpeakMissionHandoff, now = Date.now()): boolean {
 }
 
 function normalizeTargetLanguage(value: string): SpeakMissionTargetLanguage {
-  return value === "korean" || value === "spanish" ? value : "english";
+  return value === "korean" || value === "spanish" || value === "indonesian" ? value : "english";
 }
 
 function normalizeReturnDeck(value: string): SpeakMissionReturnDeck {

@@ -69,10 +69,10 @@ const FAQS: FaqItem[] = [
       id: "Bagaimana cara kerja penilaian pengucapan?",
     },
     a: {
-      ko: "Azure Speech Service가 음소 단위로 정확도, 유창성, 완성도를 측정하고, GPT-4o-mini가 그 점수를 학습 맥락에 맞게 풀어서 피드백 문장으로 만들어 줍니다. 마이크가 활성화된 상태에서만 동작해요.",
-      en: "Azure Speech Service evaluates accuracy, fluency, and completeness phoneme-by-phoneme, and GPT-4o-mini turns the raw scores into a sentence of feedback tailored to what you were trying to say. It only runs while the mic is active.",
-      es: "Azure Speech Service evalúa la precisión, fluidez e integridad fonema por fonema, y GPT-4o-mini convierte los puntajes en una frase de comentario adaptada a lo que intentabas decir. Solo funciona con el micrófono activado.",
-      id: "Azure Speech Service menilai akurasi, kelancaran, dan kelengkapan per fonem, lalu GPT-4o-mini mengubah skor itu menjadi satu kalimat masukan yang disesuaikan dengan apa yang ingin kamu ucapkan. Ini hanya berjalan saat mikrofon aktif.",
+      ko: "Azure Speech Service가 음소 단위로 정확도, 유창성, 완성도를 측정하고, 설정된 AI 코치 모델이 그 점수를 학습 맥락에 맞게 풀어서 피드백 문장으로 만들어 줍니다. 마이크가 활성화된 상태에서만 동작해요.",
+      en: "Azure Speech Service evaluates accuracy, fluency, and completeness phoneme-by-phoneme, and the configured AI coach model turns the raw scores into feedback tailored to what you were trying to say. It only runs while the mic is active.",
+      es: "Azure Speech Service evalúa la precisión, fluidez e integridad fonema por fonema, y el modelo de coach IA configurado convierte los puntajes en un comentario adaptado a lo que intentabas decir. Solo funciona con el micrófono activado.",
+      id: "Azure Speech Service menilai akurasi, kelancaran, dan kelengkapan per fonem, lalu model coach AI yang dikonfigurasi mengubah skor itu menjadi masukan sesuai konteks belajarmu. Ini hanya berjalan saat mikrofon aktif.",
     },
   },
   {
@@ -147,16 +147,16 @@ const FAQS: FaqItem[] = [
   },
   {
     q: {
-      ko: "영어와 스페인어 외 다른 언어도 배울 수 있나요?",
-      en: "Can I learn languages other than English/Spanish?",
-      es: "¿Puedo aprender otros idiomas además de inglés y español?",
-      id: "Apakah aku bisa belajar bahasa selain Inggris/Spanyol?",
+      ko: "어떤 언어를 배울 수 있나요?",
+      en: "Which languages can I learn?",
+      es: "¿Qué idiomas puedo aprender?",
+      id: "Bahasa apa saja yang bisa kupelajari?",
     },
     a: {
-      ko: "아직은 영어와 스페인어만 지원해요. 다른 언어는 발음 모델과 콘텐츠를 준비하는 데 시간이 걸리기 때문에 단계적으로 추가할 예정입니다.",
-      en: "Not yet — English and Spanish are the only learning languages supported today. Other languages require pronunciation models and content packs that we're building out gradually.",
-      es: "Todavía no. Por ahora solo se admiten inglés y español como idiomas de estudio. Otros idiomas requieren modelos de pronunciación y contenido que estamos preparando poco a poco.",
-      id: "Belum — untuk saat ini hanya bahasa Inggris dan Spanyol yang didukung. Bahasa lain membutuhkan model pengucapan dan paket konten yang sedang kami siapkan secara bertahap.",
+      ko: "현재는 한국어, 영어, 스페인어, 인도네시아어를 지원해요. 각 언어는 말하기·듣기·기초 문장·스토리/복습 흐름에 맞춰 단계적으로 보강하고 있습니다.",
+      en: "Today LinguaAI supports Korean, English, Spanish, and Indonesian. We keep improving speaking, listening, beginner sentences, story mode, and review flows for each supported language.",
+      es: "Hoy LinguaAI admite coreano, inglés, español e indonesio. Seguimos mejorando habla, escucha, frases básicas, modo historia y repasos para cada idioma compatible.",
+      id: "Saat ini LinguaAI mendukung bahasa Korea, Inggris, Spanyol, dan Indonesia. Kami terus memperbaiki latihan bicara, menyimak, kalimat dasar, mode cerita, dan alur ulasan untuk tiap bahasa.",
     },
   },
   {

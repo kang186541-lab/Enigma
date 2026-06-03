@@ -9,7 +9,7 @@ import type { NativeLanguage } from "@/context/LanguageContext";
 // dailySentence.ts only imports a `type` from LanguageContext (erased at
 // compile), so this module is fully pure — no react-native / expo / supabase.
 
-const LANGS: NativeLanguage[] = ["korean", "english", "spanish"];
+const LANGS: NativeLanguage[] = ["korean", "english", "spanish", "indonesian"];
 
 // Re-derive the source's day index so we can assert WHICH sentence is picked
 // without hard-coding a calendar date (the test must pass on any day).
@@ -22,20 +22,20 @@ function expectedIndex(bankLength: number): number {
 }
 
 describe("getTodaysSentence", () => {
-  it("returns a non-null DailySentence for all 3 languages (beginner band stocked)", () => {
+  it("returns a non-null DailySentence for all 4 languages (beginner band stocked)", () => {
     for (const lang of LANGS) {
       const sentence = getTodaysSentence(lang);
       expect(sentence).not.toBeNull();
     }
   });
 
-  it("returns a sentence with text, a meaning for all 3 native langs, and a day", () => {
+  it("returns a sentence with text, a meaning for all 4 native langs, and a day", () => {
     for (const lang of LANGS) {
       const sentence = getTodaysSentence(lang) as DailySentence;
       expect(typeof sentence.text).toBe("string");
       expect(sentence.text.length).toBeGreaterThan(0);
 
-      // meaning must be keyed by all three native languages.
+      // meaning must be keyed by all four native languages.
       expect(typeof sentence.meaning).toBe("object");
       for (const native of LANGS) {
         expect(typeof sentence.meaning[native]).toBe("string");

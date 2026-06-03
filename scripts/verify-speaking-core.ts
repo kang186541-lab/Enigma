@@ -40,6 +40,8 @@ const languageContextSource = readFileSync("context/LanguageContext.tsx", "utf8"
 const progressSyncSource = readFileSync("lib/progressSync.ts", "utf8");
 const progressStorageSource = readFileSync("lib/progressStorage.ts", "utf8");
 const speakingProgressSource = readFileSync("lib/speakingProgress.ts", "utf8");
+const speakMissionHandoffSource = readFileSync("lib/speakMissionHandoff.ts", "utf8");
+const learningEventsSource = readFileSync("lib/learningEvents.ts", "utf8");
 const srsManagerSource = readFileSync("lib/srsManager.ts", "utf8");
 const dailyCourseDataSource = readFileSync("lib/dailyCourseData.ts", "utf8");
 const learnerProfileSource = readFileSync("lib/learnerProfile.ts", "utf8");
@@ -1031,7 +1033,11 @@ assert.ok(
   routesSource.includes('"ko", "en", "es", "id"') &&
   coachingCardSource.includes('nl === "indonesian" ? data.id') &&
   phonemeCoachingSource.includes("indonesian: {") &&
-  phonemeCoachingDataSource.includes("const INDONESIAN_PHONEMES"),
+  phonemeCoachingDataSource.includes("const INDONESIAN_PHONEMES") &&
+  speakMissionHandoffSource.includes('"korean" | "english" | "spanish" | "indonesian"') &&
+  speakMissionHandoffSource.includes('value === "korean" || value === "spanish" || value === "indonesian"') &&
+  learningEventsSource.includes('nativeLanguage: ["korean", "english", "spanish", "indonesian"]') &&
+  learningEventsSource.includes('targetLanguage: ["korean", "english", "spanish", "indonesian"]'),
   "Indonesian listening/pronunciation must be wired end-to-end: Dewi needs chat+TTS, all Rudy voice/STT steps need id-ID, native-language routing must send id, and pronunciation coaching must not fall back to English"
 );
 assert.ok(
