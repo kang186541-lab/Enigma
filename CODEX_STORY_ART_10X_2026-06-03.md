@@ -303,9 +303,11 @@ Visual verification:
 - Follow-up first-run/story-flow pass: Home no longer auto-expands the secondary practice sections for true first-timers, preserving the "one clear speaking action first" CTA. Main story scenes on web now accept `Enter`/`Space` for non-puzzle narration/dialogue advancement, while puzzles keep their explicit controls. Narration scenes now use the same measured overflow safety model as dialogue scenes: long localized narration can scroll and shows a small non-text cue instead of clipping on compact screens. Rudy Step 3 now sends `nativeLang: lc` to `/api/mission-chat`, so moderation/safety fallback replies can localize correctly for supported `ko/en/es/id` users. Story text, quiz prompts, answer data, sequence/progression, language support, and Japanese scope remain unchanged.
 - Verification for this pass: forbidden story-data/Japanese diff guard returned no matches; `npx.cmd tsc --noEmit --pretty false` passed; `npm.cmd run verify:quality` passed with the existing 46 lint warnings baseline; `npx.cmd tsx scripts\verify-speaking-core.ts` passed; `git diff --check` passed. A temporary local static server confirmed `dist/index.html` and the generated web entry bundle return HTTP 200. The Browser plugin could not attach to the local route in this session (`ERR_BLOCKED_BY_CLIENT`), so no new screenshot was captured for this pass.
 - Rudy's story dialogue sprite is no longer the old standalone `rudy_story.png` asset. The first neutral dialogue cutout was replaced with a new background-aware `assets/story/characters/rudy/rudy_dialogue_stage_v2.png` sprite: closer half-body framing, stronger visual-novel line work, warm rim lighting, a speaking gesture, and a cleaner transparent silhouette for placement over the chapter backdrops. It is wired as Rudy's default dialogue portrait, expression fallback, cipher-puzzle Rudy speech bubble portrait, and root-layout preload target, while the old Rudy asset remains only for non-dialogue reward/completion UI. The stage render size was increased so Rudy reads more like an in-scene dialogue character instead of a small sticker. Corner alpha was verified after chroma-key removal, and local browser verification confirmed Madrid 2/21 renders the v2 sprite over the drained festival backdrop with no console errors. Story text, quiz prompts, answer data, sequence/progression, and supported-language scope remain unchanged.
+- Follow-up Rudy expression pass: the `worried` and `celebratory` expressions had regressed to the neutral `rudy_dialogue_stage_v2.png` sprite. Two new background-aware half-body stage sprites were generated and wired instead: `assets/story/characters/rudy/rudy_worried_stage_v2.png` and `assets/story/characters/rudy/rudy_celebratory_stage_v2.png`. The generated checkerboard background was removed with edge flood-fill alpha cleanup, and corner alpha now verifies as `0,0,0,0,0` for both files. Root-layout preload now includes both expression sprites. Story text, quiz prompts, answer data, sequence/progression, and supported-language scope remain unchanged.
 - Rudy Training Camp Step 2, Step 3, and Step 4 now include Indonesian-native UI labels for the visible speak/stop/send/retry/review/translation/scoring controls instead of falling back to English while Indonesian STT/TTS is active. Home's collapsed secondary-practice label now names Basics as well as Rudy Camp, Story, and NPC so the disclosed tools match the actual section. No lesson content, story text, quiz data, provider routing, or supported-language scope changed.
 - Indonesian-native course metadata pass: all 5 `UNITS[].title` objects and all 30 `days[].topic` objects in `lib/dailyCourseData.ts` now include `id`, so Home, Rudy course rows, Rudy lesson headers, daily lesson bridge, and chat-room lesson context no longer fall back to English for those titles. Follow-up MissionTalk pass closes the 120 active `situation.id` gaps by injecting 30 day-level Indonesian scenario sentences at the active `MISSION_CONTENT` merge point in `lib/lessonContent.ts`; `gptPrompt`, `speechLang`, `suggestedAnswers`, story text, quiz data, and progression remain unchanged. `scripts/verify-speaking-core.ts` now asserts every active MissionTalk branch has Indonesian-native situation text.
-- Latest asset audit: 108 story PNGs, 213.68 MB total, 38 character assets, warnings 0.
+- Story intro image-overlaid copy is now localized for supported `ko/en/es/id` users. Phone-message overlays, large word overlays, Mr. Black intro messages, final intro dialogue, start/skip/continue labels, and the "Name Restored" naming overlay now resolve from the viewer's native language. Target-language clue words that are intentionally part of the story learning beat, such as Seoul's `출구` and `순서`, remain as target words. Story progression, quiz prompts, answer data, provider routing, and Japanese scope remain unchanged.
+- Latest asset audit: 110 story PNGs, 218.39 MB total, 40 character assets, warnings 0.
 
 Remaining visual gap:
 
@@ -321,12 +323,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 107 PNG files.
-- 212.01 MB total.
+- 110 PNG files.
+- 218.39 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 37 files, 63.07 MB, 25.9% average brightness.
+- character: 40 files, 69.44 MB, 26.0% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.

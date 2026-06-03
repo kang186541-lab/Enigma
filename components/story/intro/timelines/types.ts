@@ -31,6 +31,9 @@ export type OverlayKind =
   | "korean-word"
   | "word";
 
+export type LocalizedText = string | Partial<Record<NativeLanguage, string>>;
+export type LocalizedTextList = string[] | Partial<Record<NativeLanguage, string[]>>;
+
 export type StoryIntroShot = {
   id: string;
   durationMs: number;
@@ -39,8 +42,8 @@ export type StoryIntroShot = {
   cue: CueKey;
   overlay?: OverlayKind;
   overlayCopy?: {
-    phoneLines?: string[];
-    word?: string;
+    phoneLines?: LocalizedTextList;
+    word?: LocalizedText;
   };
   accessibilityLabel: string;
 };
@@ -48,15 +51,15 @@ export type StoryIntroShot = {
 export interface IntroTimeline {
   shots: StoryIntroShot[];
   finalDialogue: {
-    speaker: string;
-    text: string;
+    speaker: LocalizedText;
+    text: LocalizedText;
   };
-  villainMessage?: string;
+  villainMessage?: LocalizedText;
   portraitImage: ImageSourcePropType;
   spiritImage?: ImageSourcePropType;
   copy?: {
-    title: string;
+    title: LocalizedText;
     subtitle: Record<NativeLanguage, string>;
-    startLabel?: string;
+    startLabel?: LocalizedText;
   };
 }

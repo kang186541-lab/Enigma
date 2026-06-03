@@ -22,10 +22,24 @@ export const ch1Timeline: IntroTimeline = {
       cue: "ring",
       overlay: "phone",
       overlayCopy: {
-        phoneLines: [
-          "Detective. I need... I can't...",
-          "if you're reading this, the words are already...",
-        ],
+        phoneLines: {
+          english: [
+            "Detective. I need... I can't...",
+            "if you're reading this, the words are already...",
+          ],
+          korean: [
+            "탐정님. 도움이 필요해요... 말이...",
+            "이 메시지를 읽고 있다면 단어들이 이미...",
+          ],
+          spanish: [
+            "Detective. Necesito... no puedo...",
+            "si lees esto, las palabras ya están...",
+          ],
+          indonesian: [
+            "Detektif. Aku butuh... aku tidak bisa...",
+            "kalau kamu membaca ini, kata-katanya sudah...",
+          ],
+        },
       },
       accessibilityLabel: "A phone message loses its words in the dark.",
     },
@@ -85,9 +99,19 @@ export const ch1Timeline: IntroTimeline = {
   ],
   finalDialogue: {
     speaker: "Rudy",
-    text: "Something woke me. I think it was the word that came back.",
+    text: {
+      english: "Something woke me. I think it was the word that came back.",
+      korean: "뭔가가 저를 깨웠어요. 돌아온 그 단어 때문인 것 같아요.",
+      spanish: "Algo me despertó. Creo que fue la palabra que volvió.",
+      indonesian: "Sesuatu membangunkanku. Kurasa itu kata yang kembali.",
+    },
   },
-  villainMessage: "Thank you for the word, Detective.\nI'll take very good care of all the others.\n- B",
+  villainMessage: {
+    english: "Thank you for the word, Detective.\nI'll take very good care of all the others.\n- B",
+    korean: "그 단어는 고맙게 받겠습니다, 탐정님.\n나머지 단어들도 아주 잘 보관해 두죠.\n- B",
+    spanish: "Gracias por la palabra, detective.\nCuidaré muy bien de todas las demás.\n- B",
+    indonesian: "Terima kasih untuk katanya, Detektif.\nAku akan menjaga semua kata lainnya dengan sangat baik.\n- B",
+  },
   portraitImage: SHOT_IMAGES.rudyDetective,
   spiritImage: SHOT_IMAGES.rudySpirit,
   copy: {
@@ -98,6 +122,11 @@ export const ch1Timeline: IntroTimeline = {
       spanish: "La primera noche en que las palabras empiezan a caer.",
       indonesian: "Malam pertama saat kata-kata mulai berjatuhan.",
     },
-    startLabel: "Start London Cipher",
+    startLabel: {
+      english: "Start London Cipher",
+      korean: "런던 암호 시작",
+      spanish: "Comenzar Cifra de Londres",
+      indonesian: "Mulai Sandi London",
+    },
   },
 };

@@ -23,6 +23,8 @@ import type {
   ChapterId,
   CueKey,
   IntroTimeline,
+  LocalizedText,
+  LocalizedTextList,
   MotionPreset,
   NativeLanguage,
   StoryIntroShot,
@@ -49,6 +51,84 @@ const CUE_ASSETS = {
   drum: require("@/assets/sounds/cue_drum.wav"),
   guitar: require("@/assets/sounds/cue_guitar.wav"),
 } as Record<CueKey, number>;
+
+const DEFAULT_PHONE_LINES: Record<NativeLanguage, string[]> = {
+  english: [
+    "Detective. I need... I can't...",
+    "if you're reading this, the words are already...",
+  ],
+  korean: [
+    "탐정님. 도움이 필요해요... 말이...",
+    "이 메시지를 읽고 있다면 단어들이 이미...",
+  ],
+  spanish: [
+    "Detective. Necesito... no puedo...",
+    "si lees esto, las palabras ya están...",
+  ],
+  indonesian: [
+    "Detektif. Aku butuh... aku tidak bisa...",
+    "kalau kamu membaca ini, kata-katanya sudah...",
+  ],
+};
+
+const DEFAULT_WORDS: Record<
+  "open" | "find" | "color-restore" | "carlos-call" | "word",
+  Record<NativeLanguage, string>
+> = {
+  open: {
+    english: "OPEN",
+    korean: "열림",
+    spanish: "ABRIR",
+    indonesian: "BUKA",
+  },
+  find: {
+    english: "FIND",
+    korean: "찾아",
+    spanish: "BUSCA",
+    indonesian: "CARI",
+  },
+  "color-restore": {
+    english: "RED",
+    korean: "빨강",
+    spanish: "ROJO",
+    indonesian: "MERAH",
+  },
+  "carlos-call": {
+    english: "HELP",
+    korean: "도와줘",
+    spanish: "AYUDA",
+    indonesian: "TOLONG",
+  },
+  word: {
+    english: "RECORD",
+    korean: "기록",
+    spanish: "REGISTRO",
+    indonesian: "CATATAN",
+  },
+};
+
+const NAME_RESTORED_LABEL: Record<NativeLanguage, string> = {
+  english: "Name Restored",
+  korean: "이름 복원",
+  spanish: "Nombre restaurado",
+  indonesian: "Nama dipulihkan",
+};
+
+function localizeText(value: LocalizedText | undefined, lang: NativeLanguage, fallback = "") {
+  if (!value) return fallback;
+  if (typeof value === "string") return value;
+  return value[lang] ?? value.english ?? fallback;
+}
+
+function localizeTextList(
+  value: LocalizedTextList | undefined,
+  lang: NativeLanguage,
+  fallback: string[],
+) {
+  if (!value) return fallback;
+  if (Array.isArray(value)) return value;
+  return value[lang] ?? value.english ?? fallback;
+}
 
 function prefetchImageSource(source: ImageSourcePropType | undefined) {
   if (!source) return;
@@ -85,6 +165,8 @@ export default function StoryIntroMotionComic({
   const shots = useMemo(() => timeline?.shots ?? [], [timeline]);
   const currentShot = shots[shotIndex] ?? shots[0];
   const copy = getLocalizedCopy(nativeLang, timeline);
+  const finalSpeaker = localizeText(timeline?.finalDialogue.speaker, nativeLang);
+  const finalText = localizeText(timeline?.finalDialogue.text, nativeLang);
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -250,7 +332,7 @@ export default function StoryIntroMotionComic({
 
         {phase === "playing" && (
           <ShotFrame key={currentShot.id} shot={currentShot}>
-            {renderOverlay(currentShot, timeline)}
+            {renderOverlay(currentShot, timeline, nativeLang)}
           </ShotFrame>
         )}
 
@@ -285,10 +367,10 @@ export default function StoryIntroMotionComic({
               />
             </View>
             <View style={[styles.dialogueBox, { paddingBottom: Math.max(18, insets.bottom + 10) }]}>
-              <Text style={styles.speaker}>{timeline.finalDialogue.speaker}</Text>
+              <Text style={styles.speaker}>{finalSpeaker}</Text>
               <Typewriter
                 ref={dialogueRef}
-                text={timeline.finalDialogue.text}
+                text={finalText}
                 speedMs={28}
                 textStyle={styles.dialogueText}
                 onComplete={() => setDialogueDone(true)}
@@ -407,23 +489,49 @@ function ShotFrame({
   );
 }
 
-function renderOverlay(shot: StoryIntroShot, timeline: IntroTimeline) {
+function renderOverlay(shot: StoryIntroShot, timeline: IntroTimeline, lang: NativeLanguage) {
   const kind = shot.overlay;
   if (!kind) return null;
-  if (kind === "phone") return <PhoneOverlay lines={shot.overlayCopy?.phoneLines} />;
-  if (kind === "open") return <WordOverlay word="OPEN" variant="open" />;
-  if (kind === "find") return <WordOverlay word="FIND" variant="find" />;
-  if (kind === "color-restore") return <WordOverlay word="RED" variant="open" />;
-  if (kind === "carlos-call") return <WordOverlay word={shot.overlayCopy?.word ?? "HELP"} variant="find" />;
-  if (kind === "korean-word") return <WordOverlay word={shot.overlayCopy?.word ?? "출구"} variant="open" />;
-  if (kind === "word") return <WordOverlay word={shot.overlayCopy?.word ?? "RECORD"} variant="open" />;
+  if (kind === "phone") {
+    return (
+      <PhoneOverlay
+        lines={localizeTextList(shot.overlayCopy?.phoneLines, lang, DEFAULT_PHONE_LINES[lang])}
+        lang={lang}
+      />
+    );
+  }
+  if (kind === "open") return <WordOverlay word={DEFAULT_WORDS.open[lang]} variant="open" />;
+  if (kind === "find") return <WordOverlay word={DEFAULT_WORDS.find[lang]} variant="find" />;
+  if (kind === "color-restore") return <WordOverlay word={DEFAULT_WORDS["color-restore"][lang]} variant="open" />;
+  if (kind === "carlos-call") {
+    return (
+      <WordOverlay
+        word={localizeText(shot.overlayCopy?.word, lang, DEFAULT_WORDS["carlos-call"][lang])}
+        variant="find"
+      />
+    );
+  }
+  if (kind === "korean-word") {
+    return <WordOverlay word={localizeText(shot.overlayCopy?.word, lang, "출구")} variant="open" />;
+  }
+  if (kind === "word") {
+    return (
+      <WordOverlay
+        word={localizeText(shot.overlayCopy?.word, lang, DEFAULT_WORDS.word[lang])}
+        variant="open"
+      />
+    );
+  }
   if (kind === "rudy-react") return <ColdSenseOverlay />;
   if (kind === "festival-threat") return <ColdSenseOverlay />;
-  if (kind === "black") return <BlackMessageOverlay message={timeline.villainMessage ?? ""} />;
+  if (kind === "black") {
+    return <BlackMessageOverlay message={localizeText(timeline.villainMessage, lang)} />;
+  }
   if (kind === "naming") {
     return (
       <NamingOverlay
         detectiveImage={timeline.portraitImage}
+        lang={lang}
         spiritImage={timeline.spiritImage ?? timeline.portraitImage}
       />
     );
@@ -431,12 +539,18 @@ function renderOverlay(shot: StoryIntroShot, timeline: IntroTimeline) {
   return null;
 }
 
-function PhoneOverlay({ lines }: { lines?: string[] }) {
+function PhoneOverlay({ lines, lang }: { lines: string[]; lang: NativeLanguage }) {
   const opacity = useRef(new Animated.Value(0)).current;
   const fall = useRef(new Animated.Value(0)).current;
-  const firstLine = lines?.[0] ?? "Detective. I need... I can't...";
-  const secondLine = lines?.[1] ?? "if you're reading this, the words are already...";
-  const fallingWord = secondLine.includes("color") ? "color" : "words";
+  const firstLine = lines[0] ?? DEFAULT_PHONE_LINES[lang][0];
+  const secondLine = lines[1] ?? DEFAULT_PHONE_LINES[lang][1];
+  const fallCandidates = {
+    english: ["color", "words"],
+    korean: ["색", "단어"],
+    spanish: ["color", "palabras"],
+    indonesian: ["warna", "kata"],
+  }[lang];
+  const fallingWord = fallCandidates.find((word) => secondLine.includes(word)) ?? fallCandidates[1];
   const [secondPrefix, secondSuffix = ""] = secondLine.includes(fallingWord)
     ? secondLine.split(fallingWord)
     : [`${secondLine} `, ""];
@@ -582,9 +696,11 @@ function BlackMessageOverlay({ message }: { message: string }) {
 
 function NamingOverlay({
   detectiveImage,
+  lang,
   spiritImage,
 }: {
   detectiveImage: ImageSourcePropType;
+  lang: NativeLanguage;
   spiritImage: ImageSourcePropType;
 }) {
   const spiritOpacity = useRef(new Animated.Value(0.86)).current;
@@ -684,7 +800,7 @@ function NamingOverlay({
           },
         ]}
       >
-        <Text style={styles.nameMicro}>Name Restored</Text>
+        <Text style={styles.nameMicro}>{NAME_RESTORED_LABEL[lang]}</Text>
         <Text style={styles.nameValue}>RUDY</Text>
       </Animated.View>
     </View>
@@ -699,8 +815,8 @@ function getMotionPreset(motion: MotionPreset) {
 }
 
 function getLocalizedCopy(lang: NativeLanguage, timeline: IntroTimeline | null) {
-  const title = timeline?.copy?.title ?? "London Cipher";
-  const startLabel = timeline?.copy?.startLabel ?? `Start ${title}`;
+  const title = localizeText(timeline?.copy?.title, lang, "London Cipher");
+  const startLabel = localizeText(timeline?.copy?.startLabel, lang, `Start ${title}`);
   const subtitle = timeline?.copy?.subtitle[lang] ?? timeline?.copy?.subtitle.english;
 
   if (lang === "korean") {
@@ -708,7 +824,7 @@ function getLocalizedCopy(lang: NativeLanguage, timeline: IntroTimeline | null) 
       title,
       startLabel,
       startSubtitle: subtitle ?? "단어가 무너지는 첫 밤.",
-      skipLabel: "Skip",
+      skipLabel: "건너뛰기",
       continueLabel: "계속",
       skipTypingLabel: "탭해서 빠르게 보기",
     };
@@ -718,9 +834,19 @@ function getLocalizedCopy(lang: NativeLanguage, timeline: IntroTimeline | null) 
       title,
       startLabel,
       startSubtitle: subtitle ?? "La primera noche en que las palabras empiezan a caer.",
-      skipLabel: "Skip",
+      skipLabel: "Saltar",
       continueLabel: "Continuar",
       skipTypingLabel: "Toca para revelar",
+    };
+  }
+  if (lang === "indonesian") {
+    return {
+      title,
+      startLabel,
+      startSubtitle: subtitle ?? "Malam pertama saat kata-kata mulai berjatuhan.",
+      skipLabel: "Lewati",
+      continueLabel: "Lanjut",
+      skipTypingLabel: "Ketuk untuk membuka",
     };
   }
   return {

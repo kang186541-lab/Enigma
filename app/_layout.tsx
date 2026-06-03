@@ -147,6 +147,8 @@ const PRELOAD_IMAGES = [
   require("@/assets/rudy_splash.png"),
   require("@/assets/rudy_story.png"),
   require("@/assets/story/characters/rudy/rudy_dialogue_stage_v2.png"),
+  require("@/assets/story/characters/rudy/rudy_worried_stage_v2.png"),
+  require("@/assets/story/characters/rudy/rudy_celebratory_stage_v2.png"),
 ];
 
 export default function RootLayout() {

@@ -23,10 +23,24 @@ export const ch4Timeline: IntroTimeline = {
       cue: "ring",
       overlay: "phone",
       overlayCopy: {
-        phoneLines: [
-          "The record is losing ink.",
-          "the words are becoming sand.",
-        ],
+        phoneLines: {
+          english: [
+            "The record is losing ink.",
+            "the words are becoming sand.",
+          ],
+          korean: [
+            "기록에서 잉크가 사라지고 있어요.",
+            "단어들이 모래가 되고 있어요.",
+          ],
+          spanish: [
+            "El registro está perdiendo tinta.",
+            "las palabras se están volviendo arena.",
+          ],
+          indonesian: [
+            "Catatan itu kehilangan tinta.",
+            "kata-katanya berubah menjadi pasir.",
+          ],
+        },
       },
       accessibilityLabel: "A Cairo hospital record loses its words from a phone screen.",
     },
@@ -38,7 +52,12 @@ export const ch4Timeline: IntroTimeline = {
       cue: "open",
       overlay: "word",
       overlayCopy: {
-        word: "RECORD",
+        word: {
+          english: "RECORD",
+          korean: "기록",
+          spanish: "REGISTRO",
+          indonesian: "CATATAN",
+        },
       },
       accessibilityLabel: "One abstract inscription mark restores on a Cairo chamber wall.",
     },
@@ -50,7 +69,12 @@ export const ch4Timeline: IntroTimeline = {
       cue: "gasp",
       overlay: "word",
       overlayCopy: {
-        word: "WROTE",
+        word: {
+          english: "WROTE",
+          korean: "적었다",
+          spanish: "ESCRIBIÓ",
+          indonesian: "MENULIS",
+        },
       },
       accessibilityLabel: "Professor Amira watches a hospital record crumble into golden sand.",
     },
@@ -88,17 +112,36 @@ export const ch4Timeline: IntroTimeline = {
       cue: "drum",
       overlay: "word",
       overlayCopy: {
-        word: "BABEL",
+        word: {
+          english: "BABEL",
+          korean: "BABEL",
+          spanish: "BABEL",
+          indonesian: "BABEL",
+        },
       },
       accessibilityLabel: "Ellis's journal and an old papyrus point toward Babel.",
     },
   ],
   finalDialogue: {
     speaker: "Rudy",
-    text: "Cairo is not losing words. It is losing proof that anyone ever spoke them.",
+    text: {
+      english: "Cairo is not losing words. It is losing proof that anyone ever spoke them.",
+      korean: "카이로는 단어를 잃고 있는 게 아니에요. 누군가 그 단어들을 말했었다는 증거를 잃고 있어요.",
+      spanish: "El Cairo no está perdiendo palabras. Está perdiendo la prueba de que alguien las dijo alguna vez.",
+      indonesian: "Kairo tidak kehilangan kata-kata. Kairo kehilangan bukti bahwa seseorang pernah mengucapkannya.",
+    },
   },
   villainMessage:
-    "I'm not erasing your grandmother's lullaby.\nI'm making sure her great-grandchild understands every word of it.\n- B",
+    {
+      english:
+        "I'm not erasing your grandmother's lullaby.\nI'm making sure her great-grandchild understands every word of it.\n- B",
+      korean:
+        "나는 당신 할머니의 자장가를 지우는 게 아닙니다.\n그 증손주가 그 노래의 모든 단어를 이해하게 만들고 있을 뿐이죠.\n- B",
+      spanish:
+        "No estoy borrando la nana de tu abuela.\nMe aseguro de que su bisnieto entienda cada palabra.\n- B",
+      indonesian:
+        "Aku tidak menghapus lagu nina bobo nenekmu.\nAku memastikan cicitnya memahami setiap katanya.\n- B",
+    },
   portraitImage: SHOT_IMAGES.rudyDetective,
   spiritImage: SHOT_IMAGES.rudyArchive,
   copy: {
@@ -109,6 +152,11 @@ export const ch4Timeline: IntroTimeline = {
       spanish: "La ciudad donde los registros se vuelven arena.",
       indonesian: "Kota tempat catatan berubah menjadi pasir.",
     },
-    startLabel: "Start Cairo Record",
+    startLabel: {
+      english: "Start Cairo Record",
+      korean: "카이로 기록 시작",
+      spanish: "Comenzar Registro de El Cairo",
+      indonesian: "Mulai Catatan Kairo",
+    },
   },
 };

@@ -23,10 +23,24 @@ export const ch3Timeline: IntroTimeline = {
       cue: "ring",
       overlay: "phone",
       overlayCopy: {
-        phoneLines: [
-          "No signal. No translator.",
-          "the order is already...",
-        ],
+        phoneLines: {
+          english: [
+            "No signal. No translator.",
+            "the order of words is already...",
+          ],
+          korean: [
+            "신호도 없고, 번역기도 없어요.",
+            "단어의 순서가 이미...",
+          ],
+          spanish: [
+            "Sin señal. Sin traductor.",
+            "el orden de las palabras ya está...",
+          ],
+          indonesian: [
+            "Tidak ada sinyal. Tidak ada penerjemah.",
+            "urutan kata-katanya sudah...",
+          ],
+        },
       },
       accessibilityLabel: "A dead phone in Incheon airport leaks golden language particles.",
     },
@@ -91,9 +105,19 @@ export const ch3Timeline: IntroTimeline = {
   ],
   finalDialogue: {
     speaker: "Rudy",
-    text: "Seoul is not losing words one by one. It is losing the order that lets them belong together.",
+    text: {
+      english: "Seoul is not losing words one by one. It is losing the order that lets them belong together.",
+      korean: "서울은 단어를 하나씩 잃는 게 아니에요. 단어들이 함께 있을 수 있게 해 주는 순서를 잃고 있어요.",
+      spanish: "Seúl no está perdiendo palabras una por una. Está perdiendo el orden que las mantiene unidas.",
+      indonesian: "Seoul tidak kehilangan kata satu per satu. Seoul kehilangan urutan yang membuat kata-kata itu menyatu.",
+    },
   },
-  villainMessage: "Translation isn't theft.\nMisunderstanding is.\n- B",
+  villainMessage: {
+    english: "Translation isn't theft.\nMisunderstanding is.\n- B",
+    korean: "번역은 도둑질이 아닙니다.\n오해가 도둑질이죠.\n- B",
+    spanish: "Traducir no es robar.\nMalentender sí lo es.\n- B",
+    indonesian: "Terjemahan bukan pencurian.\nKesalahpahamanlah pencuriannya.\n- B",
+  },
   portraitImage: SHOT_IMAGES.rudyDetective,
   spiritImage: SHOT_IMAGES.rudyPalace,
   copy: {
@@ -104,6 +128,11 @@ export const ch3Timeline: IntroTimeline = {
       spanish: "La ciudad donde empieza a caer el orden de las frases.",
       indonesian: "Kota tempat urutan kalimat mulai runtuh.",
     },
-    startLabel: "Start Seoul Order",
+    startLabel: {
+      english: "Start Seoul Order",
+      korean: "서울의 순서 시작",
+      spanish: "Comenzar Orden de Seúl",
+      indonesian: "Mulai Urutan Seoul",
+    },
   },
 };

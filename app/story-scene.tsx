@@ -72,6 +72,8 @@ const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_co
 const ch5PennyPortraitImg = require("@/assets/story/dialogue_sprites/ch5_penny_sprite.png");
 const ch5BlackFaceImg = require("@/assets/story/dialogue_sprites/ch5_black_face_sprite.png");
 const rudyDialogueNeutralImg = require("@/assets/story/characters/rudy/rudy_dialogue_stage_v2.png");
+const rudyWorriedStageImg = require("@/assets/story/characters/rudy/rudy_worried_stage_v2.png");
+const rudyCelebratoryStageImg = require("@/assets/story/characters/rudy/rudy_celebratory_stage_v2.png");
 const eleanorUrgentWarningImg = require("@/assets/story/characters/eleanor/eleanor_urgent_warning.png");
 const eleanorAnalyticalDiscoveryImg = require("@/assets/story/characters/eleanor/eleanor_analytical_discovery.png");
 const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
@@ -93,8 +95,8 @@ const bgBabelTowerCoreImg = require("@/assets/story/dialogue_backgrounds/babel_t
 const bgBabelLanguageGatesImg = require("@/assets/story/dialogue_backgrounds/babel_language_gates.png");
 
 const rudyExpressionSprites = {
-  worried: rudyDialogueNeutralImg,
-  celebratory: rudyDialogueNeutralImg,
+  worried: rudyWorriedStageImg,
+  celebratory: rudyCelebratoryStageImg,
 };
 
 const tomExpressionSprites = {
@@ -7196,7 +7198,8 @@ export default function StoryScene() {
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
   const introSupported = hasIntroTimeline(story.id);
   const introStorageKey = `@enigma_intro_seen_${story.id}`;
-  const introNativeLang = lang === "korean" || lang === "spanish" ? lang : "english";
+  const introNativeLang =
+    lang === "korean" || lang === "spanish" || lang === "indonesian" ? lang : "english";
   const forceIntro = intro === "1" || intro === "true";
   const audioMuted = mute === "1" || mute === "true";
   const compactStoryLayout = viewportHeight < 720 || viewportWidth < 370;

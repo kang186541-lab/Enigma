@@ -24,7 +24,12 @@ export const ch5Timeline: IntroTimeline = {
       cue: "ring",
       overlay: "word",
       overlayCopy: {
-        word: "BABEL",
+        word: {
+          english: "BABEL",
+          korean: "BABEL",
+          spanish: "BABEL",
+          indonesian: "BABEL",
+        },
       },
       accessibilityLabel: "Four city stones project the final Babel coordinates.",
     },
@@ -44,7 +49,12 @@ export const ch5Timeline: IntroTimeline = {
       cue: "open",
       overlay: "word",
       overlayCopy: {
-        word: "GATES",
+        word: {
+          english: "GATES",
+          korean: "관문",
+          spanish: "PUERTAS",
+          indonesian: "GERBANG",
+        },
       },
       accessibilityLabel: "Five language gates stack upward inside Babel Tower.",
     },
@@ -81,17 +91,36 @@ export const ch5Timeline: IntroTimeline = {
       cue: "drum",
       overlay: "word",
       overlayCopy: {
-        word: "REMEMBER",
+        word: {
+          english: "REMEMBER",
+          korean: "기억",
+          spanish: "RECUERDA",
+          indonesian: "INGAT",
+        },
       },
       accessibilityLabel: "Ellis's journal and the seven stones carry the Welsh lullaby back into the room.",
     },
   ],
   finalDialogue: {
     speaker: "Rudy",
-    text: "This is where every word we restored has been leading us.",
+    text: {
+      english: "This is where every word we restored has been leading us.",
+      korean: "우리가 되찾은 모든 단어가 우리를 여기로 이끌고 있었어요.",
+      spanish: "Aquí es adonde nos guiaba cada palabra que restauramos.",
+      indonesian: "Di sinilah semua kata yang kita pulihkan membawa kita.",
+    },
   },
   villainMessage:
-    "Tell me, Detective.\nWhen you couldn't speak the language,\ndid anyone look at you like you mattered?\n- B",
+    {
+      english:
+        "Tell me, Detective.\nWhen you couldn't speak the language,\ndid anyone look at you like you mattered?\n- B",
+      korean:
+        "말해 보세요, 탐정님.\n당신이 그 언어를 말하지 못했을 때,\n누군가 당신을 중요한 사람처럼 바라봐 준 적이 있습니까?\n- B",
+      spanish:
+        "Dime, detective.\nCuando no podías hablar el idioma,\n¿alguien te miró como si importaras?\n- B",
+      indonesian:
+        "Katakan padaku, Detektif.\nSaat kau tidak bisa berbicara bahasa itu,\napakah ada yang menatapmu seolah kau berarti?\n- B",
+    },
   portraitImage: SHOT_IMAGES.rudyDetective,
   spiritImage: SHOT_IMAGES.rudySpirit,
   copy: {
@@ -102,6 +131,11 @@ export const ch5Timeline: IntroTimeline = {
       spanish: "Cada palabra restaurada llega a la última puerta.",
       indonesian: "Setiap kata yang dipulihkan berkumpul di pintu terakhir.",
     },
-    startLabel: "Start Babel Tower",
+    startLabel: {
+      english: "Start Babel Tower",
+      korean: "바벨 탑 시작",
+      spanish: "Comenzar Torre de Babel",
+      indonesian: "Mulai Menara Babel",
+    },
   },
 };
