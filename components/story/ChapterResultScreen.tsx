@@ -54,9 +54,11 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
     <View style={styles.container}>
       {/* Grade Badge */}
       <Animated.View style={[styles.gradeSection, { opacity: gradeOpacity }]}>
-        <Animated.Text style={[styles.gradeIcon, { transform: [{ scale: badgeScale }] }]}>
-          {gradeMeta.icon}
-        </Animated.Text>
+        <Animated.View style={[styles.gradeMedallion, { borderColor: gradeMeta.color, transform: [{ scale: badgeScale }] }]}>
+          <Text style={[styles.gradeMedallionText, { color: gradeMeta.color }]}>
+            {result.gaugeGrade}
+          </Text>
+        </Animated.View>
         <Text style={[styles.gradeLabel, { color: gradeMeta.color }]}>
           {pick(gradeMeta.label, lang)}
         </Text>
@@ -68,30 +70,24 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
         {/* Stars */}
         <View style={styles.starsRow}>
           {[1, 2, 3].map(i => (
-            <Text key={i} style={[styles.star, i <= stars && styles.starActive]}>
-              {i <= stars ? "\u2B50" : "\u2606"}
-            </Text>
+            <View key={i} style={[styles.starMarker, i <= stars && styles.starMarkerActive]} />
           ))}
         </View>
 
         {/* Stat items */}
         <StatItem
-          icon="\u2705"
           label={lang === "ko" ? "\uC815\uB2F5\uB960" : lang === "es" ? "Precisión" : lang === "id" ? "Akurasi" : "Accuracy"}
           value={`${result.correctRate}%`}
         />
         <StatItem
-          icon="\uD83D\uDD0D"
           label={lang === "ko" ? "\uC218\uC9D1\uD55C \uB2E8\uC11C" : lang === "es" ? "Pistas" : lang === "id" ? "Petunjuk" : "Clues"}
           value={`${result.cluesFound}/${result.cluesTotal}`}
         />
         <StatItem
-          icon="\u2728"
           label={lang === "ko" ? "\uD68D\uB4DD XP" : lang === "es" ? "XP Ganado" : lang === "id" ? "XP Didapat" : "XP Earned"}
           value={`+${result.xpEarned}`}
         />
         <StatItem
-          icon="\uD83D\uDCD6"
           label={lang === "ko" ? "\uC0C8 \uD45C\uD604" : lang === "es" ? "Nuevas" : lang === "id" ? "Kata Baru" : "New Words"}
           value={`${result.newExpressions.length}`}
         />
@@ -110,7 +106,7 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
                 <View key={npcId} style={styles.npcRow}>
                   <Text style={styles.npcName}>{npcName}</Text>
                   <Text style={[styles.npcChange, change > 0 ? styles.npcPositive : styles.npcNegative]}>
-                    {change > 0 ? `\u2764\uFE0F +${change}` : `\uD83D\uDC94 ${change}`}
+                    {change > 0 ? `+${change}` : `${change}`}
                   </Text>
                 </View>
               );
@@ -121,7 +117,9 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
         {/* Badge */}
         {result.badgeEarned && (
           <View style={styles.badgeRow}>
-            <Text style={styles.badgeIcon}>\uD83C\uDFC5</Text>
+            <View style={styles.badgePill}>
+              <Text style={styles.badgePillText}>BADGE</Text>
+            </View>
             <Text style={styles.badgeText}>
               {lang === "ko" ? "\uBC43\uC9C0 \uD68D\uB4DD!" : lang === "es" ? "\u00A1Insignia!" : lang === "id" ? "Lencana Didapat!" : "Badge Earned!"}
             </Text>
@@ -145,10 +143,10 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
   );
 }
 
-function StatItem({ icon, label, value }: { icon: string; label: string; value: string }) {
+function StatItem({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.statRow}>
-      <Text style={styles.statIcon}>{icon}</Text>
+      <View style={styles.statMarker} />
       <Text style={styles.statLabel}>{label}</Text>
       <Text style={styles.statValue}>{value}</Text>
     </View>
@@ -161,18 +159,26 @@ const styles = StyleSheet.create({
     justifyContent: "center", alignItems: "center",
   },
   gradeSection: { alignItems: "center", marginBottom: 32 },
-  gradeIcon: { fontSize: 72 },
+  gradeMedallion: {
+    width: 88, height: 88, borderRadius: 44,
+    borderWidth: 3, alignItems: "center", justifyContent: "center",
+    backgroundColor: "rgba(201,162,39,0.08)",
+  },
+  gradeMedallionText: { fontSize: 34, fontWeight: "900" },
   gradeLabel: { fontSize: 28, fontWeight: "800", marginTop: 8 },
   gaugeValue: { fontSize: 18, color: "#888", marginTop: 4 },
   statsSection: { width: "100%", maxWidth: 360 },
   starsRow: { flexDirection: "row", justifyContent: "center", marginBottom: 20 },
-  star: { fontSize: 32, marginHorizontal: 4, color: "#444" },
-  starActive: { color: "#FFD700" },
+  starMarker: {
+    width: 48, height: 8, borderRadius: 4,
+    backgroundColor: "#444", marginHorizontal: 4,
+  },
+  starMarkerActive: { backgroundColor: "#FFD700" },
   statRow: {
     flexDirection: "row", alignItems: "center",
     paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#1A1A2E",
   },
-  statIcon: { fontSize: 20, width: 32 },
+  statMarker: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#C9A227", marginRight: 24 },
   statLabel: { flex: 1, fontSize: 16, color: "#CCC" },
   statValue: { fontSize: 18, fontWeight: "700", color: "#C9A227" },
   npcSection: { marginTop: 16 },
@@ -183,7 +189,11 @@ const styles = StyleSheet.create({
   npcPositive: { color: "#FF6B9D" },
   npcNegative: { color: "#666" },
   badgeRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 20 },
-  badgeIcon: { fontSize: 28, marginRight: 8 },
+  badgePill: {
+    borderRadius: 6, borderWidth: 1, borderColor: "#C9A227",
+    paddingHorizontal: 8, paddingVertical: 3, marginRight: 8,
+  },
+  badgePillText: { fontSize: 10, fontWeight: "800", color: "#C9A227" },
   badgeText: { fontSize: 18, fontWeight: "700", color: "#C9A227" },
   continueBtn: {
     marginTop: 32, backgroundColor: "#C9A227", paddingHorizontal: 48, paddingVertical: 16,

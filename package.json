@@ -17,6 +17,7 @@
     "verify:quality": "npm run web:build && npm run verify:speaking-core && npm run verify:web-export && npx tsc --noEmit --pretty false && npm run lint",
     "verify:speaking-core": "tsx scripts/verify-speaking-core.ts",
     "verify:web-export": "node scripts/verify-web-export.js dist",
+    "audit:story-assets": "node scripts/audit-story-assets.js",
     "lint": "npx expo lint",
     "lint:fix": "npx expo lint --fix",
     "test": "jest"

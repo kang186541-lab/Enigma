@@ -52,18 +52,31 @@ Review focus:
 ### `app/story-scene.tsx`
 
 - Dialogue portraits are larger and framed more like character-game art.
+- Dialogue/narration scenes now render over chapter-specific illustrated backgrounds, closer to a visual-novel/adventure-game staging model.
 - Rudy's story character size increased to match the stronger portrait scale.
 - Speaker tag avoids emoji when a real portrait/character art exists; it uses a small accent diamond instead.
 - Portrait name text now has a soft gold shadow so characters feel more staged.
 - Dialogue panel is slightly less rounded and more visual-novel/game-like.
 - Short mobile viewports now use compact portrait sizes and a shorter dialogue scroll cap.
 - Ch1 Mr. Black now uses the CCTV silhouette image instead of the prototype full portrait, preserving the early mystery.
+- Puzzle/solved/completion chrome removes visible emoji/check/arrow glyph dependency where practical; Rudy badges now use the Rudy image instead of fox emoji.
+
+New dedicated dialogue backgrounds:
+
+```text
+assets/story/dialogue_backgrounds/london_museum_hall.png
+assets/story/dialogue_backgrounds/madrid_festival_plaza.png
+assets/story/dialogue_backgrounds/seoul_palace_subway.png
+assets/story/dialogue_backgrounds/cairo_archive_room.png
+assets/story/dialogue_backgrounds/babel_tower_core.png
+```
 
 Review focus:
 
 - Does the bigger portrait collide with long dialogue on small mobile screens?
 - Do characters now feel more important than the dialogue UI?
 - Is the loss of emoji in speaker tags good for premium feel and web compatibility?
+- Do the new backgrounds support each chapter's actual story instead of reading as generic fantasy art?
 
 Verification:
 
@@ -73,7 +86,7 @@ Verification:
 ### `scripts/audit-story-assets.js`
 
 - Adds a repeatable story-art QA command using Node built-ins only.
-- Audits PNG count, dimensions, total size, average brightness, and groups assets into intro/portrait/boss/legacy.
+- Audits PNG count, dimensions, total size, average brightness, and groups assets into intro/background/portrait/character/sheet/boss/legacy.
 - Optional `--contact-sheet` writes an HTML contact sheet to an output directory, defaulting to OS temp.
 
 ## 10/10 Art Rubric
@@ -97,6 +110,37 @@ Generate these before replacing broad chapter art:
 - Eleanor: calm mentor, urgent warning, analytical discovery.
 - Penny: warm guide, anxious final clue, brave resolve.
 - Isabel: playful confidence, shocked concern, rallying energy.
+
+Recommended file layout:
+
+```text
+assets/story/characters/_sheets/rudy_expression_sheet_v1.png
+assets/story/characters/rudy/rudy_neutral_guide.png
+assets/story/characters/rudy/rudy_worried_detective.png
+assets/story/characters/rudy/rudy_celebratory_coach.png
+
+assets/story/characters/_sheets/mr_black_expression_sheet_v1.png
+assets/story/characters/mr_black/mr_black_silhouette_menace.png
+assets/story/characters/mr_black/mr_black_tired_reveal.png
+assets/story/characters/mr_black/mr_black_fragile_remorse.png
+
+assets/story/characters/_sheets/eleanor_expression_sheet_v1.png
+assets/story/characters/eleanor/eleanor_calm_mentor.png
+assets/story/characters/eleanor/eleanor_urgent_warning.png
+assets/story/characters/eleanor/eleanor_analytical_discovery.png
+
+assets/story/characters/_sheets/penny_expression_sheet_v1.png
+assets/story/characters/penny/penny_warm_guide.png
+assets/story/characters/penny/penny_anxious_final_clue.png
+assets/story/characters/penny/penny_brave_resolve.png
+
+assets/story/characters/_sheets/isabel_expression_sheet_v1.png
+assets/story/characters/isabel/isabel_playful_confidence.png
+assets/story/characters/isabel/isabel_shocked_concern.png
+assets/story/characters/isabel/isabel_rallying_energy.png
+```
+
+Runtime portrait files should be 1024x1536 PNG. Approval sheets should be 3072x1536 PNG with three 1024x1536 panels.
 
 ### P1 - Stronger Chapter Identity
 
@@ -146,15 +190,18 @@ Next highest-value work: generate and wire Rudy/Mr. Black/Eleanor/Penny/Isabel e
 Run this whenever new story images are added:
 
 ```bash
-node scripts/audit-story-assets.js --contact-sheet
+npm run audit:story-assets -- --contact-sheet
 ```
 
 Current audit snapshot:
 
-- 61 PNG files.
-- 129.13 MB total.
+- 66 PNG files.
+- 139.81 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
+- background: 5 files, 10.68 MB, 17.2% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
+- character: 0 files.
+- sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.
 

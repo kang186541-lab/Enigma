@@ -3,7 +3,6 @@ import {
   View, Text, StyleSheet, Modal, Pressable, ScrollView,
   TextInput, ActivityIndicator, Animated, Platform,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 import * as FileSystem from "expo-file-system/legacy";
@@ -17,19 +16,19 @@ import { checkAnswer as checkSpelling } from "@/lib/answerUtils";
 
 type QL = "ko" | "es" | "en" | "id";
 const QT: Record<string, Record<QL, string>> = {
-  checkAnswers:   { ko: "정답 확인 ✓",         es: "Comprobar ✓",             en: "Check Answers ✓",            id: "Cek Jawaban ✓" },
+  checkAnswers:   { ko: "정답 확인",           es: "Comprobar",               en: "Check Answers",              id: "Cek Jawaban" },
   arrangeWords:   { ko: "단어를 올바른 순서로 배열하세요:", es: "Ordena las palabras en la oración correcta:", en: "Arrange the words into the correct sentence:", id: "Susun kata-kata menjadi kalimat yang benar:" },
   tapWords:       { ko: "아래 단어를 탭하여 문장을 만드세요", es: "Toca las palabras abajo para formar la oración", en: "Tap words below to build the sentence", id: "Ketuk kata di bawah untuk menyusun kalimat" },
-  check:          { ko: "확인 ✓",              es: "Comprobar ✓",             en: "Check ✓",                    id: "Cek ✓" },
+  check:          { ko: "확인",                es: "Comprobar",               en: "Check",                      id: "Cek" },
   playing:        { ko: "재생 중...",           es: "Reproduciendo...",        en: "Playing...",                 id: "Memutar..." },
   playRecording:  { ko: "녹음 재생",           es: "Reproducir grabación",    en: "Play Recording",             id: "Putar Rekaman" },
   typeAnswer:     { ko: "답을 입력하세요...",    es: "Escribe tu respuesta...", en: "Type your answer...",        id: "Ketik jawabanmu..." },
-  submit:         { ko: "제출 ✓",              es: "Enviar ✓",               en: "Submit ✓",                   id: "Kirim ✓" },
+  submit:         { ko: "제출",                es: "Enviar",                 en: "Submit",                     id: "Kirim" },
   submitted:      { ko: "제출 완료! 연습을 계속하세요.", es: "¡Enviado! Sigue practicando.", en: "Submitted! Keep practising.", id: "Terkirim! Terus berlatih ya." },
   requiredWords:  { ko: "필수 단어:",           es: "Palabras requeridas:",    en: "Required words:",            id: "Kata wajib:" },
   readAloud:      { ko: "다음 문장을 소리 내어 읽으세요:", es: "Lee la siguiente oración en voz alta:", en: "Read the following sentence aloud:", id: "Baca kalimat berikut dengan lantang:" },
   noSentences:    { ko: "문장을 찾을 수 없습니다.", es: "No se encontraron oraciones.", en: "No sentences found.",   id: "Tidak ada kalimat ditemukan." },
-  submitReview:   { ko: "검토 제출 ✓",         es: "Enviar para revisión ✓",  en: "Submit for Review ✓",        id: "Kirim untuk Ditinjau ✓" },
+  submitReview:   { ko: "검토 제출",           es: "Enviar para revisión",    en: "Submit for Review",          id: "Kirim untuk Ditinjau" },
   yourAnswer:     { ko: "답변...",              es: "Tu respuesta...",         en: "Your answer...",             id: "Jawabanmu..." },
   translateTo:    { ko: "번역하세요:",          es: "Traduce a:",              en: "Translate to:",              id: "Terjemahkan ke:" },
   submitArgument: { ko: "주장 제출",            es: "Enviar argumento",        en: "Submit Argument",            id: "Kirim Argumen" },
@@ -102,7 +101,7 @@ async function playTTS(
 ) {
   const url = new URL("/api/pronunciation-tts", apiBase);
   url.searchParams.set("text", script);
-  // Derive lang from voice name if not explicitly given (e.g. "ko-KR-SunHiNeural" → "ko-KR")
+  // Derive lang from voice name if not explicitly given (e.g. "ko-KR-SunHiNeural" -> "ko-KR")
   const ttsLang = lang || (voice ? voice.split("-").slice(0, 2).join("-") : "en-US");
   url.searchParams.set("lang", ttsLang);
   if (voice) url.searchParams.set("voice", voice);
@@ -171,7 +170,9 @@ function ResultView({
 
   return (
     <Animated.View style={[styles.resultContainer, { transform: [{ scale }], opacity }]}>
-      <Text style={styles.resultEmoji}>{passed ? "🎉" : "💪"}</Text>
+      <View style={[styles.resultMark, passed ? styles.resultMarkPassed : styles.resultMarkRetry]}>
+        <Text style={styles.resultMarkText}>{passed ? "PASS" : "TRY"}</Text>
+      </View>
       <Text style={styles.resultTitle}>
         {passed
           ? (nativeLang === "ko" ? "잘했어요!" : nativeLang === "es" ? "¡Buen trabajo!" : nativeLang === "id" ? "Bagus sekali!" : "Great job!")
@@ -186,12 +187,12 @@ function ResultView({
       </View>
       {badge && (
         <View style={styles.badgeBubble}>
-          <Text style={styles.badgeText}>🏅 {badge}</Text>
+          <Text style={styles.badgeText}>{badge}</Text>
         </View>
       )}
       <Pressable style={styles.continueBtn} onPress={onContinue}>
         <Text style={styles.continueBtnText}>
-          {nativeLang === "ko" ? "계속하기 →" : nativeLang === "es" ? "Continuar →" : nativeLang === "id" ? "Lanjut →" : "Continue →"}
+          {nativeLang === "ko" ? "계속하기" : nativeLang === "es" ? "Continuar" : nativeLang === "id" ? "Lanjut" : "Continue"}
         </Text>
       </Pressable>
     </Animated.View>
@@ -262,7 +263,7 @@ function MatchingQuizView({
       <View style={styles.matchLeft}>
         <Text style={styles.matchLeftText}>{pair.left}</Text>
       </View>
-      <Text style={styles.matchArrow}>↓</Text>
+      <View style={styles.matchDivider} />
       <View style={styles.choicesGrid}>
         {pair.choices.map((ch) => {
           const isSelected = selected === ch;
@@ -358,7 +359,7 @@ function FillBlankQuizView({
         <View style={styles.blankSection}>
           <Text style={styles.blankNum}>{qt("blank", nl)} {blank.id}</Text>
           {blank.hint && (
-            <Text style={styles.hintText}>💡 {blank.hint[nativeLang] ?? blank.hint.en ?? ""}</Text>
+            <Text style={styles.hintText}>{blank.hint[nativeLang] ?? blank.hint.en ?? ""}</Text>
           )}
           <View style={styles.choicesGrid}>
             {blank.options.map((opt) => {
@@ -493,7 +494,7 @@ function WordRearrangeView({
       {/* Hint */}
       <Pressable onPress={() => { setShowHint(h => !h); setHintUsedThisQ(true); }} style={styles.hintToggle}>
         <Text style={styles.hintToggleText}>
-          💡 {showHint ? "Hide hint" : "Show hint"}{hintUsedThisQ ? " ⚠️ -XP" : ""}
+          {showHint ? "Hide hint" : "Show hint"}{hintUsedThisQ ? " (-XP)" : ""}
         </Text>
       </Pressable>
       {showHint && q.hint && (
@@ -506,7 +507,7 @@ function WordRearrangeView({
           backgroundColor: feedback === "correct" ? "#2e7d32" : feedback === "penalized" ? "#f57c00" : "#c62828",
         }]}>
           <Text style={styles.feedbackText}>
-            {feedback === "correct" ? "✓ Correct!" : feedback === "penalized" ? "✓ Correct — hint used, no XP 💡" : `✗ Answer: ${q.answer}`}
+            {feedback === "correct" ? "Correct!" : feedback === "penalized" ? "Correct - hint used, no XP" : `Answer: ${q.answer}`}
           </Text>
         </View>
       )}
@@ -580,7 +581,7 @@ function ListeningQuizView({
   return (
     <View style={styles.quizBody}>
       <Pressable style={[styles.ttsBtn, playing && styles.ttsBtnActive]} onPress={play}>
-        <Ionicons name={playing ? "volume-high" : "play-circle"} size={32} color={playing ? "#fff" : C.gold} />
+        <View style={[styles.audioIndicator, playing && styles.audioIndicatorActive]} />
         <Text style={[styles.ttsBtnText, playing && { color: "#fff" }]}>
           {playing ? qt("playing", nativeLang) : qt("playRecording", nativeLang)}
         </Text>
@@ -601,7 +602,7 @@ function ListeningQuizView({
       {feedback && (
         <View style={[styles.feedbackBanner, { backgroundColor: feedback === "correct" ? "#2e7d32" : "#c62828" }]}>
           <Text style={styles.feedbackText}>
-            {feedback === "correct" ? "✓ Correct!" : `✗ Answer: ${q.answer}`}
+            {feedback === "correct" ? "Correct!" : `Answer: ${q.answer}`}
           </Text>
         </View>
       )}
@@ -649,7 +650,7 @@ function RiddleQuizView({
     const isCorrect = acceptable.some(a => normalise(a) === normalise(input));
 
     if (isCorrect) {
-      setFeedback("✓ Correct!");
+      setFeedback("Correct!");
       setCorrect(c => c + 1);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       setTimeout(advance, 1200);
@@ -666,17 +667,17 @@ function RiddleQuizView({
       try {
         const json = JSON.parse(res.match(/\{[\s\S]*\}/)?.[0] ?? "{}");
         if (json.correct) {
-          setFeedback("✓ Correct!");
+          setFeedback("Correct!");
           setCorrect(c => c + 1);
           setTimeout(advance, 1200);
         } else {
-          setFeedback(json.feedback ?? "✗ Not quite. Try again!");
+          setFeedback(json.feedback ?? "Not quite. Try again!");
         }
         return;
       } catch (e) { console.warn('[API] riddle answer parse failed:', e); /* fall through */ }
     }
 
-    setFeedback(`✗ Not quite. Answer: ${riddle.answer}`);
+    setFeedback(`Not quite. Answer: ${riddle.answer}`);
     setTimeout(advance, 2000);
   }
 
@@ -696,7 +697,9 @@ function RiddleQuizView({
     <View style={styles.quizBody}>
       <Text style={styles.progressLabel}>{idx + 1} / {riddles.length}</Text>
       <View style={styles.riddleBox}>
-        <Text style={styles.riddleEmoji}>🔍</Text>
+        <View style={styles.riddleMark}>
+          <Text style={styles.riddleMarkText}>?</Text>
+        </View>
         <Text style={styles.riddleText}>{riddle.text}</Text>
       </View>
       <TextInput
@@ -711,7 +714,7 @@ function RiddleQuizView({
       {loading && <ActivityIndicator color={C.gold} style={{ marginTop: 12 }} />}
       {feedback && (
         <View style={[styles.feedbackBanner, {
-          backgroundColor: feedback.startsWith("✓") ? "#2e7d32" : "#8B4513",
+          backgroundColor: feedback.startsWith("Correct") ? "#2e7d32" : "#8B4513",
         }]}>
           <Text style={styles.feedbackText}>{feedback}</Text>
         </View>
@@ -802,7 +805,7 @@ function RoleplayQuizView({
       {/* Progress */}
       {ordersComplete > 0 && (
         <Text style={styles.progressLabel}>
-          {quiz.nativeLang === "ko" ? `주문: ${ordersComplete}/3 ✓` : quiz.nativeLang === "es" ? `Pedidos: ${ordersComplete}/3 ✓` : `Orders: ${ordersComplete}/3 ✓`}
+          {quiz.nativeLang === "ko" ? `주문: ${ordersComplete}/3` : quiz.nativeLang === "es" ? `Pedidos: ${ordersComplete}/3` : `Orders: ${ordersComplete}/3`}
         </Text>
       )}
 
@@ -843,7 +846,7 @@ function RoleplayQuizView({
           multiline
         />
         <Pressable style={[styles.sendBtn, !input.trim() && { opacity: 0.4 }]} onPress={sendMessage}>
-          <Ionicons name="send" size={20} color="#fff" />
+          <Text style={styles.sendBtnText}>Send</Text>
         </Pressable>
       </View>
     </View>
@@ -911,15 +914,15 @@ function WritingQuizView({
 
   if (!prompt) return null;
 
-  const imageEmoji: Record<string, string> = {
-    beach_scene: "🏖️", market_scene: "🛒", night_scene: "🌙",
+  const sceneLabel: Record<string, string> = {
+    beach_scene: "Beach", market_scene: "Market", night_scene: "Night",
   };
 
   return (
     <ScrollView style={styles.quizBodyScroll} showsVerticalScrollIndicator={false}>
       <Text style={styles.progressLabel}>{pIdx + 1} / {prompts.length}</Text>
       <View style={styles.writePromptBox}>
-        <Text style={styles.writeEmoji}>{imageEmoji[prompt.image] ?? "🖼️"}</Text>
+        <Text style={styles.writeSceneLabel}>{sceneLabel[prompt.image] ?? "Scene"}</Text>
         <Text style={styles.writeDesc}>{prompt.description}</Text>
         <Text style={styles.writeVocabLabel}>{qt("requiredWords", quiz.nativeLang)}</Text>
         <View style={styles.writeVocabRow}>
@@ -951,7 +954,7 @@ function WritingQuizView({
           <Text style={styles.writeFeedback}>{feedback}</Text>
           <Pressable style={styles.submitBtn} onPress={advance}>
             <Text style={styles.submitBtnText}>
-              {quiz.nativeLang === "ko" ? "다음 →" : quiz.nativeLang === "es" ? "Siguiente →" : "Next →"}
+              {quiz.nativeLang === "ko" ? "다음" : quiz.nativeLang === "es" ? "Siguiente" : "Next"}
             </Text>
           </Pressable>
         </View>
@@ -1104,7 +1107,7 @@ function TimedBossView({
         <>
           <Pressable style={[styles.ttsBtn, playing && styles.ttsBtnActive]}
             onPress={() => playTTS(r.ttsScript ?? "", r.ttsVoice ?? "en-GB-SoniaNeural", apiBase, setPlaying)}>
-            <Ionicons name={playing ? "volume-high" : "play-circle"} size={28} color={playing ? "#fff" : C.gold} />
+            <View style={[styles.audioIndicator, playing && styles.audioIndicatorActive]} />
             <Text style={[styles.ttsBtnText, playing && { color: "#fff" }]}>
               {playing ? qt("playing", quiz.nativeLang) : "Play"}
             </Text>
@@ -1152,7 +1155,9 @@ function TimedBossView({
       return (
         <>
           <View style={styles.riddleBox}>
-            <Text style={styles.riddleEmoji}>🔍</Text>
+            <View style={styles.riddleMark}>
+              <Text style={styles.riddleMarkText}>?</Text>
+            </View>
             <Text style={styles.riddleText}>{r.text}</Text>
           </View>
           <TextInput style={styles.textInput} value={input} onChangeText={setInput}
@@ -1194,7 +1199,6 @@ function TimedBossView({
     <View style={styles.quizBody}>
       {/* Timer */}
       <View style={[styles.timerRow, { borderColor: urgentColor }]}>
-        <Ionicons name="timer" size={20} color={urgentColor} />
         <Text style={[styles.timerText, { color: urgentColor }]}>{timeLeft}s</Text>
         <Text style={styles.progressLabel}>
           {" "}{quiz.nativeLang === "ko" ? `라운드 ${round + 1}/${rounds.length}` : quiz.nativeLang === "es" ? `Ronda ${round + 1}/${rounds.length}` : `Round ${round + 1}/${rounds.length}`}
@@ -1211,7 +1215,7 @@ function TimedBossView({
       {feedback && (
         <View style={[styles.feedbackBanner, { backgroundColor: feedback === "correct" ? "#2e7d32" : "#c62828" }]}>
           <Text style={styles.feedbackText}>
-            {feedback === "correct" ? "✓ Correct!" : `✗ Answer: ${r.answer ?? "..."}`}
+            {feedback === "correct" ? "Correct!" : `Answer: ${r.answer ?? "..."}`}
           </Text>
         </View>
       )}
@@ -1235,7 +1239,7 @@ function PronunciationQuizView({
   const sentences = resolved?.sentences ?? [];
 
   const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : tl === "id" ? "id-ID" : "en-US";
-  const rudyMsg = nl === "ko" ? "루디가 듣고 있어요… 🦊" : nl === "es" ? "Rudy está escuchando… 🦊" : "Rudy is listening… 🦊";
+  const rudyMsg = nl === "ko" ? "루디가 듣고 있어요…" : nl === "es" ? "Rudy está escuchando…" : "Rudy is listening…";
 
   const [sIdx, setSIdx] = useState(0);
   const [recordState, setRecordState] = useState<"idle" | "recording" | "processing" | "done">("idle");
@@ -1446,11 +1450,7 @@ function PronunciationQuizView({
         {recordState === "processing" ? (
           <ActivityIndicator size="large" color={C.bg1} />
         ) : (
-          <Ionicons
-            name={recordState === "recording" ? "stop-circle" : "mic"}
-            size={40}
-            color={C.bg1}
-          />
+          <Text style={styles.micBtnText}>{recordState === "recording" ? "Stop" : "Speak"}</Text>
         )}
       </Pressable>
 
@@ -1472,11 +1472,11 @@ function PronunciationQuizView({
           <Text style={styles.pronScoreLabel}>/ 100</Text>
           {passed ? (
             <Text style={[styles.pronFeedbackLabel, { color: "#4caf50" }]}>
-              {nl === "ko" ? "🎉 훌륭해요!" : nl === "es" ? "🎉 ¡Excelente!" : "🎉 Excellent!"}
+              {nl === "ko" ? "훌륭해요!" : nl === "es" ? "¡Excelente!" : "Excellent!"}
             </Text>
           ) : (
             <Text style={[styles.pronFeedbackLabel, { color: "#f44336" }]}>
-              {nl === "ko" ? "다시 도전해볼게요 🦊" : nl === "es" ? "¡Inténtalo de nuevo! 🦊" : "Keep trying! 🦊"}
+              {nl === "ko" ? "다시 도전해볼게요" : nl === "es" ? "¡Inténtalo de nuevo!" : "Keep trying!"}
             </Text>
           )}
         </View>
@@ -1497,7 +1497,7 @@ function PronunciationQuizView({
             <Text style={[styles.pronNextText, !passed && { color: C.textMuted }]}>
               {isLast
                 ? (nl === "ko" ? "완료" : nl === "es" ? "Completar" : "Complete")
-                : (nl === "ko" ? "다음 →" : nl === "es" ? "Siguiente →" : "Next →")}
+                : (nl === "ko" ? "다음" : nl === "es" ? "Siguiente" : "Next")}
             </Text>
           </Pressable>
         </View>
@@ -1542,7 +1542,7 @@ function VoicePowerQuizView({
   const sentences: VoicePowerContent[] = contentRaw?.sentences ?? [];
 
   const speechLang = tl === "ko" ? "ko-KR" : tl === "es" ? "es-ES" : tl === "id" ? "id-ID" : "en-US";
-  const rudyMsg = nl === "ko" ? "수호석이 반응하고 있어… 🦊" : nl === "es" ? "La piedra reacciona… 🦊" : "The stone reacts… 🦊";
+  const rudyMsg = nl === "ko" ? "수호석이 반응하고 있어…" : nl === "es" ? "La piedra reacciona…" : "The stone reacts…";
 
   const [sIdx, setSIdx] = useState(0);
   const [recordState, setRecordState] = useState<"idle" | "recording" | "processing" | "done">("idle");
@@ -1747,9 +1747,7 @@ function VoicePowerQuizView({
             key={i}
             style={[vpStyles.stone, { backgroundColor: stoneColor, transform: [{ scale: pulseAnim }] }]}
           >
-            <Text style={vpStyles.stoneIcon}>
-              {stoneEffect === "blinding" ? "💎" : stoneEffect === "bright" ? "✨" : stoneEffect === "glow" ? "🔵" : "⚫"}
-            </Text>
+            <View style={vpStyles.stoneCore} />
           </Animated.View>
         ))}
       </View>
@@ -1779,7 +1777,7 @@ function VoicePowerQuizView({
         {recordState === "processing" ? (
           <ActivityIndicator size="large" color={C.bg1} />
         ) : (
-          <Ionicons name={recordState === "recording" ? "stop-circle" : "mic"} size={40} color={C.bg1} />
+          <Text style={styles.micBtnText}>{recordState === "recording" ? "Stop" : "Speak"}</Text>
         )}
       </Pressable>
 
@@ -1798,7 +1796,7 @@ function VoicePowerQuizView({
           <Text style={[styles.pronFeedbackLabel, { color: stoneColor }]}>
             {passed
               ? (nl === "ko" ? "수호석이 반응합니다!" : nl === "es" ? "La piedra reacciona!" : "The stone responds!")
-              : (nl === "ko" ? "더 강하게 말해보세요 🦊" : nl === "es" ? "Habla más fuerte 🦊" : "Speak louder! 🦊")}
+              : (nl === "ko" ? "더 강하게 말해보세요" : nl === "es" ? "Habla más fuerte" : "Speak louder!")}
           </Text>
         </View>
       )}
@@ -1814,7 +1812,7 @@ function VoicePowerQuizView({
           )}
           <Pressable style={[styles.pronNextBtn, !passed && { backgroundColor: C.bg3 }]} onPress={advance}>
             <Text style={[styles.pronNextText, !passed && { color: C.textMuted }]}>
-              {isLast ? (nl === "ko" ? "완료" : "Complete") : (nl === "ko" ? "다음 →" : "Next →")}
+              {isLast ? (nl === "ko" ? "완료" : "Complete") : (nl === "ko" ? "다음" : "Next")}
             </Text>
           </Pressable>
         </View>
@@ -1952,7 +1950,7 @@ Score 0-100. Check if student used required expressions naturally. Respond ONLY 
           <Text style={dbStyles.feedbackDetail}>{feedback.text}</Text>
           <Pressable style={styles.submitBtn} onPress={nextRound}>
             <Text style={styles.submitBtnText}>
-              {isLast ? (nl === "ko" ? "결과 보기" : "See Results") : (nl === "ko" ? "다음 라운드 →" : "Next Round →")}
+              {isLast ? (nl === "ko" ? "결과 보기" : "See Results") : (nl === "ko" ? "다음 라운드" : "Next Round")}
             </Text>
           </Pressable>
         </>
@@ -2146,7 +2144,9 @@ function NpcRescueQuizView({
 
       {/* NPC rescue banner */}
       <View style={nrStyles.rescueBanner}>
-        <Text style={nrStyles.rescueEmoji}>🆘</Text>
+        <View style={nrStyles.rescueBadge}>
+          <Text style={nrStyles.rescueBadgeText}>SOS</Text>
+        </View>
         <Text style={nrStyles.rescueText}>
           {nl === "ko" ? `${rescue.npcToRescue}을(를) 구출하세요!` : `Rescue ${rescue.npcToRescue}!`}
         </Text>
@@ -2168,7 +2168,7 @@ function NpcRescueQuizView({
         disabled={recordState === "processing" || recordState === "done"}
       >
         {recordState === "processing" ? <ActivityIndicator size="large" color={C.bg1} /> : (
-          <Ionicons name={recordState === "recording" ? "stop-circle" : "mic"} size={40} color={C.bg1} />
+          <Text style={styles.micBtnText}>{recordState === "recording" ? "Stop" : "Speak"}</Text>
         )}
       </Pressable>
 
@@ -2200,7 +2200,7 @@ function NpcRescueQuizView({
           )}
           <Pressable style={[styles.pronNextBtn, !passed && { backgroundColor: C.bg3 }]} onPress={advance}>
             <Text style={[styles.pronNextText, !passed && { color: C.textMuted }]}>
-              {isLast ? (nl === "ko" ? "완료" : "Complete") : (nl === "ko" ? "다음 단계 →" : "Next Stage →")}
+              {isLast ? (nl === "ko" ? "완료" : "Complete") : (nl === "ko" ? "다음 단계" : "Next Stage")}
             </Text>
           </Pressable>
         </View>
@@ -2240,20 +2240,20 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
   if (!quiz) return null;
 
   const typeLabel: Record<string, string> = {
-    word_rearrange: "🔤 Rearrange",
-    matching: "🔗 Matching",
-    fill_blank: "✏️ Fill Blank",
-    listening: "👂 Listening",
-    riddle: "🔍 Riddle",
-    roleplay: "💬 Roleplay",
-    writing: "📝 Writing",
-    timed: "⏱ Boss Quiz",
-    mixed: "🏆 Final Trial",
-    translation: "🌐 Translate",
-    pronunciation: "🎤 Pronunciation",
-    voice_power: "💎 Voice Power",
-    debate_battle: "⚔️ Debate",
-    npc_rescue: "🆘 Rescue",
+    word_rearrange: "Rearrange",
+    matching: "Matching",
+    fill_blank: "Fill Blank",
+    listening: "Listening",
+    riddle: "Riddle",
+    roleplay: "Roleplay",
+    writing: "Writing",
+    timed: "Boss Quiz",
+    mixed: "Final Trial",
+    translation: "Translate",
+    pronunciation: "Pronunciation",
+    voice_power: "Voice Power",
+    debate_battle: "Debate",
+    npc_rescue: "Rescue",
   };
 
   function renderQuiz() {
@@ -2302,7 +2302,7 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
         {/* Header */}
         <View style={styles.header}>
           <Pressable style={styles.closeBtn} onPress={onDismiss}>
-            <Ionicons name="close" size={22} color={C.textMuted} />
+            <Text style={styles.closeBtnText}>X</Text>
           </Pressable>
           <View style={styles.headerMid}>
             <View style={styles.typeBadge}>
@@ -2310,7 +2310,7 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
             </View>
             {quiz.isBoss && (
               <View style={styles.bossBadge}>
-                <Text style={styles.bossBadgeText}>⚔️ BOSS</Text>
+                <Text style={styles.bossBadgeText}>BOSS</Text>
               </View>
             )}
           </View>
@@ -2358,6 +2358,7 @@ const styles = StyleSheet.create({
     width: 36, height: 36, borderRadius: 10,
     backgroundColor: C.bg3, justifyContent: "center", alignItems: "center",
   },
+  closeBtnText: { fontSize: 14, fontFamily: F.label, color: C.textMuted },
   headerMid: { flex: 1, flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 10 },
   typeBadge: {
     backgroundColor: C.gold + "22", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10,
@@ -2395,7 +2396,10 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: C.border, alignItems: "center",
   },
   matchLeftText: { fontSize: 18, fontFamily: F.label, color: C.parchment },
-  matchArrow: { fontSize: 20, color: C.gold, textAlign: "center" },
+  matchDivider: {
+    width: 42, height: 3, borderRadius: 2, backgroundColor: C.gold,
+    alignSelf: "center", opacity: 0.8,
+  },
   choicesGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, justifyContent: "center" },
   choiceBtn: {
     paddingHorizontal: 18, paddingVertical: 12, borderRadius: 12,
@@ -2455,6 +2459,13 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: C.gold,
   },
   ttsBtnActive: { backgroundColor: C.gold },
+  audioIndicator: {
+    width: 14, height: 14, borderRadius: 7,
+    borderWidth: 2, borderColor: C.gold,
+  },
+  audioIndicatorActive: {
+    borderColor: "#fff", backgroundColor: "#fff",
+  },
   ttsBtnText: { fontSize: 15, fontFamily: F.bodySemi, color: C.gold },
   textInput: {
     backgroundColor: C.bg3, borderRadius: 12, padding: 14,
@@ -2467,7 +2478,13 @@ const styles = StyleSheet.create({
     backgroundColor: C.bg3, borderRadius: 16, padding: 20,
     alignItems: "center", gap: 10, borderWidth: 1, borderColor: C.border,
   },
-  riddleEmoji: { fontSize: 32 },
+  riddleMark: {
+    width: 34, height: 34, borderRadius: 17,
+    borderWidth: 1, borderColor: C.gold,
+    alignItems: "center", justifyContent: "center",
+    backgroundColor: C.gold + "1f",
+  },
+  riddleMarkText: { fontSize: 20, fontFamily: F.label, color: C.gold },
   riddleText: { fontSize: 16, fontFamily: F.body, color: C.parchment, lineHeight: 24, textAlign: "center" },
 
   // Roleplay
@@ -2500,9 +2517,10 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: C.border, maxHeight: 80,
   },
   sendBtn: {
-    width: 42, height: 42, borderRadius: 12, backgroundColor: C.gold,
-    justifyContent: "center", alignItems: "center",
+    minWidth: 58, height: 42, borderRadius: 12, backgroundColor: C.gold,
+    justifyContent: "center", alignItems: "center", paddingHorizontal: 10,
   },
+  sendBtnText: { fontSize: 13, fontFamily: F.label, color: C.bg1 },
 
   // Writing
   writePromptBox: {
@@ -2510,7 +2528,10 @@ const styles = StyleSheet.create({
     alignItems: "center", gap: 8, marginTop: 14, marginBottom: 12,
     borderWidth: 1, borderColor: C.border,
   },
-  writeEmoji: { fontSize: 40 },
+  writeSceneLabel: {
+    fontSize: 12, fontFamily: F.label, color: C.gold,
+    textTransform: "uppercase", letterSpacing: 1,
+  },
   writeDesc: { fontSize: 15, fontFamily: F.body, color: C.parchment, textAlign: "center" },
   writeVocabLabel: { fontSize: 12, fontFamily: F.body, color: C.textMuted },
   writeVocabRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, justifyContent: "center" },
@@ -2556,7 +2577,14 @@ const styles = StyleSheet.create({
   resultContainer: {
     flex: 1, justifyContent: "center", alignItems: "center", gap: 14, padding: 24,
   },
-  resultEmoji: { fontSize: 64 },
+  resultMark: {
+    minWidth: 78, minHeight: 42, borderRadius: 21,
+    borderWidth: 1.5, alignItems: "center", justifyContent: "center",
+    paddingHorizontal: 16,
+  },
+  resultMarkPassed: { borderColor: "#4caf50", backgroundColor: "#4caf5030" },
+  resultMarkRetry: { borderColor: C.gold, backgroundColor: C.gold + "24" },
+  resultMarkText: { fontSize: 15, fontFamily: F.label, color: C.parchment },
   resultTitle: { fontSize: 24, fontFamily: F.label, color: C.parchment },
   resultScore: { fontSize: 56, fontFamily: F.label, color: C.gold },
   resultSub: { fontSize: 16, fontFamily: F.body, color: C.textMuted },
@@ -2593,6 +2621,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#c62828",
     shadowColor: "#c62828", shadowOpacity: 0.5, shadowRadius: 16,
   },
+  micBtnText: {
+    fontSize: 13, fontFamily: F.label, color: C.bg1,
+    textTransform: "uppercase", letterSpacing: 0,
+  },
   pronStatusText: { fontSize: 14, fontFamily: F.body, color: C.textMuted },
   pronScoreBox: {
     alignItems: "center", borderWidth: 2, borderRadius: 16,
@@ -2626,7 +2658,10 @@ const vpStyles = StyleSheet.create({
     justifyContent: "center", alignItems: "center",
     shadowOpacity: 0.6, shadowRadius: 12, elevation: 8,
   },
-  stoneIcon: { fontSize: 22 },
+  stoneCore: {
+    width: 18, height: 18, borderRadius: 9,
+    backgroundColor: "rgba(255,255,255,0.7)",
+  },
   stoneLabel: {
     fontSize: 14, fontFamily: F.label, textAlign: "center",
   },
@@ -2670,7 +2705,13 @@ const nrStyles = StyleSheet.create({
     backgroundColor: "#c62828" + "22", borderRadius: 12,
     paddingHorizontal: 16, paddingVertical: 8,
   },
-  rescueEmoji: { fontSize: 24 },
+  rescueBadge: {
+    minWidth: 38, minHeight: 26, borderRadius: 6,
+    alignItems: "center", justifyContent: "center",
+    borderWidth: 1, borderColor: "#c62828",
+    backgroundColor: "rgba(198,40,40,0.14)",
+  },
+  rescueBadgeText: { fontSize: 11, fontFamily: F.label, color: "#c62828" },
   rescueText: {
     fontSize: 15, fontFamily: F.label, color: "#c62828",
   },

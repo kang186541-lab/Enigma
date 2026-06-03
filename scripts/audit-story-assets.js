@@ -7,7 +7,7 @@ const { pathToFileURL } = require("url");
 const zlib = require("zlib");
 
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-const GROUP_ORDER = ["intro", "portrait", "boss", "legacy"];
+const GROUP_ORDER = ["intro", "background", "portrait", "character", "sheet", "boss", "legacy"];
 
 function usage() {
   return [
@@ -119,6 +119,15 @@ function classifyAsset(relativeToAssetRoot) {
   const chapterMatch = normalized.match(/chapter(\d+)_motion_comic/i) ?? filename.match(/^ch(\d+)_/i);
   const chapter = chapterMatch ? `ch${chapterMatch[1]}` : "";
 
+  if (/^dialogue_backgrounds\//.test(normalized)) {
+    return { group: "background", chapter: "shared" };
+  }
+  if (/^characters\/_sheets\//.test(normalized)) {
+    return { group: "sheet", chapter };
+  }
+  if (/^characters\//.test(normalized)) {
+    return { group: "character", chapter };
+  }
   if (/^ch\d+_intro_/.test(filename)) {
     return { group: "intro", chapter };
   }

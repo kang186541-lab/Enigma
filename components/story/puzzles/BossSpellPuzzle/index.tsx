@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
-import { Ionicons } from "@expo/vector-icons";
 
 import { C, F } from "@/constants/theme";
 
@@ -245,7 +244,7 @@ export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }
         return newMistakes;
       });
     }
-    // outcome === "ignored" → tap is duplicate or out-of-bounds; stay silent.
+    // outcome === "ignored" means tap is duplicate or out-of-bounds; stay silent.
   }, [autoPlaceForMistakes, completing, playCue, question.spellChunks, triggerWrong]);
 
   useEffect(() => {
@@ -328,7 +327,6 @@ export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }
           <Text style={styles.instruction}>{tri(question.instruction, lang)}</Text>
         </View>
         <Pressable style={styles.resetBtn} onPress={reset} disabled={completing}>
-          <Ionicons name="refresh" size={15} color={C.gold} />
           <Text style={styles.resetText}>{lang === "korean" ? "초기화" : lang === "spanish" ? "Reiniciar" : "Reset"}</Text>
         </Pressable>
       </View>
@@ -369,7 +367,7 @@ export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }
       <View style={styles.bottomPanel}>
         <View style={styles.rudyHint}>
           <View style={styles.rudyOrb}>
-            <Text style={styles.rudyEmoji}>🦊</Text>
+            <Text style={styles.rudyInitial}>R</Text>
           </View>
           <View style={styles.hintBubble}>
             <Text style={styles.hintSpeaker}>Rudy</Text>
@@ -739,8 +737,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  rudyEmoji: {
-    fontSize: 28,
+  rudyInitial: {
+    fontSize: 20,
+    color: C.gold,
+    fontFamily: F.header,
   },
   hintBubble: {
     flex: 1,
