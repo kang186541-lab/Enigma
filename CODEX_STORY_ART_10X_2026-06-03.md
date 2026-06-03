@@ -242,6 +242,7 @@ assets/story/characters/isabel/isabel_shocked_concern.png
 assets/story/characters/isabel/isabel_rallying_energy.png
 assets/story/characters/isabel/isabel_playful_confidence.png
 assets/story/characters/penny/penny_brave_resolve.png
+assets/story/characters/hassan/hassan_memory_storyteller.png
 ```
 
 `SeqScene.expression` now lets a story beat choose a character sprite variant. `Character.portraitVariants` maps those authored expressions to runtime images.
@@ -268,11 +269,12 @@ Visual verification:
 - Isabel now has authored `playful`, `shocked`, and `rallying` sprites. In the active Madrid route, `shocked` is wired to the Carlos disappearance report and sealed-stage reveal, `playful` is wired to the red-flag heartbeat beat and restored-festival goodbye, and Babel's "one voice is not a festival" callback keeps `rallying`. The legacy Madrid block still uses `shocked` for the Carlos phone account and unknown-basic-phrases line.
 - Mr. Black now has authored `tired` and `remorse` sprites. Babel's first direct confrontation uses `tired` for the "did anyone ever look at you like you mattered?" reveal, while the mother/lullaby scenes keep `remorse`.
 - Penny now has authored `anxious` and `brave` sprites. `anxious` remains wired to her confession that she believed the Universal Code would help; `brave` is wired to her final moral-resolution line that Mr. Black must answer, but not as a monster.
-- Latest asset audit: 97 story PNGs, 206,183,635 bytes total, 27 character assets, warnings 0.
+- Hassan now has an authored `storyteller` sprite. It is intentionally limited to two active-route memory beats: Cairo's Nubian/Arabic/French lullaby scene and Babel's "A lullaby is not information" callback, so the pose lands as a thematic reprise rather than a generic replacement.
+- Latest asset audit: 98 story PNGs, 207,734,879 bytes total, 28 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Eleanor, Isabel, Mr. Black, and Penny now each have multiple authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast. Goodall's next recommended high-impact active-route target is Hassan's Cairo/Babel memory-storyteller pose.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy, Eleanor, Isabel, Mr. Black, Penny, and Hassan now each have authored emotional poses, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the remaining recurring cast.
 
 ## QA Command
 

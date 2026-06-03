@@ -72,6 +72,7 @@ const mrBlackTiredRevealImg = require("@/assets/story/characters/mr_black/mr_bla
 const isabelShockedConcernImg = require("@/assets/story/characters/isabel/isabel_shocked_concern.png");
 const isabelRallyingEnergyImg = require("@/assets/story/characters/isabel/isabel_rallying_energy.png");
 const isabelPlayfulConfidenceImg = require("@/assets/story/characters/isabel/isabel_playful_confidence.png");
+const hassanMemoryStorytellerImg = require("@/assets/story/characters/hassan/hassan_memory_storyteller.png");
 const bgLondonMuseumHallImg = require("@/assets/story/dialogue_backgrounds/london_museum_hall.png");
 const bgMadridFestivalPlazaImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_plaza.png");
 const bgMadridFestivalDrainedImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_drained.png");
@@ -96,6 +97,10 @@ const isabelExpressionSprites = {
   playful: isabelPlayfulConfidenceImg,
   shocked: isabelShockedConcernImg,
   rallying: isabelRallyingEnergyImg,
+};
+
+const hassanExpressionSprites = {
+  storyteller: hassanMemoryStorytellerImg,
 };
 
 const mrBlackExpressionSprites = {
@@ -299,7 +304,11 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying" | "playful" | "storyteller";
+
+const characterExpressionFallbacks: Partial<Record<string, Partial<Record<StoryCharacterExpression, ImageSourcePropType>>>> = {
+  hassan: hassanExpressionSprites,
+};
 
 /* Sequence items */
 type SeqScene = {
@@ -4509,6 +4518,7 @@ const CAIRO_V21_STORY: Story = {
       kind: "scene",
       charId: "hassan",
       backdrop: "cairo-hospital-record",
+      expression: "storyteller",
       text: "My mother's mother sang a lullaby in Nubian, Arabic, and French. I remember only one line. My son remembers the tune. My granddaughter remembers the hand motion. Together, we still have the song.",
       textKo: "제 어머니의 어머니는 누비아어, 아랍어, 프랑스어로 자장가를 불렀습니다. 저는 한 줄만 기억해요. 제 아들은 멜로디를 기억하고, 제 손녀는 손동작을 기억하죠. 함께라면 아직 그 노래가 남아 있습니다.",
       textEs: "La madre de mi madre cantaba una nana en nubio, árabe y francés. Yo recuerdo solo una línea. Mi hijo recuerda la melodía. Mi nieta recuerda el gesto de la mano. Juntos, todavía tenemos la canción.",
@@ -5136,6 +5146,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "hassan",
       backdrop: "babel-language-gates",
+      expression: "storyteller",
       text: "A lullaby is not information. It is a hand on a forehead.",
       textKo: "자장가는 정보가 아닙니다. 이마 위에 얹힌 손이에요.",
       textEs: "Una nana no es información. Es una mano sobre la frente.",
@@ -7343,7 +7354,7 @@ export default function StoryScene() {
     ? story.characters.find((c) => c.id === item.charId) ?? story.characters[0]
     : story.characters[0];
   const activePortrait = item.kind === "scene" && item.expression
-    ? character.portraitVariants?.[item.expression] ?? character.portrait
+    ? character.portraitVariants?.[item.expression] ?? characterExpressionFallbacks[character.id]?.[item.expression] ?? character.portrait
     : character.portrait;
 
   function getSceneText(it: SeqScene) {
