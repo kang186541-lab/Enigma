@@ -604,6 +604,7 @@ function PhoneOverlay({ lines, lang }: { lines: string[]; lang: NativeLanguage }
 function WordOverlay({ word, variant }: { word: string; variant: "open" | "find" }) {
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.74)).current;
+  const textFitStyle = getWordOverlayFitStyle(word, variant);
 
   useEffect(() => {
     Animated.sequence([
@@ -630,12 +631,28 @@ function WordOverlay({ word, variant }: { word: string; variant: "open" | "find"
       style={[
         styles.word,
         variant === "open" ? styles.openWord : styles.findWord,
-        { opacity, transform: [{ scale }] },
+        textFitStyle,
+        { opacity, transform: variant === "find" ? [{ scale }, { rotate: "-2deg" }] : [{ scale }] },
       ]}
     >
       {word}
     </Animated.Text>
   );
+}
+
+function getWordOverlayFitStyle(word: string, variant: "open" | "find") {
+  const length = Array.from(word).length;
+  const hasWideGlyphs = /[^\x00-\x7F]/.test(word);
+  if (variant === "find") {
+    return {
+      fontSize: length >= 8 ? 20 : length >= 6 ? 22 : 24,
+      letterSpacing: hasWideGlyphs ? 1.2 : length >= 7 ? 2 : 4,
+    };
+  }
+  return {
+    fontSize: length >= 8 ? 34 : length >= 7 ? 37 : length >= 6 ? 40 : 44,
+    letterSpacing: hasWideGlyphs ? 1.4 : length >= 7 ? 2 : 4,
+  };
 }
 
 function ColdSenseOverlay() {
@@ -939,8 +956,12 @@ const styles = StyleSheet.create({
     color: "#ffe9a4",
     fontFamily: F.title,
     fontWeight: "900",
-    letterSpacing: 5,
+    includeFontPadding: false,
+    left: "8%",
+    letterSpacing: 4,
     position: "absolute",
+    right: "8%",
+    textAlign: "center",
     textShadowColor: "rgba(255,209,102,0.9)",
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 24,
@@ -948,14 +969,11 @@ const styles = StyleSheet.create({
   },
   openWord: {
     fontSize: 44,
-    left: "49%",
     top: "36%",
   },
   findWord: {
     fontSize: 24,
-    left: "45%",
     top: "70%",
-    transform: [{ rotate: "-2deg" }],
   },
   coldSense: {
     ...StyleSheet.absoluteFillObject,
