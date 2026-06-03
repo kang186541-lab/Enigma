@@ -212,6 +212,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         body: JSON.stringify({
           systemPrompt: data.gptPrompt,
           targetLang: learningLang,
+          nativeLang: lc,
           messages: history,
         }),
       });

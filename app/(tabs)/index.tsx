@@ -218,27 +218,10 @@ export default function HomeScreen() {
   const shimmerX  = useRef(new Animated.Value(-200)).current;
   const fireScale = useRef(new Animated.Value(1)).current;
   const flickerOp = useRef(new Animated.Value(1)).current;
-  const firstTimerAutoExpandedRef = useRef(false);
 
   useEffect(() => {
     Animated.spring(xpAnim, { toValue: progress, useNativeDriver: false, tension: 40, friction: 8 }).start();
   }, [stats.xp]);
-
-  // True first-timers (no XP, never had a session) should immediately see the
-  // structured curriculum (Rudy Training Camp / Story / NPC / stats) that is
-  // otherwise tucked behind the "more practice" gate during focus mode. Auto-
-  // expand the secondary sections exactly once for them; returning users keep
-  // focus mode. Wait for lastSessionDate to hydrate (null = not yet loaded)
-  // before deciding, so we don't misclassify a returning user as new.
-  useEffect(() => {
-    if (firstTimerAutoExpandedRef.current) return;
-    if (lastSessionDate === null && stats.xp > 0) return;
-    const isTrueFirstTimer = stats.xp === 0 && !lastSessionDate;
-    if (isTrueFirstTimer) {
-      firstTimerAutoExpandedRef.current = true;
-      setShowMorePractice(true);
-    }
-  }, [stats.xp, lastSessionDate]);
 
   const refreshBasicCourseCompleted = React.useCallback(async (profile?: LearnerProfile) => {
     const key = `basicCourseCompleted_${effectiveLearningLang}`;

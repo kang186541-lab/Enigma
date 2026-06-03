@@ -7192,6 +7192,7 @@ export default function StoryScene() {
   const backdropDriftAnim = useRef(new Animated.Value(0)).current;
   const lastDialogueStageKeyRef = useRef<string | null>(null);
   const bgmRef = useRef<Audio.Sound | null>(null);
+  const advanceRef = useRef<(() => void) | null>(null);
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
   const introSupported = hasIntroTimeline(story.id);
@@ -7201,6 +7202,7 @@ export default function StoryScene() {
   const audioMuted = mute === "1" || mute === "true";
   const compactStoryLayout = viewportHeight < 720 || viewportWidth < 370;
   const dialogueMaxHeight = compactStoryLayout ? 116 : 160;
+  const narrationMaxHeight = compactStoryLayout ? 210 : Math.min(320, Math.max(220, viewportHeight * 0.42));
 
   async function awardXp(amount: number, source: string) {
     try {
@@ -7384,6 +7386,8 @@ export default function StoryScene() {
   const [typingDone, setTypingDone] = useState(false);
   const [dialogueViewportHeight, setDialogueViewportHeight] = useState(0);
   const [dialogueContentHeight, setDialogueContentHeight] = useState(0);
+  const [narrationViewportHeight, setNarrationViewportHeight] = useState(0);
+  const [narrationContentHeight, setNarrationContentHeight] = useState(0);
 
   // Reentrancy guard for advance(). Without this, rapid taps queue multiple
   // fadeTransition callbacks each calling setSeqIdx(i => i + 1), so the user
@@ -7410,6 +7414,8 @@ export default function StoryScene() {
     setTypingDone(false);
     setDialogueViewportHeight(0);
     setDialogueContentHeight(0);
+    setNarrationViewportHeight(0);
+    setNarrationContentHeight(0);
     puzzleSolvingRef.current = false;
   }, [seqIdx]);
 
@@ -7424,6 +7430,18 @@ export default function StoryScene() {
   }, []);
 
   const dialogueNeedsScroll = dialogueViewportHeight > 0 && dialogueContentHeight > dialogueViewportHeight + 6;
+
+  const handleNarrationViewportLayout = useCallback((event: LayoutChangeEvent) => {
+    const nextHeight = Math.round(event.nativeEvent.layout.height);
+    setNarrationViewportHeight((current) => (current === nextHeight ? current : nextHeight));
+  }, []);
+
+  const handleNarrationContentSizeChange = useCallback((_width: number, height: number) => {
+    const nextHeight = Math.round(height);
+    setNarrationContentHeight((current) => (current === nextHeight ? current : nextHeight));
+  }, []);
+
+  const narrationNeedsScroll = narrationViewportHeight > 0 && narrationContentHeight > narrationViewportHeight + 6;
 
   useEffect(() => {
     const currentItem = seq[seqIdx];
@@ -7501,6 +7519,32 @@ export default function StoryScene() {
   // advancingRef and markChapterComplete/awardXp resolving. Without this,
   // a rapid double-tap on the chapter-end button used to award +150 XP
   // twice.
+  advanceRef.current = advance;
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    if (introStatus !== "hidden" || completed) return;
+
+    const currentItem = seq[seqIdx];
+    if (currentItem?.kind === "puzzle") return;
+
+    function handleStoryKeyDown(event: KeyboardEvent) {
+      if (event.defaultPrevented) return;
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      if (event.key !== "Enter" && event.key !== " ") return;
+
+      const target = event.target as HTMLElement | null;
+      const tagName = target?.tagName?.toLowerCase();
+      if (tagName === "input" || tagName === "textarea" || tagName === "select" || target?.isContentEditable) return;
+
+      event.preventDefault();
+      advanceRef.current?.();
+    }
+
+    window.addEventListener("keydown", handleStoryKeyDown);
+    return () => window.removeEventListener("keydown", handleStoryKeyDown);
+  }, [completed, introStatus, seq, seqIdx]);
+
   const finishingRef = useRef(false);
   async function finishChapter() {
     if (finishingRef.current) return;
@@ -7749,13 +7793,30 @@ export default function StoryScene() {
         {/* NARRATION */}
         {item.kind === "scene" && item.isNarration && (
           <Pressable style={styles.narrationArea} onPress={advance}>
-            <Typewriter
-              ref={typewriterRef}
-              text={getSceneText(item)}
-              speedMs={25}
-              textStyle={styles.narrationText}
-              onComplete={() => setTypingDone(true)}
-            />
+            <View style={styles.narrationTextViewport} onLayout={handleNarrationViewportLayout}>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={[styles.narrationScroll, { maxHeight: narrationMaxHeight }]}
+                onContentSizeChange={handleNarrationContentSizeChange}
+              >
+                <Typewriter
+                  ref={typewriterRef}
+                  text={getSceneText(item)}
+                  speedMs={25}
+                  textStyle={styles.narrationText}
+                  onComplete={() => setTypingDone(true)}
+                />
+              </ScrollView>
+              {narrationNeedsScroll && (
+                <LinearGradient
+                  pointerEvents="none"
+                  colors={["rgba(7,8,13,0)", "rgba(7,8,13,0.72)"]}
+                  style={styles.narrationScrollFade}
+                >
+                  <View style={styles.narrationScrollCue} />
+                </LinearGradient>
+              )}
+            </View>
             <View style={styles.narrationBtn}>
               <Text style={styles.narrationBtnText}>
                 {typingDone
@@ -8124,6 +8185,31 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     fontStyle: "italic",
     letterSpacing: 0.3,
+  },
+  narrationTextViewport: {
+    position: "relative",
+    width: "100%",
+    maxWidth: 760,
+    overflow: "hidden",
+  },
+  narrationScroll: {
+    flexGrow: 0,
+  },
+  narrationScrollFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingBottom: 4,
+  },
+  narrationScrollCue: {
+    width: 24,
+    height: 2,
+    borderRadius: 2,
+    backgroundColor: "rgba(255,226,144,0.62)",
   },
   narrationBtn: {
     backgroundColor: "rgba(201,162,39,0.15)",
