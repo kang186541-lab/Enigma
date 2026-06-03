@@ -310,7 +310,8 @@ Visual verification:
 - Follow-up localized-overlay fit pass: large intro word overlays are now centered within a stable horizontal safe area and shrink letter size/spacing for longer translated words such as `ESCRIBIÓ`, `PUERTAS`, `GERBANG`, and `RECUERDA`, reducing mobile clipping risk without changing story text, quiz data, sequence/progression, provider routing, or Japanese scope.
 - Follow-up intro accessibility pass: all 35 motion-comic shot `accessibilityLabel` strings are now localized for supported `ko/en/es/id` users, and `StoryIntroMotionComic` resolves the label at render time. This closes the remaining English-only image-description layer for screen-reader users without changing visible story text, quiz data, sequence/progression, provider routing, or Japanese scope.
 - Regression guard pass: `scripts/verify-story-intro-localization.ts` now locks the intro localization contract in CI-style verification. It asserts all 35 shot accessibility labels, phone overlays, word overlays, final dialogue, villain messages, and intro copy stay localized for supported `ko/en/es/id`; it also asserts the renderer keeps native-language overlay routing and mobile-safe word fit styling. `npm run verify:quality` now runs this guard before web-export verification.
-- Latest asset audit: 110 story PNGs, 218.39 MB total, 40 character assets, warnings 0.
+- Legacy cleanup pass: removed the unused `MotionComicPrologue` component, the old `storyAssetManifest` preview manifest, and seven obsolete Ch1 preview PNGs (`shot01`-`shot06` plus prototype `mr_black_portrait`). This eliminates the old six-stone preview path and leaves the active story runtime on `StoryIntroMotionComic` + chapter timelines only.
+- Latest asset audit: 103 story PNGs, 203.03 MB total, 40 character assets, legacy assets 0, warnings 0.
 
 Remaining visual gap:
 
@@ -326,14 +327,14 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 110 PNG files.
-- 218.39 MB total.
+- 103 PNG files.
+- 203.03 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
-- portrait: 15 files, 30.28 MB, 13.7% average brightness.
+- portrait: 14 files, 27.82 MB, 11.5% average brightness.
 - character: 40 files, 69.44 MB, 26.0% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
-- legacy: 6 files, 12.89 MB, 13.4% average brightness.
+- legacy: 0 files.
 
 Art direction implication: the current image set is very dark. Future generated assets should keep the mystery atmosphere but push faces, hands, props, and clue objects into a brighter readable value range for mobile.
