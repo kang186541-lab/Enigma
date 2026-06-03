@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { Audio } from "expo-av";
+import { Asset } from "expo-asset";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -49,6 +50,20 @@ const CUE_ASSETS = {
   guitar: require("@/assets/sounds/cue_guitar.wav"),
 } as Record<CueKey, number>;
 
+function prefetchImageSource(source: ImageSourcePropType | undefined) {
+  if (!source) return;
+
+  try {
+    if (typeof source === "object" && !Array.isArray(source) && typeof source.uri === "string") {
+      Image.prefetch(source.uri).catch(() => {});
+      return;
+    }
+    Asset.fromModule(source as number).downloadAsync().catch(() => {});
+  } catch {
+    // Prefetch is a performance hint only; never block story playback.
+  }
+}
+
 export default function StoryIntroMotionComic({
   chapterId,
   nativeLang,
@@ -67,7 +82,7 @@ export default function StoryIntroMotionComic({
   const skipOpacity = useRef(new Animated.Value(0)).current;
 
   const timeline = useMemo(() => getIntroTimeline(chapterId), [chapterId]);
-  const shots = timeline?.shots ?? [];
+  const shots = useMemo(() => timeline?.shots ?? [], [timeline]);
   const currentShot = shots[shotIndex] ?? shots[0];
   const copy = getLocalizedCopy(nativeLang, timeline);
 
@@ -149,6 +164,18 @@ export default function StoryIntroMotionComic({
   useEffect(() => {
     if (!timeline) finish("completed");
   }, [finish, timeline]);
+
+  useEffect(() => {
+    prefetchImageSource(shots[0]?.source);
+    prefetchImageSource(shots[1]?.source);
+    prefetchImageSource(timeline?.portraitImage);
+    prefetchImageSource(timeline?.spiritImage);
+  }, [shots, timeline]);
+
+  useEffect(() => {
+    prefetchImageSource(shots[shotIndex + 1]?.source);
+    prefetchImageSource(shots[shotIndex + 2]?.source);
+  }, [shotIndex, shots]);
 
   useEffect(() => {
     finishedRef.current = false;

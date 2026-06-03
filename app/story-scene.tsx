@@ -7159,6 +7159,7 @@ export default function StoryScene() {
   const stageFloatAnim = useRef(new Animated.Value(0)).current;
   const speakerPulseAnim = useRef(new Animated.Value(0)).current;
   const backdropDriftAnim = useRef(new Animated.Value(0)).current;
+  const lastDialogueStageKeyRef = useRef<string | null>(null);
   const bgmRef = useRef<Audio.Sound | null>(null);
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -7201,6 +7202,21 @@ export default function StoryScene() {
   }, [backdropDriftAnim, stageFloatAnim]);
 
   useEffect(() => {
+    const currentItem = story.sequence[seqIdx];
+    if (currentItem?.kind !== "scene" || currentItem.isNarration) {
+      lastDialogueStageKeyRef.current = null;
+      stageEnterAnim.setValue(1);
+      return;
+    }
+
+    const backdropId = currentItem.backdrop ?? getDefaultAdventureBackdrop(story.id);
+    const stageKey = `${story.id}:${currentItem.charId}:${currentItem.expression ?? "neutral"}:${backdropId}`;
+    if (lastDialogueStageKeyRef.current === stageKey) {
+      stageEnterAnim.setValue(1);
+      return;
+    }
+
+    lastDialogueStageKeyRef.current = stageKey;
     stageEnterAnim.setValue(0);
     Animated.spring(stageEnterAnim, {
       toValue: 1,
@@ -7208,7 +7224,7 @@ export default function StoryScene() {
       tension: 58,
       friction: 10,
     }).start();
-  }, [seqIdx, stageEnterAnim]);
+  }, [seqIdx, stageEnterAnim, story]);
 
   const completeIntro = useCallback(async () => {
     try {
