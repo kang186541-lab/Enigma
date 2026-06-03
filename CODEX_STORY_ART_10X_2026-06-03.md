@@ -105,7 +105,7 @@ A story asset is 10/10 only if all five are true:
 
 Generate these before replacing broad chapter art:
 
-- Rudy: neutral guide, worried detective, celebratory coach.
+- Rudy: neutral guide, worried detective, celebratory coach. `[DONE: worried + celebratory runtime sprites]`
 - Mr. Black: silhouette menace, tired reveal, fragile remorse.
 - Eleanor: calm mentor, urgent warning, analytical discovery.
 - Penny: warm guide, anxious final clue, brave resolve.
@@ -233,6 +233,8 @@ New authored expression sprites:
 ```text
 assets/story/characters/penny/penny_anxious_final_clue.png
 assets/story/characters/mr_black/mr_black_fragile_remorse.png
+assets/story/characters/rudy/rudy_worried_detective.png
+assets/story/characters/rudy/rudy_celebratory_coach.png
 ```
 
 `SeqScene.expression` now lets a story beat choose a character sprite variant. `Character.portraitVariants` maps those authored expressions to runtime images.
@@ -252,10 +254,14 @@ Visual verification:
 - Two Babel frames captured 2.6s apart changed 435,605 pixels out of 1,024,000, confirming the background/character idle motion is active.
 - Local web capture confirmed Penny's `anxious` sprite in her "I was your student" confession scene.
 - Local web capture confirmed Mr. Black's `remorse` sprite in his mother/lullaby reveal scene.
+- Rudy now has authored `worried` and `celebratory` sprites wired through the same expression system; Madrid's first Rudy scene uses `worried`, London reward beats and Babel's final reflection use `celebratory`.
+- Local web capture confirmed Madrid 2/21 renders `rudy_worried_detective` over the drained-plaza backdrop: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\rudy-worried-madrid.png`.
+- Web bundle verification confirmed both Rudy expression assets are emitted: `rudy_worried_detective.af3781...png` and `rudy_celebratory_coach.79b8...png`.
+- Latest asset audit: 90 story PNGs, 197,409,842 bytes total, 20 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Penny and Mr. Black now have one authored expression each, but true Ace Attorney-quality integration still needs transparent expression/action sheets for the main cast.
+- Most dialogue sprites are still cutouts from the current portrait set, not purpose-built action poses. Rudy now has two authored emotional poses, and Penny/Mr. Black have one each, but true Ace Attorney-quality integration still needs transparent expression/action sheets for Eleanor, Isabel, and the remaining recurring cast.
 
 ## QA Command
 

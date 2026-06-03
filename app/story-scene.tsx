@@ -61,6 +61,8 @@ const ch4BlackPartialPortraitImg = require("@/assets/story/dialogue_sprites/ch4_
 const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
 const ch5PennyPortraitImg = require("@/assets/story/dialogue_sprites/ch5_penny_sprite.png");
 const ch5BlackFaceImg = require("@/assets/story/dialogue_sprites/ch5_black_face_sprite.png");
+const rudyWorriedDetectiveImg = require("@/assets/story/characters/rudy/rudy_worried_detective.png");
+const rudyCelebratoryCoachImg = require("@/assets/story/characters/rudy/rudy_celebratory_coach.png");
 const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
 const mrBlackFragileRemorseImg = require("@/assets/story/characters/mr_black/mr_black_fragile_remorse.png");
 const bgLondonMuseumHallImg = require("@/assets/story/dialogue_backgrounds/london_museum_hall.png");
@@ -72,6 +74,11 @@ const bgCairoArchiveRoomImg = require("@/assets/story/dialogue_backgrounds/cairo
 const bgCairoHospitalRecordImg = require("@/assets/story/dialogue_backgrounds/cairo_hospital_record.png");
 const bgBabelTowerCoreImg = require("@/assets/story/dialogue_backgrounds/babel_tower_core.png");
 const bgBabelLanguageGatesImg = require("@/assets/story/dialogue_backgrounds/babel_language_gates.png");
+
+const rudyExpressionSprites = {
+  worried: rudyWorriedDetectiveImg,
+  celebratory: rudyCelebratoryCoachImg,
+};
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
 // Keyed by "text::lang". Sounds are loaded in advance; on press we just replay.
@@ -264,7 +271,7 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "remorse";
+type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "worried" | "celebratory";
 
 /* Sequence items */
 type SeqScene = {
@@ -633,6 +640,8 @@ const STORIES: Record<string, Story> = {
         side: "left",
         avatarBg: "#2c1810",
         isLingo: true,
+        portrait: rudyStoryImg,
+        portraitVariants: rudyExpressionSprites,
       },
       {
         id: "tom",
@@ -1065,6 +1074,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
+        expression: "celebratory",
         text: "You did it. The sentence holds. The door heard you. Look, partner... that glow is not the stone itself. It is a shard. A little piece the London Stone refused to give him.",
         textKo: "해냈어. 문장이 버텼어. 문이 네 말을 들었어. 봐, 파트너... 저 빛은 돌 자체가 아니야. 파편이야. London Stone이 그에게 넘겨주길 거부한 작은 조각.",
         textKoMix: "해냈어. sentence가 버텼어. 문이 네 말을 들었어. 저건 stone 자체가 아니야. shard야. London Stone이 넘겨주길 거부한 조각.",
@@ -1111,6 +1121,7 @@ const STORIES: Record<string, Story> = {
       {
         kind: "scene",
         charId: "lingo",
+        expression: "celebratory",
         text: "Seven stones are still a rumor, not proof. Good. Rumors can be investigated. For now we have one shard, one missing doctor, and one city name. Partner... Thank you. Our first spell worked.",
         textKo: "일곱 개의 돌은 아직 증거가 아니라 소문이야. 좋아. 소문은 조사할 수 있어. 지금 우리에게 있는 건 파편 하나, 실종된 박사님 한 명, 그리고 도시 이름 하나. 파트너... Thank you. 우리의 첫 주문이 통했어.",
         textKoMix: "일곱 개의 돌은 아직 proof가 아니라 rumor야. 지금 있는 건 shard 하나, missing doctor 한 명, city name 하나. Partner... Thank you. 첫 spell이 통했어.",
@@ -1174,6 +1185,8 @@ const STORIES: Record<string, Story> = {
         side: "left",
         avatarBg: "#2c1810",
         isLingo: true,
+        portrait: rudyStoryImg,
+        portraitVariants: rudyExpressionSprites,
       },
       {
         id: "isabel",
@@ -2032,6 +2045,8 @@ const STORIES: Record<string, Story> = {
         side: "left",
         avatarBg: "#2c1810",
         isLingo: true,
+        portrait: rudyStoryImg,
+        portraitVariants: rudyExpressionSprites,
       },
       {
         id: "sujin",
@@ -2729,7 +2744,7 @@ const STORIES: Record<string, Story> = {
         "clause per line. At this level learners handle most communication independently.",
     },
     characters: [
-      { id: "lingo",    emoji: "🦊",  name: "Detective Rudy",  nameKo: "루디 탐정",    nameId: "Detektif Rudy",   side: "left",  avatarBg: "#2c1810", isLingo: true },
+      { id: "lingo",    emoji: "🦊",  name: "Detective Rudy",  nameKo: "루디 탐정",    nameId: "Detektif Rudy",   side: "left",  avatarBg: "#2c1810", isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
       { id: "amira",    emoji: "👩‍🏫", name: "Professor Amira", nameKo: "아미라 교수",  nameId: "Profesor Amira",  side: "right", avatarBg: "#2A1A00" },
       { id: "hassan",   emoji: "🧑‍🤝‍🧑", name: "Hassan",         nameKo: "하산",         nameId: "Hassan",          side: "right", avatarBg: "#1A1500" },
       { id: "penny",    emoji: "📚",  name: "Miss Penny",      nameKo: "미스 페니",    nameId: "Miss Penny",      side: "right", avatarBg: "#1A0A2A" },
@@ -3119,7 +3134,7 @@ const STORIES: Record<string, Story> = {
         "Learners at this level should handle full target-language dialogue.",
     },
     characters: [
-      { id: "lingo",    emoji: "🦊",  name: "Detective Rudy",  nameKo: "루디 탐정",    nameId: "Detektif Rudy",  side: "left",  avatarBg: "#2c1810", isLingo: true },
+      { id: "lingo",    emoji: "🦊",  name: "Detective Rudy",  nameKo: "루디 탐정",    nameId: "Detektif Rudy",  side: "left",  avatarBg: "#2c1810", isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
       { id: "penny",    emoji: "📚",  name: "Miss Penny",      nameKo: "미스 페니",    nameId: "Miss Penny",     side: "right", avatarBg: "#1A0A2A" },
       { id: "tom",      emoji: "💂",  name: "Tom",             nameKo: "톰",           nameId: "Tom",            side: "left",  avatarBg: "#1E2A3A" },
       { id: "isabel",   emoji: "💃",  name: "Isabel",          nameKo: "이사벨",       nameId: "Isabel",         side: "right", avatarBg: "#3A1A0A" },
@@ -3433,7 +3448,7 @@ const MADRID_V21_STORY: Story = {
     languageNote: "Madrid introduces feelings, color, and simple description while reusing Ch1 social phrases.",
   },
   characters: [
-    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#C8232C", portrait: ch2IsabelPortraitImg },
     { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", nameId: "Don Miguel", side: "right", avatarBg: "#8B5A2B", portrait: ch2MiguelPortraitImg },
     { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", nameId: "Carlos", side: "right", avatarBg: "#6E4A35", portrait: ch2CarlosPortraitImg },
@@ -3452,6 +3467,7 @@ const MADRID_V21_STORY: Story = {
     {
       kind: "scene",
       charId: "lingo",
+      expression: "worried",
       text: "That voice from the speaker. I knew it before I knew why. He is not here in person, partner. But his rules are already in the air.",
       textKo: "스피커에서 들린 그 목소리. 이유를 알기 전부터 알아본 것 같아요. 그는 직접 여기 있는 게 아니에요, 파트너. 하지만 그의 규칙은 이미 공기 속에 퍼졌어요.",
       textKoMix: "스피커에서 들린 그 voice. 이유를 알기 전부터 알아본 것 같아요. 그는 직접 여기 있는 게 아니에요, partner. 하지만 그의 rules는 이미 공기 속에 퍼졌어요.",
@@ -3840,7 +3856,7 @@ const SEOUL_V21_STORY: Story = {
       "Seoul teaches Korean politeness and sentence order. The boss spell is fully Korean, with informal distractors used to teach register.",
   },
   characters: [
-    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
     { id: "minho", emoji: "🚕", name: "Minho", nameKo: "민호", nameId: "Minho", side: "right", avatarBg: "#1F6F8B", portrait: ch3MinhoPortraitImg },
     { id: "youngsook", emoji: "🍲", name: "Youngsook", nameKo: "영숙", nameId: "Youngsook", side: "right", avatarBg: "#A15C38", portrait: ch3YoungsookPortraitImg },
     { id: "sujin", emoji: "🔬", name: "Dr. Sujin Han", nameKo: "한수진 박사", nameId: "Dr. Sujin Han", side: "right", avatarBg: "#4C6B4F", portrait: ch3SujinPortraitImg },
@@ -4325,7 +4341,7 @@ const CAIRO_V21_STORY: Story = {
       "Cairo teaches records, memory, and simple past tense. The chapter also reveals the cost of Universal Code through Mira's flattened voice.",
   },
   characters: [
-    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
     { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", nameId: "Mira", side: "right", avatarBg: "#2F4A34", portrait: ch4MiraPortraitImg },
     { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", nameId: "Profesor Amira", side: "right", avatarBg: "#7A4D19", portrait: ch4AmiraPortraitImg },
     { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", nameId: "Hassan", side: "right", avatarBg: "#5A3216", portrait: ch4HassanPortraitImg },
@@ -4785,7 +4801,7 @@ const BABEL_V21_STORY: Story = {
       "Babel compresses the final three foundation stones into connection, memory, and beginning, then turns the final counterargument into player production.",
   },
   characters: [
-    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg },
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
     { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", nameId: "Miss Penny", side: "right", avatarBg: "#1A0A2A", portrait: ch5PennyPortraitImg, portraitVariants: { anxious: pennyAnxiousFinalClueImg } },
     { id: "tom", emoji: "💂", name: "Tom", nameKo: "톰", nameId: "Tom", side: "left", avatarBg: "#1E2A3A", portrait: ch1TomPortraitImg },
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#3A1A0A", portrait: ch2IsabelPortraitImg },
@@ -5094,6 +5110,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "lingo",
       backdrop: "babel-language-gates",
+      expression: "worried",
       text: "Partner. The final spell is not a translation. It is the thing translation missed.",
       textKo: "파트너. 마지막 주문은 번역이 아니에요. 번역이 놓친 바로 그거예요.",
       textEs: "Compa. El hechizo final no es una traducción. Es aquello que la traducción no alcanzó.",
@@ -5259,6 +5276,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "lingo",
       backdrop: "babel-language-gates",
+      expression: "celebratory",
       text: "Partner, we did not save language because it is useful. We saved it because every word is someone reaching for someone else.",
       textKo: "파트너, 우리는 언어가 유용해서 구한 게 아니에요. 모든 단어가 누군가가 다른 누군가에게 손을 뻗는 일이기 때문에 구한 거예요.",
       textEs: "Compa, no salvamos el idioma porque sea útil. Lo salvamos porque cada palabra es alguien intentando alcanzar a otra persona.",
@@ -7459,7 +7477,7 @@ export default function StoryScene() {
             >
               {character.isLingo ? (
                 <Animated.Image
-                  source={rudyStoryImg}
+                  source={activePortrait ?? rudyStoryImg}
                   style={[styles.rudyStoryChar, compactStoryLayout && styles.rudyStoryCharCompact, styles.stageCharacterShadow]}
                   resizeMode="contain"
                 />
