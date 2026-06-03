@@ -484,9 +484,74 @@ function getDefaultAdventureBackdrop(storyId: string): StoryBackdropId {
   }
 }
 
-function getSceneBackdrop(storyId: string, item: SeqItem): ImageSourcePropType | null {
+function getSceneBackdropId(storyId: string, item: SeqItem): StoryBackdropId | null {
   if (item.kind !== "scene") return null;
-  return getAdventureBackdropById(item.backdrop ?? getDefaultAdventureBackdrop(storyId));
+  return item.backdrop ?? getDefaultAdventureBackdrop(storyId);
+}
+
+type BackdropLighting = {
+  shade: readonly [string, string, string];
+  glow: readonly [string, string];
+  characterBacklight: readonly [string, string, string];
+};
+
+function getBackdropLighting(backdrop: StoryBackdropId): BackdropLighting {
+  switch (backdrop) {
+    case "london-museum":
+      return {
+        shade: ["rgba(6,9,13,0.22)", "rgba(8,10,14,0.28)", "rgba(5,6,9,0.82)"],
+        glow: ["rgba(156,199,218,0.14)", "transparent"],
+        characterBacklight: ["rgba(190,223,238,0.18)", "rgba(255,226,144,0.06)", "transparent"],
+      };
+    case "madrid-drained":
+      return {
+        shade: ["rgba(22,10,11,0.24)", "rgba(42,18,13,0.3)", "rgba(9,5,6,0.8)"],
+        glow: ["rgba(214,89,58,0.15)", "transparent"],
+        characterBacklight: ["rgba(255,171,103,0.18)", "rgba(255,226,144,0.06)", "transparent"],
+      };
+    case "madrid-sealed-stage":
+      return {
+        shade: ["rgba(20,6,8,0.28)", "rgba(45,9,13,0.34)", "rgba(8,4,6,0.84)"],
+        glow: ["rgba(216,45,52,0.18)", "transparent"],
+        characterBacklight: ["rgba(255,83,74,0.2)", "rgba(255,201,128,0.07)", "transparent"],
+      };
+    case "madrid-restored":
+      return {
+        shade: ["rgba(20,10,7,0.18)", "rgba(48,20,9,0.24)", "rgba(10,5,4,0.76)"],
+        glow: ["rgba(255,156,63,0.18)", "transparent"],
+        characterBacklight: ["rgba(255,196,112,0.22)", "rgba(255,226,144,0.08)", "transparent"],
+      };
+    case "seoul-palace-subway":
+      return {
+        shade: ["rgba(5,14,13,0.22)", "rgba(7,24,23,0.28)", "rgba(3,8,9,0.8)"],
+        glow: ["rgba(64,229,178,0.15)", "transparent"],
+        characterBacklight: ["rgba(80,226,190,0.18)", "rgba(118,187,255,0.08)", "transparent"],
+      };
+    case "cairo-archive":
+      return {
+        shade: ["rgba(22,14,8,0.2)", "rgba(42,26,10,0.28)", "rgba(9,6,3,0.8)"],
+        glow: ["rgba(233,185,93,0.16)", "transparent"],
+        characterBacklight: ["rgba(255,207,125,0.2)", "rgba(255,226,144,0.08)", "transparent"],
+      };
+    case "cairo-hospital-record":
+      return {
+        shade: ["rgba(18,16,11,0.24)", "rgba(38,31,18,0.3)", "rgba(8,7,5,0.82)"],
+        glow: ["rgba(219,183,118,0.14)", "transparent"],
+        characterBacklight: ["rgba(236,206,155,0.18)", "rgba(255,226,144,0.07)", "transparent"],
+      };
+    case "babel-core":
+      return {
+        shade: ["rgba(12,8,22,0.22)", "rgba(21,13,42,0.3)", "rgba(5,4,10,0.82)"],
+        glow: ["rgba(166,120,255,0.16)", "transparent"],
+        characterBacklight: ["rgba(173,133,255,0.2)", "rgba(255,226,144,0.08)", "transparent"],
+      };
+    case "babel-language-gates":
+      return {
+        shade: ["rgba(15,8,24,0.24)", "rgba(28,15,48,0.32)", "rgba(6,4,12,0.84)"],
+        glow: ["rgba(202,151,255,0.18)", "transparent"],
+        characterBacklight: ["rgba(204,161,255,0.22)", "rgba(255,220,132,0.08)", "transparent"],
+      };
+  }
 }
 
 /* ─────────────────── IDIOM COLLECTION ─────────────────── */
@@ -7449,7 +7514,9 @@ export default function StoryScene() {
   }
 
   const titleLabel = lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : lang === "indonesian" ? (story.titleId ?? story.title) : story.title;
-  const sceneBackdrop = getSceneBackdrop(story.id, item);
+  const sceneBackdropId = getSceneBackdropId(story.id, item);
+  const sceneBackdrop = sceneBackdropId ? getAdventureBackdropById(sceneBackdropId) : null;
+  const sceneLighting = getBackdropLighting(sceneBackdropId ?? getDefaultAdventureBackdrop(story.id));
   const characterEntryX = stageEnterAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [character.side === "left" ? -42 : 42, 0],
@@ -7550,12 +7617,12 @@ export default function StoryScene() {
               resizeMode="cover"
             />
             <LinearGradient
-              colors={["rgba(8,7,6,0.18)", "rgba(8,7,6,0.2)", "rgba(8,7,6,0.78)"]}
+              colors={sceneLighting.shade}
               locations={[0, 0.48, 1]}
               style={styles.sceneBackdropShade}
             />
             <LinearGradient
-              colors={["rgba(201,162,39,0.14)", "transparent"]}
+              colors={sceneLighting.glow}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0.6 }}
               style={styles.sceneBackdropGlow}
@@ -7605,7 +7672,7 @@ export default function StoryScene() {
                 <>
                   <LinearGradient
                     pointerEvents="none"
-                    colors={["rgba(255,226,144,0.2)", "rgba(255,226,144,0.07)", "transparent"]}
+                    colors={sceneLighting.characterBacklight}
                     locations={[0, 0.52, 1]}
                     style={[
                       styles.characterBacklight,
@@ -7680,8 +7747,15 @@ export default function StoryScene() {
                   <View key={i} style={[styles.dot, { opacity: i === seqIdx % 5 ? 1 : 0.3 }]} />
                 ))}
               </View>
-              <View style={[styles.nextBtn, compactStoryLayout && styles.nextBtnCompact]}>
-                <Text style={styles.nextBtnText}>
+              <View style={[
+                styles.nextBtn,
+                typingDone ? styles.nextBtnReady : styles.nextBtnSkip,
+                compactStoryLayout && styles.nextBtnCompact,
+              ]}>
+                <Text style={[
+                  styles.nextBtnText,
+                  typingDone ? styles.nextBtnTextReady : styles.nextBtnTextSkip,
+                ]}>
                   {typingDone
                     ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : lang === "indonesian" ? "Lanjut" : "Next")
                     : (lang === "korean" ? "전체 보기" : lang === "spanish" ? "Mostrar todo" : lang === "indonesian" ? "Tampilkan semua" : "Show all")}
@@ -8145,17 +8219,38 @@ const styles = StyleSheet.create({
   dotsRow: { flexDirection: "row", gap: 5, justifyContent: "center" },
   dot: { height: 5, width: 5, borderRadius: 3, backgroundColor: C.gold },
   nextBtn: {
-    backgroundColor: C.gold,
-    paddingVertical: 13,
-    borderRadius: 14,
+    alignSelf: "flex-end",
+    minWidth: 126,
+    maxWidth: 210,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 5,
+    borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 5,
+  },
+  nextBtnReady: {
+    backgroundColor: C.gold,
+    borderColor: "rgba(255,226,144,0.68)",
+    shadowColor: C.gold,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.26,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  nextBtnSkip: {
+    backgroundColor: "rgba(201,162,39,0.1)",
+    borderColor: "rgba(255,226,144,0.28)",
   },
   nextBtnCompact: {
-    paddingVertical: 10,
+    minWidth: 118,
+    paddingVertical: 8,
   },
-  nextBtnText: { fontSize: 14, fontFamily: F.header, color: C.bg1, letterSpacing: 0.5 },
+  nextBtnText: { fontSize: 13, fontFamily: F.header, letterSpacing: 0.5, flexShrink: 1 },
+  nextBtnTextReady: { color: C.bg1 },
+  nextBtnTextSkip: { color: C.gold },
 
   /* ── Clue Reveal ── */
   clueReveal: {
