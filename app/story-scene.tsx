@@ -66,6 +66,7 @@ const rudyCelebratoryCoachImg = require("@/assets/story/characters/rudy/rudy_cel
 const eleanorUrgentWarningImg = require("@/assets/story/characters/eleanor/eleanor_urgent_warning.png");
 const eleanorAnalyticalDiscoveryImg = require("@/assets/story/characters/eleanor/eleanor_analytical_discovery.png");
 const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
+const pennyBraveResolveImg = require("@/assets/story/characters/penny/penny_brave_resolve.png");
 const mrBlackFragileRemorseImg = require("@/assets/story/characters/mr_black/mr_black_fragile_remorse.png");
 const mrBlackTiredRevealImg = require("@/assets/story/characters/mr_black/mr_black_tired_reveal.png");
 const isabelShockedConcernImg = require("@/assets/story/characters/isabel/isabel_shocked_concern.png");
@@ -98,6 +99,11 @@ const isabelExpressionSprites = {
 const mrBlackExpressionSprites = {
   remorse: mrBlackFragileRemorseImg,
   tired: mrBlackTiredRevealImg,
+};
+
+const pennyExpressionSprites = {
+  anxious: pennyAnxiousFinalClueImg,
+  brave: pennyBraveResolveImg,
 };
 
 // ── TTS Audio Cache ────────────────────────────────────────────────────────
@@ -291,7 +297,7 @@ type StoryBackdropId =
   | "babel-core"
   | "babel-language-gates";
 
-type StoryCharacterExpression = "neutral" | "anxious" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying";
+type StoryCharacterExpression = "neutral" | "anxious" | "brave" | "remorse" | "tired" | "worried" | "celebratory" | "urgent" | "analytical" | "shocked" | "rallying";
 
 /* Sequence items */
 type SeqScene = {
@@ -4839,7 +4845,7 @@ const BABEL_V21_STORY: Story = {
   },
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
-    { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", nameId: "Miss Penny", side: "right", avatarBg: "#1A0A2A", portrait: ch5PennyPortraitImg, portraitVariants: { anxious: pennyAnxiousFinalClueImg } },
+    { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", nameId: "Miss Penny", side: "right", avatarBg: "#1A0A2A", portrait: ch5PennyPortraitImg, portraitVariants: pennyExpressionSprites },
     { id: "tom", emoji: "💂", name: "Tom", nameKo: "톰", nameId: "Tom", side: "left", avatarBg: "#1E2A3A", portrait: ch1TomPortraitImg },
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#3A1A0A", portrait: ch2IsabelPortraitImg, portraitVariants: isabelExpressionSprites },
     { id: "sujin", emoji: "👩‍🔬", name: "Sujin", nameKo: "수진", nameId: "Sujin", side: "left", avatarBg: "#1A2A3A", portrait: ch3SujinPortraitImg },
@@ -5294,6 +5300,7 @@ const BABEL_V21_STORY: Story = {
       kind: "scene",
       charId: "penny",
       backdrop: "babel-language-gates",
+      expression: "brave",
       text: "The stones are returning to their keepers. Mr. Black will answer for what he did. But not as a monster. As a man who finally heard the sentence he could not translate.",
       textKo: "수호석들은 각자의 보호자에게 돌아가고 있어요. Mr. Black은 자신이 한 일에 책임을 질 거예요. 하지만 괴물로서가 아니에요. 자신이 번역하지 못했던 문장을 마침내 들은 사람으로서.",
       textEs: "Las piedras vuelven a sus guardianes. Mr. Black responderá por lo que hizo. Pero no como un monstruo. Como un hombre que por fin oyó la frase que no pudo traducir.",
