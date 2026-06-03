@@ -160,13 +160,66 @@ export function getLatestCampPhrase(
 
 // ── STEP 3: Mission Talk content ──────────────────────────────────────────────
 
-export const MISSION_CONTENT: Record<string, Partial<Record<LearningLangKey, MissionTalkLangData>>> = {
+const MISSION_SITUATION_ID_BY_DAY: Record<string, string> = {
+  day_1: "Di museum London, Rudy bertemu partner baru. Sapa dan perkenalkan dirimu.",
+  day_2: "Rudy mengobrol dengan rekan dari berbagai negara. Ceritakan asal dan tempat tinggalmu.",
+  day_3: "Di acara museum, Rudy bertemu orang dengan berbagai pekerjaan. Latih profesi dan bahasa.",
+  day_4: "Rudy membuntuti tersangka di London dan perlu tahu lokasi pintu keluar serta toilet.",
+  day_5: "Rudy membeli perlengkapan penyelidikan sambil menyapa sesama agen dan mengecek harga.",
+  day_6: "Pesta penyambutan di museum. Gunakan semua ekspresi Unit 1 yang sudah kamu latih.",
+  day_7: "Di pintu masuk museum, Rudy bertukar kontak dengan rekan baru. Latih angka dan usia.",
+  day_8: "Rudy menyusun jadwal mingguan. Bicarakan hari, pekerjaan, dan rencana akhir pekan.",
+  day_9: "Di meja informasi museum, Rudy mengecek jadwal tur. Latih cara menyebut waktu.",
+  day_10: "Sebelum investigasi luar ruangan, Rudy mengecek cuaca dan apa yang perlu dibawa.",
+  day_11: "Di toko suvenir museum, Rudy memilih hadiah. Bicarakan warna, ukuran, dan harga.",
+  day_12: "Pesta akhir pekan di museum. Gunakan angka, hari, waktu, cuaca, warna, dan ukuran.",
+  day_13: "Rudy menyamar di restoran favorit tersangka. Gunakan obrolan makanan sebagai kedok.",
+  day_14: "Rudy membuntuti tersangka di kafe langganan. Pesan makanan dan minuman agar tetap menyamar.",
+  day_15: "Saatnya membayar setelah makan. Tanya harga, pahami angka, dan minta tagihan.",
+  day_16: "Makanan sudah datang. Beri tahu Rudy bagaimana rasanya dan gunakan ungkapan rasa.",
+  day_17: "Rudy membawa rekan baru ke restoran. Rekomendasikan makanan dan tanyakan saran.",
+  day_18: "Makan malam tim museum. Gunakan semua ekspresi makanan dari Unit 3.",
+  day_19: "Rudy mengikuti petunjuk sandi untuk menemukan tempat persembunyian Mr. Black.",
+  day_20: "Kontak Seoul memberi arah ke markas Mr. Black. Pahami dan ulangi instruksinya.",
+  day_21: "Rudy kehilangan jejak tersangka di Myeongdong dan ikut tersesat. Minta arah dengan tenang.",
+  day_22: "Di Bandara Kairo, Rudy harus cepat menuju pusat kota untuk mengejar tersangka.",
+  day_23: "Peralatan Rudy hilang di Kairo. Minta bantuan warga lokal untuk menemukan stasiun kereta.",
+  day_24: "Pengejaran terakhir Unit 4. Arahkan Rudy dari bandara ke persembunyian terakhir Mr. Black.",
+  day_25: "Di Menara Babel, Rudy membangun kepercayaan dengan membicarakan keluarga.",
+  day_26: "Rudy harus menggambarkan tersangka dengan tepat. Latih ciri fisik, pakaian, dan usia.",
+  day_27: "Di pesta Menara Babel, Rudy mencari teman baru lewat obrolan tentang hobi.",
+  day_28: "Rekan tim Rudy sedang kesulitan. Tanyakan perasaan mereka dan beri semangat.",
+  day_29: "Misi berhasil. Rudy dan tim merencanakan pesta perayaan bersama.",
+  day_30: "Misi akhir A1. Gabungkan semuanya, dari perkenalan sampai membuat rencana.",
+};
+
+function withIndonesianMissionSituations(
+  content: Record<string, Partial<Record<LearningLangKey, MissionTalkLangData>>>,
+): Record<string, Partial<Record<LearningLangKey, MissionTalkLangData>>> {
+  const enriched: Record<string, Partial<Record<LearningLangKey, MissionTalkLangData>>> = {};
+
+  for (const [dayId, byLanguage] of Object.entries(content)) {
+    const idSituation = MISSION_SITUATION_ID_BY_DAY[dayId];
+    enriched[dayId] = {};
+
+    for (const [language, data] of Object.entries(byLanguage) as [LearningLangKey, MissionTalkLangData | undefined][]) {
+      if (!data) continue;
+      enriched[dayId][language] = idSituation
+        ? { ...data, situation: { ...data.situation, id: data.situation.id?.trim() ? data.situation.id : idSituation } }
+        : data;
+    }
+  }
+
+  return enriched;
+}
+
+export const MISSION_CONTENT: Record<string, Partial<Record<LearningLangKey, MissionTalkLangData>>> = withIndonesianMissionSituations({
   ...MISSION_CONTENT_IMPROVED,  // Day 1-6
   ...MISSION_CONTENT_UNIT2,     // Day 7-12
   ...MISSION_CONTENT_UNIT3,     // Day 13-18
   ...MISSION_CONTENT_UNIT4,     // Day 19-24
   ...MISSION_CONTENT_UNIT5,     // Day 25-30
-};
+});
 
 // ── STEP 4: Review content ────────────────────────────────────────────────────
 

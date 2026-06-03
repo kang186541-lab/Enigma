@@ -165,6 +165,27 @@ function collectDayOneToSixText(lang: LearningLangKey): string {
   return normalizeContentText(lines.join(" "));
 }
 
+function assertMissionTalkSituationsHaveIndonesianNativeText(): void {
+  const missing: string[] = [];
+
+  for (const [dayId, byLanguage] of Object.entries(MISSION_CONTENT)) {
+    for (const lang of languages) {
+      const mission = byLanguage?.[lang];
+      if (mission && !mission.situation.id?.trim()) {
+        missing.push(`${dayId}:${lang}`);
+      }
+    }
+  }
+
+  assert.deepEqual(
+    missing,
+    [],
+    "Every active Mission Talk branch must include Indonesian-native situation text, because Indonesian-native users can learn any target language",
+  );
+}
+
+assertMissionTalkSituationsHaveIndonesianNativeText();
+
 assert.equal(RUDY_GUIDE_CARDS.length, 13, "Rudy's Language Guide must stay exactly 13 cards: 7 philosophy + 5 app-usage/curriculum + 1 closer (daily drip)");
 const guideTitlesKo = RUDY_GUIDE_CARDS.map((card) => card.title.korean);
 assert.deepEqual(
