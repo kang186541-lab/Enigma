@@ -302,11 +302,12 @@ Visual verification:
 - Dialogue boxes now measure their text viewport and content height; if a localized line overflows, the player gets a subtle bottom fade and small non-text scroll cue. Local web verification confirmed Seoul 1/27 and Seoul 2/27 still render correctly after this pass: `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\seoul-dialogue-scroll-cue-pass.png` and `C:\Users\Admin\AppData\Local\Temp\linguaai-story-stage-shots\seoul-dialogue-scroll-cue-rudy-scene.png`.
 - Follow-up first-run/story-flow pass: Home no longer auto-expands the secondary practice sections for true first-timers, preserving the "one clear speaking action first" CTA. Main story scenes on web now accept `Enter`/`Space` for non-puzzle narration/dialogue advancement, while puzzles keep their explicit controls. Narration scenes now use the same measured overflow safety model as dialogue scenes: long localized narration can scroll and shows a small non-text cue instead of clipping on compact screens. Rudy Step 3 now sends `nativeLang: lc` to `/api/mission-chat`, so moderation/safety fallback replies can localize correctly for supported `ko/en/es/id` users. Story text, quiz prompts, answer data, sequence/progression, language support, and Japanese scope remain unchanged.
 - Verification for this pass: forbidden story-data/Japanese diff guard returned no matches; `npx.cmd tsc --noEmit --pretty false` passed; `npm.cmd run verify:quality` passed with the existing 46 lint warnings baseline; `npx.cmd tsx scripts\verify-speaking-core.ts` passed; `git diff --check` passed. A temporary local static server confirmed `dist/index.html` and the generated web entry bundle return HTTP 200. The Browser plugin could not attach to the local route in this session (`ERR_BLOCKED_BY_CLIENT`), so no new screenshot was captured for this pass.
-- Latest asset audit: 106 story PNGs, 220,445,163 bytes total, 36 character assets, warnings 0.
+- Rudy's story dialogue sprite is no longer the old standalone `rudy_story.png` asset. A new transparent `assets/story/characters/rudy/rudy_dialogue_neutral.png` stage sprite is wired as Rudy's default dialogue portrait and expression fallback, while the old Rudy asset remains only for non-dialogue reward/cipher/completion UI. The generated image initially contained a baked checkerboard background; this pass flood-filled the edge-connected checkerboard to alpha 0 and verified corner alpha before bundling. Local web capture confirmed Madrid 2/21 renders the new Rudy cleanly over the festival backdrop with no checkerboard and no console errors: `C:\tmp\linguaai-story-stage-shots\rudy-dialogue-neutral-madrid-transparent.png`. Story text, quiz prompts, answer data, sequence/progression, language support, and Japanese scope remain unchanged.
+- Latest asset audit: 107 story PNGs, 212.01 MB total, 37 character assets, warnings 0.
 
 Remaining visual gap:
 
-- Most dialogue sprites are still cutouts from the current portrait set, not full expression sheets. Rudy, Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, Don Miguel, Carlos, and Minho now each have at least one authored emotional/action pose, and the common grounding/occlusion, backdrop-aware lighting, compact prompt, active-speaker pulse, speaker-change-aware pacing, and intro prefetch passes improve integration, but true Ace Attorney-quality production still needs broader expression sheets and more scene-specific staging for secondary beats.
+- Most dialogue sprites are still cutouts from the current portrait set, not full expression sheets. Rudy now has a background-friendly neutral stage sprite, while Tom, Eleanor, Isabel, Mr. Black, Penny, Hassan, Sujin, Mira, Amira, Youngsook, Don Miguel, Carlos, and Minho each have at least one authored emotional/action pose. The common grounding/occlusion, backdrop-aware lighting, compact prompt, active-speaker pulse, speaker-change-aware pacing, and intro prefetch passes improve integration, but true Ace Attorney-quality production still needs broader expression sheets and more scene-specific staging for secondary beats.
 
 ## QA Command
 
@@ -318,12 +319,12 @@ npm run audit:story-assets -- --contact-sheet
 
 Current audit snapshot:
 
-- 106 PNG files.
-- 220.45 MB total.
+- 107 PNG files.
+- 212.01 MB total.
 - intro: 35 files, 74.09 MB, 12.2% average brightness.
 - background: 9 files, 19.81 MB, 15.3% average brightness.
 - portrait: 15 files, 30.28 MB, 13.7% average brightness.
-- character: 36 files, 61.29 MB, 25.7% average brightness.
+- character: 37 files, 63.07 MB, 25.9% average brightness.
 - sheet: 0 files.
 - boss: 5 files, 11.87 MB, 10.9% average brightness.
 - legacy: 6 files, 12.89 MB, 13.4% average brightness.

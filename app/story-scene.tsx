@@ -71,8 +71,7 @@ const ch4BlackPartialPortraitImg = require("@/assets/story/dialogue_sprites/ch4_
 const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
 const ch5PennyPortraitImg = require("@/assets/story/dialogue_sprites/ch5_penny_sprite.png");
 const ch5BlackFaceImg = require("@/assets/story/dialogue_sprites/ch5_black_face_sprite.png");
-const rudyWorriedDetectiveImg = require("@/assets/story/characters/rudy/rudy_worried_detective.png");
-const rudyCelebratoryCoachImg = require("@/assets/story/characters/rudy/rudy_celebratory_coach.png");
+const rudyDialogueNeutralImg = require("@/assets/story/characters/rudy/rudy_dialogue_neutral.png");
 const eleanorUrgentWarningImg = require("@/assets/story/characters/eleanor/eleanor_urgent_warning.png");
 const eleanorAnalyticalDiscoveryImg = require("@/assets/story/characters/eleanor/eleanor_analytical_discovery.png");
 const pennyAnxiousFinalClueImg = require("@/assets/story/characters/penny/penny_anxious_final_clue.png");
@@ -94,8 +93,8 @@ const bgBabelTowerCoreImg = require("@/assets/story/dialogue_backgrounds/babel_t
 const bgBabelLanguageGatesImg = require("@/assets/story/dialogue_backgrounds/babel_language_gates.png");
 
 const rudyExpressionSprites = {
-  worried: rudyWorriedDetectiveImg,
-  celebratory: rudyCelebratoryCoachImg,
+  worried: rudyDialogueNeutralImg,
+  celebratory: rudyDialogueNeutralImg,
 };
 
 const tomExpressionSprites = {
@@ -517,7 +516,7 @@ function getSceneCharacterImageSource(story: Story, item: SeqItem): ImageSourceP
     ? character.portraitVariants?.[item.expression] ?? characterExpressionFallbacks[character.id]?.[item.expression] ?? character.portrait
     : character.portrait;
 
-  return character.isLingo ? (portrait ?? rudyStoryImg) : (portrait ?? null);
+  return character.isLingo ? (portrait ?? rudyDialogueNeutralImg) : (portrait ?? null);
 }
 
 type BackdropLighting = {
@@ -819,7 +818,7 @@ const STORIES: Record<string, Story> = {
         side: "left",
         avatarBg: "#2c1810",
         isLingo: true,
-        portrait: rudyStoryImg,
+        portrait: rudyDialogueNeutralImg,
         portraitVariants: rudyExpressionSprites,
       },
       {
@@ -1373,7 +1372,7 @@ const STORIES: Record<string, Story> = {
         side: "left",
         avatarBg: "#2c1810",
         isLingo: true,
-        portrait: rudyStoryImg,
+        portrait: rudyDialogueNeutralImg,
         portraitVariants: rudyExpressionSprites,
       },
       {
@@ -2237,7 +2236,7 @@ const STORIES: Record<string, Story> = {
         side: "left",
         avatarBg: "#2c1810",
         isLingo: true,
-        portrait: rudyStoryImg,
+        portrait: rudyDialogueNeutralImg,
         portraitVariants: rudyExpressionSprites,
       },
       {
@@ -2936,7 +2935,7 @@ const STORIES: Record<string, Story> = {
         "clause per line. At this level learners handle most communication independently.",
     },
     characters: [
-      { id: "lingo",    emoji: "🦊",  name: "Detective Rudy",  nameKo: "루디 탐정",    nameId: "Detektif Rudy",   side: "left",  avatarBg: "#2c1810", isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
+      { id: "lingo",    emoji: "🦊",  name: "Detective Rudy",  nameKo: "루디 탐정",    nameId: "Detektif Rudy",   side: "left",  avatarBg: "#2c1810", isLingo: true, portrait: rudyDialogueNeutralImg, portraitVariants: rudyExpressionSprites },
       { id: "amira",    emoji: "👩‍🏫", name: "Professor Amira", nameKo: "아미라 교수",  nameId: "Profesor Amira",  side: "right", avatarBg: "#2A1A00" },
       { id: "hassan",   emoji: "🧑‍🤝‍🧑", name: "Hassan",         nameKo: "하산",         nameId: "Hassan",          side: "right", avatarBg: "#1A1500" },
       { id: "penny",    emoji: "📚",  name: "Miss Penny",      nameKo: "미스 페니",    nameId: "Miss Penny",      side: "right", avatarBg: "#1A0A2A" },
@@ -3326,7 +3325,7 @@ const STORIES: Record<string, Story> = {
         "Learners at this level should handle full target-language dialogue.",
     },
     characters: [
-      { id: "lingo",    emoji: "🦊",  name: "Detective Rudy",  nameKo: "루디 탐정",    nameId: "Detektif Rudy",  side: "left",  avatarBg: "#2c1810", isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
+      { id: "lingo",    emoji: "🦊",  name: "Detective Rudy",  nameKo: "루디 탐정",    nameId: "Detektif Rudy",  side: "left",  avatarBg: "#2c1810", isLingo: true, portrait: rudyDialogueNeutralImg, portraitVariants: rudyExpressionSprites },
       { id: "penny",    emoji: "📚",  name: "Miss Penny",      nameKo: "미스 페니",    nameId: "Miss Penny",     side: "right", avatarBg: "#1A0A2A" },
       { id: "tom",      emoji: "💂",  name: "Tom",             nameKo: "톰",           nameId: "Tom",            side: "left",  avatarBg: "#1E2A3A" },
       { id: "isabel",   emoji: "💃",  name: "Isabel",          nameKo: "이사벨",       nameId: "Isabel",         side: "right", avatarBg: "#3A1A0A" },
@@ -3640,7 +3639,7 @@ const MADRID_V21_STORY: Story = {
     languageNote: "Madrid introduces feelings, color, and simple description while reusing Ch1 social phrases.",
   },
   characters: [
-    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyDialogueNeutralImg, portraitVariants: rudyExpressionSprites },
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#C8232C", portrait: ch2IsabelPortraitImg, portraitVariants: isabelExpressionSprites },
     { id: "miguel", emoji: "🎸", name: "Don Miguel", nameKo: "돈 미겔", nameId: "Don Miguel", side: "right", avatarBg: "#8B5A2B", portrait: ch2MiguelPortraitImg, portraitVariants: miguelExpressionSprites },
     { id: "carlos", emoji: "🎨", name: "Carlos", nameKo: "카를로스", nameId: "Carlos", side: "right", avatarBg: "#6E4A35", portrait: ch2CarlosPortraitImg, portraitVariants: carlosExpressionSprites },
@@ -4057,7 +4056,7 @@ const SEOUL_V21_STORY: Story = {
       "Seoul teaches Korean politeness and sentence order. The boss spell is fully Korean, with informal distractors used to teach register.",
   },
   characters: [
-    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyDialogueNeutralImg, portraitVariants: rudyExpressionSprites },
     { id: "minho", emoji: "🚕", name: "Minho", nameKo: "민호", nameId: "Minho", side: "right", avatarBg: "#1F6F8B", portrait: ch3MinhoPortraitImg, portraitVariants: minhoExpressionSprites },
     { id: "youngsook", emoji: "🍲", name: "Youngsook", nameKo: "영숙", nameId: "Youngsook", side: "right", avatarBg: "#A15C38", portrait: ch3YoungsookPortraitImg, portraitVariants: youngsookExpressionSprites },
     { id: "sujin", emoji: "🔬", name: "Dr. Sujin Han", nameKo: "한수진 박사", nameId: "Dr. Sujin Han", side: "right", avatarBg: "#4C6B4F", portrait: ch3SujinPortraitImg },
@@ -4551,7 +4550,7 @@ const CAIRO_V21_STORY: Story = {
       "Cairo teaches records, memory, and simple past tense. The chapter also reveals the cost of Universal Code through Mira's flattened voice.",
   },
   characters: [
-    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyDialogueNeutralImg, portraitVariants: rudyExpressionSprites },
     { id: "mira", emoji: "☕", name: "Mira", nameKo: "미라", nameId: "Mira", side: "right", avatarBg: "#2F4A34", portrait: ch4MiraPortraitImg },
     { id: "amira", emoji: "📜", name: "Professor Amira", nameKo: "아미라 교수", nameId: "Profesor Amira", side: "right", avatarBg: "#7A4D19", portrait: ch4AmiraPortraitImg },
     { id: "hassan", emoji: "🪕", name: "Hassan", nameKo: "하산", nameId: "Hassan", side: "right", avatarBg: "#5A3216", portrait: ch4HassanPortraitImg },
@@ -5017,7 +5016,7 @@ const BABEL_V21_STORY: Story = {
       "Babel compresses the final three foundation stones into connection, memory, and beginning, then turns the final counterargument into player production.",
   },
   characters: [
-    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyStoryImg, portraitVariants: rudyExpressionSprites },
+    { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyDialogueNeutralImg, portraitVariants: rudyExpressionSprites },
     { id: "penny", emoji: "📚", name: "Miss Penny", nameKo: "미스 페니", nameId: "Miss Penny", side: "right", avatarBg: "#1A0A2A", portrait: ch5PennyPortraitImg, portraitVariants: pennyExpressionSprites },
     { id: "tom", emoji: "💂", name: "Tom", nameKo: "톰", nameId: "Tom", side: "left", avatarBg: "#1E2A3A", portrait: ch1TomPortraitImg, portraitVariants: tomExpressionSprites },
     { id: "isabel", emoji: "💃", name: "Isabel", nameKo: "이사벨", nameId: "Isabel", side: "right", avatarBg: "#3A1A0A", portrait: ch2IsabelPortraitImg, portraitVariants: isabelExpressionSprites },
@@ -7870,7 +7869,7 @@ export default function StoryScene() {
               )}
               {character.isLingo ? (
                 <Animated.Image
-                  source={activePortrait ?? rudyStoryImg}
+                  source={activePortrait ?? rudyDialogueNeutralImg}
                   style={[styles.rudyStoryChar, compactStoryLayout && styles.rudyStoryCharCompact, styles.stageCharacterShadow]}
                   resizeMode="contain"
                 />
