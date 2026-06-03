@@ -34,7 +34,43 @@ const QT: Record<string, Record<QL, string>> = {
   submitArgument: { ko: "주장 제출",            es: "Enviar argumento",        en: "Submit Argument",            id: "Kirim Argumen" },
   typeArgument:   { ko: "반론을 입력하세요…",    es: "Escribe tu contraargumento…", en: "Type your counter-argument…", id: "Ketik argumen bantahanmu…" },
   listening:      { ko: "듣는 중…",             es: "Escuchando…",             en: "Listening…",                 id: "Mendengarkan…" },
+  evaluating:     { ko: "평가 중…",             es: "Evaluando…",              en: "Evaluating…",                id: "Menilai…" },
+  tapMic:         { ko: "마이크를 눌러 말하세요", es: "Presiona el micrófono",   en: "Tap mic to speak",           id: "Ketuk mikrofon untuk bicara" },
   blank:          { ko: "빈칸",                 es: "Espacio",                 en: "Blank",                      id: "Kosong" },
+  passMark:       { ko: "통과",                 es: "PASA",                    en: "PASS",                       id: "LULUS" },
+  tryMark:        { ko: "재도전",               es: "INTENTA",                 en: "TRY",                        id: "COBA" },
+  hideHint:       { ko: "힌트 숨기기",           es: "Ocultar pista",           en: "Hide hint",                  id: "Sembunyikan petunjuk" },
+  showHint:       { ko: "힌트 보기",             es: "Ver pista",               en: "Show hint",                  id: "Lihat petunjuk" },
+  correct:        { ko: "정답!",                es: "¡Correcto!",              en: "Correct!",                   id: "Benar!" },
+  correctHint:    { ko: "정답 - 힌트 사용, XP 없음", es: "Correcto - pista usada, sin XP", en: "Correct - hint used, no XP", id: "Benar - pakai petunjuk, tanpa XP" },
+  answerPrefix:   { ko: "정답",                 es: "Respuesta",               en: "Answer",                     id: "Jawaban" },
+  notQuite:       { ko: "아직 아니에요. 다시 해봐요!", es: "No del todo. Inténtalo otra vez.", en: "Not quite. Try again!", id: "Belum tepat. Coba lagi!" },
+  send:           { ko: "보내기",               es: "Enviar",                  en: "Send",                       id: "Kirim" },
+  beachScene:     { ko: "해변",                 es: "Playa",                   en: "Beach",                      id: "Pantai" },
+  marketScene:    { ko: "시장",                 es: "Mercado",                 en: "Market",                     id: "Pasar" },
+  nightScene:     { ko: "밤",                   es: "Noche",                   en: "Night",                      id: "Malam" },
+  scene:          { ko: "장면",                 es: "Escena",                  en: "Scene",                      id: "Adegan" },
+  stop:           { ko: "중지",                 es: "Parar",                   en: "Stop",                       id: "Berhenti" },
+  speak:          { ko: "말하기",               es: "Hablar",                  en: "Speak",                      id: "Bicara" },
+  complete:       { ko: "완료",                 es: "Completar",               en: "Complete",                   id: "Selesai" },
+  next:           { ko: "다음",                 es: "Siguiente",               en: "Next",                       id: "Lanjut" },
+  nextStage:      { ko: "다음 단계",             es: "Siguiente etapa",         en: "Next Stage",                 id: "Tahap berikutnya" },
+  nextRound:      { ko: "다음 라운드",           es: "Siguiente ronda",         en: "Next Round",                 id: "Ronde berikutnya" },
+  seeResults:     { ko: "결과 보기",             es: "Ver resultados",          en: "See Results",                id: "Lihat hasil" },
+  speakLouder:    { ko: "더 강하게 말해보세요",   es: "Habla más fuerte",        en: "Speak louder!",              id: "Bicara lebih keras!" },
+  retry:          { ko: "다시 녹음",             es: "Reintentar",              en: "Retry",                      id: "Ulangi" },
+  rescueStage:    { ko: "구출 단계",             es: "Etapa de rescate",        en: "Rescue Stage",               id: "Tahap Penyelamatan" },
+  rescueSuccess:  { ko: "구출 성공!",            es: "¡Rescate logrado!",       en: "Rescue success!",            id: "Penyelamatan berhasil!" },
+  tryAgain:       { ko: "다시 시도하세요",        es: "Inténtalo de nuevo",      en: "Try again",                  id: "Coba lagi" },
+  micUnsupported: { ko: "마이크를 지원하지 않아요.", es: "El micrófono no es compatible.", en: "Microphone not supported.", id: "Mikrofon tidak didukung." },
+  micPermission:  { ko: "마이크 권한이 필요해요.", es: "Se necesita permiso del micrófono.", en: "Microphone permission required.", id: "Izin mikrofon diperlukan." },
+  micStartFailed: { ko: "마이크를 시작할 수 없어요.", es: "No se puede iniciar el micrófono.", en: "Cannot start microphone.", id: "Mikrofon tidak bisa dimulai." },
+  evaluationError:{ ko: "채점 오류",             es: "Error de evaluación.",     en: "Evaluation error.",          id: "Kesalahan evaluasi." },
+  excellent:      { ko: "훌륭해요!",             es: "¡Excelente!",             en: "Excellent!",                 id: "Bagus sekali!" },
+  keepTrying:     { ko: "다시 도전해볼게요",      es: "¡Inténtalo de nuevo!",    en: "Keep trying!",               id: "Terus coba!" },
+  stonePrompt:    { ko: "수호석에 힘을 불어넣으세요:", es: "Da poder a la piedra:", en: "Empower the Guardian Stone:", id: "Beri kekuatan pada Batu Penjaga:" },
+  stoneChecking:  { ko: "수호석 반응 확인 중…",   es: "Comprobando la piedra…",   en: "Checking stone response…",   id: "Memeriksa respons batu…" },
+  stoneResponds:  { ko: "수호석이 반응합니다!",   es: "¡La piedra reacciona!",   en: "The stone responds!",        id: "Batu itu merespons!" },
 };
 function qt(key: string, lang: LangCode): string {
   const entry = QT[key];
@@ -171,7 +207,7 @@ function ResultView({
   return (
     <Animated.View style={[styles.resultContainer, { transform: [{ scale }], opacity }]}>
       <View style={[styles.resultMark, passed ? styles.resultMarkPassed : styles.resultMarkRetry]}>
-        <Text style={styles.resultMarkText}>{passed ? "PASS" : "TRY"}</Text>
+        <Text style={styles.resultMarkText}>{qt(passed ? "passMark" : "tryMark", nativeLang)}</Text>
       </View>
       <Text style={styles.resultTitle}>
         {passed
@@ -494,7 +530,7 @@ function WordRearrangeView({
       {/* Hint */}
       <Pressable onPress={() => { setShowHint(h => !h); setHintUsedThisQ(true); }} style={styles.hintToggle}>
         <Text style={styles.hintToggleText}>
-          {showHint ? "Hide hint" : "Show hint"}{hintUsedThisQ ? " (-XP)" : ""}
+          {qt(showHint ? "hideHint" : "showHint", nativeLang)}{hintUsedThisQ ? " (-XP)" : ""}
         </Text>
       </Pressable>
       {showHint && q.hint && (
@@ -507,7 +543,7 @@ function WordRearrangeView({
           backgroundColor: feedback === "correct" ? "#2e7d32" : feedback === "penalized" ? "#f57c00" : "#c62828",
         }]}>
           <Text style={styles.feedbackText}>
-            {feedback === "correct" ? "Correct!" : feedback === "penalized" ? "Correct - hint used, no XP" : `Answer: ${q.answer}`}
+            {feedback === "correct" ? qt("correct", nativeLang) : feedback === "penalized" ? qt("correctHint", nativeLang) : `${qt("answerPrefix", nativeLang)}: ${q.answer}`}
           </Text>
         </View>
       )}
@@ -602,7 +638,7 @@ function ListeningQuizView({
       {feedback && (
         <View style={[styles.feedbackBanner, { backgroundColor: feedback === "correct" ? "#2e7d32" : "#c62828" }]}>
           <Text style={styles.feedbackText}>
-            {feedback === "correct" ? "Correct!" : `Answer: ${q.answer}`}
+            {feedback === "correct" ? qt("correct", nativeLang) : `${qt("answerPrefix", nativeLang)}: ${q.answer}`}
           </Text>
         </View>
       )}
@@ -650,7 +686,7 @@ function RiddleQuizView({
     const isCorrect = acceptable.some(a => normalise(a) === normalise(input));
 
     if (isCorrect) {
-      setFeedback("Correct!");
+      setFeedback(qt("correct", nativeLang));
       setCorrect(c => c + 1);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       setTimeout(advance, 1200);
@@ -667,17 +703,17 @@ function RiddleQuizView({
       try {
         const json = JSON.parse(res.match(/\{[\s\S]*\}/)?.[0] ?? "{}");
         if (json.correct) {
-          setFeedback("Correct!");
+          setFeedback(qt("correct", nativeLang));
           setCorrect(c => c + 1);
           setTimeout(advance, 1200);
         } else {
-          setFeedback(json.feedback ?? "Not quite. Try again!");
+          setFeedback(json.feedback ?? qt("notQuite", nativeLang));
         }
         return;
       } catch (e) { console.warn('[API] riddle answer parse failed:', e); /* fall through */ }
     }
 
-    setFeedback(`Not quite. Answer: ${riddle.answer}`);
+    setFeedback(`${qt("notQuite", nativeLang)} ${qt("answerPrefix", nativeLang)}: ${riddle.answer}`);
     setTimeout(advance, 2000);
   }
 
@@ -714,7 +750,7 @@ function RiddleQuizView({
       {loading && <ActivityIndicator color={C.gold} style={{ marginTop: 12 }} />}
       {feedback && (
         <View style={[styles.feedbackBanner, {
-          backgroundColor: feedback.startsWith("Correct") ? "#2e7d32" : "#8B4513",
+          backgroundColor: feedback === qt("correct", nativeLang) ? "#2e7d32" : "#8B4513",
         }]}>
           <Text style={styles.feedbackText}>{feedback}</Text>
         </View>
@@ -805,7 +841,7 @@ function RoleplayQuizView({
       {/* Progress */}
       {ordersComplete > 0 && (
         <Text style={styles.progressLabel}>
-          {quiz.nativeLang === "ko" ? `주문: ${ordersComplete}/3` : quiz.nativeLang === "es" ? `Pedidos: ${ordersComplete}/3` : `Orders: ${ordersComplete}/3`}
+            {quiz.nativeLang === "ko" ? `주문: ${ordersComplete}/3` : quiz.nativeLang === "es" ? `Pedidos: ${ordersComplete}/3` : quiz.nativeLang === "id" ? `Pesanan: ${ordersComplete}/3` : `Orders: ${ordersComplete}/3`}
         </Text>
       )}
 
@@ -818,7 +854,7 @@ function RoleplayQuizView({
       >
         {messages.length === 0 && (
           <Text style={styles.chatPlaceholder}>
-            {quiz.nativeLang === "ko" ? "대화를 시작하세요..." : quiz.nativeLang === "es" ? "Inicia la conversación..." : "Start the conversation..."}
+            {quiz.nativeLang === "ko" ? "대화를 시작하세요..." : quiz.nativeLang === "es" ? "Inicia la conversación..." : quiz.nativeLang === "id" ? "Mulai percakapan..." : "Start the conversation..."}
           </Text>
         )}
         {messages.map((m, i) => (
@@ -846,7 +882,7 @@ function RoleplayQuizView({
           multiline
         />
         <Pressable style={[styles.sendBtn, !input.trim() && { opacity: 0.4 }]} onPress={sendMessage}>
-          <Text style={styles.sendBtnText}>Send</Text>
+          <Text style={styles.sendBtnText}>{qt("send", quiz.nativeLang)}</Text>
         </Pressable>
       </View>
     </View>
@@ -915,14 +951,16 @@ function WritingQuizView({
   if (!prompt) return null;
 
   const sceneLabel: Record<string, string> = {
-    beach_scene: "Beach", market_scene: "Market", night_scene: "Night",
+    beach_scene: qt("beachScene", quiz.nativeLang),
+    market_scene: qt("marketScene", quiz.nativeLang),
+    night_scene: qt("nightScene", quiz.nativeLang),
   };
 
   return (
     <ScrollView style={styles.quizBodyScroll} showsVerticalScrollIndicator={false}>
       <Text style={styles.progressLabel}>{pIdx + 1} / {prompts.length}</Text>
       <View style={styles.writePromptBox}>
-        <Text style={styles.writeSceneLabel}>{sceneLabel[prompt.image] ?? "Scene"}</Text>
+        <Text style={styles.writeSceneLabel}>{sceneLabel[prompt.image] ?? qt("scene", quiz.nativeLang)}</Text>
         <Text style={styles.writeDesc}>{prompt.description}</Text>
         <Text style={styles.writeVocabLabel}>{qt("requiredWords", quiz.nativeLang)}</Text>
         <View style={styles.writeVocabRow}>
@@ -1215,7 +1253,7 @@ function TimedBossView({
       {feedback && (
         <View style={[styles.feedbackBanner, { backgroundColor: feedback === "correct" ? "#2e7d32" : "#c62828" }]}>
           <Text style={styles.feedbackText}>
-            {feedback === "correct" ? "Correct!" : `Answer: ${r.answer ?? "..."}`}
+            {feedback === "correct" ? qt("correct", quiz.nativeLang) : `${qt("answerPrefix", quiz.nativeLang)}: ${r.answer ?? "..."}`}
           </Text>
         </View>
       )}
@@ -1416,7 +1454,7 @@ function PronunciationQuizView({
       autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 8000);
     }).catch((e) => {
       console.warn('[Speech] microphone permission denied:', e);
-      setError(nl === "ko" ? "마이크 권한을 허용해주세요." : "Microphone permission required.");
+      setError(qt("micPermission", nl));
     });
   }
 
@@ -1450,7 +1488,7 @@ function PronunciationQuizView({
         {recordState === "processing" ? (
           <ActivityIndicator size="large" color={C.bg1} />
         ) : (
-          <Text style={styles.micBtnText}>{recordState === "recording" ? "Stop" : "Speak"}</Text>
+          <Text style={styles.micBtnText}>{qt(recordState === "recording" ? "stop" : "speak", nl)}</Text>
         )}
       </Pressable>
 
@@ -1459,9 +1497,9 @@ function PronunciationQuizView({
         {recordState === "recording"
           ? rudyMsg
           : recordState === "processing"
-          ? (nl === "ko" ? "채점 중…" : nl === "es" ? "Evaluando…" : "Evaluating…")
+          ? qt("evaluating", nl)
           : recordState === "idle"
-          ? (nl === "ko" ? "마이크 버튼을 눌러 말하세요" : nl === "es" ? "Presiona el micrófono" : "Tap mic to speak")
+          ? qt("tapMic", nl)
           : ""}
       </Text>
 
@@ -1472,11 +1510,11 @@ function PronunciationQuizView({
           <Text style={styles.pronScoreLabel}>/ 100</Text>
           {passed ? (
             <Text style={[styles.pronFeedbackLabel, { color: "#4caf50" }]}>
-              {nl === "ko" ? "훌륭해요!" : nl === "es" ? "¡Excelente!" : "Excellent!"}
+              {qt("excellent", nl)}
             </Text>
           ) : (
             <Text style={[styles.pronFeedbackLabel, { color: "#f44336" }]}>
-              {nl === "ko" ? "다시 도전해볼게요" : nl === "es" ? "¡Inténtalo de nuevo!" : "Keep trying!"}
+              {qt("keepTrying", nl)}
             </Text>
           )}
         </View>
@@ -1490,14 +1528,14 @@ function PronunciationQuizView({
         <View style={styles.pronActionRow}>
           {!passed && (
             <Pressable style={styles.pronRetryBtn} onPress={() => { setScore(null); setError(""); setRecordState("idle"); }}>
-              <Text style={styles.pronRetryText}>{nl === "ko" ? "다시 녹음" : nl === "es" ? "Reintentar" : "Retry"}</Text>
+              <Text style={styles.pronRetryText}>{qt("retry", nl)}</Text>
             </Pressable>
           )}
           <Pressable style={[styles.pronNextBtn, !passed && { backgroundColor: C.bg3 }]} onPress={advance}>
             <Text style={[styles.pronNextText, !passed && { color: C.textMuted }]}>
               {isLast
-                ? (nl === "ko" ? "완료" : nl === "es" ? "Completar" : "Complete")
-                : (nl === "ko" ? "다음" : nl === "es" ? "Siguiente" : "Next")}
+                ? qt("complete", nl)
+                : qt("next", nl)}
             </Text>
           </Pressable>
         </View>
@@ -1756,7 +1794,7 @@ function VoicePowerQuizView({
       {/* Sentence card */}
       <View style={styles.pronCard}>
         <Text style={styles.pronSentenceLabel}>
-          {nl === "ko" ? "수호석에 힘을 불어넣으세요:" : nl === "es" ? "Da poder a la piedra:" : "Empower the Guardian Stone:"}
+          {qt("stonePrompt", nl)}
         </Text>
         <Text style={styles.pronSentenceText}>{sentence.sentence}</Text>
         {sentence.translation && (
@@ -1777,14 +1815,14 @@ function VoicePowerQuizView({
         {recordState === "processing" ? (
           <ActivityIndicator size="large" color={C.bg1} />
         ) : (
-          <Text style={styles.micBtnText}>{recordState === "recording" ? "Stop" : "Speak"}</Text>
+          <Text style={styles.micBtnText}>{qt(recordState === "recording" ? "stop" : "speak", nl)}</Text>
         )}
       </Pressable>
 
       <Text style={styles.pronStatusText}>
         {recordState === "recording" ? rudyMsg
-          : recordState === "processing" ? (nl === "ko" ? "수호석 반응 확인 중…" : "Checking stone response…")
-          : recordState === "idle" ? (nl === "ko" ? "마이크를 눌러 말하세요" : "Tap mic to speak")
+          : recordState === "processing" ? qt("stoneChecking", nl)
+          : recordState === "idle" ? qt("tapMic", nl)
           : ""}
       </Text>
 
@@ -1795,8 +1833,8 @@ function VoicePowerQuizView({
           <Text style={styles.pronScoreLabel}>/ 100</Text>
           <Text style={[styles.pronFeedbackLabel, { color: stoneColor }]}>
             {passed
-              ? (nl === "ko" ? "수호석이 반응합니다!" : nl === "es" ? "La piedra reacciona!" : "The stone responds!")
-              : (nl === "ko" ? "더 강하게 말해보세요" : nl === "es" ? "Habla más fuerte" : "Speak louder!")}
+              ? qt("stoneResponds", nl)
+              : qt("speakLouder", nl)}
           </Text>
         </View>
       )}
@@ -1807,12 +1845,12 @@ function VoicePowerQuizView({
         <View style={styles.pronActionRow}>
           {!passed && (
             <Pressable style={styles.pronRetryBtn} onPress={() => { setScore(null); setStoneEffect("dim"); setError(""); setRecordState("idle"); }}>
-              <Text style={styles.pronRetryText}>{nl === "ko" ? "다시 녹음" : nl === "es" ? "Reintentar" : "Retry"}</Text>
+              <Text style={styles.pronRetryText}>{qt("retry", nl)}</Text>
             </Pressable>
           )}
           <Pressable style={[styles.pronNextBtn, !passed && { backgroundColor: C.bg3 }]} onPress={advance}>
             <Text style={[styles.pronNextText, !passed && { color: C.textMuted }]}>
-              {isLast ? (nl === "ko" ? "완료" : "Complete") : (nl === "ko" ? "다음" : "Next")}
+              {isLast ? qt("complete", nl) : qt("next", nl)}
             </Text>
           </Pressable>
         </View>
@@ -2119,16 +2157,16 @@ function NpcRescueQuizView({
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         } catch (e) {
           console.warn('[API] pronunciation assessment failed:', e);
-          setError(nl === "ko" ? "채점 오류" : "Evaluation error.");
+          setError(qt("evaluationError", nl));
         } finally { setRecordState("done"); }
       };
       recorder.start();
       setRecordState("recording");
       autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 8000);
-    }).catch((e) => { console.warn('[Speech] microphone permission denied:', e); setError(nl === "ko" ? "마이크 권한 필요" : "Microphone permission required."); });
+    }).catch((e) => { console.warn('[Speech] microphone permission denied:', e); setError(qt("micPermission", nl)); });
   }
 
-  if (!stage) return <Text style={styles.instructionText}>No rescue stages found.</Text>;
+  if (!stage) return <Text style={styles.instructionText}>{qt("noSentences", nl)}</Text>;
 
   const progressPct = ((stageIdx + (passed ? 1 : 0)) / totalStages) * 100;
 
@@ -2139,7 +2177,7 @@ function NpcRescueQuizView({
         <View style={[nrStyles.progressBarFill, { width: `${progressPct}%` as any }]} />
       </View>
       <Text style={styles.pronProgress}>
-        {nl === "ko" ? `구출 단계 ${stageIdx + 1} / ${totalStages}` : `Rescue Stage ${stageIdx + 1} / ${totalStages}`}
+        {`${qt("rescueStage", nl)} ${stageIdx + 1} / ${totalStages}`}
       </Text>
 
       {/* NPC rescue banner */}
@@ -2148,7 +2186,7 @@ function NpcRescueQuizView({
           <Text style={nrStyles.rescueBadgeText}>SOS</Text>
         </View>
         <Text style={nrStyles.rescueText}>
-          {nl === "ko" ? `${rescue.npcToRescue}을(를) 구출하세요!` : `Rescue ${rescue.npcToRescue}!`}
+          {nl === "ko" ? `${rescue.npcToRescue}을(를) 구출하세요!` : nl === "es" ? `¡Rescata a ${rescue.npcToRescue}!` : nl === "id" ? `Selamatkan ${rescue.npcToRescue}!` : `Rescue ${rescue.npcToRescue}!`}
         </Text>
       </View>
 
@@ -2168,14 +2206,14 @@ function NpcRescueQuizView({
         disabled={recordState === "processing" || recordState === "done"}
       >
         {recordState === "processing" ? <ActivityIndicator size="large" color={C.bg1} /> : (
-          <Text style={styles.micBtnText}>{recordState === "recording" ? "Stop" : "Speak"}</Text>
+          <Text style={styles.micBtnText}>{qt(recordState === "recording" ? "stop" : "speak", nl)}</Text>
         )}
       </Pressable>
 
       <Text style={styles.pronStatusText}>
-        {recordState === "recording" ? (nl === "ko" ? "듣고 있어요…" : "Listening…")
-          : recordState === "processing" ? (nl === "ko" ? "평가 중…" : "Evaluating…")
-          : recordState === "idle" ? (nl === "ko" ? "마이크를 눌러 말하세요" : "Tap mic to speak")
+        {recordState === "recording" ? qt("listening", nl)
+          : recordState === "processing" ? qt("evaluating", nl)
+          : recordState === "idle" ? qt("tapMic", nl)
           : ""}
       </Text>
 
@@ -2184,7 +2222,7 @@ function NpcRescueQuizView({
           <Text style={[styles.pronScoreNum, { color: passed ? "#4caf50" : "#f44336" }]}>{score}</Text>
           <Text style={styles.pronScoreLabel}>/ 100</Text>
           <Text style={[styles.pronFeedbackLabel, { color: passed ? "#4caf50" : "#f44336" }]}>
-            {passed ? (nl === "ko" ? "구출 성공!" : "Rescue success!") : (nl === "ko" ? "다시 시도하세요" : "Try again")}
+            {passed ? qt("rescueSuccess", nl) : qt("tryAgain", nl)}
           </Text>
         </View>
       )}
@@ -2195,12 +2233,12 @@ function NpcRescueQuizView({
         <View style={styles.pronActionRow}>
           {!passed && (
             <Pressable style={styles.pronRetryBtn} onPress={() => { setScore(null); setError(""); setRecordState("idle"); }}>
-              <Text style={styles.pronRetryText}>{nl === "ko" ? "다시 녹음" : "Retry"}</Text>
+              <Text style={styles.pronRetryText}>{qt("retry", nl)}</Text>
             </Pressable>
           )}
           <Pressable style={[styles.pronNextBtn, !passed && { backgroundColor: C.bg3 }]} onPress={advance}>
             <Text style={[styles.pronNextText, !passed && { color: C.textMuted }]}>
-              {isLast ? (nl === "ko" ? "완료" : "Complete") : (nl === "ko" ? "다음 단계" : "Next Stage")}
+              {isLast ? qt("complete", nl) : qt("nextStage", nl)}
             </Text>
           </Pressable>
         </View>

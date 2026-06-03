@@ -49,6 +49,7 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
 
   const gradeMeta = GAUGE_GRADE_META[result.gaugeGrade];
   const stars = result.correctRate >= 90 ? 3 : result.correctRate >= 70 ? 2 : 1;
+  const badgeLabel = lang === "ko" ? "배지" : lang === "es" ? "Insignia" : lang === "id" ? "Lencana" : "Badge";
 
   return (
     <View style={styles.container}>
@@ -118,7 +119,7 @@ export default function ChapterResultScreen({ result, onContinue }: Props) {
         {result.badgeEarned && (
           <View style={styles.badgeRow}>
             <View style={styles.badgePill}>
-              <Text style={styles.badgePillText}>BADGE</Text>
+              <Text style={styles.badgePillText}>{badgeLabel}</Text>
             </View>
             <Text style={styles.badgeText}>
               {lang === "ko" ? "\uBC43\uC9C0 \uD68D\uB4DD!" : lang === "es" ? "\u00A1Insignia!" : lang === "id" ? "Lencana Didapat!" : "Badge Earned!"}
