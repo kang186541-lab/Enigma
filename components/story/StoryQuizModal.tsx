@@ -61,6 +61,8 @@ const QT: Record<string, Record<QL, string>> = {
   nextStage:      { ko: "다음 단계",             es: "Siguiente etapa",         en: "Next Stage",                 id: "Tahap berikutnya" },
   nextRound:      { ko: "다음 라운드",           es: "Siguiente ronda",         en: "Next Round",                 id: "Ronde berikutnya" },
   seeResults:     { ko: "결과 보기",             es: "Ver resultados",          en: "See Results",                id: "Lihat hasil" },
+  wonRound:       { ko: "이 라운드 승리!",        es: "¡Ganaste esta ronda!",     en: "You won this round!",         id: "Kamu menang ronde ini!" },
+  lostRound:      { ko: "이 라운드 패배",         es: "Perdiste esta ronda",      en: "You lost this round",         id: "Kamu kalah ronde ini" },
   speakLouder:    { ko: "더 강하게 말해보세요",   es: "Habla más fuerte",        en: "Speak louder!",              id: "Bicara lebih keras!" },
   retry:          { ko: "다시 녹음",             es: "Reintentar",              en: "Retry",                      id: "Ulangi" },
   rescueStage:    { ko: "구출 단계",             es: "Etapa de rescate",        en: "Rescue Stage",               id: "Tahap Penyelamatan" },
@@ -121,6 +123,20 @@ function unknownRoundLabel(type: string, uiLang: LangCode): string {
   if (uiLang === "es") return `Tipo de ronda desconocido: ${type}`;
   if (uiLang === "id") return `Jenis ronde tidak dikenal: ${type}`;
   return `Unknown round type: ${type}`;
+}
+
+function roundCounterLabel(current: number, total: number, uiLang: LangCode): string {
+  if (uiLang === "ko") return `라운드 ${current}/${total}`;
+  if (uiLang === "es") return `Ronda ${current}/${total}`;
+  if (uiLang === "id") return `Ronde ${current}/${total}`;
+  return `Round ${current}/${total}`;
+}
+
+function unsupportedQuizTypeLabel(type: string, uiLang: LangCode): string {
+  if (uiLang === "ko") return `아직 지원하지 않는 퀴즈 유형: ${type}`;
+  if (uiLang === "es") return `Tipo de quiz aún no admitido: ${type}`;
+  if (uiLang === "id") return `Jenis kuis belum didukung: ${type}`;
+  return `Quiz type not yet supported: ${type}`;
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -635,7 +651,7 @@ function ListeningQuizView({
   function checkAnswer() {
     const q = questions[qIdx];
     const acceptable = q.acceptableAnswers ?? [];
-    const langMap: Record<string, string> = { en: "english", es: "spanish", ko: "korean" };
+    const langMap: Record<string, string> = { en: "english", es: "spanish", ko: "korean", id: "indonesian" };
     const learningLang = langMap[targetLang] ?? "english";
     const result = checkSpelling(input, q.answer, { acceptableAnswers: acceptable, learningLang });
     const isCorrect = result.correct;
@@ -1276,7 +1292,7 @@ function TimedBossView({
       <View style={[styles.timerRow, { borderColor: urgentColor }]}>
         <Text style={[styles.timerText, { color: urgentColor }]}>{timeLeft}s</Text>
         <Text style={styles.progressLabel}>
-          {" "}{quiz.nativeLang === "ko" ? `라운드 ${round + 1}/${rounds.length}` : quiz.nativeLang === "es" ? `Ronda ${round + 1}/${rounds.length}` : `Round ${round + 1}/${rounds.length}`}
+          {" "}{roundCounterLabel(round + 1, rounds.length, quiz.nativeLang)}
         </Text>
       </View>
 
@@ -1967,7 +1983,7 @@ Score 0-100. Check if student used required expressions naturally. Respond ONLY 
       {/* Round indicator */}
       <View style={styles.roundBadge}>
         <Text style={styles.roundBadgeText}>
-          ROUND {roundIdx + 1} / {totalRounds}
+          {roundCounterLabel(roundIdx + 1, totalRounds, nl)}
         </Text>
       </View>
 
@@ -2008,7 +2024,7 @@ Score 0-100. Check if student used required expressions naturally. Respond ONLY 
             disabled={!input.trim() || loading}
           >
             {loading ? <ActivityIndicator color={C.bg1} /> : (
-              <Text style={styles.submitBtnText}>{nl === "ko" ? "반론 제출" : "Submit Argument"}</Text>
+              <Text style={styles.submitBtnText}>{qt("submitArgument", nl)}</Text>
             )}
           </Pressable>
         </>
@@ -2019,13 +2035,13 @@ Score 0-100. Check if student used required expressions naturally. Respond ONLY 
         <>
           <View style={[styles.feedbackBanner, { backgroundColor: feedback.won ? "#2e7d32" : "#c62828" }]}>
             <Text style={styles.feedbackText}>
-              {feedback.won ? (nl === "ko" ? "이 라운드 승리!" : "You won this round!") : (nl === "ko" ? "이 라운드 패배" : "You lost this round")}
+              {qt(feedback.won ? "wonRound" : "lostRound", nl)}
             </Text>
           </View>
           <Text style={dbStyles.feedbackDetail}>{feedback.text}</Text>
           <Pressable style={styles.submitBtn} onPress={nextRound}>
             <Text style={styles.submitBtnText}>
-              {isLast ? (nl === "ko" ? "결과 보기" : "See Results") : (nl === "ko" ? "다음 라운드" : "Next Round")}
+              {qt(isLast ? "seeResults" : "nextRound", nl)}
             </Text>
           </Pressable>
         </>
@@ -2362,7 +2378,7 @@ export default function StoryQuizModal({ quiz, visible, onComplete, onDismiss }:
         return <NpcRescueQuizView quiz={quiz!} onDone={handleDone} />;
       default:
         return <Text style={styles.instructionText}>
-          {quiz!.nativeLang === "ko" ? `아직 지원하지 않는 퀴즈 유형: ${quiz!.type}` : quiz!.nativeLang === "es" ? `Tipo de quiz aún no admitido: ${quiz!.type}` : `Quiz type not yet supported: ${quiz!.type}`}
+          {unsupportedQuizTypeLabel(quiz!.type, quiz!.nativeLang)}
         </Text>;
     }
   }

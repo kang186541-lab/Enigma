@@ -289,10 +289,15 @@ const FEEDBACK_MESSAGES: Record<string, Record<"excellent" | "good" | "needsWork
     good: ["¡Bien hecho! 👍", "¡Buena pronunciación!", "¡Sigue practicando y serás perfecto! 🦊"],
     needsWork: ["¡Inténtalo de nuevo! 💪", "¡Un poco más de práctica!", "¡Rudy cree en ti! 🦊"],
   },
+  id: {
+    excellent: ["Sempurna! 🌟", "Pelafalanmu hebat! 🦊", "Kedengarannya alami! ⭐"],
+    good: ["Bagus! 👍", "Pelafalan yang baik!", "Terus berlatih, kamu pasti bisa! 🦊"],
+    needsWork: ["Coba sekali lagi! 💪", "Sedikit latihan lagi!", "Rudy mendukungmu! 🦊"],
+  },
 };
 
 export function getRandomFeedback(type: "excellent" | "good" | "needsWork", nativeLang: string): string {
-  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
+  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
   const pool = FEEDBACK_MESSAGES[lc]?.[type] ?? FEEDBACK_MESSAGES.en[type];
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -313,11 +318,16 @@ export const COMPLETION_MESSAGES = {
     "¡Increíble! ¡Dijiste {sentenceCount} oraciones hoy! ¡Sigue así mañana! 🦊",
     "¡Siento que mejoras! ¡Nos vemos en '{nextTopic}' mañana! 🦊",
   ],
+  id: [
+    "Kerja bagus hari ini, partner! Besok kita belajar '{nextTopic}'. Sampai jumpa! 🦊",
+    "Luar biasa! Hari ini kamu mengucapkan {sentenceCount} kalimat! Lanjutkan besok! 🦊",
+    "Rudy merasa kemampuanmu makin kuat! Sampai jumpa di latihan '{nextTopic}' besok! 🦊",
+  ],
 };
 
 export function getCompletionMessage(nativeLang: string, sentenceCount: number, nextTopic: string): string {
-  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : "en";
-  const msgs = COMPLETION_MESSAGES[lc as "ko" | "en" | "es"];
+  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
+  const msgs = COMPLETION_MESSAGES[lc as "ko" | "en" | "es" | "id"];
   const msg = msgs[Math.floor(Math.random() * msgs.length)];
   return msg
     .replace("{sentenceCount}", String(sentenceCount))

@@ -31,6 +31,8 @@ const requiredQuizKeys = [
   "nextStage",
   "nextRound",
   "seeResults",
+  "wonRound",
+  "lostRound",
   "speakLouder",
   "retry",
   "rescueStage",
@@ -101,6 +103,22 @@ const bannedStoryQuizPatterns = [
     label: "writing minimum sentence label",
   },
   {
+    pattern: /ROUND \{roundIdx \+ 1\} \/ \{totalRounds\}/,
+    label: "debate round counter",
+  },
+  {
+    pattern: /nl === "ko" \? "반론 제출" : "Submit Argument"/,
+    label: "debate submit button",
+  },
+  {
+    pattern: /feedback\.won \? \(nl === "ko" \? "이 라운드 승리!" : "You won this round!"\)|isLast \? \(nl === "ko" \? "결과 보기" : "See Results"\)|nl === "ko" \? "다음 라운드" : "Next Round"/,
+    label: "debate feedback/actions",
+  },
+  {
+    pattern: /Quiz type not yet supported: \$\{quiz!\.type\}/,
+    label: "unsupported quiz type fallback",
+  },
+  {
     pattern: /beach_scene:\s*"Beach",\s*market_scene:\s*"Market",\s*night_scene:\s*"Night"/,
     label: "writing scene labels",
   },
@@ -125,12 +143,17 @@ assert.ok(
   "NPC rescue result copy must stay localized",
 );
 assert.ok(
-  storyQuizSource.includes("translateInstruction(quiz.targetLang, quiz.nativeLang)") &&
+    storyQuizSource.includes("translateInstruction(quiz.targetLang, quiz.nativeLang)") &&
     storyQuizSource.includes("describeInstruction(quiz.targetLang, quiz.nativeLang)") &&
     storyQuizSource.includes("minSentencesLabel(prompt.minSentences, quiz.nativeLang)") &&
+    storyQuizSource.includes("roundCounterLabel(round + 1, rounds.length, quiz.nativeLang)") &&
+    storyQuizSource.includes("roundCounterLabel(roundIdx + 1, totalRounds, nl)") &&
+    storyQuizSource.includes("unsupportedQuizTypeLabel(quiz!.type, quiz!.nativeLang)") &&
+    storyQuizSource.includes('id: "indonesian"') &&
     storyQuizSource.includes('placeholder={qt("typeArgument", nl)}') &&
+    storyQuizSource.includes('qt("submitArgument", nl)') &&
     storyQuizSource.includes('qt("useExpressions", nl)'),
-  "story quiz prompts, writing labels, and debate inputs must stay localized",
+  "story quiz prompts, writing labels, debate labels, target-language maps, and fallback messages must stay localized",
 );
 
 assert.doesNotMatch(

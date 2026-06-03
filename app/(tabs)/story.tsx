@@ -38,17 +38,21 @@ const CHAPTERS = [
     titleEn: "The London Cipher",
     titleKo: "런던의 암호",
     titleEs: "El Cifrado de Londres",
+    titleId: "Sandi London",
     descEn: "Decode the ∆LX symbol before the black-coat thief erases London's words",
     descKo: "검은 코트의 도둑이 런던의 단어들을 지우기 전에 ∆LX 기호를 해독하라",
     descEs: "Descifra el símbolo ∆LX antes de que el ladrón del abrigo negro borre las palabras de Londres",
+    descId: "Pecahkan simbol ∆LX sebelum pencuri berjas hitam menghapus kata-kata London",
     characters: ["🕵️", "👩‍💼", "🕴️"],
     scenes: 17,
     missionEn: "4 puzzles + 2 clues",
     missionKo: "퍼즐 4개 + 단서 2개",
     missionEs: "4 puzzles + 2 pistas",
+    missionId: "4 teka-teki + 2 petunjuk",
     arcEn: "Curiosity → Tension → Shock → Resolve",
     arcKo: "호기심 → 긴장 → 충격 → 결의",
     arcEs: "Curiosidad → Tensión → Conmoción → Determinación",
+    arcId: "Rasa ingin tahu → Tegang → Terkejut → Tekad",
     npcLangRatio: 0.3,
   },
   {
@@ -60,17 +64,21 @@ const CHAPTERS = [
     titleEn: "The Madrid Disappearance",
     titleKo: "마드리드의 실종",
     titleEs: "La Desaparición de Madrid",
+    titleId: "Hilangnya Madrid",
     descEn: "London and Madrid are compromised. Two city stones remain before Babel reveals the final three.",
     descKo: "런던과 마드리드는 이미 위험해졌어. 바벨이 마지막 세 개를 드러내기 전, 도시 수호석 두 개가 남아 있어.",
     descEs: "Londres y Madrid están comprometidas. Quedan dos piedras de ciudad antes de que Babel revele las tres finales.",
+    descId: "London dan Madrid sudah terancam. Dua batu kota tersisa sebelum Babel mengungkap tiga yang terakhir.",
     characters: ["💃", "🥬", "🕴️"],
     scenes: 16,
     missionEn: "4 puzzles + 1 clue",
     missionKo: "퍼즐 4개 + 단서 1개",
     missionEs: "4 puzzles + 1 pista",
+    missionId: "4 teka-teki + 1 petunjuk",
     arcEn: "Fear → Compassion → Anger → Pursuit",
     arcKo: "공포 → 연민 → 분노 → 추격",
     arcEs: "Miedo → Compasión → Ira → Persecución",
+    arcId: "Takut → Belas kasih → Marah → Mengejar",
     npcLangRatio: 0.5,
   },
   {
@@ -82,17 +90,21 @@ const CHAPTERS = [
     titleEn: "The Seoul Secret",
     titleKo: "서울의 비밀",
     titleEs: "El Secreto de Seúl",
+    titleId: "Rahasia Seoul",
     descEn: "Project Erase, the Lexicon Society's plan to delete all world languages",
     descKo: "이레이즈 프로젝트, Lexicon Society의 전 세계 언어 삭제 계획",
     descEs: "Proyecto Borrado, el plan de la Sociedad Lexicon para eliminar todos los idiomas",
+    descId: "Project Erase, rencana Lexicon Society untuk menghapus semua bahasa dunia",
     characters: ["👨‍💼", "👩‍⚕️", "🕴️"],
     scenes: 15,
     missionEn: "4 puzzles + 1 clue",
     missionKo: "퍼즐 4개 + 단서 1개",
     missionEs: "4 puzzles + 1 pista",
+    missionId: "4 teka-teki + 1 petunjuk",
     arcEn: "Confusion → Bonding → Betrayal → Awakening",
     arcKo: "혼란 → 유대 → 배신 → 각성",
     arcEs: "Confusión → Vínculo → Traición → Despertar",
+    arcId: "Bingung → Ikatan → Pengkhianatan → Bangkit",
     npcLangRatio: 0.7,
   },
   {
@@ -104,17 +116,21 @@ const CHAPTERS = [
     titleEn: "The Cairo Stone",
     titleKo: "카이로의 수호석",
     titleEs: "La Piedra de El Cairo",
+    titleId: "Batu Kairo",
     descEn: "Miss Penny holds the key, but Mr. Black is already at Saqqara",
     descKo: "미스 페니가 열쇠를 쥐고 있다. 하지만 미스터 블랙은 이미 사카라에",
     descEs: "Miss Penny tiene la clave, pero Mr. Black ya está en Saqqara",
+    descId: "Miss Penny memegang kuncinya, tetapi Mr. Black sudah berada di Saqqara",
     characters: ["🐪", "💃", "🕴️"],
     scenes: 18,
     missionEn: "4 puzzles + 2 clues",
     missionKo: "퍼즐 4개 + 단서 2개",
     missionEs: "4 puzzles + 2 pistas",
+    missionId: "4 teka-teki + 2 petunjuk",
     arcEn: "Anger → Conflict → Understanding → Forgiveness",
     arcKo: "분노 → 갈등 → 이해 → 용서의 선택",
     arcEs: "Ira → Conflicto → Comprensión → Perdón",
+    arcId: "Marah → Konflik → Memahami → Memaafkan",
     npcLangRatio: 0.85,
   },
   {
@@ -126,17 +142,21 @@ const CHAPTERS = [
     titleEn: "The Last Language",
     titleKo: "최후의 언어",
     titleEs: "El Último Idioma",
+    titleId: "Bahasa Terakhir",
     descEn: "Five language gates. Seven stones. One chance to stop the Universal Code",
     descKo: "5개의 언어 관문. 7개의 수호석. 유니버설 코드를 막을 마지막 기회",
     descEs: "Cinco puertas de idioma. Siete piedras. Una oportunidad de detener el Código Universal",
+    descId: "Lima gerbang bahasa. Tujuh batu. Satu kesempatan untuk menghentikan Kode Universal",
     characters: ["🏛️", "🦊", "🕴️"],
     scenes: 20,
     missionEn: "4 puzzles + 2 clues",
     missionKo: "퍼즐 4개 + 단서 2개",
     missionEs: "4 puzzles + 2 pistas",
+    missionId: "4 teka-teki + 2 petunjuk",
     arcEn: "Resolve → Crisis → Loss → Unity → Triumph",
     arcKo: "결의 → 위기 → 상실 → 연대 → 승리",
     arcEs: "Resolución → Crisis → Pérdida → Unidad → Triunfo",
+    arcId: "Tekad → Krisis → Kehilangan → Persatuan → Kemenangan",
     npcLangRatio: 0.95,
   },
 ];
@@ -183,24 +203,28 @@ export default function StoryTab() {
   function getTitle(ch: (typeof CHAPTERS)[0]) {
     if (lang === "korean") return ch.titleKo;
     if (lang === "spanish") return ch.titleEs;
+    if (lang === "indonesian") return ch.titleId;
     return ch.titleEn;
   }
 
   function getDesc(ch: (typeof CHAPTERS)[0]) {
     if (lang === "korean") return ch.descKo;
     if (lang === "spanish") return ch.descEs;
+    if (lang === "indonesian") return ch.descId;
     return ch.descEn;
   }
 
   function getMission(ch: (typeof CHAPTERS)[0]) {
     if (lang === "korean") return ch.missionKo;
     if (lang === "spanish") return ch.missionEs;
+    if (lang === "indonesian") return ch.missionId;
     return ch.missionEn;
   }
 
   function getArc(ch: (typeof CHAPTERS)[0]) {
     if (lang === "korean") return ch.arcKo;
     if (lang === "spanish") return ch.arcEs;
+    if (lang === "indonesian") return ch.arcId;
     return ch.arcEn;
   }
 
@@ -235,7 +259,7 @@ export default function StoryTab() {
   const doneLabel =
     lang === "korean" ? "완료" : lang === "spanish" ? "Completado" : lang === "indonesian" ? "Selesai" : "Done";
   const replayLabel =
-    lang === "korean" ? "다시 보기" : lang === "spanish" ? "Replay" : lang === "indonesian" ? "Putar lagi" : "Replay";
+    lang === "korean" ? "다시 보기" : lang === "spanish" ? "Repetir" : lang === "indonesian" ? "Putar lagi" : "Replay";
   const playLabel =
     lang === "korean" ? "시작 ▶" : lang === "spanish" ? "Iniciar ▶" : lang === "indonesian" ? "Mulai ▶" : "Play ▶";
 
@@ -573,14 +597,14 @@ export default function StoryTab() {
                     return (
                       <View style={styles.ioRow}>
                         <Text style={styles.ioLabel}>
-                          {lang === "korean" ? "입력" : lang === "indonesian" ? "Masuk" : "In"}
+                          {lang === "korean" ? "입력" : lang === "spanish" ? "Entrada" : lang === "indonesian" ? "Masuk" : "In"}
                         </Text>
                         <View style={styles.ioBar}>
                           <View style={[styles.ioBarInput, { flex: io.inputCount }]} />
                           <View style={[styles.ioBarOutput, { flex: io.outputCount }]} />
                         </View>
                         <Text style={styles.ioLabel}>
-                          {lang === "korean" ? "출력" : lang === "indonesian" ? "Keluar" : "Out"}
+                          {lang === "korean" ? "출력" : lang === "spanish" ? "Salida" : lang === "indonesian" ? "Keluar" : "Out"}
                         </Text>
                         <Text style={styles.ioPct}>{outputPct}%</Text>
                       </View>

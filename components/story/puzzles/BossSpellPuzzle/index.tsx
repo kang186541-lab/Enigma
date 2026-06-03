@@ -317,6 +317,8 @@ export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }
     ? "보스 주문"
     : lang === "spanish"
       ? "Hechizo final"
+      : lang === "indonesian"
+        ? "Mantra bos"
       : "Boss Spell";
 
   return (
@@ -327,7 +329,9 @@ export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }
           <Text style={styles.instruction}>{tri(question.instruction, lang)}</Text>
         </View>
         <Pressable style={styles.resetBtn} onPress={reset} disabled={completing}>
-          <Text style={styles.resetText}>{lang === "korean" ? "초기화" : lang === "spanish" ? "Reiniciar" : "Reset"}</Text>
+          <Text style={styles.resetText}>
+            {lang === "korean" ? "초기화" : lang === "spanish" ? "Reiniciar" : lang === "indonesian" ? "Atur ulang" : "Reset"}
+          </Text>
         </Pressable>
       </View>
 
@@ -427,7 +431,10 @@ function DoorVisual({
   return (
     <View style={styles.doorStage}>
       {doorImage ? (
-        <Image source={doorImage} style={styles.doorImage} resizeMode="cover" />
+        <>
+          <Image source={doorImage} style={styles.doorImageBackdrop} resizeMode="cover" />
+          <Image source={doorImage} style={styles.doorImageFocus} resizeMode="contain" />
+        </>
       ) : (
         <View style={styles.drawnDoor}>
           <View style={styles.doorTop} />
@@ -565,7 +572,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   doorStage: {
-    height: 260,
+    height: 300,
     borderRadius: 8,
     overflow: "hidden",
     borderWidth: 1,
@@ -574,10 +581,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  doorImage: {
+  doorImageBackdrop: {
     ...StyleSheet.absoluteFillObject,
     width: "100%",
     height: "100%",
+    opacity: 0.38,
+    transform: [{ scale: 1.08 }],
+  },
+  doorImageFocus: {
+    position: "absolute",
+    top: 10,
+    bottom: 10,
+    left: 10,
+    right: 10,
   },
   doorCompletionOverlay: {
     ...StyleSheet.absoluteFillObject,

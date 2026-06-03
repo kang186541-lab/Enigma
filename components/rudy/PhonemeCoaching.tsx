@@ -53,8 +53,8 @@ async function playWordTTS(word: string, lang: string) {
   } catch (e) { console.warn('[PhonemeCoaching] word TTS failed:', e); }
 }
 
-function L(nl: string, ko: string, es: string, en: string): string {
-  return nl === "korean" ? ko : nl === "spanish" ? es : en;
+function L(nl: string, ko: string, es: string, en: string, id = en): string {
+  return nl === "korean" ? ko : nl === "spanish" ? es : nl === "indonesian" ? id : en;
 }
 
 // ── IPA → Readable mapping ───────────────────────────────────────────────────
@@ -252,7 +252,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
       <View style={s.headerRow}>
         <Ionicons name="analytics-outline" size={16} color={C.gold} />
         <Text style={s.headerText}>
-          {L(nativeLang, "발음 피드백", "Retroalimentación", "Pronunciation Feedback")}
+          {L(nativeLang, "발음 피드백", "Retroalimentación", "Pronunciation Feedback", "Umpan balik pengucapan")}
         </Text>
       </View>
 
@@ -285,8 +285,8 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                 <View style={s.expandHint}>
                   <Text style={s.expandHintText}>
                     {isExpanded
-                      ? L(nativeLang, "접기", "Cerrar", "Close")
-                      : L(nativeLang, "코칭 보기", "Ver consejo", "View tips")}
+                      ? L(nativeLang, "접기", "Cerrar", "Close", "Tutup")
+                      : L(nativeLang, "코칭 보기", "Ver consejo", "View tips", "Lihat tips")}
                   </Text>
                   <Ionicons
                     name={isExpanded ? "chevron-up" : "chevron-down"}
@@ -315,7 +315,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                 {w.phonemes && w.phonemes.length > 0 && (
                   <View style={s.phonemeSection}>
                     <Text style={s.phonemeSectionTitle}>
-                      {L(nativeLang, "음소별 점수", "Puntuación por fonema", "Phoneme Scores")}
+                      {L(nativeLang, "음소별 점수", "Puntuación por fonema", "Phoneme Scores", "Skor fonem")}
                     </Text>
                     <View style={s.phonemeList}>
                       {w.phonemes.filter(p => p.phoneme && p.phoneme.trim() !== "").map((p, pi) => {
@@ -341,7 +341,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                             </Text>
                             {isLowest && (
                               <Text style={s.lowestTag}>
-                                {L(nativeLang, "집중!", "¡Foco!", "Focus!")}
+                                {L(nativeLang, "집중!", "¡Foco!", "Focus!", "Fokus!")}
                               </Text>
                             )}
                           </View>
@@ -361,7 +361,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                       <View style={s.coachingHeader}>
                         <EmojiText style={s.coachingIcon}>{wpi === 0 ? "💡" : "📌"}</EmojiText>
                         <Text style={s.coachingTitle}>
-                          {L(nativeLang, "발음 코칭", "Consejo", "Coaching Tip")}
+                          {L(nativeLang, "발음 코칭", "Consejo", "Coaching Tip", "Tips pengucapan")}
                         </Text>
                         <Text style={s.coachingPhoneme}>
                           {readable ? `"${readable.display}" (${readable.example})` : `/${wp.phoneme}/`}
@@ -380,7 +380,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
                 >
                   <Ionicons name="volume-low" size={16} color={C.gold} />
                   <Text style={s.slowTtsText}>
-                    {L(nativeLang, "느리게 듣기", "Escuchar lento", "Listen slow")}
+                    {L(nativeLang, "느리게 듣기", "Escuchar lento", "Listen slow", "Dengarkan pelan")}
                   </Text>
                 </Pressable>
               </View>
@@ -397,7 +397,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
         >
           <Ionicons name="refresh" size={14} color="#e5a940" />
           <Text style={s.retryText}>
-            {L(nativeLang, "다시 도전하기", "Intentar de nuevo", "Try again")}
+            {L(nativeLang, "다시 도전하기", "Intentar de nuevo", "Try again", "Coba lagi")}
           </Text>
         </Pressable>
       )}

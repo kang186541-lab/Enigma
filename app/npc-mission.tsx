@@ -94,6 +94,19 @@ function stripEmojis(text: string): string {
     .trim();
 }
 
+function npcReplyFallback(nativeLang: string): string {
+  if (nativeLang === "korean") {
+    return "지금 NPC 연결이 잠깐 불안정해요. 다시 한 문장만 보내볼까요?";
+  }
+  if (nativeLang === "spanish") {
+    return "La conexión con el NPC está fallando un momento. ¿Probamos con una frase más?";
+  }
+  if (nativeLang === "indonesian") {
+    return "Koneksi NPC sedang bermasalah sebentar. Coba kirim satu kalimat lagi?";
+  }
+  return "The NPC connection is having trouble for a moment. Try one more short sentence?";
+}
+
 export default function NpcMissionScreen() {
   const { npcId } = useLocalSearchParams<{ npcId: string }>();
   const insets = useSafeAreaInsets();
@@ -327,7 +340,7 @@ export default function NpcMissionScreen() {
       console.warn('[API] fetchNpcReply failed:', e);
       if (!isStart) {
         const fallbackId = Date.now().toString() + "err";
-        setMessages(prev => [{ id: fallbackId, text: "...", isUser: false }, ...prev]);
+        setMessages(prev => [{ id: fallbackId, text: npcReplyFallback(native), isUser: false }, ...prev]);
       } else {
         setChoicesError(e instanceof Error ? e.message : "network");
       }

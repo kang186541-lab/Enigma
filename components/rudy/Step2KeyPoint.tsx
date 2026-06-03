@@ -188,6 +188,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         ? `거의 왔어요. Rudy는 "${quiz.answer}"로 말해요.`
         : nativeLang === "spanish"
         ? `Casi. Rudy lo diría así: "${quiz.answer}".`
+        : nativeLang === "indonesian"
+        ? `Hampir benar. Rudy akan mengatakannya seperti ini: "${quiz.answer}".`
         : `Almost. Rudy would say it this way: "${quiz.answer}".`;
       setWrongFeedback(wrongMsg);
       setTimeout(() => setQuizPhase("wrong"), 200);
@@ -492,13 +494,13 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
 
             {/* Examples */}
             <View style={s.exSection}>
-              <EmojiText style={s.exLabel}>{nativeLang === "korean" ? "📝 실전 예문" : nativeLang === "spanish" ? "📝 Ejemplos reales" : "📝 Real examples"}</EmojiText>
+              <EmojiText style={s.exLabel}>{pickNativeCopy(nativeLang, { korean: "📝 실전 예문", spanish: "📝 Ejemplos reales", indonesian: "📝 Contoh nyata", english: "📝 Real examples" })}</EmojiText>
               <Text style={s.exText}>{getExplanation(rich.examples, lc)}</Text>
             </View>
 
             {/* Mistakes */}
             <View style={s.mistakeSection}>
-              <EmojiText style={s.mistakeLabel}>{nativeLang === "korean" ? "🚫 흔한 실수" : nativeLang === "spanish" ? "🚫 Errores comunes" : "🚫 Common mistakes"}</EmojiText>
+              <EmojiText style={s.mistakeLabel}>{pickNativeCopy(nativeLang, { korean: "🚫 흔한 실수", spanish: "🚫 Errores comunes", indonesian: "🚫 Kesalahan umum", english: "🚫 Common mistakes" })}</EmojiText>
               <Text style={s.mistakeText}>{getExplanation(rich.mistakes, lc)}</Text>
             </View>
 
