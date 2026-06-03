@@ -7789,6 +7789,16 @@ export default function StoryScene() {
               end={{ x: 1, y: 0.6 }}
               style={styles.sceneBackdropGlow}
             />
+            <LinearGradient
+              pointerEvents="none"
+              colors={["rgba(7,8,13,0)", "rgba(7,8,13,0.34)", "rgba(5,5,8,0.84)"]}
+              locations={[0, 0.58, 1]}
+              style={styles.sceneForegroundDepth}
+            />
+            <View
+              pointerEvents="none"
+              style={[styles.sceneStageGround, { borderTopColor: story.accentColor }]}
+            />
           </>
         )}
 
@@ -8168,6 +8178,21 @@ const styles = StyleSheet.create({
   sceneBackdropGlow: {
     ...StyleSheet.absoluteFillObject,
     opacity: 0.9,
+  },
+  sceneForegroundDepth: {
+    ...StyleSheet.absoluteFillObject,
+    top: "42%",
+  },
+  sceneStageGround: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 126,
+    height: 74,
+    borderTopWidth: 1,
+    backgroundColor: "rgba(8,8,10,0.28)",
+    opacity: 0.28,
+    transform: [{ skewY: "-2deg" }],
   },
 
   /* ── Narration ── */
