@@ -21,8 +21,12 @@ const QT: Record<string, Record<QL, string>> = {
   tapWords:       { ko: "아래 단어를 탭하여 문장을 만드세요", es: "Toca las palabras abajo para formar la oración", en: "Tap words below to build the sentence", id: "Ketuk kata di bawah untuk menyusun kalimat" },
   check:          { ko: "확인",                es: "Comprobar",               en: "Check",                      id: "Cek" },
   playing:        { ko: "재생 중...",           es: "Reproduciendo...",        en: "Playing...",                 id: "Memutar..." },
+  play:           { ko: "재생",                 es: "Reproducir",             en: "Play",                       id: "Putar" },
   playRecording:  { ko: "녹음 재생",           es: "Reproducir grabación",    en: "Play Recording",             id: "Putar Rekaman" },
   typeAnswer:     { ko: "답을 입력하세요...",    es: "Escribe tu respuesta...", en: "Type your answer...",        id: "Ketik jawabanmu..." },
+  typeTarget:     { ko: "목표 언어로 입력하세요...", es: "Escribe en el idioma objetivo...", en: "Type in the target language...", id: "Ketik dalam bahasa target..." },
+  translationPlaceholder: { ko: "번역을 입력하세요...", es: "Traducción...", en: "Translation...", id: "Terjemahan..." },
+  writeResponse:  { ko: "응답을 작성하세요...",   es: "Escribe tu respuesta...", en: "Write your response...", id: "Tulis jawabanmu..." },
   submit:         { ko: "제출",                es: "Enviar",                 en: "Submit",                     id: "Kirim" },
   submitted:      { ko: "제출 완료! 연습을 계속하세요.", es: "¡Enviado! Sigue practicando.", en: "Submitted! Keep practising.", id: "Terkirim! Terus berlatih ya." },
   requiredWords:  { ko: "필수 단어:",           es: "Palabras requeridas:",    en: "Required words:",            id: "Kata wajib:" },
@@ -71,11 +75,52 @@ const QT: Record<string, Record<QL, string>> = {
   stonePrompt:    { ko: "수호석에 힘을 불어넣으세요:", es: "Da poder a la piedra:", en: "Empower the Guardian Stone:", id: "Beri kekuatan pada Batu Penjaga:" },
   stoneChecking:  { ko: "수호석 반응 확인 중…",   es: "Comprobando la piedra…",   en: "Checking stone response…",   id: "Memeriksa respons batu…" },
   stoneResponds:  { ko: "수호석이 반응합니다!",   es: "¡La piedra reacciona!",   en: "The stone responds!",        id: "Batu itu merespons!" },
+  useExpressions: { ko: "사용해야 할 표현:",     es: "Usa estas expresiones:",  en: "Use these expressions:",      id: "Gunakan ungkapan ini:" },
 };
 function qt(key: string, lang: LangCode): string {
   const entry = QT[key];
   if (!entry) return key;
   return entry[lang as QL] ?? entry.en;
+}
+
+function languageNameFor(target: LangCode | string, uiLang: LangCode): string {
+  const names: Record<string, Record<QL, string>> = {
+    ko: { ko: "한국어", es: "coreano", en: "Korean", id: "bahasa Korea" },
+    es: { ko: "스페인어", es: "español", en: "Spanish", id: "bahasa Spanyol" },
+    en: { ko: "영어", es: "inglés", en: "English", id: "bahasa Inggris" },
+    id: { ko: "인도네시아어", es: "indonesio", en: "Indonesian", id: "bahasa Indonesia" },
+  };
+  return names[target]?.[uiLang as QL] ?? names[target]?.en ?? String(target).toUpperCase();
+}
+
+function translateInstruction(target: LangCode | string, uiLang: LangCode): string {
+  const targetName = languageNameFor(target, uiLang);
+  if (uiLang === "ko") return `${targetName}로 번역하세요:`;
+  if (uiLang === "es") return `Traduce al ${targetName}:`;
+  if (uiLang === "id") return `Terjemahkan ke ${targetName}:`;
+  return `Translate to ${targetName}:`;
+}
+
+function describeInstruction(target: LangCode | string, uiLang: LangCode): string {
+  const targetName = languageNameFor(target, uiLang);
+  if (uiLang === "ko") return `${targetName}로 묘사하세요...`;
+  if (uiLang === "es") return `Describe en ${targetName}...`;
+  if (uiLang === "id") return `Jelaskan dalam ${targetName}...`;
+  return `Describe in ${targetName}...`;
+}
+
+function minSentencesLabel(count: number, uiLang: LangCode): string {
+  if (uiLang === "ko") return `최소 ${count}문장`;
+  if (uiLang === "es") return `Mín. ${count} frases`;
+  if (uiLang === "id") return `Min. ${count} kalimat`;
+  return `Min. ${count} sentences`;
+}
+
+function unknownRoundLabel(type: string, uiLang: LangCode): string {
+  if (uiLang === "ko") return `알 수 없는 라운드 유형: ${type}`;
+  if (uiLang === "es") return `Tipo de ronda desconocido: ${type}`;
+  if (uiLang === "id") return `Jenis ronde tidak dikenal: ${type}`;
+  return `Unknown round type: ${type}`;
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -875,7 +920,7 @@ function RoleplayQuizView({
           style={styles.chatInput}
           value={input}
           onChangeText={setInput}
-          placeholder="Type in target language..."
+          placeholder={qt("typeTarget", quiz.nativeLang)}
           placeholderTextColor={C.textMuted}
           returnKeyType="send"
           onSubmitEditing={sendMessage}
@@ -968,7 +1013,7 @@ function WritingQuizView({
             <View key={v} style={styles.vocabChip}><Text style={styles.vocabChipText}>{v}</Text></View>
           ))}
         </View>
-        <Text style={styles.writeMeta}>Min. {prompt.minSentences} sentences</Text>
+        <Text style={styles.writeMeta}>{minSentencesLabel(prompt.minSentences, quiz.nativeLang)}</Text>
       </View>
 
       <TextInput
@@ -977,7 +1022,7 @@ function WritingQuizView({
         onChangeText={setInput}
         multiline
         numberOfLines={5}
-        placeholder={`Describe in ${quiz.targetLang === "ko" ? "Korean" : quiz.targetLang === "es" ? "Spanish" : "English"}...`}
+        placeholder={describeInstruction(quiz.targetLang, quiz.nativeLang)}
         placeholderTextColor={C.textMuted}
         textAlignVertical="top"
       />
@@ -992,7 +1037,7 @@ function WritingQuizView({
           <Text style={styles.writeFeedback}>{feedback}</Text>
           <Pressable style={styles.submitBtn} onPress={advance}>
             <Text style={styles.submitBtnText}>
-              {quiz.nativeLang === "ko" ? "다음" : quiz.nativeLang === "es" ? "Siguiente" : "Next"}
+              {qt("next", quiz.nativeLang)}
             </Text>
           </Pressable>
         </View>
@@ -1147,12 +1192,12 @@ function TimedBossView({
             onPress={() => playTTS(r.ttsScript ?? "", r.ttsVoice ?? "en-GB-SoniaNeural", apiBase, setPlaying)}>
             <View style={[styles.audioIndicator, playing && styles.audioIndicatorActive]} />
             <Text style={[styles.ttsBtnText, playing && { color: "#fff" }]}>
-              {playing ? qt("playing", quiz.nativeLang) : "Play"}
+              {playing ? qt("playing", quiz.nativeLang) : qt("play", quiz.nativeLang)}
             </Text>
           </Pressable>
           <Text style={styles.bossQuestion}>{r.question}</Text>
           <TextInput style={styles.textInput} value={input} onChangeText={setInput}
-            placeholder="Answer..." placeholderTextColor={C.textMuted}
+            placeholder={qt("typeAnswer", quiz.nativeLang)} placeholderTextColor={C.textMuted}
             returnKeyType="done" onSubmitEditing={submitText} />
           {!feedback && input.length > 0 && (
             <Pressable style={styles.submitBtn} onPress={submitText}>
@@ -1167,18 +1212,12 @@ function TimedBossView({
       const src = r.source?.[quiz.nativeLang] ?? r.source?.en ?? "";
       return (
         <>
-          <Text style={styles.instructionText}>
-            {quiz.nativeLang === "ko"
-              ? `${quiz.targetLang === "ko" ? "한국어" : quiz.targetLang === "es" ? "스페인어" : "영어"}로 번역하세요:`
-              : quiz.nativeLang === "es"
-              ? `Traduce al ${quiz.targetLang === "ko" ? "coreano" : quiz.targetLang === "es" ? "español" : "inglés"}:`
-              : `Translate to ${quiz.targetLang === "ko" ? "Korean" : quiz.targetLang === "es" ? "Spanish" : "English"}:`}
-          </Text>
+          <Text style={styles.instructionText}>{translateInstruction(quiz.targetLang, quiz.nativeLang)}</Text>
           <View style={styles.riddleBox}>
             <Text style={styles.riddleText}>{src}</Text>
           </View>
           <TextInput style={styles.textInput} value={input} onChangeText={setInput}
-            placeholder="Translation..." placeholderTextColor={C.textMuted}
+            placeholder={qt("translationPlaceholder", quiz.nativeLang)} placeholderTextColor={C.textMuted}
             returnKeyType="done" onSubmitEditing={submitText} />
           {!feedback && input.length > 0 && (
             <Pressable style={styles.submitBtn} onPress={submitText}>
@@ -1199,7 +1238,7 @@ function TimedBossView({
             <Text style={styles.riddleText}>{r.text}</Text>
           </View>
           <TextInput style={styles.textInput} value={input} onChangeText={setInput}
-            placeholder="Answer..." placeholderTextColor={C.textMuted}
+            placeholder={qt("typeAnswer", quiz.nativeLang)} placeholderTextColor={C.textMuted}
             returnKeyType="done" onSubmitEditing={submitText} />
           {!feedback && input.length > 0 && (
             <Pressable style={styles.submitBtn} onPress={submitText}>
@@ -1217,7 +1256,7 @@ function TimedBossView({
             <Text style={styles.instructionText}>{r.prompt}</Text>
           </View>
           <TextInput style={[styles.writeInput, { height: 100 }]} value={input} onChangeText={setInput}
-            multiline placeholder="Write your response..." placeholderTextColor={C.textMuted}
+            multiline placeholder={qt("writeResponse", quiz.nativeLang)} placeholderTextColor={C.textMuted}
             textAlignVertical="top" />
           {input.length > 20 && (
             <Pressable style={styles.submitBtn} onPress={() => advance(true)}>
@@ -1228,9 +1267,7 @@ function TimedBossView({
       );
     }
 
-    return <Text style={styles.instructionText}>
-      {quiz.nativeLang === "ko" ? `알 수 없는 라운드 유형: ${r.type}` : quiz.nativeLang === "es" ? `Tipo de ronda desconocido: ${r.type}` : `Unknown round type: ${r.type}`}
-    </Text>;
+    return <Text style={styles.instructionText}>{unknownRoundLabel(r.type, quiz.nativeLang)}</Text>;
   }
 
   return (
@@ -1945,7 +1982,7 @@ Score 0-100. Check if student used required expressions naturally. Respond ONLY 
       {/* Required expressions */}
       {round?.requiredExpressions && round.requiredExpressions.length > 0 && (
         <View style={dbStyles.exprRow}>
-          <Text style={dbStyles.exprLabel}>{nl === "ko" ? "사용해야 할 표현:" : "Use these expressions:"}</Text>
+          <Text style={dbStyles.exprLabel}>{qt("useExpressions", nl)}</Text>
           <View style={styles.wordBank}>
             {round.requiredExpressions.map((e, i) => (
               <View key={i} style={styles.wordChip}><Text style={styles.wordChipText}>{e}</Text></View>
@@ -1961,7 +1998,7 @@ Score 0-100. Check if student used required expressions naturally. Respond ONLY 
             style={styles.chatInput}
             value={input}
             onChangeText={setInput}
-            placeholder={nl === "ko" ? "반론을 입력하세요…" : "Type your counter-argument…"}
+            placeholder={qt("typeArgument", nl)}
             placeholderTextColor={C.textMuted}
             multiline
           />

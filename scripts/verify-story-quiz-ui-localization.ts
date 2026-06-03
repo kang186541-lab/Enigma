@@ -8,6 +8,11 @@ const languages = ["ko", "es", "en", "id"] as const;
 const requiredQuizKeys = [
   "passMark",
   "tryMark",
+  "play",
+  "typeAnswer",
+  "typeTarget",
+  "translationPlaceholder",
+  "writeResponse",
   "hideHint",
   "showHint",
   "correct",
@@ -42,6 +47,8 @@ const requiredQuizKeys = [
   "stonePrompt",
   "stoneChecking",
   "stoneResponds",
+  "typeArgument",
+  "useExpressions",
 ];
 
 for (const key of requiredQuizKeys) {
@@ -66,6 +73,34 @@ const bannedStoryQuizPatterns = [
     label: "recording Stop/Speak button",
   },
   {
+    pattern: /\{playing \? qt\("playing", quiz\.nativeLang\) : "Play"\}/,
+    label: "listening TTS Play button",
+  },
+  {
+    pattern: /placeholder="Answer\.\.\."/,
+    label: "listening answer placeholder",
+  },
+  {
+    pattern: /placeholder="Translation\.\.\."/,
+    label: "translation placeholder",
+  },
+  {
+    pattern: /placeholder="Type in target language\.\.\."/,
+    label: "roleplay target-language placeholder",
+  },
+  {
+    pattern: /Describe in \$\{quiz\.targetLang/,
+    label: "writing describe placeholder",
+  },
+  {
+    pattern: /placeholder="Write your response\.\.\."/,
+    label: "roleplay response placeholder",
+  },
+  {
+    pattern: /Min\. \{prompt\.minSentences\} sentences/,
+    label: "writing minimum sentence label",
+  },
+  {
     pattern: /beach_scene:\s*"Beach",\s*market_scene:\s*"Market",\s*night_scene:\s*"Night"/,
     label: "writing scene labels",
   },
@@ -88,6 +123,14 @@ assert.ok(
     storyQuizSource.includes('qt("rescueSuccess", nl)') &&
     storyQuizSource.includes('qt("tryAgain", nl)'),
   "NPC rescue result copy must stay localized",
+);
+assert.ok(
+  storyQuizSource.includes("translateInstruction(quiz.targetLang, quiz.nativeLang)") &&
+    storyQuizSource.includes("describeInstruction(quiz.targetLang, quiz.nativeLang)") &&
+    storyQuizSource.includes("minSentencesLabel(prompt.minSentences, quiz.nativeLang)") &&
+    storyQuizSource.includes('placeholder={qt("typeArgument", nl)}') &&
+    storyQuizSource.includes('qt("useExpressions", nl)'),
+  "story quiz prompts, writing labels, and debate inputs must stay localized",
 );
 
 assert.doesNotMatch(
