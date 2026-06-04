@@ -9,11 +9,11 @@ export interface NPCVisual {
 
 export const NPC_VISUALS: Record<string, NPCVisual> = {
   penny: { rolePortrait: require("../assets/npcs/roles/penny_role.png"), sceneImage: require("../assets/npcs/scenes/penny_cafe_scene.png"), roleLabel: "Cafe barista", sceneColors: ["#1d120d", "#5f321e", "#c48a52"] },
-  miguel: { rolePortrait: require("../assets/npcs/roles/miguel_role.png"), roleLabel: "Restaurant host", sceneColors: ["#21120b", "#7a3f1d", "#d39a49"] },
-  tom: { rolePortrait: require("../assets/npcs/roles/tom_role.png"), roleLabel: "Taxi driver", sceneColors: ["#111821", "#34485c", "#d5a335"] },
-  hassan: { rolePortrait: require("../assets/npcs/roles/hassan_role.png"), roleLabel: "Airport helper", sceneColors: ["#102032", "#24516b", "#d7b36a"] },
+  miguel: { rolePortrait: require("../assets/npcs/roles/miguel_role.png"), sceneImage: require("../assets/npcs/scenes/miguel_restaurant_scene.png"), roleLabel: "Restaurant host", sceneColors: ["#21120b", "#7a3f1d", "#d39a49"] },
+  tom: { rolePortrait: require("../assets/npcs/roles/tom_role.png"), sceneImage: require("../assets/npcs/scenes/tom_taxi_scene.png"), roleLabel: "Taxi driver", sceneColors: ["#111821", "#34485c", "#d5a335"] },
+  hassan: { rolePortrait: require("../assets/npcs/roles/hassan_role.png"), sceneImage: require("../assets/npcs/scenes/hassan_airport_scene.png"), roleLabel: "Airport helper", sceneColors: ["#102032", "#24516b", "#d7b36a"] },
   eleanor: { rolePortrait: require("../assets/npcs/roles/eleanor_role.png"), roleLabel: "Hotel concierge", sceneColors: ["#19101a", "#58446a", "#c7a16a"] },
-  sujin: { rolePortrait: require("../assets/npcs/roles/sujin_role.png"), roleLabel: "Clinic doctor", sceneColors: ["#102024", "#39666b", "#dce8dd"] },
+  sujin: { rolePortrait: require("../assets/npcs/roles/sujin_role.png"), sceneImage: require("../assets/npcs/scenes/sujin_clinic_scene.png"), roleLabel: "Clinic doctor", sceneColors: ["#102024", "#39666b", "#dce8dd"] },
   minho: { rolePortrait: require("../assets/npcs/roles/minho_role.png"), roleLabel: "Phone shop clerk", sceneColors: ["#121630", "#4052a0", "#6bd6ff"] },
   youngsook: { rolePortrait: require("../assets/npcs/roles/youngsook_role.png"), roleLabel: "Market vendor", sceneColors: ["#181407", "#7c5d20", "#e4b34c"] },
   isabel: { rolePortrait: require("../assets/npcs/roles/isabel_role.png"), roleLabel: "Clothing associate", sceneColors: ["#22101d", "#8b3d61", "#dfa35f"] },

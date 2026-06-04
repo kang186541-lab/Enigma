@@ -46,15 +46,26 @@ for (const id of npcIds) {
   }
 }
 
-const pennyScenePath = path.join(root, "assets", "npcs", "scenes", "penny_cafe_scene.png");
-if (!visualsSource.includes('sceneImage: require("../assets/npcs/scenes/penny_cafe_scene.png")')) {
-  fail("Penny cafe should use a full scenario scene plate, not only a small avatar portrait");
-}
-if (!fs.existsSync(pennyScenePath)) {
-  fail(`missing Penny cafe scenario scene plate: ${pennyScenePath}`);
-}
-if (fs.statSync(pennyScenePath).size < 500_000) {
-  fail("Penny cafe scenario scene plate is suspiciously small");
+const scenePlateRequirements: Array<[string, string]> = [
+  ["penny", "penny_cafe_scene.png"],
+  ["miguel", "miguel_restaurant_scene.png"],
+  ["tom", "tom_taxi_scene.png"],
+  ["hassan", "hassan_airport_scene.png"],
+  ["sujin", "sujin_clinic_scene.png"],
+];
+
+for (const [id, filename] of scenePlateRequirements) {
+  const scenePath = path.join(root, "assets", "npcs", "scenes", filename);
+  const requireString = `sceneImage: require("../assets/npcs/scenes/${filename}")`;
+  if (!visualsSource.includes(requireString)) {
+    fail(`${id} should use a full scenario scene plate, not only a small avatar portrait`);
+  }
+  if (!fs.existsSync(scenePath)) {
+    fail(`missing ${id} scenario scene plate: ${scenePath}`);
+  }
+  if (fs.statSync(scenePath).size < 500_000) {
+    fail(`${id} scenario scene plate is suspiciously small`);
+  }
 }
 
 if (!avatarSource.includes("getNPCVisual") || !avatarSource.includes("rolePortrait")) {
@@ -80,4 +91,4 @@ for (const anchor of ["sceneStage", "sceneImageStage", "sceneCharacter", "ImageB
   }
 }
 
-console.log(`[verify-npc-visuals] PASS: ${npcIds.length} NPC role portraits are registered, present, and wired.`);
+console.log(`[verify-npc-visuals] PASS: ${npcIds.length} NPC role portraits and ${scenePlateRequirements.length} scene plates are registered, present, and wired.`);
