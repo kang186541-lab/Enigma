@@ -84,6 +84,10 @@ const isabelShockedConcernImg = require("@/assets/story/characters/isabel/isabel
 const isabelRallyingEnergyImg = require("@/assets/story/characters/isabel/isabel_rallying_energy.png");
 const isabelPlayfulConfidenceImg = require("@/assets/story/characters/isabel/isabel_playful_confidence.png");
 const hassanMemoryStorytellerImg = require("@/assets/story/characters/hassan/hassan_memory_storyteller.png");
+
+// Dialogue art contract: backgrounds and character sprites are text-free art
+// plates. All player-visible dialogue, captions, clues, and labels must render
+// through localized runtime text (getSceneText/tri), never as baked image text.
 const bgLondonMuseumHallImg = require("@/assets/story/dialogue_backgrounds/london_museum_hall.png");
 const bgMadridFestivalPlazaImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_plaza.png");
 const bgMadridFestivalDrainedImg = require("@/assets/story/dialogue_backgrounds/madrid_festival_drained.png");

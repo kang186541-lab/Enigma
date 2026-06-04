@@ -16,6 +16,10 @@ function assertIncludes(needle: string, message: string): void {
   assert.ok(storySceneSource.includes(needle), message);
 }
 
+function countIncludes(needle: string): number {
+  return storySceneSource.split(needle).length - 1;
+}
+
 function assertAssetExists(assetPath: string): void {
   assert.ok(existsSync(assetPath), `${assetPath} must exist`);
 }
@@ -215,6 +219,21 @@ assertIncludes("style={styles.stagePortraitFade}", "Character bottom occlusion f
 assertIncludes("styles.stageCharacterShadow", "Character art should keep stage shadowing");
 assertIncludes("speakerPulseAnim", "Dialogue scenes should keep active-speaker motion");
 assertIncludes("lastDialogueStageKeyRef", "Same-speaker dialogue should avoid replaying full entrance animation");
+assertIncludes(
+  "Dialogue art contract: backgrounds and character sprites are text-free art",
+  "Dialogue visual assets must stay documented as text-free art plates",
+);
+assertIncludes(
+  "function getSceneText(it: SeqScene)",
+  "Dialogue/narration copy must keep a centralized localized text resolver",
+);
+assert.ok(
+  countIncludes("text={getSceneText(item)}") >= 2,
+  "Narration and dialogue scenes must render copy through localized Typewriter text, not baked image text",
+);
+assertIncludes('if (lang === "korean")', "Story scene text resolver must keep Korean localization");
+assertIncludes('if (lang === "spanish")', "Story scene text resolver must keep Spanish localization");
+assertIncludes('if (lang === "indonesian")', "Story scene text resolver must keep Indonesian localization");
 
 assertIncludes("sceneForegroundDepth: {", "Foreground depth style must stay defined");
 assertIncludes('top: "42%"', "Foreground depth should begin below the upper focal area");
