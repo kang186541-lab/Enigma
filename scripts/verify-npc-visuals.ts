@@ -91,10 +91,22 @@ if (/npcAvatarEmoji>\{npc/.test(missionSource) || /emojiText>\{unlocked \? npc\.
   fail("NPC screens still render identity avatars directly from emoji fallback");
 }
 
-for (const anchor of ["sceneStage", "sceneImageStage", "sceneCharacter", "ImageBackground", "Animated.Image"]) {
+for (const anchor of ["sceneStage", "sceneImageStage", "scenePlateImage", "sceneCharacter", "Animated.Image"]) {
   if (!missionSource.includes(anchor)) {
     fail(`app/npc-mission.tsx is missing scenario stage anchor: ${anchor}`);
   }
+}
+
+if (missionSource.includes("ImageBackground")) {
+  fail("NPC scene stage should not use ImageBackground; RN Web can crop scene plates at their intrinsic size");
+}
+
+if (!missionSource.includes("aspectRatio: 16 / 9")) {
+  fail("NPC scene plates must preserve their 16:9 composition instead of using a short fixed-height crop");
+}
+
+if (/sceneImageStage:\s*\{[\s\S]*height:\s*Platform\.OS\s*===\s*"web"\s*\?\s*154/.test(missionSource)) {
+  fail("NPC scene stage still uses the old short 154px web height that crops character faces");
 }
 
 console.log(`[verify-npc-visuals] PASS: ${npcIds.length} NPC role portraits and ${scenePlateRequirements.length} scene plates are registered, present, and wired.`);

@@ -6,7 +6,6 @@ import {
   FlatList,
   TextInput,
   Pressable,
-  ImageBackground,
   Platform,
   ActivityIndicator,
   Modal,
@@ -897,13 +896,13 @@ export default function NpcMissionScreen() {
         {npc && npcVisual ? (
           <View style={styles.sceneStage}>
             {npcVisual.sceneImage ? (
-              <ImageBackground
-                source={npcVisual.sceneImage}
-                style={styles.sceneImageStage}
-                imageStyle={styles.sceneImage}
-                resizeMode="cover"
-                accessibilityIgnoresInvertColors
-              >
+              <View style={styles.sceneImageStage}>
+                <Animated.Image
+                  source={npcVisual.sceneImage}
+                  style={styles.scenePlateImage}
+                  resizeMode="cover"
+                  accessibilityIgnoresInvertColors
+                />
                 <LinearGradient
                   colors={["rgba(8,5,3,0.04)", "rgba(8,5,3,0.38)", "rgba(8,5,3,0.74)"]}
                   start={{ x: 1, y: 0 }}
@@ -914,7 +913,7 @@ export default function NpcMissionScreen() {
                   <Text style={styles.sceneRole}>{scenario}</Text>
                   <Text style={styles.sceneName}>{npc.name}</Text>
                 </View>
-              </ImageBackground>
+              </View>
             ) : (
               <LinearGradient colors={sceneColors} style={styles.sceneImageStage}>
                 <View style={styles.sceneShelfLine} />
@@ -1323,7 +1322,10 @@ const styles = StyleSheet.create({
     backgroundColor: C.bg1,
   },
   sceneImageStage: {
-    height: Platform.OS === "web" ? 154 : 142,
+    width: "100%",
+    aspectRatio: 16 / 9,
+    minHeight: Platform.OS === "web" ? 210 : 190,
+    maxHeight: Platform.OS === "web" ? 340 : 280,
     borderRadius: 18,
     overflow: "hidden",
     borderWidth: 1,
@@ -1336,7 +1338,10 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     elevation: 5,
   },
-  sceneImage: {
+  scenePlateImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: "100%",
+    height: "100%",
     borderRadius: 18,
   },
   sceneTextBlock: {
