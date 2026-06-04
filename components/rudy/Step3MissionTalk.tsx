@@ -1006,13 +1006,13 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
               <ActivityIndicator size="large" color={C.gold} />
             ) : wordPopup ? (
               <>
-                <Text style={s.popupWord}>{wordPopup.word}</Text>
+                <BidiTargetText targetLang={learningLang} rtlAlign="center" style={s.popupWord}>{wordPopup.word}</BidiTargetText>
                 {wordPopup.partOfSpeech ? <Text style={s.popupPos}>{wordPopup.partOfSpeech}</Text> : null}
                 <Text style={s.popupMeaning}>{wordPopup.meaning}</Text>
                 {wordPopup.example ? (
                   <View style={s.popupExWrap}>
                     <Text style={s.popupExLabel}>{exampleLabel}</Text>
-                    <Text style={s.popupEx}>{wordPopup.example}</Text>
+                    <BidiTargetText targetLang={learningLang} style={s.popupEx}>{wordPopup.example}</BidiTargetText>
                   </View>
                 ) : null}
                 {wordPopup.sentenceTranslation ? (

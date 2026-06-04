@@ -14,7 +14,7 @@ import { type Step2Data, type FillBlankQuiz, type GrammarExplanation } from "@/l
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { PhonemeCoaching } from "./PhonemeCoaching";
-import { BidiTargetText } from "@/components/BidiTargetText";
+import { BidiTargetText, isRtlLang } from "@/components/BidiTargetText";
 
 const RUDY_RECORDING_MS = 8000;
 
@@ -66,6 +66,7 @@ const SPEECH_LANG_MAP: Record<string, string> = {
   spanish: "es-ES",
   korean:  "ko-KR",
   indonesian: "id-ID",
+  arabic: "ar-EG",
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -535,6 +536,11 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   }
 
   const promptParts = quiz.promptWithBlank.split("___");
+  // RTL target (Arabic): the fill-blank prompt fragments + the blank itself are
+  // learning-target text. Lay the row out right-to-left so the part *before* the
+  // blank sits on the right (natural Arabic reading), and render each fragment
+  // with writingDirection:'rtl'. LTR targets keep the exact original row.
+  const promptRtl = isRtlLang(speechLang);
 
   return (
     <View style={s.container}>
@@ -553,8 +559,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         <Text style={s.promptInstruct}>
           {fillBlankLabel}
         </Text>
-        <View style={s.promptRow}>
-          <Text style={s.promptText}>{promptParts[0]}</Text>
+        <View style={promptRtl ? [s.promptRow, s.promptRowRtl] : s.promptRow}>
+          <BidiTargetText targetLang={speechLang} rtlAlign="center" style={s.promptText}>{promptParts[0]}</BidiTargetText>
           <View style={[
             s.blankBox,
             quizPhase === "correct" && s.blankCorrect,
@@ -573,16 +579,16 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
                 onSubmitEditing={() => { if (inputVal.trim()) submitAnswer(inputVal.trim()); }}
               />
             ) : (
-              <Text style={[
+              <BidiTargetText targetLang={speechLang} rtlAlign="center" style={[
                 s.blankText,
                 quizPhase === "correct" && s.blankTextCorrect,
                 quizPhase === "wrong"   && s.blankTextWrong,
               ]}>
                 {selected ?? quiz.answer}
-              </Text>
+              </BidiTargetText>
             )}
           </View>
-          {promptParts[1] ? <Text style={s.promptText}>{promptParts[1]}</Text> : null}
+          {promptParts[1] ? <BidiTargetText targetLang={speechLang} rtlAlign="center" style={s.promptText}>{promptParts[1]}</BidiTargetText> : null}
         </View>
 
         {/* Wrong feedback */}
@@ -610,7 +616,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
               style={({ pressed }) => [s.optionBtn, pressed && s.optionBtnPressed]}
               onPress={() => submitAnswer(opt)}
             >
-              <Text style={s.optionBtnText}>{opt}</Text>
+              <BidiTargetText targetLang={speechLang} rtlAlign="center" style={s.optionBtnText}>{opt}</BidiTargetText>
             </Pressable>
           ))}
         </View>
@@ -780,6 +786,7 @@ const s = StyleSheet.create({
   },
   promptInstruct: { fontSize: 12, fontFamily: F.label, color: C.goldDim, textAlign: "center" },
   promptRow:      { flexDirection: "row", alignItems: "center", flexWrap: "wrap", justifyContent: "center", gap: 4 },
+  promptRowRtl:   { flexDirection: "row-reverse" },
   promptText:     { fontSize: 18, fontFamily: F.header, color: C.parchment },
   blankBox: {
     borderBottomWidth: 2, borderBottomColor: C.gold, minWidth: 60,

@@ -24,6 +24,7 @@ import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
 import { PhonemeCoaching } from "@/components/rudy/PhonemeCoaching";
 import { CoachingCard } from "@/components/rudy/CoachingCard";
+import { BidiTargetText } from "@/components/BidiTargetText";
 import { useLocalized } from "@/lib/runtimeTranslate";
 import { getCefrTierLabel } from "@/lib/dailyCourseData";
 import { trackLearningEvent } from "@/lib/learningEvents";
@@ -538,6 +539,7 @@ const LANG_TABS: { key: LangTab; label: string; flag: string; color: string }[] 
   { key: "english", label: "English", flag: "🇬🇧", color: "#6B9DFF" },
   { key: "spanish", label: "Spanish", flag: "🇪🇸", color: "#FF9D6B" },
   { key: "indonesian", label: "Indonesian", flag: "🇮🇩", color: "#6BCB9D" },
+  { key: "arabic", label: "Arabic", flag: "🇪🇬", color: "#E8B4B8" },
 ];
 
 // Overall score bands are deliberately gentle. The app philosophy is
@@ -2306,9 +2308,9 @@ export default function SpeakScreen() {
                   {getNextMissionPreviewTitle(nativeLang, nextMissionStep)}
                 </Text>
               </View>
-              <Text style={styles.nextMissionPreviewPhrase} numberOfLines={2}>
-                “{nextMissionPreview.word}”
-              </Text>
+              <BidiTargetText targetLang={nextMissionPreview.speechLang} rtlAlign="center" style={styles.nextMissionPreviewPhrase} numberOfLines={2}>
+                {`“${nextMissionPreview.word}”`}
+              </BidiTargetText>
               <Text style={styles.nextMissionPreviewMeaning} numberOfLines={2}>
                 {nextMissionPreview.meaning}
               </Text>
@@ -2512,9 +2514,9 @@ export default function SpeakScreen() {
               </Pressable>
             </View>
 
-            <Text style={styles.wordText} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.62}>
+            <BidiTargetText targetLang={phrase.speechLang} rtlAlign="center" style={styles.wordText} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.62}>
               {phrase.word}
-            </Text>
+            </BidiTargetText>
 
             <View style={styles.ipaRow}>
               <Text style={styles.ipaTag}>IPA</Text>

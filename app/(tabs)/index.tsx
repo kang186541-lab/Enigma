@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLanguage, getLevel, getLevelProgress, getLevelName, getEffectiveLearningLanguage, NativeLanguage } from "@/context/LanguageContext";
+import { useLanguage, getLevel, getLevelProgress, getLevelName, getEffectiveLearningLanguage, toNativeLearning, NativeLanguage } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
 import { LanguageChangeModal } from "@/components/LanguageChangeModal";
@@ -212,7 +212,10 @@ export default function HomeScreen() {
   const [lastSessionDate, setLastSessionDate] = React.useState<string | null>(null);
   const [showMorePractice, setShowMorePractice] = React.useState(false);
   const [showMoreTools, setShowMoreTools] = React.useState(false);
-  const effectiveLearningLang = getEffectiveLearningLanguage(nativeLang, learningLanguage);
+  // Home preview/chrome (speaking-mission card, language chip) has no Arabic
+  // copy yet, so coerce an "arabic" target to a native default for this screen.
+  // The real Arabic speak-first flow lives in the Speak tab and daily-lesson.
+  const effectiveLearningLang = toNativeLearning(nativeLang, getEffectiveLearningLanguage(nativeLang, learningLanguage));
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
