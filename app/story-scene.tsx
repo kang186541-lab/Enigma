@@ -518,11 +518,30 @@ function getSceneCharacterImageSource(story: Story, item: SeqItem): ImageSourceP
   if (item.kind !== "scene") return null;
 
   const character = story.characters.find((c) => c.id === item.charId) ?? story.characters[0];
-  const portrait = item.expression
-    ? character.portraitVariants?.[item.expression] ?? characterExpressionFallbacks[character.id]?.[item.expression] ?? character.portrait
-    : character.portrait;
+  const portrait = getSceneCharacterPortrait(character, item);
 
   return character.isLingo ? (portrait ?? rudyDialogueNeutralImg) : (portrait ?? null);
+}
+
+function getSceneCharacterPortrait(character: Character, item: SeqScene): ImageSourcePropType | undefined {
+  return item.expression
+    ? character.portraitVariants?.[item.expression] ?? characterExpressionFallbacks[character.id]?.[item.expression] ?? character.portrait
+    : character.portrait;
+}
+
+function findSupportingDialogueScene(storyId: string, sequence: SeqItem[], activeIndex: number, activeScene: SeqScene): SeqScene | null {
+  const activeBackdrop = getSceneBackdropId(storyId, activeScene);
+  const offsets = [-1, 1, -2, 2, -3, 3, -4, 4, -5, 5];
+  const candidates = offsets
+    .map((offset) => sequence[activeIndex + offset])
+    .filter((candidate): candidate is SeqScene => (
+      Boolean(candidate)
+      && candidate.kind === "scene"
+      && !candidate.isNarration
+      && candidate.charId !== activeScene.charId
+    ));
+
+  return candidates.find((candidate) => getSceneBackdropId(storyId, candidate) === activeBackdrop) ?? candidates[0] ?? null;
 }
 
 type BackdropLighting = {
@@ -7633,9 +7652,18 @@ export default function StoryScene() {
   const character = item.kind === "scene"
     ? story.characters.find((c) => c.id === item.charId) ?? story.characters[0]
     : story.characters[0];
-  const activePortrait = item.kind === "scene" && item.expression
-    ? character.portraitVariants?.[item.expression] ?? characterExpressionFallbacks[character.id]?.[item.expression] ?? character.portrait
-    : character.portrait;
+  const activePortrait = item.kind === "scene" ? getSceneCharacterPortrait(character, item) : character.portrait;
+  const sceneBackdropId = getSceneBackdropId(story.id, item);
+  const supportingScene = item.kind === "scene" && !item.isNarration
+    ? findSupportingDialogueScene(story.id, seq, seqIdx, item)
+    : null;
+  const supportingCharacter = supportingScene
+    ? story.characters.find((c) => c.id === supportingScene.charId) ?? null
+    : null;
+  const supportingPortrait = supportingScene && supportingCharacter
+    ? getSceneCharacterPortrait(supportingCharacter, supportingScene)
+    : null;
+  const supportSide = character.side === "left" ? "right" : "left";
 
   function getSceneText(it: SeqScene) {
     // For non-narration dialogue, prefer mixed-language versions (textKoMix/textEsMix)
@@ -7663,7 +7691,9 @@ export default function StoryScene() {
   }
 
   const titleLabel = lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : lang === "indonesian" ? (story.titleId ?? story.title) : story.title;
-  const sceneBackdropId = getSceneBackdropId(story.id, item);
+  const storyAdvanceAccessibilityLabel = typingDone
+    ? (lang === "korean" ? "다음 스토리 대사" : lang === "spanish" ? "Siguiente linea de historia" : lang === "indonesian" ? "Lanjutkan cerita" : "Next story line")
+    : (lang === "korean" ? "스토리 대사 전체 보기" : lang === "spanish" ? "Mostrar todo el texto de historia" : lang === "indonesian" ? "Tampilkan semua teks cerita" : "Show full story text");
   const sceneBackdrop = sceneBackdropId ? getAdventureBackdropById(sceneBackdropId) : null;
   const sceneLighting = getBackdropLighting(sceneBackdropId ?? getDefaultAdventureBackdrop(story.id));
   const characterEntryX = stageEnterAnim.interpolate({
@@ -7691,6 +7721,18 @@ export default function StoryScene() {
     inputRange: [0, 1],
     outputRange: [1, 1.006],
   });
+  const supportCharacterEntryX = stageEnterAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [supportSide === "left" ? -24 : 24, 0],
+  });
+  const supportCharacterEntryOpacity = stageEnterAnim.interpolate({
+    inputRange: [0, 0.45, 1],
+    outputRange: [0, 0.28, 0.64],
+  });
+  const supportCharacterFloatY = stageFloatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [3, -4],
+  });
   const speakerMarkScale = speakerPulseAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 1.22],
@@ -7700,6 +7742,7 @@ export default function StoryScene() {
     outputRange: [0.78, 1],
   });
   const hasStageCharacterArt = Boolean(character.isLingo || activePortrait);
+  const hasSupportCharacterArt = Boolean(supportingCharacter && (supportingCharacter.isLingo || supportingPortrait));
   const backdropScale = backdropDriftAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [1.02, 1.055],
@@ -7808,7 +7851,12 @@ export default function StoryScene() {
 
         {/* NARRATION */}
         {item.kind === "scene" && item.isNarration && (
-          <Pressable style={styles.narrationArea} onPress={advance}>
+          <Pressable
+            accessibilityLabel={storyAdvanceAccessibilityLabel}
+            accessibilityRole="button"
+            style={styles.narrationArea}
+            onPress={advance}
+          >
             <View style={styles.narrationTextViewport} onLayout={handleNarrationViewportLayout}>
               <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -7847,6 +7895,79 @@ export default function StoryScene() {
         {/* DIALOGUE SCENE */}
         {item.kind === "scene" && !item.isNarration && (
           <View style={styles.sceneContainer}>
+            {supportingCharacter && hasSupportCharacterArt && (
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  styles.supportCharacterArea,
+                  compactStoryLayout && styles.supportCharacterAreaCompact,
+                  supportSide === "left" ? styles.supportCharacterAreaLeft : styles.supportCharacterAreaRight,
+                  {
+                    opacity: supportCharacterEntryOpacity,
+                    transform: [
+                      { translateX: supportCharacterEntryX },
+                      { translateY: supportCharacterFloatY },
+                    ],
+                  },
+                ]}
+              >
+                <LinearGradient
+                  pointerEvents="none"
+                  colors={sceneLighting.characterBacklight}
+                  locations={[0, 0.52, 1]}
+                  style={[
+                    styles.characterBacklight,
+                    styles.supportCharacterBacklight,
+                    compactStoryLayout && styles.characterBacklightCompact,
+                    supportSide === "left" ? styles.characterBacklightLeft : styles.characterBacklightRight,
+                  ]}
+                />
+                <View
+                  pointerEvents="none"
+                  style={[
+                    styles.characterGroundShadow,
+                    styles.supportCharacterGroundShadow,
+                    compactStoryLayout && styles.characterGroundShadowCompact,
+                    supportSide === "left" ? styles.characterGroundShadowLeft : styles.characterGroundShadowRight,
+                  ]}
+                />
+                {supportingCharacter.isLingo ? (
+                  <Animated.Image
+                    source={supportingPortrait ?? rudyDialogueNeutralImg}
+                    style={[
+                      styles.rudyStoryChar,
+                      compactStoryLayout && styles.rudyStoryCharCompact,
+                      styles.supportRudyStoryChar,
+                      compactStoryLayout && styles.supportRudyStoryCharCompact,
+                      styles.stageCharacterShadow,
+                    ]}
+                    resizeMode="contain"
+                  />
+                ) : supportingPortrait ? (
+                  <View
+                    style={[
+                      styles.stagePortraitWrap,
+                      compactStoryLayout && styles.stagePortraitWrapCompact,
+                      styles.supportPortraitWrap,
+                      compactStoryLayout && styles.supportPortraitWrapCompact,
+                      { shadowColor: story.accentColor },
+                    ]}
+                  >
+                    <Image
+                      source={supportingPortrait}
+                      style={styles.characterPortrait}
+                      resizeMode="contain"
+                    />
+                  </View>
+                ) : null}
+                <LinearGradient
+                  pointerEvents="none"
+                  colors={["transparent", "rgba(8,8,10,0.34)", "rgba(8,8,10,0.72)"]}
+                  locations={[0, 0.62, 1]}
+                  style={styles.stagePortraitFade}
+                />
+              </Animated.View>
+            )}
             <Animated.View
               style={[
                 styles.characterArea,
@@ -7918,7 +8039,12 @@ export default function StoryScene() {
               )}
             </Animated.View>
 
-            <Pressable style={styles.dialogueBox} onPress={advance}>
+            <Pressable
+              accessibilityLabel={storyAdvanceAccessibilityLabel}
+              accessibilityRole="button"
+              style={styles.dialogueBox}
+              onPress={advance}
+            >
               <View style={styles.speakerTag}>
                 {activePortrait || character.isLingo ? (
                   <Animated.View
@@ -8275,6 +8401,27 @@ const styles = StyleSheet.create({
   characterAreaRight: {
     alignItems: "flex-end",
   },
+  supportCharacterArea: {
+    position: "absolute",
+    bottom: 106,
+    width: "48%",
+    minHeight: 260,
+    justifyContent: "flex-end",
+    zIndex: 0,
+  },
+  supportCharacterAreaCompact: {
+    bottom: 118,
+    width: "46%",
+    minHeight: 210,
+  },
+  supportCharacterAreaLeft: {
+    left: -18,
+    alignItems: "flex-start",
+  },
+  supportCharacterAreaRight: {
+    right: -18,
+    alignItems: "flex-end",
+  },
   avatarOuter: {
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
@@ -8303,6 +8450,15 @@ const styles = StyleSheet.create({
     width: 272,
     height: 336,
   },
+  supportRudyStoryChar: {
+    width: 226,
+    height: 282,
+    opacity: 0.9,
+  },
+  supportRudyStoryCharCompact: {
+    width: 172,
+    height: 216,
+  },
   stageCharacterShadow: {
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 12 },
@@ -8330,6 +8486,11 @@ const styles = StyleSheet.create({
   characterBacklightRight: {
     right: 0,
   },
+  supportCharacterBacklight: {
+    bottom: 24,
+    opacity: 0.38,
+    transform: [{ scale: 0.78 }],
+  },
   characterGroundShadow: {
     position: "absolute",
     bottom: 24,
@@ -8350,6 +8511,11 @@ const styles = StyleSheet.create({
   },
   characterGroundShadowRight: {
     right: 36,
+  },
+  supportCharacterGroundShadow: {
+    bottom: 10,
+    opacity: 0.62,
+    transform: [{ scaleX: 0.88 }],
   },
   portraitCard: {
     width: 206,
@@ -8385,6 +8551,18 @@ const styles = StyleSheet.create({
   stagePortraitWrapCompact: {
     width: 224,
     height: 336,
+  },
+  supportPortraitWrap: {
+    width: 208,
+    height: 312,
+    opacity: 0.92,
+    shadowOpacity: 0.22,
+    shadowRadius: 18,
+    zIndex: 1,
+  },
+  supportPortraitWrapCompact: {
+    width: 158,
+    height: 238,
   },
   stagePortraitFade: {
     position: "absolute",

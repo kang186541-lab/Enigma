@@ -206,6 +206,7 @@ assert.ok(validBackdrops.size >= 9, "Story backdrop id union should cover all au
 assertIncludes("function getAdventureBackdropById(backdrop: StoryBackdropId): ImageSourcePropType", "Backdrop lookup must stay centralized");
 assertIncludes("function getSceneBackdropId(storyId: string, item: SeqItem): StoryBackdropId | null", "Scene backdrop routing must stay explicit");
 assertIncludes("function getSceneCharacterImageSource(story: Story, item: SeqItem): ImageSourcePropType | null", "Character prefetch routing must stay explicit");
+assertIncludes("function findSupportingDialogueScene(", "Dialogue scenes should keep visual-novel supporting actor blocking");
 assertIncludes("prefetchSceneItem(seq[seqIdx + 2]);", "Story stage should prefetch current plus next two scene images");
 
 assertIncludes("styles.sceneBackdropImage,", "Dialogue backdrop image layer must stay rendered");
@@ -215,6 +216,8 @@ assertIncludes("style={styles.sceneForegroundDepth}", "Dialogue foreground depth
 assertIncludes("style={[styles.sceneStageGround, { borderTopColor: story.accentColor }]}", "Dialogue stage ground must stay tied to chapter accent color");
 assertIncludes("styles.characterBacklight,", "Character backlight must stay applied");
 assertIncludes("styles.characterGroundShadow,", "Character ground shadow must stay applied");
+assertIncludes("styles.supportCharacterArea,", "Dialogue scenes should render a background/support actor layer");
+assertIncludes("supportingCharacter && hasSupportCharacterArt", "Supporting actors should only render when real character art is available");
 assertIncludes("style={styles.stagePortraitFade}", "Character bottom occlusion fade must stay rendered");
 assertIncludes("styles.stageCharacterShadow", "Character art should keep stage shadowing");
 assertIncludes("speakerPulseAnim", "Dialogue scenes should keep active-speaker motion");
