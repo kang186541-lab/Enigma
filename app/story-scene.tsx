@@ -174,6 +174,8 @@ interface Character {
   nameKo?: string;
   /** Indonesian (id-ID) character name. Falls back to `name` when absent. */
   nameId?: string;
+  /** Egyptian Arabic (ar-EG) character name. Falls back to `name` when absent. */
+  nameAr?: string;
   side: "left" | "right";
   avatarBg: string;
   isLingo?: boolean;
@@ -187,6 +189,8 @@ interface Tri {
   es: string;
   /** Optional Indonesian (id-ID). Falls back to `en` when absent. */
   id?: string;
+  /** Optional Egyptian Arabic (ar-EG). Falls back to `en` when absent. */
+  ar?: string;
 }
 
 /* Puzzle types */
@@ -448,6 +452,7 @@ function tri(t: Tri, lang: string) {
   if (lang === "korean") return t.ko;
   if (lang === "spanish") return t.es;
   if (lang === "indonesian") return t.id ?? t.en;
+  if (lang === "arabic") return t.ar ?? t.en;
   return t.en;
 }
 
