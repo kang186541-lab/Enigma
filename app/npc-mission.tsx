@@ -26,6 +26,7 @@ import { getApiUrl } from "@/lib/query-client";
 import { queueProgressPush } from "@/lib/progressSync";
 import { recordAudio } from "@/lib/audio";
 import { EmojiText } from "@/components/EmojiText";
+import { NpcAvatar } from "@/components/NpcAvatar";
 import { C, F } from "@/constants/theme";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -763,9 +764,7 @@ export default function NpcMissionScreen() {
     return (
       <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowNpc]}>
         {!item.isUser && npc && (
-          <View style={[styles.npcAvatar, { backgroundColor: npc.color + "33", borderColor: npc.color + "88" }]}>
-            <EmojiText style={styles.npcAvatarEmoji}>{npc.emoji}</EmojiText>
-          </View>
+          <NpcAvatar npc={npc} size={36} radius={12} />
         )}
         <View style={styles.bubbleCol}>
           <View style={[styles.bubble, item.isUser ? styles.bubbleUser : styles.bubbleNpc]}>
@@ -846,9 +845,7 @@ export default function NpcMissionScreen() {
           <Ionicons name="arrow-back" size={20} color={C.gold} />
         </Pressable>
 
-        <View style={[styles.headerAvatar, { backgroundColor: (npc?.color ?? "#888") + "33", borderColor: (npc?.color ?? "#888") + "88" }]}>
-          <EmojiText style={styles.headerAvatarEmoji}>{npc?.emoji ?? "?"}</EmojiText>
-        </View>
+        <NpcAvatar npc={npc} size={46} radius={15} />
 
         <View style={styles.headerInfo}>
           <View style={styles.headerNameRow}>
@@ -887,9 +884,7 @@ export default function NpcMissionScreen() {
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={isTyping ? (
             <View style={[styles.msgRow, styles.msgRowNpc]}>
-              <View style={[styles.npcAvatar, { backgroundColor: (npc?.color ?? "#888") + "33", borderColor: (npc?.color ?? "#888") + "88" }]}>
-                <EmojiText style={styles.npcAvatarEmoji}>{npc?.emoji ?? "?"}</EmojiText>
-              </View>
+              <NpcAvatar npc={npc} size={36} radius={12} />
               <View style={[styles.bubble, styles.bubbleNpc, styles.typingBubble]}>
                 <View style={styles.typingDots}>
                   {[0, 1, 2].map(i => <View key={i} style={styles.dot} />)}
@@ -1106,9 +1101,7 @@ export default function NpcMissionScreen() {
       >
         <View style={styles.popupOverlay}>
           <View style={styles.popupCard}>
-            <View style={[styles.popupAvatar, { backgroundColor: (npc?.color ?? "#888") + "33" }]}>
-              <EmojiText style={styles.popupAvatarEmoji}>{npc?.emoji ?? "?"}</EmojiText>
-            </View>
+            <NpcAvatar npc={npc} size={64} radius={20} />
             <Text style={styles.popupLabel}>
               {native === "korean" ? "선택한 문장" : native === "spanish" ? "Tu respuesta" : native === "indonesian" ? "Jawabanmu" : "Your response"}
             </Text>
