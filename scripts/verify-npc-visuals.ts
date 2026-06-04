@@ -51,7 +51,13 @@ const scenePlateRequirements: Array<[string, string]> = [
   ["miguel", "miguel_restaurant_scene.png"],
   ["tom", "tom_taxi_scene.png"],
   ["hassan", "hassan_airport_scene.png"],
+  ["eleanor", "eleanor_hotel_scene.png"],
   ["sujin", "sujin_clinic_scene.png"],
+  ["minho", "minho_phone_shop_scene.png"],
+  ["youngsook", "youngsook_market_scene.png"],
+  ["isabel", "isabel_shopping_scene.png"],
+  ["carlos", "carlos_bar_scene.png"],
+  ["amira", "amira_bank_scene.png"],
 ];
 
 for (const [id, filename] of scenePlateRequirements) {
