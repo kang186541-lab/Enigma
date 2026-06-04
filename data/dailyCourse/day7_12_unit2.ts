@@ -156,6 +156,36 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
         ],
       },
     },
+    arabic: {
+      step1Sentences: [
+        { text: "عَنْدِي كَلْبِين وْتَلَات قُطَط فِي الْبيت. (3andi kalbeen we-talat ʼoṭaṭ fil-beet.)", speechLang: "ar-EG", meaning: { ko: "집에 강아지 두 마리, 고양이 세 마리가 있어요.", en: "I have two dogs and three cats at home.", es: "Tengo dos perros y tres gatos en casa." } },
+        { text: "فِيه خَمَسْتَاشَر وَاحِد فِي الطَّابُور. دُول كْتِير! (fiih khamastaashar waaḥed fiṭ-ṭaaboor. dool kteer!)", speechLang: "ar-EG", meaning: { ko: "줄에 열다섯 명이 있어요. 정말 많다!", en: "There are fifteen people in line. That's a lot!", es: "Hay quince personas en la fila. ¡Son muchas!" } },
+        { text: "عِشْرِين، تَلَاتِين، أَرْبِعِين، خَمْسِين، سِتِّين، سَبْعِين، تَمَانِين، تِسْعِين، مِيَّة. (3eshreen, talaateen, arbi3een, khamseen, setteen, sab3een, tamaaneen, tes3een, meyya.)", speechLang: "ar-EG", meaning: { ko: "20, 30, 40, 50, 60, 70, 80, 90, 100.", en: "Tens: twenty to one hundred.", es: "Decenas: veinte a cien." } },
+        { text: "عَنْدَك كَام سَنَة؟ أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة. (3andak kaam sana? ana 3andi khamsa we-3eshreen sana.)", speechLang: "ar-EG", meaning: { ko: "몇 살이에요? 저는 스물다섯 살이에요.", en: "How old are you? I'm twenty-five years old.", es: "¿Cuántos años tienes? Tengo veinticinco años." }, recallRound: true },
+        { text: "دَه بِخَمَسْتَاشَر دُولَار. (da be-khamastaashar dolaar.)", speechLang: "ar-EG", meaning: { ko: "15달러입니다.", en: "That's fifteen dollars, please.", es: "Son quince dólares, por favor." }, recallRound: true },
+        { text: "السَّاعَة تَلَاتَة وْنُص. (es-saa3a talaata we-noṣ.)", speechLang: "ar-EG", meaning: { ko: "세 시 삼십 분이에요.", en: "It's three thirty.", es: "Son las tres y treinta." } },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: عَنْدَك كَام سَنَة؟ (3andak kaam sana?) → أَنَا عَنْدِي ___ سَنَة. / 나이는 '가지다(3andi)'로 표현해요. 11-19는 '-taashar'(khamastaashar=15), 십 단위는 '-een'(3eshreen=20), 100은 'meyya'.", en: "Pattern: 3andak kaam sana? → ana 3andi ___ sana. Egyptian uses 'to have' (3andi) for age. 11-19 end in '-taashar' (khamastaashar=15), tens end in '-een' (3eshreen=20), and 100 is 'meyya'.", es: "Patrón: 3andak kaam sana? → ana 3andi ___ sana. El egipcio usa 'tener' (3andi) para la edad. 11-19 terminan en '-taashar' (khamastaashar=15), las decenas en '-een' (3eshreen=20), y 100 es 'meyya'." },
+          examples: { ko: "عَنْدَك كَام سَنَة؟ أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة. (몇 살이에요? 25살이에요.)\nدَه بِخَمَسْتَاشَر دُولَار. (15달러입니다.)\nفِيه تَلَاتِين طَالِب فِي فَصْلِي. (우리 반에 학생이 30명이에요.)", en: "3andak kaam sana? ana 3andi khamsa we-3eshreen sana. (Asking and telling age.)\nda be-khamastaashar dolaar. (Using numbers for prices.)\nfiih talaateen ṭaaleb fi faṣli. (Counting people with numbers.)", es: "3andak kaam sana? ana 3andi khamsa we-3eshreen sana. (Preguntando y diciendo la edad.)\nda be-khamastaashar dolaar. (Usando números para precios.)\nfiih talaateen ṭaaleb fi faṣli. (Contando personas.)" },
+          mistakes: { ko: "❌ أَنَا خَمْسَة وْعِشْرِين سَنَة. (ana khamsa we-3eshreen sana.)\n✅ أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة. (나이는 'عَنْدِي'(3andi=가지고 있다)를 꼭 써요!)\n\n❌ خَمْسِين (khamseen=50) ↔ خَمَسْتَاشَر (khamastaashar=15)\n✅ khamastaashar=15, khamseen=50 ('-taashar'와 '-een'을 헷갈리지 마세요!)", en: "❌ ana khamsa we-3eshreen sana.\n✅ ana 3andi khamsa we-3eshreen sana. (Use '3andi' (I have) for age — don't drop it!)\n\n❌ Mixing khamastaashar (15) and khamseen (50)\n✅ khamastaashar=15, khamseen=50 ('-taashar'=teen, '-een'=ty — don't swap them!)", es: "❌ ana khamsa we-3eshreen sana.\n✅ ana 3andi khamsa we-3eshreen sana. (Usa '3andi' (tengo) para la edad — ¡no lo omitas!)\n\n❌ Confundir khamastaashar (15) y khamseen (50)\n✅ khamastaashar=15, khamseen=50 ('-taashar'=teen, '-een'=ty — ¡no los cambies!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 이집트 아랍어 숫자도 레고 블록이야! '-taashar'(11-19)랑 '-een'(십 단위)만 알면 100까지 조립 끝. 그리고 나이엔 항상 'عَنْدِي'(3andi=나 가지고 있어)를 붙여~", en: "Detective Rudy's tip: Egyptian numbers are like Lego blocks too! Learn '-taashar' (11-19) and '-een' (tens) and you can build up to 100. And for age, always say '3andi' (I have)!", es: "Consejo del detective Rudy: ¡Los números egipcios también son como bloques de Lego! Aprende '-taashar' (11-19) y '-een' (decenas) y construyes hasta 100. Y para la edad, siempre di '3andi' (tengo)." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "عَنْدَك كَام ___؟", answer: "سَنَة", options: ["سَنَة", "اِسْم", "بَلَد"], fullSentence: "عَنْدَك كَام سَنَة؟", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" } },
+          { type: "select", promptWithBlank: "أَنَا ___ خَمْسَة وْعِشْرِين سَنَة.", answer: "عَنْدِي", options: ["عَنْدِي", "أَنَا", "بَتَاعِي"], fullSentence: "أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة.", fullSentenceMeaning: { ko: "저는 스물다섯 살이에요.", en: "I'm twenty-five years old.", es: "Tengo veinticinco años." } },
+          { type: "select", promptWithBlank: "عَشَرَة، ___، اِتْنَاشَر، تَلَتَاشَر...", answer: "حِدَاشَر", options: ["حِدَاشَر", "عَشَرَة وَاحِد", "وَاحِد عَشَرَة"], fullSentence: "عَشَرَة، حِدَاشَر، اِتْنَاشَر، تَلَتَاشَر.", fullSentenceMeaning: { ko: "10, 11, 12, 13.", en: "Ten, eleven, twelve, thirteen.", es: "Diez, once, doce, trece." } },
+          { type: "fill_blank", promptWithBlank: "دَه بِـ ___ دُولَار.", answer: "خَمَسْتَاشَر", options: ["خَمَسْتَاشَر", "خَمْسِين", "أَرْبَعْتَاشَر"], fullSentence: "دَه بِخَمَسْتَاشَر دُولَار.", fullSentenceMeaning: { ko: "15달러입니다.", en: "Fifteen dollars.", es: "Quince dólares." } },
+          { type: "input", promptWithBlank: "عِشْرِين، تَلَاتِين، أَرْبِعِين، ___.", answer: "خَمْسِين", fullSentence: "عِشْرِين، تَلَاتِين، أَرْبِعِين، خَمْسِين.", fullSentenceMeaning: { ko: "20, 30, 40, 50.", en: "Twenty, thirty, forty, fifty.", es: "Veinte, treinta, cuarenta, cincuenta." } },
+          { type: "listening", audioText: "دَه بِخَمَسْتَاشَر دُولَار.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["دَه بِخَمَسْتَاشَر دُولَار.", "عَنْدَك كَام سَنَة؟", "السَّاعَة تَلَاتَة وْنُص.", "دَه بْمِيَّة دُولَار."], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 
   // ─────────────── Day 8: Days of the Week ───────────────────────────────────
@@ -269,6 +299,34 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
           { type: "select", promptWithBlank: "Sampai ___ hari Rabu!", answer: "jumpa", options: ["jumpa", "nanti", "besok"], fullSentence: "Sampai jumpa hari Rabu!", fullSentenceMeaning: { ko: "수요일에 봐요!", en: "See you on Wednesday!", es: "¡Te veo el miércoles!" } },
           { type: "input", promptWithBlank: "Hari ini hari ___.", answer: "Senin", fullSentence: "Hari ini hari Senin.", fullSentenceMeaning: { ko: "오늘은 월요일이에요.", en: "Today is Monday.", es: "Hoy es lunes." } },
           { type: "listening", audioText: "Apa rencana Anda akhir pekan ini?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Apa rencana Anda akhir pekan ini?", "Hari ini hari Senin.", "Saya bekerja dari Senin sampai Jumat.", "Sampai jumpa hari Rabu!"], correct: 0, audioOnly: true },
+        ],
+      },
+    },
+    arabic: {
+      step1Sentences: [
+        { text: "النَّهَارْدَه إِيه؟ (en-naharda eeh?)", speechLang: "ar-EG", meaning: { ko: "오늘 무슨 요일이에요?", en: "What day is it today?", es: "¿Qué día es hoy?" } },
+        { text: "النَّهَارْدَه الِاتْنِين. (en-naharda el-etneen.)", speechLang: "ar-EG", meaning: { ko: "오늘은 월요일이에요.", en: "Today is Monday.", es: "Hoy es lunes." } },
+        { text: "أَنَا بَشْتَغَل مِن الِاتْنِين لِلْجُمْعَة. (ana bashtaghal men el-etneen lel-gom3a.)", speechLang: "ar-EG", meaning: { ko: "월요일부터 금요일까지 일해요.", en: "I work from Monday to Friday.", es: "Trabajo de lunes a viernes." } },
+        { text: "هَتْعْمِل إِيه آخِر الأُسْبُوع؟ (hat3mel eeh aakher el-osboo3?)", speechLang: "ar-EG", meaning: { ko: "이번 주말에 뭐 해?", en: "What are you doing this weekend?", es: "¿Qué haces este fin de semana?" }, recallRound: true },
+        { text: "أَشُوفَك يَوْم الأَرْبَع! (ashoofak yoom el-arba3!)", speechLang: "ar-EG", meaning: { ko: "수요일에 봐요!", en: "See you on Wednesday!", es: "¡Te veo el miércoles!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: النَّهَارْدَه إِيه؟ (en-naharda eeh?) → النَّهَارْدَه ___. / 요일: el-etneen(월)~el-gom3a(금)~es-sabt(토)~el-ḥadd(일). 범위: 'men A le-B'. 특정 요일: 'yoom + 요일'.", en: "Pattern: en-naharda eeh? → en-naharda ___. Days: el-etneen(Mon), et-talat(Tue), el-arba3(Wed), el-khamees(Thu), el-gom3a(Fri), es-sabt(Sat), el-ḥadd(Sun). Range: 'men A le-B'. Specific day: 'yoom + day'.", es: "Patrón: en-naharda eeh? → en-naharda ___. Días: el-etneen(lun), et-talat(mar), el-arba3(mié), el-khamees(jue), el-gom3a(vie), es-sabt(sáb), el-ḥadd(dom). Rango: 'men A le-B'. Día específico: 'yoom + día'." },
+          examples: { ko: "النَّهَارْدَه إِيه؟ النَّهَارْدَه الِاتْنِين. (오늘 무슨 요일? 월요일이에요.)\nأَنَا بَشْتَغَل مِن الِاتْنِين لِلْجُمْعَة. (월요일부터 금요일까지 일해요.)\nأَشُوفَك يَوْم الأَرْبَع! (수요일에 봐요!)", en: "en-naharda eeh? en-naharda el-etneen. (Asking about the day.)\nana bashtaghal men el-etneen lel-gom3a. (Describing your work week.)\nashoofak yoom el-arba3! (Making plans for a specific day.)", es: "en-naharda eeh? en-naharda el-etneen. (Preguntando por el día.)\nana bashtaghal men el-etneen lel-gom3a. (Describiendo la semana laboral.)\nashoofak yoom el-arba3! (Haciendo planes para un día.)" },
+          mistakes: { ko: "❌ أَشُوفَك فِي الأَرْبَع. (ashoofak fil-arba3.)\n✅ أَشُوفَك يَوْم الأَرْبَع. (요일 앞엔 'yoom'(날)을 붙이면 자연스러워요!)\n\n❌ مِن الِاتْنِين فِي الْجُمْعَة. (men el-etneen fil-gom3a.)\n✅ مِن الِاتْنِين لِلْجُمْعَة. (범위는 'men...le-...' 짝으로 써요!)", en: "❌ ashoofak fil-arba3.\n✅ ashoofak yoom el-arba3. (Put 'yoom' (day) before the weekday — it sounds natural!)\n\n❌ men el-etneen fil-gom3a.\n✅ men el-etneen lel-gom3a. (For a range, pair 'men...le-...'!)", es: "❌ ashoofak fil-arba3.\n✅ ashoofak yoom el-arba3. (Pon 'yoom' (día) antes del día — ¡suena natural!)\n\n❌ men el-etneen fil-gom3a.\n✅ men el-etneen lel-gom3a. (Para un rango, usa el par 'men...le-...'.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 이집트 요일은 진짜 쉬워! 대부분 숫자에서 왔어 — et-talat(화)=3, el-arba3(수)=4, el-khamees(목)=5! 요일 앞에 'yoom'만 붙이면 끝~", en: "Detective Rudy's tip: Egyptian weekdays are easy — most come from numbers! et-talat (Tue)=3rd, el-arba3 (Wed)=4th, el-khamees (Thu)=5th! Just add 'yoom' before the day. Case solved!", es: "Consejo del detective Rudy: ¡Los días egipcios son fáciles — la mayoría vienen de números! et-talat (mar)=3º, el-arba3 (mié)=4º, el-khamees (jue)=5º. ¡Solo añade 'yoom' antes del día!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "النَّهَارْدَه ___؟", answer: "إِيه", options: ["إِيه", "فِين", "مِين"], fullSentence: "النَّهَارْدَه إِيه؟", fullSentenceMeaning: { ko: "오늘 무슨 요일이에요?", en: "What day is it today?", es: "¿Qué día es hoy?" } },
+          { type: "select", promptWithBlank: "أَنَا بَشْتَغَل ___ الِاتْنِين لِلْجُمْعَة.", answer: "مِن", options: ["مِن", "فِي", "عَلَى"], fullSentence: "أَنَا بَشْتَغَل مِن الِاتْنِين لِلْجُمْعَة.", fullSentenceMeaning: { ko: "월요일부터 금요일까지 일해요.", en: "I work from Monday to Friday.", es: "Trabajo de lunes a viernes." } },
+          { type: "select", promptWithBlank: "أَشُوفَك ___ الأَرْبَع!", answer: "يَوْم", options: ["يَوْم", "فِي", "عَلَى"], fullSentence: "أَشُوفَك يَوْم الأَرْبَع!", fullSentenceMeaning: { ko: "수요일에 봐요!", en: "See you on Wednesday!", es: "¡Te veo el miércoles!" } },
+          { type: "input", promptWithBlank: "النَّهَارْدَه ___.", answer: "الِاتْنِين", fullSentence: "النَّهَارْدَه الِاتْنِين.", fullSentenceMeaning: { ko: "오늘은 월요일이에요.", en: "Today is Monday.", es: "Hoy es lunes." } },
+          { type: "listening", audioText: "هَتْعْمِل إِيه آخِر الأُسْبُوع؟", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["هَتْعْمِل إِيه آخِر الأُسْبُوع؟", "النَّهَارْدَه الِاتْنِين.", "أَنَا بَشْتَغَل مِن الِاتْنِين لِلْجُمْعَة.", "أَشُوفَك يَوْم الأَرْبَع!"], correct: 0, audioOnly: true },
         ],
       },
     },
@@ -406,6 +464,39 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    arabic: {
+      step1Sentences: [
+        { text: "السَّاعَة كَام؟ (es-saa3a kaam?)", speechLang: "ar-EG", meaning: { ko: "지금 몇 시예요?", en: "What time is it?", es: "¿Qué hora es?" } },
+        { text: "السَّاعَة تَلَاتَة. (es-saa3a talaata.)", speechLang: "ar-EG", meaning: { ko: "세 시예요.", en: "It's three o'clock.", es: "Son las tres." } },
+        { text: "السَّاعَة سَبْعَة وْنُص. (es-saa3a sab3a we-noṣ.)", speechLang: "ar-EG", meaning: { ko: "일곱 시 반이에요.", en: "It's half past seven.", es: "Son las siete y media." } },
+        { text: "الِاجْتِمَاع السَّاعَة عَشَرَة الصُّبْح. (el-egtemaa3 es-saa3a 3ashara eṣ-ṣobḥ.)", speechLang: "ar-EG", meaning: { ko: "회의는 아침 열 시예요.", en: "The meeting is at ten in the morning.", es: "La reunión es a las diez de la mañana." }, recallRound: true },
+        { text: "أَنَا بَصْحَى السَّاعَة سَبْعَة كُلّ يَوْم. (ana baṣ-ḥa es-saa3a sab3a koll yoom.)", speechLang: "ar-EG", meaning: { ko: "매일 일곱 시에 일어나요.", en: "I wake up at seven every day.", es: "Me despierto a las siete todos los días." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: السَّاعَة كَام؟ (es-saa3a kaam?) → السَّاعَة ___. / 'es-saa3a'는 '시'. 30분: 'we-noṣ'(와 누스, 반). 약속 시간도 그냥 'es-saa3a ___'. 오전: 'eṣ-ṣobḥ', 오후: 'baad eḍ-ḍohr'.", en: "Pattern: es-saa3a kaam? → es-saa3a ___. 'es-saa3a' means 'o'clock'. Half hour: 'we-noṣ' (and a half). Appointments also just use 'es-saa3a ___'. AM: 'eṣ-ṣobḥ', PM: 'baad eḍ-ḍohr'.", es: "Patrón: es-saa3a kaam? → es-saa3a ___. 'es-saa3a' significa 'hora'. Media hora: 'we-noṣ' (y media). Las citas también usan 'es-saa3a ___'. AM: 'eṣ-ṣobḥ', PM: 'baad eḍ-ḍohr'." },
+          examples: { ko: "السَّاعَة كَام؟ السَّاعَة تَلَاتَة. (몇 시? 세 시예요.)\nالسَّاعَة سَبْعَة وْنُص. (7시 반이에요.)\nالِاجْتِمَاع السَّاعَة عَشَرَة الصُّبْح. (회의는 오전 10시예요.)", en: "es-saa3a kaam? es-saa3a talaata. (Asking and telling the time.)\nes-saa3a sab3a we-noṣ. (Saying it's 7:30.)\nel-egtemaa3 es-saa3a 3ashara eṣ-ṣobḥ. (Specifying a morning appointment.)", es: "es-saa3a kaam? es-saa3a talaata. (Preguntando y diciendo la hora.)\nes-saa3a sab3a we-noṣ. (Son las 7:30.)\nel-egtemaa3 es-saa3a 3ashara eṣ-ṣobḥ. (Especificando una cita por la mañana.)" },
+          mistakes: { ko: "❌ السَّاعَة سَبْعَة نُص. (es-saa3a sab3a noṣ.)\n✅ السَّاعَة سَبْعَة وْنُص. (반을 말할 땐 'we-'(와)를 꼭 붙여요!)\n\n❌ الِاجْتِمَاع عَلَى عَشَرَة. (el-egtemaa3 3ala 3ashara.)\n✅ الِاجْتِمَاع السَّاعَة عَشَرَة. (시간엔 그냥 'es-saa3a'를 써요, 전치사 필요 없어요!)", en: "❌ es-saa3a sab3a noṣ.\n✅ es-saa3a sab3a we-noṣ. (For half, always add 'we-' (and)!)\n\n❌ el-egtemaa3 3ala 3ashara.\n✅ el-egtemaa3 es-saa3a 3ashara. (Use 'es-saa3a' for time — no extra preposition needed!)", es: "❌ es-saa3a sab3a noṣ.\n✅ es-saa3a sab3a we-noṣ. (Para la media, ¡siempre añade 'we-' (y)!)\n\n❌ el-egtemaa3 3ala 3ashara.\n✅ el-egtemaa3 es-saa3a 3ashara. (Usa 'es-saa3a' para la hora — ¡sin preposición extra!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 이집트에서 시간은 'es-saa3a + 숫자'면 끝! 30분은 'we-noṣ'(와 누스)만 붙여. 15분은 'we-rob3'(와 룹), 45분은 'illa rob3'(일라 룹). 이 단서들이면 시계 완전 정복~", en: "Detective Rudy's tip: In Egypt, time is just 'es-saa3a + number'! For :30 add 'we-noṣ' (and a half). :15 is 'we-rob3', :45 is 'illa rob3' (minus a quarter). Crack these clues and you'll never be late!", es: "Consejo del detective Rudy: ¡En Egipto, la hora es solo 'es-saa3a + número'! Para :30 añade 'we-noṣ' (y media). :15 es 'we-rob3', :45 es 'illa rob3' (menos cuarto). ¡Descifra estas pistas!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "السَّاعَة ___؟", answer: "كَام", options: ["كَام", "إِيه", "فِين"], fullSentence: "السَّاعَة كَام؟", fullSentenceMeaning: { ko: "지금 몇 시예요?", en: "What time is it?", es: "¿Qué hora es?" } },
+          { type: "select", promptWithBlank: "___ تَلَاتَة.", answer: "السَّاعَة", options: ["السَّاعَة", "اليَوْم", "السَّنَة"], fullSentence: "السَّاعَة تَلَاتَة.", fullSentenceMeaning: { ko: "세 시예요.", en: "It's three o'clock.", es: "Son las tres." } },
+          { type: "select", promptWithBlank: "الِاجْتِمَاع السَّاعَة عَشَرَة ___.", answer: "الصُّبْح", options: ["الصُّبْح", "بِاللِّيل", "السَّنَة"], fullSentence: "الِاجْتِمَاع السَّاعَة عَشَرَة الصُّبْح.", fullSentenceMeaning: { ko: "회의는 열 시예요.", en: "The meeting is at ten.", es: "La reunión es a las diez." } },
+          { type: "input", promptWithBlank: "السَّاعَة سَبْعَة وْ ___.", answer: "نُص", fullSentence: "السَّاعَة سَبْعَة وْنُص.", fullSentenceMeaning: { ko: "일곱 시 반이에요.", en: "It's half past seven.", es: "Son las siete y media." } },
+          { type: "input", promptWithBlank: "أَنَا بَصْحَى السَّاعَة سَبْعَة كُلّ ___.", answer: "يَوْم", fullSentence: "أَنَا بَصْحَى السَّاعَة سَبْعَة كُلّ يَوْم.", fullSentenceMeaning: { ko: "매일 일곱 시에 일어나요.", en: "I wake up at seven every day.", es: "Me despierto a las siete todos los días." } },
+          { type: "listening", audioText: "الِاجْتِمَاع السَّاعَة عَشَرَة الصُّبْح.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["الِاجْتِمَاع السَّاعَة عَشَرَة الصُّبْح.", "السَّاعَة كَام؟", "أَنَا بَصْحَى السَّاعَة سَبْعَة.", "السَّاعَة سَبْعَة وْنُص."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Thank you.", es: "Gracias.", ko: "감사합니다." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 10: Talking About Weather ─────────────────────────────
@@ -531,6 +622,38 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
           { type: "select", promptWithBlank: "Hari ini ___.", answer: "hujan", options: ["hujan", "cuaca", "jam"], fullSentence: "Hari ini hujan.", fullSentenceMeaning: { ko: "오늘 비가 와요.", en: "It's raining today.", es: "Hoy está lloviendo." } },
           { type: "input", promptWithBlank: "Di luar ___. Bawa jaket!", answer: "dingin", fullSentence: "Di luar dingin. Bawa jaket!", fullSentenceMeaning: { ko: "밖이 추워요. 재킷 가져가세요!", en: "It's cold outside. Bring a jacket!", es: "Hace frío afuera. ¡Trae una chaqueta!" } },
           { type: "listening", audioText: "Hari ini hujan.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Hari ini hujan.", "Cuacanya cerah dan hangat.", "Saya suka cuaca panas.", "Di luar dingin."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Where is the bathroom?", es: "¿Dónde está el baño?", ko: "화장실이 어디에요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Help! Please help me.", es: "¡Ayuda! Por favor, ayúdeme.", ko: "도와주세요! 제발 도와주세요." }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    arabic: {
+      step1Sentences: [
+        { text: "الْجَوّ عَامِل إِيه النَّهَارْدَه؟ (el-gaww 3aamel eeh en-naharda?)", speechLang: "ar-EG", meaning: { ko: "오늘 날씨 어때요?", en: "How's the weather today?", es: "¿Cómo está el clima hoy?" } },
+        { text: "الدُّنْيَا صَحْو وْدَافِيَة. (ed-donya ṣaḥw we-dafya.)", speechLang: "ar-EG", meaning: { ko: "맑고 따뜻해요.", en: "It's sunny and warm.", es: "Está soleado y cálido." } },
+        { text: "النَّهَارْدَه بِتْمَطَّر. (en-naharda betmaṭṭar.)", speechLang: "ar-EG", meaning: { ko: "오늘 비가 와요.", en: "It's raining today.", es: "Hoy está lloviendo." } },
+        { text: "الدُّنْيَا بَرْد بَرَّه. خُد جَاكِتَّة! (ed-donya bard barra. khod jaketta!)", speechLang: "ar-EG", meaning: { ko: "밖이 추워요. 재킷 가져가세요!", en: "It's cold outside. Bring a jacket!", es: "Hace frío afuera. ¡Trae una chaqueta!" }, recallRound: true },
+        { text: "أَنَا بَحِبّ الْجَوّ الْحَرّ. (ana baḥebb el-gaww el-ḥarr.)", speechLang: "ar-EG", meaning: { ko: "더운 날씨를 좋아해요.", en: "I like hot weather.", es: "Me gusta el clima caliente." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: الْجَوّ عَامِل إِيه؟ (el-gaww 3aamel eeh?) → الدُّنْيَا ___. / 'ed-donya'(세상/날씨)로 시작해요. 상태: ṣaḥw(맑음), meghayyem(흐림), bard(추움), ḥarr(더움), dafya(따뜻함). 비: 'betmaṭṭar'(비 온다).", en: "Pattern: el-gaww 3aamel eeh? → ed-donya ___. Egyptians start with 'ed-donya' (the world/weather). Conditions: ṣaḥw(sunny), meghayyem(cloudy), bard(cold), ḥarr(hot), dafya(warm). Rain: 'betmaṭṭar' (it's raining).", es: "Patrón: el-gaww 3aamel eeh? → ed-donya ___. Los egipcios empiezan con 'ed-donya' (el mundo/clima). Condiciones: ṣaḥw(soleado), meghayyem(nublado), bard(frío), ḥarr(caliente), dafya(cálido). Lluvia: 'betmaṭṭar'." },
+          examples: { ko: "الْجَوّ عَامِل إِيه النَّهَارْدَه؟ الدُّنْيَا صَحْو وْدَافِيَة. (오늘 날씨 어때? 맑고 따뜻해.)\nالنَّهَارْدَه بِتْمَطَّر. (오늘 비가 와요.)\nالدُّنْيَا بَرْد بَرَّه. خُد جَاكِتَّة! (밖이 추워요. 재킷 가져가!)", en: "el-gaww 3aamel eeh en-naharda? ed-donya ṣaḥw we-dafya. (Asking about and describing weather.)\nen-naharda betmaṭṭar. (Describing ongoing weather.)\ned-donya bard barra. khod jaketta! (Giving weather-based advice.)", es: "el-gaww 3aamel eeh en-naharda? ed-donya ṣaḥw we-dafya. (Preguntando y describiendo el clima.)\nen-naharda betmaṭṭar. (Describiendo clima en curso.)\ned-donya bard barra. khod jaketta! (Dando consejo basado en el clima.)" },
+          mistakes: { ko: "❌ الدُّنْيَا هِيَّ بَرْد. (ed-donya heyya bard.)\n✅ الدُّنْيَا بَرْد. (날씨는 단순하게! be동사(heyya) 필요 없어요)\n\n❌ النَّهَارْدَه مَطَر. (en-naharda maṭar.)\n✅ النَّهَارْدَه بِتْمَطَّر. ('비가 온다'는 동사 'betmaṭṭar'를 써요!)", en: "❌ ed-donya heyya bard.\n✅ ed-donya bard. (Keep weather simple — no 'to be' (heyya) needed!)\n\n❌ en-naharda maṭar. (= today rain, noun)\n✅ en-naharda betmaṭṭar. (Use the verb 'betmaṭṭar' for 'it's raining'!)", es: "❌ ed-donya heyya bard.\n✅ ed-donya bard. (¡Mantén el clima simple — sin 'ser' (heyya)!)\n\n❌ en-naharda maṭar. (= hoy lluvia, sustantivo)\n✅ en-naharda betmaṭṭar. (Usa el verbo 'betmaṭṭar' para 'está lloviendo'.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 이집트 날씨의 단서는 'ed-donya'(الدُّنْيَا)야! '세상이 추워, 세상이 더워'처럼 날씨를 말해. ed-donya bard, ed-donya ḥarr... 형용사만 툭 던지면 끝~", en: "Detective Rudy's tip: The clue to Egyptian weather is 'ed-donya' (the world)! Egyptians say 'the world is cold/hot.' ed-donya bard, ed-donya ḥarr... just drop the adjective and case solved!", es: "Consejo del detective Rudy: ¡La pista del clima egipcio es 'ed-donya' (el mundo)! Los egipcios dicen 'el mundo está frío/caliente.' ed-donya bard, ed-donya ḥarr... ¡solo suelta el adjetivo!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "الْجَوّ عَامِل ___ النَّهَارْدَه؟", answer: "إِيه", options: ["إِيه", "فِين", "كَام"], fullSentence: "الْجَوّ عَامِل إِيه النَّهَارْدَه؟", fullSentenceMeaning: { ko: "오늘 날씨 어때요?", en: "How's the weather today?", es: "¿Cómo está el clima hoy?" } },
+          { type: "select", promptWithBlank: "الدُّنْيَا صَحْو وْ ___.", answer: "دَافِيَة", options: ["دَافِيَة", "النَّهَارْدَه", "الصُّبْح"], fullSentence: "الدُّنْيَا صَحْو وْدَافِيَة.", fullSentenceMeaning: { ko: "맑고 따뜻해요.", en: "It's sunny and warm.", es: "Está soleado y cálido." } },
+          { type: "select", promptWithBlank: "النَّهَارْدَه ___.", answer: "بِتْمَطَّر", options: ["بِتْمَطَّر", "الْجَوّ", "السَّاعَة"], fullSentence: "النَّهَارْدَه بِتْمَطَّر.", fullSentenceMeaning: { ko: "오늘 비가 와요.", en: "It's raining today.", es: "Hoy está lloviendo." } },
+          { type: "input", promptWithBlank: "الدُّنْيَا ___ بَرَّه. خُد جَاكِتَّة!", answer: "بَرْد", fullSentence: "الدُّنْيَا بَرْد بَرَّه. خُد جَاكِتَّة!", fullSentenceMeaning: { ko: "밖이 추워요. 재킷 가져가세요!", en: "It's cold outside. Bring a jacket!", es: "Hace frío afuera. ¡Trae una chaqueta!" } },
+          { type: "listening", audioText: "النَّهَارْدَه بِتْمَطَّر.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["النَّهَارْدَه بِتْمَطَّر.", "الدُّنْيَا صَحْو وْدَافِيَة.", "أَنَا بَحِبّ الْجَوّ الْحَرّ.", "الدُّنْيَا بَرْد بَرَّه."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -674,6 +797,35 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Do you speak English?", es: "¿Habla inglés?", ko: "영어 하세요?" }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    arabic: {
+      step1Sentences: [
+        { text: "دَه لَوْنُه إِيه؟ (da lawno eeh?)", speechLang: "ar-EG", meaning: { ko: "이건 무슨 색이에요?", en: "What colour is this?", es: "¿De qué color es esto?" } },
+        { text: "دَه أَحْمَر. أَنَا بَحِبّ الأَزْرَق. (da aḥmar. ana baḥebb el-azraʼ.)", speechLang: "ar-EG", meaning: { ko: "빨간색이에요. 저는 파란색을 좋아해요.", en: "It's red. I like blue.", es: "Es rojo. Me gusta el azul." } },
+        { text: "فِيه مَقَاس أَكْبَر؟ (fiih maʼaas akbar?)", speechLang: "ar-EG", meaning: { ko: "이거 더 큰 사이즈 있어요?", en: "Do you have this in a bigger size?", es: "¿Tiene esto en una talla más grande?" } },
+        { text: "دَه صُغَيَّر أَوِي. عَايِز وَاحِد أَكْبَر. (da ṣoghayyar awi. 3aayez waaḥed akbar.)", speechLang: "ar-EG", meaning: { ko: "이건 너무 작아요. 더 큰 거 필요해요.", en: "This is too small. I need a larger one.", es: "Esto es muy pequeño. Necesito uno más grande." }, recallRound: true },
+        { text: "هَاخُد الأَسْوَد. (haakhod el-aswad.)", speechLang: "ar-EG", meaning: { ko: "검은색 걸로 할게요.", en: "I'll take the black one, please.", es: "Me llevo el negro, por favor." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: دَه لَوْنُه إِيه؟ (da lawno eeh?) → دَه ___. / 색상: aḥmar(빨강), azraʼ(파랑), akhḍar(초록), eswed/aswad(검정), abyaḍ(흰색), aṣfar(노랑). 비교급: 'akbar'(더 큰), 'aṣghar'(더 작은). 'awi'=너무/아주. 쇼핑: 'haakhod ___'(이거 살게요).", en: "Pattern: da lawno eeh? → da ___. Colours: aḥmar(red), azraʼ(blue), akhḍar(green), aswad(black), abyaḍ(white), aṣfar(yellow). Comparative: 'akbar'(bigger), 'aṣghar'(smaller). 'awi'=too/very. Shopping: 'haakhod ___'(I'll take ___).", es: "Patrón: da lawno eeh? → da ___. Colores: aḥmar(rojo), azraʼ(azul), akhḍar(verde), aswad(negro), abyaḍ(blanco), aṣfar(amarillo). Comparativo: 'akbar'(más grande), 'aṣghar'(más pequeño). 'awi'=demasiado/muy. Compras: 'haakhod ___'(me llevo ___)." },
+          examples: { ko: "دَه لَوْنُه إِيه؟ دَه أَحْمَر. (이건 무슨 색? 빨간색이에요.)\nفِيه مَقَاس أَكْبَر؟ (더 큰 사이즈 있어요?)\nهَاخُد الأَسْوَد. (검은색 걸로 할게요.)", en: "da lawno eeh? da aḥmar. (Asking about colour.)\nfiih maʼaas akbar? (Requesting a larger size.)\nhaakhod el-aswad. (Making a purchase decision.)", es: "da lawno eeh? da aḥmar. (Preguntando por el color.)\nfiih maʼaas akbar? (Pidiendo una talla más grande.)\nhaakhod el-aswad. (Tomando una decisión de compra.)" },
+          mistakes: { ko: "❌ دَه كَبِير أَكْتَر. (da kebeer aktar.)\n✅ دَه أَكْبَر. (비교급은 한 단어로 'akbar'! 'more big'처럼 두 단어로 쓰지 마세요)\n\n❌ هَاخُد لَوْن أَسْوَد دَه. (haakhod lawn aswad da.)\n✅ هَاخُد الأَسْوَد. (그냥 'el-aswad'(그 검은 거)면 충분해요!)", en: "❌ da kebeer aktar.\n✅ da akbar. (Comparative is ONE word — 'akbar'! Don't say it like 'more big'.)\n\n❌ haakhod lawn aswad da.\n✅ haakhod el-aswad. (Just 'el-aswad' (the black one) is enough!)", es: "❌ da kebeer aktar.\n✅ da akbar. (¡El comparativo es UNA palabra — 'akbar'! No lo digas como 'más grande'.)\n\n❌ haakhod lawn aswad da.\n✅ haakhod el-aswad. (¡Solo 'el-aswad' (el negro) es suficiente!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 이집트에서 쇼핑할 땐 'haakhod ___'(하خُد=이거 살게요)만 알면 끝! haakhod el-aswad, haakhod el-azraʼ... 색만 넣어. 비교는 'akbar'(더 큰), 'aṣghar'(더 작은) 한 단어면 OK~", en: "Detective Rudy's tip: For shopping in Egypt, just learn 'haakhod ___' (I'll take ___)! haakhod el-aswad, haakhod el-azraʼ... just add a colour. And comparing is one word: 'akbar' (bigger), 'aṣghar' (smaller)!", es: "Consejo del detective Rudy: Para comprar en Egipto, ¡solo aprende 'haakhod ___' (me llevo ___)! haakhod el-aswad, haakhod el-azraʼ... solo añade un color. Y comparar es una palabra: 'akbar' (más grande), 'aṣghar' (más pequeño)." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "دَه ___ إِيه؟", answer: "لَوْنُه", options: ["لَوْنُه", "مَقَاسُه", "نَوْعُه"], fullSentence: "دَه لَوْنُه إِيه؟", fullSentenceMeaning: { ko: "이건 무슨 색이에요?", en: "What colour is this?", es: "¿De qué color es esto?" } },
+          { type: "select", promptWithBlank: "دَه صُغَيَّر ___.", answer: "أَوِي", options: ["أَوِي", "أَكْبَر", "كْتِير"], fullSentence: "دَه صُغَيَّر أَوِي.", fullSentenceMeaning: { ko: "이건 너무 작아요.", en: "This is too small.", es: "Esto es muy pequeño." } },
+          { type: "select", promptWithBlank: "فِيه مَقَاس ___؟", answer: "أَكْبَر", options: ["أَكْبَر", "أَوِي", "كْتِير"], fullSentence: "فِيه مَقَاس أَكْبَر؟", fullSentenceMeaning: { ko: "이거 더 큰 사이즈 있어요?", en: "Do you have this in a bigger size?", es: "¿Tiene esto en una talla más grande?" } },
+          { type: "input", promptWithBlank: "هَاخُد ___.", answer: "الأَسْوَد", fullSentence: "هَاخُد الأَسْوَد.", fullSentenceMeaning: { ko: "검은색 걸로 할게요.", en: "I'll take the black one.", es: "Me llevo el negro." } },
+          { type: "input", promptWithBlank: "أَنَا بَحِبّ ___.", answer: "الأَزْرَق", fullSentence: "أَنَا بَحِبّ الأَزْرَق.", fullSentenceMeaning: { ko: "파란색을 좋아해요.", en: "I like blue.", es: "Me gusta el azul." } },
+          { type: "listening", audioText: "هَاخُد الأَسْوَد.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["هَاخُد الأَسْوَد.", "دَه صُغَيَّر أَوِي. عَايِز وَاحِد أَكْبَر.", "فِيه مَقَاس أَكْبَر؟", "دَه لَوْنُه إِيه؟"], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 
   // ─────────────── Day 12: Unit 2 Review ─────────────────────────────────────
@@ -794,6 +946,35 @@ export const LESSON_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
         ],
       },
     },
+    arabic: {
+      step1Sentences: [
+        { text: "أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة. نِمْرِة تِلِيفُونِي ٠١٠-١٢٣٤-٥٦٧٨. (ana 3andi khamsa we-3eshreen sana. nemret telefoni ṣefr-waaḥed-ṣefr...)", speechLang: "ar-EG", meaning: { ko: "저는 스물다섯 살이에요. 전화번호는 010-1234-5678이에요.", en: "I'm twenty-five years old. My phone number is 010-1234-5678.", es: "Tengo veinticinco años. Mi número es 010-1234-5678." } },
+        { text: "النَّهَارْدَه الْجُمْعَة. أَشُوفَك يَوْم الِاتْنِين! (en-naharda el-gom3a. ashoofak yoom el-etneen!)", speechLang: "ar-EG", meaning: { ko: "오늘은 금요일이에요. 월요일에 봐요!", en: "Today is Friday. See you on Monday!", es: "Hoy es viernes. ¡Te veo el lunes!" } },
+        { text: "السَّاعَة تَلَاتَة وْنُص. الِاجْتِمَاع السَّاعَة أَرْبَعَة. (es-saa3a talaata we-noṣ. el-egtemaa3 es-saa3a arba3a.)", speechLang: "ar-EG", meaning: { ko: "세 시 반이에요. 회의는 네 시예요.", en: "It's half past three. The meeting is at four.", es: "Son las tres y media. La reunión es a las cuatro." } },
+        { text: "النَّهَارْدَه بِتْمَطَّر. بَرْد. خُد جَاكِتَّة! (en-naharda betmaṭṭar. bard. khod jaketta!)", speechLang: "ar-EG", meaning: { ko: "오늘 비가 와요. 추워요. 재킷 가져가세요!", en: "It's raining today. It's cold. Bring a jacket!", es: "Hoy llueve. Hace frío. ¡Trae una chaqueta!" }, recallRound: true },
+        { text: "أَنَا بَحِبّ الأَزْرَق. فِيه مَقَاس أَكْبَر؟ (ana baḥebb el-azraʼ. fiih maʼaas akbar?)", speechLang: "ar-EG", meaning: { ko: "파란색이 좋아요. 더 큰 사이즈 있어요?", en: "I like the blue one. Do you have a bigger size?", es: "Me gusta el azul. ¿Tiene una talla más grande?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: Unit 2 이집트 아랍어 총복습! 숫자/나이(3andak kaam sana?), 요일(en-naharda eeh?), 시간(es-saa3a kaam?), 날씨(el-gaww 3aamel eeh?), 색상/크기(da lawno eeh? maʼaas?).", en: "Pattern: Unit 2 Egyptian Arabic review! Numbers/age (3andak kaam sana?), days (en-naharda eeh?), time (es-saa3a kaam?), weather (el-gaww 3aamel eeh?), colours/sizes (da lawno eeh? maʼaas?).", es: "Patrón: Repaso completo de Unidad 2 en árabe egipcio. Números/edad (3andak kaam sana?), días (en-naharda eeh?), hora (es-saa3a kaam?), clima (el-gaww 3aamel eeh?), colores/tallas (da lawno eeh?)." },
+          examples: { ko: "أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة. النَّهَارْدَه الْجُمْعَة. (나이+요일 연결)\nالسَّاعَة تَلَاتَة وْنُص. النَّهَارْدَه بِتْمَطَّر. (시간+날씨 연결)\nأَنَا بَحِبّ الأَزْرَق. فِيه مَقَاس أَكْبَر؟ (색상+크기 연결)", en: "ana 3andi khamsa we-3eshreen sana. en-naharda el-gom3a. (Connecting age + day.)\nes-saa3a talaata we-noṣ. en-naharda betmaṭṭar. (Connecting time + weather.)\nana baḥebb el-azraʼ. fiih maʼaas akbar? (Connecting colour + size.)", es: "ana 3andi khamsa we-3eshreen sana. en-naharda el-gom3a. (Conectando edad + día.)\nes-saa3a talaata we-noṣ. en-naharda betmaṭṭar. (Conectando hora + clima.)\nana baḥebb el-azraʼ. fiih maʼaas akbar? (Conectando color + talla.)" },
+          mistakes: { ko: "❌ أَنَا خَمْسَة وْعِشْرِين سَنَة. (3andi 빠짐)\n✅ أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة.\n\n❌ السَّاعَة سَبْعَة نُص. ↔ السَّاعَة سَبْعَة وْنُص.\n✅ 반은 'we-noṣ'(와 누스), 비교는 'akbar' 한 단어!", en: "❌ ana khamsa we-3eshreen sana. (missing 3andi)\n✅ ana 3andi khamsa we-3eshreen sana.\n\n❌ es-saa3a sab3a noṣ.\n✅ es-saa3a sab3a we-noṣ. (Half = 'we-noṣ' with 'and'; comparative = one word 'akbar'!)", es: "❌ ana khamsa we-3eshreen sana. (falta 3andi)\n✅ ana 3andi khamsa we-3eshreen sana.\n\n❌ es-saa3a sab3a noṣ.\n✅ es-saa3a sab3a we-noṣ. (Media = 'we-noṣ' con 'y'; comparativo = una palabra 'akbar'.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 이집트 아랍어 핵심 정리! 숫자는 '-taashar/-een' 블록, 나이엔 'عَنْدِي'(3andi), 요일엔 'yoom', 시간은 'es-saa3a + we-noṣ', 날씨는 'ed-donya + 형용사', 비교는 'akbar'. 이 단서들이면 Unit 2 완벽 클리어!", en: "Detective Rudy's tip: Egyptian Arabic cheat sheet! Numbers = '-taashar/-een' blocks, age = '3andi', days = 'yoom', time = 'es-saa3a + we-noṣ', weather = 'ed-donya + adjective', compare = 'akbar'. These clues solve Unit 2!", es: "Consejo del detective Rudy: Resumen del árabe egipcio. Números = bloques '-taashar/-een', edad = '3andi', días = 'yoom', hora = 'es-saa3a + we-noṣ', clima = 'ed-donya + adjetivo', comparar = 'akbar'. ¡Estas pistas resuelven la Unidad 2!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "عَنْدَك كَام ___؟", answer: "سَنَة", options: ["سَنَة", "اِسْم", "بَلَد"], fullSentence: "عَنْدَك كَام سَنَة؟", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" } },
+          { type: "select", promptWithBlank: "السَّاعَة ___؟", answer: "كَام", options: ["كَام", "إِيه", "فِين"], fullSentence: "السَّاعَة كَام؟", fullSentenceMeaning: { ko: "지금 몇 시예요?", en: "What time is it?", es: "¿Qué hora es?" } },
+          { type: "input", promptWithBlank: "الْجَوّ عَامِل ___ النَّهَارْدَه؟", answer: "إِيه", fullSentence: "الْجَوّ عَامِل إِيه النَّهَارْدَه؟", fullSentenceMeaning: { ko: "오늘 날씨 어때요?", en: "How's the weather?", es: "¿Cómo está el clima?" } },
+          { type: "input", promptWithBlank: "النَّهَارْدَه ___؟", answer: "إِيه", fullSentence: "النَّهَارْدَه إِيه؟", fullSentenceMeaning: { ko: "오늘 무슨 요일이에요?", en: "What day is it?", es: "¿Qué día es hoy?" } },
+          { type: "input", promptWithBlank: "فِيه مَقَاس ___؟", answer: "أَكْبَر", fullSentence: "فِيه مَقَاس أَكْبَر؟", fullSentenceMeaning: { ko: "이거 더 큰 사이즈 있어요?", en: "Do you have a bigger size?", es: "¿Tiene una talla más grande?" } },
+          { type: "listening", audioText: "أَنَا بَحِبّ الأَزْرَق. فِيه مَقَاس أَكْبَر؟", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["أَنَا بَحِبّ الأَزْرَق. فِيه مَقَاس أَكْبَر؟", "النَّهَارْدَه بِتْمَطَّر. بَرْد.", "السَّاعَة كَام؟", "عَنْدَك كَام سَنَة؟"], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 };
 
@@ -808,6 +989,7 @@ export const MISSION_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "박물관 입구에서 새 동료의 연락처를 교환하고 있습니다.", en: "Exchanging contact info at the museum.", es: "Intercambiando información de contacto." }, gptPrompt: "You are Rudy exchanging contact information with your partner. Simple A1 {targetLang}. Practice: 1) ask their age 2) exchange phone numbers 3) count items together. Keep very simple.", speechLang: "es-ES", suggestedAnswers: ["Tengo veinticinco años.", "Mi número de teléfono es ___.", "¿Cuántos años tienes?", "Uno, dos, tres...", "Hay cinco cuadros."] },
     korean: { situation: { ko: "박물관 입구에서 새 동료의 연락처를 교환하고 있습니다.", en: "Exchanging contact info at the museum.", es: "Intercambiando información de contacto." }, gptPrompt: "You are Rudy exchanging contact information with your partner. Simple A1 {targetLang}. Practice: 1) ask their age 2) exchange phone numbers 3) count items together. Keep very simple.", speechLang: "ko-KR", suggestedAnswers: ["저는 스물다섯 살이에요.", "제 전화번호는 ___이에요.", "몇 살이에요?", "하나, 둘, 셋...", "그림이 다섯 개 있어요."] },
     indonesian: { situation: { ko: "박물관 입구에서 새 동료의 연락처를 교환하고 있습니다.", en: "Exchanging contact info at the museum.", es: "Intercambiando información de contacto." }, gptPrompt: "You are Rudy exchanging contact information with your partner. Simple A1 {targetLang}. Practice: 1) ask their age ('Berapa umur Anda?') 2) exchange phone numbers (spell out each digit: nol, satu, dua...) 3) count items together. Keep very simple.", speechLang: "id-ID", suggestedAnswers: ["Saya berumur dua puluh lima tahun.", "Nomor telepon saya ___.", "Berapa umur Anda?", "Satu, dua, tiga...", "Ada lima lukisan."] },
+    arabic: { situation: { ko: "박물관 입구에서 새 동료의 연락처를 교환하고 있습니다.", en: "Exchanging contact info at the museum.", es: "Intercambiando información de contacto." }, gptPrompt: "You are Rudy exchanging contact information with your partner. Simple A1 Egyptian Colloquial Arabic. Practice: 1) ask their age ('3andak kaam sana?') 2) exchange phone numbers (spell out each digit: ṣefr, waaḥed, etneen...) 3) count items together. Keep very simple.", speechLang: "ar-EG", suggestedAnswers: ["أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة. (ana 3andi khamsa we-3eshreen sana.)", "نِمْرِة تِلِيفُونِي ___. (nemret telefoni ___.)", "عَنْدَك كَام سَنَة؟ (3andak kaam sana?)", "وَاحِد، اِتْنِين، تَلَاتَة... (waaḥed, etneen, talaata...)", "فِيه خَمْس لُوحَات. (fiih khams looḥaat.)"] },
   },
 
   day_8: {
@@ -815,6 +997,7 @@ export const MISSION_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "루디와 한 주의 일정을 계획하고 있습니다.", en: "Planning the week with Rudy.", es: "Planificando la semana con Rudy." }, gptPrompt: "You are Rudy planning the week with your partner. Simple A1 {targetLang}. Practice: days of the week, work schedule, weekend plans, setting meeting days. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["Hoy es lunes.", "Trabajo de lunes a viernes.", "¿Qué haces este fin de semana?", "¡Te veo el miércoles!", "¿Qué día es hoy?"] },
     korean: { situation: { ko: "루디와 한 주의 일정을 계획하고 있습니다.", en: "Planning the week with Rudy.", es: "Planificando la semana con Rudy." }, gptPrompt: "You are Rudy planning the week with your partner. Simple A1 {targetLang}. Practice: days, schedule, weekend plans, meeting days. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["오늘은 월요일이에요.", "월요일부터 금요일까지 일해요.", "이번 주말에 뭐 해?", "수요일에 봐요!", "오늘 무슨 요일이에요?"] },
     indonesian: { situation: { ko: "루디와 한 주의 일정을 계획하고 있습니다.", en: "Planning the week with Rudy.", es: "Planificando la semana con Rudy." }, gptPrompt: "You are Rudy planning the week with your partner. Simple A1 {targetLang}. Practice: days of the week (hari Senin, Selasa...), work schedule (dari Senin sampai Jumat), weekend plans, setting meeting days. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Hari ini hari Senin.", "Saya bekerja dari Senin sampai Jumat.", "Apa rencana Anda akhir pekan ini?", "Sampai jumpa hari Rabu!", "Hari ini hari apa?"] },
+    arabic: { situation: { ko: "루디와 한 주의 일정을 계획하고 있습니다.", en: "Planning the week with Rudy.", es: "Planificando la semana con Rudy." }, gptPrompt: "You are Rudy planning the week with your partner. Simple A1 Egyptian Colloquial Arabic. Practice: days of the week (el-etneen, et-talat, el-arba3...), work schedule (men el-etneen lel-gom3a), weekend plans, setting meeting days ('yoom el-arba3'). Keep simple.", speechLang: "ar-EG", suggestedAnswers: ["النَّهَارْدَه الِاتْنِين. (en-naharda el-etneen.)", "أَنَا بَشْتَغَل مِن الِاتْنِين لِلْجُمْعَة. (ana bashtaghal men el-etneen lel-gom3a.)", "هَتْعْمِل إِيه آخِر الأُسْبُوع؟ (hat3mel eeh aakher el-osboo3?)", "أَشُوفَك يَوْم الأَرْبَع! (ashoofak yoom el-arba3!)", "النَّهَارْدَه إِيه؟ (en-naharda eeh?)"] },
   },
 
   day_9: {
@@ -822,6 +1005,7 @@ export const MISSION_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "박물관에서 투어 시간을 확인하고 있습니다.", en: "Checking tour times at the museum.", es: "Verificando horarios de tours en el museo." }, gptPrompt: "You are Rudy at the museum coordinating tour times. Simple A1 {targetLang}. Practice: asking time, saying tour times, daily routine. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["¿Qué hora es?", "Son las tres.", "El tour es a las dos y media.", "Me despierto a las siete.", "El museo cierra a las cinco."] },
     korean: { situation: { ko: "박물관에서 투어 시간을 확인하고 있습니다.", en: "Checking tour times at the museum.", es: "Verificando horarios de tours." }, gptPrompt: "You are Rudy at the museum coordinating tour times. Simple A1 {targetLang}. Practice: asking time, tour times, daily routine. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["지금 몇 시예요?", "세 시예요.", "투어는 두 시 반이에요.", "일곱 시에 일어나요.", "박물관은 다섯 시에 닫아요."] },
     indonesian: { situation: { ko: "박물관에서 투어 시간을 확인하고 있습니다.", en: "Checking tour times at the museum.", es: "Verificando horarios de tours." }, gptPrompt: "You are Rudy at the museum coordinating tour times. Simple A1 {targetLang}. Practice: asking time ('Sekarang jam berapa?'), tour times (jam dua, jam setengah tiga), daily routine. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Sekarang jam berapa?", "Sekarang jam tiga.", "Turnya jam setengah tiga.", "Saya bangun jam tujuh.", "Museum tutup jam lima."] },
+    arabic: { situation: { ko: "박물관에서 투어 시간을 확인하고 있습니다.", en: "Checking tour times at the museum.", es: "Verificando horarios de tours." }, gptPrompt: "You are Rudy at the museum coordinating tour times. Simple A1 Egyptian Colloquial Arabic. Practice: asking time ('es-saa3a kaam?'), tour times (es-saa3a etneen, es-saa3a talaata we-noṣ), daily routine. Keep simple.", speechLang: "ar-EG", suggestedAnswers: ["السَّاعَة كَام؟ (es-saa3a kaam?)", "السَّاعَة تَلَاتَة. (es-saa3a talaata.)", "الْجَوْلَة السَّاعَة اِتْنِين وْنُص. (el-gawla es-saa3a etneen we-noṣ.)", "أَنَا بَصْحَى السَّاعَة سَبْعَة. (ana baṣ-ḥa es-saa3a sab3a.)", "الْمَتْحَف بِيِقْفِل السَّاعَة خَمْسَة. (el-matḥaf beyeʼfel es-saa3a khamsa.)"] },
   },
 
   day_10: {
@@ -829,6 +1013,7 @@ export const MISSION_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "야외 조사 전에 날씨를 확인하고 있습니다.", en: "Checking weather before outdoor investigation.", es: "Verificando el clima antes de investigar." }, gptPrompt: "You are Rudy planning an outdoor investigation. Simple A1 {targetLang}. Practice: weather questions, descriptions, clothing, preferences. Keep simple and fun.", speechLang: "es-ES", suggestedAnswers: ["¿Cómo está el clima hoy?", "Está soleado y cálido.", "¡Está lloviendo! Trae un paraguas.", "Hace frío afuera.", "Me gusta el clima caliente."] },
     korean: { situation: { ko: "야외 조사 전에 날씨를 확인하고 있습니다.", en: "Checking weather before investigation.", es: "Verificando el clima." }, gptPrompt: "You are Rudy planning an outdoor investigation. Simple A1 {targetLang}. Practice: weather, clothing, preferences. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["오늘 날씨 어때요?", "맑고 따뜻해요.", "비가 와요! 우산 가져가세요.", "밖이 추워요.", "더운 날씨를 좋아해요."] },
     indonesian: { situation: { ko: "야외 조사 전에 날씨를 확인하고 있습니다.", en: "Checking weather before investigation.", es: "Verificando el clima." }, gptPrompt: "You are Rudy planning an outdoor investigation. Simple A1 {targetLang}. Practice: weather (cerah, hujan, dingin, panas), clothing, preferences. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Bagaimana cuaca hari ini?", "Cuacanya cerah dan hangat.", "Hujan! Bawa payung.", "Di luar dingin.", "Saya suka cuaca panas."] },
+    arabic: { situation: { ko: "야외 조사 전에 날씨를 확인하고 있습니다.", en: "Checking weather before investigation.", es: "Verificando el clima." }, gptPrompt: "You are Rudy planning an outdoor investigation. Simple A1 Egyptian Colloquial Arabic. Practice: weather (ṣaḥw, betmaṭṭar, bard, ḥarr), clothing, preferences. Keep simple.", speechLang: "ar-EG", suggestedAnswers: ["الْجَوّ عَامِل إِيه النَّهَارْدَه؟ (el-gaww 3aamel eeh en-naharda?)", "الدُّنْيَا صَحْو وْدَافِيَة. (ed-donya ṣaḥw we-dafya.)", "بِتْمَطَّر! خُد شَمْسِيَّة. (betmaṭṭar! khod shamseyya.)", "الدُّنْيَا بَرْد بَرَّه. (ed-donya bard barra.)", "أَنَا بَحِبّ الْجَوّ الْحَرّ. (ana baḥebb el-gaww el-ḥarr.)"] },
   },
 
   day_11: {
@@ -836,6 +1021,7 @@ export const MISSION_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "박물관 기념품 가게에서 선물을 고르고 있습니다.", en: "Shopping at the museum gift shop.", es: "Comprando en la tienda del museo." }, gptPrompt: "You are Rudy at the gift shop helping choose souvenirs. Simple A1 {targetLang}. Practice: colours, preferences, sizes, choosing items. Make it feel like real shopping.", speechLang: "es-ES", suggestedAnswers: ["¿De qué color es esto?", "Me gusta el azul.", "¿Tiene una talla más grande?", "Esto es muy pequeño.", "Me llevo el negro, por favor.", "¿Cuánto cuesta esto?"] },
     korean: { situation: { ko: "박물관 기념품 가게에서 선물을 고르고 있습니다.", en: "Shopping at the museum gift shop.", es: "Comprando en la tienda." }, gptPrompt: "You are Rudy at the gift shop helping choose souvenirs. Simple A1 {targetLang}. Practice: colours, sizes, choosing items. Make it like real shopping.", speechLang: "ko-KR", suggestedAnswers: ["이건 무슨 색이에요?", "파란색을 좋아해요.", "더 큰 사이즈 있어요?", "이건 너무 작아요.", "검은색 걸로 할게요.", "이거 얼마예요?"] },
     indonesian: { situation: { ko: "박물관 기념품 가게에서 선물을 고르고 있습니다.", en: "Shopping at the museum gift shop.", es: "Comprando en la tienda." }, gptPrompt: "You are Rudy at the gift shop helping choose souvenirs. Simple A1 {targetLang}. Practice: colours (merah, biru, hitam), sizes (lebih besar, terlalu kecil), choosing items ('Saya ambil yang ___'). Make it like real shopping.", speechLang: "id-ID", suggestedAnswers: ["Ini warna apa?", "Saya suka biru.", "Apakah ada ukuran yang lebih besar?", "Ini terlalu kecil.", "Saya ambil yang hitam.", "Ini berapa harganya?"] },
+    arabic: { situation: { ko: "박물관 기념품 가게에서 선물을 고르고 있습니다.", en: "Shopping at the museum gift shop.", es: "Comprando en la tienda." }, gptPrompt: "You are Rudy at the gift shop helping choose souvenirs. Simple A1 Egyptian Colloquial Arabic. Practice: colours (aḥmar, azraʼ, aswad), sizes (akbar, ṣoghayyar awi), choosing items ('haakhod el-___'). Make it like real shopping.", speechLang: "ar-EG", suggestedAnswers: ["دَه لَوْنُه إِيه؟ (da lawno eeh?)", "أَنَا بَحِبّ الأَزْرَق. (ana baḥebb el-azraʼ.)", "فِيه مَقَاس أَكْبَر؟ (fiih maʼaas akbar?)", "دَه صُغَيَّر أَوِي. (da ṣoghayyar awi.)", "هَاخُد الأَسْوَد. (haakhod el-aswad.)", "دَه بِكَام؟ (da bekaam?)"] },
   },
 
   day_12: {
@@ -843,6 +1029,7 @@ export const MISSION_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "박물관 주간 마무리 파티입니다!", en: "End-of-week party! Use everything!", es: "¡Fiesta de fin de semana! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting an end-of-week gathering. Test ALL of Unit 2 in A1 {targetLang}: numbers/age, days, time, weather, colours/sizes. Also reinforce Unit 1. Create 2-3 mini-scenarios. Be encouraging.", speechLang: "es-ES", suggestedAnswers: ["Tengo veinticinco años.", "¡Hoy es viernes!", "Son las tres y media.", "Está soleado y cálido.", "Me gusta el azul.", "¿Cuánto cuesta esto?", "¿Dónde está el baño?"] },
     korean: { situation: { ko: "박물관 주간 마무리 파티입니다! 이번 주 배운 모든 표현을 사용해보세요!", en: "End-of-week party! Use everything!", es: "¡Fiesta! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting an end-of-week gathering. Test ALL of Unit 2 in A1 {targetLang}: numbers/age, days, time, weather, colours/sizes. Also reinforce Unit 1. Create 2-3 mini-scenarios. Be encouraging.", speechLang: "ko-KR", suggestedAnswers: ["저는 스물다섯 살이에요.", "오늘은 금요일이에요!", "세 시 반이에요.", "맑고 따뜻해요.", "파란색이 좋아요.", "이거 얼마예요?", "화장실이 어디예요?"] },
     indonesian: { situation: { ko: "박물관 주간 마무리 파티입니다! 이번 주 배운 모든 표현을 사용해보세요!", en: "End-of-week party! Use everything!", es: "¡Fiesta! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting an end-of-week gathering. Test ALL of Unit 2 in A1 {targetLang}: numbers/age, days, time, weather, colours/sizes. Also reinforce Unit 1 survival phrases naturally (Apa kabar? Di mana toilet?). Create 2-3 mini-scenarios. Be encouraging.", speechLang: "id-ID", suggestedAnswers: ["Saya berumur dua puluh lima tahun.", "Hari ini hari Jumat!", "Sekarang jam setengah empat.", "Cuacanya cerah dan hangat.", "Saya suka yang biru.", "Ini berapa harganya?", "Di mana toilet?"] },
+    arabic: { situation: { ko: "박물관 주간 마무리 파티입니다! 이번 주 배운 모든 표현을 사용해보세요!", en: "End-of-week party! Use everything!", es: "¡Fiesta! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting an end-of-week gathering. Test ALL of Unit 2 in A1 Egyptian Colloquial Arabic: numbers/age, days, time, weather, colours/sizes. Also reinforce Unit 1 survival phrases naturally (Ezzayyak? Feen el-ḥammaam?). Create 2-3 mini-scenarios. Be encouraging.", speechLang: "ar-EG", suggestedAnswers: ["أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة. (ana 3andi khamsa we-3eshreen sana.)", "النَّهَارْدَه الْجُمْعَة! (en-naharda el-gom3a!)", "السَّاعَة تَلَاتَة وْنُص. (es-saa3a talaata we-noṣ.)", "الدُّنْيَا صَحْو وْدَافِيَة. (ed-donya ṣaḥw we-dafya.)", "أَنَا بَحِبّ الأَزْرَق. (ana baḥebb el-azraʼ.)", "دَه بِكَام؟ (da bekaam?)", "فِين الْحَمَّام؟ (feen el-ḥammaam?)"] },
   },
 };
 
@@ -881,6 +1068,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "Berapa ___ Anda?", answer: "umur", options: ["umur", "nama", "kota"], fullSentence: "Berapa umur Anda?", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" } },
       { type: "speak", sentence: "Saya berumur dua puluh lima tahun.", speechLang: "id-ID", meaning: { ko: "저는 스물다섯 살이에요.", en: "I'm 25 years old.", es: "Tengo 25 años." } },
     ],
+    arabic: [
+      { type: "speak", sentence: "مَعْلِش، أَنَا مِش فَاهِم. مُمْكِن تِقُول تَانِي؟ (ma3lesh, ana mish faahem. momken teʼool taani?)", speechLang: "ar-EG", meaning: { ko: "이해를 못 했어요. 다시 한번 말해주세요.", en: "Sorry, I don't understand. Can you say that again?", es: "No entiendo. ¿Puede repetir?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "دَه ___؟", answer: "بِكَام", options: ["بِكَام", "إِيه", "فِين"], fullSentence: "دَه بِكَام؟", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "عَنْدِي كَلْبِين وْتَلَات قُطَط فِي الْبيت.", speechLang: "ar-EG", meaning: { ko: "집에 강아지 두 마리, 고양이 세 마리가 있어요.", en: "I have two dogs and three cats at home.", es: "Tengo dos perros y tres gatos en casa." } },
+      { type: "fill_blank", promptWithBlank: "عَنْدَك كَام ___؟", answer: "سَنَة", options: ["سَنَة", "اِسْم", "بَلَد"], fullSentence: "عَنْدَك كَام سَنَة؟", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" } },
+      { type: "speak", sentence: "أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة.", speechLang: "ar-EG", meaning: { ko: "저는 스물다섯 살이에요.", en: "I'm 25 years old.", es: "Tengo 25 años." } },
+    ],
   },
 
   day_8: {
@@ -911,6 +1105,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Hari ini hari Senin. Sampai jumpa hari Jumat!", speechLang: "id-ID", meaning: { ko: "오늘은 월요일. 금요일에 봐요!", en: "Today is Monday. See you Friday!", es: "Hoy es lunes. ¡Nos vemos el viernes!" } },
       { type: "fill_blank", promptWithBlank: "Saya bekerja ___ Senin sampai Jumat.", answer: "dari", options: ["dari", "di", "ke"], fullSentence: "Saya bekerja dari Senin sampai Jumat.", fullSentenceMeaning: { ko: "월~금 일해요.", en: "I work Mon-Fri.", es: "Trabajo lunes a viernes." } },
       { type: "speak", sentence: "Apa rencana Anda akhir pekan ini?", speechLang: "id-ID", meaning: { ko: "이번 주말에 뭐 해?", en: "What are you doing this weekend?", es: "¿Qué haces este fin de semana?" } },
+    ],
+    arabic: [
+      { type: "speak", sentence: "أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة.", speechLang: "ar-EG", meaning: { ko: "저는 스물다섯 살이에요.", en: "I'm 25.", es: "Tengo 25 años." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "عَنْدَك كَام ___؟", answer: "سَنَة", options: ["سَنَة", "اِسْم", "بَلَد"], fullSentence: "عَنْدَك كَام سَنَة؟", fullSentenceMeaning: { ko: "몇 살이에요?", en: "How old are you?", es: "¿Cuántos años tienes?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "النَّهَارْدَه الِاتْنِين. أَشُوفَك يَوْم الْجُمْعَة!", speechLang: "ar-EG", meaning: { ko: "오늘은 월요일. 금요일에 봐요!", en: "Today is Monday. See you Friday!", es: "Hoy es lunes. ¡Nos vemos el viernes!" } },
+      { type: "fill_blank", promptWithBlank: "أَنَا بَشْتَغَل ___ الِاتْنِين لِلْجُمْعَة.", answer: "مِن", options: ["مِن", "فِي", "عَلَى"], fullSentence: "أَنَا بَشْتَغَل مِن الِاتْنِين لِلْجُمْعَة.", fullSentenceMeaning: { ko: "월~금 일해요.", en: "I work Mon-Fri.", es: "Trabajo lunes a viernes." } },
+      { type: "speak", sentence: "هَتْعْمِل إِيه آخِر الأُسْبُوع؟", speechLang: "ar-EG", meaning: { ko: "이번 주말에 뭐 해?", en: "What are you doing this weekend?", es: "¿Qué haces este fin de semana?" } },
     ],
   },
 
@@ -943,6 +1144,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "Sekarang jam ___ delapan.", answer: "setengah", options: ["setengah", "lebih", "kurang"], fullSentence: "Sekarang jam setengah delapan.", fullSentenceMeaning: { ko: "일곱 시 반이에요.", en: "It's 7:30.", es: "Son las 7 y media." } },
       { type: "speak", sentence: "Saya bangun jam tujuh setiap hari.", speechLang: "id-ID", meaning: { ko: "매일 일곱 시에 일어나요.", en: "I wake up at 7.", es: "Me despierto a las 7." } },
     ],
+    arabic: [
+      { type: "speak", sentence: "النَّهَارْدَه الأَرْبَع. أَشُوفَك يَوْم الْجُمْعَة!", speechLang: "ar-EG", meaning: { ko: "오늘은 수요일. 금요일에 봐요!", en: "Wednesday. See you Friday!", es: "Miércoles. ¡Nos vemos el viernes!" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "النَّهَارْدَه ___؟", answer: "إِيه", options: ["إِيه", "فِين", "مِين"], fullSentence: "النَّهَارْدَه إِيه؟", fullSentenceMeaning: { ko: "오늘 무슨 요일?", en: "What day?", es: "¿Qué día?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "السَّاعَة كَام؟ السَّاعَة تَلَاتَة.", speechLang: "ar-EG", meaning: { ko: "몇 시예요? 세 시예요.", en: "What time? 3 o'clock.", es: "¿Qué hora? Las tres." } },
+      { type: "fill_blank", promptWithBlank: "السَّاعَة سَبْعَة وْ ___.", answer: "نُص", options: ["نُص", "رُبْع", "تِلْت"], fullSentence: "السَّاعَة سَبْعَة وْنُص.", fullSentenceMeaning: { ko: "일곱 시 반이에요.", en: "It's 7:30.", es: "Son las 7 y media." } },
+      { type: "speak", sentence: "أَنَا بَصْحَى السَّاعَة سَبْعَة كُلّ يَوْم.", speechLang: "ar-EG", meaning: { ko: "매일 일곱 시에 일어나요.", en: "I wake up at 7.", es: "Me despierto a las 7." } },
+    ],
   },
 
   day_10: {
@@ -973,6 +1181,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Cuacanya cerah dan hangat hari ini.", speechLang: "id-ID", meaning: { ko: "오늘 맑고 따뜻해요.", en: "Sunny and warm.", es: "Soleado y cálido." } },
       { type: "fill_blank", promptWithBlank: "Hari ini ___.", answer: "hujan", options: ["hujan", "cuaca", "jam"], fullSentence: "Hari ini hujan.", fullSentenceMeaning: { ko: "비가 와요.", en: "It's raining.", es: "Está lloviendo." } },
       { type: "speak", sentence: "Di luar dingin. Bawa jaket!", speechLang: "id-ID", meaning: { ko: "밖이 추워요. 재킷!", en: "Cold outside. Jacket!", es: "Frío afuera. ¡Chaqueta!" } },
+    ],
+    arabic: [
+      { type: "speak", sentence: "السَّاعَة تَلَاتَة. الِاجْتِمَاع السَّاعَة أَرْبَعَة.", speechLang: "ar-EG", meaning: { ko: "세 시. 회의는 네 시.", en: "It's 3. Meeting at 4.", es: "Las 3. Reunión a las 4." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "السَّاعَة ___؟", answer: "كَام", options: ["كَام", "إِيه", "فِين"], fullSentence: "السَّاعَة كَام؟", fullSentenceMeaning: { ko: "몇 시예요?", en: "What time?", es: "¿Qué hora?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "الدُّنْيَا صَحْو وْدَافِيَة النَّهَارْدَه.", speechLang: "ar-EG", meaning: { ko: "오늘 맑고 따뜻해요.", en: "Sunny and warm.", es: "Soleado y cálido." } },
+      { type: "fill_blank", promptWithBlank: "النَّهَارْدَه ___.", answer: "بِتْمَطَّر", options: ["بِتْمَطَّر", "الْجَوّ", "السَّاعَة"], fullSentence: "النَّهَارْدَه بِتْمَطَّر.", fullSentenceMeaning: { ko: "비가 와요.", en: "It's raining.", es: "Está lloviendo." } },
+      { type: "speak", sentence: "الدُّنْيَا بَرْد بَرَّه. خُد جَاكِتَّة!", speechLang: "ar-EG", meaning: { ko: "밖이 추워요. 재킷!", en: "Cold outside. Jacket!", es: "Frío afuera. ¡Chaqueta!" } },
     ],
   },
 
@@ -1005,6 +1220,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "Ini ___ kecil.", answer: "terlalu", options: ["terlalu", "lebih", "sangat"], fullSentence: "Ini terlalu kecil.", fullSentenceMeaning: { ko: "너무 작아요.", en: "Too small.", es: "Muy pequeño." } },
       { type: "speak", sentence: "Saya ambil yang hitam.", speechLang: "id-ID", meaning: { ko: "검은색 걸로.", en: "I'll take the black one.", es: "Me llevo el negro." } },
     ],
+    arabic: [
+      { type: "speak", sentence: "الدُّنْيَا صَحْو. أَنَا بَحِبّ الْجَوّ الْحَرّ.", speechLang: "ar-EG", meaning: { ko: "맑아요. 더운 날씨 좋아해요.", en: "Sunny. I like hot weather.", es: "Soleado. Me gusta el clima caliente." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "الْجَوّ عَامِل ___ النَّهَارْدَه؟", answer: "إِيه", options: ["إِيه", "فِين", "كَام"], fullSentence: "الْجَوّ عَامِل إِيه النَّهَارْدَه؟", fullSentenceMeaning: { ko: "날씨 어때요?", en: "How's the weather?", es: "¿Cómo está el clima?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "دَه لَوْنُه إِيه؟ أَنَا بَحِبّ الأَزْرَق.", speechLang: "ar-EG", meaning: { ko: "무슨 색? 파란색 좋아요.", en: "What colour? I like blue.", es: "¿Qué color? Me gusta azul." } },
+      { type: "fill_blank", promptWithBlank: "دَه ___ كِبِير.", answer: "مِش", options: ["مِش", "أَكْبَر", "أَوِي"], fullSentence: "دَه مِش كِبِير.", fullSentenceMeaning: { ko: "너무 작아요.", en: "Too small.", es: "Muy pequeño." } },
+      { type: "speak", sentence: "هَاخُد الأَسْوَد.", speechLang: "ar-EG", meaning: { ko: "검은색 걸로.", en: "I'll take the black one.", es: "Me llevo el negro." } },
+    ],
   },
 
   day_12: {
@@ -1035,6 +1257,13 @@ export const REVIEW_CONTENT_UNIT2: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Sekarang jam setengah empat. Rapatnya jam empat.", speechLang: "id-ID", meaning: { ko: "세 시 반. 회의 네 시.", en: "3:30. Meeting 4.", es: "3:30. Reunión 4." } },
       { type: "speak", sentence: "Hari ini hujan. Dingin. Bawa jaket!", speechLang: "id-ID", meaning: { ko: "비 와요. 추워요. 재킷!", en: "Rain. Cold. Jacket!", es: "Lluvia. Frío. ¡Chaqueta!" } },
       { type: "speak", sentence: "Saya suka yang biru. Apakah ada ukuran yang lebih besar? Ini berapa harganya?", speechLang: "id-ID", meaning: { ko: "파란색 좋아요. 큰 사이즈? 얼마?", en: "Like blue. Bigger? How much?", es: "Azul. ¿Más grande? ¿Cuánto?" } },
+    ],
+    arabic: [
+      { type: "speak", sentence: "أَنَا عَنْدِي خَمْسَة وْعِشْرِين سَنَة. عَنْدَك كَام سَنَة؟", speechLang: "ar-EG", meaning: { ko: "스물다섯 살이에요. 당신은?", en: "I'm 25. You?", es: "Tengo 25. ¿Y tú?" } },
+      { type: "speak", sentence: "النَّهَارْدَه الْجُمْعَة. أَنَا بَشْتَغَل مِن الِاتْنِين لِلْجُمْعَة.", speechLang: "ar-EG", meaning: { ko: "금요일. 월~금 일해요.", en: "Friday. Mon-Fri work.", es: "Viernes. Lunes a viernes." } },
+      { type: "speak", sentence: "السَّاعَة تَلَاتَة وْنُص. الِاجْتِمَاع السَّاعَة أَرْبَعَة.", speechLang: "ar-EG", meaning: { ko: "세 시 반. 회의 네 시.", en: "3:30. Meeting 4.", es: "3:30. Reunión 4." } },
+      { type: "speak", sentence: "النَّهَارْدَه بِتْمَطَّر. بَرْد. خُد جَاكِتَّة!", speechLang: "ar-EG", meaning: { ko: "비 와요. 추워요. 재킷!", en: "Rain. Cold. Jacket!", es: "Lluvia. Frío. ¡Chaqueta!" } },
+      { type: "speak", sentence: "أَنَا بَحِبّ الأَزْرَق. فِيه مَقَاس أَكْبَر؟ دَه بِكَام؟", speechLang: "ar-EG", meaning: { ko: "파란색 좋아요. 큰 사이즈? 얼마?", en: "Like blue. Bigger? How much?", es: "Azul. ¿Más grande? ¿Cuánto?" } },
     ],
   },
 };

@@ -167,6 +167,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Nice to meet you.", es: "Encantado de conocerle.", ko: "만나서 반가워요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    arabic: {
+      step1Sentences: [
+        { text: "دي عيلتي. (di 3elti)", speechLang: "ar-EG", meaning: { ko: "이것은 제 가족이에요.", en: "This is my family.", es: "Esta es mi familia." } },
+        { text: "عندي أخين وأخت واحدة. (3andi akhén w okht waħda)", speechLang: "ar-EG", meaning: { ko: "저는 형제 둘과 자매 하나가 있어요.", en: "I have two brothers and one sister.", es: "Tengo dos hermanos y una hermana." } },
+        { text: "أمي مُدَرِّسة. (ommi modarresa)", speechLang: "ar-EG", meaning: { ko: "어머니는 선생님.", en: "My mother is a teacher.", es: "Mi madre es profesora." } },
+        { text: "أبويا بيشتغل في مُستشفى. (abuya beyeshtaghal fi mostashfa)", speechLang: "ar-EG", meaning: { ko: "아버지는 병원에서 일해요.", en: "My father works at a hospital.", es: "Mi padre trabaja en un hospital." }, recallRound: true },
+        { text: "عندك أطفال؟ (3andak atfaal?)", speechLang: "ar-EG", meaning: { ko: "자녀가 있으세요?", en: "Do you have any children?", es: "¿Tienes hijos?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "가족 소개: 'دي/ده ___' / 소유: '___ + ي (제 ___)' / 가족 수: 'عندي ___' / 직업: '___ + 직업' 또는 'بيشتغل في ___'", en: "'دي/ده ___' → introduce family / noun + ي → 'my ___' / 'عندي ___' → count / job goes straight after, or 'بيشتغل في ___' → works at", es: "'دي/ده ___' → presentar familia / sustantivo + ي → 'mi ___' / 'عندي ___' → contar / el trabajo va después, o 'بيشتغل في ___' → trabaja en" },
+          examples: { ko: "دي أمي. / عندي أخت وأخين. / أبويا بيشتغل في بنك. (di ommi / 3andi okht w akhén / abuya beyeshtaghal fi bank)", en: "دي أمي. / عندي أخت وأخين. / أبويا بيشتغل في بنك. (di ommi / 3andi okht w akhén / abuya beyeshtaghal fi bank)", es: "دي أمي. / عندي أخت وأخين. / أبويا بيشتغل في بنك. (di ommi / 3andi okht w akhén / abuya beyeshtaghal fi bank)" },
+          mistakes: { ko: "❌ دي العيلة بتاعتي.\n✅ دي عيلتي.\n\n❌ أنا عندي أخ اتنين.\n✅ عندي أخين.", en: "❌ دي العيلة بتاعتي. (too long/stiff)\n✅ دي عيلتي. (just add ي for 'my')\n\n❌ أنا عندي أخ اتنين.\n✅ عندي أخين. (use the dual أخين, not أخ + اتنين)", es: "❌ دي العيلة بتاعتي.\n✅ دي عيلتي. (solo añade ي para 'mi')\n\n❌ أنا عندي أخ اتنين.\n✅ عندي أخين. (usa el dual أخين, no أخ + اتنين)" },
+          rudyTip: { ko: "이집트 사투리는 '제 ___'를 명사 끝에 ي만 붙여! عيلة(가족) → عيلتي(제 가족), أم(엄마) → أمي(우리 엄마). '~가 있어요'는 'عندي'(3andi) 하나면 끝!", en: "In Egyptian, 'my ___' is just adding ي to the end! عيلة (family) → عيلتي (my family), أم (mom) → أمي (my mom). And 'I have' is one word: 'عندي' (3andi)!", es: "¡En egipcio, 'mi ___' es solo añadir ي al final! عيلة (familia) → عيلتي, أم (mamá) → أمي. Y 'tengo' es una palabra: 'عندي' (3andi)." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "دي ___.", answer: "عيلتي", options: ["عيلتي", "صاحبي", "بيتي"], fullSentence: "دي عيلتي.", fullSentenceMeaning: { ko: "이것은 제 가족.", en: "This is my family.", es: "Esta es mi familia." } },
+          { type: "select", promptWithBlank: "عندي ___ وأخت واحدة.", answer: "أخين", options: ["أخين", "صحاب", "مُدَرِّسين"], fullSentence: "عندي أخين وأخت واحدة.", fullSentenceMeaning: { ko: "형제 둘, 자매 하나.", en: "Two brothers, one sister.", es: "Dos hermanos, una hermana." } },
+          { type: "select", promptWithBlank: "أمي ___.", answer: "مُدَرِّسة", options: ["مُدَرِّسة", "طالبة", "دكتورة"], fullSentence: "أمي مُدَرِّسة.", fullSentenceMeaning: { ko: "어머니는 선생님.", en: "My mother is a teacher.", es: "Mi madre es profesora." } },
+          { type: "input", promptWithBlank: "أبويا ___ في مُستشفى.", answer: "بيشتغل", fullSentence: "أبويا بيشتغل في مُستشفى.", fullSentenceMeaning: { ko: "아버지는 병원에서 일해요.", en: "Father works at hospital.", es: "Padre trabaja en hospital." } },
+          { type: "input", promptWithBlank: "عندك ___؟", answer: "أطفال", fullSentence: "عندك أطفال؟", fullSentenceMeaning: { ko: "자녀가 있으세요?", en: "Do you have children?", es: "¿Tienes hijos?" } },
+          { type: "listening", audioText: "عندك أطفال؟", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["عندك أطفال؟", "دي عيلتي.", "عندي أخين وأخت واحدة.", "أمي مُدَرِّسة."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "My name is Rudy.", es: "Mi nombre es Rudy.", ko: "제 이름은 루디예요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Nice to meet you.", es: "Encantado de conocerle.", ko: "만나서 반가워요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 26: Describing People ───────────────────────────────
@@ -296,6 +329,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "Pria ber___ itu guru saya.", answer: "kacamata", fullSentence: "Pria berkacamata itu guru saya.", fullSentenceMeaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is teacher.", es: "Hombre con gafas es profesor." } },
           { type: "input", promptWithBlank: "Dia sangat ___ dan berambut panjang.", answer: "tinggi", fullSentence: "Dia sangat tinggi dan berambut panjang.", fullSentenceMeaning: { ko: "그녀는 키가 크고 머리가 길어요.", en: "She is very tall and has long hair.", es: "Ella es muy alta y tiene el pelo largo." } },
           { type: "listening", audioText: "Dia sangat tinggi dan berambut panjang.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Dia sangat tinggi dan berambut panjang.", "Dia memakai jaket biru.", "Teman saya sangat baik.", "Pria berkacamata itu guru saya."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "That's fifteen dollars, please.", es: "Son quince dólares, por favor.", ko: "15달러예요." }, fromDay: 6, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "How much does it cost?", es: "¿Cuánto cuesta?", ko: "얼마예요?" }, fromDay: 6, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    arabic: {
+      step1Sentences: [
+        { text: "هيَّ طويلة وشعرها طويل. (heyya tawila w sha3raha tawil)", speechLang: "ar-EG", meaning: { ko: "그녀는 키가 크고 머리카락이 길어요.", en: "She is tall and has long hair.", es: "Ella es alta y tiene el pelo largo." } },
+        { text: "هو لابس جاكيت أزرق. (howwa labes jakét azra2)", speechLang: "ar-EG", meaning: { ko: "그는 파란색 재킷을 입고 있어요.", en: "He is wearing a blue jacket.", es: "Él lleva una chaqueta azul." } },
+        { text: "صاحبي طيّب أوي. (saħbi tayyeb awi)", speechLang: "ar-EG", meaning: { ko: "제 친구는 매우 친절해요.", en: "My friend is very kind.", es: "Mi amigo es muy amable." } },
+        { text: "الراجل اللي لابس نضّارة ده مُدَرِّسي. (er-raagel elli labes naddara da modarresi)", speechLang: "ar-EG", meaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is my teacher.", es: "Hombre con gafas es mi profesor." }, recallRound: true },
+        { text: "هيَّ طويلة أوي وشعرها طويل. (heyya tawila awi w sha3raha tawil)", speechLang: "ar-EG", meaning: { ko: "그녀는 키가 크고 머리가 길어요.", en: "She is very tall and has long hair.", es: "Ella es muy alta y tiene el pelo largo." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "외모: 'هو/هيَّ + 형용사' (طويل/قصير) / 옷: 'لابس ___' / 특징: 'اللي لابس ___ ده' / 성격: '___ أوي (매우 ___)'", en: "'هو/هيَّ + adjective' (طويل/قصير) → appearance / 'لابس ___' → wearing / 'اللي لابس ___ ده' → the one wearing → identify / '___ أوي' → very ___", es: "'هو/هيَّ + adjetivo' (طويل/قصير) → apariencia / 'لابس ___' → llevar puesto / 'اللي لابس ___ ده' → identificar / '___ أوي' → muy ___" },
+          examples: { ko: "هيَّ طويلة وشعرها بُنّي. / هو لابس قميص أحمر. / الست اللي لابسة بُرنيطة دي صاحبتي. (heyya tawila w sha3raha bonni / howwa labes 2amis aħmar / es-sett elli labsa borneeta di saħebti)", en: "هيَّ طويلة وشعرها بُنّي. / هو لابس قميص أحمر. / الست اللي لابسة بُرنيطة دي صاحبتي. (heyya tawila w sha3raha bonni / howwa labes 2amis aħmar / es-sett elli labsa borneeta di saħebti)", es: "هيَّ طويلة وشعرها بُنّي. / هو لابس قميص أحمر. / الست اللي لابسة بُرنيطة دي صاحبتي. (heyya tawila w sha3raha bonni / howwa labes 2amis aħmar / es-sett elli labsa borneeta di saħebti)" },
+          mistakes: { ko: "❌ هو طويلة.\n✅ هو طويل.\n\n❌ هو بيلبس جاكيت دلوقتي.\n✅ هو لابس جاكيت.", en: "❌ هو طويلة. (adjective must match gender)\n✅ هو طويل.\n\n❌ هو بيلبس جاكيت. (that means the habit of dressing)\n✅ هو لابس جاكيت. (use the participle لابس for 'is wearing now')", es: "❌ هو طويلة.\n✅ هو طويل. (el adjetivo concuerda en género)\n\n❌ هو بيلبس جاكيت.\n✅ هو لابس جاكيت. (usa el participio لابس para 'lleva puesto ahora')" },
+          rudyTip: { ko: "이집트 사투리에서 '입고 있다'는 'لابس'(labes) — 동사가 아니라 형용사처럼 써! 남자는 لابس, 여자는 لابسة. 그리고 '매우'는 형용사 뒤에 'أوي'(awi)를 붙여 — 'طويل أوي'(키 엄청 커)!", en: "In Egyptian, 'wearing' is 'لابس' (labes) — used like an adjective, not a verb! Man = لابس, woman = لابسة. And 'very' goes AFTER: 'أوي' (awi) — 'طويل أوي' (super tall)!", es: "En egipcio, 'llevar puesto' es 'لابس' (labes), ¡como adjetivo, no verbo! Hombre = لابس, mujer = لابسة. Y 'muy' va DESPUÉS: 'أوي' (awi) — 'طويل أوي'." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "هيَّ طويلة و___ طويل.", answer: "شعرها", options: ["شعرها", "عينها", "إيدها"], fullSentence: "هيَّ طويلة وشعرها طويل.", fullSentenceMeaning: { ko: "키 크고 머리 길어요.", en: "Tall with long hair.", es: "Alta con pelo largo." } },
+          { type: "select", promptWithBlank: "هو ___ جاكيت أزرق.", answer: "لابس", options: ["لابس", "عنده", "بيعمل"], fullSentence: "هو لابس جاكيت أزرق.", fullSentenceMeaning: { ko: "파란 재킷 입고 있어요.", en: "Wearing a blue jacket.", es: "Lleva chaqueta azul." } },
+          { type: "select", promptWithBlank: "صاحبي طيّب ___.", answer: "أوي", options: ["أوي", "طويل", "أزرق"], fullSentence: "صاحبي طيّب أوي.", fullSentenceMeaning: { ko: "친구는 매우 친절해요.", en: "My friend is very kind.", es: "Mi amigo es muy amable." } },
+          { type: "input", promptWithBlank: "الراجل اللي لابس ___ ده مُدَرِّسي.", answer: "نضّارة", fullSentence: "الراجل اللي لابس نضّارة ده مُدَرِّسي.", fullSentenceMeaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is teacher.", es: "Hombre con gafas es profesor." } },
+          { type: "input", promptWithBlank: "هيَّ طويلة ___ وشعرها طويل.", answer: "أوي", fullSentence: "هيَّ طويلة أوي وشعرها طويل.", fullSentenceMeaning: { ko: "그녀는 키가 크고 머리가 길어요.", en: "She is very tall and has long hair.", es: "Ella es muy alta y tiene el pelo largo." } },
+          { type: "listening", audioText: "هيَّ طويلة أوي وشعرها طويل.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["هيَّ طويلة أوي وشعرها طويل.", "هو لابس جاكيت أزرق.", "صاحبي طيّب أوي.", "الراجل اللي لابس نضّارة ده مُدَرِّسي."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -439,6 +505,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Are you hungry?", es: "¿Tienes hambre?", ko: "배고프세요?" }, fromDay: 11, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    arabic: {
+      step1Sentences: [
+        { text: "بتحب تعمل إيه في وقت فراغك؟ (betħeb te3mel éh fi wa2t faraghak?)", speechLang: "ar-EG", meaning: { ko: "여가 시간에 뭘 좋아하세요?", en: "What do you like to do in your free time?", es: "¿Qué te gusta hacer en tu tiempo libre?" } },
+        { text: "بحب أقرا كتب وأتفرّج على أفلام. (baħeb a2ra kotob w atfarrag 3ala aflaam)", speechLang: "ar-EG", meaning: { ko: "저는 책 읽기와 영화 보기를 좋아해요.", en: "I like reading books and watching movies.", es: "Me gusta leer libros y ver películas." } },
+        { text: "بتلعب رياضة؟ (betel3ab reyaada?)", speechLang: "ar-EG", meaning: { ko: "스포츠를 하세요?", en: "Do you play any sports?", es: "¿Practicas algún deporte?" } },
+        { text: "بلعب كورة كل آخر أسبوع. (bal3ab kora koll aakher osbou3)", speechLang: "ar-EG", meaning: { ko: "매주 주말 축구해요.", en: "I play football every weekend.", es: "Juego al fútbol cada fin de semana." }, recallRound: true },
+        { text: "هوايتي الطبخ. (hewayti et-tabkh)", speechLang: "ar-EG", meaning: { ko: "취미는 요리.", en: "My hobby is cooking.", es: "Mi hobby es cocinar." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "취미 질문: 'بتحب تعمل إيه؟' / 대답: 'بحب + 동사 (أقرا/أتفرّج)' / 스포츠: 'بلعب ___' / 취미: 'هوايتي ___'", en: "'بتحب تعمل إيه؟' → ask hobbies / 'بحب + verb' (أقرا/أتفرّج) → answer / 'بلعب ___' → sports / 'هوايتي ___' → hobby", es: "'بتحب تعمل إيه؟' → preguntar hobbies / 'بحب + verbo' (أقرا/أتفرّج) → responder / 'بلعب ___' → deportes / 'هوايتي ___' → hobby" },
+          examples: { ko: "بحب أعوم في الصيف. / بلعب تنس يوم السبت. / هوايتي الرسم. (baħeb a3oum fis-séf / bal3ab tenes yom es-sabt / hewayti er-rasm)", en: "بحب أعوم في الصيف. / بلعب تنس يوم السبت. / هوايتي الرسم. (baħeb a3oum fis-séf / bal3ab tenes yom es-sabt / hewayti er-rasm)", es: "بحب أعوم في الصيف. / بلعب تنس يوم السبت. / هوايتي الرسم. (baħeb a3oum fis-séf / bal3ab tenes yom es-sabt / hewayti er-rasm)" },
+          mistakes: { ko: "❌ أنا أحب القراءة.\n✅ بحب أقرا.\n\n❌ بلعب الطبخ.\n✅ هوايتي الطبخ.", en: "❌ أنا أحب القراءة. (MSA/stiff)\n✅ بحب أقرا. (Egyptian uses ب- prefix + verb)\n\n❌ بلعب الطبخ.\n✅ هوايتي الطبخ. ('بلعب' is for sports, not cooking)", es: "❌ أنا أحب القراءة. (árabe estándar/rígido)\n✅ بحب أقرا. (el egipcio usa el prefijo ب- + verbo)\n\n❌ بلعب الطبخ.\n✅ هوايتي الطبخ. ('بلعب' es para deportes, no cocinar)" },
+          rudyTip: { ko: "이집트 사투리는 현재형 앞에 'بـ'(b-)를 붙여! 'أقرا'(읽다) → 'بقرا'(읽어), 'بحب أقرا'(읽는 거 좋아해). 운동은 'بلعب', 취미는 'هوايتي'(hewayti)로 말해~", en: "Egyptian adds 'بـ' (b-) before present-tense verbs! 'أقرا' (read) → 'بقرا', 'بحب أقرا' (I like to read). Sports = 'بلعب', hobbies = 'هوايتي' (hewayti)!", es: "¡El egipcio añade 'بـ' (b-) antes de verbos en presente! 'أقرا' (leer) → 'بقرا', 'بحب أقرا'. Deportes = 'بلعب', hobbies = 'هوايتي'." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "بتحب ___ إيه في وقت فراغك؟", answer: "تعمل", options: ["تعمل", "تروح", "تجيب"], fullSentence: "بتحب تعمل إيه في وقت فراغك؟", fullSentenceMeaning: { ko: "여가에 뭘 좋아하세요?", en: "What do you like to do?", es: "¿Qué te gusta hacer?" } },
+          { type: "select", promptWithBlank: "بحب ___ كتب.", answer: "أقرا", options: ["أقرا", "ألعب", "ألبس"], fullSentence: "بحب أقرا كتب.", fullSentenceMeaning: { ko: "책 읽기를 좋아해요.", en: "I like reading books.", es: "Me gusta leer libros." } },
+          { type: "select", promptWithBlank: "بلعب ___ كل آخر أسبوع.", answer: "كورة", options: ["كورة", "كتب", "أكل"], fullSentence: "بلعب كورة كل آخر أسبوع.", fullSentenceMeaning: { ko: "매주 주말 축구해요.", en: "I play football every weekend.", es: "Juego al fútbol cada fin de semana." } },
+          { type: "input", promptWithBlank: "بتلعب ___؟", answer: "رياضة", fullSentence: "بتلعب رياضة؟", fullSentenceMeaning: { ko: "스포츠 하세요?", en: "Do you play sports?", es: "¿Practicas deportes?" } },
+          { type: "input", promptWithBlank: "___ الطبخ.", answer: "هوايتي", fullSentence: "هوايتي الطبخ.", fullSentenceMeaning: { ko: "취미는 요리.", en: "My hobby is cooking.", es: "Mi hobby es cocinar." } },
+          { type: "listening", audioText: "هوايتي الطبخ.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["هوايتي الطبخ.", "بتحب تعمل إيه في وقت فراغك؟", "بحب أقرا كتب وأتفرّج على أفلام.", "بتلعب رياضة؟"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "I would like to order, please.", es: "Quisiera pedir, por favor.", ko: "주문할게요." }, fromDay: 11, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Are you hungry?", es: "¿Tienes hambre?", ko: "배고프세요?" }, fromDay: 11, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 28: Feelings & Emotions ─────────────────────────────
@@ -568,6 +667,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "Apakah Anda baik-baik saja? Anda terlihat ___.", answer: "khawatir", fullSentence: "Apakah Anda baik-baik saja? Anda terlihat khawatir.", fullSentenceMeaning: { ko: "괜찮아요? 걱정돼 보여요.", en: "OK? You look worried.", es: "¿Bien? Pareces preocupado." } },
           { type: "input", promptWithBlank: "Saya ___ sekali soal perjalanan ini!", answer: "senang", fullSentence: "Saya senang sekali soal perjalanan ini!", fullSentenceMeaning: { ko: "여행이 기대돼요!", en: "Excited about the trip!", es: "¡Emocionado por el viaje!" } },
           { type: "listening", audioText: "Saya senang sekali soal perjalanan ini!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Saya senang sekali soal perjalanan ini!", "Bagaimana perasaan Anda hari ini?", "Saya sangat senang hari ini.", "Saya lelah karena bekerja seharian."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Where is the subway station?", es: "¿Dónde está la estación de metro?", ko: "지하철역이 어디에 있나요?" }, fromDay: 19, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "How far is it?", es: "¿A qué distancia está?", ko: "얼마나 멀어요?" }, fromDay: 19, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    arabic: {
+      step1Sentences: [
+        { text: "حاسس بإيه النهارده؟ (ħases be-éh en-naharda?)", speechLang: "ar-EG", meaning: { ko: "오늘 기분이 어떠세요?", en: "How are you feeling today?", es: "¿Cómo te sientes hoy?" } },
+        { text: "أنا مبسوط أوي النهارده. (ana mabsout awi en-naharda)", speechLang: "ar-EG", meaning: { ko: "오늘 매우 행복해요.", en: "I am very happy today.", es: "Estoy muy feliz hoy." } },
+        { text: "أنا تعبان علشان اشتغلت طول اليوم. (ana ta3baan 3alashan eshtaghalt tool el-yom)", speechLang: "ar-EG", meaning: { ko: "하루 종일 일해서 피곤해요.", en: "I am tired because I worked all day.", es: "Estoy cansado porque trabajé todo el día." } },
+        { text: "إنت كويّس؟ شكلك قلقان. (enta kowayyes? shaklak 2al2aan)", speechLang: "ar-EG", meaning: { ko: "괜찮아요? 걱정돼 보여요.", en: "Are you okay? You look worried.", es: "¿Estás bien? Pareces preocupado." }, recallRound: true },
+        { text: "أنا متحمّس أوي للرحلة! (ana metħammes awi ler-reħla!)", speechLang: "ar-EG", meaning: { ko: "여행이 기대돼요!", en: "I am excited about the trip!", es: "¡Estoy emocionado por el viaje!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "감정 질문: 'حاسس بإيه؟' / 대답: 'أنا ___' (مبسوط/تعبان) / 이유: 'علشان ___' / 상대 감정: 'شكلك ___'", en: "'حاسس بإيه؟' → ask feelings / 'أنا ___' (مبسوط/تعبان) → express / 'علشان ___' → give reason / 'شكلك ___' → observe others (you look ___)", es: "'حاسس بإيه؟' → preguntar / 'أنا ___' (مبسوط/تعبان) → expresar / 'علشان ___' → razón / 'شكلك ___' → observar (pareces ___)" },
+          examples: { ko: "أنا تعبان علشان مانمتش كويّس. / شكلك مبسوط النهارده! / أنا متحمّس للحفلة. (ana ta3baan 3alashan manemtesh kowayyes / shaklak mabsout en-naharda / ana metħammes lel-ħafla)", en: "أنا تعبان علشان مانمتش كويّس. / شكلك مبسوط النهارده! / أنا متحمّس للحفلة. (ana ta3baan 3alashan manemtesh kowayyes / shaklak mabsout en-naharda / ana metħammes lel-ħafla)", es: "أنا تعبان علشان مانمتش كويّس. / شكلك مبسوط النهارده! / أنا متحمّس للحفلة. (ana ta3baan 3alashan manemtesh kowayyes / shaklak mabsout en-naharda / ana metħammes lel-ħafla)" },
+          mistakes: { ko: "❌ أنا سعيد جداً.\n✅ أنا مبسوط أوي.\n\n❌ أنا تعبان بسبب علشان اشتغلت.\n✅ أنا تعبان علشان اشتغلت.", en: "❌ أنا سعيد جداً. (MSA/stiff)\n✅ أنا مبسوط أوي. (Egyptian: مبسوط + أوي)\n\n❌ أنا تعبان بسبب علشان اشتغلت. (doubled 'because')\n✅ أنا تعبان علشان اشتغلت. ('علشان' alone = because)", es: "❌ أنا سعيد جداً. (árabe estándar)\n✅ أنا مبسوط أوي. (egipcio: مبسوط + أوي)\n\n❌ أنا تعبان بسبب علشان اشتغلت.\n✅ أنا تعبان علشان اشتغلت. ('علشان' solo = porque)" },
+          rudyTip: { ko: "이집트 사람들은 '행복해'를 'مبسوط'(mabsout)라고 해 — 교과서 'سعيد' 말고! 이유는 'علشان'(3alashan) 하나면 끝, 상대 기분은 'شكلك'(shaklak, 너 ~해 보여)로 물어봐~", en: "Egyptians say 'مبسوط' (mabsout) for happy — not the textbook 'سعيد'! One word 'علشان' (3alashan) gives the reason, and 'شكلك' (shaklak = you look ___) checks on others!", es: "¡Los egipcios dicen 'مبسوط' (mabsout) para feliz, no el 'سعيد' de libro! Una palabra, 'علشان' (3alashan), da la razón, y 'شكلك' (shaklak = pareces ___) observa a otros." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "حاسس ___ النهارده؟", answer: "بإيه", options: ["بإيه", "فين", "إمتى"], fullSentence: "حاسس بإيه النهارده؟", fullSentenceMeaning: { ko: "오늘 기분 어때?", en: "How are you feeling?", es: "¿Cómo te sientes?" } },
+          { type: "select", promptWithBlank: "أنا ___ أوي النهارده.", answer: "مبسوط", options: ["مبسوط", "طويل", "أزرق"], fullSentence: "أنا مبسوط أوي النهارده.", fullSentenceMeaning: { ko: "오늘 매우 행복해요.", en: "I am very happy.", es: "Estoy muy feliz." } },
+          { type: "select", promptWithBlank: "أنا تعبان ___ اشتغلت طول اليوم.", answer: "علشان", options: ["علشان", "بس", "و"], fullSentence: "أنا تعبان علشان اشتغلت طول اليوم.", fullSentenceMeaning: { ko: "일해서 피곤해요.", en: "Tired because I worked.", es: "Cansado porque trabajé." } },
+          { type: "input", promptWithBlank: "إنت كويّس؟ ___ قلقان.", answer: "شكلك", fullSentence: "إنت كويّس؟ شكلك قلقان.", fullSentenceMeaning: { ko: "괜찮아요? 걱정돼 보여요.", en: "OK? You look worried.", es: "¿Bien? Pareces preocupado." } },
+          { type: "input", promptWithBlank: "أنا ___ أوي للرحلة!", answer: "متحمّس", fullSentence: "أنا متحمّس أوي للرحلة!", fullSentenceMeaning: { ko: "여행이 기대돼요!", en: "Excited about the trip!", es: "¡Emocionado por el viaje!" } },
+          { type: "listening", audioText: "أنا متحمّس أوي للرحلة!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["أنا متحمّس أوي للرحلة!", "حاسس بإيه النهارده؟", "أنا مبسوط أوي النهارده.", "أنا تعبان علشان اشتغلت طول اليوم."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -711,6 +843,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    arabic: {
+      step1Sentences: [
+        { text: "إنت فاضي آخر الأسبوع ده؟ (enta faadi aakher el-osbou3 da?)", speechLang: "ar-EG", meaning: { ko: "이번 주말에 시간 있어요?", en: "Are you free this weekend?", es: "¿Estás libre este fin de semana?" } },
+        { text: "تعالى نتقابل في الكافيه الساعة تلاتة. (ta3ala net2abel fil-kaféh es-sa3a talata)", speechLang: "ar-EG", meaning: { ko: "3시에 카페에서 만나요.", en: "Let's meet at the cafe at three o'clock.", es: "Encontrémonos en el café a las tres." } },
+        { text: "تحب نروح السينما؟ (teħeb nerouħ es-sinema?)", speechLang: "ar-EG", meaning: { ko: "영화관에 갈래요?", en: "Would you like to go to the cinema?", es: "¿Te gustaría ir al cine?" } },
+        { text: "آسف، مش هينفع. عندي ارتباط. (aasef, mesh hayenfa3. 3andi ertebaat)", speechLang: "ar-EG", meaning: { ko: "미안, 안 돼요. 약속 있어요.", en: "Sorry, I can't. I have plans.", es: "Lo siento, no puedo. Tengo planes." }, recallRound: true },
+        { text: "فكرة حلوة! أشوفك هناك. (fekra ħelwa! ashoufak henaak)", speechLang: "ar-EG", meaning: { ko: "좋아요! 거기서 봐요.", en: "That sounds great! See you there.", es: "¡Suena genial! Nos vemos allí." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "시간 확인: 'إنت فاضي ___؟' / 제안: 'تعالى نـ___' 또는 'تحب نـ___؟' / 거절: 'آسف، مش هينفع' / 수락: 'فكرة حلوة!'", en: "'إنت فاضي ___؟' → check availability / 'تعالى نـ___' or 'تحب نـ___؟' → suggest (let's / would you like to) / 'آسف، مش هينفع' → decline / 'فكرة حلوة!' → accept (great idea!)", es: "'إنت فاضي ___؟' → disponibilidad / 'تعالى نـ___' o 'تحب نـ___؟' → sugerir / 'آسف، مش هينفع' → rechazar / 'فكرة حلوة!' → aceptar" },
+          examples: { ko: "إنت فاضي يوم السبت؟ / تعالى نروح الجنينة. / تحب نتغدّى مع بعض؟ (enta faadi yom es-sabt / ta3ala nerouħ el-geneena / teħeb netghadda ma3a ba3d)", en: "إنت فاضي يوم السبت؟ / تعالى نروح الجنينة. / تحب نتغدّى مع بعض؟ (enta faadi yom es-sabt / ta3ala nerouħ el-geneena / teħeb netghadda ma3a ba3d)", es: "إنت فاضي يوم السبت؟ / تعالى نروح الجنينة. / تحب نتغدّى مع بعض؟ (enta faadi yom es-sabt / ta3ala nerouħ el-geneena / teħeb netghadda ma3a ba3d)" },
+          mistakes: { ko: "❌ هل أنت متفرغ؟\n✅ إنت فاضي؟\n\n❌ أنا لا أستطيع.\n✅ مش هينفع. / مقدرش.", en: "❌ هل أنت متفرغ؟ (MSA/stiff)\n✅ إنت فاضي؟ (Egyptian for 'are you free?')\n\n❌ أنا لا أستطيع. (MSA)\n✅ مش هينفع. / مقدرش. (Egyptian 'I can't / it won't work')", es: "❌ هل أنت متفرغ؟ (árabe estándar)\n✅ إنت فاضي؟ (egipcio para '¿estás libre?')\n\n❌ أنا لا أستطيع.\n✅ مش هينفع. / مقدرش. (egipcio 'no puedo / no funciona')" },
+          rudyTip: { ko: "약속 잡기 이집트식! '시간 있어?'는 'إنت فاضي؟'(enta faadi). 제안할 땐 'تعالى'(ta3ala, 와서~하자) 붙여. 거절은 'مش هينفع'(mesh hayenfa3, 안 될 거 같아), 수락은 'فكرة حلوة!'(좋은 생각!)~", en: "Egyptian plan-making! 'Free?' = 'إنت فاضي؟' (enta faadi). To suggest, lead with 'تعالى' (ta3ala = come, let's). Decline = 'مش هينفع' (it won't work), accept = 'فكرة حلوة!' (nice idea!)", es: "¡Planes a la egipcia! '¿Libre?' = 'إنت فاضي؟' (enta faadi). Para sugerir, empieza con 'تعالى' (ta3ala = ven, vamos). Rechazar = 'مش هينفع', aceptar = 'فكرة حلوة!'" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "إنت ___ آخر الأسبوع ده؟", answer: "فاضي", options: ["فاضي", "مشغول", "هنا"], fullSentence: "إنت فاضي آخر الأسبوع ده؟", fullSentenceMeaning: { ko: "이번 주말 시간 있어?", en: "Free this weekend?", es: "¿Libre este fin de semana?" } },
+          { type: "select", promptWithBlank: "___ نتقابل في الكافيه.", answer: "تعالى", options: ["تعالى", "أنا", "إنت"], fullSentence: "تعالى نتقابل في الكافيه.", fullSentenceMeaning: { ko: "카페에서 만나요.", en: "Let's meet at the cafe.", es: "Encontrémonos en el café." } },
+          { type: "select", promptWithBlank: "تحب ___ السينما؟", answer: "نروح", options: ["نروح", "ناكل", "ننام"], fullSentence: "تحب نروح السينما؟", fullSentenceMeaning: { ko: "영화관에 갈래요?", en: "Like to go to the cinema?", es: "¿Ir al cine?" } },
+          { type: "input", promptWithBlank: "آسف، مش ___. عندي ارتباط.", answer: "هينفع", fullSentence: "آسف، مش هينفع. عندي ارتباط.", fullSentenceMeaning: { ko: "미안, 안 돼. 약속 있어.", en: "Sorry, can't. Have plans.", es: "Lo siento, no puedo." } },
+          { type: "input", promptWithBlank: "___ حلوة! أشوفك هناك.", answer: "فكرة", fullSentence: "فكرة حلوة! أشوفك هناك.", fullSentenceMeaning: { ko: "좋아! 거기서 봐.", en: "Great idea! See you.", es: "¡Buena idea! Nos vemos." } },
+          { type: "listening", audioText: "فكرة حلوة! أشوفك هناك.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["فكرة حلوة! أشوفك هناك.", "إنت فاضي آخر الأسبوع ده؟", "تعالى نتقابل في الكافيه الساعة تلاتة.", "تحب نروح السينما؟"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again slowly?", es: "¿Puede repetirlo más despacio?", ko: "천천히 다시 말해줄 수 있어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 30: Final Review + A1 Celebration ───────────────────
@@ -847,6 +1012,39 @@ export const LESSON_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Where is the bathroom? I'm lost!", es: "¿Dónde está el baño? ¡Estoy perdido!", ko: "화장실이 어디에 있나요? 길을 잃었어요!" }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    arabic: {
+      step1Sentences: [
+        { text: "أهلاً، أنا اسمي رودي. أنا من كوريا. (ahlan, ana esmi Rudy. ana men Korya)", speechLang: "ar-EG", meaning: { ko: "안녕, 이름은 루디. 한국 출신.", en: "Hello, I'm Rudy. From Korea.", es: "Hola, soy Rudy. De Corea." } },
+        { text: "عندي أخين. أمي مُدَرِّسة. (3andi akhén. ommi modarresa)", speechLang: "ar-EG", meaning: { ko: "형제 둘. 어머니는 선생님.", en: "Two brothers. Mother is teacher.", es: "Dos hermanos. Madre profesora." } },
+        { text: "أنا مبسوط علشان خلّصت كل الدروس! (ana mabsout 3alashan khallast koll ed-doroos!)", speechLang: "ar-EG", meaning: { ko: "수업 끝내서 행복!", en: "Happy I finished lessons!", es: "¡Feliz por terminar!" } },
+        { text: "إنت فاضي بكرة؟ تعالى نحتفل! (enta faadi bokra? ta3ala neħtefel!)", speechLang: "ar-EG", meaning: { ko: "내일 시간 있어? 축하!", en: "Free tomorrow? Let's celebrate!", es: "¿Libre mañana? ¡Felicidades!" }, recallRound: true },
+        { text: "شكراً على كل حاجة. أشوفك تاني! (shokran 3ala koll ħaaga. ashoufak taani!)", speechLang: "ar-EG", meaning: { ko: "모든 것에 감사. 다음에!", en: "Thanks for everything. See you!", es: "Gracias por todo. ¡Nos vemos!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "A1 종합 복습: 자기소개 + 가족 + 묘사 + 취미 + 감정 + 약속 — 30일 이집트 사투리 패턴 총정리!", en: "A1 Full Review: introductions + family + descriptions + hobbies + feelings + plans — all 30 days of Egyptian Arabic patterns!", es: "Repaso A1: presentaciones + familia + descripciones + hobbies + sentimientos + planes — todos los patrones de 30 días de árabe egipcio." },
+          examples: { ko: "أنا اسمي رودي. عندي أخين. / أنا مبسوط علشان خلّصت! / إنت فاضي بكرة؟ تعالى نحتفل! (ana esmi Rudy. 3andi akhén / ana mabsout 3alashan khallast / enta faadi bokra? ta3ala neħtefel)", en: "أنا اسمي رودي. عندي أخين. / أنا مبسوط علشان خلّصت! / إنت فاضي بكرة؟ تعالى نحتفل! (ana esmi Rudy. 3andi akhén / ana mabsout 3alashan khallast / enta faadi bokra? ta3ala neħtefel)", es: "أنا اسمي رودي. عندي أخين. / أنا مبسوط علشان خلّصت! / إنت فاضي بكرة؟ تعالى نحتفل! (ana esmi Rudy. 3andi akhén / ana mabsout 3alashan khallast / enta faadi bokra? ta3ala neħtefel)" },
+          mistakes: { ko: "❌ اسمي هو رودي.\n✅ أنا اسمي رودي.\n\n❌ أنا مبسوط بسبب خلّصت.\n✅ أنا مبسوط علشان خلّصت.", en: "❌ اسمي هو رودي. (don't add 'هو' here)\n✅ أنا اسمي رودي.\n\n❌ أنا مبسوط بسبب خلّصت.\n✅ أنا مبسوط علشان خلّصت. ('علشان' is the natural Egyptian 'because')", es: "❌ اسمي هو رودي.\n✅ أنا اسمي رودي.\n\n❌ أنا مبسوط بسبب خلّصت.\n✅ أنا مبسوط علشان خلّصت. ('علشان' es el 'porque' egipcio natural)" },
+          rudyTip: { ko: "30일 이집트 사투리 완주, مبروك(mabrouk, 축하)! 'بـ' 현재형, 'عندي'(가지다), 'علشان'(왜냐하면), 명사+ي(제 ___) — 이게 이집트 사투리의 기둥이야. 계속 말하면 더 쉬워져!", en: "30 days of Egyptian Arabic done — مبروك (mabrouk, congrats)! The ب- present tense, 'عندي' (I have), 'علشان' (because), noun+ي (my ___) — these are the pillars. Keep talking and it gets easier!", es: "30 días de árabe egipcio — ¡مبروك (mabrouk, felicidades)! El presente con ب-, 'عندي' (tengo), 'علشان' (porque), sustantivo+ي (mi ___): esos son los pilares. Sigue hablando y será más fácil." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "أنا ___ رودي.", answer: "اسمي", options: ["اسمي", "عندي", "أنا"], fullSentence: "أنا اسمي رودي.", fullSentenceMeaning: { ko: "이름은 루디.", en: "My name is Rudy.", es: "Me llamo Rudy." } },
+          { type: "select", promptWithBlank: "أنا ___ علشان خلّصت!", answer: "مبسوط", options: ["مبسوط", "تعبان", "قلقان"], fullSentence: "أنا مبسوط علشان خلّصت!", fullSentenceMeaning: { ko: "끝내서 행복!", en: "Happy because finished!", es: "¡Feliz porque terminé!" } },
+          { type: "select", promptWithBlank: "إنت ___ بكرة؟", answer: "فاضي", options: ["فاضي", "كويّس", "حلو"], fullSentence: "إنت فاضي بكرة؟", fullSentenceMeaning: { ko: "내일 시간 있어?", en: "Free tomorrow?", es: "¿Libre mañana?" } },
+          { type: "input", promptWithBlank: "شكراً على كل ___.", answer: "حاجة", fullSentence: "شكراً على كل حاجة.", fullSentenceMeaning: { ko: "모든 것에 감사.", en: "Thanks for everything.", es: "Gracias por todo." } },
+          { type: "input", promptWithBlank: "أشوفك ___!", answer: "تاني", fullSentence: "أشوفك تاني!", fullSentenceMeaning: { ko: "다음에 봐요!", en: "See you again!", es: "¡Hasta la próxima!" } },
+          { type: "listening", audioText: "شكراً على كل حاجة. أشوفك تاني!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["شكراً على كل حاجة. أشوفك تاني!", "أهلاً، أنا اسمي رودي. أنا من كوريا.", "عندي أخين. أمي مُدَرِّسة.", "إنت فاضي بكرة؟ تعالى نحتفل!"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Hello, nice to meet you.", es: "Hola, encantado de conocerle.", ko: "안녕하세요, 만나서 반가워요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Where is the bathroom? I'm lost!", es: "¿Dónde está el baño? ¡Estoy perdido!", ko: "화장실이 어디에 있나요? 길을 잃었어요!" }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 };
 
@@ -861,6 +1059,7 @@ export const MISSION_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "바벨탑에서 다른 요원의 가족을 알아야 해요!", en: "Babel Tower: learn about the agent's family!", es: "Torre de Babel: conoce a la familia del agente." }, gptPrompt: "You are a fellow agent at Babel Tower. Build trust through family talk. Simple A1 {targetLang}. Practice: introducing family, jobs, numbers. Be friendly.", speechLang: "es-ES", suggestedAnswers: ["Esta es mi familia.", "Tengo dos hermanos.", "Mi madre es profesora.", "¿Tienes hijos?", "¿Qué hace tu padre?", "¡Encantado de conocer a tu familia!"] },
     korean: { situation: { ko: "바벨탑에서 다른 요원과 가족 이야기를 하며 신뢰를 쌓으세요!", en: "Babel Tower: build trust through family talk!", es: "Torre de Babel: confianza a través de familia." }, gptPrompt: "You are a fellow agent at Babel Tower. Build trust through family talk. Simple A1 {targetLang}. Practice: 가족, 직업, 숫자. Be friendly.", speechLang: "ko-KR", suggestedAnswers: ["이것은 제 가족이에요.", "형이 둘 있어요.", "어머니는 선생님이에요.", "자녀가 있으세요?", "아버지는 뭘 하세요?", "가족을 만나서 반가워요!"] },
     indonesian: { situation: { ko: "바벨탑에서 다른 요원과 가족 이야기를 하며 신뢰를 쌓으세요!", en: "Babel Tower: build trust through family talk!", es: "Torre de Babel: confianza a través de familia." }, gptPrompt: "You are a fellow agent at Babel Tower. Build trust through family talk. Simple A1 {targetLang}. Practice: introducing family (keluarga), jobs (pekerjaan), numbers. Share your own family. Be friendly.", speechLang: "id-ID", suggestedAnswers: ["Ini keluarga saya.", "Saya punya dua saudara laki-laki.", "Ibu saya seorang guru.", "Apakah Anda punya anak?", "Apa pekerjaan ayah Anda?", "Senang berkenalan dengan keluarga Anda!"] },
+    arabic: { situation: { ko: "바벨탑에서 다른 요원과 가족 이야기를 하며 신뢰를 쌓으세요!", en: "Babel Tower: build trust through family talk!", es: "Torre de Babel: confianza a través de familia." }, gptPrompt: "You are a fellow agent at Babel Tower. Build trust through family talk. Simple A1 Egyptian colloquial Arabic (Cairene, not MSA). Practice: introducing family (عيلة/عائلة), jobs (شغل), numbers. Use markers like عندي/أبويا/أمي/دي. Share your own family. Be friendly.", speechLang: "ar-EG", suggestedAnswers: ["دي عيلتي.", "عندي أخين.", "أمي مُدَرِّسة.", "عندك أطفال؟", "أبوك بيشتغل إيه؟", "تشرّفت بعيلتك!"] },
   },
 
   day_26: {
@@ -868,6 +1067,7 @@ export const MISSION_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "용의자를 묘사해야 해요! 정확하게!", en: "Describe the suspect precisely!", es: "¡Describe al sospechoso con precisión!" }, gptPrompt: "You are Rudy's handler. User must describe a suspect in A1 {targetLang}. Practice: height, hair, clothes, glasses, age. Ask follow-ups. Correct gently.", speechLang: "es-ES", suggestedAnswers: ["Ella es alta.", "Tiene el pelo largo.", "Lleva una chaqueta azul.", "El hombre con gafas.", "Parece joven.", "Tiene unos treinta años."] },
     korean: { situation: { ko: "용의자를 정확하게 묘사해야 해요!", en: "Describe the suspect!", es: "¡Describe al sospechoso!" }, gptPrompt: "You are Rudy's handler. User must describe a suspect in A1 {targetLang}. Practice: 키, 머리, 옷, 안경, 나이. Ask follow-ups. Correct gently.", speechLang: "ko-KR", suggestedAnswers: ["키가 커요.", "머리가 길어요.", "파란 재킷을 입고 있어요.", "안경 쓴 남자예요.", "어려 보여요.", "서른 살 정도예요."] },
     indonesian: { situation: { ko: "용의자를 정확하게 묘사해야 해요!", en: "Describe the suspect!", es: "¡Describe al sospechoso!" }, gptPrompt: "You are Rudy's handler. User must describe a suspect in A1 {targetLang}. Practice: height (tinggi), hair (rambut), clothes (memakai), glasses (kacamata), age (usia). Ask follow-ups. Correct gently.", speechLang: "id-ID", suggestedAnswers: ["Dia tinggi.", "Dia berambut panjang.", "Dia memakai jaket biru.", "Pria berkacamata itu.", "Dia terlihat muda.", "Usianya sekitar tiga puluh tahun."] },
+    arabic: { situation: { ko: "용의자를 정확하게 묘사해야 해요!", en: "Describe the suspect!", es: "¡Describe al sospechoso!" }, gptPrompt: "You are Rudy's handler. User must describe a suspect in A1 Egyptian colloquial Arabic (Cairene, not MSA). Practice: height (طويل/قصير), hair (شعر), clothes (لابس), glasses (نضّارة), age (سن). Use markers like ده/دي/اللي/أوي. Ask follow-ups. Correct gently.", speechLang: "ar-EG", suggestedAnswers: ["هو طويل.", "شعره طويل.", "هو لابس جاكيت أزرق.", "الراجل اللي لابس نضّارة.", "شكله صغيّر.", "سنّه حوالي تلاتين سنة."] },
   },
 
   day_27: {
@@ -875,6 +1075,7 @@ export const MISSION_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "바벨탑 파티에서 취미로 친구를 사귀세요!", en: "Babel party: make friends through hobbies!", es: "Fiesta Babel: amigos por hobbies." }, gptPrompt: "You are a friendly guest at a Babel Tower party. Simple A1 {targetLang}. Talk about hobbies, sports, free time. Find common interests. Mix in food from Unit 3.", speechLang: "es-ES", suggestedAnswers: ["¿Qué te gusta hacer?", "Me gusta leer.", "¿Practicas algún deporte?", "Juego al fútbol.", "Mi hobby es cocinar.", "¡Suena divertido!"] },
     korean: { situation: { ko: "바벨탑 파티에서 취미로 친구를 사귀세요!", en: "Babel party: hobbies and friends!", es: "Fiesta Babel: hobbies y amigos." }, gptPrompt: "You are a friendly guest at Babel Tower party. Simple A1 {targetLang}. 취미, 운동, 여가. Find common interests. Mix in 음식 from Unit 3.", speechLang: "ko-KR", suggestedAnswers: ["뭘 좋아하세요?", "책 읽기를 좋아해요.", "운동을 하세요?", "축구를 해요.", "제 취미는 요리예요.", "재미있겠어요!"] },
     indonesian: { situation: { ko: "바벨탑 파티에서 취미로 친구를 사귀세요!", en: "Babel party: hobbies and friends!", es: "Fiesta Babel: hobbies y amigos." }, gptPrompt: "You are a friendly guest at Babel Tower party. Simple A1 {targetLang}. Talk about hobbies (hobi), sports (olahraga), free time (waktu luang). Find common interests. Mix in food (makanan) from Unit 3.", speechLang: "id-ID", suggestedAnswers: ["Apa yang Anda suka lakukan?", "Saya suka membaca buku.", "Apakah Anda berolahraga?", "Saya bermain sepak bola.", "Hobi saya memasak.", "Kedengarannya seru!"] },
+    arabic: { situation: { ko: "바벨탑 파티에서 취미로 친구를 사귀세요!", en: "Babel party: hobbies and friends!", es: "Fiesta Babel: hobbies y amigos." }, gptPrompt: "You are a friendly guest at Babel Tower party. Simple A1 Egyptian colloquial Arabic (Cairene, not MSA). Talk about hobbies (هواية), sports (رياضة), free time (وقت فراغ). Use the ب- present tense (بحب/بلعب) and markers like أوي. Find common interests. Mix in food (أكل) from Unit 3.", speechLang: "ar-EG", suggestedAnswers: ["بتحب تعمل إيه؟", "بحب أقرا كتب.", "بتلعب رياضة؟", "بلعب كورة.", "هوايتي الطبخ.", "ده حلو أوي!"] },
   },
 
   day_28: {
@@ -882,6 +1083,7 @@ export const MISSION_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "팀원이 힘들어해요. 격려하세요!", en: "Teammate is down. Encourage them!", es: "Compañero desanimado. ¡Anímalo!" }, gptPrompt: "You are a teammate feeling down. Simple A1 {targetLang}. User asks about feelings and encourages. Express: tired, worried, then happier. End positive.", speechLang: "es-ES", suggestedAnswers: ["¿Cómo te sientes?", "¿Estás bien?", "Pareces cansado.", "¡No te preocupes!", "¡Estoy emocionado por mañana!", "¡Suena genial!"] },
     korean: { situation: { ko: "팀원이 힘들어하고 있어요. 감정을 물어보고 격려하세요!", en: "Teammate struggling. Ask and encourage!", es: "Compañero mal. ¡Pregunta y anima!" }, gptPrompt: "You are a teammate feeling down. Simple A1 {targetLang}. User asks about feelings and encourages. Express: 피곤, 걱정, then 행복. End positive.", speechLang: "ko-KR", suggestedAnswers: ["기분이 어때요?", "괜찮아요?", "피곤해 보여요.", "걱정 마세요!", "내일이 기대돼요!", "좋아요!"] },
     indonesian: { situation: { ko: "팀원이 힘들어하고 있어요. 감정을 물어보고 격려하세요!", en: "Teammate struggling. Ask and encourage!", es: "Compañero mal. ¡Pregunta y anima!" }, gptPrompt: "You are a teammate feeling down. Simple A1 {targetLang}. User asks about feelings and encourages. Express: tired (lelah), worried (khawatir), then happy (senang). End positive.", speechLang: "id-ID", suggestedAnswers: ["Bagaimana perasaan Anda?", "Apakah Anda baik-baik saja?", "Anda terlihat lelah.", "Jangan khawatir!", "Saya senang sekali soal besok!", "Kedengarannya bagus!"] },
+    arabic: { situation: { ko: "팀원이 힘들어하고 있어요. 감정을 물어보고 격려하세요!", en: "Teammate struggling. Ask and encourage!", es: "Compañero mal. ¡Pregunta y anima!" }, gptPrompt: "You are a teammate feeling down. Simple A1 Egyptian colloquial Arabic (Cairene, not MSA). User asks about feelings and encourages. Express: tired (تعبان), worried (قلقان), then happy (مبسوط). Use markers like شكلك/علشان/أوي. End positive.", speechLang: "ar-EG", suggestedAnswers: ["حاسس بإيه؟", "إنت كويّس؟", "شكلك تعبان.", "ماتقلقش!", "أنا متحمّس أوي لبكرة!", "ده حلو أوي!"] },
   },
 
   day_29: {
@@ -889,6 +1091,7 @@ export const MISSION_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "미션 성공! 축하 파티를 계획하세요!", en: "Mission success! Plan the party!", es: "¡Misión cumplida! ¡Planea la fiesta!" }, gptPrompt: "You are Rudy's teammate planning a celebration. Simple A1 {targetLang}. Practice: free, suggest activities, agree/decline, time/place. Mix ALL units. Fun conversation.", speechLang: "es-ES", suggestedAnswers: ["¿Estás libre este fin de semana?", "Encontrémonos en el café.", "¿Te gustaría ir al cine?", "¡Suena genial!", "Lo siento, no puedo.", "¡Nos vemos a las tres!"] },
     korean: { situation: { ko: "미션 성공! 팀원들과 축하 파티를 계획하세요!", en: "Mission success! Plan the party!", es: "¡Misión! ¡Planea la fiesta!" }, gptPrompt: "You are Rudy's teammate planning a celebration. Simple A1 {targetLang}. Practice: 시간, activities, agree/decline, 장소. Mix ALL units. Fun conversation.", speechLang: "ko-KR", suggestedAnswers: ["이번 주말에 시간 있어요?", "카페에서 만나요.", "영화관에 갈래요?", "좋아요!", "미안해요, 안 돼요.", "3시에 봐요!"] },
     indonesian: { situation: { ko: "미션 성공! 팀원들과 축하 파티를 계획하세요!", en: "Mission success! Plan the party!", es: "¡Misión! ¡Planea la fiesta!" }, gptPrompt: "You are Rudy's teammate planning a celebration. Simple A1 {targetLang}. Practice: time (waktu), activities, agree/decline, place (tempat). Mix ALL units. Fun conversation.", speechLang: "id-ID", suggestedAnswers: ["Apakah Anda ada waktu akhir pekan ini?", "Mari bertemu di kafe.", "Apakah Anda mau pergi ke bioskop?", "Kedengarannya bagus!", "Maaf, saya tidak bisa.", "Sampai jumpa jam tiga!"] },
+    arabic: { situation: { ko: "미션 성공! 팀원들과 축하 파티를 계획하세요!", en: "Mission success! Plan the party!", es: "¡Misión! ¡Planea la fiesta!" }, gptPrompt: "You are Rudy's teammate planning a celebration. Simple A1 Egyptian colloquial Arabic (Cairene, not MSA). Practice: time (وقت/ساعة), activities, agree/decline, place (مكان). Use markers like فاضي/تعالى/تحب/فكرة حلوة. Mix ALL units. Fun conversation.", speechLang: "ar-EG", suggestedAnswers: ["إنت فاضي آخر الأسبوع ده؟", "تعالى نتقابل في الكافيه.", "تحب نروح السينما؟", "فكرة حلوة!", "آسف، مش هينفع.", "أشوفك الساعة تلاتة!"] },
   },
 
   day_30: {
@@ -896,6 +1099,7 @@ export const MISSION_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "A1 마지막 미션! 모든 것을 종합하세요!", en: "Final A1 mission! Combine everything!", es: "¡Misión final A1! ¡Combina todo!" }, gptPrompt: "You are the final mission coordinator. A1 graduation test. Simple A1 {targetLang}. Test ALL 30 days naturally: intro, family, describe, hobbies, feelings, plans. Celebrate! Victory lap.", speechLang: "es-ES", suggestedAnswers: ["Hola, me llamo Rudy.", "Tengo dos hermanos.", "¡Estoy feliz hoy!", "Mi hobby es cocinar.", "¿Estás libre mañana?", "¡Gracias por todo!"] },
     korean: { situation: { ko: "A1 마지막 미션! 30일 동안 배운 모든 것을 사용하세요!", en: "Final A1 mission! Use everything!", es: "¡Misión final! ¡Usa todo!" }, gptPrompt: "You are the final mission coordinator. A1 graduation. Simple A1 {targetLang}. Test ALL 30 days: 자기소개, 가족, 묘사, 취미, 감정, 약속. Celebrate! Victory lap.", speechLang: "ko-KR", suggestedAnswers: ["안녕하세요, 루디예요.", "형이 둘 있어요.", "오늘 행복해요!", "취미는 요리예요.", "내일 시간 있어요?", "모든 것에 감사해요!"] },
     indonesian: { situation: { ko: "A1 마지막 미션! 30일 동안 배운 모든 것을 사용하세요!", en: "Final A1 mission! Use everything!", es: "¡Misión final! ¡Usa todo!" }, gptPrompt: "You are the final mission coordinator. A1 graduation. Simple A1 {targetLang}. Test ALL 30 days: introductions (perkenalan), family (keluarga), describing (deskripsi), hobbies (hobi), feelings (perasaan), plans (rencana). Celebrate! Victory lap.", speechLang: "id-ID", suggestedAnswers: ["Halo, nama saya Rudy.", "Saya punya dua saudara laki-laki.", "Saya senang hari ini!", "Hobi saya memasak.", "Apakah Anda ada waktu besok?", "Terima kasih untuk semuanya!"] },
+    arabic: { situation: { ko: "A1 마지막 미션! 30일 동안 배운 모든 것을 사용하세요!", en: "Final A1 mission! Use everything!", es: "¡Misión final! ¡Usa todo!" }, gptPrompt: "You are the final mission coordinator. A1 graduation. Simple A1 Egyptian colloquial Arabic (Cairene, not MSA). Test ALL 30 days: introductions (تعارف), family (عيلة), describing (وصف), hobbies (هواية), feelings (إحساس), plans (مواعيد). Use everyday markers like عندي/مبسوط/فاضي/تعالى. Celebrate! Victory lap.", speechLang: "ar-EG", suggestedAnswers: ["أهلاً، أنا اسمي رودي.", "عندي أخين.", "أنا مبسوط النهارده!", "هوايتي الطبخ.", "إنت فاضي بكرة؟", "شكراً على كل حاجة!"] },
   },
 };
 
@@ -934,6 +1138,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "Ibu saya seorang ___.", answer: "guru", options: ["guru", "saudara", "anak"], fullSentence: "Ibu saya seorang guru.", fullSentenceMeaning: { ko: "어머니는 선생님.", en: "Mother is a teacher.", es: "Madre es profesora." } },
       { type: "speak", sentence: "Apakah Anda punya anak?", speechLang: "id-ID", meaning: { ko: "자녀가 있으세요?", en: "Have children?", es: "¿Tienes hijos?" } },
     ],
+    arabic: [
+      { type: "speak", sentence: "لو سمحت، أنا تُهت. ممكن تورّيني على الخريطة؟ (law samaħt, ana toht. momken tewarríni 3al khareeta?)", speechLang: "ar-EG", meaning: { ko: "길 잃었어요. 지도에서 보여주세요.", en: "Lost. Show me on the map?", es: "Perdido. ¿Mapa?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "اطلع من مخرج رقم ___ في المحطة.", answer: "تلاتة", options: ["تلاتة", "شمال", "بعيد"], fullSentence: "اطلع من مخرج رقم تلاتة في المحطة.", fullSentenceMeaning: { ko: "지하철 3번 출구.", en: "Subway exit three.", es: "Metro salida tres." }, isYesterdayReview: true },
+      { type: "speak", sentence: "دي عيلتي. عندي أخين. (di 3elti. 3andi akhén)", speechLang: "ar-EG", meaning: { ko: "제 가족이에요. 형제가 둘.", en: "My family. Two brothers.", es: "Mi familia. Dos hermanos." } },
+      { type: "fill_blank", promptWithBlank: "أمي ___.", answer: "مُدَرِّسة", options: ["مُدَرِّسة", "أخت", "بنت"], fullSentence: "أمي مُدَرِّسة.", fullSentenceMeaning: { ko: "어머니는 선생님.", en: "Mother is a teacher.", es: "Madre es profesora." } },
+      { type: "speak", sentence: "عندك أطفال؟ (3andak atfaal?)", speechLang: "ar-EG", meaning: { ko: "자녀가 있으세요?", en: "Have children?", es: "¿Tienes hijos?" } },
+    ],
   },
 
   day_26: {
@@ -964,6 +1175,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Dia tinggi dan berambut panjang.", speechLang: "id-ID", meaning: { ko: "키 크고 머리 길어요.", en: "Tall, long hair.", es: "Alta, pelo largo." } },
       { type: "fill_blank", promptWithBlank: "Dia ___ jaket biru.", answer: "memakai", options: ["memakai", "makan", "membaca"], fullSentence: "Dia memakai jaket biru.", fullSentenceMeaning: { ko: "파란 재킷 입고 있어요.", en: "Wearing blue jacket.", es: "Lleva chaqueta azul." } },
       { type: "speak", sentence: "Pria berkacamata itu guru saya.", speechLang: "id-ID", meaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is teacher.", es: "Hombre con gafas es profesor." } },
+    ],
+    arabic: [
+      { type: "speak", sentence: "دي عيلتي. أبويا بيشتغل في مُستشفى. (di 3elti. abuya beyeshtaghal fi mostashfa)", speechLang: "ar-EG", meaning: { ko: "제 가족. 아버지는 병원에서 일해요.", en: "My family. Father works at hospital.", es: "Mi familia. Padre trabaja en hospital." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "عندي ___ وأخت واحدة.", answer: "أخين", options: ["أخين", "أم", "مُدَرِّس"], fullSentence: "عندي أخين وأخت واحدة.", fullSentenceMeaning: { ko: "형제 둘, 자매 하나.", en: "Two brothers, one sister.", es: "Dos hermanos, una hermana." }, isYesterdayReview: true },
+      { type: "speak", sentence: "هيَّ طويلة وشعرها طويل. (heyya tawila w sha3raha tawil)", speechLang: "ar-EG", meaning: { ko: "키 크고 머리 길어요.", en: "Tall, long hair.", es: "Alta, pelo largo." } },
+      { type: "fill_blank", promptWithBlank: "هو ___ جاكيت أزرق.", answer: "لابس", options: ["لابس", "بياكل", "بيقرا"], fullSentence: "هو لابس جاكيت أزرق.", fullSentenceMeaning: { ko: "파란 재킷 입고 있어요.", en: "Wearing blue jacket.", es: "Lleva chaqueta azul." } },
+      { type: "speak", sentence: "الراجل اللي لابس نضّارة ده مُدَرِّسي. (er-raagel elli labes naddara da modarresi)", speechLang: "ar-EG", meaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses is teacher.", es: "Hombre con gafas es profesor." } },
     ],
   },
 
@@ -1004,6 +1222,15 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Di mana toilet?", speechLang: "id-ID", meaning: { ko: "화장실이 어디에요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" }, isYesterdayReview: true },
       { type: "speak", sentence: "Ini berapa harganya?", speechLang: "id-ID", meaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" }, isYesterdayReview: true },
     ],
+    arabic: [
+      { type: "speak", sentence: "هيَّ طويلة وشعرها طويل. هيَّ لابسة جاكيت أزرق. (heyya tawila w sha3raha tawil. heyya labsa jakét azra2)", speechLang: "ar-EG", meaning: { ko: "키 크고 머리 길어요. 파란 재킷.", en: "Tall, long hair. Blue jacket.", es: "Alta, pelo largo. Chaqueta azul." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "الراجل اللي لابس ___ ده مُدَرِّسي.", answer: "نضّارة", options: ["نضّارة", "شعر", "جاكيت"], fullSentence: "الراجل اللي لابس نضّارة ده مُدَرِّسي.", fullSentenceMeaning: { ko: "안경 쓴 남자가 선생님.", en: "Man with glasses, teacher.", es: "Hombre con gafas, profesor." }, isYesterdayReview: true },
+      { type: "speak", sentence: "بحب أقرا كتب وأتفرّج على أفلام. (baħeb a2ra kotob w atfarrag 3ala aflaam)", speechLang: "ar-EG", meaning: { ko: "책 읽기와 영화 보기를 좋아해요.", en: "Like reading and movies.", es: "Leer y ver películas." } },
+      { type: "fill_blank", promptWithBlank: "بلعب ___ كل آخر أسبوع.", answer: "كورة", options: ["كورة", "كتب", "أكل"], fullSentence: "بلعب كورة كل آخر أسبوع.", fullSentenceMeaning: { ko: "매주 주말 축구.", en: "Football every weekend.", es: "Fútbol cada fin de semana." } },
+      { type: "speak", sentence: "هوايتي الطبخ. بتحب تعمل إيه؟ (hewayti et-tabkh. betħeb te3mel éh?)", speechLang: "ar-EG", meaning: { ko: "취미는 요리. 뭘 좋아해요?", en: "Hobby: cooking. What do you like?", es: "Hobby: cocinar. ¿Qué te gusta?" } },
+      { type: "speak", sentence: "فين الحمّام؟ (fén el-ħammaam?)", speechLang: "ar-EG", meaning: { ko: "화장실이 어디에요?", en: "Where is the bathroom?", es: "¿Dónde está el baño?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "ده بكام؟ (da bekaam?)", speechLang: "ar-EG", meaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" }, isYesterdayReview: true },
+    ],
   },
 
   day_28: {
@@ -1034,6 +1261,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Saya sangat senang hari ini. Saya senang sekali soal perjalanan ini!", speechLang: "id-ID", meaning: { ko: "오늘 행복해요. 여행이 기대돼!", en: "Happy today. Excited about trip!", es: "Feliz hoy. ¡Emocionado por el viaje!" } },
       { type: "fill_blank", promptWithBlank: "Saya lelah ___ bekerja seharian.", answer: "karena", options: ["karena", "tetapi", "dan"], fullSentence: "Saya lelah karena bekerja seharian.", fullSentenceMeaning: { ko: "일해서 피곤해요.", en: "Tired because worked.", es: "Cansado porque trabajé." } },
       { type: "speak", sentence: "Apakah Anda baik-baik saja? Anda terlihat khawatir.", speechLang: "id-ID", meaning: { ko: "괜찮아요? 걱정돼 보여요.", en: "OK? Look worried.", es: "¿Bien? Preocupado." } },
+    ],
+    arabic: [
+      { type: "speak", sentence: "بحب أقرا كتب. هوايتي الطبخ. (baħeb a2ra kotob. hewayti et-tabkh)", speechLang: "ar-EG", meaning: { ko: "책 읽기 좋아해요. 취미는 요리.", en: "Like reading. Hobby: cooking.", es: "Leer. Hobby: cocinar." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "بتلعب ___؟", answer: "رياضة", options: ["رياضة", "كتب", "أكل"], fullSentence: "بتلعب رياضة؟", fullSentenceMeaning: { ko: "스포츠 하세요?", en: "Play sports?", es: "¿Practicas deporte?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "أنا مبسوط أوي النهارده. أنا متحمّس أوي للرحلة! (ana mabsout awi en-naharda. ana metħammes awi ler-reħla!)", speechLang: "ar-EG", meaning: { ko: "오늘 행복해요. 여행이 기대돼!", en: "Happy today. Excited about trip!", es: "Feliz hoy. ¡Emocionado por el viaje!" } },
+      { type: "fill_blank", promptWithBlank: "أنا تعبان ___ اشتغلت طول اليوم.", answer: "علشان", options: ["علشان", "بس", "و"], fullSentence: "أنا تعبان علشان اشتغلت طول اليوم.", fullSentenceMeaning: { ko: "일해서 피곤해요.", en: "Tired because worked.", es: "Cansado porque trabajé." } },
+      { type: "speak", sentence: "إنت كويّس؟ شكلك قلقان. (enta kowayyes? shaklak 2al2aan)", speechLang: "ar-EG", meaning: { ko: "괜찮아요? 걱정돼 보여요.", en: "OK? Look worried.", es: "¿Bien? Preocupado." } },
     ],
   },
 
@@ -1066,6 +1300,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "Apakah Anda mau ___ ke bioskop?", answer: "pergi", options: ["pergi", "makan", "tidur"], fullSentence: "Apakah Anda mau pergi ke bioskop?", fullSentenceMeaning: { ko: "영화관 갈래요?", en: "Cinema?", es: "¿Cine?" } },
       { type: "speak", sentence: "Kedengarannya bagus! Sampai jumpa jam tiga.", speechLang: "id-ID", meaning: { ko: "좋아요! 3시에 봐요.", en: "Great! See you at three.", es: "¡Genial! A las tres." } },
     ],
+    arabic: [
+      { type: "speak", sentence: "أنا مبسوط النهارده! أنا متحمّس أوي لآخر الأسبوع. (ana mabsout en-naharda! ana metħammes awi le-aakher el-osbou3)", speechLang: "ar-EG", meaning: { ko: "오늘 행복! 주말이 기대돼.", en: "Happy! Excited for weekend.", es: "¡Feliz! ¡Emocionado por el fin de semana!" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "إنت كويّس؟ شكلك ___.", answer: "قلقان", options: ["قلقان", "مبسوط", "طويل"], fullSentence: "إنت كويّس؟ شكلك قلقان.", fullSentenceMeaning: { ko: "괜찮아? 걱정돼 보여.", en: "OK? Worried?", es: "¿Bien? ¿Preocupado?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "إنت فاضي آخر الأسبوع ده؟ تعالى نتقابل في الكافيه. (enta faadi aakher el-osbou3 da? ta3ala net2abel fil-kaféh)", speechLang: "ar-EG", meaning: { ko: "주말에 시간 있어? 카페에서 만나요.", en: "Free? Meet at cafe.", es: "¿Libre? Café." } },
+      { type: "fill_blank", promptWithBlank: "تحب ___ السينما؟", answer: "نروح", options: ["نروح", "ناكل", "ننام"], fullSentence: "تحب نروح السينما؟", fullSentenceMeaning: { ko: "영화관 갈래요?", en: "Cinema?", es: "¿Cine?" } },
+      { type: "speak", sentence: "فكرة حلوة! أشوفك الساعة تلاتة. (fekra ħelwa! ashoufak es-sa3a talata)", speechLang: "ar-EG", meaning: { ko: "좋아요! 3시에 봐요.", en: "Great! See you at three.", es: "¡Genial! A las tres." } },
+    ],
   },
 
   day_30: {
@@ -1096,6 +1337,13 @@ export const REVIEW_CONTENT_UNIT5: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Halo, nama saya Rudy. Saya berasal dari Korea. Saya punya dua saudara laki-laki.", speechLang: "id-ID", meaning: { ko: "안녕, 루디예요. 한국. 형제 둘.", en: "Hi, Rudy. Korea. Two brothers.", es: "Hola, Rudy. Corea. Dos hermanos." } },
       { type: "fill_blank", promptWithBlank: "Saya ___ karena sudah menyelesaikan semua pelajaran!", answer: "senang", options: ["senang", "lelah", "khawatir"], fullSentence: "Saya senang karena sudah menyelesaikan semua pelajaran!", fullSentenceMeaning: { ko: "수업 다 끝내서 행복!", en: "Happy, finished lessons!", es: "¡Feliz, terminé lecciones!" } },
       { type: "speak", sentence: "Terima kasih untuk semuanya. Sampai jumpa lagi!", speechLang: "id-ID", meaning: { ko: "모든 것에 감사. 다음에!", en: "Thanks! See you!", es: "¡Gracias! ¡Nos vemos!" } },
+    ],
+    arabic: [
+      { type: "speak", sentence: "إنت فاضي؟ تعالى نتقابل في الكافيه الساعة تلاتة. (enta faadi? ta3ala net2abel fil-kaféh es-sa3a talata)", speechLang: "ar-EG", meaning: { ko: "시간 있어? 3시에 카페.", en: "Free? Cafe at three.", es: "¿Libre? Café a las tres." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "آسف، مش ___. عندي ارتباط.", answer: "هينفع", options: ["هينفع", "عايز", "هروح"], fullSentence: "آسف، مش هينفع. عندي ارتباط.", fullSentenceMeaning: { ko: "미안, 안 돼. 약속 있어.", en: "Sorry, can't. Plans.", es: "Lo siento, no puedo." }, isYesterdayReview: true },
+      { type: "speak", sentence: "أهلاً، أنا اسمي رودي. أنا من كوريا. عندي أخين. (ahlan, ana esmi Rudy. ana men Korya. 3andi akhén)", speechLang: "ar-EG", meaning: { ko: "안녕, 루디예요. 한국. 형제 둘.", en: "Hi, Rudy. Korea. Two brothers.", es: "Hola, Rudy. Corea. Dos hermanos." } },
+      { type: "fill_blank", promptWithBlank: "أنا ___ علشان خلّصت كل الدروس!", answer: "مبسوط", options: ["مبسوط", "تعبان", "قلقان"], fullSentence: "أنا مبسوط علشان خلّصت كل الدروس!", fullSentenceMeaning: { ko: "수업 다 끝내서 행복!", en: "Happy, finished lessons!", es: "¡Feliz, terminé lecciones!" } },
+      { type: "speak", sentence: "شكراً على كل حاجة. أشوفك تاني! (shokran 3ala koll ħaaga. ashoufak taani!)", speechLang: "ar-EG", meaning: { ko: "모든 것에 감사. 다음에!", en: "Thanks! See you!", es: "¡Gracias! ¡Nos vemos!" } },
     ],
   },
 };

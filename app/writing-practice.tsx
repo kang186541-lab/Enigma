@@ -42,33 +42,38 @@ function t(obj: Record<string, string>, lang: string) { return obj[lang] || obj.
 
 interface Exercise {
   type: "translate" | "complete" | "free";
-  prompt: { ko: string; en: string; es: string; id: string };
+  // ar = Egyptian colloquial (Cairene) target-language text used for the SRS
+  // phrase when an Arabic learner gets a translate exercise wrong. ko/en/es/id
+  // remain the native-UI glosses shown in the prompt card.
+  prompt: { ko: string; en: string; es: string; id: string; ar: string };
   answer?: string; // for translate/complete
-  hint?: { ko: string; en: string; es: string; id: string };
+  hint?: { ko: string; en: string; es: string; id: string; ar: string };
 }
 
 const EXERCISES: Exercise[] = [
   // Translation exercises
-  { type: "translate", prompt: { ko: "안녕하세요, 만나서 반갑습니다.", en: "Hello, nice to meet you.", es: "Hola, encantado de conocerte.", id: "Halo, senang bertemu denganmu." } },
-  { type: "translate", prompt: { ko: "오늘 날씨가 좋아요.", en: "The weather is nice today.", es: "El clima esta bonito hoy.", id: "Cuacanya bagus hari ini." } },
-  { type: "translate", prompt: { ko: "커피 한 잔 주세요.", en: "One coffee, please.", es: "Un cafe, por favor.", id: "Satu kopi, tolong." } },
-  { type: "translate", prompt: { ko: "이것은 얼마입니까?", en: "How much is this?", es: "Cuanto cuesta esto?", id: "Berapa harganya ini?" } },
-  { type: "translate", prompt: { ko: "화장실이 어디에 있어요?", en: "Where is the restroom?", es: "Donde esta el bano?", id: "Di mana toiletnya?" } },
+  { type: "translate", prompt: { ko: "안녕하세요, 만나서 반갑습니다.", en: "Hello, nice to meet you.", es: "Hola, encantado de conocerte.", id: "Halo, senang bertemu denganmu.", ar: "أهلاً، فُرْصة سعيدة. (ahlan, forsa sa3iida.)" } },
+  { type: "translate", prompt: { ko: "오늘 날씨가 좋아요.", en: "The weather is nice today.", es: "El clima esta bonito hoy.", id: "Cuacanya bagus hari ini.", ar: "الجَوّ حِلْو النَّهارْدَه. (el-gaww 7elw ennaharda.)" } },
+  { type: "translate", prompt: { ko: "커피 한 잔 주세요.", en: "One coffee, please.", es: "Un cafe, por favor.", id: "Satu kopi, tolong.", ar: "قَهْوة واحْدة، لو سَمَحْت. (ahwa wa7da, law sama7t.)" } },
+  { type: "translate", prompt: { ko: "이것은 얼마입니까?", en: "How much is this?", es: "Cuanto cuesta esto?", id: "Berapa harganya ini?", ar: "ده بِكامْ؟ (da bekaam?)" } },
+  { type: "translate", prompt: { ko: "화장실이 어디에 있어요?", en: "Where is the restroom?", es: "Donde esta el bano?", id: "Di mana toiletnya?", ar: "الحَمّامْ فينْ؟ (el-7ammaam feen?)" } },
   // Completion exercises
-  { type: "complete", prompt: { ko: "저는 학생___.", en: "I ___ a student.", es: "Yo ___ estudiante.", id: "Saya ___ seorang pelajar." }, answer: "입니다", hint: { ko: "정중한 어미", en: "formal ending", es: "terminacion formal", id: "akhiran formal" } },
-  { type: "complete", prompt: { ko: "밥을 ___.", en: "I ___ rice.", es: "Yo ___ arroz.", id: "Saya ___ nasi." }, answer: "먹어요", hint: { ko: "먹다 (정중형)", en: "to eat (polite)", es: "comer (cortes)", id: "makan (bentuk sopan)" } },
-  { type: "complete", prompt: { ko: "한국에 ___ 싶어요.", en: "I want to ___ to Korea.", es: "Quiero ___ a Corea.", id: "Saya ingin ___ ke Korea." }, answer: "가고", hint: { ko: "가다 + 싶다", en: "to go + want", es: "ir + querer", id: "pergi + ingin" } },
+  { type: "complete", prompt: { ko: "저는 학생___.", en: "I ___ a student.", es: "Yo ___ estudiante.", id: "Saya ___ seorang pelajar.", ar: "أنا ___ طالِب. (ana ___ taalib.)" }, answer: "입니다", hint: { ko: "정중한 어미", en: "formal ending", es: "terminacion formal", id: "akhiran formal", ar: "ضَمير المُتكلِّم (مِش لازِم فِعل) — ana = أنا" } },
+  { type: "complete", prompt: { ko: "밥을 ___.", en: "I ___ rice.", es: "Yo ___ arroz.", id: "Saya ___ nasi.", ar: "أنا ___ رُزّ. (ana ___ roz.)" }, answer: "먹어요", hint: { ko: "먹다 (정중형)", en: "to eat (polite)", es: "comer (cortes)", id: "makan (bentuk sopan)", ar: "فِعل المُضارِع بِـ + الفِعل — baakol = بآكُل (آكُل)" } },
+  { type: "complete", prompt: { ko: "한국에 ___ 싶어요.", en: "I want to ___ to Korea.", es: "Quiero ___ a Corea.", id: "Saya ingin ___ ke Korea.", ar: "أنا ___ أروح كوريا. (ana ___ arou7 koureya.)" }, answer: "가고", hint: { ko: "가다 + 싶다", en: "to go + want", es: "ir + querer", id: "pergi + ingin", ar: "عاوِز/عايِز + الفِعل — 3aayez = عاوِز" } },
   // Free writing
-  { type: "free", prompt: { ko: "자기 소개를 해보세요", en: "Introduce yourself", es: "Presentate", id: "Perkenalkan dirimu" } },
-  { type: "free", prompt: { ko: "오늘 하루를 설명하세요", en: "Describe your day today", es: "Describe tu dia de hoy", id: "Ceritakan harimu hari ini" } },
-  { type: "free", prompt: { ko: "좋아하는 음식에 대해 쓰세요", en: "Write about your favorite food", es: "Escribe sobre tu comida favorita", id: "Tulis tentang makanan favoritmu" } },
+  { type: "free", prompt: { ko: "자기 소개를 해보세요", en: "Introduce yourself", es: "Presentate", id: "Perkenalkan dirimu", ar: "عَرِّف بِنَفْسَك (3arraf benafsak)" } },
+  { type: "free", prompt: { ko: "오늘 하루를 설명하세요", en: "Describe your day today", es: "Describe tu dia de hoy", id: "Ceritakan harimu hari ini", ar: "إحْكي لي يَوْمَك النَّهارْدَه عامِل إزّايْ (e7ki-li yomak ennaharda 3aamel ezzaay)" } },
+  { type: "free", prompt: { ko: "좋아하는 음식에 대해 쓰세요", en: "Write about your favorite food", es: "Escribe sobre tu comida favorita", id: "Tulis tentang makanan favoritmu", ar: "إكْتِب عن أكْلَتَك المُفَضَّلة (ekteb 3an akletak el-mofaddala)" } },
 ];
 
 export default function WritingPractice() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { nativeLanguage: nativeLang, learningLanguage, awardXp } = useLanguage();
-  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
+  // Native UI language (ko/en/es/id only — "arabic" is never a NativeLanguage,
+  // but the arabic→"ar" arm mirrors the learning-target pattern for safety).
+  const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : (nativeLang as string) === "arabic" ? "ar" : "en";
 
   const [exerciseIdx, setExerciseIdx] = useState(0);
   const [input, setInput] = useState("");
@@ -154,9 +159,9 @@ export default function WritingPractice() {
 
     // Add wrong answers to SRS
     if (!isCorrect && exercise.type === "translate") {
-      const targetLang = learningLanguage === "korean" ? "ko" : learningLanguage === "spanish" ? "es" : learningLanguage === "indonesian" ? "id" : "en";
+      const targetLang = learningLanguage === "korean" ? "ko" : learningLanguage === "spanish" ? "es" : learningLanguage === "indonesian" ? "id" : learningLanguage === "arabic" ? "ar" : "en";
       addPhrases([{
-        phrase: exercise.prompt[targetLang as "ko" | "en" | "es" | "id"],
+        phrase: exercise.prompt[targetLang as "ko" | "en" | "es" | "id" | "ar"],
         meaning: t(exercise.prompt, lc),
         source: "writing",
       }]).catch((e) => console.warn('[Writing] addPhrases failed:', e));
