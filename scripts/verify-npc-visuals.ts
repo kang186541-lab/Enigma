@@ -30,6 +30,11 @@ for (const id of npcIds) {
     fail(`missing role portrait registry entry for NPC "${id}"`);
   }
 
+  const colorPattern = new RegExp(`\\b${id}:\\s*\\{[^}]*sceneColors:\\s*\\[\\s*"#[0-9a-fA-F]{6}"\\s*,\\s*"#[0-9a-fA-F]{6}"\\s*,\\s*"#[0-9a-fA-F]{6}"\\s*\\]`, "s");
+  if (!colorPattern.test(visualsSource)) {
+    fail(`missing scenario color staging for NPC "${id}"`);
+  }
+
   const assetPath = path.join(root, "assets", "npcs", "roles", `${id}_role.png`);
   if (!fs.existsSync(assetPath)) {
     fail(`missing role portrait asset for NPC "${id}": ${assetPath}`);
@@ -39,6 +44,17 @@ for (const id of npcIds) {
   if (size < 100_000) {
     fail(`role portrait asset for NPC "${id}" is suspiciously small: ${size} bytes`);
   }
+}
+
+const pennyScenePath = path.join(root, "assets", "npcs", "scenes", "penny_cafe_scene.png");
+if (!visualsSource.includes('sceneImage: require("../assets/npcs/scenes/penny_cafe_scene.png")')) {
+  fail("Penny cafe should use a full scenario scene plate, not only a small avatar portrait");
+}
+if (!fs.existsSync(pennyScenePath)) {
+  fail(`missing Penny cafe scenario scene plate: ${pennyScenePath}`);
+}
+if (fs.statSync(pennyScenePath).size < 500_000) {
+  fail("Penny cafe scenario scene plate is suspiciously small");
 }
 
 if (!avatarSource.includes("getNPCVisual") || !avatarSource.includes("rolePortrait")) {
@@ -56,6 +72,12 @@ if (missionAvatarCount < 4) {
 
 if (/npcAvatarEmoji>\{npc/.test(missionSource) || /emojiText>\{unlocked \? npc\.emoji/.test(listSource)) {
   fail("NPC screens still render identity avatars directly from emoji fallback");
+}
+
+for (const anchor of ["sceneStage", "sceneImageStage", "sceneCharacter", "ImageBackground", "Animated.Image"]) {
+  if (!missionSource.includes(anchor)) {
+    fail(`app/npc-mission.tsx is missing scenario stage anchor: ${anchor}`);
+  }
 }
 
 console.log(`[verify-npc-visuals] PASS: ${npcIds.length} NPC role portraits are registered, present, and wired.`);

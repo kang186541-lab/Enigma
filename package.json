@@ -26,6 +26,7 @@
     "verify:web-export": "node scripts/verify-web-export.js dist",
     "verify:web-emoji": "tsx scripts/verify-web-emoji-safety.ts",
     "audit:story-assets": "node scripts/audit-story-assets.js",
+    "optimize:story-assets": "node scripts/optimize-story-pngs.js",
     "lint": "npx expo lint",
     "lint:fix": "npx expo lint --fix",
     "test": "jest"

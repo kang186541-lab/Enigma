@@ -207,6 +207,10 @@ assertIncludes("function getAdventureBackdropById(backdrop: StoryBackdropId): Im
 assertIncludes("function getSceneBackdropId(storyId: string, item: SeqItem): StoryBackdropId | null", "Scene backdrop routing must stay explicit");
 assertIncludes("function getSceneCharacterImageSource(story: Story, item: SeqItem): ImageSourcePropType | null", "Character prefetch routing must stay explicit");
 assertIncludes("function findSupportingDialogueScene(", "Dialogue scenes should keep visual-novel supporting actor blocking");
+assertIncludes("seenCharacterIds", "Supporting actor blocking must avoid revealing not-yet-seen future characters");
+assertIncludes("!typingDone && typewriterRef.current && !typewriterRef.current.isDone()", "Story advance must trust parent typingDone state after skip so visible Next buttons can actually advance on web");
+assertIncludes("webFadeOutFallbackMs", "Story fade transition must have a web fallback so advance callbacks cannot hang");
+assertIncludes("setTimeout(runSceneChange, webFadeOutFallbackMs)", "Story fade transition must force scene changes on web if animation callbacks stall");
 assertIncludes("prefetchSceneItem(seq[seqIdx + 2]);", "Story stage should prefetch current plus next two scene images");
 
 assertIncludes("styles.sceneBackdropImage,", "Dialogue backdrop image layer must stay rendered");

@@ -6,6 +6,7 @@ import {
   FlatList,
   TextInput,
   Pressable,
+  ImageBackground,
   Platform,
   ActivityIndicator,
   Modal,
@@ -19,9 +20,11 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Audio, AVPlaybackStatus } from "expo-av";
+import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getEffectiveLearningLanguage, useLanguage, type NativeLanguage } from "@/context/LanguageContext";
 import { getNPC, NPC, NPC_EMOTIONS, NPC_REL_LEVELS, getRelTier, getRelLabel, RelationshipTier } from "@/constants/npcs";
+import { getNPCVisual } from "@/constants/npcVisuals";
 import { getApiUrl } from "@/lib/query-client";
 import { queueProgressPush } from "@/lib/progressSync";
 import { recordAudio } from "@/lib/audio";
@@ -140,6 +143,7 @@ export default function NpcMissionScreen() {
   const [popupPlaying, setPopupPlaying] = useState(false);
 
   const [scoreAnim] = useState(new Animated.Value(0));
+  const sceneAnim = useRef(new Animated.Value(0)).current;
   const [scoreDisplay, setScoreDisplay] = useState<{ amount: number; positive: boolean } | null>(null);
   const scoreTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -156,6 +160,17 @@ export default function NpcMissionScreen() {
   const level = NPC_REL_LEVELS[tier];
 
   useEffect(() => { return () => { stopAudio(); }; }, []);
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(sceneAnim, { toValue: 1, duration: 2600, useNativeDriver: true }),
+        Animated.timing(sceneAnim, { toValue: 0, duration: 2600, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [sceneAnim]);
 
   useEffect(() => {
     if (!npc) return;
@@ -832,6 +847,10 @@ export default function NpcMissionScreen() {
   const nativeScenario = native === "korean" ? npc?.scenarioKo : native === "spanish" ? npc?.scenarioEs : native === "indonesian" ? npc?.scenarioId : npc?.scenario;
   const learnScenario  = language === "korean" ? npc?.scenarioKo : language === "spanish" ? npc?.scenarioEs : language === "indonesian" ? npc?.scenarioId : npc?.scenario;
   const scenario = native === language ? nativeScenario : `${nativeScenario} (${learnScenario})`;
+  const npcVisual = getNPCVisual(npc?.id);
+  const sceneColors = npcVisual?.sceneColors ?? ["#15100d", "#392719", "#c9a227"];
+  const sceneTranslateY = sceneAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -4] });
+  const sceneScale = sceneAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.012] });
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
@@ -875,6 +894,55 @@ export default function NpcMissionScreen() {
         keyboardVerticalOffset={0}
       >
         {/* ── CHAT ── */}
+        {npc && npcVisual ? (
+          <View style={styles.sceneStage}>
+            {npcVisual.sceneImage ? (
+              <ImageBackground
+                source={npcVisual.sceneImage}
+                style={styles.sceneImageStage}
+                imageStyle={styles.sceneImage}
+                resizeMode="cover"
+                accessibilityIgnoresInvertColors
+              >
+                <LinearGradient
+                  colors={["rgba(8,5,3,0.04)", "rgba(8,5,3,0.38)", "rgba(8,5,3,0.74)"]}
+                  start={{ x: 1, y: 0 }}
+                  end={{ x: 0, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <View style={styles.sceneTextBlock}>
+                  <Text style={styles.sceneRole}>{scenario}</Text>
+                  <Text style={styles.sceneName}>{npc.name}</Text>
+                </View>
+              </ImageBackground>
+            ) : (
+              <LinearGradient colors={sceneColors} style={styles.sceneImageStage}>
+                <View style={styles.sceneShelfLine} />
+                <View style={[styles.sceneGlow, { backgroundColor: `${npc.color}38` }]} />
+                <View style={styles.sceneCounter} />
+                <View style={styles.sceneTextBlock}>
+                  <Text style={styles.sceneRole}>{scenario}</Text>
+                  <Text style={styles.sceneName}>{npc.name}</Text>
+                </View>
+                <Animated.Image
+                  source={npcVisual.rolePortrait}
+                  style={[
+                    styles.sceneCharacter,
+                    {
+                      transform: [
+                        { translateY: sceneTranslateY },
+                        { scale: sceneScale },
+                      ],
+                    },
+                  ]}
+                  resizeMode="contain"
+                  accessibilityIgnoresInvertColors
+                />
+              </LinearGradient>
+            )}
+          </View>
+        ) : null}
+
         <FlatList
           data={messages}
           keyExtractor={m => m.id}
@@ -1247,6 +1315,90 @@ export default function NpcMissionScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.bg1 },
   flex: { flex: 1 },
+
+  sceneStage: {
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 4,
+    backgroundColor: C.bg1,
+  },
+  sceneImageStage: {
+    height: Platform.OS === "web" ? 154 : 142,
+    borderRadius: 18,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.42)",
+    position: "relative",
+    justifyContent: "flex-end",
+    shadowColor: C.gold,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+    elevation: 5,
+  },
+  sceneImage: {
+    borderRadius: 18,
+  },
+  sceneTextBlock: {
+    position: "absolute",
+    left: 14,
+    top: 12,
+    bottom: 12,
+    width: "50%",
+    zIndex: 4,
+    justifyContent: "flex-end",
+    gap: 3,
+  },
+  sceneRole: {
+    fontSize: 10,
+    fontFamily: F.label,
+    color: C.gold,
+    textTransform: "uppercase",
+  },
+  sceneName: {
+    fontSize: 21,
+    lineHeight: 25,
+    fontFamily: F.header,
+    color: C.parchment,
+    textShadowColor: "rgba(0,0,0,0.45)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  sceneShelfLine: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 34,
+    height: 1,
+    backgroundColor: "rgba(244,232,193,0.18)",
+  },
+  sceneGlow: {
+    position: "absolute",
+    width: 170,
+    height: 170,
+    borderRadius: 85,
+    right: 18,
+    top: 6,
+    opacity: 0.75,
+  },
+  sceneCounter: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 34,
+    backgroundColor: "rgba(20,9,4,0.46)",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(244,232,193,0.14)",
+  },
+  sceneCharacter: {
+    position: "absolute",
+    right: -16,
+    bottom: -22,
+    width: "58%",
+    height: "126%",
+    zIndex: 3,
+  },
 
   header: {
     flexDirection: "row",

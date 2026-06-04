@@ -531,9 +531,17 @@ function getSceneCharacterPortrait(character: Character, item: SeqScene): ImageS
 
 function findSupportingDialogueScene(storyId: string, sequence: SeqItem[], activeIndex: number, activeScene: SeqScene): SeqScene | null {
   const activeBackdrop = getSceneBackdropId(storyId, activeScene);
-  const offsets = [-1, 1, -2, 2, -3, 3, -4, 4, -5, 5];
+  const seenCharacterIds = new Set(
+    sequence
+      .slice(0, activeIndex)
+      .filter((candidate): candidate is SeqScene => candidate.kind === "scene" && !candidate.isNarration)
+      .map((candidate) => candidate.charId),
+  );
+  const offsets = [-1, -2, -3, -4, -5, 1, 2, 3, 4, 5];
   const candidates = offsets
-    .map((offset) => sequence[activeIndex + offset])
+    .map((offset) => ({ offset, item: sequence[activeIndex + offset] }))
+    .filter(({ offset, item }) => offset < 0 || (item?.kind === "scene" && seenCharacterIds.has(item.charId)))
+    .map(({ item }) => item)
     .filter((candidate): candidate is SeqScene => (
       Boolean(candidate)
       && candidate.kind === "scene"
@@ -7396,12 +7404,32 @@ export default function StoryScene() {
     // dialogue/scene changes without breaking the cross-fade illusion.
     // `onFullyDone` fires after the fade-in completes so callers can release
     // reentrancy guards covering the whole transition window.
-    Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true }).start(() => {
+    const useNativeFadeDriver = Platform.OS !== "web";
+    const webFadeOutFallbackMs = 140;
+    const webFadeInFallbackMs = 160;
+    let didRunSceneChange = false;
+    let didRelease = false;
+
+    const release = () => {
+      if (didRelease) return;
+      didRelease = true;
+      onFullyDone?.();
+    };
+
+    const runSceneChange = () => {
+      if (didRunSceneChange) return;
+      didRunSceneChange = true;
       cb();
-      Animated.timing(fadeAnim, { toValue: 1, duration: 120, useNativeDriver: true }).start(() => {
-        onFullyDone?.();
+      Animated.timing(fadeAnim, { toValue: 1, duration: 120, useNativeDriver: useNativeFadeDriver }).start(() => {
+        release();
       });
+      if (Platform.OS === "web") setTimeout(release, webFadeInFallbackMs);
+    };
+
+    Animated.timing(fadeAnim, { toValue: 0, duration: 100, useNativeDriver: useNativeFadeDriver }).start(() => {
+      runSceneChange();
     });
+    if (Platform.OS === "web") setTimeout(runSceneChange, webFadeOutFallbackMs);
   }
 
   // Typewriter ref + done state for the currently-displayed scene/narration.
@@ -7492,7 +7520,7 @@ export default function StoryScene() {
   function advance() {
     // First-tap behavior: if the current scene's typewriter is still running,
     // skip to full text instead of advancing. This matches Pokemon / VN UX.
-    if (typewriterRef.current && !typewriterRef.current.isDone()) {
+    if (!typingDone && typewriterRef.current && !typewriterRef.current.isDone()) {
       typewriterRef.current.skip();
       Haptics.selectionAsync();
       return;
@@ -7544,6 +7572,11 @@ export default function StoryScene() {
   // advancingRef and markChapterComplete/awardXp resolving. Without this,
   // a rapid double-tap on the chapter-end button used to award +150 XP
   // twice.
+  function pressAdvance(event?: { stopPropagation?: () => void }) {
+    event?.stopPropagation?.();
+    advance();
+  }
+
   advanceRef.current = advance;
 
   useEffect(() => {
@@ -7852,8 +7885,7 @@ export default function StoryScene() {
         {/* NARRATION */}
         {item.kind === "scene" && item.isNarration && (
           <Pressable
-            accessibilityLabel={storyAdvanceAccessibilityLabel}
-            accessibilityRole="button"
+            accessible={false}
             style={styles.narrationArea}
             onPress={advance}
           >
@@ -7881,14 +7913,19 @@ export default function StoryScene() {
                 </LinearGradient>
               )}
             </View>
-            <View style={styles.narrationBtn}>
+            <Pressable
+              accessibilityLabel={storyAdvanceAccessibilityLabel}
+              accessibilityRole="button"
+              style={styles.narrationBtn}
+              onPress={pressAdvance}
+            >
               <Text style={styles.narrationBtnText}>
                 {typingDone
                   ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : lang === "indonesian" ? "Lanjut" : "Next")
                   : (lang === "korean" ? "전체 보기" : lang === "spanish" ? "Mostrar todo" : lang === "indonesian" ? "Tampilkan semua" : "Show all")}
               </Text>
               {typingDone && <BlinkingArrow color={C.gold} />}
-            </View>
+            </Pressable>
           </Pressable>
         )}
 
@@ -8040,8 +8077,7 @@ export default function StoryScene() {
             </Animated.View>
 
             <Pressable
-              accessibilityLabel={storyAdvanceAccessibilityLabel}
-              accessibilityRole="button"
+              accessible={false}
               style={styles.dialogueBox}
               onPress={advance}
             >
@@ -8091,11 +8127,16 @@ export default function StoryScene() {
                   <View key={i} style={[styles.dot, { opacity: i === seqIdx % 5 ? 1 : 0.3 }]} />
                 ))}
               </View>
-              <View style={[
+              <Pressable
+                accessibilityLabel={storyAdvanceAccessibilityLabel}
+                accessibilityRole="button"
+                onPress={pressAdvance}
+                style={[
                 styles.nextBtn,
                 typingDone ? styles.nextBtnReady : styles.nextBtnSkip,
                 compactStoryLayout && styles.nextBtnCompact,
-              ]}>
+              ]}
+              >
                 <Text style={[
                   styles.nextBtnText,
                   typingDone ? styles.nextBtnTextReady : styles.nextBtnTextSkip,
@@ -8105,7 +8146,7 @@ export default function StoryScene() {
                     : (lang === "korean" ? "전체 보기" : lang === "spanish" ? "Mostrar todo" : lang === "indonesian" ? "Tampilkan semua" : "Show all")}
                 </Text>
                 {typingDone && <BlinkingArrow color={C.bg1} />}
-              </View>
+              </Pressable>
             </Pressable>
           </View>
         )}
