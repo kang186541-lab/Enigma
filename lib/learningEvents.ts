@@ -39,7 +39,7 @@ const ALLOWED_PROP_KEYS: Record<LearningEventName, readonly string[]> = {
 const ALLOWED_STRING_VALUES: Record<string, readonly string[]> = {
   surface: ["home", "speak", "cards", "onboarding"],
   nativeLanguage: ["korean", "english", "spanish", "indonesian"],
-  targetLanguage: ["korean", "english", "spanish", "indonesian"],
+  targetLanguage: ["korean", "english", "spanish", "indonesian", "arabic"],
   scoreBand: ["pass", "coach", "repair"],
   assessmentStatus: ["scored", "unscored"],
   platform: ["ios", "android", "web", "windows", "macos"],

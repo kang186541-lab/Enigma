@@ -13,7 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
+import { useLanguage, NativeLanguage, LearningTargetLanguage } from "@/context/LanguageContext";
 import { Ionicons } from "@expo/vector-icons";
 import { EmojiText } from "@/components/EmojiText";
 import { C, F } from "@/constants/theme";
@@ -48,12 +48,22 @@ function RudySplashPlaceholder() {
 
 type Step = 1 | 2;
 
-const ALL_LANGS: { id: NativeLanguage; badge: string; nameMap: Record<NativeLanguage, string> }[] = [
+// The full LEARNING-target list (used by Step 2). `id` is a LearningTargetLanguage
+// so it can include Arabic (a target-only language, never a native UI option).
+// Arabic is appended LAST and shown with a BETA badge, exactly like Indonesian.
+const ALL_LANGS: { id: LearningTargetLanguage; badge: string; nameMap: Record<NativeLanguage, string> }[] = [
   { id: "korean",  badge: "KO", nameMap: { korean: "한국어",    english: "Korean",  spanish: "Coreano", indonesian: "Korea" } },
   { id: "english", badge: "EN", nameMap: { korean: "영어",      english: "English", spanish: "Inglés", indonesian: "Inggris"  } },
   { id: "spanish", badge: "ES", nameMap: { korean: "스페인어",  english: "Spanish", spanish: "Español", indonesian: "Spanyol" } },
   { id: "indonesian", badge: "ID", nameMap: { korean: "인도네시아어", english: "Indonesian", spanish: "Indonesio", indonesian: "Indonesia" } },
+  { id: "arabic", badge: "AR", nameMap: { korean: "아랍어", english: "Arabic", spanish: "Árabe", indonesian: "Arab" } },
 ];
+
+// Step 1 (native UI language) only ever offers the four NATIVE languages —
+// Arabic is a learning target, never a native UI language.
+const NATIVE_LANGS = ALL_LANGS.filter(
+  (l): l is typeof l & { id: NativeLanguage } => l.id !== "arabic"
+);
 
 const UI: Record<NativeLanguage, {
   step1Title: string; step1Sub: string;
@@ -165,16 +175,16 @@ export default function OnboardingScreen() {
 
   const [step,      setStep]      = useState<Step>(1);
   const [nativeSel, setNativeSel] = useState<NativeLanguage | null>(null);
-  const [learnSel,  setLearnSel]  = useState<NativeLanguage | null>(null);
+  const [learnSel,  setLearnSel]  = useState<LearningTargetLanguage | null>(null);
   const [goalSel,   setGoalSel]   = useState<LearningGoal | null>(null);
   const [loading,   setLoading]   = useState(false);
   const submittingRef = useRef(false);
 
   const uiLang: NativeLanguage = nativeSel ?? "english";
   const ui = UI[uiLang];
-  // Step 1 (native picker) shows all four languages. The LEARNING list now
-  // includes Indonesian as a selectable target (BETA) — it just can't equal the
-  // chosen native language.
+  // Step 1 (native picker) shows the four native languages. The LEARNING list
+  // includes Indonesian and Arabic as selectable targets (BETA) — they just
+  // can't equal the chosen native language (Arabic never can: it's not native).
   const learningOptions = ALL_LANGS.filter((l) => l.id !== nativeSel);
   const setupCtaLabel = !learnSel ? ui.chooseLanguageCta : !goalSel ? ui.chooseGoalCta : ui.continueToGuideCta;
   // Indonesian is now a valid learning target (BETA). `meanings` is Partial, so
@@ -193,7 +203,7 @@ export default function OnboardingScreen() {
     setNativeSel(lang); setLearnSel(null); setGoalSel(null);
   };
 
-  const handleLearnPick = (lang: NativeLanguage) => {
+  const handleLearnPick = (lang: LearningTargetLanguage) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setLearnSel(lang);
   };
@@ -358,7 +368,7 @@ export default function OnboardingScreen() {
             </View>
 
             <View style={styles.cards}>
-              {ALL_LANGS.map((lang) => {
+              {NATIVE_LANGS.map((lang) => {
                 const sel = nativeSel === lang.id;
                 return (
                   <Pressable
@@ -431,7 +441,7 @@ export default function OnboardingScreen() {
                     onPress={() => handleLearnPick(lang.id)}
                     accessibilityRole="button"
                     accessibilityState={{ selected: sel }}
-                    accessibilityLabel={lang.id === "indonesian" ? `${lang.nameMap[uiLang]} (BETA)` : lang.nameMap[uiLang]}
+                    accessibilityLabel={lang.id === "indonesian" || lang.id === "arabic" ? `${lang.nameMap[uiLang]} (BETA)` : lang.nameMap[uiLang]}
                   >
                     <View style={styles.langBadge}>
                       <Text style={styles.langBadgeText}>{lang.badge}</Text>
@@ -439,7 +449,7 @@ export default function OnboardingScreen() {
                     <Text style={[styles.cardName, sel && styles.cardNameSel]}>
                       {lang.nameMap[uiLang]}
                     </Text>
-                    {lang.id === "indonesian" && (
+                    {(lang.id === "indonesian" || lang.id === "arabic") && (
                       <View style={styles.betaBadge}>
                         <Text style={styles.betaBadgeText}>BETA</Text>
                       </View>

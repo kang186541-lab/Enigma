@@ -29,13 +29,11 @@ import { RUDY_GUIDE_CARDS } from "../lib/rudyGuideCards";
 //
 // Arabic note: its day 1-6 LESSON/MISSION/REVIEW content exists and IS asserted
 // here (Mission-Talk situation loop + day1-6 collection), and all 7 goal loops
-// pass. What does NOT yet exist for Arabic — and is therefore deliberately NOT
-// asserted — is the survival-phrase FAMILY mapping: there is no
-// `dayOneToSixSurvivalFamilies.arabic` and no `SURVIVAL_PHRASE_FAMILIES.arabic`,
-// so the day1-6 survival-family loop and `getDailySpeakingSurvivalCoverage`
-// (7-10 exposures) simply iterate nothing for Arabic. Authoring those
-// family→phrase maps is the documented follow-on; per the "only assert content
-// that exists" rule we do not invent them here.
+// pass. Arabic now ALSO ships the survival-phrase FAMILY mapping
+// (`dayOneToSixSurvivalFamilies.arabic` + `SURVIVAL_PHRASE_FAMILIES.arabic`
+// backed by a DAILY_SPEAKING_STARTERS.arabic pack), so the day1-6
+// survival-family loop and `getDailySpeakingSurvivalCoverage` (7-10 exposures)
+// assert Arabic too, exactly like Indonesian.
 const languages: LearningLangKey[] = ["korean", "english", "spanish", "indonesian", "arabic"];
 const goals: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"];
 const onboardingSource = readFileSync("app/onboarding.tsx", "utf8");
@@ -75,12 +73,9 @@ const geminiSource = readFileSync("server/gemini.ts", "utf8");
 const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as { dependencies?: Record<string, string> };
 
 // Partial: this is the day 1-6 survival-phrase FAMILY mapping. The loop below
-// only checks the families authored here. Arabic is now in the `languages`
-// array and its day 1-6 LESSON/MISSION/REVIEW content exists, but its
-// survival-family → phrase mapping has NOT been authored, so there is no
-// `arabic` key here and the `?? {}` fallback at the loop makes Arabic iterate
-// no families. (Authoring the Arabic survival-family map is the documented
-// follow-on; we do not invent assertions for content that does not exist.)
+// only checks the families authored here. All five learning targets (incl.
+// Arabic) now have an authored map, so each family is asserted against that
+// language's day 1-6 course content.
 const dayOneToSixSurvivalFamilies: Partial<Record<LearningLangKey, Record<string, string[]>>> = {
   english: {
     greeting: ["hello"],
@@ -149,6 +144,27 @@ const dayOneToSixSurvivalFamilies: Partial<Record<LearningLangKey, Record<string
     no: ["아니요"],
     help: ["도와주세요", "도움"],
     name: ["제 이름"],
+  },
+  // Arabic (Egyptian colloquial) is now first-class: it's in the `languages`
+  // array, so the day 1-6 survival-phrase loop DOES assert these families
+  // against the Arabic course content. Variants use the EXACT Egyptian spelling
+  // (incl. harakat) as written in the day1-6 lessons/missions
+  // (data/dailyCourse/day1_6_improved.ts) so the substring match holds.
+  arabic: {
+    greeting: ["أهلاً"],
+    goodbye: ["مع السَّلامة", "أشوفَك بَعْدين"],
+    thanks: ["شُكْراً"],
+    sorry: ["آسِف"],
+    dont_understand: ["مِش فاهِم"],
+    repeat: ["مُمْكِن تِقول تاني", "تاني"],
+    slow_speech: ["بِراحة"],
+    bridge_language: ["بِتِتْكَلِّم إنجِليزي"],
+    where: ["فين الحَمّام", "فين"],
+    how_much: ["بِكام ده", "بِكام"],
+    yes: ["آه"],
+    no: ["لأ"],
+    help: ["النَّجْدة", "ساعِدني", "مُساعْدة"],
+    name: ["أنا اسمي", "اسمي"],
   },
 };
 
@@ -964,9 +980,9 @@ assert.equal(getDailySpeakingSentenceLoop("spanish", "exam")[0]?.phrase, "¿Cuá
 // Arabic (Egyptian colloquial, ar-EG) is a LEARNING TARGET, mirrored on the
 // Indonesian daily-speaking playbook. These anchors lock that the Arabic daily
 // speaking content actually exists and stays on the real ar-EG phoneme path
-// (NOT the id-ID similarity fallback). They assert only content that exists:
-// the per-goal loops + day 1-6 lessons. Arabic survival-family coverage is the
-// documented follow-on and is intentionally not asserted (see comments above).
+// (NOT the id-ID similarity fallback): the per-goal loops + day 1-6 lessons.
+// Arabic survival-family coverage (day1-6 family loop + the 7-10 exposure lock)
+// is now asserted too, via the generic per-language loops above.
 const arabicExamLoop = getDailySpeakingSentenceLoop("arabic", "exam");
 assert.ok(arabicExamLoop.length >= SPEAKING_DAILY_GOAL, "Arabic exam loop should have a full day of speakable sentences");
 assert.equal(arabicExamLoop[0]?.phrase, "الاِمْتِحان إِمْتى؟", "Arabic exam loop should lead with the Egyptian colloquial exam question");
@@ -1098,7 +1114,7 @@ assert.ok(
   speakMissionHandoffSource.includes('"korean" | "english" | "spanish" | "indonesian"') &&
   speakMissionHandoffSource.includes('value === "korean" || value === "spanish" || value === "indonesian"') &&
   learningEventsSource.includes('nativeLanguage: ["korean", "english", "spanish", "indonesian"]') &&
-  learningEventsSource.includes('targetLanguage: ["korean", "english", "spanish", "indonesian"]'),
+  learningEventsSource.includes('targetLanguage: ["korean", "english", "spanish", "indonesian", "arabic"]'),
   "Indonesian listening/pronunciation must be wired end-to-end: Dewi needs chat+TTS, all Rudy voice/STT steps need id-ID, native-language routing must send id, and pronunciation coaching must not fall back to English"
 );
 assert.ok(

@@ -121,7 +121,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
   const total   = questions.length;
 
   const STT_LANG: Record<string, string> = {
-    english: "en-US", spanish: "es-ES", korean: "ko-KR", indonesian: "id-ID",
+    english: "en-US", spanish: "es-ES", korean: "ko-KR", indonesian: "id-ID", arabic: "ar-EG",
   };
   const sttLang = STT_LANG[learningLang] ?? "en-US";
 
@@ -615,7 +615,9 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         ) : (
           /* FILL_BLANK question */
           <View style={s.fillWrap}>
-            <Text style={s.promptText}>{q.promptWithBlank ?? ""}</Text>
+            <BidiTargetText targetLang={q.speechLang ?? sttLang} style={s.promptText}>
+              {q.promptWithBlank ?? ""}
+            </BidiTargetText>
             <View style={s.optionsRow}>
               {(q.options ?? []).map((opt, i) => {
                 const isSelected = selectedOption === opt;
@@ -634,9 +636,13 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
                     onPress={() => handleSelect(opt)}
                     disabled={qPhase !== "ready"}
                   >
-                    <Text style={[s.optBtnText, (isCorrect || (isSelected && !isWrong)) && { color: C.bg1 }]}>
+                    <BidiTargetText
+                      targetLang={q.speechLang ?? sttLang}
+                      rtlAlign="center"
+                      style={[s.optBtnText, (isCorrect || (isSelected && !isWrong)) && { color: C.bg1 }]}
+                    >
                       {opt}
-                    </Text>
+                    </BidiTargetText>
                   </Pressable>
                 );
               })}

@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Audio } from "expo-av";
-import { useLanguage, NativeLanguage, getEffectiveLearningLanguage } from "@/context/LanguageContext";
+import { useLanguage, NativeLanguage, getEffectiveLearningLanguage, toNativeLearning } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { apiFetchWithAuth, getAuthHeaderRecord } from "@/lib/apiFetchWithAuth";
 import { getDueCards, getDueCount, recordReview } from "@/lib/srsManager";
@@ -1330,7 +1330,9 @@ export default function CardsScreen() {
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const nativeLang = nativeLanguage ?? "english";
   const native = nativeLang as NativeLanguage;
-  const lang: NativeLanguage = getEffectiveLearningLanguage(native, learningLanguage);
+  // SRS flashcard decks (BEGINNER_CARDS_BY_LANG / ADVANCED_CARDS) are not yet
+  // authored for Arabic, so coerce an "arabic" target to a native default here.
+  const lang: NativeLanguage = toNativeLearning(native, getEffectiveLearningLanguage(native, learningLanguage));
 
   // Default deck depends on SRS due count: if anything is due, the SRS deck
   // becomes the user's primary entry; otherwise the legacy beginner deck is

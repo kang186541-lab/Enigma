@@ -19,7 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { C, F } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
-import { useLanguage, getEffectiveLearningLanguage } from "@/context/LanguageContext";
+import { useLanguage, toNativeLearning } from "@/context/LanguageContext";
 import { getHeroCopy } from "@/lib/heroCopy";
 
 const SEEN_KEY = "@lingua_signin_modal_seen_v1";
@@ -167,7 +167,9 @@ export function FirstTimeSignInModal() {
   // cards do. Source of truth: lib/heroCopy.ts. Falls through to the
   // self-learn placeholder when no learning language is set yet (rare —
   // existing users hitting this modal already have onboarding done).
-  const effectiveLearning = getEffectiveLearningLanguage(lc, learningLanguage);
+  // Hero tagline copy (getHeroCopy) is native-keyed and has no Arabic variant,
+  // so coerce an "arabic" target to a native default for this one-time modal.
+  const effectiveLearning = toNativeLearning(lc, learningLanguage);
   const heroTagline = getHeroCopy(lc, effectiveLearning).tagline;
 
   return (

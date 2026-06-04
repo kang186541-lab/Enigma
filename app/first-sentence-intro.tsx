@@ -15,6 +15,7 @@ import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { C, F } from "@/constants/theme";
 import { EmojiText } from "@/components/EmojiText";
+import { BidiTargetText } from "@/components/BidiTargetText";
 import { useLanguage, type NativeLanguage } from "@/context/LanguageContext";
 import { getApiUrl } from "@/lib/query-client";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
@@ -527,9 +528,9 @@ export default function FirstSentenceIntroScreen() {
                 style={StyleSheet.absoluteFill}
               />
               <Text style={styles.cardKicker}>{ui.step1Title}</Text>
-              <Text style={styles.phraseBig} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.6}>
+              <BidiTargetText targetLang={phrase.speechLang} rtlAlign="center" style={styles.phraseBig} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.6}>
                 {phrase.phrase}
-              </Text>
+              </BidiTargetText>
 
               <View style={styles.meaningBlock}>
                 <Text style={styles.fieldLabel}>{ui.meaningLabel}</Text>
@@ -612,9 +613,9 @@ export default function FirstSentenceIntroScreen() {
                   const played = playedChunks.has(i);
                   return (
                     <View key={`${chunk.text}-${i}`} style={[styles.chunkRow, played && styles.chunkRowPlayed]}>
-                      <Text style={styles.chunkText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+                      <BidiTargetText targetLang={phrase.speechLang} rtlAlign="center" style={styles.chunkText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
                         {chunk.text}
-                      </Text>
+                      </BidiTargetText>
                       <View style={styles.chunkActions}>
                         <Pressable
                           style={({ pressed }) => [styles.chunkPlay, pressed && styles.pressed]}
@@ -687,9 +688,9 @@ export default function FirstSentenceIntroScreen() {
                 style={StyleSheet.absoluteFill}
               />
               <Text style={styles.cardKicker}>{ui.step3Title}</Text>
-              <Text style={styles.phraseBig} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.6}>
+              <BidiTargetText targetLang={phrase.speechLang} rtlAlign="center" style={styles.phraseBig} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.6}>
                 {phrase.phrase}
-              </Text>
+              </BidiTargetText>
               <Text style={styles.step3Body}>{ui.step3Body}</Text>
             </View>
 

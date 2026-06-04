@@ -110,8 +110,11 @@ export type StatsUpdate = Partial<UserStats> | ((current: UserStats) => Partial<
 export interface LanguageContextType {
   nativeLanguage: NativeLanguage | null;
   setNativeLanguage: (lang: NativeLanguage) => Promise<void>;
-  learningLanguage: NativeLanguage | null;
-  setLearningLanguage: (lang: NativeLanguage) => Promise<void>;
+  // The learning TARGET may be any LearningTargetLanguage (the native set PLUS
+  // Arabic, which is a target-only, never a native UI language). ko/en/es/id are
+  // unchanged — this only WIDENS the union to additionally allow "arabic".
+  learningLanguage: LearningTargetLanguage | null;
+  setLearningLanguage: (lang: LearningTargetLanguage) => Promise<void>;
   hasOnboarded: boolean;
   isHydrated: boolean;
   stats: UserStats;
@@ -133,11 +136,33 @@ export function getDefaultLearning(native: NativeLanguage): NativeLanguage {
   return all.find((l) => l !== native) ?? "english";
 }
 
+// Effective learning TARGET. The 2nd param accepts any LearningTargetLanguage
+// (incl. "arabic"), and the chosen target is preserved verbatim — the speak-first
+// flow and the day1-6 course (daily-lesson / rudy-lesson, keyed by LearningLangKey
+// which includes "arabic") rely on this. When no distinct target is set it falls
+// back to a NATIVE default. ko/en/es/id resolve EXACTLY as before — this only
+// WIDENS the param/return union to additionally allow "arabic" through.
+//
+// NOTE: surfaces that have no Arabic content yet (home/cards/basic-course/NPC)
+// already guard with `?? <english>`/Partial-record fallbacks, so an "arabic"
+// return degrades gracefully there.
 export function getEffectiveLearningLanguage(
   native: NativeLanguage,
-  learning: NativeLanguage | null | undefined
-): NativeLanguage {
+  learning: LearningTargetLanguage | null | undefined
+): LearningTargetLanguage {
   return learning && learning !== native ? learning : getDefaultLearning(native);
+}
+
+// Coerce a learning target to a guaranteed NATIVE language, for surfaces that
+// have no Arabic content yet (home preview, SRS flashcard decks, hero copy):
+// "arabic" degrades to a native default; ko/en/es/id pass through unchanged.
+export function toNativeLearning(
+  native: NativeLanguage,
+  learning: LearningTargetLanguage | null | undefined
+): NativeLanguage {
+  return learning && learning !== "arabic" && learning !== native
+    ? learning
+    : getDefaultLearning(native);
 }
 
 const translations: Record<NativeLanguage, Record<string, string>> = {
@@ -391,6 +416,13 @@ function isNativeLanguage(value: unknown): value is NativeLanguage {
   return value === "korean" || value === "english" || value === "spanish" || value === "indonesian";
 }
 
+// Storage guard for the LEARNING target (native set PLUS "arabic"). Used so a
+// persisted "arabic" target survives hydration instead of being dropped by the
+// native-only guard. ko/en/es/id pass both guards identically.
+function isLearningTargetStored(value: unknown): value is LearningTargetLanguage {
+  return isNativeLanguage(value) || value === "arabic";
+}
+
 function mergeStoryProgress(local: StoryProgressBlob | null, remote: unknown): StoryProgressBlob {
   const r = (remote && typeof remote === "object" ? remote : {}) as Partial<StoryProgressBlob>;
   const l = local ?? { completed: [], unlocked: ["london"] };
@@ -430,7 +462,7 @@ function mergeStringRecord(local: Record<string, string> | null, remote: unknown
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [nativeLanguage, setNativeLanguageState] = useState<NativeLanguage | null>(null);
-  const [learningLanguage, setLearningLanguageState] = useState<NativeLanguage | null>(null);
+  const [learningLanguage, setLearningLanguageState] = useState<LearningTargetLanguage | null>(null);
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [pendingLevelUp, setPendingLevelUp] = useState<Level | null>(null);
@@ -499,7 +531,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         const statsStr = await AsyncStorage.getItem("@lingua_stats");
         if (lang) {
           const native = lang as NativeLanguage;
-          const learning = isNativeLanguage(ll) ? ll : null;
+          // Preserve a stored target (incl. "arabic") through hydration.
+          const learning = isLearningTargetStored(ll) ? ll : null;
           const effectiveLearning = getEffectiveLearningLanguage(native, learning);
           setNativeLanguageState(native);
           setHasOnboarded(true);
@@ -556,7 +589,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         const localNative = isNativeLanguage(localNativeRaw)
           ? localNativeRaw
           : switchedUser ? null : nativeLanguage;
-        const localLearning = isNativeLanguage(localLearningRaw)
+        const localLearning = isLearningTargetStored(localLearningRaw)
           ? localLearningRaw
           : switchedUser ? null : learningLanguage;
         const localLastSessionDate = await AsyncStorage.getItem("@lingua_last_session_date");
@@ -645,8 +678,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           setNativeLanguageState(remote.native_lang);
           setHasOnboarded(true);
         }
-        if (!localLearning && isNativeLanguage(remote.learning_lang)) {
+        if (!localLearning && isLearningTargetStored(remote.learning_lang)) {
           const nativeForLearning = localNative ?? (isNativeLanguage(remote.native_lang) ? remote.native_lang : nativeLanguage) ?? "english";
+          // Preserve a server-side "arabic" target so it syncs to a fresh device.
           const remoteLearning = getEffectiveLearningLanguage(nativeForLearning, remote.learning_lang);
           await AsyncStorage.setItem("@lingua_learning_language", remoteLearning);
           setLearningLanguageState(remoteLearning);
@@ -819,7 +853,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setNativeLanguageState(lang);
     setHasOnboarded(true);
     const currentLL = await AsyncStorage.getItem("@lingua_learning_language");
-    const effectiveLearning = getEffectiveLearningLanguage(lang, isNativeLanguage(currentLL) ? currentLL : null);
+    // Preserve a stored target (incl. "arabic") when only the native changes.
+    const effectiveLearning = getEffectiveLearningLanguage(lang, isLearningTargetStored(currentLL) ? currentLL : null);
     if (!currentLL || currentLL !== effectiveLearning) {
       await AsyncStorage.setItem("@lingua_learning_language", effectiveLearning);
       setLearningLanguageState(effectiveLearning);
@@ -829,9 +864,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const setLearningLanguage = async (lang: NativeLanguage) => {
+  const setLearningLanguage = async (lang: LearningTargetLanguage) => {
     const storedNative = await AsyncStorage.getItem("@lingua_language");
     const native = isNativeLanguage(storedNative) ? storedNative : nativeLanguage;
+    // Preserve the raw target (incl. "arabic") instead of stripping it to a
+    // native default — the speak-first flow and the day1-6 course are keyed by
+    // the target language. ko/en/es/id resolve identically to before.
     const effectiveLearning = native ? getEffectiveLearningLanguage(native, lang) : lang;
     await AsyncStorage.setItem("@lingua_learning_language", effectiveLearning);
     setLearningLanguageState(effectiveLearning);

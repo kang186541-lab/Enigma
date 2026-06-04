@@ -419,6 +419,28 @@ const DAILY_SPEAKING_STARTERS: Partial<Record<DailySpeakingLanguage, RawDailyPhr
     id("Tolong bantu saya.", "/ˈto.loŋ ˈban.tu ˈsa.ja/", "도와주세요.", "Please help me.", "Ayúdame, por favor.", "An emergency sentence. Slow and clear is enough."),
     id("Siapa nama kamu?", "/siˈa.pa ˈna.ma ˈka.mu/", "이름이 뭐예요?", "What is your name?", "¿Cómo te llamas?", "A real first conversation question."),
   ],
+  // Egyptian Arabic (BETA) starter set — SPOKEN Egyptian colloquial, NOT MSA.
+  // Shown with harakat; `ipa` carries a Latin romanization (see the pack note
+  // above). word = Egyptian Arabic, meaning = Korean, meaningEn = English,
+  // meaningEs = Spanish, meaningId = Indonesian gloss; masculine address forms
+  // match the "Alex" placeholder learner. These starters feed every goal loop,
+  // so the bridge_language / where / how_much / yes / no / help survival
+  // families below resolve to exactly 7 daily-speaking exposures (one per goal).
+  arabic: [
+    { word: "آه", ipa: "aah", meaning: "네.", meaningEn: "Yes.", meaningEs: "Sí.", meaningId: "Ya.", speechLang: "ar-EG", tip: "aah = yes (Egyptian). Short and warm — not the formal نعم." },
+    { word: "لأ", ipa: "la2", meaning: "아니요.", meaningEn: "No.", meaningEs: "No.", meaningId: "Tidak.", speechLang: "ar-EG", tip: "la2 = no (Egyptian). One quick syllable with a glottal stop at the end." },
+    { word: "تَمام", ipa: "tamaam", meaning: "괜찮아요.", meaningEn: "Okay / All good.", meaningEs: "Está bien.", meaningId: "Oke / Baik.", speechLang: "ar-EG", tip: "tamaam = okay/perfect. A tiny all-purpose 'all good' you'll hear everywhere." },
+    { word: "مِن فَضْلَك", ipa: "men fadlak", meaning: "부탁합니다.", meaningEn: "Please.", meaningEs: "Por favor.", meaningId: "Tolong / Silakan.", speechLang: "ar-EG", tip: "men fadlak = please (to a man). Softens any request." },
+    { word: "بِتِتْكَلِّم إنجِليزي؟", ipa: "beteklem engelizi?", meaning: "영어 할 줄 아세요?", meaningEn: "Do you speak English?", meaningEs: "¿Hablas inglés?", meaningId: "Apakah kamu bisa bahasa Inggris?", speechLang: "ar-EG", tip: "beteklem = do you speak (to a man). Useful when you need a bridge language." },
+    { word: "أنا مُبْتَدِئ", ipa: "ana mobtade2", meaning: "저는 초보자예요.", meaningEn: "I am a beginner.", meaningEs: "Soy principiante.", meaningId: "Saya pemula.", speechLang: "ar-EG", tip: "ana mobtade2 = I'm a beginner. Say it without apology — it helps people help you." },
+    { word: "الحَمّام فِين؟", ipa: "el-hammaam feen?", meaning: "화장실이 어디예요?", meaningEn: "Where is the bathroom?", meaningEs: "¿Dónde está el baño?", meaningId: "Di mana toilet?", speechLang: "ar-EG", tip: "feen = where (Egyptian, not MSA أين). A real travel question." },
+    { word: "بِكام دَه؟", ipa: "bekaam da?", meaning: "얼마예요?", meaningEn: "How much is this?", meaningEs: "¿Cuánto cuesta esto?", meaningId: "Berapa harganya?", speechLang: "ar-EG", tip: "bekaam = how much (Egyptian). da = this. A daily shopping question." },
+    { word: "ساعِدْني، لو سَمَحْت", ipa: "saa3edni, law samaht", meaning: "도와주세요.", meaningEn: "Please help me.", meaningEs: "Ayúdame, por favor.", meaningId: "Tolong bantu saya.", speechLang: "ar-EG", tip: "saa3edni = help me. Slow and clear is enough in an emergency." },
+    { word: "اسْمَك إيه؟", ipa: "esmak eh?", meaning: "이름이 뭐예요?", meaningEn: "What is your name?", meaningEs: "¿Cómo te llamas?", meaningId: "Siapa nama kamu?", speechLang: "ar-EG", tip: "eh = what (Egyptian, not MSA ما). Asking a man his name." },
+    { word: "أنا مِن كوريا", ipa: "ana men Korea", meaning: "저는 한국에서 왔어요.", meaningEn: "I'm from Korea.", meaningEs: "Soy de Corea.", meaningId: "Saya dari Korea.", speechLang: "ar-EG", tip: "ana men = I'm from. Swap Korea for your own country." },
+    { word: "فِين المَحَطّة؟", ipa: "feen el-mahatta?", meaning: "역이 어디예요?", meaningEn: "Where is the station?", meaningEs: "¿Dónde está la estación?", meaningId: "Di mana stasiun?", speechLang: "ar-EG", tip: "mahatta = station. Pair feen with any place you need." },
+    { word: "مَيَّة، لو سَمَحْت", ipa: "mayya, law samaht", meaning: "물 주세요.", meaningEn: "Water, please.", meaningEs: "Agua, por favor.", meaningId: "Air, tolong.", speechLang: "ar-EG", tip: "mayya = water (Egyptian for ماء). A real café/restaurant request." },
+  ],
 };
 
 const DAILY_GOAL_BOOSTERS: Partial<Record<DailySpeakingLanguage, Partial<Record<LearningGoal, RawDailyPhrase[]>>>> = {
@@ -704,6 +726,26 @@ export const SURVIVAL_PHRASE_FAMILIES: Partial<Record<DailySpeakingLanguage, Rec
     no: ["Tidak."],
     help: ["Tolong bantu saya."],
     name: ["Nama saya Alex."],
+  },
+  // Egyptian Arabic (BETA), mirroring the Indonesian survival map. Each phrase
+  // is an exact `word` from the Arabic DEFAULT pack or DAILY_SPEAKING_STARTERS
+  // pack above, so getDailySpeakingSurvivalCoverage reports exactly 7 exposures
+  // per family (one per goal) with 7 distinct goal context tips — the 7-10 lock.
+  arabic: {
+    greeting: ["أَهْلاً"],
+    goodbye: ["مَعَ السَّلامَة"],
+    thanks: ["شُكْراً"],
+    sorry: ["آسِف"],
+    dont_understand: ["مِش فاهِم"],
+    repeat: ["تاني، لو سَمَحْت"],
+    slow_speech: ["بِالرّاحَة، لو سَمَحْت"],
+    bridge_language: ["بِتِتْكَلِّم إنجِليزي؟"],
+    where: ["الحَمّام فِين؟"],
+    how_much: ["بِكام دَه؟"],
+    yes: ["آه"],
+    no: ["لأ"],
+    help: ["ساعِدْني، لو سَمَحْت"],
+    name: ["اسْمي أليكس"],
   },
 };
 

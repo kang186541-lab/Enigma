@@ -4,24 +4,28 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import { C, F } from "@/constants/theme";
-import { useLanguage, NativeLanguage } from "@/context/LanguageContext";
+import { useLanguage, NativeLanguage, LearningTargetLanguage } from "@/context/LanguageContext";
 import { EmojiText } from "@/components/EmojiText";
 
 // ── Language metadata ──────────────────────────────────────────────────────────
-
-const LANG_META: Record<NativeLanguage, { flag: string; ko: string; en: string; es: string }> = {
+// Keyed by LearningTargetLanguage so the learning picker can offer Arabic (a
+// target-only language, never a native UI option). Arabic (Egyptian, ar-EG)
+// uses the 🇪🇬 flag; its name reuses the en string for Spanish-native users.
+const LANG_META: Record<LearningTargetLanguage, { flag: string; ko: string; en: string; es: string }> = {
   korean:  { flag: "🇰🇷", ko: "한국어",    en: "Korean",  es: "Coreano" },
   english: { flag: "🇬🇧", ko: "영어",      en: "English", es: "Inglés"  },
   spanish: { flag: "🇪🇸", ko: "스페인어",  en: "Español", es: "Español" },
   indonesian: { flag: "🇮🇩", ko: "인도네시아어", en: "Indonesian", es: "Indonesio" },
+  arabic: { flag: "🇪🇬", ko: "아랍어", en: "Arabic", es: "Árabe" },
 };
 
-// Native picker shows all four languages; the learning picker now also offers
-// Indonesian as a selectable target (BETA).
+// Native picker shows only the four NATIVE UI languages (Arabic is never a
+// native option). The learning picker also offers Indonesian and Arabic as
+// selectable targets (BETA).
 const ALL_LANGS: NativeLanguage[] = ["korean", "english", "spanish", "indonesian"];
-const LEARNING_LANGS: NativeLanguage[] = [...ALL_LANGS];
+const LEARNING_LANGS: LearningTargetLanguage[] = [...ALL_LANGS, "arabic"];
 
-function getLangName(lang: NativeLanguage, nativeLang: NativeLanguage): string {
+function getLangName(lang: LearningTargetLanguage, nativeLang: NativeLanguage): string {
   const m = LANG_META[lang];
   if (nativeLang === "korean")  return m.ko;
   if (nativeLang === "spanish") return m.es;
@@ -54,7 +58,7 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
   const { nativeLanguage, learningLanguage, setNativeLanguage, setLearningLanguage } = useLanguage();
 
   const [selNative,  setSelNative]  = useState<NativeLanguage>(nativeLanguage ?? "korean");
-  const [selLearn,   setSelLearn]   = useState<NativeLanguage>(learningLanguage ?? "english");
+  const [selLearn,   setSelLearn]   = useState<LearningTargetLanguage>(learningLanguage ?? "english");
   const [conflict,   setConflict]   = useState(false);
   const [saving,     setSaving]     = useState(false);
 
@@ -88,16 +92,17 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelNative(lang);
     setConflict(lang === selLearn);
-    // Auto-fix learning language if conflict (never auto-pick indonesian — it
-    // is not a learning target).
+    // Auto-fix learning language if conflict. Prefer another NATIVE language as
+    // the auto-pick so we never silently drop a learner into a BETA target
+    // (Indonesian/Arabic) they didn't choose.
     if (lang === selLearn) {
-      const fallback = LEARNING_LANGS.find((l) => l !== lang) ?? "english";
+      const fallback = ALL_LANGS.find((l) => l !== lang) ?? "english";
       setSelLearn(fallback);
       setConflict(false);
     }
   }
 
-  function pickLearn(lang: NativeLanguage) {
+  function pickLearn(lang: LearningTargetLanguage) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (lang === selNative) { setConflict(true); return; }
     setConflict(false);
@@ -147,7 +152,7 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
             </Pressable>
           ))}
 
-          {/* Learning language — Indonesian is selectable (BETA) */}
+          {/* Learning language — Indonesian and Arabic are selectable (BETA) */}
           <Text style={[s.sectionLabel, { marginTop: 18 }]}>{getLabel("learnSec", nativeLang)}</Text>
           {LEARNING_LANGS.filter((l) => l !== selNative).map((lang) => (
             <Pressable
@@ -159,7 +164,7 @@ export function LanguageChangeModal({ visible, onClose }: Props) {
               <Text style={[s.langName, selLearn === lang && s.langNameSelected]}>
                 {getLangName(lang, nativeLang)}
               </Text>
-              {lang === "indonesian" && (
+              {(lang === "indonesian" || lang === "arabic") && (
                 <View style={s.betaBadge}><Text style={s.betaBadgeText}>BETA</Text></View>
               )}
               {selLearn === lang && <Text style={s.checkmark}>✓</Text>}
