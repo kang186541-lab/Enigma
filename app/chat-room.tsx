@@ -24,6 +24,7 @@ import { getTutor, TUTOR_IMAGES, Tutor } from "@/constants/tutors";
 import { useLanguage } from "@/context/LanguageContext";
 import { XPToast } from "@/components/XPToast";
 import { EmojiText } from "@/components/EmojiText";
+import { BidiTargetText, isRtlLang, isolateLtrRuns } from "@/components/BidiTargetText";
 import { getApiUrl } from "@/lib/query-client";
 import { recordAudio } from "@/lib/audio";
 import { C, F } from "@/constants/theme";
@@ -1121,10 +1122,44 @@ export default function ChatRoomScreen() {
     // Render AI bubble text with per-word highlight when speaking.
     // During speech: use TTS-clean text (no emojis) so word indices match exactly.
     // At rest: show full display text including emojis in the bubble.
+    //
+    // RTL targets (Arabic, ar-EG): the karaoke renders each word as its own
+    // sibling <Text>, and a flattened sibling array is NOT reordered by a plain
+    // writingDirection:'rtl' on the parent — so for RTL we lay the tokens out in
+    // VISUAL order (reversed) while each word keeps its LOGICAL spoken index, so
+    // subtitleWordIdx still highlights the correct word. LTR targets keep the
+    // EXACT original code path (byte-for-byte unchanged).
+    const targetRtl = !item.isUser && isRtlLang(tutor?.language);
     const renderBubbleText = () => {
       const displayText = item.isUser ? item.text : stripMarkdown(item.text);
       if (!item.isUser && isSpeakingThis) {
         const speakText = stripForTTS(displayText);
+        if (targetRtl) {
+          // Build [token, logicalWordIdx] pairs (logical = spoken order), then
+          // reverse the token sequence so word 0 sits rightmost (RTL reading
+          // start). Highlight still compares against the logical index.
+          let wordCount = 0;
+          const tokens = speakText.split(/(\s+)/).map((token, i) => {
+            const isSpace = /^\s+$/.test(token);
+            const logicalIdx = isSpace ? -1 : wordCount++;
+            return { token, i, isSpace, logicalIdx };
+          });
+          return (
+            <Text style={[styles.bubbleText, styles.bubbleTextAI, styles.bubbleTextRtl]}>
+              {tokens.slice().reverse().map(({ token, i, isSpace, logicalIdx }) => {
+                if (isSpace) return <Text key={i}>{token}</Text>;
+                return (
+                  <Text
+                    key={i}
+                    style={logicalIdx === subtitleWordIdx ? styles.subtitleHighlight : undefined}
+                  >
+                    {isolateLtrRuns(token)}
+                  </Text>
+                );
+              })}
+            </Text>
+          );
+        }
         let wordCount = 0;
         return (
           <Text style={[styles.bubbleText, styles.bubbleTextAI]}>
@@ -1144,9 +1179,12 @@ export default function ChatRoomScreen() {
         );
       }
       return (
-        <Text style={[styles.bubbleText, item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI]}>
+        <BidiTargetText
+          targetLang={item.isUser ? undefined : tutor?.language}
+          style={[styles.bubbleText, item.isUser ? styles.bubbleTextUser : styles.bubbleTextAI]}
+        >
           {displayText}
-        </Text>
+        </BidiTargetText>
       );
     };
 
@@ -2043,6 +2081,9 @@ const styles = StyleSheet.create({
   bubbleText: { fontSize: 15, lineHeight: 21 },
   bubbleTextUser: { fontFamily: F.body, color: C.bg1 },
   bubbleTextAI: { fontFamily: F.body, color: C.textParchment },
+  // RTL targets only (Arabic). Applied to the speaking-karaoke wrapper so the
+  // line reads right-to-left; LTR bubbles never receive this.
+  bubbleTextRtl: { writingDirection: "rtl", textAlign: "right" },
 
   bubbleActions: {
     flexDirection: "row",

@@ -408,11 +408,166 @@ const INDONESIAN_PHONEMES: PhonemeMap = {
   },
 };
 
+// ── Arabic phonemes — Egyptian colloquial (for learners of Arabic) ───────────
+// Keyed for Azure ar-EG Pronunciation Assessment phoneme output. Azure emits
+// IPA-style symbols, so each emphatic/guttural is keyed by its IPA token AND by
+// the Arabic letter as a fallback (the lookup also tries lowercase + stripped).
+// Tip values carry ko/en/es/id — the same 4-key native-reader shape as
+// INDONESIAN_PHONEMES (NO 5th "ar" key; Arabic is a target, not a UI language).
+// Focus: the emphatics (ص ض ط ظ) and gutturals (ع ح ق خ غ) that are hardest for
+// learners, plus a few common consonants/vowels a beginner needs.
+const ARABIC_PHONEMES: PhonemeMap = {
+  // ── Emphatic (velarized) consonants ────────────
+  "sˤ": { // ص — emphatic s
+    ko: "ص는 'ㅅ'을 혀 뒤쪽을 목구멍 쪽으로 당기며 묵직하게 내요. 일반 'س(s)'보다 입안이 더 넓어요.",
+    en: "ص is a 'heavy' s: say s while pulling the back of the tongue toward the throat. Darker than plain س (s).",
+    es: "ص es una 's' enfática: pronúnciala tirando la parte trasera de la lengua hacia la garganta. Más grave que la س normal.",
+    id: "ص adalah s 'berat': ucapkan s sambil menarik pangkal lidah ke arah tenggorokan. Lebih gelap daripada س biasa.",
+  },
+  "dˤ": { // ض — emphatic d
+    ko: "ض는 묵직한 'ㄷ'이에요. 혀를 넓게 펴고 뒤쪽을 목구멍으로 당기며 발음해요. 아랍어의 상징적인 소리예요.",
+    en: "ض is a 'heavy' d. Spread the tongue and pull its back toward the throat. This is the iconic Arabic sound.",
+    es: "ض es una 'd' enfática. Aplana la lengua y tira su parte trasera hacia la garganta. Es el sonido emblemático del árabe.",
+    id: "ض adalah d 'berat'. Lebarkan lidah dan tarik pangkalnya ke tenggorokan. Ini bunyi khas bahasa Arab.",
+  },
+  "tˤ": { // ط — emphatic t
+    ko: "ط는 묵직한 'ㄷ/ㅌ'이에요. 일반 'ت(t)'보다 혀를 더 넓고 무겁게, 목 안쪽 울림과 함께 내요.",
+    en: "ط is a 'heavy' t. Heavier and darker than plain ت (t) — flatten the tongue and add a throaty resonance.",
+    es: "ط es una 't' enfática. Más grave que la ت normal: aplana la lengua y añade resonancia desde la garganta.",
+    id: "ط adalah t 'berat'. Lebih berat dan gelap daripada ت biasa — lebarkan lidah dan beri resonansi dari tenggorokan.",
+  },
+  "ðˤ": { // ظ — emphatic dh/z (Egyptian often a heavy z)
+    ko: "ظ는 묵직한 'ð/z'예요. 이집트 구어에서는 무거운 'z'에 가까워요. 혀 뒤쪽을 당기며 두껍게 내요.",
+    en: "ظ is a 'heavy' dh/z. In Egyptian it often sounds like a dark, emphatic z. Pull the tongue back and keep it thick.",
+    es: "ظ es una 'dh/z' enfática. En egipcio suena como una z grave y enfática. Tira la lengua atrás y mantenla densa.",
+    id: "ظ adalah dh/z 'berat'. Dalam dialek Mesir sering terdengar seperti z yang gelap dan tegas. Tarik lidah ke belakang.",
+  },
+  // ── Gutturals (pharyngeal / uvular / velar) ────
+  "ʕ": { // ع — voiced pharyngeal
+    ko: "ع는 목구멍 깊은 곳을 살짝 조이며 울리는 소리예요. 한국어에 없어요. 'ㅏ' 하면서 목을 가볍게 조여 보세요.",
+    en: "ع is a voiced sound made by gently squeezing deep in the throat. No English equivalent — try saying 'ah' while tightening your throat.",
+    es: "ع es un sonido sonoro hecho apretando suavemente lo profundo de la garganta. No existe en español: di 'a' apretando la garganta.",
+    id: "ع adalah bunyi bersuara dari menekan lembut bagian dalam tenggorokan. Tak ada di bahasa Indonesia — ucapkan 'a' sambil menyempitkan tenggorokan.",
+  },
+  "ħ": { // ح — voiceless pharyngeal
+    ko: "ح는 목구멍 깊은 곳에서 내쉬는 강한 'ㅎ'이에요. 'هـ(h)'보다 훨씬 거칠고 목에서 긁히는 느낌이에요.",
+    en: "ح is a strong, breathy h made deep in the throat — much rougher than ه (h), like fogging a mirror from the throat.",
+    es: "ح es una 'h' fuerte y áspera desde lo profundo de la garganta — mucho más ronca que la ه (h).",
+    id: "ح adalah h yang kuat dan berdesah dari dalam tenggorokan — jauh lebih kasar daripada ه (h).",
+  },
+  "q": { // ق — voiceless uvular stop
+    ko: "ق는 'ㅋ'보다 훨씬 뒤, 목젖 근처에서 막았다 터뜨려요. 이집트 구어에서는 성문 정지음(ʔ)으로 바뀌기도 해요.",
+    en: "ق is a 'k' made far back at the uvula. In Egyptian colloquial it's often replaced by a glottal stop (ʔ).",
+    es: "ق es una 'k' producida muy atrás, en la úvula. En árabe egipcio suele sustituirse por un golpe glotal (ʔ).",
+    id: "ق adalah 'k' yang dibuat jauh di belakang, di anak tekak. Dalam dialek Mesir sering diganti hentian glotal (ʔ).",
+  },
+  "x": { // خ — voiceless velar fricative
+    ko: "خ는 목 뒤에서 거칠게 긁는 소리예요. 스페인어 'j(jota)'나 독일어 'Bach'의 'ch'와 같아요.",
+    en: "خ is a rasping sound from the back of the throat, like the 'ch' in German 'Bach' or Spanish 'j'.",
+    es: "خ es como la 'j' española (jota): un sonido raspado en la parte de atrás de la garganta.",
+    id: "خ adalah bunyi serak dari belakang tenggorokan, seperti 'kh' pada 'khusus' atau 'ch' Jerman pada 'Bach'.",
+  },
+  "ɣ": { // غ — voiced velar fricative
+    ko: "غ는 خ의 울림 있는 버전이에요. 프랑스어 'r'처럼 목 뒤에서 가글하듯 울려요.",
+    en: "غ is the voiced version of خ — a gargling sound at the back of the throat, like a French 'r'.",
+    es: "غ es la versión sonora de خ: un sonido de gárgaras al fondo de la garganta, como la 'r' francesa.",
+    id: "غ adalah versi bersuara dari خ — bunyi seperti berkumur di belakang tenggorokan, mirip 'r' Prancis.",
+  },
+  // ── Other consonants beginners need ────────────
+  "ʔ": { // ء / همزة — glottal stop (also Egyptian ق)
+    ko: "ء(함자)는 성문 정지음이에요. '아_아'처럼 목을 순간적으로 막았다 여는 소리예요. 이집트에서는 ق도 이 소리로 나요.",
+    en: "ء (hamza) is a glottal stop — the catch in the middle of 'uh-oh'. In Egyptian, ق is pronounced this way too.",
+    es: "ء (hamza) es un golpe glotal — el corte en medio de 'uh-oh'. En egipcio, la ق también se pronuncia así.",
+    id: "ء (hamzah) adalah hentian glotal — jeda di tengah 'uh-oh'. Dalam dialek Mesir, ق juga diucapkan begini.",
+  },
+  "r": { // ر — alveolar tap/trill
+    ko: "ر는 혀끝을 잇몸에 가볍게 한 번 튕기거나 굴려요. 스페인어 'r'와 비슷하고 영어 'r'처럼 당기지 않아요.",
+    en: "ر is a tapped or rolled r — flick the tongue tip once at the ridge. Like Spanish 'r', not the pulled-back English r.",
+    es: "ر es una 'r' de toque o vibrante — como la 'r' española en 'pero' o 'perro'. Muy natural para ti.",
+    id: "ر adalah r yang diketuk atau digetarkan — sentil ujung lidah sekali di gusi. Mirip r Indonesia, bukan r Inggris.",
+  },
+  // ── Long vs short vowels (length is meaningful) ─
+  "aː": { // ا — long a (alif)
+    ko: "긴 모음 'aː'는 짧은 'a'보다 두 배 길게 끌어요. 아랍어에서 길이가 뜻을 바꾸니 충분히 길게 내세요.",
+    en: "Long 'aa' is held about twice as long as short 'a'. Vowel length changes meaning in Arabic, so stretch it fully.",
+    es: "La 'aa' larga dura el doble que la 'a' corta. En árabe la duración cambia el significado, así que alárgala bien.",
+    id: "Vokal panjang 'aa' ditahan sekitar dua kali lebih lama dari 'a' pendek. Panjang vokal mengubah makna dalam bahasa Arab.",
+  },
+  "iː": { // ي — long i
+    ko: "긴 모음 'iː'는 'ㅣ'를 길게 빼요. 짧은 'i'와 길이로 구분되니 충분히 길게 유지하세요.",
+    en: "Long 'ee' is a sustained 'ee'. It contrasts with short 'i' purely by length, so hold it.",
+    es: "La 'ii' larga es una 'i' sostenida. Se distingue de la 'i' corta solo por la duración, así que mantenla.",
+    id: "Vokal panjang 'ii' adalah 'i' yang ditahan. Bedanya dengan 'i' pendek hanya pada panjangnya, jadi tahan.",
+  },
+  "uː": { // و — long u
+    ko: "긴 모음 'uː'는 입술을 둥글게 모아 'ㅜ'를 길게 빼요. 짧은 'u'와 길이로 구분돼요.",
+    en: "Long 'oo' is a sustained, rounded 'oo'. It contrasts with short 'u' by length.",
+    es: "La 'uu' larga es una 'u' redondeada y sostenida. Se distingue de la 'u' corta por la duración.",
+    id: "Vokal panjang 'uu' adalah 'u' bulat yang ditahan. Bedanya dengan 'u' pendek pada panjangnya.",
+  },
+  // ── Arabic-letter keys (fallback if a consumer passes the letter) ──
+  "ص": {
+    ko: "ص는 묵직한 'ㅅ'이에요. 혀 뒤쪽을 목구멍으로 당기며 내요.",
+    en: "ص is a 'heavy' (emphatic) s — pull the back of the tongue toward the throat.",
+    es: "ص es una 's' enfática — tira la parte trasera de la lengua hacia la garganta.",
+    id: "ص adalah s 'berat' (emfatik) — tarik pangkal lidah ke tenggorokan.",
+  },
+  "ض": {
+    ko: "ض는 묵직한 'ㄷ'이에요. 혀를 넓게 펴고 뒤쪽을 당기며 내는 아랍어의 상징적 소리예요.",
+    en: "ض is a 'heavy' (emphatic) d — the iconic Arabic sound. Spread the tongue and pull its back.",
+    es: "ض es una 'd' enfática — el sonido emblemático del árabe. Aplana la lengua y tira atrás.",
+    id: "ض adalah d 'berat' (emfatik) — bunyi khas bahasa Arab. Lebarkan lidah dan tarik pangkalnya.",
+  },
+  "ط": {
+    ko: "ط는 묵직한 'ㅌ'이에요. 일반 'ت'보다 혀를 더 넓고 무겁게 내요.",
+    en: "ط is a 'heavy' (emphatic) t — heavier and darker than plain ت.",
+    es: "ط es una 't' enfática — más grave que la ت normal.",
+    id: "ط adalah t 'berat' (emfatik) — lebih berat daripada ت biasa.",
+  },
+  "ظ": {
+    ko: "ظ는 묵직한 'z/ð'예요. 이집트 구어에서는 무거운 'z'에 가까워요.",
+    en: "ظ is a 'heavy' (emphatic) dh/z — in Egyptian, close to a dark z.",
+    es: "ظ es una 'dh/z' enfática — en egipcio, cercana a una z grave.",
+    id: "ظ adalah dh/z 'berat' (emfatik) — dalam dialek Mesir mirip z yang gelap.",
+  },
+  "ع": {
+    ko: "ع는 목구멍 깊은 곳을 조이며 울리는 소리예요. 한국어에 없어요.",
+    en: "ع is a voiced pharyngeal sound — squeeze deep in the throat. No English equivalent.",
+    es: "ع es un sonido faríngeo sonoro — aprieta lo profundo de la garganta. No existe en español.",
+    id: "ع adalah bunyi faring bersuara — tekan bagian dalam tenggorokan. Tak ada padanannya.",
+  },
+  "ح": {
+    ko: "ح는 목구멍 깊은 곳에서 내쉬는 강한 'ㅎ'이에요. 'هـ'보다 훨씬 거칠어요.",
+    en: "ح is a strong, breathy pharyngeal h — much rougher than ه.",
+    es: "ح es una 'h' faríngea fuerte y áspera — mucho más ronca que la ه.",
+    id: "ح adalah h faring yang kuat dan berdesah — jauh lebih kasar daripada ه.",
+  },
+  "ق": {
+    ko: "ق는 목젖 근처에서 막았다 터뜨리는 'ㅋ'이에요. 이집트 구어에서는 ʔ(성문 정지음)로 바뀌기도 해요.",
+    en: "ق is a uvular k. In Egyptian colloquial it's often a glottal stop (ʔ).",
+    es: "ق es una 'k' uvular. En egipcio suele ser un golpe glotal (ʔ).",
+    id: "ق adalah 'k' uvular. Dalam dialek Mesir sering jadi hentian glotal (ʔ).",
+  },
+  "خ": {
+    ko: "خ는 목 뒤에서 거칠게 긁는 소리예요. 스페인어 'j'나 'Bach'의 'ch'와 같아요.",
+    en: "خ is a rasping velar sound, like the 'ch' in 'Bach' or Spanish 'j'.",
+    es: "خ es como la 'j' española — un sonido raspado atrás.",
+    id: "خ adalah bunyi serak velar, seperti 'kh' atau 'ch' Jerman pada 'Bach'.",
+  },
+  "غ": {
+    ko: "غ는 خ의 울림 있는 버전이에요. 프랑스어 'r'처럼 가글하듯 내요.",
+    en: "غ is the voiced version of خ — a gargling sound, like a French 'r'.",
+    es: "غ es la versión sonora de خ — como la 'r' francesa, de gárgaras.",
+    id: "غ adalah versi bersuara dari خ — seperti 'r' Prancis, bunyi berkumur.",
+  },
+};
+
 const DB: Record<string, PhonemeMap> = {
   english: ENGLISH_PHONEMES,
   spanish: SPANISH_PHONEMES,
   korean: KOREAN_PHONEMES,
   indonesian: INDONESIAN_PHONEMES,
+  arabic: ARABIC_PHONEMES,
 };
 
 /**

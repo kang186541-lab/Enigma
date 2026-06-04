@@ -14,6 +14,7 @@ import { type Step2Data, type FillBlankQuiz, type GrammarExplanation } from "@/l
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { PhonemeCoaching } from "./PhonemeCoaching";
+import { BidiTargetText } from "@/components/BidiTargetText";
 
 const RUDY_RECORDING_MS = 8000;
 
@@ -656,7 +657,9 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         <View style={s.speakBox}>
           {/* Full sentence display */}
           <View style={s.fullSentenceCard}>
-            <Text style={s.fullSentenceText}>{quiz.fullSentence}</Text>
+            <BidiTargetText targetLang={speechLang} rtlAlign="center" style={s.fullSentenceText}>
+              {quiz.fullSentence}
+            </BidiTargetText>
             <Text style={s.fullSentenceMeaning}>
               {quiz.fullSentenceMeaning ? getMeaning(quiz.fullSentenceMeaning, lc) : quiz.fullSentence}
             </Text>

@@ -112,7 +112,7 @@ export interface DayRewards {
   bonusPronunciation: number;
 }
 
-export type LearningLangKey = "english" | "spanish" | "korean" | "indonesian";
+export type LearningLangKey = "english" | "spanish" | "korean" | "indonesian" | "arabic";
 
 // ── Speech lang codes ────────────────────────────────────────────────────────
 
@@ -121,6 +121,8 @@ export const SPEECH_LANG: Record<LearningLangKey, string> = {
   spanish: "es-ES",
   korean:  "ko-KR",
   indonesian: "id-ID",
+  // Egyptian colloquial — the spoken register for a speak-first app (NOT MSA).
+  arabic: "ar-EG",
 };
 
 // ── Day 1–30 content (all 3 learning languages) ────────────────────────────

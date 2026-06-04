@@ -1,7 +1,7 @@
 import type { LearningGoal } from "@/lib/learnerProfile";
 import { SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 
-export type DailySpeakingLanguage = "korean" | "english" | "spanish" | "indonesian";
+export type DailySpeakingLanguage = "korean" | "english" | "spanish" | "indonesian" | "arabic";
 
 export type DailySpeakingPhrase = {
   phrase: string;
@@ -10,7 +10,7 @@ export type DailySpeakingPhrase = {
   // meaning, so this is Partial. Accessors fall back through the available keys.
   meanings: Partial<Record<DailySpeakingLanguage, string>>;
   level: "A1";
-  speechLang: "ko-KR" | "en-US" | "es-ES" | "id-ID";
+  speechLang: "ko-KR" | "en-US" | "es-ES" | "id-ID" | "ar-EG";
   tip: string;
   practiceContext?: LearningGoal;
   contextTip?: string;
@@ -241,6 +241,81 @@ const DAILY_SPEAKING_PACKS: Partial<Record<DailySpeakingLanguage, Partial<Record
       { word: "Saya sudah siap.", ipa: "/ˈsa.ja ˈsu.dah ˈsi.ap/", meaning: "준비됐어요.", meaningEn: "I am ready.", meaningEs: "Estoy listo.", meaningId: "Saya sudah siap.", speechLang: "id-ID", tip: "siap = ready. A short confidence sentence." },
       { word: "Saya tidak tahu jawabannya.", ipa: "/ˈsa.ja ˈti.daʔ ˈta.hu dʒaˈwa.ban.ɲa/", meaning: "답을 모르겠어요.", meaningEn: "I don't know the answer.", meaningEs: "No sé la respuesta.", meaningId: "Saya tidak tahu jawabannya.", speechLang: "id-ID", tip: "jawaban = answer. An honest test sentence." },
       { word: "Tolong bicara pelan-pelan.", ipa: "/ˈto.loŋ biˈtʃa.ra ˈpə.lan ˈpə.lan/", meaning: "천천히 말해 주세요.", meaningEn: "Please speak slowly.", meaningEs: "Habla despacio, por favor.", meaningId: "Tolong bicara pelan-pelan.", speechLang: "id-ID", tip: "Useful when the instructions are read aloud fast." },
+    ],
+  },
+  // ── Egyptian Arabic (BETA) starter packs ─────────────────────────────────
+  // SPOKEN Egyptian colloquial (مصري), NOT Modern Standard Arabic — this is a
+  // speak-first app and nobody converses in MSA. Shown with harakat (short
+  // vowels) for beginners; `ipa` carries a Latin ROMANIZATION line (the GOAL
+  // asks for romanization, and Egyptian pronunciation differs enough from the
+  // script — e.g. ق read as a glottal stop — that a phonetic IPA would mislead).
+  // For an Arabic TARGET phrase: word = Egyptian Arabic (spoken), meaning = Korean,
+  // meaningEn = English, meaningEs = Spanish, meaningId = Indonesian gloss.
+  // Address forms use the masculine (matching the "Alex" placeholder learner);
+  // goals without a specific pack fall back to `default` (Arabic), never English.
+  arabic: {
+    default: [
+      { word: "أَهْلاً", ipa: "ahlan", meaning: "안녕하세요", meaningEn: "Hi / Welcome", meaningEs: "Hola", meaningId: "Halo", speechLang: "ar-EG", tip: "ahlan = the easy everyday hello in Egypt. One warm word." },
+      { word: "إِزَّيَّك؟", ipa: "ezzayyak?", meaning: "잘 지내요?", meaningEn: "How are you?", meaningEs: "¿Cómo estás?", meaningId: "Apa kabar?", speechLang: "ar-EG", tip: "ezzayyak = how are you (to a man). The real Egyptian greeting, not MSA." },
+      { word: "شُكْراً", ipa: "shukran", meaning: "감사합니다", meaningEn: "Thank you", meaningEs: "Gracias", meaningId: "Terima kasih", speechLang: "ar-EG", tip: "shukran = thank you. Stress the first syllable: SHUK-ran." },
+      { word: "مِش فاهِم", ipa: "mish faahem", meaning: "이해 못 했어요.", meaningEn: "I don't understand.", meaningEs: "No entiendo.", meaningId: "Saya tidak mengerti.", speechLang: "ar-EG", tip: "mish = not (Egyptian). A real repair phrase, said by a man." },
+      { word: "تاني، لو سَمَحْت", ipa: "taani, law samaht", meaning: "다시 말해 주세요.", meaningEn: "Again, please.", meaningEs: "Otra vez, por favor.", meaningId: "Tolong ulangi.", speechLang: "ar-EG", tip: "taani = again (pure Egyptian). law samaht = please." },
+      { word: "بِالرّاحَة، لو سَمَحْت", ipa: "bi-r-raaha, law samaht", meaning: "천천히 말해 주세요.", meaningEn: "Slowly, please.", meaningEs: "Despacio, por favor.", meaningId: "Tolong bicara pelan-pelan.", speechLang: "ar-EG", tip: "bi-r-raaha = take it easy / slowly. Very Egyptian." },
+      { word: "صَباح الخير", ipa: "sabaah el-kheir", meaning: "좋은 아침이에요.", meaningEn: "Good morning.", meaningEs: "Buenos días.", meaningId: "Selamat pagi.", speechLang: "ar-EG", tip: "sabaah el-kheir = good morning. The kh is a throaty h sound." },
+      { word: "مَعَ السَّلامَة", ipa: "ma3a s-salaama", meaning: "안녕히 가세요.", meaningEn: "Goodbye.", meaningEs: "Adiós.", meaningId: "Sampai jumpa.", speechLang: "ar-EG", tip: "ma3a s-salaama = goodbye (literally 'with safety'). The 3 is the deep ع." },
+      { word: "آسِف", ipa: "aasef", meaning: "미안해요.", meaningEn: "Sorry.", meaningEs: "Lo siento.", meaningId: "Maaf.", speechLang: "ar-EG", tip: "aasef = sorry (said by a man). Short and sincere." },
+      { word: "اسْمي أليكس", ipa: "esmi Alex", meaning: "제 이름은 알렉스예요.", meaningEn: "My name is Alex.", meaningEs: "Me llamo Alex.", meaningId: "Nama saya Alex.", speechLang: "ar-EG", tip: "esmi = my name. Swap Alex for your own name." },
+    ],
+    travel: [
+      { word: "الحَمّام فِين؟", ipa: "el-hammaam feen?", meaning: "화장실이 어디예요?", meaningEn: "Where is the bathroom?", meaningEs: "¿Dónde está el baño?", meaningId: "Di mana toilet?", speechLang: "ar-EG", tip: "feen = where (Egyptian, not MSA أين). A real travel question." },
+      { word: "بِكام دَه؟", ipa: "bekaam da?", meaning: "얼마예요?", meaningEn: "How much is this?", meaningEs: "¿Cuánto cuesta esto?", meaningId: "Berapa harganya?", speechLang: "ar-EG", tip: "bekaam = how much (Egyptian). da = this. A daily shopping question." },
+      { word: "ساعِدْني، لو سَمَحْت", ipa: "saa3edni, law samaht", meaning: "도와주세요.", meaningEn: "Please help me.", meaningEs: "Ayúdame, por favor.", meaningId: "Tolong bantu saya.", speechLang: "ar-EG", tip: "saa3edni = help me. Slow and clear is enough in an emergency." },
+      { word: "عايِز مَيَّة", ipa: "3aayez mayya", meaning: "물 주세요.", meaningEn: "I want water.", meaningEs: "Quiero agua.", meaningId: "Saya mau air.", speechLang: "ar-EG", tip: "3aayez = I want (a man). mayya = water (Egyptian for ماء)." },
+      { word: "اِسْتَنّى هِنا، لو سَمَحْت", ipa: "estanna hena, law samaht", meaning: "여기 세워 주세요.", meaningEn: "Stop here, please.", meaningEs: "Pare aquí, por favor.", meaningId: "Berhenti di sini.", speechLang: "ar-EG", tip: "estanna = wait/stop. hena = here. Taxi survival." },
+      { word: "أنا تُهْت", ipa: "ana toht", meaning: "길을 잃었어요.", meaningEn: "I am lost.", meaningEs: "Estoy perdido.", meaningId: "Saya tersesat.", speechLang: "ar-EG", tip: "ana toht = I got lost. Say it calmly when you need directions." },
+      { word: "عايِز تاكْسي", ipa: "3aayez taksi", meaning: "택시 불러 주세요.", meaningEn: "I want a taxi.", meaningEs: "Quiero un taxi.", meaningId: "Tolong panggil taksi.", speechLang: "ar-EG", tip: "taksi = taxi. A practical street request." },
+    ],
+    relationship: [
+      { word: "اسْمَك إيه؟", ipa: "esmak eh?", meaning: "이름이 뭐예요?", meaningEn: "What is your name?", meaningEs: "¿Cómo te llamas?", meaningId: "Siapa nama kamu?", speechLang: "ar-EG", tip: "eh = what (Egyptian, not MSA ما). Asking a man his name." },
+      { word: "اسْمي أليكس", ipa: "esmi Alex", meaning: "제 이름은 알렉스예요.", meaningEn: "My name is Alex.", meaningEs: "Me llamo Alex.", meaningId: "Nama saya Alex.", speechLang: "ar-EG", tip: "Swap Alex for your name when you practice." },
+      { word: "فُرْصة سَعيدة", ipa: "forsa sa3iida", meaning: "만나서 반가워요.", meaningEn: "Nice to meet you.", meaningEs: "Mucho gusto.", meaningId: "Senang bertemu kamu.", speechLang: "ar-EG", tip: "forsa sa3iida = nice to meet you (literally 'happy chance')." },
+      { word: "إِزَّيَّك؟", ipa: "ezzayyak?", meaning: "잘 지내요?", meaningEn: "How are you?", meaningEs: "¿Cómo estás?", meaningId: "Apa kabar?", speechLang: "ar-EG", tip: "ezzayyak = how are you (to a man). A warm everyday check-in." },
+      { word: "أشوفَك بَعْدين", ipa: "ashoofak ba3deen", meaning: "나중에 봐요.", meaningEn: "See you later.", meaningEs: "Hasta luego.", meaningId: "Sampai nanti.", speechLang: "ar-EG", tip: "ashoofak = I'll see you. ba3deen = later. A casual goodbye." },
+      { word: "شُكْراً جَزيلاً", ipa: "shukran gaziilan", meaning: "정말 고마워요.", meaningEn: "Thank you very much.", meaningEs: "Muchas gracias.", meaningId: "Terima kasih banyak.", speechLang: "ar-EG", tip: "gaziilan = a lot. Warm gratitude. Note Egyptian g in gaziilan." },
+      { word: "آسِف، أنا اِتْأَخَّرْت", ipa: "aasef, ana et'akhkhart", meaning: "늦어서 미안해요.", meaningEn: "Sorry, I am late.", meaningEs: "Perdón por llegar tarde.", meaningId: "Maaf, saya terlambat.", speechLang: "ar-EG", tip: "et'akhkhart = I was late. A gentle, honest apology." },
+    ],
+    work: [
+      { word: "تاني، لو سَمَحْت", ipa: "taani, law samaht", meaning: "다시 말해 주세요.", meaningEn: "Again, please.", meaningEs: "Otra vez, por favor.", meaningId: "Tolong ulangi.", speechLang: "ar-EG", tip: "A useful meeting repair phrase. Say it calmly." },
+      { word: "مِش فاهِم", ipa: "mish faahem", meaning: "이해 못 했어요.", meaningEn: "I don't understand.", meaningEs: "No entiendo.", meaningId: "Saya tidak mengerti.", speechLang: "ar-EG", tip: "It is okay to ask. mish = not (Egyptian)." },
+      { word: "عَنْدي سُؤال", ipa: "3andi su'aal", meaning: "질문 있어요.", meaningEn: "I have a question.", meaningEs: "Tengo una pregunta.", meaningId: "Saya punya pertanyaan.", speechLang: "ar-EG", tip: "3andi = I have. su'aal = question. Say it before you get stuck." },
+      { word: "اِسْتَنّى شْوَيّة، لو سَمَحْت", ipa: "estanna shwayya, law samaht", meaning: "잠시만 기다려 주세요.", meaningEn: "Wait a moment, please.", meaningEs: "Espere un momento, por favor.", meaningId: "Tolong tunggu sebentar.", speechLang: "ar-EG", tip: "shwayya = a little/a moment. A polite pause at work." },
+      { word: "شُكْراً", ipa: "shukran", meaning: "감사합니다.", meaningEn: "Thank you.", meaningEs: "Gracias.", meaningId: "Terima kasih.", speechLang: "ar-EG", tip: "End politely and clearly." },
+      { word: "هَبْعَت إيميل", ipa: "hab3at email", meaning: "이메일 보낼게요.", meaningEn: "I'll send an email.", meaningEs: "Enviaré un correo.", meaningId: "Saya akan kirim email.", speechLang: "ar-EG", tip: "ha- = will (Egyptian future). hab3at = I'll send." },
+      { word: "بُصّ على دَه، لو سَمَحْت", ipa: "boss 3ala da, law samaht", meaning: "확인해 주세요.", meaningEn: "Please check this.", meaningEs: "Revísalo, por favor.", meaningId: "Tolong periksa ini.", speechLang: "ar-EG", tip: "boss = look. da = this. Useful for documents." },
+    ],
+    study: [
+      { word: "مِش فاهِم", ipa: "mish faahem", meaning: "이해 못 했어요.", meaningEn: "I don't understand.", meaningEs: "No entiendo.", meaningId: "Saya tidak mengerti.", speechLang: "ar-EG", tip: "A classroom survival phrase. Say it without fear." },
+      { word: "تاني، لو سَمَحْت", ipa: "taani, law samaht", meaning: "다시 말해 주세요.", meaningEn: "Again, please.", meaningEs: "Otra vez, por favor.", meaningId: "Tolong ulangi.", speechLang: "ar-EG", tip: "taani = again. Ask before you fall behind." },
+      { word: "الكِلْمة دي مَعْناها إيه؟", ipa: "el-kelma di ma3naaha eh?", meaning: "이 단어 무슨 뜻이에요?", meaningEn: "What does this word mean?", meaningEs: "¿Qué significa esta palabra?", meaningId: "Apa arti kata ini?", speechLang: "ar-EG", tip: "kelma = word. di = this (feminine). A real learner question." },
+      { word: "اِشْرَحْها تاني، لو سَمَحْت", ipa: "eshrah-ha taani, law samaht", meaning: "다시 설명해 주세요.", meaningEn: "Please explain it again.", meaningEs: "Explícalo otra vez, por favor.", meaningId: "Tolong jelaskan lagi.", speechLang: "ar-EG", tip: "eshrah = explain. Ask for another explanation." },
+      { word: "عايِز أَتْعَلِّم", ipa: "3aayez at3allem", meaning: "공부하고 싶어요.", meaningEn: "I want to learn.", meaningEs: "Quiero aprender.", meaningId: "Saya mau belajar.", speechLang: "ar-EG", tip: "3aayez = I want. at3allem = to learn. A direct learning sentence." },
+      { word: "شُكْراً يا أُسْتاذ", ipa: "shukran ya ostaaz", meaning: "감사합니다, 선생님.", meaningEn: "Thank you, teacher.", meaningEs: "Gracias, profesor.", meaningId: "Terima kasih, Pak.", speechLang: "ar-EG", tip: "ya = O (address). ostaaz = teacher/sir. End the lesson politely." },
+    ],
+    hobby: [
+      { word: "أنا بَحِبّ المُوسيقى", ipa: "ana baheb el-mosiiqa", meaning: "저는 음악을 좋아해요.", meaningEn: "I like music.", meaningEs: "Me gusta la música.", meaningId: "Saya suka musik.", speechLang: "ar-EG", tip: "baheb = I love/like (Egyptian). A short, useful opinion." },
+      { word: "دَه عَجَبْني", ipa: "da 3agabni", meaning: "마음에 들어요.", meaningEn: "I like it.", meaningEs: "Me gusta.", meaningId: "Saya suka ini.", speechLang: "ar-EG", tip: "3agabni = it pleased me. A tiny opinion you can use anywhere." },
+      { word: "هِوايْتي القِراية", ipa: "hewaayti el-eraaya", meaning: "제 취미는 독서예요.", meaningEn: "My hobby is reading.", meaningEs: "Mi pasatiempo es leer.", meaningId: "Hobi saya membaca.", speechLang: "ar-EG", tip: "hewaaya = hobby. eraaya = reading. Swap in your own hobby." },
+      { word: "دَه حِلْو أَوي", ipa: "da helw awi", meaning: "재미있어요.", meaningEn: "This is really nice.", meaningEs: "Esto es muy bueno.", meaningId: "Ini menyenangkan.", speechLang: "ar-EG", tip: "helw = nice/sweet. awi = very (Egyptian). A tiny reaction." },
+      { word: "يالّا نِعْمِلْها سَوا", ipa: "yalla ne3melha sawa", meaning: "같이 해요.", meaningEn: "Let's do it together.", meaningEs: "Hagámoslo juntos.", meaningId: "Mari kita lakukan bersama.", speechLang: "ar-EG", tip: "yalla = come on. sawa = together. Invite someone naturally." },
+      { word: "رَشَّحْلي حاجة، لو سَمَحْت", ipa: "rashshahli haaga, law samaht", meaning: "추천해 주세요.", meaningEn: "Recommend me something, please.", meaningEs: "Recomiéndame algo, por favor.", meaningId: "Tolong rekomendasikan sesuatu.", speechLang: "ar-EG", tip: "haaga = something (Egyptian). Ask for a song, show, or place." },
+    ],
+    exam: [
+      { word: "الاِمْتِحان إِمْتى؟", ipa: "el-emtihaan emta?", meaning: "시험이 언제예요?", meaningEn: "When is the exam?", meaningEs: "¿Cuándo es el examen?", meaningId: "Kapan ujiannya?", speechLang: "ar-EG", tip: "emta = when (Egyptian). emtihaan = exam. A real test-day question." },
+      { word: "عَنْدي سُؤال", ipa: "3andi su'aal", meaning: "질문 있어요.", meaningEn: "I have a question.", meaningEs: "Tengo una pregunta.", meaningId: "Saya punya pertanyaan.", speechLang: "ar-EG", tip: "3andi su'aal = I have a question. Say it before you freeze." },
+      { word: "اِشْرَحْها تاني، لو سَمَحْت", ipa: "eshrah-ha taani, law samaht", meaning: "다시 설명해 주세요.", meaningEn: "Please explain it again.", meaningEs: "Explícalo otra vez, por favor.", meaningId: "Tolong jelaskan lagi.", speechLang: "ar-EG", tip: "eshrah = explain. Ask for a clearer version." },
+      { word: "عايِز وَقْت زِيادة", ipa: "3aayez wa't ziyaada", meaning: "시간이 더 필요해요.", meaningEn: "I need more time.", meaningEs: "Necesito más tiempo.", meaningId: "Saya butuh waktu lagi.", speechLang: "ar-EG", tip: "wa't = time. ziyaada = extra. A real request under pressure." },
+      { word: "أنا جاهِز", ipa: "ana gaahez", meaning: "준비됐어요.", meaningEn: "I am ready.", meaningEs: "Estoy listo.", meaningId: "Saya sudah siap.", speechLang: "ar-EG", tip: "gaahez = ready (a man). Note the Egyptian hard g. A confidence line." },
+      { word: "مَعْرَفْش الإِجابة", ipa: "ma3rafsh el-egaaba", meaning: "답을 모르겠어요.", meaningEn: "I don't know the answer.", meaningEs: "No sé la respuesta.", meaningId: "Saya tidak tahu jawabannya.", speechLang: "ar-EG", tip: "ma3rafsh = I don't know (Egyptian ما...ش). egaaba = answer." },
     ],
   },
 };
@@ -634,7 +709,11 @@ export const SURVIVAL_PHRASE_FAMILIES: Partial<Record<DailySpeakingLanguage, Rec
 
 const DAILY_SPEAKING_GOALS: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"];
 
-const GOAL_CONTEXT_TIPS: Record<LearningGoal, Record<DailySpeakingLanguage, string>> = {
+// Inner map is Partial because the reader-native axis is only ever ko/en/es/id
+// (Arabic is a LEARNING TARGET, never a native UI language). A new "arabic"
+// member of DailySpeakingLanguage therefore needs no reader-side tip here; all
+// reads go through getGoalContextTip(...) which already falls back to English.
+const GOAL_CONTEXT_TIPS: Record<LearningGoal, Partial<Record<DailySpeakingLanguage, string>>> = {
   travel: {
     english: "Travel context: use it with staff, drivers, shopkeepers, or strangers who can help.",
     korean: "여행 상황: 직원, 기사님, 가게 주인, 또는 도와줄 수 있는 사람에게 써요.",

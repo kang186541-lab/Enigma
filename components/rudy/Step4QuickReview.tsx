@@ -14,6 +14,7 @@ import type { ReviewQuestion } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { PhonemeCoaching } from "./PhonemeCoaching";
+import { BidiTargetText } from "@/components/BidiTargetText";
 
 const RUDY_RECORDING_MS = 8000;
 
@@ -606,7 +607,9 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         {isSpeakQ ? (
           /* SPEAK question */
           <View style={s.speakWrap}>
-            <Text style={s.sentenceText}>{sentence}</Text>
+            <BidiTargetText targetLang={speechLang} rtlAlign="center" style={s.sentenceText}>
+              {sentence}
+            </BidiTargetText>
             {meaning ? <Text style={s.meaningText}>{meaning}</Text> : null}
           </View>
         ) : (
@@ -640,7 +643,9 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
             </View>
             {qPhase === "revealed" && q.fullSentence && (
               <View style={s.fullSentenceBox}>
-                <Text style={s.fullSentenceText}>{q.fullSentence}</Text>
+                <BidiTargetText targetLang={q.speechLang ?? sttLang} style={s.fullSentenceText}>
+                  {q.fullSentence}
+                </BidiTargetText>
                 {q.fullSentenceMeaning && (
                   <Text style={s.fullSentenceMeaning}>{getMeaning(q.fullSentenceMeaning, lc)}</Text>
                 )}
@@ -662,7 +667,9 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
           <EmojiText style={s.resultStars}>{"⭐".repeat(stars).padEnd(3, "☆")}</EmojiText>
           <Text style={s.resultScore}>{pronScore}{pointsSuffix}</Text>
           <View style={s.resultSentence}>
-            <Text style={s.resultSentenceText}>{sentence}</Text>
+            <BidiTargetText targetLang={speechLang} style={s.resultSentenceText}>
+              {sentence}
+            </BidiTargetText>
             <Pressable onPress={() => playTTS(sentence, speechLang)}>
               <Ionicons name="volume-medium" size={14} color={C.gold} />
             </Pressable>
