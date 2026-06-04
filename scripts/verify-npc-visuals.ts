@@ -58,6 +58,18 @@ const scenePlateRequirements: Array<[string, string]> = [
   ["isabel", "isabel_shopping_scene.png"],
   ["carlos", "carlos_bar_scene.png"],
   ["amira", "amira_bank_scene.png"],
+  ["ryan", "ryan_fast_food_scene.png"],
+  ["nari", "nari_transit_scene.png"],
+  ["derek", "derek_guesthouse_scene.png"],
+  ["mei", "mei_pharmacy_scene.png"],
+  ["juno", "juno_delivery_scene.png"],
+  ["gloria", "gloria_returns_scene.png"],
+  ["stan", "stan_post_office_scene.png"],
+  ["hana", "hana_social_scene.png"],
+  ["vincent", "vincent_apartment_scene.png"],
+  ["claire", "claire_interview_scene.png"],
+  ["officer_kwon", "officer_kwon_visa_scene.png"],
+  ["luca", "luca_hair_salon_scene.png"],
 ];
 
 for (const [id, filename] of scenePlateRequirements) {
