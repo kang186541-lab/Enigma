@@ -35,6 +35,7 @@ import {
   SPEAKING_DAILY_GOAL,
 } from "@/lib/speakingProgress";
 import { C, F } from "@/constants/theme";
+import { BidiTargetText } from "@/components/BidiTargetText";
 
 type BridgeState = {
   day: DayData;
@@ -82,32 +83,50 @@ const FALLBACK_SENTENCE: Record<LearningLangKey, LessonSentence> = {
       es: "Hola, me llamo Rudy.",
     },
   },
+  // Arabic (BETA, Egyptian colloquial): the 30-day course content is a follow-on,
+  // so a missing Arabic course day degrades to this fallback opener instead of
+  // crashing. Shown with harakat for beginners.
+  arabic: {
+    text: "أهلاً، أنا اسمي رودي.",
+    speechLang: "ar-EG",
+    meaning: {
+      ko: "안녕하세요. 제 이름은 Rudy예요.",
+      en: "Hello, my name is Rudy.",
+      es: "Hola, me llamo Rudy.",
+    },
+  },
 };
 
-const LANGUAGE_LABEL: Record<NativeLanguage, Record<NativeLanguage, string>> = {
+// Outer axis = native UI language (ko/en/es/id). Inner axis = the learning
+// TARGET being labeled, so it is keyed by LearningLangKey to include Arabic.
+const LANGUAGE_LABEL: Record<NativeLanguage, Record<LearningLangKey, string>> = {
   korean: {
     korean: "한국어",
     english: "영어",
     spanish: "스페인어",
     indonesian: "인도네시아어",
+    arabic: "아랍어",
   },
   english: {
     korean: "Korean",
     english: "English",
     spanish: "Spanish",
     indonesian: "Indonesian",
+    arabic: "Arabic",
   },
   spanish: {
     korean: "coreano",
     english: "inglés",
     spanish: "español",
     indonesian: "indonesio",
+    arabic: "árabe",
   },
   indonesian: {
     korean: "Korea",
     english: "Inggris",
     spanish: "Spanyol",
     indonesian: "Indonesia",
+    arabic: "Arab",
   },
 };
 
@@ -130,7 +149,7 @@ function getFirstSentence(day: DayData, learnLang: LearningLangKey): LessonSente
   return LESSON_CONTENT[day.id]?.[learnLang]?.step1Sentences?.[0] ?? FALLBACK_SENTENCE[learnLang];
 }
 
-function copy(nativeLang: NativeLanguage, learnLang: NativeLanguage) {
+function copy(nativeLang: NativeLanguage, learnLang: LearningLangKey) {
   const target = LANGUAGE_LABEL[nativeLang][learnLang];
   if (nativeLang === "korean") {
     return {
@@ -309,7 +328,9 @@ export default function DailyLessonBridge() {
 
           <View style={styles.phraseCard}>
             <Text style={styles.label}>{text.phraseLabel}</Text>
-            <Text style={styles.phrase}>{state.sentence.text}</Text>
+            <BidiTargetText targetLang={state.sentence.speechLang} style={styles.phrase}>
+              {state.sentence.text}
+            </BidiTargetText>
             <Text style={styles.meaning}>{meaning}</Text>
           </View>
 

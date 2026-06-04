@@ -23,6 +23,7 @@ const LANG_COLORS: Record<TutorLanguage, string> = {
   spanish: "#c97b27",
   korean:  "#9b8bb4",
   indonesian: "#6BCB9D",
+  arabic: "#C9A227",
 };
 
 type NLang = "korean" | "english" | "spanish" | "indonesian";
@@ -102,6 +103,7 @@ const GROUP_LABELS: Record<TutorLanguage, Record<NLang, string>> = {
   spanish: { korean: "스페인어", english: "Spanish", spanish: "Español", indonesian: "Spanyol" },
   korean:  { korean: "한국어", english: "Korean", spanish: "Coreano", indonesian: "Korea" },
   indonesian: { korean: "인도네시아어", english: "Indonesian", spanish: "Indonesio", indonesian: "Indonesia" },
+  arabic: { korean: "아랍어 (이집트)", english: "Arabic (Egyptian)", spanish: "Árabe (egipcio)", indonesian: "Arab (Mesir)" },
 };
 
 const STYLE_LABELS: Record<"formal" | "casual", Record<NLang, string>> = {

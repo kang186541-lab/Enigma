@@ -20,13 +20,23 @@ import { LESSON_CONTENT, MISSION_CONTENT, REVIEW_CONTENT, type LearningLangKey }
 import type { LearningGoal, SpeakingProgress } from "../lib/learnerProfile";
 import { RUDY_GUIDE_CARDS } from "../lib/rudyGuideCards";
 
-// All four languages now run through the content-count loops. Indonesian
-// (id-ID) is lock-covered for what these loops actually check: the day 1-6
-// survival-phrase families, per-goal daily-speaking content, and survival
-// coverage. (The days 7-30 course UNITS are enrichment and are NOT asserted by
-// these loops, so Indonesian is promoted to first-class on day1-6 + daily
-// speaking; unit 2-5 course content remains a non-blocking follow-on.)
-const languages: LearningLangKey[] = ["korean", "english", "spanish", "indonesian"];
+// All five learning targets now run through the content-count loops.
+// Indonesian (id-ID) and Arabic / Egyptian colloquial (ar-EG) are lock-covered
+// for what these loops actually check: per-goal daily-speaking content (>=5
+// unique A1 phrases with ko/en/es meanings, the target speechLang, and a goal
+// context tip) and Mission-Talk native situation text. (The days 7-30 course
+// UNITS are enrichment and are NOT asserted by these loops.)
+//
+// Arabic note: its day 1-6 LESSON/MISSION/REVIEW content exists and IS asserted
+// here (Mission-Talk situation loop + day1-6 collection), and all 7 goal loops
+// pass. What does NOT yet exist for Arabic — and is therefore deliberately NOT
+// asserted — is the survival-phrase FAMILY mapping: there is no
+// `dayOneToSixSurvivalFamilies.arabic` and no `SURVIVAL_PHRASE_FAMILIES.arabic`,
+// so the day1-6 survival-family loop and `getDailySpeakingSurvivalCoverage`
+// (7-10 exposures) simply iterate nothing for Arabic. Authoring those
+// family→phrase maps is the documented follow-on; per the "only assert content
+// that exists" rule we do not invent them here.
+const languages: LearningLangKey[] = ["korean", "english", "spanish", "indonesian", "arabic"];
 const goals: LearningGoal[] = ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"];
 const onboardingSource = readFileSync("app/onboarding.tsx", "utf8");
 const speakSource = readFileSync("app/(tabs)/speak.tsx", "utf8");
@@ -64,7 +74,14 @@ const aiTextSource = readFileSync("server/aiText.ts", "utf8");
 const geminiSource = readFileSync("server/gemini.ts", "utf8");
 const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as { dependencies?: Record<string, string> };
 
-const dayOneToSixSurvivalFamilies: Record<LearningLangKey, Record<string, string[]>> = {
+// Partial: this is the day 1-6 survival-phrase FAMILY mapping. The loop below
+// only checks the families authored here. Arabic is now in the `languages`
+// array and its day 1-6 LESSON/MISSION/REVIEW content exists, but its
+// survival-family → phrase mapping has NOT been authored, so there is no
+// `arabic` key here and the `?? {}` fallback at the loop makes Arabic iterate
+// no families. (Authoring the Arabic survival-family map is the documented
+// follow-on; we do not invent assertions for content that does not exist.)
+const dayOneToSixSurvivalFamilies: Partial<Record<LearningLangKey, Record<string, string[]>>> = {
   english: {
     greeting: ["hello"],
     goodbye: ["goodbye", "see you later", "take care"],
@@ -892,7 +909,7 @@ assert.ok(
 
 for (const lang of languages) {
   const courseText = collectDayOneToSixText(lang);
-  for (const [family, variants] of Object.entries(dayOneToSixSurvivalFamilies[lang])) {
+  for (const [family, variants] of Object.entries(dayOneToSixSurvivalFamilies[lang] ?? {})) {
     assert.ok(
       variants.some((variant) => courseText.includes(normalizeContentText(variant))),
       `Day 1-6 ${lang} curriculum is missing survival phrase family: ${family}`
@@ -910,7 +927,7 @@ for (const lang of languages) {
       assert.ok(phrase.meanings.korean, `${lang}/${goal}/${phrase.phrase} missing Korean meaning`);
       assert.ok(phrase.meanings.english, `${lang}/${goal}/${phrase.phrase} missing English meaning`);
       assert.ok(phrase.meanings.spanish, `${lang}/${goal}/${phrase.phrase} missing Spanish meaning`);
-      assert.ok(phrase.speechLang === "ko-KR" || phrase.speechLang === "en-US" || phrase.speechLang === "es-ES" || phrase.speechLang === "id-ID");
+      assert.ok(phrase.speechLang === "ko-KR" || phrase.speechLang === "en-US" || phrase.speechLang === "es-ES" || phrase.speechLang === "id-ID" || phrase.speechLang === "ar-EG");
       assert.equal(phrase.practiceContext, goal, `${lang}/${goal}/${phrase.phrase} missing goal practice context`);
       assert.ok(phrase.contextTip, `${lang}/${goal}/${phrase.phrase} missing context tip`);
     }
@@ -943,6 +960,41 @@ for (const lang of languages) {
 assert.equal(getDailySpeakingSentenceLoop("korean", "exam")[0]?.phrase, "시험이 언제예요?");
 assert.equal(getDailySpeakingSentenceLoop("english", "exam")[0]?.phrase, "When is the exam?");
 assert.equal(getDailySpeakingSentenceLoop("spanish", "exam")[0]?.phrase, "¿Cuándo es el examen?");
+
+// Arabic (Egyptian colloquial, ar-EG) is a LEARNING TARGET, mirrored on the
+// Indonesian daily-speaking playbook. These anchors lock that the Arabic daily
+// speaking content actually exists and stays on the real ar-EG phoneme path
+// (NOT the id-ID similarity fallback). They assert only content that exists:
+// the per-goal loops + day 1-6 lessons. Arabic survival-family coverage is the
+// documented follow-on and is intentionally not asserted (see comments above).
+const arabicExamLoop = getDailySpeakingSentenceLoop("arabic", "exam");
+assert.ok(arabicExamLoop.length >= SPEAKING_DAILY_GOAL, "Arabic exam loop should have a full day of speakable sentences");
+assert.equal(arabicExamLoop[0]?.phrase, "الاِمْتِحان إِمْتى؟", "Arabic exam loop should lead with the Egyptian colloquial exam question");
+assert.ok(
+  arabicExamLoop.every((phrase) => phrase.speechLang === "ar-EG"),
+  "Every Arabic daily-speaking phrase must stay on the ar-EG locale so Azure uses the real phoneme assessment path, not the id-ID similarity fallback",
+);
+assert.equal(
+  getDailySpeakingMissionPhrase("arabic", "exam", 0)?.phrase,
+  arabicExamLoop[0].phrase,
+  "Arabic first mission phrase should be the locked exam-loop opener",
+);
+assert.equal(
+  getDailySpeakingMissionPhrase("arabic", "exam", arabicExamLoop.length)?.phrase,
+  arabicExamLoop[0].phrase,
+  "Arabic mission phrase should wrap back to the loop opener after a full cycle",
+);
+assert.equal(getDailySpeakingSentenceLoop("arabic", null)[0]?.phrase, "أَهْلاً", "Arabic first-day (no-goal) loop should open with the everyday Egyptian hello");
+// Arabic day 1-6 course content must exist on the real ar-EG locale.
+for (let day = 1; day <= 6; day += 1) {
+  const arabicLesson = LESSON_CONTENT[`day_${day}`]?.arabic;
+  assert.ok(arabicLesson, `Arabic day ${day} lesson content should exist`);
+  assert.ok(
+    (arabicLesson?.step1Sentences ?? []).length > 0 &&
+      (arabicLesson?.step1Sentences ?? []).every((sentence) => sentence.speechLang === "ar-EG"),
+    `Arabic day ${day} listen-and-repeat sentences should be authored on the ar-EG locale`,
+  );
+}
 
 const englishExamLoop = getDailySpeakingSentenceLoop("english", "exam");
 assert.equal(getDailySpeakingMissionPhrase("english", "exam", 0)?.phrase, englishExamLoop[0].phrase);

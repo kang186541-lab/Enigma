@@ -7,6 +7,7 @@ import { EmojiText } from "@/components/EmojiText";
 import { getApiUrl } from "@/lib/query-client";
 import { getCoachingTip, getErrorLabel } from "@/data/phonemeCoaching";
 import { registerGlobalSound, registerGlobalWebAudio } from "@/lib/ttsManager";
+import { BidiTargetText } from "@/components/BidiTargetText";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -279,7 +280,7 @@ export function PhonemeCoaching({ wordScores, nativeLang, targetLang, speechLang
               }}
             >
               <EmojiText style={s.wordIcon}>{w.score >= WEAK_THRESHOLD ? "✅" : "⚠️"}</EmojiText>
-              <Text style={[s.wordText, isWeak && s.wordTextWeak]}>{w.word}</Text>
+              <BidiTargetText targetLang={speechLang} style={[s.wordText, isWeak && s.wordTextWeak]}>{w.word}</BidiTargetText>
               <Text style={[s.wordScore, isWeak && s.wordScoreWeak]}>{w.score}%</Text>
               {isWeak ? (
                 <View style={s.expandHint}>

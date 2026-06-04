@@ -51,7 +51,7 @@ const TAB_BAR_HEIGHT = 49;
 const SESSION_SIZE = 8;
 const WEAK_THRESHOLD = 75;
 
-type LangTab = "korean" | "english" | "spanish" | "indonesian";
+type LangTab = "korean" | "english" | "spanish" | "indonesian" | "arabic";
 
 interface Phrase {
   word: string;
@@ -64,7 +64,12 @@ interface Phrase {
   contextTip?: string;
 }
 
-const PHRASE_SETS: Record<LangTab, Phrase[]> = {
+// Partial: open-practice drill sets are authored per language. Arabic (BETA) is
+// a recognized learning target but ships its drill words in the Content phase,
+// so a missing key here falls back to an empty pool at the access site (the
+// guided daily-speaking flow drives Arabic practice in the meantime). ko/en/es/id
+// keys are unchanged.
+const PHRASE_SETS: Partial<Record<LangTab, Phrase[]>> = {
   english: [
     // ── A1 Beginner ──────────────────────────────────────────────────────────
     { word: "Apple", ipa: "/ˈæp.əl/", meaning: "사과", level: "A1", speechLang: "en-US", tip: "Two syllables: AE-pul. The 'æ' vowel is open and short." },
@@ -789,7 +794,7 @@ function buildSession(
   goal?: LearningGoal | null,
   nativeLang: NativeLanguage = "english"
 ): Phrase[] {
-  const all = PHRASE_SETS[lang];
+  const all = PHRASE_SETS[lang] ?? [];
   const weakSet = new Set(weakWords);
   const lastSet = new Set(lastSeenWords);
   const shuffle = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5);
@@ -839,7 +844,7 @@ function routeParam(value: string | string[] | undefined): string | undefined {
 }
 
 function normalizeLangTab(value: unknown): LangTab | null {
-  return value === "korean" || value === "english" || value === "spanish" || value === "indonesian" ? value : null;
+  return value === "korean" || value === "english" || value === "spanish" || value === "indonesian" || value === "arabic" ? value : null;
 }
 
 function normalizeDeckType(value: unknown): "srs" | "beginner" | "advanced" {
@@ -859,6 +864,7 @@ function langFromSpeechLang(value: string | undefined): LangTab | null {
   if (lang.startsWith("en")) return "english";
   if (lang.startsWith("es")) return "spanish";
   if (lang.startsWith("id")) return "indonesian";
+  if (lang.startsWith("ar")) return "arabic";
   return null;
 }
 
@@ -866,6 +872,7 @@ function speechLangForLang(lang: LangTab): string {
   if (lang === "korean") return "ko-KR";
   if (lang === "spanish") return "es-ES";
   if (lang === "indonesian") return "id-ID";
+  if (lang === "arabic") return "ar-EG";
   return "en-US";
 }
 
@@ -903,10 +910,10 @@ function getReviewSentencePhrase(
 
 function getFirstSpeakingMissionCopy(nativeLang: NativeLanguage, targetLang: LangTab, goal: LearningGoal | null) {
   const targetName: Record<NativeLanguage, Record<LangTab, string>> = {
-    korean: { korean: "한국어", english: "영어", spanish: "스페인어", indonesian: "인도네시아어" },
-    english: { korean: "Korean", english: "English", spanish: "Spanish", indonesian: "Indonesian" },
-    spanish: { korean: "coreano", english: "inglés", spanish: "español", indonesian: "indonesio" },
-    indonesian: { korean: "Korea", english: "Inggris", spanish: "Spanyol", indonesian: "Indonesia" },
+    korean: { korean: "한국어", english: "영어", spanish: "스페인어", indonesian: "인도네시아어", arabic: "아랍어" },
+    english: { korean: "Korean", english: "English", spanish: "Spanish", indonesian: "Indonesian", arabic: "Arabic" },
+    spanish: { korean: "coreano", english: "inglés", spanish: "español", indonesian: "indonesio", arabic: "árabe" },
+    indonesian: { korean: "Korea", english: "Inggris", spanish: "Spanyol", indonesian: "Indonesia", arabic: "Arab" },
   };
   const goalLabel: Partial<Record<LearningGoal, Record<NativeLanguage, string>>> = {
     travel: { korean: "여행에서 쓸", english: "travel", spanish: "de viaje", indonesian: "untuk perjalanan" },

@@ -2,7 +2,7 @@ import { ImageSourcePropType, Platform } from "react-native";
 import { Audio } from "expo-av";
 import { getApiUrl } from "@/lib/query-client";
 
-export type TutorLanguage = "english" | "spanish" | "korean" | "indonesian";
+export type TutorLanguage = "english" | "spanish" | "korean" | "indonesian" | "arabic";
 
 export const TUTOR_IMAGES: Record<string, ImageSourcePropType> = {
   // Story character tutors reuse existing avatar assets

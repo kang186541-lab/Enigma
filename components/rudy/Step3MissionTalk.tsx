@@ -12,6 +12,7 @@ import { EmojiText } from "@/components/EmojiText";
 import { getApiUrl } from "@/lib/query-client";
 import { apiFetchWithAuth } from "@/lib/apiFetchWithAuth";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
+import { BidiTargetText, isRtlLang, isolateLtrRuns } from "@/components/BidiTargetText";
 import { type MissionTalkLangData } from "@/lib/lessonContent";
 import type { Tri } from "@/lib/dailyCourseData";
 
@@ -145,6 +146,9 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   const sttLang   = STT_LANG[learningLang] ?? "en-US";
   const ttsLang   = data.speechLang;
   const rudyVoice = RUDY_VOICE[learningLang] ?? "en-GB-RyanNeural";
+  // RTL targets (Arabic): chat bubbles + suggested answers read right-to-left.
+  // LTR targets keep the exact existing rendering.
+  const targetRtl = isRtlLang(learningLang);
 
   const buildHistory = (msgs: ChatMsg[]) =>
     msgs.filter((m) => !m.sttError && !m.connectionError).map((m) => ({
@@ -820,22 +824,30 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
             )}
             {msg.role === "rudy" ? (
               <View>
-                {/* Tappable words */}
-                <Text style={s.bubbleText}>
-                  {msg.text.split(/(\s+)/g).map((token, ti) => {
-                    const cleaned = token.replace(/[*_]/g, "").replace(/[.,!?;:"""''()]/g, "");
-                    if (!cleaned.trim()) return <Text key={ti}>{token}</Text>;
-                    const isBold = token.startsWith("**") && token.endsWith("**");
-                    return (
-                      <Text
-                        key={ti}
-                        style={isBold ? { color: C.gold, fontFamily: F.bodySemi } : undefined}
-                        onPress={() => lookupWord(cleaned, msg.text)}
-                      >
-                        {isBold ? token.slice(2, -2) : token}
-                      </Text>
-                    );
-                  })}
+                {/* Tappable words. RTL targets render tokens in visual order
+                    (reversed) so the line reads right-to-left; a flattened
+                    sibling <Text> array is not reordered by writingDirection
+                    alone. LTR targets keep the exact original order. */}
+                <Text style={targetRtl ? [s.bubbleText, s.bubbleTextRtl] : s.bubbleText}>
+                  {(() => {
+                    const parts = msg.text.split(/(\s+)/g);
+                    const ordered = targetRtl ? parts.slice().reverse() : parts;
+                    return ordered.map((token, ti) => {
+                      const cleaned = token.replace(/[*_]/g, "").replace(/[.,!?;:"""''()]/g, "");
+                      if (!cleaned.trim()) return <Text key={ti}>{token}</Text>;
+                      const isBold = token.startsWith("**") && token.endsWith("**");
+                      const shown = isBold ? token.slice(2, -2) : token;
+                      return (
+                        <Text
+                          key={ti}
+                          style={isBold ? { color: C.gold, fontFamily: F.bodySemi } : undefined}
+                          onPress={() => lookupWord(cleaned, msg.text)}
+                        >
+                          {targetRtl ? isolateLtrRuns(shown) : shown}
+                        </Text>
+                      );
+                    });
+                  })()}
                 </Text>
                 {/* Translation toggle + text */}
                 <Pressable
@@ -854,7 +866,9 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 ) : null}
               </View>
             ) : (
-              <Text style={[s.bubbleText, s.userBubbleText]}>{msg.text}</Text>
+              <BidiTargetText targetLang={learningLang} style={[s.bubbleText, s.userBubbleText]}>
+                {msg.text}
+              </BidiTargetText>
             )}
             {msg.role === "user" && msg.isVoice && (
               <Text style={s.voiceBadge}>{voiceBonus}</Text>
@@ -900,7 +914,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 style={({ pressed }) => [s.suggestBtn, pressed && { opacity: 0.75 }]}
                 onPress={() => sendUserMessage(ans, false)}
               >
-                <Text style={s.suggestBtnText}>{ans}</Text>
+                <BidiTargetText targetLang={learningLang} style={s.suggestBtnText}>{ans}</BidiTargetText>
                 <Ionicons name="mic" size={11} color={C.gold} />
               </Pressable>
             ))}
@@ -1040,6 +1054,7 @@ const s = StyleSheet.create({
   rudyLabel:    { fontSize: 10, fontFamily: F.label, color: C.goldDim, marginBottom: 2 },
   errorLabel:   { color: "rgba(201,162,39,0.5)" },
   bubbleText:   { fontSize: 15, fontFamily: F.body, color: C.parchment, lineHeight: 22 },
+  bubbleTextRtl: { writingDirection: "rtl", textAlign: "right" },
   userBubbleText: { color: C.gold },
   voiceBadge:   { fontSize: 10, fontFamily: F.label, color: C.goldDim, textAlign: "right", marginTop: 2 },
 

@@ -30,6 +30,7 @@ import { localDateString } from "@/lib/progressStorage";
 import { XPToast } from "@/components/XPToast";
 import { RippleButton } from "@/components/RippleButton";
 import { EmojiText } from "@/components/EmojiText";
+import { BidiTargetText } from "@/components/BidiTargetText";
 import { C, F } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
@@ -1877,7 +1878,7 @@ export default function CardsScreen() {
                   />
                   <View style={styles.cardInner}>
                     <EmojiText style={styles.cardEmoji}>{card?.emoji ?? ""}</EmojiText>
-                    <Text style={styles.cardWordFront}>{card?.word}</Text>
+                    <BidiTargetText targetLang={card?.speechLang} rtlAlign="center" style={styles.cardWordFront}>{card?.word}</BidiTargetText>
                     {card?.pronunciation && (
                       <Text style={styles.cardPronunciation}>/{card.pronunciation}/</Text>
                     )}
@@ -1929,14 +1930,14 @@ export default function CardsScreen() {
                   />
                   <View style={styles.cardInnerBack}>
                     <EmojiText style={styles.cardEmojiBack}>{card?.emoji ?? ""}</EmojiText>
-                    <Text style={styles.cardWordBack}>{card?.word}</Text>
+                    <BidiTargetText targetLang={card?.speechLang} rtlAlign="center" style={styles.cardWordBack}>{card?.word}</BidiTargetText>
                     <View style={styles.divider} />
                     <Text style={styles.cardMeaning}>{card?.meanings[nativeLang as NativeLanguage]}</Text>
                     <View style={styles.exampleBox}>
                       <Text style={styles.exampleLabel}>
                         {nativeLang === "korean" ? "예문" : nativeLang === "spanish" ? "Ejemplo" : nativeLang === "indonesian" ? "Contoh" : "Example"}
                       </Text>
-                      <Text style={styles.exampleText}>{card?.example}</Text>
+                      <BidiTargetText targetLang={card?.speechLang} style={styles.exampleText}>{card?.example}</BidiTargetText>
                       {card?.exampleTranslation[nativeLang as NativeLanguage] &&
                         card.exampleTranslation[nativeLang as NativeLanguage] !== card.example && (
                         <Text style={styles.exampleTranslationText}>

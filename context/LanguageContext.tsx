@@ -29,6 +29,36 @@ import { Analytics } from "@/lib/analytics";
 
 export type NativeLanguage = "korean" | "english" | "spanish" | "indonesian";
 
+// ── Learning targets ────────────────────────────────────────────────────────
+// The set of languages a learner can STUDY. This is a superset of the native UI
+// languages: every native language can also be a target, PLUS targets that are
+// intentionally NOT offered as a UI/chrome language. Arabic (Egyptian colloquial,
+// ar-EG) is the first such target — the app chrome stays LTR ko/en/es/id, while
+// the Arabic *target* text is RTL. Keep Arabic OUT of NativeLanguage so it never
+// appears as a selectable native UI language and never forces an `arabic` key on
+// the many Record<NativeLanguage> UI/translation maps.
+export type LearningTargetLanguage = NativeLanguage | "arabic";
+
+// Azure locale per learning target. Mirrors lib/lessonContent.ts SPEECH_LANG;
+// kept here so target wiring is discoverable from the language context too.
+export const LEARNING_TARGET_SPEECH_LANG: Record<LearningTargetLanguage, string> = {
+  korean: "ko-KR",
+  english: "en-US",
+  spanish: "es-ES",
+  indonesian: "id-ID",
+  arabic: "ar-EG",
+};
+
+export function isLearningTargetLanguage(value: unknown): value is LearningTargetLanguage {
+  return (
+    value === "korean" ||
+    value === "english" ||
+    value === "spanish" ||
+    value === "indonesian" ||
+    value === "arabic"
+  );
+}
+
 export interface Level {
   num: number;
   emoji: string;

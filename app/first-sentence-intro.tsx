@@ -321,7 +321,10 @@ function normalizeNative(value: string | undefined): NativeLanguage {
 }
 
 function normalizeLearn(value: string | undefined): DailySpeakingLanguage | null {
-  if (value === "korean" || value === "english" || value === "spanish" || value === "indonesian") return value;
+  if (
+    value === "korean" || value === "english" || value === "spanish" ||
+    value === "indonesian" || value === "arabic"
+  ) return value;
   return null;
 }
 

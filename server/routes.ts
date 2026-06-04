@@ -896,6 +896,10 @@ Student's ${learnName} answer: ${userAnswer}`;
     jisu:   { voice: "ko-KR-SunHiNeural",  lang: "ko-KR" }, // female ✓
     minjun: { voice: "ko-KR-InJoonNeural", lang: "ko-KR" }, // male  ✓
     dewi:   { voice: "id-ID-GadisNeural",  lang: "id-ID" }, // female ✓ (Indonesian)
+    // Arabic (BETA, Egyptian colloquial ar-EG) — both registered so a future
+    // Arabic tutor persona can pick either voice without touching this lock.
+    salma:  { voice: "ar-EG-SalmaNeural",  lang: "ar-EG" }, // female ✓ (Arabic, Egyptian)
+    shakir: { voice: "ar-EG-ShakirNeural", lang: "ar-EG" }, // male  ✓ (Arabic, Egyptian)
     // Story character tutors
     eleanor:     { voice: "en-GB-SoniaNeural",  lang: "en-GB" }, // Lady Eleanor
     tom_tutor:   { voice: "en-US-TonyNeural",   lang: "en-US" }, // Tom
@@ -1043,6 +1047,9 @@ Student's ${learnName} answer: ${userAnswer}`;
     "es-ES": "es-ES-ElviraNeural",
     "es-MX": "es-MX-DaliaNeural",
     "id-ID": "id-ID-GadisNeural",
+    // Arabic (Egyptian colloquial) — Salma is the default target voice for
+    // pronunciation TTS; Shakir (male) is available via TUTOR_AZURE_VOICES.
+    "ar-EG": "ar-EG-SalmaNeural",
   };
 
   // SSML express-as style per voice — applied automatically based on voice name.
@@ -1627,9 +1634,14 @@ Student's ${learnName} answer: ${userAnswer}`;
       const { join } = await import("path");
 
       // Azure Pronunciation Assessment only supports en-US for English (not en-GB, en-AU etc.)
+      // Arabic uses Egyptian colloquial (ar-EG), which Azure Pronunciation
+      // Assessment DOES support at the phoneme level — so it takes this REAL
+      // phoneme path (it is intentionally NOT routed through the id-ID STT
+      // similarity fallback above).
       const sttLang = lang.startsWith("en-") ? "en-US"
                     : lang.startsWith("es-") ? "es-ES"
                     : lang.startsWith("ko-") ? "ko-KR"
+                    : lang.startsWith("ar-") ? "ar-EG"
                     : lang;
 
       const rawBuffer = Buffer.from(audio, "base64");

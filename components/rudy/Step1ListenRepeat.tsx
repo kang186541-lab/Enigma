@@ -14,6 +14,7 @@ import { type LessonSentence, type Step1Config, getRandomFeedback } from "@/lib/
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { PhonemeCoaching } from "./PhonemeCoaching";
+import { BidiTargetText } from "@/components/BidiTargetText";
 
 const RUDY_RECORDING_MS = 8000;
 const RUDY_RECORD_READY_DELAY_MS = 250;
@@ -538,9 +539,13 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       {/* Sentence card */}
       <View style={s.sentenceCard}>
         <Text style={s.sentenceCounter}>{sentIdx + 1}/{sentences.length}</Text>
-        <Text style={s.sentenceText}>
-          {isAudioOnlyRound && !textRevealed ? audioOnlyPlaceholder : sentence.text}
-        </Text>
+        {isAudioOnlyRound && !textRevealed ? (
+          <Text style={s.sentenceText}>{audioOnlyPlaceholder}</Text>
+        ) : (
+          <BidiTargetText targetLang={sentence.speechLang} rtlAlign="center" style={s.sentenceText}>
+            {sentence.text}
+          </BidiTargetText>
+        )}
         {!(isAudioOnlyRound && !textRevealed) && (
           <Text style={s.sentenceMeaning}>{getMeaning(sentence.meaning, lc)}</Text>
         )}
