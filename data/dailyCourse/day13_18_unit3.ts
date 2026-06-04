@@ -154,6 +154,35 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
         ],
       },
     },
+    arabic: {
+      step1Sentences: [
+        { text: "أنا بحِبّ البيتزا والمكرونة. (ana baḥebb el-bitza wel-makarōna)", speechLang: "ar-EG", meaning: { ko: "저는 피자와 파스타를 좋아해요.", en: "I like pizza and pasta.", es: "Me gusta la pizza y la pasta." } },
+        { text: "بتحِبّ أكل إيه؟ (betḥebb akl ēh?)", speechLang: "ar-EG", meaning: { ko: "어떤 음식을 좋아하세요?", en: "What food do you like?", es: "¿Qué comida te gusta?" } },
+        { text: "أنا بحِبّ الأكل الكوري أوي. (ana baḥebb el-akl el-kōri awi)", speechLang: "ar-EG", meaning: { ko: "한국 음식을 정말 좋아해요.", en: "I love Korean food.", es: "Me encanta la comida coreana." } },
+        { text: "أنا مش بحِبّ الأكل الحرّاق. (ana mesh baḥebb el-akl el-ḥarrāʾ)", speechLang: "ar-EG", meaning: { ko: "매운 음식을 안 좋아해요.", en: "I don't like spicy food.", es: "No me gusta la comida picante." }, recallRound: true },
+        { text: "إنت جعان؟ (enta gaʿān?)", speechLang: "ar-EG", meaning: { ko: "배고프세요?", en: "Are you hungry?", es: "¿Tienes hambre?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: أنا بحِبّ ___ (좋아해요) / أنا بحِبّ ___ أوي (정말 좋아해요) / أنا مش بحِبّ ___ (안 좋아해요). 질문: بتحِبّ أكل إيه؟ 'بحِبّ(baḥebb)'는 '좋아하다', 'مش(mesh)'는 부정, 'أوي(awi)'는 '아주'예요.", en: "Pattern: أنا بحِبّ ___ (I like) / أنا بحِبّ ___ أوي (I love, lit. 'I like ___ a lot') / أنا مش بحِبّ ___ (I don't like). Question: بتحِبّ أكل إيه؟ 'baḥebb' = like, 'mesh' = not, 'awi' = very/a lot.", es: "Patrón: أنا بحِبّ ___ (me gusta) / أنا بحِبّ ___ أوي (me encanta) / أنا مش بحِبّ ___ (no me gusta). Pregunta: بتحِبّ أكل إيه؟ 'baḥebb' = gustar, 'mesh' = no, 'awi' = mucho." },
+          examples: { ko: "أنا بحِبّ الفراخ والرُّز. (ana baḥebb el-firākh wel-ruzz — 치킨이랑 밥을 좋아해요.)\nأنا بحِبّ الأكل الإيطالي أوي. (ana baḥebb el-akl el-īṭāli awi — 이탈리아 음식을 정말 좋아해요.)\nأنا مش بحِبّ القهوة المُرّة. (ana mesh baḥebb el-ʾahwa el-murra — 쓴 커피를 안 좋아해요.)", en: "أنا بحِبّ الفراخ والرُّز. (ana baḥebb el-firākh wel-ruzz — I like chicken and rice.)\nأنا بحِبّ الأكل الإيطالي أوي. (ana baḥebb el-akl el-īṭāli awi — I love Italian food.)\nأنا مش بحِبّ القهوة المُرّة. (ana mesh baḥebb el-ʾahwa el-murra — I don't like bitter coffee.)", es: "أنا بحِبّ الفراخ والرُّز. (ana baḥebb el-firākh wel-ruzz — Me gusta el pollo y el arroz.)\nأنا بحِبّ الأكل الإيطالي أوي. (ana baḥebb el-akl el-īṭāli awi — Me encanta la comida italiana.)\nأنا مش بحِبّ القهوة المُرّة. (ana mesh baḥebb el-ʾahwa el-murra — No me gusta el café amargo.)" },
+          mistakes: { ko: "❌ أنا بحِبّ آكل بيتزا. (ana baḥebb ākol bitza)\n✅ أنا بحِبّ البيتزا. (ana baḥebb el-bitza — بحِبّ 뒤에 바로 음식 이름! '먹다(آكل)'를 넣을 필요 없어요.)\n\n❌ أنا لا بحِبّ الحرّاق. (ana laa baḥebb...)\n✅ أنا مش بحِبّ الأكل الحرّاق. (ana mesh baḥebb... — 이집트 구어 부정은 'لا(laa)'가 아니라 'مش(mesh)'예요!)", en: "❌ أنا بحِبّ آكل بيتزا. (ana baḥebb ākol bitza)\n✅ أنا بحِبّ البيتزا. (ana baḥebb el-bitza — Put the food right after بحِبّ — no need to add آكل (eat)!)\n\n❌ أنا لا بحِبّ الحرّاق. (ana laa baḥebb...)\n✅ أنا مش بحِبّ الأكل الحرّاق. (ana mesh baḥebb... — In Egyptian, negate with 'mesh', not the MSA 'laa'!)", es: "❌ أنا بحِبّ آكل بيتزا. (ana baḥebb ākol bitza)\n✅ أنا بحِبّ البيتزا. (ana baḥebb el-bitza — Pon la comida justo después de بحِبّ — no agregues آكل (comer).)\n\n❌ أنا لا بحِبّ الحرّاق. (ana laa baḥebb...)\n✅ أنا مش بحِبّ الأكل الحرّاق. (ana mesh baḥebb... — En egipcio se niega con 'mesh', no con el 'laa' del árabe estándar.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 잠입 수사의 기본은 대화를 이끄는 거야! 'بتحِبّ أكل إيه؟(betḥebb akl ēh?)'로 먼저 물어보고, 답이 오면 'وأنا كمان!(wana kamān!)'(저도요!) 하면 금방 친해질 수 있어~", en: "Detective Rudy's tip: The key to going undercover? Ask 'betḥebb akl ēh?' first — everyone loves talking food! When they answer, say 'wana kamān!' (Me too!) for instant rapport.", es: "Consejo del detective Rudy: ¿La clave para ir encubierto? Pregunta 'betḥebb akl ēh?' primero — ¡a todos les gusta hablar de comida! Cuando respondan, di 'wana kamān!' (¡Yo también!)." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "أنا ___ البيتزا والمكرونة.", answer: "بحِبّ", options: ["بحِبّ", "عايز", "باكل"], fullSentence: "أنا بحِبّ البيتزا والمكرونة.", fullSentenceMeaning: { ko: "저는 피자와 파스타를 좋아해요.", en: "I like pizza and pasta.", es: "Me gusta la pizza y la pasta." } },
+          { type: "select", promptWithBlank: "بتحِبّ ___ إيه؟", answer: "أكل", options: ["أكل", "حد", "مطعم"], fullSentence: "بتحِبّ أكل إيه؟", fullSentenceMeaning: { ko: "어떤 음식을 좋아하세요?", en: "What food do you like?", es: "¿Qué comida te gusta?" } },
+          { type: "select", promptWithBlank: "أنا مش بحِبّ الأكل ___.", answer: "الحرّاق", options: ["الحرّاق", "السُّخن", "السريع"], fullSentence: "أنا مش بحِبّ الأكل الحرّاق.", fullSentenceMeaning: { ko: "매운 음식을 안 좋아해요.", en: "I don't like spicy food.", es: "No me gusta la comida picante." } },
+          { type: "input", promptWithBlank: "إنت ___؟", answer: "جعان", fullSentence: "إنت جعان؟", fullSentenceMeaning: { ko: "배고프세요?", en: "Are you hungry?", es: "¿Tienes hambre?" } },
+          { type: "input", promptWithBlank: "أنا بحِبّ الأكل الكوري ___.", answer: "أوي", fullSentence: "أنا بحِبّ الأكل الكوري أوي.", fullSentenceMeaning: { ko: "한국 음식을 정말 좋아해요.", en: "I love Korean food.", es: "Me encanta la comida coreana." } },
+          { type: "listening", audioText: "إنت جعان؟", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["إنت جعان؟", "أنا بحِبّ الأكل الكوري أوي.", "أنا مش بحِبّ الأكل الحرّاق.", "بتحِبّ أكل إيه؟"], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 
   // ─────────────── Day 14: Ordering at a Restaurant ────────────────────────
@@ -283,6 +312,39 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "Saya ___ ayam, tolong.", answer: "pesan", fullSentence: "Saya pesan ayam, tolong.", fullSentenceMeaning: { ko: "치킨으로 할게요.", en: "I'll have the chicken, please.", es: "Voy a pedir el pollo, por favor." } },
           { type: "input", promptWithBlank: "Boleh saya minta ___?", answer: "air", fullSentence: "Boleh saya minta air?", fullSentenceMeaning: { ko: "물 좀 주세요.", en: "Can I have water, please?", es: "¿Puedo tener agua, por favor?" } },
           { type: "listening", audioText: "Makan di sini atau bawa pulang?", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Makan di sini atau bawa pulang?", "Saya pesan ayam, tolong.", "Boleh saya minta menu?", "Saya mau kopi, tolong."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Hello, my name is ___.", es: "Hola, me llamo ___.", ko: "안녕하세요, 제 이름은 ___이에요." }, fromDay: 4, context: { ko: "자기소개 복습", en: "Self-introduction review", es: "Repaso de presentación" } },
+        { sentence: { en: "Nice to meet you.", es: "Mucho gusto.", ko: "만나서 반가워요." }, fromDay: 4, context: { ko: "자기소개 복습", en: "Self-introduction review", es: "Repaso de presentación" } },
+      ],
+    },
+    arabic: {
+      step1Sentences: [
+        { text: "مُمكن المنيو لو سمحت؟ (mumken el-menyu law samaḥt?)", speechLang: "ar-EG", meaning: { ko: "메뉴판 좀 주시겠어요?", en: "Can I have the menu, please?", es: "¿Puedo ver el menú, por favor?" } },
+        { text: "عايز قهوة، لو سمحت. (ʿāyez ʾahwa, law samaḥt)", speechLang: "ar-EG", meaning: { ko: "커피 한 잔 주세요.", en: "I'd like a coffee, please.", es: "Quiero un café, por favor." } },
+        { text: "مُمكن مَيّة لو سمحت؟ (mumken mayya law samaḥt?)", speechLang: "ar-EG", meaning: { ko: "물 좀 주세요.", en: "Can I have water, please?", es: "¿Puedo tener agua, por favor?" } },
+        { text: "هاخُد الفراخ، لو سمحت. (hākhod el-firākh, law samaḥt)", speechLang: "ar-EG", meaning: { ko: "치킨으로 할게요.", en: "I'll have the chicken, please.", es: "Voy a pedir el pollo, por favor." }, recallRound: true },
+        { text: "هُنا ولا تيك أواي؟ (hena walla tēk away?)", speechLang: "ar-EG", meaning: { ko: "여기서 드실 건가요, 가져가실 건가요?", en: "For here or to go?", es: "¿Para aquí o para llevar?" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: عايز ___ (주세요) / مُمكن ___؟ (~좀 주시겠어요?) / هاخُد ___ (~으로 할게요). 끝에 'لو سمحت(law samaḥt)'(부탁해요)을 붙이면 더 공손해요! 메뉴 요청: مُمكن المنيو لو سمحت؟", en: "Pattern: عايز ___ (I'd like) / مُمكن ___؟ (Can I have ___?) / هاخُد ___ (I'll have/take). Add 'law samaḥt' (please) to be polite! Menu request: mumken el-menyu law samaḥt?", es: "Patrón: عايز ___ (quiero) / مُمكن ___؟ (¿Puedo pedir ___?) / هاخُد ___ (voy a tomar). ¡Agrega 'law samaḥt' (por favor) para ser cortés! Menú: mumken el-menyu law samaḥt?" },
+          examples: { ko: "عايز ستيك وسلطة، لو سمحت. (ʿāyez sitēk we-salaṭa, law samaḥt — 스테이크랑 샐러드 주세요.)\nمُمكن عصير برتقان لو سمحت؟ (mumken ʿaṣīr burtuʾān law samaḥt? — 오렌지 주스 주시겠어요?)\nهاخُد المكرونة، لو سمحت. (hākhod el-makarōna, law samaḥt — 파스타로 할게요.)", en: "عايز ستيك وسلطة، لو سمحت. (ʿāyez sitēk we-salaṭa, law samaḥt — I'd like a steak and a salad, please.)\nمُمكن عصير برتقان لو سمحت؟ (mumken ʿaṣīr burtuʾān law samaḥt? — Can I have orange juice, please?)\nهاخُد المكرونة، لو سمحت. (hākhod el-makarōna, law samaḥt — I'll have the pasta, please.)", es: "عايز ستيك وسلطة، لو سمحت. (ʿāyez sitēk we-salaṭa, law samaḥt — Quiero un bistec y una ensalada, por favor.)\nمُمكن عصير برتقان لو سمحت؟ (mumken ʿaṣīr burtuʾān law samaḥt? — ¿Puedo tener jugo de naranja, por favor?)\nهاخُد المكرونة، لو سمحت. (hākhod el-makarōna, law samaḥt — Voy a pedir la pasta, por favor.)" },
+          mistakes: { ko: "❌ هات المنيو! (hāt el-menyu!)\n✅ مُمكن المنيو لو سمحت؟ (mumken el-menyu law samaḥt? — 명령형 'هات(hāt)'(줘) 대신 'مُمكن... لو سمحت؟'가 공손해요!)\n\n❌ أنا أريد قهوة. (ana urīd ʾahwa)\n✅ عايز قهوة، لو سمحت. (ʿāyez ʾahwa, law samaḥt — '원하다'는 표준어 'أريد'가 아니라 이집트 구어 'عايز(ʿāyez)'예요!)", en: "❌ هات المنيو! (hāt el-menyu!)\n✅ مُمكن المنيو لو سمحت؟ (mumken el-menyu law samaḥt? — Use the polite 'mumken... law samaḥt?' instead of the command 'hāt' (give)!)\n\n❌ أنا أريد قهوة. (ana urīd ʾahwa)\n✅ عايز قهوة، لو سمحت. (ʿāyez ʾahwa, law samaḥt — 'I want' in Egyptian is 'ʿāyez', not the MSA 'urīd'!)", es: "❌ هات المنيو! (hāt el-menyu!)\n✅ مُمكن المنيو لو سمحت؟ (mumken el-menyu law samaḥt? — Usa el cortés 'mumken... law samaḥt?' en vez del mandato 'hāt' (dame).)\n\n❌ أنا أريد قهوة. (ana urīd ʾahwa)\n✅ عايز قهوة، لو سمحت. (ʿāyez ʾahwa, law samaḥt — 'Quiero' en egipcio es 'ʿāyez', no el 'urīd' del árabe estándar.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 잠입 수사할 때 'لو سمحت(law samaḥt)'만 붙이면 어디서든 환영받아! 'مُمكن ___؟(mumken ___?)'는 '~좀 주시겠어요?'라는 만능 주문 표현이야. 의심받을 일 없지~", en: "Detective Rudy's tip: Going undercover? Just add 'law samaḥt' and you're welcome anywhere! 'mumken ___?' is your all-purpose polite order — no one suspects a thing.", es: "Consejo del detective Rudy: ¿Vas encubierto? ¡Solo agrega 'law samaḥt' y serás bienvenido! 'mumken ___?' es tu pedido cortés todoterreno — nadie sospechará." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "مُمكن ___ لو سمحت؟", answer: "المنيو", options: ["المنيو", "الأكل", "الترابيزة"], fullSentence: "مُمكن المنيو لو سمحت؟", fullSentenceMeaning: { ko: "메뉴판 좀 주시겠어요?", en: "Can I have the menu, please?", es: "¿Puedo ver el menú, por favor?" } },
+          { type: "select", promptWithBlank: "___ قهوة، لو سمحت.", answer: "عايز", options: ["عايز", "عندي", "رايح"], fullSentence: "عايز قهوة، لو سمحت.", fullSentenceMeaning: { ko: "커피 한 잔 주세요.", en: "I'd like a coffee, please.", es: "Quiero un café, por favor." } },
+          { type: "select", promptWithBlank: "هُنا ولا ___؟", answer: "تيك أواي", options: ["تيك أواي", "رايح", "خارج"], fullSentence: "هُنا ولا تيك أواي؟", fullSentenceMeaning: { ko: "여기서 드실 건가요, 가져가실 건가요?", en: "For here or to go?", es: "¿Para aquí o para llevar?" } },
+          { type: "input", promptWithBlank: "___ الفراخ، لو سمحت.", answer: "هاخُد", fullSentence: "هاخُد الفراخ، لو سمحت.", fullSentenceMeaning: { ko: "치킨으로 할게요.", en: "I'll have the chicken, please.", es: "Voy a pedir el pollo, por favor." } },
+          { type: "input", promptWithBlank: "مُمكن ___ لو سمحت؟", answer: "مَيّة", fullSentence: "مُمكن مَيّة لو سمحت؟", fullSentenceMeaning: { ko: "물 좀 주세요.", en: "Can I have water, please?", es: "¿Puedo tener agua, por favor?" } },
+          { type: "listening", audioText: "هُنا ولا تيك أواي؟", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["هُنا ولا تيك أواي؟", "هاخُد الفراخ، لو سمحت.", "مُمكن المنيو لو سمحت؟", "عايز قهوة، لو سمحت."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -426,6 +488,39 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Can you say that again, please?", es: "¿Puede repetirlo, por favor?", ko: "다시 한번 말해 주시겠어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    arabic: {
+      step1Sentences: [
+        { text: "ده بكام؟ (da bekām?)", speechLang: "ar-EG", meaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" } },
+        { text: "بعشرة دولار. (be-ʿashara dolār)", speechLang: "ar-EG", meaning: { ko: "10달러예요.", en: "It's ten dollars.", es: "Son diez dólares." } },
+        { text: "ده غالي أوي! (da ghāli awi!)", speechLang: "ar-EG", meaning: { ko: "너무 비싸요!", en: "That's too expensive!", es: "¡Eso es muy caro!" } },
+        { text: "مُمكن أدفع بالفيزا؟ (mumken adfaʿ bel-vīza?)", speechLang: "ar-EG", meaning: { ko: "카드로 결제할 수 있어요?", en: "Can I pay by card?", es: "¿Puedo pagar con tarjeta?" }, recallRound: true },
+        { text: "الحساب، لو سمحت. (el-ḥesāb, law samaḥt)", speechLang: "ar-EG", meaning: { ko: "계산서 주세요.", en: "The bill, please.", es: "La cuenta, por favor." }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: ___ بكام؟ (얼마예요?) → بـ ___ (가격은 ~예요). 비쌀 때: ده غالي أوي! 결제: مُمكن أدفع بالفيزا؟ / الحساب، لو سمحت. 'بكام(bekām)'는 '얼마', 'غالي(ghāli)'는 '비싼'이에요.", en: "Pattern: ___ بكام؟ (How much?) → بـ ___ (It's ___). Too pricey: da ghāli awi! Paying: mumken adfaʿ bel-vīza? / el-ḥesāb, law samaḥt. 'bekām' = how much, 'ghāli' = expensive.", es: "Patrón: ___ بكام؟ (¿Cuánto cuesta?) → بـ ___ (Son ___). Caro: da ghāli awi! Pagar: mumken adfaʿ bel-vīza? / el-ḥesāb, law samaḥt. 'bekām' = cuánto, 'ghāli' = caro." },
+          examples: { ko: "الشُّربة دي بكام؟ بتمنية دولار. (el-shorba di bekām? be-tamanya dolār — 이 수프 얼마예요? 8달러예요.)\nالبيتزا الكبيرة بكام؟ بخمستاشر دولار. (el-bitza el-kebīra bekām? be-khamastāshar dolār — 큰 피자 얼마예요? 15달러예요.)\nمُمكن أدفع بالفيزا؟ أكيد! (mumken adfaʿ bel-vīza? akīd! — 카드로 돼요? 물론이죠!)", en: "الشُّربة دي بكام؟ بتمنية دولار. (el-shorba di bekām? be-tamanya dolār — How much is this soup? It's eight dollars.)\nالبيتزا الكبيرة بكام؟ بخمستاشر دولار. (el-bitza el-kebīra bekām? be-khamastāshar dolār — How much is a large pizza? Fifteen dollars.)\nمُمكن أدفع بالفيزا؟ أكيد! (mumken adfaʿ bel-vīza? akīd! — Can I pay by card? Of course!)", es: "الشُّربة دي بكام؟ بتمنية دولار. (el-shorba di bekām? be-tamanya dolār — ¿Cuánto cuesta esta sopa? Ocho dólares.)\nالبيتزا الكبيرة بكام؟ بخمستاشر دولار. (el-bitza el-kebīra bekām? be-khamastāshar dolār — ¿Una pizza grande? Quince dólares.)\nمُمكن أدفع بالفيزا؟ أكيد! (mumken adfaʿ bel-vīza? akīd! — ¿Puedo pagar con tarjeta? ¡Claro!)" },
+          mistakes: { ko: "❌ ده كام غالي؟ (da kām ghāli?)\n✅ ده بكام؟ (da bekām? — 가격을 물을 때는 'بكام(bekām)'(얼마)! 'غالي(ghāli)'는 '비싼'이라는 뜻이에요.)\n\n❌ ده كم؟ (da kam?)\n✅ ده بكام؟ (da bekām? — 표준어 'كم(kam)'이 아니라 이집트 구어 'بكام(bekām)'을 써요! 'بـ(be-)'가 가격을 뜻해요.)", en: "❌ ده كام غالي؟ (da kām ghāli?)\n✅ ده بكام؟ (da bekām? — Ask price with 'bekām' (how much) — 'ghāli' means 'expensive'!)\n\n❌ ده كم؟ (da kam?)\n✅ ده بكام؟ (da bekām? — Use Egyptian 'bekām', not the MSA 'kam'! The 'be-' prefix carries the 'how much in price' sense.)", es: "❌ ده كام غالي؟ (da kām ghāli?)\n✅ ده بكام؟ (da bekām? — Pregunta el precio con 'bekām' (cuánto) — '¡ghāli' significa 'caro'!)\n\n❌ ده كم؟ (da kam?)\n✅ ده بكام؟ (da bekām? — Usa el egipcio 'bekām', no el 'kam' del árabe estándar.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 'بكام؟(bekām?)'가 핵심 단서야! 가격 답을 들을 때는 Unit 2에서 배운 숫자가 중요하니까 복습해둬. 이집트에서는 흥정도 가능하니 'غالي أوي!(ghāli awi!)'도 알아두면 좋아~", en: "Detective Rudy's tip: 'bekām?' is the key clue! Listen for Unit 2 numbers in the answer. In Egypt you can often haggle, so 'ghāli awi!' (too expensive!) is handy evidence!", es: "Consejo del detective Rudy: '¡bekām?' es la pista clave! Escucha los números de la Unidad 2. En Egipto se puede regatear, así que 'ghāli awi!' es muy útil." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "ده ___؟", answer: "بكام", options: ["بكام", "غالي", "فلوس"], fullSentence: "ده بكام؟", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta esto?" } },
+          { type: "select", promptWithBlank: "ده ___ أوي!", answer: "غالي", options: ["غالي", "رخيص", "كبير"], fullSentence: "ده غالي أوي!", fullSentenceMeaning: { ko: "너무 비싸요!", en: "That's too expensive!", es: "¡Eso es muy caro!" } },
+          { type: "select", promptWithBlank: "مُمكن أدفع ___؟", answer: "بالفيزا", options: ["بالفيزا", "في الفيزا", "للفيزا"], fullSentence: "مُمكن أدفع بالفيزا؟", fullSentenceMeaning: { ko: "카드로 결제할 수 있어요?", en: "Can I pay by card?", es: "¿Puedo pagar con tarjeta?" } },
+          { type: "input", promptWithBlank: "___، لو سمحت.", answer: "الحساب", fullSentence: "الحساب، لو سمحت.", fullSentenceMeaning: { ko: "계산서 주세요.", en: "The bill, please.", es: "La cuenta, por favor." } },
+          { type: "input", promptWithBlank: "بـ___ دولار.", answer: "عشرة", fullSentence: "بعشرة دولار.", fullSentenceMeaning: { ko: "10달러예요.", en: "It's ten dollars.", es: "Son diez dólares." } },
+          { type: "listening", audioText: "الحساب، لو سمحت.", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["الحساب، لو سمحت.", "مُمكن أدفع بالفيزا؟", "ده بكام؟", "ده غالي أوي!"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Sorry, I don't understand.", es: "Lo siento, no entiendo.", ko: "죄송해요, 이해를 못 했어요." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Can you say that again, please?", es: "¿Puede repetirlo, por favor?", ko: "다시 한번 말해 주시겠어요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 16: Expressing Food Feelings ────────────────────────
@@ -555,6 +650,39 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
           { type: "input", promptWithBlank: "Ini ___ enak.", answer: "sangat", fullSentence: "Ini sangat enak.", fullSentenceMeaning: { ko: "정말 맛있어요.", en: "It's very good.", es: "Está muy bueno." } },
           { type: "input", promptWithBlank: "Ini terlalu ___.", answer: "manis", fullSentence: "Ini terlalu manis.", fullSentenceMeaning: { ko: "너무 달아요.", en: "It's too sweet.", es: "Está muy dulce." } },
           { type: "listening", audioText: "Saya kenyang. Terima kasih!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["Saya kenyang. Terima kasih!", "Ini terlalu manis.", "Ini enak sekali!", "Ini terlalu asin."], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Where is the exit?", es: "¿Dónde está la salida?", ko: "출구가 어디에요?" }, fromDay: 2, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Excuse me.", es: "Disculpe.", ko: "실례합니다." }, fromDay: 1, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
+    arabic: {
+      step1Sentences: [
+        { text: "ده لذيذ أوي! (da lazīz awi!)", speechLang: "ar-EG", meaning: { ko: "이거 맛있어요!", en: "This is delicious!", es: "¡Esto está delicioso!" } },
+        { text: "ده حِلو أوي. (da ḥelw awi)", speechLang: "ar-EG", meaning: { ko: "정말 맛있어요.", en: "It's very good.", es: "Está muy bueno." } },
+        { text: "ده مالح أوي. (da māleḥ awi)", speechLang: "ar-EG", meaning: { ko: "너무 짜요.", en: "It's too salty.", es: "Está muy salado." } },
+        { text: "ده سُكّر أوي. (da sukkar awi)", speechLang: "ar-EG", meaning: { ko: "너무 달아요.", en: "It's too sweet.", es: "Está muy dulce." }, recallRound: true },
+        { text: "أنا شبعان. شُكراً! (ana shabʿān. shukran!)", speechLang: "ar-EG", meaning: { ko: "배불러요. 감사합니다!", en: "I'm full. Thank you!", es: "Estoy lleno. ¡Gracias!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: ده + 맛 형용사 + أوي! 긍정: لذيذ(lazīz, 맛있는), حِلو(ḥelw, 좋은). 부정: مالح(māleḥ, 짠), سُكّر(sukkar, 단), حرّاق(ḥarrāʾ, 매운). 'أوي(awi)'는 '아주/너무'. 끝날 때: أنا شبعان(ana shabʿān).", en: "Pattern: ده + taste adjective + أوي! Positive: lazīz (delicious), ḥelw (good/sweet-nice). Negative: māleḥ (salty), sukkar (too sweet), ḥarrāʾ (spicy). 'awi' = very/too. Finished: ana shabʿān (I'm full).", es: "Patrón: ده + adjetivo + أوي! Positivo: lazīz (delicioso), ḥelw (bueno). Negativo: māleḥ (salado), sukkar (dulce), ḥarrāʾ (picante). 'awi' = muy/demasiado. Lleno: ana shabʿān." },
+          examples: { ko: "ده لذيذ أوي! أنا بحِبّه! (da lazīz awi! ana baḥebbo! — 이거 맛있어요! 정말 좋아요!)\nده حرّاق أوي بالنسبة لي. (da ḥarrāʾ awi bel-nesba li — 저한테는 너무 매워요.)\nأنا شبعان. كان لذيذ أوي! (ana shabʿān. kān lazīz awi! — 배불러요. 정말 맛있었어요!)", en: "ده لذيذ أوي! أنا بحِبّه! (da lazīz awi! ana baḥebbo! — This is delicious! I love it!)\nده حرّاق أوي بالنسبة لي. (da ḥarrāʾ awi bel-nesba li — It's too spicy for me.)\nأنا شبعان. كان لذيذ أوي! (ana shabʿān. kān lazīz awi! — I'm full. That was so good!)", es: "ده لذيذ أوي! أنا بحِبّه! (da lazīz awi! ana baḥebbo! — ¡Esto está delicioso! ¡Me encanta!)\nده حرّاق أوي بالنسبة لي. (da ḥarrāʾ awi bel-nesba li — Es muy picante para mí.)\nأنا شبعان. كان لذيذ أوي! (ana shabʿān. kān lazīz awi! — Estoy lleno. ¡Estuvo muy bueno!)" },
+          mistakes: { ko: "❌ أنا لذيذ. (ana lazīz)\n✅ ده لذيذ. (da lazīz — 음식이 맛있다고 할 때는 'ده(da)'(이거)! 'أنا لذيذ'는 내가 맛있다는 이상한 뜻이 돼요.)\n\n❌ أنا مليان. (ana malyān)\n✅ أنا شبعان. (ana shabʿān — 배부르다는 'شبعان(shabʿān)'! 'مليان(malyān)'은 물건이 가득 찼다는 뜻이에요.)", en: "❌ أنا لذيذ. (ana lazīz)\n✅ ده لذيذ. (da lazīz — For tasty food, use 'da' (this) — 'ana lazīz' awkwardly means 'I am tasty'!)\n\n❌ أنا مليان. (ana malyān)\n✅ أنا شبعان. (ana shabʿān — 'Full (from food)' is 'shabʿān' — 'malyān' means a container is full!)", es: "❌ أنا لذيذ. (ana lazīz)\n✅ ده لذيذ. (da lazīz — Para comida rica usa 'da' (esto) — '¡ana lazīz' significa 'yo soy rico'!)\n\n❌ أنا مليان. (ana malyān)\n✅ أنا شبعان. (ana shabʿān — 'Lleno (de comida)' es 'shabʿān' — '¡malyān' es un recipiente lleno!)" },
+          rudyTip: { ko: "탐정 루디의 팁: 'لذيذ(lazīz)'는 맛있을 때 쓰는 마법의 단어야! 강조하려면 'لذيذ أوي(lazīz awi)'(아주 맛있어요)를 써. 'أوي(awi)'(너무)는 맛이 과할 때도 쓰는 단서지 — مالح أوي(māleḥ awi)처럼~", en: "Detective Rudy's tip: 'lazīz' is the magic word for tasty! To emphasize, say 'lazīz awi' (very delicious). 'awi' (too/very) is also your clue for an overdone taste — like 'māleḥ awi' (too salty)!", es: "Consejo del detective Rudy: '¡lazīz' es la palabra mágica para 'rico'! Para enfatizar, di 'lazīz awi'. 'awi' (demasiado/muy) es tu pista para un sabor excesivo — como 'māleḥ awi' (muy salado)." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "ده ___ أوي!", answer: "لذيذ", options: ["لذيذ", "جعان", "عطشان"], fullSentence: "ده لذيذ أوي!", fullSentenceMeaning: { ko: "이거 맛있어요!", en: "This is delicious!", es: "¡Esto está delicioso!" } },
+          { type: "select", promptWithBlank: "ده ___ أوي.", answer: "مالح", options: ["مالح", "ملح", "صلصة"], fullSentence: "ده مالح أوي.", fullSentenceMeaning: { ko: "너무 짜요.", en: "It's too salty.", es: "Está muy salado." } },
+          { type: "select", promptWithBlank: "أنا ___. شُكراً!", answer: "شبعان", options: ["شبعان", "جعان", "لذيذ"], fullSentence: "أنا شبعان. شُكراً!", fullSentenceMeaning: { ko: "배불러요. 감사합니다!", en: "I'm full. Thank you!", es: "Estoy lleno. ¡Gracias!" } },
+          { type: "input", promptWithBlank: "ده ___ أوي.", answer: "حِلو", fullSentence: "ده حِلو أوي.", fullSentenceMeaning: { ko: "정말 맛있어요.", en: "It's very good.", es: "Está muy bueno." } },
+          { type: "input", promptWithBlank: "ده ___ أوي.", answer: "سُكّر", fullSentence: "ده سُكّر أوي.", fullSentenceMeaning: { ko: "너무 달아요.", en: "It's too sweet.", es: "Está muy dulce." } },
+          { type: "listening", audioText: "أنا شبعان. شُكراً!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["أنا شبعان. شُكراً!", "ده سُكّر أوي.", "ده لذيذ أوي!", "ده مالح أوي."], correct: 0, audioOnly: true },
         ],
       },
       crossUnitReview: [
@@ -698,6 +826,39 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
         { sentence: { en: "Help! Please help me.", es: "¡Ayuda! Por favor, ayúdeme.", ko: "도와주세요! 제발 도와주세요." }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
       ],
     },
+    arabic: {
+      step1Sentences: [
+        { text: "أنا برشّح الستيك. (ana barashshaḥ el-sitēk)", speechLang: "ar-EG", meaning: { ko: "스테이크를 추천해요.", en: "I recommend the steak.", es: "Recomiendo el bistec." } },
+        { text: "لازم تجرّب الشُّربة. (lāzem tegarrab el-shorba)", speechLang: "ar-EG", meaning: { ko: "수프를 한번 드셔보세요.", en: "You should try the soup.", es: "Deberías probar la sopa." } },
+        { text: "بترشّح إيه؟ (betrashshaḥ ēh?)", speechLang: "ar-EG", meaning: { ko: "뭘 추천하세요?", en: "What do you recommend?", es: "¿Qué recomiendas?" } },
+        { text: "السلطة طازة أوي. (el-salaṭa ṭāza awi)", speechLang: "ar-EG", meaning: { ko: "샐러드가 아주 신선해요.", en: "The salad is very fresh.", es: "La ensalada está muy fresca." }, recallRound: true },
+        { text: "يلّا ناكُل مع بعض! (yalla nākol maʿa baʿḍ!)", speechLang: "ar-EG", meaning: { ko: "같이 먹어요!", en: "Let's eat together!", es: "¡Comamos juntos!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "패턴: أنا برشّح ___ (추천해요) / لازم تجرّب ___ (한번 드셔보세요) / بترشّح إيه؟ (뭘 추천하세요?). 추천: برشّح(barashshaḥ), 제안: لازم تجرّب(lāzem tegarrab, 꼭 해봐).", en: "Pattern: أنا برشّح ___ (I recommend) / لازم تجرّب ___ (You should try) / بترشّح إيه؟ (What do you recommend?). Recommend: barashshaḥ. Encourage: lāzem tegarrab (you must try).", es: "Patrón: أنا برشّح ___ (recomiendo) / لازم تجرّب ___ (deberías probar) / بترشّح إيه؟ (¿Qué recomiendas?). Recomendar: barashshaḥ. Animar: lāzem tegarrab." },
+          examples: { ko: "أنا برشّح السمك المشوي. لذيذ أوي! (ana barashshaḥ el-samak el-mashwi. lazīz awi! — 생선구이를 추천해요. 대박 맛있어요!)\nلازم تجرّب كيكة الشوكولاتة. (lāzem tegarrab kēkat el-shokolāta — 초콜릿 케이크를 한번 드셔보세요.)\nبترشّح إيه في الحلو؟ (betrashshaḥ ēh fel-ḥelw? — 디저트 뭘 추천하세요?)", en: "أنا برشّح السمك المشوي. لذيذ أوي! (ana barashshaḥ el-samak el-mashwi. lazīz awi! — I recommend the grilled fish. So delicious!)\nلازم تجرّب كيكة الشوكولاتة. (lāzem tegarrab kēkat el-shokolāta — You should try the chocolate cake.)\nبترشّح إيه في الحلو؟ (betrashshaḥ ēh fel-ḥelw? — What do you recommend for dessert?)", es: "أنا برشّح السمك المشوي. لذيذ أوي! (ana barashshaḥ el-samak el-mashwi. lazīz awi! — Recomiendo el pescado a la parrilla. ¡Muy rico!)\nلازم تجرّب كيكة الشوكولاتة. (lāzem tegarrab kēkat el-shokolāta — Deberías probar el pastel de chocolate.)\nبترشّح إيه في الحلو؟ (betrashshaḥ ēh fel-ḥelw? — ¿Qué recomiendas de postre?)" },
+          mistakes: { ko: "❌ لازم إنت تجرّب الشُّربة. (lāzem enta tegarrab...)\n✅ لازم تجرّب الشُّربة. (lāzem tegarrab... — 'لازم(lāzem)'(해야 한다) 뒤에 주어 없이 바로 동사가 와요!)\n\n❌ أنا توصية بالستيك. (ana tawṣeya...)\n✅ أنا برشّح الستيك. (ana barashshaḥ... — 동사는 'برشّح(barashshaḥ)'! 'توصية(tawṣeya)'는 명사예요.)", en: "❌ لازم إنت تجرّب الشُّربة. (lāzem enta tegarrab...)\n✅ لازم تجرّب الشُّربة. (lāzem tegarrab... — After 'lāzem' (must), the verb comes directly — no separate pronoun needed!)\n\n❌ أنا توصية بالستيك. (ana tawṣeya...)\n✅ أنا برشّح الستيك. (ana barashshaḥ... — The verb is 'barashshaḥ' — 'tawṣeya' is the noun (a recommendation)!)", es: "❌ لازم إنت تجرّب الشُّربة. (lāzem enta tegarrab...)\n✅ لازم تجرّب الشُّربة. (lāzem tegarrab... — Tras 'lāzem' (deber), el verbo va directo — ¡sin pronombre aparte!)\n\n❌ أنا توصية بالستيك. (ana tawṣeya...)\n✅ أنا برشّح الستيك. (ana barashshaḥ... — El verbo es 'barashshaḥ' — 'tawṣeya' es el sustantivo.)" },
+          rudyTip: { ko: "탐정 루디의 팁: 잠입 수사 중 친해지고 싶을 때 음식 추천이 최고야! 'لازم تجرّب ___!(lāzem tegarrab ___!)'(꼭 드셔보세요!)라고 하면 상대방이 좋아하고 대화가 자연스럽게 이어져~", en: "Detective Rudy's tip: Want to build trust undercover? Recommend food! 'lāzem tegarrab ___!' (You should try this!) makes people light up and keeps the conversation flowing.", es: "Consejo del detective Rudy: ¿Quieres ganar confianza encubierto? ¡Recomienda comida! 'lāzem tegarrab ___!' hace sonreír y mantiene la conversación." },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "أنا ___ الستيك.", answer: "برشّح", options: ["برشّح", "بحِبّ", "عايز"], fullSentence: "أنا برشّح الستيك.", fullSentenceMeaning: { ko: "스테이크를 추천해요.", en: "I recommend the steak.", es: "Recomiendo el bistec." } },
+          { type: "select", promptWithBlank: "لازم ___ الشُّربة.", answer: "تجرّب", options: ["تجرّب", "تاكُل", "عندك"], fullSentence: "لازم تجرّب الشُّربة.", fullSentenceMeaning: { ko: "수프를 한번 드셔보세요.", en: "You should try the soup.", es: "Deberías probar la sopa." } },
+          { type: "select", promptWithBlank: "___ إيه؟", answer: "بترشّح", options: ["بترشّح", "عايز", "بتحِبّ"], fullSentence: "بترشّح إيه؟", fullSentenceMeaning: { ko: "뭘 추천하세요?", en: "What do you recommend?", es: "¿Qué recomiendas?" } },
+          { type: "input", promptWithBlank: "السلطة ___ أوي.", answer: "طازة", fullSentence: "السلطة طازة أوي.", fullSentenceMeaning: { ko: "샐러드가 아주 신선해요.", en: "The salad is very fresh.", es: "La ensalada está muy fresca." } },
+          { type: "input", promptWithBlank: "يلّا ناكُل مع ___!", answer: "بعض", fullSentence: "يلّا ناكُل مع بعض!", fullSentenceMeaning: { ko: "같이 먹어요!", en: "Let's eat together!", es: "¡Comamos juntos!" } },
+          { type: "listening", audioText: "يلّا ناكُل مع بعض!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["يلّا ناكُل مع بعض!", "السلطة طازة أوي.", "أنا برشّح الستيك.", "بترشّح إيه؟"], correct: 0, audioOnly: true },
+        ],
+      },
+      crossUnitReview: [
+        { sentence: { en: "Do you speak English?", es: "¿Habla inglés?", ko: "영어 하세요?" }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+        { sentence: { en: "Help! Please help me.", es: "¡Ayuda! Por favor, ayúdeme.", ko: "도와주세요! 제발 도와주세요." }, fromDay: 3, context: { ko: "생존 표현 복습", en: "Survival phrase review", es: "Repaso de supervivencia" } },
+      ],
+    },
   },
 
   // ─────────────── Day 18: Unit 3 Review ───────────────────────────────────
@@ -818,6 +979,35 @@ export const LESSON_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
         ],
       },
     },
+    arabic: {
+      step1Sentences: [
+        { text: "أنا بحِبّ البيتزا. بتحِبّ أكل إيه؟ (ana baḥebb el-bitza. betḥebb akl ēh?)", speechLang: "ar-EG", meaning: { ko: "저는 피자를 좋아해요. 어떤 음식을 좋아하세요?", en: "I like pizza. What food do you like?", es: "Me gusta la pizza. ¿Qué comida te gusta?" } },
+        { text: "عايز قهوة وفراخ، لو سمحت. (ʿāyez ʾahwa we-firākh, law samaḥt)", speechLang: "ar-EG", meaning: { ko: "커피 한 잔이랑 치킨 주세요.", en: "I'd like a coffee and the chicken, please.", es: "Quiero un café y el pollo, por favor." } },
+        { text: "الحساب بكام؟ مُمكن أدفع بالفيزا؟ (el-ḥesāb bekām? mumken adfaʿ bel-vīza?)", speechLang: "ar-EG", meaning: { ko: "계산이 얼마예요? 카드로 결제할 수 있어요?", en: "How much is the bill? Can I pay by card?", es: "¿Cuánto es la cuenta? ¿Puedo pagar con tarjeta?" } },
+        { text: "ده لذيذ أوي! أنا برشّحه. (da lazīz awi! ana barashshaḥo)", speechLang: "ar-EG", meaning: { ko: "이거 맛있어요! 추천해요.", en: "This is delicious! I recommend it.", es: "¡Está delicioso! Lo recomiendo." }, recallRound: true },
+        { text: "أنا شبعان. شُكراً، مع السلامة! (ana shabʿān. shukran, maʿa salāma!)", speechLang: "ar-EG", meaning: { ko: "배불러요. 감사합니다, 안녕히 계세요!", en: "I'm full. Thank you, goodbye!", es: "Estoy lleno. ¡Gracias, adiós!" }, recallRound: true },
+      ],
+      step1Config: {
+        hasAudioOnlyRound: true,
+        audioOnlyCount: 2,
+      },
+      step2: {
+        explanation: {
+          pattern: { ko: "Unit 3 총정리! 좋아하는 음식: أنا بحِبّ ___. 주문: عايز ___، لو سمحت. 가격: ___ بكام؟ 맛: ده لذيذ! / ده مالح أوي. 추천: أنا برشّح ___.", en: "Unit 3 Review! Likes: أنا بحِبّ ___. Order: عايز ___, law samaḥt. Price: ___ بكام؟ Taste: da lazīz! / da māleḥ awi. Recommend: أنا برشّح ___.", es: "Repaso Unidad 3! Gustar: أنا بحِبّ ___. Pedir: عايز ___, law samaḥt. Precio: ___ بكام؟ Sabor: da lazīz! / da māleḥ awi. Recomendar: أنا برشّح ___." },
+          examples: { ko: "عايز بيتزا، لو سمحت. هي بكام؟ (ʿāyez bitza, law samaḥt. heyya bekām? — 피자 주세요. 얼마예요?)\nده لذيذ أوي! أنا برشّحه. (da lazīz awi! ana barashshaḥo — 맛있어요! 추천해요.)\nأنا شبعان. مُمكن أدفع بالفيزا؟ شُكراً! (ana shabʿān. mumken adfaʿ bel-vīza? shukran! — 배불러요. 카드로 돼요? 감사합니다!)", en: "عايز بيتزا، لو سمحت. هي بكام؟ (ʿāyez bitza, law samaḥt. heyya bekām? — I'd like a pizza, please. How much is it?)\nده لذيذ أوي! أنا برشّحه. (da lazīz awi! ana barashshaḥo — This is delicious! I recommend it.)\nأنا شبعان. مُمكن أدفع بالفيزا؟ شُكراً! (ana shabʿān. mumken adfaʿ bel-vīza? shukran! — I'm full. Can I pay by card? Thank you!)", es: "عايز بيتزا، لو سمحت. هي بكام؟ (ʿāyez bitza, law samaḥt. heyya bekām? — Quiero una pizza, por favor. ¿Cuánto cuesta?)\nده لذيذ أوي! أنا برشّحه. (da lazīz awi! ana barashshaḥo — ¡Está delicioso! Lo recomiendo.)\nأنا شبعان. مُمكن أدفع بالفيزا؟ شُكراً! (ana shabʿān. mumken adfaʿ bel-vīza? shukran! — Estoy lleno. ¿Puedo pagar con tarjeta? ¡Gracias!)" },
+          mistakes: { ko: "❌ أنا بحِبّ آكل بيتزا. ده كام غالي؟\n✅ أنا بحِبّ البيتزا. ده بكام؟ (بحِبّ 뒤에 바로 음식! 가격은 'بكام(bekām)'!)\n\n❌ أنا لذيذ. أنا مليان.\n✅ ده لذيذ. أنا شبعان. (음식은 'ده لذيذ(da lazīz)', 배부른 건 'أنا شبعان(ana shabʿān)'!)", en: "❌ أنا بحِبّ آكل بيتزا. ده كام غالي؟\n✅ أنا بحِبّ البيتزا. ده بكام؟ (Food right after بحِبّ; price is 'bekām'!)\n\n❌ أنا لذيذ. أنا مليان.\n✅ ده لذيذ. أنا شبعان. (Food = 'da lazīz', full = 'ana shabʿān'!)", es: "❌ أنا بحِبّ آكل بيتزا. ده كام غالي؟\n✅ أنا بحِبّ البيتزا. ده بكام؟ (Comida tras بحِبّ; precio es 'bekām'.)\n\n❌ أنا لذيذ. أنا مليان.\n✅ ده لذيذ. أنا شبعان. (Comida = 'da lazīz', lleno = 'ana shabʿān'.)" },
+          rudyTip: { ko: "탐정 루디의 팁: Unit 3 완료! 이제 이집트 사투리로 식당에서 주문부터 결제까지 혼자 할 수 있어. بحِبّ، لو سمحت، بكام، لذيذ — 다 마스터했지? 잠입 수사 대성공! 다음 유닛에서 또 만나~", en: "Detective Rudy's tip: Unit 3 complete! You can now order, taste, recommend, and pay — all in Egyptian Arabic. baḥebb, law samaḥt, bekām, lazīz — all mastered! Undercover mission success! Next case awaits!", es: "Consejo del detective Rudy: ¡Unidad 3 completada! Ahora puedes pedir, probar, recomendar y pagar en árabe egipcio. baḥebb, law samaḥt, bekām, lazīz — ¡todo dominado! ¡Misión exitosa!" },
+        } as GrammarExplanation,
+        quizzes: [
+          { type: "select", promptWithBlank: "___ قهوة، لو سمحت.", answer: "عايز", options: ["عايز", "عندي", "رايح"], fullSentence: "عايز قهوة، لو سمحت.", fullSentenceMeaning: { ko: "커피 한 잔 주세요.", en: "I'd like a coffee.", es: "Quiero un café." } },
+          { type: "select", promptWithBlank: "ده ___ أوي!", answer: "لذيذ", options: ["لذيذ", "جعان", "غالي"], fullSentence: "ده لذيذ أوي!", fullSentenceMeaning: { ko: "맛있어요!", en: "Delicious!", es: "¡Delicioso!" } },
+          { type: "select", promptWithBlank: "أنا ___ الستيك.", answer: "برشّح", options: ["برشّح", "بأكُل", "بأطلُب"], fullSentence: "أنا برشّح الستيك.", fullSentenceMeaning: { ko: "스테이크를 추천해요.", en: "I recommend the steak.", es: "Recomiendo el bistec." } },
+          { type: "input", promptWithBlank: "ده ___؟", answer: "بكام", fullSentence: "ده بكام؟", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much is this?", es: "¿Cuánto cuesta?" } },
+          { type: "input", promptWithBlank: "أنا ___. شُكراً!", answer: "شبعان", fullSentence: "أنا شبعان. شُكراً!", fullSentenceMeaning: { ko: "배불러요. 감사합니다!", en: "I'm full. Thanks!", es: "Estoy lleno. ¡Gracias!" } },
+          { type: "listening", audioText: "أنا شبعان. شُكراً، مع السلامة!", question: { ko: "방금 뭐라고 했나요?", en: "What was just said?", es: "¿Qué se acaba de decir?" }, options: ["أنا شبعان. شُكراً، مع السلامة!", "ده لذيذ أوي! أنا برشّحه.", "الحساب بكام؟", "عايز قهوة، لو سمحت."], correct: 0, audioOnly: true },
+        ],
+      },
+    },
   },
 };
 
@@ -832,6 +1022,7 @@ export const MISSION_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "탐정 루디와 함께 용의자 식당에 잠입! 음식 이야기로 위장하면서 정보를 모으세요.", en: "Undercover at the suspect's restaurant with Detective Rudy! Use food talk as your cover.", es: "¡Encubierto en el restaurante del sospechoso con el detective Rudy! Usa la charla sobre comida como cobertura." }, gptPrompt: "You are Rudy the detective fox, and your partner is going undercover at a suspect's restaurant to gather intel. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: food preferences, asking about hunger, likes/dislikes as cover conversation. Remind them to use 'No entiendo' if stuck. Keep simple and fun.", speechLang: "es-ES", suggestedAnswers: ["Me gusta la pizza.", "¿Qué comida te gusta?", "Me encanta la comida coreana.", "No me gusta la comida picante.", "¿Tienes hambre?", "¡Sí, mucha hambre!"] },
     korean: { situation: { ko: "탐정 루디와 함께 용의자가 자주 가는 식당에 잠입 수사! 음식 이야기로 위장하면서 정보를 수집하세요!", en: "Undercover at the suspect's favourite restaurant with Detective Rudy! Gather intel while talking food.", es: "¡Encubierto en el restaurante favorito del sospechoso con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox, and your partner is going undercover at a suspect's favourite restaurant to gather intel. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: food preferences, asking about hunger, likes/dislikes. Remind them to use '이해를 못 했어요' if stuck. Keep simple and fun.", speechLang: "ko-KR", suggestedAnswers: ["피자를 좋아해요.", "어떤 음식을 좋아하세요?", "한국 음식을 정말 좋아해요.", "매운 음식을 안 좋아해요.", "배고프세요?", "네, 정말 배고파요!"] },
     indonesian: { situation: { ko: "탐정 루디와 함께 용의자가 자주 가는 식당에 잠입 수사! 음식 이야기로 위장하면서 정보를 수집하세요!", en: "Undercover at the suspect's favourite restaurant with Detective Rudy! Gather intel while talking food.", es: "¡Encubierto en el restaurante favorito del sospechoso con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox, and your partner is going undercover at a suspect's favourite restaurant to gather intel. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: food preferences ('Saya suka ___'), asking what they like ('Kamu suka makanan apa?'), asking about hunger ('Apakah kamu lapar?'), and dislikes ('Saya tidak suka ___') as cover conversation. Remind them to use 'Saya tidak mengerti' if stuck. Keep simple and fun.", speechLang: "id-ID", suggestedAnswers: ["Saya suka pizza.", "Kamu suka makanan apa?", "Saya sangat suka makanan Korea.", "Saya tidak suka makanan pedas.", "Apakah kamu lapar?", "Ya, saya sangat lapar!"] },
+    arabic: { situation: { ko: "탐정 루디와 함께 용의자가 자주 가는 식당에 잠입 수사! 음식 이야기로 위장하면서 정보를 수집하세요!", en: "Undercover at the suspect's favourite restaurant with Detective Rudy! Gather intel while talking food.", es: "¡Encubierto en el restaurante favorito del sospechoso con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox, and your partner is going undercover at a suspect's favourite restaurant to gather intel. Detective/mystery framing throughout. Use simple A1 Egyptian Colloquial Arabic (Cairene, not MSA). Practice: food preferences ('ana baḥebb ___'), asking what they like ('betḥebb akl ēh?'), asking about hunger ('enta gaʿān?'), and dislikes ('ana mesh baḥebb ___') as cover conversation. Use Egyptian markers (mesh, ʿāyez, awi). Remind them to use 'ana mesh fāhem' if stuck. Keep simple and fun.", speechLang: "ar-EG", suggestedAnswers: ["أنا بحِبّ البيتزا.", "بتحِبّ أكل إيه؟", "أنا بحِبّ الأكل الكوري أوي.", "أنا مش بحِبّ الأكل الحرّاق.", "إنت جعان؟", "آه، أنا جعان أوي!"] },
   },
 
   day_14: {
@@ -839,6 +1030,7 @@ export const MISSION_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "용의자의 단골 카페를 미행 중! 주문을 하면서 감시를 계속하세요.", en: "Shadowing the suspect at their usual café! Keep your cover by ordering.", es: "¡Siguiendo al sospechoso en su café habitual! Mantén tu cobertura pidiendo." }, gptPrompt: "You are Rudy the detective fox. Your partner is shadowing a suspect at their usual café. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: asking for menu, ordering food/drinks, 'para aquí o para llevar?' (staying to keep watch), confirm order. Remind them of 'por favor'. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["¿Puedo ver el menú, por favor?", "Quiero un café, por favor.", "Voy a pedir el pollo.", "¿Puedo tener agua, por favor?", "Para aquí, por favor.", "¡Gracias!"] },
     korean: { situation: { ko: "탐정 루디와 함께 용의자의 단골 카페를 미행! 주문하면서 자연스럽게 위장하세요.", en: "Shadowing the suspect at their usual café with Detective Rudy! Order to blend in.", es: "¡Siguiendo al sospechoso en su café habitual con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox. Your partner is shadowing a suspect at their usual café. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: asking for menu, ordering food/drinks, for here or takeout (staying to keep watch), confirm order. Remind them of '주세요'. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["메뉴판 좀 주시겠어요?", "커피 한 잔 주세요.", "치킨으로 할게요.", "물 좀 주세요.", "여기서 먹을게요.", "감사합니다!"] },
     indonesian: { situation: { ko: "탐정 루디와 함께 용의자의 단골 카페를 미행! 주문하면서 자연스럽게 위장하세요.", en: "Shadowing the suspect at their usual café with Detective Rudy! Order to blend in.", es: "¡Siguiendo al sospechoso en su café habitual con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox. Your partner is shadowing a suspect at their usual café. Detective/mystery framing throughout. Simple A1 {targetLang}. Practice: asking for the menu as cover ('Boleh saya minta menu?'), ordering food and drinks ('Saya mau ___, tolong', 'Boleh saya minta ___?'), 'Makan di sini atau bawa pulang?' (choosing to stay and keep watch), and confirming the order. If they forget 'tolong', gently remind them. Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Boleh saya minta menu?", "Saya mau kopi, tolong.", "Saya pesan ayam, tolong.", "Boleh saya minta air?", "Makan di sini, tolong.", "Terima kasih!"] },
+    arabic: { situation: { ko: "탐정 루디와 함께 용의자의 단골 카페를 미행! 주문하면서 자연스럽게 위장하세요.", en: "Shadowing the suspect at their usual café with Detective Rudy! Order to blend in.", es: "¡Siguiendo al sospechoso en su café habitual con el detective Rudy!" }, gptPrompt: "You are Rudy the detective fox. Your partner is shadowing a suspect at their usual café. Detective/mystery framing throughout. Use simple A1 Egyptian Colloquial Arabic (Cairene, not MSA). Practice: asking for the menu as cover ('mumken el-menyu law samaḥt?'), ordering food and drinks ('ʿāyez ___, law samaḥt', 'mumken ___?'), 'hena walla tēk away?' (choosing to stay and keep watch), and confirming the order. Use Egyptian markers (ʿāyez, mumken, law samaḥt). If they forget 'law samaḥt', gently remind them. Keep simple.", speechLang: "ar-EG", suggestedAnswers: ["مُمكن المنيو لو سمحت؟", "عايز قهوة، لو سمحت.", "هاخُد الفراخ، لو سمحت.", "مُمكن مَيّة لو سمحت؟", "هُنا، لو سمحت.", "شُكراً!"] },
   },
 
   day_15: {
@@ -846,6 +1038,7 @@ export const MISSION_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "식사 후 계산할 시간입니다. 숫자도 활용하세요!", en: "Time to pay. Use numbers too!", es: "Hora de pagar. ¡Usa números!" }, gptPrompt: "You are Rudy helping your partner pay at the restaurant. Simple A1 {targetLang}. Practice: asking prices, understanding amounts (numbers from Unit 2), saying too expensive, paying by card, asking for the bill. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["¿Cuánto cuesta esto?", "Son diez dólares.", "¡Muy caro!", "¿Puedo pagar con tarjeta?", "La cuenta, por favor.", "¡Gracias!"] },
     korean: { situation: { ko: "식사 후 계산할 시간입니다. Unit 2 숫자도 활용하세요!", en: "Time to pay. Use numbers!", es: "Hora de pagar. ¡Números!" }, gptPrompt: "You are Rudy helping your partner pay at the restaurant. Simple A1 {targetLang}. Practice: asking prices, understanding amounts, saying expensive, paying by card, asking for the bill. Use numbers from Unit 2. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["이거 얼마예요?", "만 원이에요.", "너무 비싸요!", "카드로 결제할 수 있어요?", "계산서 주세요.", "감사합니다!"] },
     indonesian: { situation: { ko: "식사 후 계산할 시간입니다. Unit 2 숫자도 활용하세요!", en: "Time to pay. Use numbers!", es: "Hora de pagar. ¡Números!" }, gptPrompt: "You are Rudy helping your partner pay at the restaurant. Simple A1 {targetLang}. Practice: asking 'Ini berapa harganya?' for items, understanding prices using numbers from Unit 2, saying 'Itu terlalu mahal!', asking 'Boleh saya bayar dengan kartu?', and asking for the bill ('Minta bonnya, tolong'). Mix in previous vocabulary naturally (numbers, 'terima kasih'). Keep simple.", speechLang: "id-ID", suggestedAnswers: ["Ini berapa harganya?", "Harganya sepuluh dolar.", "Itu terlalu mahal!", "Boleh saya bayar dengan kartu?", "Minta bonnya, tolong.", "Terima kasih!"] },
+    arabic: { situation: { ko: "식사 후 계산할 시간입니다. Unit 2 숫자도 활용하세요!", en: "Time to pay. Use numbers!", es: "Hora de pagar. ¡Números!" }, gptPrompt: "You are Rudy helping your partner pay at the restaurant. Use simple A1 Egyptian Colloquial Arabic (Cairene, not MSA). Practice: asking 'ده بكام؟ (da bekām?)' for items, understanding prices using numbers from Unit 2, saying 'ده غالي أوي! (da ghāli awi!)', asking 'مُمكن أدفع بالفيزا؟ (mumken adfaʿ bel-vīza?)', and asking for the bill ('el-ḥesāb, law samaḥt'). Use Egyptian markers (bekām, awi). Mix in previous vocabulary naturally (numbers, 'shukran'). Keep simple.", speechLang: "ar-EG", suggestedAnswers: ["ده بكام؟", "بعشرة دولار.", "ده غالي أوي!", "مُمكن أدفع بالفيزا؟", "الحساب، لو سمحت.", "شُكراً!"] },
   },
 
   day_16: {
@@ -853,6 +1046,7 @@ export const MISSION_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "음식이 도착했습니다! 맛을 표현해보세요.", en: "Food has arrived! Express the taste.", es: "¡Llegó la comida! Expresa el sabor." }, gptPrompt: "You are Rudy eating with your partner. Simple A1 {targetLang}. Practice: taste expressions (delicious, good, salty, sweet), saying I'm full, using Gracias. Try different foods. Keep simple and fun.", speechLang: "es-ES", suggestedAnswers: ["¡Esto está delicioso!", "Está muy bueno.", "Está muy salado.", "Está muy dulce.", "Estoy lleno. ¡Gracias!", "¿Puede repetir eso?"] },
     korean: { situation: { ko: "음식이 도착했어요! 맛을 표현해보세요.", en: "Food is here! Express the taste.", es: "¡Llegó la comida!" }, gptPrompt: "You are Rudy eating with your partner. Simple A1 {targetLang}. Practice: taste expressions (맛있어요, 짜요, 달아요), 배불러요, 감사합니다. Try different foods. Keep simple and fun.", speechLang: "ko-KR", suggestedAnswers: ["이거 맛있어요!", "정말 맛있어요.", "너무 짜요.", "너무 달아요.", "배불러요. 감사합니다!", "다시 한번 말해 주시겠어요?"] },
     indonesian: { situation: { ko: "음식이 도착했어요! 맛을 표현해보세요.", en: "Food is here! Express the taste.", es: "¡Llegó la comida!" }, gptPrompt: "You are Rudy eating with your partner. Simple A1 {targetLang}. Practice: taste expressions ('Ini enak!', 'Ini terlalu asin', 'Ini terlalu manis'), saying 'Saya kenyang' at the end, and 'Terima kasih'. Try different foods so they can practise multiple taste words. Keep simple and fun.", speechLang: "id-ID", suggestedAnswers: ["Ini enak sekali!", "Ini sangat enak.", "Ini terlalu asin.", "Ini terlalu manis.", "Saya kenyang. Terima kasih!", "Bisa tolong ulangi?"] },
+    arabic: { situation: { ko: "음식이 도착했어요! 맛을 표현해보세요.", en: "Food is here! Express the taste.", es: "¡Llegó la comida!" }, gptPrompt: "You are Rudy eating with your partner. Use simple A1 Egyptian Colloquial Arabic (Cairene, not MSA). Practice: taste expressions ('da lazīz!', 'da māleḥ awi', 'da sukkar awi'), saying 'ana shabʿān' at the end, and 'shukran'. Use Egyptian markers (da, awi). Try different foods so they can practise multiple taste words. Keep simple and fun.", speechLang: "ar-EG", suggestedAnswers: ["ده لذيذ أوي!", "ده حِلو أوي.", "ده مالح أوي.", "ده سُكّر أوي.", "أنا شبعان. شُكراً!", "مُمكن تعيد تاني؟"] },
   },
 
   day_17: {
@@ -860,6 +1054,7 @@ export const MISSION_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "루디가 새 동료를 식당에 데려왔습니다. 추천해주세요!", en: "Rudy brought a new colleague. Recommend dishes!", es: "Rudy trajo un colega nuevo. ¡Recomienda!" }, gptPrompt: "You are Rudy at the restaurant with your partner and a new colleague. Simple A1 {targetLang}. Practice: recommending, asking recommendations, describing food, suggesting to eat together. Reinforce ordering and taste. Keep simple.", speechLang: "es-ES", suggestedAnswers: ["Recomiendo el bistec.", "Deberías probar la sopa.", "¿Qué recomiendas?", "La ensalada está muy fresca.", "¡Comamos juntos!", "¡Está delicioso!"] },
     korean: { situation: { ko: "루디가 새 동료를 데려왔어요. 맛있는 음식을 추천해주세요!", en: "New colleague! Recommend dishes!", es: "¡Nuevo colega! ¡Recomienda!" }, gptPrompt: "You are Rudy at the restaurant with your partner and a new colleague. Simple A1 {targetLang}. Practice: recommending, asking recommendations, describing food, eating together. Reinforce ordering and taste. Keep simple.", speechLang: "ko-KR", suggestedAnswers: ["스테이크를 추천해요.", "수프를 한번 드셔보세요.", "뭘 추천하세요?", "샐러드가 아주 신선해요.", "같이 먹어요!", "이거 맛있어요!"] },
     indonesian: { situation: { ko: "루디가 새 동료를 데려왔어요. 맛있는 음식을 추천해주세요!", en: "New colleague! Recommend dishes!", es: "¡Nuevo colega! ¡Recomienda!" }, gptPrompt: "You are Rudy at the restaurant with your partner and a new colleague. Simple A1 {targetLang}. Practice: recommending dishes ('Saya merekomendasikan ___', 'Kamu harus coba ___'), asking 'Apa yang kamu rekomendasikan?', describing food ('segar', 'enak'), and suggesting to eat together ('Ayo makan bersama!'). Reinforce ordering and taste naturally. Keep simple and encouraging.", speechLang: "id-ID", suggestedAnswers: ["Saya merekomendasikan steak.", "Kamu harus coba supnya.", "Apa yang kamu rekomendasikan?", "Saladnya sangat segar.", "Ayo makan bersama!", "Ini enak sekali!"] },
+    arabic: { situation: { ko: "루디가 새 동료를 데려왔어요. 맛있는 음식을 추천해주세요!", en: "New colleague! Recommend dishes!", es: "¡Nuevo colega! ¡Recomienda!" }, gptPrompt: "You are Rudy at the restaurant with your partner and a new colleague. Use simple A1 Egyptian Colloquial Arabic (Cairene, not MSA). Practice: recommending dishes ('ana barashshaḥ ___', 'lāzem tegarrab ___'), asking 'betrashshaḥ ēh?', describing food ('ṭāza', 'lazīz'), and suggesting to eat together ('yalla nākol maʿa baʿḍ!'). Use Egyptian markers (lāzem, awi, yalla). Reinforce ordering and taste naturally. Keep simple and encouraging.", speechLang: "ar-EG", suggestedAnswers: ["أنا برشّح الستيك.", "لازم تجرّب الشُّربة.", "بترشّح إيه؟", "السلطة طازة أوي.", "يلّا ناكُل مع بعض!", "ده لذيذ أوي!"] },
   },
 
   day_18: {
@@ -867,6 +1062,7 @@ export const MISSION_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKe
     spanish: { situation: { ko: "박물관 팀 저녁 모임입니다!", en: "Museum team dinner! Use everything!", es: "¡Cena del equipo! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting a team dinner. Test ALL of Unit 3 in A1 {targetLang}: food preferences, ordering, prices/paying, taste, recommendations. Also reinforce Units 1-2 (greetings, numbers, time). Create 2-3 mini-scenarios. Be encouraging.", speechLang: "es-ES", suggestedAnswers: ["Me gusta la pizza. ¿Qué te gusta?", "Quiero un café, por favor.", "¿Cuánto cuesta esto?", "¡Está delicioso!", "Recomiendo el bistec.", "Estoy lleno. ¡Gracias, adiós!"] },
     korean: { situation: { ko: "박물관 팀 저녁 모임입니다! 이번 주 배운 모든 표현을 활용하세요!", en: "Team dinner! Use everything!", es: "¡Cena! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting a team dinner. Test ALL of Unit 3 in A1 {targetLang}: food preferences, ordering, prices/paying, taste, recommendations. Also reinforce Units 1-2 (greetings, numbers, time). Create 2-3 mini-scenarios. Be encouraging.", speechLang: "ko-KR", suggestedAnswers: ["피자를 좋아해요. 뭘 좋아하세요?", "커피 한 잔 주세요.", "이거 얼마예요?", "이거 맛있어요!", "스테이크를 추천해요.", "배불러요. 감사합니다, 안녕히 계세요!"] },
     indonesian: { situation: { ko: "박물관 팀 저녁 모임입니다! 이번 주 배운 모든 표현을 활용하세요!", en: "Team dinner! Use everything!", es: "¡Cena! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting a team dinner at a restaurant near the museum. Test ALL of Unit 3 in natural A1 {targetLang}: food preferences ('Saya suka ___'), ordering food and drinks ('Saya mau ___, tolong'), asking prices and paying ('Berapa harganya?', 'Boleh saya bayar dengan kartu?'), expressing taste ('Ini enak!', 'Ini terlalu asin'), and recommending dishes ('Saya merekomendasikan ___'). Also reinforce Unit 1 (greetings, introductions, 'Saya tidak mengerti') and Unit 2 (numbers for prices, time for a reservation). Create 2-3 mini-scenarios: arriving, ordering, paying. Be encouraging but thorough.", speechLang: "id-ID", suggestedAnswers: ["Saya suka pizza. Kamu suka makanan apa?", "Saya mau kopi, tolong.", "Ini berapa harganya?", "Ini enak sekali!", "Saya merekomendasikan steak.", "Saya kenyang. Terima kasih, sampai jumpa!"] },
+    arabic: { situation: { ko: "박물관 팀 저녁 모임입니다! 이번 주 배운 모든 표현을 활용하세요!", en: "Team dinner! Use everything!", es: "¡Cena! ¡Usa todo!" }, gptPrompt: "You are Rudy hosting a team dinner at a restaurant near the museum. Test ALL of Unit 3 in natural A1 Egyptian Colloquial Arabic (Cairene, not MSA): food preferences ('ana baḥebb ___'), ordering food and drinks ('ʿāyez ___, law samaḥt'), asking prices and paying ('___ bekām?', 'mumken adfaʿ bel-vīza?'), expressing taste ('da lazīz!', 'da māleḥ awi'), and recommending dishes ('ana barashshaḥ ___'). Use Egyptian markers (baḥebb, ʿāyez, mesh, bekām, awi). Also reinforce Unit 1 (greetings, introductions, 'ana mesh fāhem') and Unit 2 (numbers for prices, time for a reservation). Create 2-3 mini-scenarios: arriving, ordering, paying. Be encouraging but thorough.", speechLang: "ar-EG", suggestedAnswers: ["أنا بحِبّ البيتزا. بتحِبّ أكل إيه؟", "عايز قهوة، لو سمحت.", "ده بكام؟", "ده لذيذ أوي!", "أنا برشّح الستيك.", "أنا شبعان. شُكراً، مع السلامة!"] },
   },
 };
 
@@ -905,6 +1101,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "Kamu suka makanan ___?", answer: "apa", options: ["apa", "siapa", "mana"], fullSentence: "Kamu suka makanan apa?", fullSentenceMeaning: { ko: "어떤 음식?", en: "What food?", es: "¿Qué comida?" } },
       { type: "speak", sentence: "Apakah kamu lapar? Saya sangat suka makanan Korea!", speechLang: "id-ID", meaning: { ko: "배고프세요? 한국 음식!", en: "Hungry? I love Korean food!", es: "¿Hambre? ¡Comida coreana!" } },
     ],
+    arabic: [
+      { type: "speak", sentence: "أنا بحِبّ الأزرق. عندك مقاس أكبر؟ (ana baḥebb el-azraʾ. ʿandak maʾās akbar?)", speechLang: "ar-EG", meaning: { ko: "파란색 좋아요. 큰 사이즈?", en: "I like blue. Bigger?", es: "Me gusta azul. ¿Más grande?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "ده ___؟", answer: "بكام", options: ["بكام", "غالي", "فلوس"], fullSentence: "ده بكام؟", fullSentenceMeaning: { ko: "이거 얼마예요?", en: "How much?", es: "¿Cuánto?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "أنا بحِبّ البيتزا والمكرونة. (ana baḥebb el-bitza wel-makarōna)", speechLang: "ar-EG", meaning: { ko: "피자와 파스타를 좋아해요.", en: "I like pizza and pasta.", es: "Me gusta pizza y pasta." } },
+      { type: "fill_blank", promptWithBlank: "بتحِبّ ___ إيه؟", answer: "أكل", options: ["أكل", "حد", "مطعم"], fullSentence: "بتحِبّ أكل إيه؟", fullSentenceMeaning: { ko: "어떤 음식?", en: "What food?", es: "¿Qué comida?" } },
+      { type: "speak", sentence: "إنت جعان؟ أنا بحِبّ الأكل الكوري أوي! (enta gaʿān? ana baḥebb el-akl el-kōri awi!)", speechLang: "ar-EG", meaning: { ko: "배고프세요? 한국 음식!", en: "Hungry? I love Korean food!", es: "¿Hambre? ¡Comida coreana!" } },
+    ],
   },
 
   day_14: {
@@ -935,6 +1138,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Boleh saya minta menu?", speechLang: "id-ID", meaning: { ko: "메뉴판 주세요.", en: "Menu, please.", es: "¿El menú?" } },
       { type: "fill_blank", promptWithBlank: "Saya ___ kopi, tolong.", answer: "mau", options: ["mau", "ada", "pergi"], fullSentence: "Saya mau kopi, tolong.", fullSentenceMeaning: { ko: "커피 주세요.", en: "A coffee, please.", es: "Un café, por favor." } },
       { type: "speak", sentence: "Saya pesan ayam, tolong. Makan di sini.", speechLang: "id-ID", meaning: { ko: "치킨으로. 여기서.", en: "Chicken. For here.", es: "Pollo. Aquí." } },
+    ],
+    arabic: [
+      { type: "speak", sentence: "أنا بحِبّ البيتزا. بتحِبّ أكل إيه؟ (ana baḥebb el-bitza. betḥebb akl ēh?)", speechLang: "ar-EG", meaning: { ko: "피자 좋아해요. 뭘?", en: "I like pizza. You?", es: "Me gusta pizza. ¿Y tú?" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "إنت ___؟", answer: "جعان", options: ["جعان", "عطشان", "شبعان"], fullSentence: "إنت جعان؟", fullSentenceMeaning: { ko: "배고프세요?", en: "Hungry?", es: "¿Hambre?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "مُمكن المنيو لو سمحت؟ (mumken el-menyu law samaḥt?)", speechLang: "ar-EG", meaning: { ko: "메뉴판 주세요.", en: "Menu, please.", es: "¿El menú?" } },
+      { type: "fill_blank", promptWithBlank: "___ قهوة، لو سمحت.", answer: "عايز", options: ["عايز", "عندي", "رايح"], fullSentence: "عايز قهوة، لو سمحت.", fullSentenceMeaning: { ko: "커피 주세요.", en: "A coffee, please.", es: "Un café, por favor." } },
+      { type: "speak", sentence: "هاخُد الفراخ، لو سمحت. هُنا. (hākhod el-firākh, law samaḥt. hena)", speechLang: "ar-EG", meaning: { ko: "치킨으로. 여기서.", en: "Chicken. For here.", es: "Pollo. Aquí." } },
     ],
   },
 
@@ -975,6 +1185,15 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Maaf, saya tidak mengerti.", speechLang: "id-ID", meaning: { ko: "죄송해요, 이해가 안 돼요.", en: "Sorry, I don't understand.", es: "Lo siento, no entiendo." }, isYesterdayReview: true },
       { type: "speak", sentence: "Bisa tolong ulangi?", speechLang: "id-ID", meaning: { ko: "다시 한 번 말해 주세요.", en: "Can you say that again, please?", es: "¿Puede repetirlo, por favor?" }, isYesterdayReview: true },
     ],
+    arabic: [
+      { type: "speak", sentence: "عايز قهوة وفراخ، لو سمحت. (ʿāyez ʾahwa we-firākh, law samaḥt)", speechLang: "ar-EG", meaning: { ko: "커피랑 치킨 주세요.", en: "Coffee and chicken, please.", es: "Café y pollo, por favor." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "هُنا ولا ___؟", answer: "تيك أواي", options: ["تيك أواي", "رايح", "خارج"], fullSentence: "هُنا ولا تيك أواي؟", fullSentenceMeaning: { ko: "여기서? 포장?", en: "Here or to go?", es: "¿Aquí o para llevar?" }, isYesterdayReview: true },
+      { type: "speak", sentence: "ده بكام؟ ده غالي أوي! (da bekām? da ghāli awi!)", speechLang: "ar-EG", meaning: { ko: "얼마? 비싸요!", en: "How much? Expensive!", es: "¿Cuánto? ¡Caro!" } },
+      { type: "fill_blank", promptWithBlank: "مُمكن أدفع ___؟", answer: "بالفيزا", options: ["بالفيزا", "في الفيزا", "للفيزا"], fullSentence: "مُمكن أدفع بالفيزا؟", fullSentenceMeaning: { ko: "카드로요?", en: "Card?", es: "¿Tarjeta?" } },
+      { type: "speak", sentence: "الحساب، لو سمحت. شُكراً! (el-ḥesāb, law samaḥt. shukran!)", speechLang: "ar-EG", meaning: { ko: "계산서요. 감사!", en: "Bill. Thanks!", es: "Cuenta. ¡Gracias!" } },
+      { type: "speak", sentence: "آسف، أنا مش فاهم. (āsef, ana mesh fāhem)", speechLang: "ar-EG", meaning: { ko: "죄송해요, 이해가 안 돼요.", en: "Sorry, I don't understand.", es: "Lo siento, no entiendo." }, isYesterdayReview: true },
+      { type: "speak", sentence: "مُمكن تعيد تاني؟ (mumken teʿīd tāni?)", speechLang: "ar-EG", meaning: { ko: "다시 한 번 말해 주세요.", en: "Can you say that again, please?", es: "¿Puede repetirlo, por favor?" }, isYesterdayReview: true },
+    ],
   },
 
   day_16: {
@@ -1005,6 +1224,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Ini enak sekali! Ini sangat enak.", speechLang: "id-ID", meaning: { ko: "맛있어요! 정말 맛있어요.", en: "Delicious! Very good.", es: "¡Delicioso! Muy bueno." } },
       { type: "fill_blank", promptWithBlank: "Ini terlalu ___.", answer: "asin", options: ["asin", "garam", "pedas"], fullSentence: "Ini terlalu asin.", fullSentenceMeaning: { ko: "너무 짜요.", en: "Too salty.", es: "Muy salado." } },
       { type: "speak", sentence: "Saya kenyang. Terima kasih!", speechLang: "id-ID", meaning: { ko: "배불러요. 감사!", en: "Full. Thanks!", es: "Lleno. ¡Gracias!" } },
+    ],
+    arabic: [
+      { type: "speak", sentence: "ده بكام؟ بعشرة دولار. (da bekām? be-ʿashara dolār)", speechLang: "ar-EG", meaning: { ko: "얼마예요? 10달러.", en: "How much? Ten dollars.", es: "¿Cuánto? Diez dólares." }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "___، لو سمحت.", answer: "الحساب", options: ["الحساب", "المنيو", "المَيّة"], fullSentence: "الحساب، لو سمحت.", fullSentenceMeaning: { ko: "계산서 주세요.", en: "The bill, please.", es: "La cuenta, por favor." }, isYesterdayReview: true },
+      { type: "speak", sentence: "ده لذيذ أوي! ده حِلو أوي. (da lazīz awi! da ḥelw awi)", speechLang: "ar-EG", meaning: { ko: "맛있어요! 정말 맛있어요.", en: "Delicious! Very good.", es: "¡Delicioso! Muy bueno." } },
+      { type: "fill_blank", promptWithBlank: "ده ___ أوي.", answer: "مالح", options: ["مالح", "ملح", "حرّاق"], fullSentence: "ده مالح أوي.", fullSentenceMeaning: { ko: "너무 짜요.", en: "Too salty.", es: "Muy salado." } },
+      { type: "speak", sentence: "أنا شبعان. شُكراً! (ana shabʿān. shukran!)", speechLang: "ar-EG", meaning: { ko: "배불러요. 감사!", en: "Full. Thanks!", es: "Lleno. ¡Gracias!" } },
     ],
   },
 
@@ -1037,6 +1263,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "fill_blank", promptWithBlank: "Apa yang kamu ___?", answer: "rekomendasikan", options: ["rekomendasikan", "mau", "suka"], fullSentence: "Apa yang kamu rekomendasikan?", fullSentenceMeaning: { ko: "뭘 추천하세요?", en: "What do you recommend?", es: "¿Qué recomiendas?" } },
       { type: "speak", sentence: "Saladnya segar. Ayo makan bersama!", speechLang: "id-ID", meaning: { ko: "샐러드 신선. 같이!", en: "Salad fresh. Let's eat!", es: "Ensalada fresca. ¡Comamos!" } },
     ],
+    arabic: [
+      { type: "speak", sentence: "ده لذيذ أوي! ده حِلو أوي. (da lazīz awi! da ḥelw awi)", speechLang: "ar-EG", meaning: { ko: "맛있어요! 정말!", en: "Delicious! Very good.", es: "¡Delicioso!" }, isYesterdayReview: true },
+      { type: "fill_blank", promptWithBlank: "أنا ___. شُكراً!", answer: "شبعان", options: ["شبعان", "جعان", "لذيذ"], fullSentence: "أنا شبعان. شُكراً!", fullSentenceMeaning: { ko: "배불러요. 감사!", en: "Full. Thanks!", es: "Lleno. ¡Gracias!" }, isYesterdayReview: true },
+      { type: "speak", sentence: "أنا برشّح الستيك. لازم تجرّبه. (ana barashshaḥ el-sitēk. lāzem tegarrabo)", speechLang: "ar-EG", meaning: { ko: "스테이크 추천. 드셔보세요.", en: "I recommend the steak. Try it.", es: "Recomiendo el bistec. Pruébalo." } },
+      { type: "fill_blank", promptWithBlank: "___ إيه؟", answer: "بترشّح", options: ["بترشّح", "عايز", "بتحِبّ"], fullSentence: "بترشّح إيه؟", fullSentenceMeaning: { ko: "뭘 추천하세요?", en: "What do you recommend?", es: "¿Qué recomiendas?" } },
+      { type: "speak", sentence: "السلطة طازة. يلّا ناكُل مع بعض! (el-salaṭa ṭāza. yalla nākol maʿa baʿḍ!)", speechLang: "ar-EG", meaning: { ko: "샐러드 신선. 같이!", en: "Salad fresh. Let's eat!", es: "Ensalada fresca. ¡Comamos!" } },
+    ],
   },
 
   day_18: {
@@ -1067,6 +1300,13 @@ export const REVIEW_CONTENT_UNIT3: Record<string, Partial<Record<LearningLangKey
       { type: "speak", sentence: "Ini enak sekali! Saya merekomendasikan steak.", speechLang: "id-ID", meaning: { ko: "맛있어요! 스테이크 추천해요.", en: "Delicious! I recommend steak.", es: "¡Delicioso! Recomiendo bistec." } },
       { type: "speak", sentence: "Kamu harus coba supnya. Saladnya sangat segar.", speechLang: "id-ID", meaning: { ko: "수프 드셔보세요. 샐러드가 신선해요.", en: "Try the soup. Salad is fresh.", es: "Prueba la sopa. Ensalada fresca." } },
       { type: "speak", sentence: "Saya kenyang. Terima kasih! Sampai jumpa besok!", speechLang: "id-ID", meaning: { ko: "배불러요. 감사합니다! 내일 봐요!", en: "Full. Thanks! See you tomorrow!", es: "Lleno. ¡Gracias! ¡Hasta mañana!" } },
+    ],
+    arabic: [
+      { type: "speak", sentence: "أنا بحِبّ البيتزا. عايز قهوة، لو سمحت. (ana baḥebb el-bitza. ʿāyez ʾahwa, law samaḥt)", speechLang: "ar-EG", meaning: { ko: "피자 좋아해요. 커피 한 잔 주세요.", en: "I like pizza. Coffee, please.", es: "Me gusta pizza. Café, por favor." } },
+      { type: "speak", sentence: "ده بكام؟ مُمكن أدفع بالفيزا؟ (da bekām? mumken adfaʿ bel-vīza?)", speechLang: "ar-EG", meaning: { ko: "이거 얼마예요? 카드로요?", en: "How much? Card?", es: "¿Cuánto? ¿Tarjeta?" } },
+      { type: "speak", sentence: "ده لذيذ أوي! أنا برشّح الستيك. (da lazīz awi! ana barashshaḥ el-sitēk)", speechLang: "ar-EG", meaning: { ko: "맛있어요! 스테이크 추천해요.", en: "Delicious! I recommend steak.", es: "¡Delicioso! Recomiendo bistec." } },
+      { type: "speak", sentence: "لازم تجرّب الشُّربة. السلطة طازة أوي. (lāzem tegarrab el-shorba. el-salaṭa ṭāza awi)", speechLang: "ar-EG", meaning: { ko: "수프 드셔보세요. 샐러드가 신선해요.", en: "Try the soup. Salad is fresh.", es: "Prueba la sopa. Ensalada fresca." } },
+      { type: "speak", sentence: "أنا شبعان. شُكراً! مع السلامة، أشوفك بُكرة! (ana shabʿān. shukran! maʿa salāma, ashūfak bokra!)", speechLang: "ar-EG", meaning: { ko: "배불러요. 감사합니다! 내일 봐요!", en: "Full. Thanks! See you tomorrow!", es: "Lleno. ¡Gracias! ¡Hasta mañana!" } },
     ],
   },
 };

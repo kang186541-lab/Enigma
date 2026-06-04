@@ -245,6 +245,73 @@ const COURSES: Record<string, CourseData> = {
       { phrase: "Permisi.",      meaning: { ko: "실례합니다.",  en: "Excuse me.",  es: "Perdón.",      id: "Meminta perhatian dengan sopan" }, usage: { ko: "정중히 주의를 끌 때",      en: "To get attention politely", es: "Para llamar la atención",   id: "Untuk menarik perhatian dengan sopan" } },
     ],
   },
+
+  // Egyptian colloquial (Cairene) learning target. Mirrors the `indonesian`
+  // block's shape exactly — Arabic SCRIPT (with harakat) sits in the same fields
+  // Latin scripts use, and a Cairene romanization rides alongside in `roman`/the
+  // tips. Pronunciation tips reflect real Egyptian sounds (ج = hard "g",
+  // ق = glottal stop, ث→s, ذ/ظ→z), NOT MSA. ko/en/es/id glosses are unchanged.
+  arabic: {
+    stepNames: ["الحُرُوف (al-ḥuruuf)", "كَلِمَات أَساسِيَّة (kalimaat)", "تَحِيَّات (taḥeyyaat)", "خَلَصْنا! (khalaṣna!)"],
+    lang: "ar-EG",
+    lingoTips: [
+      "إِسمَع وبَعدِين اِكتِب الحَرف! 🦊 (esma3 we ektib el-7arf!)",
+      "دُوس عَلى كُل كارت عَشان تِشُوف المَعنى! 🦊 (dous 3ala kol kart!)",
+      "إِسمَع وقُول بصَوت عالي! 🦊 (esma3 we 'oul be-ṣout 3aali!)",
+      "خَلَصت الدَّورة الأَساسِيَّة! 🦊🎉 (khalaṣt el-dawra!)",
+    ],
+    // 28 letters of the Arabic alphabet. `char` = the isolated letter form,
+    // `roman` = Cairene sound value, `tip` = Egyptian letter name (with harakat)
+    // + a sound cue and an example Egyptian word. Hard "g" for ج, hamza for ق.
+    chars: [
+      { char: "ا", roman: "a / ā",  tip: "أَلِف (alif) · صَوت 'aa' الطَّوِيل — زَيّ 'باب' (baab) 🚪" },
+      { char: "ب", roman: "b",      tip: "باء (baa') · زَيّ 'b' — زَيّ 'بِيت' (beet) 🏠" },
+      { char: "ت", roman: "t",      tip: "تاء (taa') · زَيّ 't' — زَيّ 'تُفّاحة' (tuffaa7a) 🍎" },
+      { char: "ث", roman: "s / t",  tip: "ثاء (saa') · في مَصر بِننطُقها 's' — زَيّ 'تَلاتة' (talaata) 3️⃣" },
+      { char: "ج", roman: "g",      tip: "جِيم (giim) · في مَصر 'g' جامْدة — زَيّ 'جامِل' (gamiil) 😍" },
+      { char: "ح", roman: "ḥ",      tip: "حاء (7aa') · 'h' قَوِيّة مِن الزُّور — زَيّ 'حَبِيبي' (7abiibi) ❤️" },
+      { char: "خ", roman: "kh",     tip: "خاء (khaa') · زَيّ 'ch' في الأَلماني — زَيّ 'خُبز' (khubz) 🍞" },
+      { char: "د", roman: "d",      tip: "دال (daal) · زَيّ 'd' — زَيّ 'دُنيا' (donya) 🌍" },
+      { char: "ذ", roman: "z / d",  tip: "ذال (zaal) · في مَصر بِننطُقها 'z' — زَيّ 'ده' (da) 👉" },
+      { char: "ر", roman: "r",      tip: "راء (raa') · 'r' مِترَعِّشة — زَيّ 'رايِح' (raaye7) 🚶" },
+      { char: "ز", roman: "z",      tip: "زاي (zaay) · زَيّ 'z' — زَيّ 'زَمان' (zamaan) ⏳" },
+      { char: "س", roman: "s",      tip: "سِين (siin) · زَيّ 's' — زَيّ 'سَلام' (salaam) ✌️" },
+      { char: "ش", roman: "sh",     tip: "شِين (shiin) · زَيّ 'sh' — زَيّ 'شُكراً' (shukran) 🙏" },
+      { char: "ص", roman: "ṣ",      tip: "صاد (ṣaad) · 's' مُفَخَّمة — زَيّ 'صُبح' (ṣob7) 🌅" },
+      { char: "ض", roman: "ḍ",      tip: "ضاد (ḍaad) · 'd' مُفَخَّمة — زَيّ 'ضَهري' (ḍahri) 🔙" },
+      { char: "ط", roman: "ṭ",      tip: "طاء (ṭaa') · 't' مُفَخَّمة — زَيّ 'طَيِّب' (ṭayyeb) 👌" },
+      { char: "ظ", roman: "z",      tip: "ظاء (ẓaa') · في مَصر بِننطُقها 'z' تِقِيلة — زَيّ 'ظَريف' (zariif) 😎" },
+      { char: "ع", roman: "3 / ʿ",  tip: "عِين (3een) · صَوت مِن جُوّه الزُّور — زَيّ 'عَين' (3een) 👁️" },
+      { char: "غ", roman: "gh",     tip: "غِين (gheen) · زَيّ غَرغَرة خَفِيفة — زَيّ 'غالي' (ghaali) 💎" },
+      { char: "ف", roman: "f",      tip: "فاء (faa') · زَيّ 'f' — زَيّ 'فُلوس' (filoos) 💰" },
+      { char: "ق", roman: "' / ʾ",  tip: "قاف (qaaf) · في مَصر بِنوقَّفها (hamza) — زَيّ 'قَلب' (alb) 💗" },
+      { char: "ك", roman: "k",      tip: "كاف (kaaf) · زَيّ 'k' — زَيّ 'كِتاب' (kitaab) 📖" },
+      { char: "ل", roman: "l",      tip: "لام (laam) · زَيّ 'l' — زَيّ 'لِيمُون' (laymoon) 🍋" },
+      { char: "م", roman: "m",      tip: "مِيم (miim) · زَيّ 'm' — زَيّ 'مَيّة' (mayya) 💧" },
+      { char: "ن", roman: "n",      tip: "نُون (noon) · زَيّ 'n' — زَيّ 'نَهار' (nahaar) ☀️" },
+      { char: "ه", roman: "h",      tip: "هاء (haa') · زَيّ 'h' خَفِيفة — زَيّ 'هِنا' (hena) 📍" },
+      { char: "و", roman: "w / ū",  tip: "واو (waaw) · 'w' أو 'uu' — زَيّ 'وَلَد' (walad) 👦" },
+      { char: "ي", roman: "y / ī",  tip: "ياء (yaa') · 'y' أو 'ii' — زَيّ 'يَوم' (yoom) 📅" },
+    ],
+    words: [
+      { word: "أَهلاً",       meaning: { ko: "안녕하세요",  en: "Hello",      es: "Hola",      id: "Sapaan" },        emoji: "👋" },
+      { word: "شُكراً",       meaning: { ko: "감사합니다",  en: "Thank you",  es: "Gracias",   id: "Ungkapan terima kasih" }, emoji: "🙏" },
+      { word: "أَيوة",        meaning: { ko: "네",          en: "Yes",        es: "Sí",        id: "Jawaban setuju" }, emoji: "✅" },
+      { word: "لأ",           meaning: { ko: "아니요",      en: "No",         es: "No",        id: "Jawaban menolak" }, emoji: "❌" },
+      { word: "مَيّة",        meaning: { ko: "물",          en: "Water",      es: "Agua",      id: "Air" },           emoji: "💧" },
+      { word: "آكِل",         meaning: { ko: "먹다",        en: "Eat",        es: "Comer",     id: "Makan" },         emoji: "🍽️" },
+      { word: "بِيت",         meaning: { ko: "집",          en: "House",      es: "Casa",      id: "Rumah" },         emoji: "🏠" },
+      { word: "مَدرَسة",      meaning: { ko: "학교",        en: "School",     es: "Escuela",   id: "Sekolah" },       emoji: "🏫" },
+      { word: "حُبّ",         meaning: { ko: "사랑",        en: "Love",       es: "Amor",      id: "Cinta" },         emoji: "❤️" },
+      { word: "صاحِب",        meaning: { ko: "친구",        en: "Friend",     es: "Amigo",     id: "Teman" },         emoji: "🤝" },
+    ],
+    greetings: [
+      { phrase: "إِزَّيَّك؟",          meaning: { ko: "안녕하세요! (잘 지내요?)",  en: "How are you?",      es: "¿Cómo estás?",       id: "Apa kabar?" },              usage: { ko: "누군가에게 인사할 때",     en: "When greeting someone",     es: "Al saludar a alguien",      id: "Saat menyapa seseorang" } },
+      { phrase: "شُكراً جَزِيلاً",     meaning: { ko: "감사합니다!",  en: "Thank you very much!",  es: "¡Muchas gracias!",    id: "Terima kasih banyak!" },    usage: { ko: "감사를 표현할 때",         en: "To show gratitude",         es: "Para mostrar gratitud",     id: "Untuk menyampaikan terima kasih" } },
+      { phrase: "آسِف",                meaning: { ko: "죄송합니다.",  en: "I'm sorry.",  es: "Lo siento.",   id: "Permintaan maaf" },     usage: { ko: "사과할 때",                en: "When apologising",          es: "Para disculparse",          id: "Saat meminta maaf" } },
+      { phrase: "لَو سَمَحت",          meaning: { ko: "실례합니다.",  en: "Excuse me / Please.",  es: "Perdón / Por favor.",  id: "Permisi" },                 usage: { ko: "정중히 주의를 끌 때",      en: "To get attention politely", es: "Para llamar la atención",   id: "Untuk menarik perhatian dengan sopan" } },
+    ],
+  },
 };
 
 
@@ -255,6 +322,7 @@ const BC_VOICES: Record<string, string> = {
   "es-ES": "es-ES-AlvaroNeural",
   "ko-KR": "ko-KR-InJoonNeural",
   "id-ID": "id-ID-ArdiNeural",
+  "ar-EG": "ar-EG-ShakirNeural",
 };
 
 /** Stop and unload the module-level native sound */

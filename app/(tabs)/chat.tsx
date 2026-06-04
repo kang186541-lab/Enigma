@@ -96,6 +96,15 @@ const TUTOR_I18N: Record<string, {
       indonesian: "Pemandu Jakarta yang hangat. Sabar, ramah, dan suka memberi semangat. Membantumu berbicara bahasa Indonesia sehari-hari.",
     },
   },
+  layla: {
+    region: { korean: "이집트 아랍어", english: "Egyptian Arabic", spanish: "Árabe egipcio", indonesian: "Bahasa Arab Mesir" },
+    personality: {
+      korean: "따뜻한 카이로 가이드. 인내심 있고 친근하며 격려를 잘함. 일상 이집트 아랍어를 가르침.",
+      english: "Warm Cairo guide. Patient, friendly, and encouraging. Helps you speak everyday Egyptian Arabic.",
+      spanish: "Guía cálida de El Cairo. Paciente, amable y alentadora. Te ayuda a hablar árabe egipcio cotidiano.",
+      indonesian: "Pemandu Kairo yang hangat. Sabar, ramah, dan suka memberi semangat. Membantumu berbicara bahasa Arab Mesir sehari-hari.",
+    },
+  },
 };
 
 const GROUP_LABELS: Record<TutorLanguage, Record<NLang, string>> = {

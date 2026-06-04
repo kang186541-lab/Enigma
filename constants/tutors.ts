@@ -13,6 +13,7 @@ export const TUTOR_IMAGES: Record<string, ImageSourcePropType> = {
   sujin:   require("../assets/avatars/jisu.png"),     // Sujin (formal Korean)
   minho_tutor: require("../assets/avatars/minjun.png"), // Minho (MZ Korean)
   dewi:    require("../assets/avatars/jane.png"),     // Dewi (Indonesian, BETA) — reuses an existing avatar
+  layla:   require("../assets/avatars/jane.png"),     // Layla (Arabic, Egyptian, BETA) — reuses an existing avatar
   // Legacy aliases for backward compat
   sarah:  require("../assets/avatars/sarah.png"),
   jake:   require("../assets/avatars/jake.png"),
@@ -195,6 +196,29 @@ export const TUTORS: Tutor[] = [
       "Terima kasih sudah berani bicara. Itu yang paling penting!",
     ],
   },
+  // ── Arabic Tutor (Egyptian colloquial, BETA) ─────────────────────────────
+  {
+    id: "layla",
+    name: "ليلى (Layla)",
+    emoji: "🌙",
+    flag: "🇪🇬",
+    region: "Egyptian Arabic",
+    personality: "Warm Cairo guide. Patient, friendly, and encouraging. Helps you speak everyday Egyptian Arabic.",
+    speechLang: "ar-EG",
+    language: "arabic",
+    style: "casual",
+    greeting:
+      "أهلاً! أنا ليلى. فرصة سعيدة! يلّا نتعلّم العربي المصري مع بعض. ما تخافش من الغلط، خالص! (ahlan! ana Layla. forSa sa3ida! yalla net3allem el-3arabi el-maSri ma3a ba3D. ma tkhafsh men el-ghalaT, khaaliS!)",
+    responses: [
+      "برافو عليك! نطقك بقى طبيعي أكتر. عايز تجرّب جملة أطول شويّة؟ (bravo 3aleek! noT2ak ba2a Tabee3i aktar. 3aayez tegarrab gomla aTwal shwayya?)",
+      "قرّبت توصل! في المصري العامي، إحنا بنقولها كده. جرّب تاني، يلّا. (2arrabt tewSal! fel-maSri el-3aammi, e7na bne2olha keda. garrab taani, yalla.)",
+      "تمام أوي! إنت بتتعلّم بسرعة جداً. كمّل كده! (tamaam awi! enta betet3allem be-sor3a giddan. kammel keda!)",
+      "ولا يهمّك، كلّنا بنغلط. قولها بالراحة وعلى مهلك. (wala yhemmak, kollena bneghlaT. 2olha bel-ra7a we 3ala mahlak.)",
+      "جامد! بقيت بتتكلّم زيّ المصريين بالظبط. (gaamed! ba2eet betetkallem zayy el-maSreyyin bel-ZabT.)",
+      "جرّب تاني وإنت واثق في نفسك. إنت تقدر أكيد! (garrab taani w-enta waase2 fi nafsak. enta te2dar akeed!)",
+      "ميرسي إنك اتشجّعت واتكلّمت. ده أهمّ حاجة خالص! (merci ennak etshagga3t w-etkallemt. da ahamm 7aaga khaaliS!)",
+    ],
+  },
 ];
 
 export const TUTOR_GROUPS: { language: TutorLanguage; label: string; flag: string }[] = [
@@ -202,6 +226,7 @@ export const TUTOR_GROUPS: { language: TutorLanguage; label: string; flag: strin
   { language: "spanish", label: "Spanish", flag: "🇪🇸🇲🇽" },
   { language: "korean", label: "Korean", flag: "🇰🇷" },
   { language: "indonesian", label: "Indonesian", flag: "🇮🇩" },
+  { language: "arabic", label: "Arabic", flag: "🇪🇬" },
 ];
 
 export function getTutor(id: string): Tutor | undefined {

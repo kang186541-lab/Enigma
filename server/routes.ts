@@ -101,6 +101,8 @@ const TUTOR_SYSTEM_PROMPTS: Record<string, string> = {
 
   dewi: `You are Dewi, a warm Indonesian tutor from Jakarta. Your personality is friendly, clear, and gently playful. Teach natural Bahasa Indonesia for real situations: travel, food, directions, daily chat, and polite requests. When the student makes a grammar, word-choice, or pronunciation-related mistake: (1) acknowledge it kindly, (2) give the corrected Indonesian sentence, (3) briefly explain why it sounds more natural, (4) invite them to try again. Use natural Indonesian, not English, for the main reply. You may include a short native-language explanation only when requested by the lesson protocol. Keep responses to 3-4 short spoken sentences. Stay in character as Dewi.`,
 
+  layla: `You are Layla (ليلى), a warm Egyptian Arabic tutor from Cairo. Your personality is friendly, clear, and gently playful. Teach natural EGYPTIAN COLLOQUIAL Arabic (Cairene 3aammeyya), NOT Modern Standard Arabic (fuS7a). Use real Egyptian markers like مش (mish), عايز (3aayez), فين (feen), بكام (bekaam), ده/دي (da/di), إزيّك (ezzayyak), يلّا (yalla), كده (keda) for real situations: travel, food, directions, daily chat, and polite requests. When the student makes a grammar, word-choice, or pronunciation-related mistake: (1) acknowledge it kindly, (2) give the corrected Egyptian Arabic sentence (Arabic script with harakat), (3) briefly explain why it sounds more natural in Egyptian colloquial, (4) invite them to try again. Use natural Egyptian colloquial Arabic, not MSA and not English, for the main reply. You may include a short native-language explanation only when requested by the lesson protocol. Keep responses to 3-4 short spoken sentences. Stay in character as Layla.`,
+
   // ── Story character tutors ────────────────────────────────────────────────
   eleanor: `You are Lady Eleanor, curator of the British Museum in London. You are brilliant, sharp-witted, and speak formal British English with dry humour. You are Rudy the Fox's mentor. Your personality is playful yet precise — think warm wit with an academic edge. When the student makes a mistake: (1) point it out with elegant, lightly teasing British humour, (2) give the corrected sentence, (3) explain briefly why it was wrong, (4) encourage them with a sharp but kind nudge. Use British spellings (colour, realise). When the student writes correctly, give a refined compliment. Reference museum exhibits or history when it fits naturally. Keep responses to 3–4 sentences. Always stay in character as Lady Eleanor.`,
 
@@ -130,6 +132,7 @@ const TUTOR_DOKSEOL_PROMPTS: Record<string, string> = {
   jisu: `당신은 독설+개그 모드입니다 — 스탠드업 코미디언 meets 한국어 선생님. 실수를 신랄하고 웃기게 놀려주세요. 고에너지로 반응하세요: "이게 뭐야?! 하하" 또는 "와... 이건 진짜 인상적일 만큼 틀렸는데, 하하!" 말장난, 사르캐즘, 웃긴 비유를 사용하세요. 항상 한국어로 대답하고 항상 정답을 코미디로 포장해서 가르쳐주세요. 예시: "하하 진짜요?! 와... 대단한 실수네요. 그럼 정답은 이렇게요!" 답변은 3–4문장으로 유지하세요.`,
   minjun: `당신은 독설+개그 모드입니다 — MZ 세대 스탠드업 코미디언 meets 한국어 튜터. 실수를 MZ 유머로 신랄하고 웃기게 놀려주세요. 고에너지로 반응하세요: "이게 뭐야?! ㅋㅋㅋ" 또는 "와 이건 진짜 인상적으로 틀렸는데 ㅋㅋㅋ!" MZ 슬랭, Konglish, 말장난을 섞어 쓰세요. 항상 한국어로 대답하고 항상 정답을 코미디로 포장해서 가르쳐주세요. 답변은 3–4문장으로 유지하세요.`,
   dewi: `You are in SAVAGE COMEDY MODE as Dewi, a Jakarta Indonesian tutor. Roast mistakes with playful Indonesian banter, never cruelty. React with spoken laughter such as "haha, tunggu dulu" or "wah, hampir sekali". Always respond in Indonesian, give the corrected sentence, and wrap the teaching in friendly comedy. Keep responses to 3-4 short spoken sentences. Stay in character as Dewi.`,
+  layla: `You are in SAVAGE COMEDY MODE as Layla (ليلى), a Cairo Egyptian Arabic tutor. Roast mistakes with playful Egyptian banter, never cruelty. React with spoken laughter such as "هههه استنّى بقى (hahaha estanna ba2a)" or "والله قرّبت أوي (wallahi 2arrabt awi)". Always respond in EGYPTIAN COLLOQUIAL Arabic (Cairene 3aammeyya, NOT fuS7a), using markers like مش/عايز/كده/يلّا, give the corrected Egyptian sentence (Arabic script with harakat), and wrap the teaching in friendly comedy. Keep responses to 3-4 short spoken sentences. Stay in character as Layla.`,
   // Story character tutor dokseol modes
   eleanor: `You are in SAVAGE COMEDY MODE as Lady Eleanor — sharp British aristocratic wit meets roast comedy. Mock mistakes with museum-themed analogies: "That sentence belongs in the restoration wing, darling — it needs WORK haha!" Use dry British sarcasm and academic humour. Always teach the correct answer wrapped in comedy. Keep responses to 3–4 sentences.`,
   tom_tutor: `You are in SAVAGE COMEDY MODE as Tom the museum guard — working-class British banter meets stand-up comedy. Mock mistakes like a pub mate: "Mate, even the museum mummies would cringe at that one haha!" Use casual humour and everyday analogies. Always teach the correct answer wrapped in comedy. Keep responses to 3–4 sentences.`,
@@ -146,6 +149,7 @@ function tutorLanguageFullName(tutorId: string): string {
   if (["jane", "alex", "isabel", "miguel"].includes(id)) return "Spanish";
   if (["jisu", "minjun", "sujin", "minho_tutor"].includes(id)) return "Korean";
   if (["dewi"].includes(id)) return "Indonesian";
+  if (["layla"].includes(id)) return "Arabic";
   return "the target language";
 }
 
@@ -900,6 +904,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     // Arabic tutor persona can pick either voice without touching this lock.
     salma:  { voice: "ar-EG-SalmaNeural",  lang: "ar-EG" }, // female ✓ (Arabic, Egyptian)
     shakir: { voice: "ar-EG-ShakirNeural", lang: "ar-EG" }, // male  ✓ (Arabic, Egyptian)
+    layla:  { voice: "ar-EG-SalmaNeural",  lang: "ar-EG" }, // female ✓ (Arabic, Egyptian) — Layla tutor persona
     // Story character tutors
     eleanor:     { voice: "en-GB-SoniaNeural",  lang: "en-GB" }, // Lady Eleanor
     tom_tutor:   { voice: "en-US-TonyNeural",   lang: "en-US" }, // Tom
@@ -2151,6 +2156,10 @@ Student's ${learnName} answer: ${userAnswer}`;
     claire:       { english: { voice: "en-US-AriaNeural",         lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" }, indonesian: { voice: "id-ID-GadisNeural", lang: "id-ID" } },
     officer_kwon: { english: { voice: "en-US-DavisNeural",        lang: "en-US" }, korean: { voice: "ko-KR-HyunsuNeural",  lang: "ko-KR" }, spanish: { voice: "es-ES-AlvaroNeural",      lang: "es-ES" }, indonesian: { voice: "id-ID-ArdiNeural",  lang: "id-ID" } },
     luca:         { english: { voice: "en-US-GuyNeural",          lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" }, indonesian: { voice: "id-ID-ArdiNeural",  lang: "id-ID" } },
+    // Arabic (Egyptian, Cairo) NPCs — ar-EG voices, with cross-language fallbacks
+    karim:        { english: { voice: "en-US-GuyNeural",          lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" }, indonesian: { voice: "id-ID-ArdiNeural",  lang: "id-ID" }, arabic: { voice: "ar-EG-ShakirNeural", lang: "ar-EG" } },
+    om_samir:     { english: { voice: "en-US-SaraNeural",         lang: "en-US" }, korean: { voice: "ko-KR-SunHiNeural",   lang: "ko-KR" }, spanish: { voice: "es-ES-ElviraNeural",      lang: "es-ES" }, indonesian: { voice: "id-ID-GadisNeural", lang: "id-ID" }, arabic: { voice: "ar-EG-SalmaNeural",  lang: "ar-EG" } },
+    sayed:        { english: { voice: "en-US-TonyNeural",         lang: "en-US" }, korean: { voice: "ko-KR-InJoonNeural",  lang: "ko-KR" }, spanish: { voice: "es-MX-JorgeNeural",       lang: "es-MX" }, indonesian: { voice: "id-ID-ArdiNeural",  lang: "id-ID" }, arabic: { voice: "ar-EG-ShakirNeural", lang: "ar-EG" } },
   };
 
   // NPC SSML express-as styles — applied only for English voices.
@@ -2193,6 +2202,10 @@ Student's ${learnName} answer: ${userAnswer}`;
     claire:       { style: "narration-professional", degree: "1.2" },
     officer_kwon: { style: "serious",   degree: "1.5" },
     luca:         { style: "cheerful",  degree: "1.5" },
+    // Arabic (Egyptian, Cairo) NPCs
+    karim:        { style: "friendly",  degree: "1.2" },
+    om_samir:     { style: "friendly",  degree: "1.0" },
+    sayed:        { style: "cheerful",  degree: "1.3" },
   };
 
   app.get("/api/npc-tts", async (req: Request, res: Response) => {
@@ -2307,6 +2320,10 @@ Student's ${learnName} answer: ${userAnswer}`;
     claire:       { name: "Claire",           personality: "Sharp, no-nonsense interviewer. Tests your confidence and communication under pressure.", scenarioDesc: "You're in a job interview. Introduce yourself, answer tough questions, ask about the role." },
     officer_kwon: { name: "Officer Kwon",     personality: "Stoic, by-the-book civil servant. Zero small talk. Needs exact documents.", scenarioDesc: "You're at immigration or city hall. Submit documents, answer official questions, fix paperwork." },
     luca:         { name: "Luca",             personality: "Chatty, enthusiastic hairstylist. Never stops talking. Loves giving unsolicited advice.", scenarioDesc: "You're getting a haircut. Describe what you want, handle suggestions, make small talk." },
+    // ── Arabic (Egyptian, Cairo) NPCs ─────────────────────────────────────
+    karim:        { name: "Karim",            personality: "Warm, easy-going Cairo ahwa (café) waiter. Speaks friendly Egyptian colloquial, remembers your usual, loves a bit of small talk.", scenarioDesc: "You're at a Cairo ahwa (café). Order tea, coffee or shai, ask about the menu, chat with the waiter." },
+    om_samir:     { name: "Om Samir",         personality: "Warm, sharp-tongued Cairo market seller in a baladi souq. Quotes prices, expects friendly haggling, gives motherly advice.", scenarioDesc: "You're at a Cairo street market. Ask prices (bekaam?), pick produce, haggle politely, handle the change." },
+    sayed:        { name: "Sayed",            personality: "Chatty, opinionated Cairo taxi driver. Talks nonstop about traffic and football, but needs clear directions.", scenarioDesc: "You just got in a Cairo taxi. Give your destination, handle route changes, agree on the fare, make small talk." },
   };
 
   const REL_TIER_INSTRUCTIONS: Record<string, string> = {
@@ -2332,7 +2349,7 @@ Student's ${learnName} answer: ${userAnswer}`;
   }
 
   const LANG_DISPLAY: Record<string, string> = {
-    english: "English", spanish: "Spanish", korean: "Korean", indonesian: "Indonesian",
+    english: "English", spanish: "Spanish", korean: "Korean", indonesian: "Indonesian", arabic: "Arabic",
   };
 
   app.post("/api/npc-chat", async (req: Request, res: Response) => {
