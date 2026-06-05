@@ -78,13 +78,13 @@ function setupCors(app: express.Application) {
     }
 
     if (process.env.REPLIT_DOMAINS) {
-      process.env.REPLIT_DOMAINS.split(",").forEach((d) => {
+      process.env.REPLIT_DOMAINS.split(",").forEach((d: string) => {
         addOrigin(`https://${d.trim()}`);
       });
     }
 
     if (process.env.CORS_ALLOWED_ORIGINS) {
-      process.env.CORS_ALLOWED_ORIGINS.split(",").forEach((allowedOrigin) => {
+      process.env.CORS_ALLOWED_ORIGINS.split(",").forEach((allowedOrigin: string) => {
         addOrigin(allowedOrigin);
       });
     }
