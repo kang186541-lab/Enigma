@@ -72,6 +72,24 @@ function logProviderError(scope: string, status: number, body: string | undefine
   }
 }
 
+async function translateTextForFeature(taskLabel: string, text: string, targetLanguage: string): Promise<string> {
+  const source = text.trim();
+  if (!source || !targetLanguage.trim()) return "";
+  const translation = await completeText({
+    taskLabel,
+    model: "gpt-4o",
+    maxTokens: 300,
+    messages: [
+      {
+        role: "system",
+        content: `You are a translation assistant. Translate the user's text into ${targetLanguage}. Return ONLY the translated text with no explanation, no quotes, no prefixes.`,
+      },
+      { role: "user", content: source },
+    ],
+  });
+  return translation.trim();
+}
+
 function sendVoiceServiceUnavailable(res: Response, scope: string): Response {
   console.error(`${scope} unavailable: missing provider configuration`);
   return res.status(503).json({ error: "Voice service unavailable" });
@@ -869,18 +887,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         return res.status(400).json({ error: "text and targetLanguage are required" });
       }
 
-      const translation = await completeText({
-        taskLabel: "/api/translate",
-        model: "gpt-4o",
-        maxTokens: 300,
-        messages: [
-          {
-            role: "system",
-            content: `You are a translation assistant. Translate the user's text into ${targetLanguage}. Return ONLY the translated text with no explanation, no quotes, no prefixes.`,
-          },
-          { role: "user", content: text },
-        ],
-      });
+      const translation = await translateTextForFeature("/api/translate", text, targetLanguage);
       res.json({ translation });
     } catch (err) {
       if (!logAiProviderOutage("[/api/translate]", err)) console.error("[/api/translate] unexpected error:", err);
@@ -2227,7 +2234,15 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       const npcVoices = NPC_AZURE_VOICES[npcId];
       if (!npcVoices) return res.status(400).json({ error: "Unknown npcId" });
-      const voiceInfo = npcVoices[npcLang] ?? npcVoices["english"];
+      // Arabic (BETA) is a learning TARGET with no per-NPC voice row; Egyptian
+      // Arabic has two neural voices, so pick by the NPC's gender (inferred from
+      // its Indonesian voice — Gadis = female, Ardi = male) instead of falling
+      // back to an English voice for an Arabic learner.
+      const voiceInfo =
+        npcVoices[npcLang] ??
+        (npcLang === "arabic"
+          ? { voice: npcVoices.indonesian?.voice?.includes("Gadis") ? "ar-EG-SalmaNeural" : "ar-EG-ShakirNeural", lang: "ar-EG" }
+          : npcVoices["english"]);
 
       const speaking_rate = Math.min(1.5, Math.max(0.7, parseFloat(speed ?? "1.0")));
 
@@ -2448,12 +2463,39 @@ Student's ${learnName} answer: ${userAnswer}`;
       const rawChoices: RawChoice[] = Array.isArray(parsed.choices) ? parsed.choices.slice(0, 3) : [];
       const choices = rawChoices.map((c): { text: string; translation: string } => {
         if (typeof c === "string") return { text: c, translation: "" };
-        return { text: c.text ?? "", translation: c.translation ?? "" };
+        return { text: (c.text ?? "").trim(), translation: (c.translation ?? "").trim() };
       });
+      const reply = (parsed.reply ?? "...").trim() || "...";
+      let replyTranslation = (parsed.replyTranslation ?? "").trim();
+      if (includeTranslation && !replyTranslation) {
+        try {
+          replyTranslation = await translateTextForFeature("[/api/npc-chat] replyTranslation", reply, nativeLangDisplay);
+        } catch (translationErr) {
+          if (!logAiProviderOutage("[/api/npc-chat] replyTranslation", translationErr)) {
+            console.warn("[/api/npc-chat] reply translation fallback failed");
+          }
+        }
+      }
+
+      if (includeTranslation) {
+        await Promise.all(choices.map(async (choice, idx) => {
+          if (!choice.text || choice.translation) return;
+          try {
+            choices[idx] = {
+              ...choice,
+              translation: await translateTextForFeature("[/api/npc-chat] choiceTranslation", choice.text, nativeLangDisplay),
+            };
+          } catch (translationErr) {
+            if (!logAiProviderOutage("[/api/npc-chat] choiceTranslation", translationErr)) {
+              console.warn("[/api/npc-chat] choice translation fallback failed");
+            }
+          }
+        }));
+      }
 
       res.json({
-        reply:            parsed.reply            ?? "...",
-        replyTranslation: (parsed.replyTranslation ?? "").trim() || undefined,
+        reply,
+        replyTranslation: replyTranslation || undefined,
         scoreChange:      typeof parsed.scoreChange === "number" ? Math.max(-10, Math.min(10, parsed.scoreChange)) : 0,
         emotion:          parsed.emotion          ?? "neutral",
         choices,
@@ -2480,9 +2522,11 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       const LANG_FULL: Record<string, string> = {
         english: "English", spanish: "Spanish", korean: "Korean", indonesian: "Indonesian",
-        "en-US": "English", "es-ES": "Spanish", "ko-KR": "Korean",
+        "en-US": "English", "es-ES": "Spanish", "ko-KR": "Korean", "id": "Indonesian",
+        "en": "English", "es": "Spanish", "ko": "Korean",
       };
       const langName = LANG_FULL[targetLang] ?? "English";
+      const nativeName = nativeLang ? (LANG_FULL[nativeLang] ?? "English") : "English";
 
       // ── Content moderation on latest user message ────────────────────────
       // Short Korean messages bypass moderation (greetings / noise). Other
@@ -2546,8 +2590,18 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       // Strip the [EVAL] block from reply shown to user
       const reply = raw.replace(/\s*\[EVAL\][\s\S]*?\[\/EVAL\]/g, "").trim();
+      let replyTranslation = "";
+      if (nativeName.toLowerCase() !== langName.toLowerCase() && reply) {
+        try {
+          replyTranslation = await translateTextForFeature("[/api/mission-chat] replyTranslation", reply, nativeName);
+        } catch (translationErr) {
+          if (!logAiProviderOutage("[/api/mission-chat] replyTranslation", translationErr)) {
+            console.warn("[/api/mission-chat] reply translation fallback failed");
+          }
+        }
+      }
 
-      res.json({ reply, sentenceCount, grammarNote, shouldEnd });
+      res.json({ reply, replyTranslation: replyTranslation || undefined, sentenceCount, grammarNote, shouldEnd });
     } catch (err) {
       if (!logAiProviderOutage("[/api/mission-chat]", err)) console.error("[/api/mission-chat] unexpected error:", err);
       res.status(500).json({ error: "Mission chat failed" });

@@ -110,6 +110,26 @@ function npcReplyFallback(nativeLang: string): string {
   return "The NPC connection is having trouble for a moment. Try one more short sentence?";
 }
 
+function translationUnavailableText(nativeLang: string): string {
+  if (nativeLang === "korean") return "번역을 불러오지 못했어요. 잠시 후 다시 눌러 주세요.";
+  if (nativeLang === "spanish") return "No se pudo cargar la traducción. Inténtalo de nuevo en un momento.";
+  if (nativeLang === "indonesian") return "Terjemahan belum bisa dimuat. Coba lagi sebentar lagi.";
+  return "Translation could not be loaded. Please try again in a moment.";
+}
+
+function translationToggleLabel(nativeLang: string, shown: boolean): string {
+  if (shown) {
+    if (nativeLang === "korean") return "번역 숨기기";
+    if (nativeLang === "spanish") return "Ocultar";
+    if (nativeLang === "indonesian") return "Sembunyikan";
+    return "Hide";
+  }
+  if (nativeLang === "korean") return "번역 보기";
+  if (nativeLang === "spanish") return "Ver traducción";
+  if (nativeLang === "indonesian") return "Terjemahkan";
+  return "Translate";
+}
+
 export default function NpcMissionScreen() {
   const { npcId } = useLocalSearchParams<{ npcId: string }>();
   const insets = useSafeAreaInsets();
@@ -174,6 +194,9 @@ export default function NpcMissionScreen() {
   useEffect(() => {
     if (!npc) return;
     const openingText = NPC_OPENING[npc.id]?.[language] ?? NPC_OPENING[npc.id]?.english ?? "Hello!";
+    const openingTranslation = native !== language
+      ? (NPC_OPENING[npc.id]?.[native] ?? "")
+      : "";
     const openingId   = "opening-" + npc.id;
 
     AsyncStorage.multiGet([REL_KEY, EMO_KEY]).then(([[, relRaw], [, emoRaw]]) => {
@@ -183,12 +206,12 @@ export default function NpcMissionScreen() {
       const savedEmo   = emos[npc.id] ?? "neutral";
       setRelationship(savedScore);
       setEmotion(savedEmo);
-      setMessages([{ id: openingId, text: openingText, isUser: false }]);
+      setMessages([{ id: openingId, text: openingText, isUser: false, translation: openingTranslation }]);
       setTimeout(() => playNpcTts(openingText, openingId), 400);
       fetchNpcReply([], true, savedScore);
     }).catch((e) => {
       console.warn('[NPC] Storage load failed:', e);
-      setMessages([{ id: openingId, text: openingText, isUser: false }]);
+      setMessages([{ id: openingId, text: openingText, isUser: false, translation: openingTranslation }]);
       setTimeout(() => playNpcTts(openingText, openingId), 400);
       fetchNpcReply([], true, 0);
     });
@@ -700,7 +723,11 @@ export default function NpcMissionScreen() {
     setIsRecording(true);
     try {
       const { base64, mimeType } = await recordAudio(4000);
-      const voiceInfo = npc?.voice[language as keyof NonNullable<typeof npc>["voice"]] ?? { lang: "en-US" };
+      // Arabic (BETA) has no per-NPC voice row; the user speaks Egyptian Arabic,
+      // so STT must use ar-EG (not the en-US fallback) to recognize their input.
+      const voiceInfo =
+        npc?.voice[language as keyof NonNullable<typeof npc>["voice"]] ??
+        (language === "arabic" ? { lang: "ar-EG" } : { lang: "en-US" });
       const res = await fetch(new URL("/api/stt", getApiUrl()).toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -737,7 +764,7 @@ export default function NpcMissionScreen() {
       return;
     }
 
-    const hasTransl = !!translation || !!onDemandTranslMap[id];
+    const hasTransl = !!translation?.trim() || !!onDemandTranslMap[id]?.trim();
     if (hasTransl) {
       LayoutAnimation.configureNext(LayoutAnimation.create(250, "easeInEaseOut", "opacity"));
       setMsgTranslVisible(prev => new Set(prev).add(id));
@@ -756,12 +783,14 @@ export default function NpcMissionScreen() {
         body: JSON.stringify({ text, targetLanguage: langLabel[native] ?? native }),
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data?.error ?? "Translation failed");
       const tr = (data.translation ?? "").trim();
+      if (!tr) throw new Error("Translation returned empty text");
       LayoutAnimation.configureNext(LayoutAnimation.create(250, "easeInEaseOut", "opacity"));
-      setOnDemandTranslMap(prev => ({ ...prev, [id]: tr || text }));
+      setOnDemandTranslMap(prev => ({ ...prev, [id]: tr }));
     } catch (e) {
       console.warn('[API] translation request failed:', e);
-      setOnDemandTranslMap(prev => ({ ...prev, [id]: "" }));
+      setOnDemandTranslMap(prev => ({ ...prev, [id]: translationUnavailableText(native) }));
     } finally {
       setFetchingTranslSet(prev => { const n = new Set(prev); n.delete(id); return n; });
     }
@@ -770,10 +799,8 @@ export default function NpcMissionScreen() {
   const renderItem = ({ item }: { item: NpcMessage }) => {
     const translShown   = msgTranslVisible.has(item.id);
     const isFetching    = fetchingTranslSet.has(item.id);
-    const resolvedTransl = item.translation || onDemandTranslMap[item.id] || "";
-    const btnLabel = translShown
-      ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : native === "indonesian" ? "Sembunyikan" : "Hide")
-      : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : native === "indonesian" ? "Terjemahkan" : "Translate");
+    const resolvedTransl = item.translation?.trim() || onDemandTranslMap[item.id]?.trim() || "";
+    const btnLabel = translationToggleLabel(native, translShown);
 
     return (
       <View style={[styles.msgRow, item.isUser ? styles.msgRowUser : styles.msgRowNpc]}>
@@ -893,40 +920,14 @@ export default function NpcMissionScreen() {
         keyboardVerticalOffset={0}
       >
         {/* ── CHAT ── */}
-        {npc && npcVisual ? (
-          <View style={styles.sceneStage}>
-            {npcVisual.sceneImage ? (
-              <View style={styles.sceneImageStage}>
+        <View style={styles.chatScene}>
+          {npc && npcVisual ? (
+            <View style={styles.sceneBackdrop} pointerEvents="none">
+              {npcVisual.sceneImage ? (
                 <Animated.Image
                   source={npcVisual.sceneImage}
-                  style={styles.scenePlateImage}
-                  resizeMode="cover"
-                  accessibilityIgnoresInvertColors
-                />
-                <LinearGradient
-                  colors={["rgba(8,5,3,0.04)", "rgba(8,5,3,0.38)", "rgba(8,5,3,0.74)"]}
-                  start={{ x: 1, y: 0 }}
-                  end={{ x: 0, y: 0 }}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={styles.sceneTextBlock}>
-                  <Text style={styles.sceneRole}>{scenario}</Text>
-                  <Text style={styles.sceneName}>{npc.name}</Text>
-                </View>
-              </View>
-            ) : (
-              <LinearGradient colors={sceneColors} style={styles.sceneImageStage}>
-                <View style={styles.sceneShelfLine} />
-                <View style={[styles.sceneGlow, { backgroundColor: `${npc.color}38` }]} />
-                <View style={styles.sceneCounter} />
-                <View style={styles.sceneTextBlock}>
-                  <Text style={styles.sceneRole}>{scenario}</Text>
-                  <Text style={styles.sceneName}>{npc.name}</Text>
-                </View>
-                <Animated.Image
-                  source={npcVisual.rolePortrait}
                   style={[
-                    styles.sceneCharacter,
+                    styles.sceneBackdropImage,
                     {
                       transform: [
                         { translateY: sceneTranslateY },
@@ -934,19 +935,36 @@ export default function NpcMissionScreen() {
                       ],
                     },
                   ]}
-                  resizeMode="contain"
+                  resizeMode="cover"
                   accessibilityIgnoresInvertColors
                 />
-              </LinearGradient>
-            )}
-          </View>
-        ) : null}
+              ) : (
+                <LinearGradient colors={sceneColors} style={StyleSheet.absoluteFill} />
+              )}
+              <LinearGradient
+                colors={[
+                  "rgba(15,7,3,0.48)",
+                  "rgba(15,7,3,0.68)",
+                  "rgba(15,7,3,0.88)",
+                ]}
+                locations={[0, 0.48, 1]}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <View style={styles.sceneMetaPill}>
+                <Text style={styles.sceneRole} numberOfLines={1}>{scenario}</Text>
+                <Text style={styles.sceneName} numberOfLines={1}>{npc.name}</Text>
+              </View>
+            </View>
+          ) : null}
 
-        <FlatList
+          <FlatList
           data={messages}
           keyExtractor={m => m.id}
           renderItem={renderItem}
           inverted
+          style={styles.chatList}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={isTyping ? (
@@ -959,15 +977,15 @@ export default function NpcMissionScreen() {
               </View>
             </View>
           ) : null}
-        />
+          />
 
-        {/* ── TUTOR HINT ── */}
-        <View style={styles.hintBar}>
-          <Text style={styles.hintText}>{tutorHint}</Text>
-        </View>
+          {/* ── TUTOR HINT ── */}
+          <View style={styles.hintBar}>
+            <Text style={styles.hintText}>{tutorHint}</Text>
+          </View>
 
-        {/* ── INPUT AREA ── */}
-        <View style={[styles.inputArea, { paddingBottom: bottomPad + 8 }]}>
+          {/* ── INPUT AREA ── */}
+          <View style={[styles.inputArea, { paddingBottom: bottomPad + 8 }]}>
           {/* Stranger: 3 choice buttons */}
           {showStranger && choices.length > 0 && (
             <View style={styles.choicesWrap}>
@@ -1137,6 +1155,7 @@ export default function NpcMissionScreen() {
               </Pressable>
             </View>
           )}
+          </View>
         </View>
       </KeyboardAvoidingView>
 
@@ -1315,44 +1334,33 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.bg1 },
   flex: { flex: 1 },
 
-  sceneStage: {
-    paddingHorizontal: 12,
-    paddingTop: 8,
-    paddingBottom: 4,
+  chatScene: {
+    flex: 1,
+    position: "relative",
+    overflow: "hidden",
     backgroundColor: C.bg1,
   },
-  sceneImageStage: {
-    width: "100%",
-    aspectRatio: 16 / 9,
-    minHeight: Platform.OS === "web" ? 210 : 190,
-    maxHeight: Platform.OS === "web" ? 340 : 280,
-    borderRadius: 18,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(201,162,39,0.42)",
-    position: "relative",
-    justifyContent: "flex-end",
-    shadowColor: C.gold,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.18,
-    shadowRadius: 14,
-    elevation: 5,
+  sceneBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 0,
   },
-  scenePlateImage: {
+  sceneBackdropImage: {
     ...StyleSheet.absoluteFillObject,
     width: "100%",
     height: "100%",
-    borderRadius: 18,
+    opacity: 0.58,
   },
-  sceneTextBlock: {
+  sceneMetaPill: {
     position: "absolute",
     left: 14,
-    top: 12,
-    bottom: 12,
-    width: "50%",
-    zIndex: 4,
-    justifyContent: "flex-end",
-    gap: 3,
+    top: 10,
+    maxWidth: "72%",
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(201,162,39,0.32)",
+    backgroundColor: "rgba(14,7,4,0.58)",
   },
   sceneRole: {
     fontSize: 10,
@@ -1368,41 +1376,6 @@ const styles = StyleSheet.create({
     textShadowColor: "rgba(0,0,0,0.45)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
-  },
-  sceneShelfLine: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 34,
-    height: 1,
-    backgroundColor: "rgba(244,232,193,0.18)",
-  },
-  sceneGlow: {
-    position: "absolute",
-    width: 170,
-    height: 170,
-    borderRadius: 85,
-    right: 18,
-    top: 6,
-    opacity: 0.75,
-  },
-  sceneCounter: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 34,
-    backgroundColor: "rgba(20,9,4,0.46)",
-    borderTopWidth: 1,
-    borderTopColor: "rgba(244,232,193,0.14)",
-  },
-  sceneCharacter: {
-    position: "absolute",
-    right: -16,
-    bottom: -22,
-    width: "58%",
-    height: "126%",
-    zIndex: 3,
   },
 
   header: {
@@ -1440,6 +1413,7 @@ const styles = StyleSheet.create({
   relFill: { height: 4, borderRadius: 2 },
   relLabel: { fontSize: 10, fontFamily: F.bodySemi, flexShrink: 0 },
 
+  chatList: { flex: 1, zIndex: 1 },
   listContent: { paddingHorizontal: 14, paddingVertical: 12, gap: 10 },
   msgRow: { flexDirection: "row", alignItems: "flex-end", gap: 8 },
   msgRowUser: { justifyContent: "flex-end" },
@@ -1491,6 +1465,7 @@ const styles = StyleSheet.create({
   dot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: C.goldDark },
 
   hintBar: {
+    zIndex: 2,
     paddingHorizontal: 14,
     paddingVertical: 5,
     borderTopWidth: 1,
@@ -1500,6 +1475,7 @@ const styles = StyleSheet.create({
   hintText: { fontSize: 11, fontFamily: F.body, color: C.goldDark, fontStyle: "italic", textAlign: "center" },
 
   inputArea: {
+    zIndex: 2,
     backgroundColor: C.bg1,
     borderTopWidth: 1,
     borderTopColor: C.border,

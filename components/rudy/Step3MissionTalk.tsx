@@ -50,6 +50,7 @@ interface Props {
 type RudyLineResult = {
   text: string;
   ok: boolean;
+  translation?: string;
 };
 
 // ── STT language mapping ──────────────────────────────────────────────────────
@@ -171,17 +172,19 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         const opening: ChatMsg = {
           role: "rudy",
           text: rudyLine.text,
+          translation: rudyLine.translation,
           connectionError: !rudyLine.ok,
         };
         setMessages([opening]);
         if (rudyLine.ok) {
           playTTS(rudyLine.text);
-          // Fetch translation in background
-          fetchTranslation(rudyLine.text).then((tr) => {
-            if (tr && mountedRef.current) {
-              setMessages((prev) => prev.map((m, i) => i === 0 ? { ...m, translation: tr } : m));
-            }
-          });
+          if (!rudyLine.translation) {
+            fetchTranslation(rudyLine.text).then((tr) => {
+              if (tr && mountedRef.current) {
+                setMessages((prev) => prev.map((m, i) => i === 0 ? { ...m, translation: tr } : m));
+              }
+            });
+          }
         }
       }
       setPhase("idle");
@@ -240,11 +243,11 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         throw new Error(`HTTP ${res.status}: ${body.slice(0, 180)}`);
       }
       const json = await res.json() as {
-        reply: string; sentenceCount: number;
+        reply: string; replyTranslation?: string; sentenceCount: number;
         grammarNote: string; shouldEnd: boolean;
       };
 
-      if (!mountedRef.current) return { text: json.reply, ok: true };
+      if (!mountedRef.current) return { text: json.reply, translation: json.replyTranslation, ok: true };
       if (json.grammarNote) setGrammarNotes((prev) => [...prev, json.grammarNote]);
       if (json.shouldEnd) {
         if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
@@ -253,7 +256,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         }, 2500);
       }
 
-      return { text: json.reply, ok: true };
+      return { text: json.reply, translation: json.replyTranslation, ok: true };
     } catch (e) {
       console.warn('[API] mission chat request failed:', e);
       return {
@@ -271,6 +274,12 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
   // ── Translate Rudy's message ──────────────────────────────────────────────────
 
   const NATIVE_LANG_LABEL: Record<string, string> = { korean: "Korean", english: "English", spanish: "Spanish", indonesian: "Indonesian" };
+  const translationUnavailable = pickNativeCopy(nativeLang, {
+    korean: "번역을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
+    spanish: "No se pudo cargar la traducción. Inténtalo de nuevo en un momento.",
+    indonesian: "Terjemahan belum bisa dimuat. Coba lagi sebentar lagi.",
+    english: "Translation could not be loaded. Please try again in a moment.",
+  });
 
   async function fetchTranslation(text: string): Promise<string> {
     try {
@@ -280,10 +289,10 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: sanitizeForTTS(text), targetLanguage: NATIVE_LANG_LABEL[nativeLang] ?? "Korean" }),
       });
-      if (!res.ok) return "";
+      if (!res.ok) return translationUnavailable;
       const json = await res.json();
-      return json.translation ?? "";
-    } catch (e) { console.warn('[API] translation request failed:', e); return ""; }
+      return (json.translation ?? "").trim() || translationUnavailable;
+    } catch (e) { console.warn('[API] translation request failed:', e); return translationUnavailable; }
   }
 
   // ── Word lookup ─────────────────────────────────────────────────────────────
@@ -627,24 +636,26 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
       const rudyMsg: ChatMsg = {
         role: "rudy",
         text: rudyLine.text,
+        translation: rudyLine.translation,
         connectionError: !rudyLine.ok,
       };
       setMessages((prev) => [...prev, rudyMsg]);
       if (rudyLine.ok) {
         playTTS(rudyLine.text);
-        // Fetch translation in background
-        fetchTranslation(rudyLine.text).then((tr) => {
-          if (tr && mountedRef.current) {
-            setMessages((prev) => {
-              const copy = [...prev];
-              const lastRudyIdx = copy.length - 1 - [...copy].reverse().findIndex((m) => m.role === "rudy" && !m.connectionError);
-              if (lastRudyIdx >= 0 && lastRudyIdx < copy.length) {
-                copy[lastRudyIdx] = { ...copy[lastRudyIdx], translation: tr };
-              }
-              return copy;
-            });
-          }
-        });
+        if (!rudyLine.translation) {
+          fetchTranslation(rudyLine.text).then((tr) => {
+            if (tr && mountedRef.current) {
+              setMessages((prev) => {
+                const copy = [...prev];
+                const lastRudyIdx = copy.length - 1 - [...copy].reverse().findIndex((m) => m.role === "rudy" && !m.connectionError);
+                if (lastRudyIdx >= 0 && lastRudyIdx < copy.length) {
+                  copy[lastRudyIdx] = { ...copy[lastRudyIdx], translation: tr };
+                }
+                return copy;
+              });
+            }
+          });
+        }
       }
     } finally {
       sendInFlightRef.current = false;

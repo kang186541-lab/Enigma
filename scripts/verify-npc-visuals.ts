@@ -103,9 +103,15 @@ if (/npcAvatarEmoji>\{npc/.test(missionSource) || /emojiText>\{unlocked \? npc\.
   fail("NPC screens still render identity avatars directly from emoji fallback");
 }
 
-for (const anchor of ["sceneStage", "sceneImageStage", "scenePlateImage", "sceneCharacter", "Animated.Image"]) {
+for (const anchor of ["chatScene", "sceneBackdrop", "sceneBackdropImage", "sceneMetaPill", "Animated.Image"]) {
   if (!missionSource.includes(anchor)) {
-    fail(`app/npc-mission.tsx is missing scenario stage anchor: ${anchor}`);
+    fail(`app/npc-mission.tsx is missing background-scene anchor: ${anchor}`);
+  }
+}
+
+for (const removedAnchor of ["sceneStage", "sceneImageStage", "scenePlateImage", "sceneCharacter"]) {
+  if (missionSource.includes(removedAnchor)) {
+    fail(`app/npc-mission.tsx still contains old foreground scene-card anchor: ${removedAnchor}`);
   }
 }
 
@@ -113,12 +119,16 @@ if (missionSource.includes("ImageBackground")) {
   fail("NPC scene stage should not use ImageBackground; RN Web can crop scene plates at their intrinsic size");
 }
 
-if (!missionSource.includes("aspectRatio: 16 / 9")) {
-  fail("NPC scene plates must preserve their 16:9 composition instead of using a short fixed-height crop");
+if (!missionSource.includes('pointerEvents="none"')) {
+  fail("NPC scene backdrop must be pointer-events-none so it cannot block chat controls");
 }
 
-if (/sceneImageStage:\s*\{[\s\S]*height:\s*Platform\.OS\s*===\s*"web"\s*\?\s*154/.test(missionSource)) {
-  fail("NPC scene stage still uses the old short 154px web height that crops character faces");
+if (!missionSource.includes("style={styles.chatList}") || !missionSource.includes("zIndex: 1")) {
+  fail("NPC chat list must be explicitly layered above the scene backdrop");
+}
+
+if (/scene(?:Image)?Stage:\s*\{[\s\S]*maxHeight:/s.test(missionSource)) {
+  fail("NPC mission still has a maxHeight-clamped foreground scene stage");
 }
 
 console.log(`[verify-npc-visuals] PASS: ${npcIds.length} NPC role portraits and ${scenePlateRequirements.length} scene plates are registered, present, and wired.`);
