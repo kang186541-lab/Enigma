@@ -2,7 +2,7 @@ export interface CulturalNote {
   id: string;
   category: "culture" | "idiom" | "etiquette";
   icon: string;
-  language: "ko" | "en" | "es" | "ar";
+  language: "ko" | "en" | "es" | "ar" | "id";
   country?: string;
   title: { ko: string; en: string; es: string; id: string };
   content: { ko: string; en: string; es: string; id: string };
@@ -1082,10 +1082,242 @@ export const CULTURAL_NOTES: CulturalNote[] = [
       id: "Pujian sering diikuti 'ma sha Allah' untuk menangkal mata jahat (el-ain). Jimat biru 'khamsa' (tangan Fatimah) melindungi darinya. Memuji bayi atau mobil baru? Tambahkan 'ma sha Allah'.",
     },
   },
+
+  // ════════════════════════════════════════════
+  // INDONESIAN LEARNERS (language: "id") — Indonesian culture, ~12 notes
+  // ════════════════════════════════════════════
+  {
+    id: "cn56",
+    category: "etiquette",
+    icon: "🥿",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "집에 들어갈 땐 신발을 벗어요",
+      en: "Take off your shoes before entering a home",
+      es: "Quítate los zapatos antes de entrar a una casa",
+      id: "Lepas sepatu sebelum masuk rumah",
+    },
+    content: {
+      ko: "인도네시아에서는 집에 들어가기 전에 항상 신발을 벗어요. 문 앞에 신발이 놓여 있으면 안에서도 벗으라는 신호예요. 깜빡하면 큰 실례예요!",
+      en: "In Indonesia, you always remove your shoes before entering a home. Shoes lined up by the door are your cue to do the same. Forgetting is a real faux pas!",
+      es: "En Indonesia, siempre te quitas los zapatos antes de entrar a una casa. Los zapatos junto a la puerta son la señal de hacer lo mismo. ¡Olvidarlo es una falta de respeto!",
+      id: "Di Indonesia, kamu selalu melepas sepatu sebelum masuk rumah. Sepatu yang berjajar di depan pintu adalah tanda untuk ikut melepas. Lupa melakukannya itu nggak sopan!",
+    },
+  },
+  {
+    id: "cn57",
+    category: "etiquette",
+    icon: "✋",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "먹고 건넬 땐 오른손으로",
+      en: "Eat and give with the right hand",
+      es: "Come y da con la mano derecha",
+      id: "Makan dan memberi dengan tangan kanan",
+    },
+    content: {
+      ko: "음식을 먹거나 물건을 주고받을 때는 항상 오른손을 쓰세요. 왼손은 부정하게 여겨져요. 양손으로 건네면 더 정중한 표현이에요.",
+      en: "Always use your right hand to eat or to give and receive things. The left hand is considered unclean. Using both hands is even more polite.",
+      es: "Usa siempre la mano derecha para comer o para dar y recibir cosas. La mano izquierda se considera impura. Usar ambas manos es aún más cortés.",
+      id: "Selalu gunakan tangan kanan untuk makan atau memberi dan menerima sesuatu. Tangan kiri dianggap kurang pantas. Memberi dengan dua tangan malah lebih sopan.",
+    },
+  },
+  {
+    id: "cn58",
+    category: "culture",
+    icon: "🕰️",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "잠 까렛: 고무줄 시간",
+      en: "Jam karet: 'rubber time'",
+      es: "Jam karet: la 'hora elástica'",
+      id: "Jam karet",
+    },
+    content: {
+      ko: "'잠 까렛'은 '고무 시간'이라는 뜻으로, 약속 시간이 고무줄처럼 늘어나는 느긋한 시간 관념이에요. 사교 모임이 조금 늦게 시작해도 너무 놀라지 마세요!",
+      en: "'Jam karet' means 'rubber time' — a relaxed attitude where appointments stretch like elastic. Don't be surprised if social gatherings start a bit late!",
+      es: "'Jam karet' significa 'hora de goma': una actitud relajada en la que las citas se estiran como un elástico. ¡No te sorprendas si las reuniones sociales empiezan algo tarde!",
+      id: "'Jam karet' artinya waktu yang molor seperti karet — sikap santai di mana janji bisa mundur. Jangan kaget kalau acara santai mulai agak telat ya!",
+    },
+  },
+  {
+    id: "cn59",
+    category: "etiquette",
+    icon: "🙏",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "살림: 어른 손에 인사하기",
+      en: "Salim: greeting elders by hand",
+      es: "Salim: saludar a los mayores con la mano",
+      id: "Salim (cium tangan)",
+    },
+    content: {
+      ko: "'살림' 또는 '찌움 땅안'은 어른의 손등을 잡아 자신의 이마에 살짝 갖다 대는 인사예요. 존경을 표하는 방법으로, 특히 부모님과 어르신께 해요.",
+      en: "'Salim' (or cium tangan) is taking an elder's hand and gently touching it to your forehead. It's a gesture of respect, especially toward parents and the elderly.",
+      es: "'Salim' (o cium tangan) consiste en tomar la mano de un mayor y tocarla suavemente con tu frente. Es un gesto de respeto, sobre todo hacia los padres y los ancianos.",
+      id: "'Salim' atau cium tangan adalah mengambil tangan orang yang lebih tua dan menempelkannya lembut ke dahimu. Ini tanda hormat, terutama kepada orang tua dan yang lebih sepuh.",
+    },
+  },
+  {
+    id: "cn60",
+    category: "etiquette",
+    icon: "👍",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "소빤 산뚠: 부드러운 태도",
+      en: "Sopan santun: gentle manners",
+      es: "Sopan santun: modales suaves",
+      id: "Sopan santun",
+    },
+    content: {
+      ko: "인도네시아에서는 부드럽게 말하고 차분한 태도가 중요해요. 무언가를 가리킬 땐 검지가 아니라 엄지를 써요. 큰 소리나 화내는 모습은 무례하게 여겨져요.",
+      en: "In Indonesia, a soft voice and calm manner matter. To point at something, use your thumb, never your index finger. Raising your voice or showing anger is seen as rude.",
+      es: "En Indonesia, importan la voz suave y los modales tranquilos. Para señalar algo, usa el pulgar, nunca el índice. Alzar la voz o mostrar enojo se considera grosero.",
+      id: "Di Indonesia, suara yang lembut dan sikap tenang itu penting. Untuk menunjuk sesuatu, gunakan ibu jari, bukan telunjuk. Meninggikan suara atau marah dianggap tidak sopan.",
+    },
+  },
+  {
+    id: "cn61",
+    category: "culture",
+    icon: "🤝",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "고똥 로용: 상부상조 정신",
+      en: "Gotong royong: communal help",
+      es: "Gotong royong: ayuda comunitaria",
+      id: "Gotong royong",
+    },
+    content: {
+      ko: "'고똥 로용'은 마을 사람들이 함께 일을 돕는 상부상조의 정신이에요. 이사, 결혼식, 청소 등 큰일이 있으면 이웃이 자연스럽게 모여 도와요.",
+      en: "'Gotong royong' is the spirit of communal mutual help. For big tasks — moving house, weddings, cleanups — neighbors naturally gather to pitch in together.",
+      es: "'Gotong royong' es el espíritu de ayuda mutua comunitaria. Para tareas grandes — mudanzas, bodas, limpiezas — los vecinos se reúnen de forma natural para colaborar.",
+      id: "'Gotong royong' adalah semangat saling membantu dalam komunitas. Untuk urusan besar — pindah rumah, hajatan, kerja bakti — tetangga dengan sendirinya berkumpul dan ikut membantu.",
+    },
+  },
+  {
+    id: "cn62",
+    category: "etiquette",
+    icon: "🛍️",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "빠사르에서 흥정하기",
+      en: "Bargaining at the pasar",
+      es: "Regatear en el pasar",
+      id: "Tawar-menawar di pasar",
+    },
+    content: {
+      ko: "전통 시장(빠사르)에서는 흥정(따와르-머나와르)이 당연한 일이에요. 웃으며 가격을 깎아 보세요. 다만 정찰제인 쇼핑몰과 미니마켓에서는 안 통해요!",
+      en: "At traditional markets (pasar), bargaining (tawar-menawar) is expected. Smile and negotiate the price down. But it won't work at fixed-price malls and minimarkets!",
+      es: "En los mercados tradicionales (pasar), regatear (tawar-menawar) es lo normal. Sonríe y negocia para bajar el precio. ¡Pero no funciona en los centros comerciales y minimarkets de precio fijo!",
+      id: "Di pasar tradisional, tawar-menawar itu wajar. Tersenyumlah dan tawar harganya. Tapi ini nggak berlaku di mal dan minimarket yang harganya pas!",
+    },
+  },
+  {
+    id: "cn63",
+    category: "culture",
+    icon: "🍚",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "쌀은 주식이에요",
+      en: "Rice is the staple",
+      es: "El arroz es el alimento básico",
+      id: "Nasi adalah makanan pokok",
+    },
+    content: {
+      ko: "인도네시아에서 밥(나시)은 식사의 핵심이에요. '벌룸 마깐'(아직 안 먹었어요)은 다른 걸 먹었어도 밥을 안 먹었으면 쓸 정도로, 밥을 먹어야 진짜 식사예요!",
+      en: "In Indonesia, rice (nasi) is the heart of a meal. 'Belum makan' (I haven't eaten) can mean you haven't had rice yet — even after a snack. No rice, no real meal!",
+      es: "En Indonesia, el arroz (nasi) es el centro de la comida. 'Belum makan' (no he comido) puede significar que aún no has comido arroz, aunque hayas picado algo. ¡Sin arroz no hay comida de verdad!",
+      id: "Di Indonesia, nasi adalah inti dari sebuah makan. 'Belum makan' bisa berarti kamu belum makan nasi — meski sudah ngemil. Tanpa nasi, belum dianggap makan sungguhan!",
+    },
+  },
+  {
+    id: "cn64",
+    category: "idiom",
+    icon: "😌",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "띠닥 아빠-아빠: 괜찮아요",
+      en: "Tidak apa-apa: it's fine",
+      es: "Tidak apa-apa: no pasa nada",
+      id: "Tidak apa-apa / nggak apa-apa",
+    },
+    content: {
+      ko: "'띠닥 아빠-아빠'(편하게는 '응각 아빠-아빠')는 '괜찮아요, 별일 아니에요'라는 뜻이에요. 사과를 받아주거나 상대를 안심시킬 때 자주 쓰는 따뜻한 표현이에요.",
+      en: "'Tidak apa-apa' (casually 'nggak apa-apa') means 'it's fine, no problem.' It's a warm, reassuring phrase used to accept an apology or put someone at ease.",
+      es: "'Tidak apa-apa' (de forma casual 'nggak apa-apa') significa 'no pasa nada, no hay problema'. Es una frase cálida y tranquilizadora para aceptar una disculpa o calmar a alguien.",
+      id: "'Tidak apa-apa' (santainya 'nggak apa-apa') berarti 'nggak masalah, santai aja'. Ini ungkapan hangat yang menenangkan, dipakai untuk menerima permintaan maaf atau membuat orang lega.",
+    },
+  },
+  {
+    id: "cn65",
+    category: "culture",
+    icon: "🌙",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "르바란과 무딕 (귀향)",
+      en: "Lebaran & mudik (homecoming)",
+      es: "Lebaran y mudik (el regreso a casa)",
+      id: "Lebaran & mudik",
+    },
+    content: {
+      ko: "르바란(이둘 피뜨리)은 라마단이 끝난 뒤의 가장 큰 명절이에요. 수백만 명이 고향으로 돌아가는 '무딕'을 하고, 어른께 용서를 구하며 '모홍 마앞 라히르 단 바띤'이라고 말해요.",
+      en: "Lebaran (Idul Fitri) is the biggest holiday, marking the end of Ramadan. Millions travel home in the 'mudik' exodus and ask elders for forgiveness: 'Mohon maaf lahir dan batin.'",
+      es: "Lebaran (Idul Fitri) es la fiesta más grande, que marca el fin del Ramadán. Millones viajan a casa en el éxodo 'mudik' y piden perdón a los mayores: 'Mohon maaf lahir dan batin.'",
+      id: "Lebaran (Idul Fitri) adalah hari raya terbesar, menandai akhir Ramadan. Jutaan orang pulang kampung dalam tradisi 'mudik' dan meminta maaf kepada yang lebih tua: 'Mohon maaf lahir dan batin.'",
+    },
+  },
+  {
+    id: "cn66",
+    category: "etiquette",
+    icon: "🧓",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "어른과 또래를 부르는 호칭",
+      en: "Addressing elders and peers",
+      es: "Cómo dirigirse a mayores y compañeros",
+      id: "Memanggil orang yang lebih tua",
+    },
+    content: {
+      ko: "나이 많은 남성은 '바빡', 여성은 '이부'라고 불러요. 또래나 조금 손위의 젊은 남성은 '마스', 여성은 '음박'이라고 해요. 이름만 부르지 말고 호칭을 붙이는 게 예의예요!",
+      en: "Call an older man 'Bapak' (Pak) and an older woman 'Ibu' (Bu). For peers or slightly older young people, use 'Mas' (men) and 'Mbak' (women). Adding a title — not just a name — is polite!",
+      es: "Llama a un hombre mayor 'Bapak' (Pak) y a una mujer mayor 'Ibu' (Bu). Para compañeros o jóvenes algo mayores, usa 'Mas' (hombres) y 'Mbak' (mujeres). ¡Añadir un título, y no solo el nombre, es cortés!",
+      id: "Panggil pria yang lebih tua 'Bapak' (Pak) dan wanita yang lebih tua 'Ibu' (Bu). Untuk sebaya atau anak muda yang sedikit lebih tua, pakai 'Mas' (pria) dan 'Mbak' (wanita). Menambahkan sapaan — bukan cuma nama — itu sopan!",
+    },
+  },
+  {
+    id: "cn67",
+    category: "etiquette",
+    icon: "🍈",
+    language: "id",
+    country: "ID",
+    title: {
+      ko: "두리안 예절",
+      en: "Durian etiquette",
+      es: "Etiqueta del durián",
+      id: "Etika durian",
+    },
+    content: {
+      ko: "'과일의 왕' 두리안은 향이 아주 강해서 많은 호텔, 버스, 기차에서 반입이 금지돼 있어요. 냄새 표지판을 잘 보고, 밀폐된 공간에서는 먹지 마세요!",
+      en: "Durian, the 'king of fruits,' has such a strong smell that it's banned in many hotels, buses, and trains. Watch for the no-durian signs, and don't eat it in enclosed spaces!",
+      es: "El durián, el 'rey de las frutas', tiene un olor tan fuerte que está prohibido en muchos hoteles, autobuses y trenes. Fíjate en los carteles que lo prohíben y no lo comas en espacios cerrados.",
+      id: "Durian, sang 'raja buah', baunya sangat kuat sampai dilarang di banyak hotel, bus, dan kereta. Perhatikan tanda larangan durian, dan jangan memakannya di ruang tertutup!",
+    },
+  },
 ];
 
 /** Get today's cultural note for a specific learning language (cycles daily) */
-export function getTodayNote(learningLang: "ko" | "en" | "es" | "ar"): CulturalNote {
+export function getTodayNote(learningLang: "ko" | "en" | "es" | "ar" | "id"): CulturalNote {
   const filtered = getNotesForLanguage(learningLang);
   const dayOfYear = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
@@ -1094,6 +1326,6 @@ export function getTodayNote(learningLang: "ko" | "en" | "es" | "ar"): CulturalN
 }
 
 /** Get notes for a specific learning language */
-export function getNotesForLanguage(lang: "ko" | "en" | "es" | "ar"): CulturalNote[] {
+export function getNotesForLanguage(lang: "ko" | "en" | "es" | "ar" | "id"): CulturalNote[] {
   return CULTURAL_NOTES.filter((n) => n.language === lang);
 }
