@@ -21,6 +21,8 @@ type Tri = {
   es: string;
   /** Optional Indonesian (id-ID). Falls back to `en` when absent. */
   id?: string;
+  /** Optional Egyptian Arabic (ar-EG). Falls back to `en` when absent. */
+  ar?: string;
 };
 
 type BossSpellHint = {
@@ -61,6 +63,7 @@ function tri(value: Tri, lang: string): string {
   if (lang === "korean") return value.ko;
   if (lang === "spanish") return value.es;
   if (lang === "indonesian") return value.id ?? value.en;
+  if (lang === "arabic") return value.ar ?? value.en;
   return value.en;
 }
 
