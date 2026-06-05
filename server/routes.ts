@@ -1502,19 +1502,24 @@ Student's ${learnName} answer: ${userAnswer}`;
     const nb0 = data.NBest?.[0];
     const displayText = data.DisplayText ?? nb0?.Display ?? "";
     const lexical = nb0?.Lexical ?? displayText;
+    // Authoritative "did we hear anything" value: Azure sometimes returns
+    // RecognitionStatus:"Success" with an empty DisplayText but a populated
+    // NBest[0].Lexical. Gating on displayText alone discarded those and made
+    // valid id-ID utterances (e.g. "terima kasih") unscorable. Fall back to Lexical.
+    const recognizedText = displayText.trim() || nb0?.Lexical?.trim() || "";
     if (isVerboseVoiceLogging()) {
       console.log(`[assess-id] Azure status=${status}  display="${displayText}"  lexical="${lexical}"`);
     } else {
       console.log(`[assess-id] Azure status=${status}  display=${redactTranscript(displayText)}`);
     }
 
-    if (status !== "Success" || !displayText.trim()) {
-      return res.json(noVoicePayload(status, displayText));
+    if (status !== "Success" || !recognizedText) {
+      return res.json(noVoicePayload(status, recognizedText));
     }
 
     // ── Token + edit-distance scoring ──────────────────────────────────────
     const targetTokens = tokenizeId(word);
-    const saidTokens = tokenizeId(lexical || displayText);
+    const saidTokens = tokenizeId(lexical || recognizedText);
     const tokenScores = targetTokens.map((t) => bestIndonesianTokenScore(t, saidTokens));
     const matched = tokenScores.filter((s) => s >= 0.78).length;
     const similarity = tokenScores.length > 0
@@ -1567,7 +1572,7 @@ Student's ${learnName} answer: ${userAnswer}`;
               role: "user",
               content:
                 `Target Indonesian phrase: "${word}". ` +
-                `Learner said (STT): "${displayText}". ` +
+                `Learner said (STT): "${recognizedText}". ` +
                 `Rate intelligibility 0-100 (did they produce the target words?). ` +
                 `Reply ONLY JSON {"score":N,"note":"<short Indonesian tip>"}.`,
             },
@@ -1593,7 +1598,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       accuracyScore,
       fluencyScore,
       completenessScore,
-      recognizedText: displayText,
+      recognizedText,
       feedback,
       words,
     });
