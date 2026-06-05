@@ -212,10 +212,11 @@ export default function HomeScreen() {
   const [lastSessionDate, setLastSessionDate] = React.useState<string | null>(null);
   const [showMorePractice, setShowMorePractice] = React.useState(false);
   const [showMoreTools, setShowMoreTools] = React.useState(false);
+  const targetLearningLang = getEffectiveLearningLanguage(nativeLang, learningLanguage);
   // Home preview/chrome (speaking-mission card, language chip) has no Arabic
-  // copy yet, so coerce an "arabic" target to a native default for this screen.
+  // copy yet, so coerce an "arabic" target to a native default for those surfaces.
   // The real Arabic speak-first flow lives in the Speak tab and daily-lesson.
-  const effectiveLearningLang = toNativeLearning(nativeLang, getEffectiveLearningLanguage(nativeLang, learningLanguage));
+  const effectiveLearningLang = toNativeLearning(nativeLang, targetLearningLang);
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
@@ -1035,7 +1036,7 @@ export default function HomeScreen() {
       </View>
 
       {/* ── TODAY'S CULTURAL NOTE ── */}
-      <CulturalNoteSection nativeLang={nativeLang} learningLang={effectiveLearningLang} />
+      <CulturalNoteSection nativeLang={nativeLang} learningLang={targetLearningLang} />
 
       {/* ── QUICK PRACTICE ────────────────────────────── */}
       <GoldDivider label={nativeLang === "korean" ? "빠른 학습" : nativeLang === "spanish" ? "PRÁCTICA RÁPIDA" : nativeLang === "indonesian" ? "LATIHAN CEPAT" : "QUICK PRACTICE"} />
