@@ -42,33 +42,43 @@ import BossSpellPuzzle, { BossSpellQuestion } from "@/components/story/puzzles/B
 import { EmojiText } from "@/components/EmojiText";
 
 const rudyStoryImg = require("@/assets/rudy_story.png");
-const ch1BossDoorImg = require("@/assets/story/chapter1_motion_comic/ch1_boss_door.png");
+const ch1BossDoorPortraitImg = require("@/assets/story/chapter1_motion_comic/ch1_boss_door.png");
+const ch1BossDoorQuizPlateImg = require("@/assets/story/chapter1_motion_comic/ch1_boss_door_quiz_plate.jpg");
+const ch1BossDoorImg = Platform.OS === "web" ? ch1BossDoorQuizPlateImg : ch1BossDoorPortraitImg;
 const ch1TomPortraitImg = require("@/assets/story/dialogue_sprites/ch1_tom_sprite.png");
 const tomGruffGuardImg = require("@/assets/story/characters/tom/tom_gruff_guard.png");
 const ch1EleanorPortraitImg = require("@/assets/story/dialogue_sprites/ch1_eleanor_sprite.png");
 const ch1EllisPortraitImg = require("@/assets/story/dialogue_sprites/ch1_ellis_sprite.png");
 const ch1BlackCctvImg = require("@/assets/story/dialogue_sprites/ch1_black_cctv_sprite.png");
-const ch2BossStageImg = require("@/assets/story/chapter2_motion_comic/ch2_boss_stage.png");
+const ch2BossStagePortraitImg = require("@/assets/story/chapter2_motion_comic/ch2_boss_stage.png");
+const ch2BossStageQuizPlateImg = require("@/assets/story/chapter2_motion_comic/ch2_boss_stage_quiz_plate.jpg");
+const ch2BossStageImg = Platform.OS === "web" ? ch2BossStageQuizPlateImg : ch2BossStagePortraitImg;
 const ch2IsabelPortraitImg = require("@/assets/story/dialogue_sprites/ch2_isabel_sprite.png");
 const ch2MiguelPortraitImg = require("@/assets/story/dialogue_sprites/ch2_miguel_sprite.png");
 const miguelFestivalMemoryImg = require("@/assets/story/characters/miguel/miguel_festival_memory.png");
 const ch2CarlosPortraitImg = require("@/assets/story/dialogue_sprites/ch2_carlos_sprite.png");
 const carlosColorReturningRestorerImg = require("@/assets/story/characters/carlos/carlos_color_returning_restorer.png");
-const ch3BossPalaceImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace.png");
+const ch3BossPalacePortraitImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace.png");
+const ch3BossPalaceQuizPlateImg = require("@/assets/story/chapter3_motion_comic/ch3_boss_palace_quiz_plate.jpg");
+const ch3BossPalaceImg = Platform.OS === "web" ? ch3BossPalaceQuizPlateImg : ch3BossPalacePortraitImg;
 const ch3MinhoPortraitImg = require("@/assets/story/dialogue_sprites/ch3_minho_sprite.png");
 const minhoStreetwiseGuideImg = require("@/assets/story/characters/minho/minho_streetwise_guide.png");
 const ch3YoungsookPortraitImg = require("@/assets/story/dialogue_sprites/ch3_youngsook_sprite.png");
 const youngsookWarmWisdomImg = require("@/assets/story/characters/youngsook/youngsook_warm_wisdom.png");
 const ch3SujinPortraitImg = require("@/assets/story/dialogue_sprites/ch3_sujin_sprite.png");
 const sujinDiagnosticFocusImg = require("@/assets/story/characters/sujin/sujin_diagnostic_focus.png");
-const ch4BossArchiveImg = require("@/assets/story/chapter4_motion_comic/ch4_boss_archive.png");
+const ch4BossArchivePortraitImg = require("@/assets/story/chapter4_motion_comic/ch4_boss_archive.png");
+const ch4BossArchiveQuizPlateImg = require("@/assets/story/chapter4_motion_comic/ch4_boss_archive_quiz_plate.jpg");
+const ch4BossArchiveImg = Platform.OS === "web" ? ch4BossArchiveQuizPlateImg : ch4BossArchivePortraitImg;
 const ch4MiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_mira_sprite.png");
 const miraFlatDeliveryImg = require("@/assets/story/characters/mira/mira_flat_delivery.png");
 const ch4AmiraPortraitImg = require("@/assets/story/dialogue_sprites/ch4_amira_sprite.png");
 const amiraProtectiveArchivistImg = require("@/assets/story/characters/amira/amira_protective_archivist.png");
 const ch4HassanPortraitImg = require("@/assets/story/dialogue_sprites/ch4_hassan_sprite.png");
 const ch4BlackPartialPortraitImg = require("@/assets/story/dialogue_sprites/ch4_black_partial_sprite.png");
-const ch5BossCoreImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
+const ch5BossCorePortraitImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core.png");
+const ch5BossCoreQuizPlateImg = require("@/assets/story/chapter5_motion_comic/ch5_boss_core_quiz_plate.jpg");
+const ch5BossCoreImg = Platform.OS === "web" ? ch5BossCoreQuizPlateImg : ch5BossCorePortraitImg;
 const ch5PennyPortraitImg = require("@/assets/story/dialogue_sprites/ch5_penny_sprite.png");
 const ch5BlackFaceImg = require("@/assets/story/dialogue_sprites/ch5_black_face_sprite.png");
 const rudyDialogueNeutralImg = require("@/assets/story/characters/rudy/rudy_dialogue_stage_v2.png");
@@ -668,6 +678,11 @@ const IDIOM_COLLECTION: Record<string, {
         meaning: { en: "Break a leg!", ko: "행운을 빌어!", es: "¡Buena suerte!" },
         literal: { en: "May you succeed!", ko: "성공하길 바라!" },
       },
+      ar: {
+        expression: "بالتوفيق!",
+        meaning: { en: "Break a leg!", ko: "행운을 빌어!", es: "¡Buena suerte!" },
+        literal: { en: "With success!", ko: "성공을 빌어!" },
+      },
     },
   },
 
@@ -1077,13 +1092,13 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "tom",
         expression: "gruff_guard",
-        text: "Huh. Alright then. Didn't expect that, to be honest. Most people who show up at 4 AM can't even string a sentence together. You lot? Not bad. Not bad at all. Go on in, then. Break a leg, mate!",
-        textKo: "흠. 그래. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 제대로 못 만들거든. 너희? 나쁘지 않아. 전혀. 들어가, 그럼. Break a leg, mate!",
-        textKoMix: "흠. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 못 만들거든. 너희? Not bad. 전혀. 들어가, 그럼. Goodbye는 아직 아니야. Break a leg, mate!",
-        textEs: "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoría de los que aparecen a las 4 AM ni pueden armar una frase. ¿Ustedes? Nada mal. Nada mal. Pasen, entonces. Break a leg, mate!",
-        textEsMix: "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoría que aparecen a las 4 AM ni pueden armar una frase. ¿Ustedes? Not bad. Nada mal. Pasen, entonces. Goodbye todavía no. Break a leg, mate!",
-        textId: "Hmm. Baiklah kalau begitu. Jujur, aku tak menyangka. Kebanyakan orang yang muncul jam 4 pagi bahkan tak bisa merangkai satu kalimat. Kalian? Lumayan. Lumayan sekali. Masuklah kalau begitu. Break a leg, mate!",
-        textIdMix: "Hmm. Jujur, aku tak menyangka. Kebanyakan orang yang muncul jam 4 pagi bahkan tak bisa merangkai kalimat. Kalian? Not bad. Sama sekali tidak. Masuklah. Goodbye belum dulu. Break a leg, mate!",
+        text: "Huh. Alright then. Didn't expect that, to be honest. Most people who show up at 4 AM can't even string a sentence together. You lot? Not bad. Not bad at all. Go on in, then. {IDIOM}",
+        textKo: "흠. 그래. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 제대로 못 만들거든. 너희? 나쁘지 않아. 전혀. 들어가, 그럼. {IDIOM}",
+        textKoMix: "흠. 솔직히 예상 못 했어. 새벽 4시에 나타나는 사람들 대부분은 문장도 못 만들거든. 너희? Not bad. 전혀. 들어가, 그럼. Goodbye는 아직 아니야. {IDIOM}",
+        textEs: "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoría de los que aparecen a las 4 AM ni pueden armar una frase. ¿Ustedes? Nada mal. Nada mal. Pasen, entonces. {IDIOM}",
+        textEsMix: "Hmm. Vale entonces. No me lo esperaba, la verdad. La mayoría que aparecen a las 4 AM ni pueden armar una frase. ¿Ustedes? Not bad. Nada mal. Pasen, entonces. Goodbye todavía no. {IDIOM}",
+        textId: "Hmm. Baiklah kalau begitu. Jujur, aku tak menyangka. Kebanyakan orang yang muncul jam 4 pagi bahkan tak bisa merangkai satu kalimat. Kalian? Lumayan. Lumayan sekali. Masuklah kalau begitu. {IDIOM}",
+        textIdMix: "Hmm. Jujur, aku tak menyangka. Kebanyakan orang yang muncul jam 4 pagi bahkan tak bisa merangkai kalimat. Kalian? Not bad. Sama sekali tidak. Masuklah. Goodbye belum dulu. {IDIOM}",
         idiomRef: "idiom_tom_1",
       },
       {
@@ -1199,9 +1214,9 @@ const STORIES: Record<string, Story> = {
         charId: "eleanor",
         expression: "analytical",
         text: "That door has no keyhole. Ellis called it a verbal lock. It opens only when a speaker gives it a sentence with need, direction, and a name. A little dramatic, yes. She was always like that.",
-        textKo: "저 문에는 열쇠구멍이 없어요. 엘리스 박사는 저걸 verbal lock이라고 불렀죠. 필요, 방향, 이름이 들어간 문장을 말해야만 열립니다. 조금 극적이죠. 네, 박사님은 늘 저랬어요.",
+        textKo: "저 문에는 열쇠구멍이 없어요. 엘리스 박사는 저걸 음성 자물쇠라고 불렀죠. 필요, 방향, 이름이 들어간 문장을 말해야만 열립니다. 조금 극적이죠. 네, 박사님은 늘 저랬어요.",
         textKoMix: "저 문에는 열쇠구멍이 없어요. Ellis는 저걸 verbal lock이라고 불렀죠. need, direction, name이 들어간 sentence가 필요해요.",
-        textEs: "Esa puerta no tiene cerradura. Ellis la llamaba un verbal lock. Solo se abre cuando alguien le da una frase con necesidad, dirección y nombre. Un poco dramático, sí. Ella siempre era así.",
+        textEs: "Esa puerta no tiene cerradura. Ellis la llamaba una cerradura verbal. Solo se abre cuando alguien le da una frase con necesidad, dirección y nombre. Un poco dramático, sí. Ella siempre era así.",
         textEsMix: "Esa puerta no tiene llave. Ellis la llamaba verbal lock. Necesita una sentence con need, direction y name.",
         textId: "Pintu itu tidak punya lubang kunci. Ellis menyebutnya verbal lock. Ia hanya terbuka saat seorang penutur memberinya sebuah kalimat dengan kebutuhan, arah, dan sebuah nama. Sedikit dramatis, ya. Beliau memang selalu begitu.",
         textIdMix: "Pintu itu tidak punya lubang kunci. Ellis menyebutnya verbal lock. Ia butuh sebuah sentence dengan need, direction, dan name.",
@@ -1343,11 +1358,11 @@ const STORIES: Record<string, Story> = {
         kind: "scene",
         charId: "eleanor",
         text: "Goodbye, Detective. And I mean that as a promise, not an ending. Find Ellis. Find out why she built a lock for beginners. Madrid is where B wants you to look next.",
-        textKo: "Goodbye, Detective. 끝이라는 뜻이 아니라 약속이라는 뜻으로요. 엘리스 박사를 찾아주세요. 왜 박사님이 초보자를 위한 자물쇠를 만들었는지도요. 마드리드는 B가 다음으로 보라고 남긴 곳입니다.",
+        textKo: "안녕히 가세요, 탐정님. 끝이라는 뜻이 아니라 약속이라는 뜻으로요. 엘리스 박사를 찾아주세요. 왜 박사님이 초보자를 위한 자물쇠를 만들었는지도요. 마드리드는 B가 다음으로 보라고 남긴 곳입니다.",
         textKoMix: "Goodbye, Detective. 끝이라는 뜻이 아니라 약속이에요. Ellis를 찾아주세요. 왜 beginner를 위한 lock을 만들었는지도요. Madrid가 다음 단서예요.",
-        textEs: "Goodbye, Detective. Y lo digo como una promesa, no como un final. Encuentra a Ellis. Descubre por qué construyó una cerradura para principiantes. Madrid es donde B quiere que mires después.",
+        textEs: "Adiós, Detective. Y lo digo como una promesa, no como un final. Encuentra a Ellis. Descubre por qué construyó una cerradura para principiantes. Madrid es donde B quiere que mires después.",
         textEsMix: "Goodbye, Detective. Lo digo como promesa, no como final. Encuentra a Ellis. Descubre por qué hizo un lock para beginners. Madrid es la siguiente pista.",
-        textId: "Goodbye, Detective. Dan saya memaksudkannya sebagai janji, bukan akhir. Temukan Ellis. Cari tahu mengapa ia membuat kunci untuk para pemula. Madrid adalah tempat yang B ingin kamu selidiki berikutnya.",
+        textId: "Selamat tinggal, Detektif. Dan saya memaksudkannya sebagai janji, bukan akhir. Temukan Ellis. Cari tahu mengapa ia membuat kunci untuk para pemula. Madrid adalah tempat yang B ingin kamu selidiki berikutnya.",
         textIdMix: "Goodbye, Detective. Saya memaksudkannya sebagai janji, bukan akhir. Temukan Ellis. Cari tahu mengapa ia membuat lock untuk para beginner. Madrid adalah petunjuk berikutnya.",
       },
       {
@@ -1355,11 +1370,11 @@ const STORIES: Record<string, Story> = {
         charId: "lingo",
         expression: "celebratory",
         text: "Seven stones are still a rumor, not proof. Good. Rumors can be investigated. For now we have one shard, one missing doctor, and one city name. Partner... Thank you. Our first spell worked.",
-        textKo: "일곱 개의 돌은 아직 증거가 아니라 소문이야. 좋아. 소문은 조사할 수 있어. 지금 우리에게 있는 건 파편 하나, 실종된 박사님 한 명, 그리고 도시 이름 하나. 파트너... Thank you. 우리의 첫 주문이 통했어.",
+        textKo: "일곱 개의 돌은 아직 증거가 아니라 소문이야. 좋아. 소문은 조사할 수 있어. 지금 우리에게 있는 건 파편 하나, 실종된 박사님 한 명, 그리고 도시 이름 하나. 파트너... 고마워. 우리의 첫 주문이 통했어.",
         textKoMix: "일곱 개의 돌은 아직 proof가 아니라 rumor야. 지금 있는 건 shard 하나, missing doctor 한 명, city name 하나. Partner... Thank you. 첫 spell이 통했어.",
-        textEs: "Las siete piedras aún son un rumor, no una prueba. Bien. Los rumores se pueden investigar. Por ahora tenemos un fragmento, una doctora desaparecida y el nombre de una ciudad. Compañero... Thank you. Nuestro primer hechizo funcionó.",
+        textEs: "Las siete piedras aún son un rumor, no una prueba. Bien. Los rumores se pueden investigar. Por ahora tenemos un fragmento, una doctora desaparecida y el nombre de una ciudad. Compañero... Gracias. Nuestro primer hechizo funcionó.",
         textEsMix: "Las siete piedras aún son rumor, no proof. Tenemos un shard, una doctora missing y un city name. Compañero... Thank you. Nuestro primer spell funcionó.",
-        textId: "Tujuh batu itu masih rumor, bukan bukti. Bagus. Rumor bisa diselidiki. Untuk sekarang kita punya satu pecahan, satu dokter yang hilang, dan satu nama kota. Partner... Thank you. Mantra pertama kita berhasil.",
+        textId: "Tujuh batu itu masih rumor, bukan bukti. Bagus. Rumor bisa diselidiki. Untuk sekarang kita punya satu pecahan, satu dokter yang hilang, dan satu nama kota. Partner... Terima kasih. Mantra pertama kita berhasil.",
         textIdMix: "Tujuh batu itu masih rumor, bukan proof. Sekarang kita punya satu shard, satu missing doctor, satu city name. Partner... Thank you. spell pertama kita berhasil.",
       },
       {
@@ -4014,7 +4029,7 @@ const MADRID_V21_STORY: Story = {
       textKoMix: "*거칠게 숨을 쉬며* 모두의 voice가 들렸지만, 모든 word가 smooth하고 empty하게 돌아왔어요. Isabel. Thank you. 아무도 color를 찾지 못할 줄 알았어요.",
       textEs: "*respirando con fuerza* Podía oír a todos, pero cada palabra volvía pulida, suave, vacía. Isabel. Thank you. Pensé que nadie encontraría el color.",
       textEsMix: "*respirando con fuerza* Podía oír a todos, pero cada word volvía smooth y empty. Isabel. Thank you. Pensé que nadie encontraría el color.",
-      textId: "*terengah-engah* Aku bisa mendengar semua orang, tapi setiap kata kembali terpoles, halus, kosong. Isabel. Thank you. Kukira tak ada yang akan menemukan warnanya.",
+      textId: "*terengah-engah* Aku bisa mendengar semua orang, tapi setiap kata kembali terpoles, halus, kosong. Isabel. Terima kasih. Kukira tak ada yang akan menemukan warnanya.",
       textIdMix: "*terengah-engah* Aku bisa mendengar semua orang, tapi setiap word kembali smooth dan empty. Isabel. Thank you. Kukira tak ada yang akan menemukan color-nya.",
     },
     {
@@ -4081,9 +4096,9 @@ const MADRID_V21_STORY: Story = {
       text: "Then go. Carlos and I will keep the festival loud until you come back. Goodbye, Detective. And thank you.",
       textKo: "그럼 가요. 당신이 돌아올 때까지 카를로스와 제가 축제를 크게 울리게 할게요. 안녕히 가요, 탐정님. 그리고 고마워요.",
       textKoMix: "그럼 가요. 당신이 돌아올 때까지 Carlos와 제가 festival을 크게 울리게 할게요. Goodbye, Detective. 그리고 Thank you.",
-      textEs: "Entonces ve. Carlos y yo mantendremos el festival bien ruidoso hasta que vuelvas. Goodbye, Detective. Y thank you.",
+      textEs: "Entonces ve. Carlos y yo mantendremos el festival bien ruidoso hasta que vuelvas. Adiós, Detective. Y gracias.",
       textEsMix: "Entonces ve. Carlos y yo mantendremos el festival fuerte. Goodbye, Detective. Y Thank you.",
-      textId: "Kalau begitu, pergilah. Carlos dan aku akan menjaga festival ini tetap meriah sampai kau kembali. Goodbye, Detektif. Dan thank you.",
+      textId: "Kalau begitu, pergilah. Carlos dan aku akan menjaga festival ini tetap meriah sampai kau kembali. Selamat tinggal, Detektif. Dan terima kasih.",
       textIdMix: "Kalau begitu, pergilah. Carlos dan aku akan menjaga festival ini tetap meriah. Goodbye, Detective. Dan Thank you.",
     },
     {
@@ -4580,10 +4595,10 @@ const SEOUL_V21_STORY: Story = {
       kind: "scene",
       charId: "youngsook",
       expression: "warm_wisdom",
-      text: "가야지. But eat one more bite before you go. Goodbye, Detective. And 감사합니다 for bringing the order back.",
-      textKo: "가야지. 그래도 가기 전에 한 입 더 먹고 가. Goodbye, 탐정. 그리고 순서를 되돌려줘서 감사합니다.",
-      textEs: "Tienes que ir. Pero come un bocado más antes. Goodbye, Detective. Y 감사합니다 por devolver el orden.",
-      textId: "가야지. Tapi makan satu suap lagi sebelum kau pergi. Goodbye, Detektif. Dan 감사합니다 karena sudah mengembalikan tata urutannya.",
+      text: "You should get going. But eat one more bite before you go. Goodbye, Detective. And thank you for bringing the order back.",
+      textKo: "가야지. 그래도 가기 전에 한 입 더 먹고 가. 안녕히 가요, 탐정. 그리고 순서를 되돌려줘서 감사합니다.",
+      textEs: "Tienes que ir. Pero come un bocado más antes. Adiós, Detective. Y gracias por devolver el orden.",
+      textId: "Kamu harus pergi. Tapi makan satu suap lagi sebelum kau pergi. Selamat tinggal, Detektif. Dan terima kasih karena sudah mengembalikan tata urutannya.",
     },
     {
       kind: "clue",
@@ -4654,7 +4669,7 @@ const CAIRO_V21_STORY: Story = {
       text: "Hello, Detective. I am so happy to see you again. Thank you for saving me that night.",
       textKo: "안녕하세요, 탐정님. 다시 만나서 정말 기쁩니다. 그날 저를 구해주셔서 감사합니다.",
       textEs: "Hola, Detective. Estoy muy feliz de verte de nuevo. Gracias por salvarme esa noche.",
-      textId: "Hello, Detektif. Saya sangat senang bertemu denganmu lagi. Thank you sudah menyelamatkan saya malam itu.",
+      textId: "Halo, Detektif. Saya sangat senang bertemu denganmu lagi. Terima kasih sudah menyelamatkan saya malam itu.",
     },
     {
       kind: "scene",
@@ -5046,8 +5061,8 @@ const CAIRO_V21_STORY: Story = {
       charId: "hassan",
       text: "My mother always said: words are the only things we leave behind that can still answer back. Goodbye, Detective. Remember us correctly.",
       textKo: "제 어머니는 늘 말씀하셨습니다. 우리가 남기는 것 중 다시 대답할 수 있는 건 말뿐이라고요. 안녕히 가세요, 탐정. 우리를 제대로 기억해 주세요.",
-      textEs: "Mi madre siempre decía: las palabras son lo único que dejamos atrás que todavía puede responder. Goodbye, Detective. Recuérdanos correctamente.",
-      textId: "Ibuku selalu berkata: kata-kata adalah satu-satunya yang kita tinggalkan yang masih bisa menjawab. Goodbye, Detektif. Ingatlah kami dengan benar.",
+      textEs: "Mi madre siempre decía: las palabras son lo único que dejamos atrás que todavía puede responder. Adiós, Detective. Recuérdanos correctamente.",
+      textId: "Ibuku selalu berkata: kata-kata adalah satu-satunya yang kita tinggalkan yang masih bisa menjawab. Selamat tinggal, Detektif. Ingatlah kami dengan benar.",
     },
     {
       kind: "scene",
@@ -7787,22 +7802,33 @@ export default function StoryScene() {
   const supportSide = character.side === "left" ? "right" : "left";
 
   function getSceneText(it: SeqScene) {
-    // For non-narration dialogue, prefer mixed-language versions (textKoMix/textEsMix)
-    // which keep learned English expressions inline for progressive immersion.
-    // Narration scenes always use the fully-translated versions.
-    if (lang === "korean") {
-      if (!it.isNarration && it.textKoMix) return it.textKoMix;
-      if (it.textKo) return it.textKo;
+    // Pure native target: always use the fully-translated field for the user's
+    // native (UI) language. The textKoMix/textEsMix/textIdMix variants — which
+    // sprinkled English target words inline for "progressive immersion" — are
+    // intentionally NOT used: the user asked for dialogue 100% in their native
+    // language, with target-language practice happening in the puzzles instead.
+    let out =
+      lang === "korean" ? (it.textKo ?? it.text)
+      : lang === "spanish" ? (it.textEs ?? it.text)
+      : lang === "indonesian" ? (it.textId ?? it.text)
+      : it.text;
+
+    // Idiom localization: idiom scenes carry a {IDIOM} placeholder in their text.
+    // Substitute the idiom for the LEARNING language (mirrors the Expression Book
+    // wiring in advance()), so a learner of Indonesian sees the Indonesian idiom,
+    // a learner of Spanish the Spanish one, etc. Falls back to English.
+    if (it.idiomRef && out.includes("{IDIOM}")) {
+      const entry = IDIOM_COLLECTION[it.idiomRef];
+      const tl =
+        learningLang === "korean" ? "ko"
+        : learningLang === "spanish" ? "es"
+        : learningLang === "indonesian" ? "id"
+        : learningLang === "arabic" ? "ar"
+        : "en";
+      const expr = entry?.idiom[tl]?.expression ?? entry?.idiom["en"]?.expression ?? "Break a leg!";
+      out = out.replace(/\{IDIOM\}/g, expr);
     }
-    if (lang === "spanish") {
-      if (!it.isNarration && it.textEsMix) return it.textEsMix;
-      if (it.textEs) return it.textEs;
-    }
-    if (lang === "indonesian") {
-      if (!it.isNarration && it.textIdMix) return it.textIdMix;
-      if (it.textId) return it.textId;
-    }
-    return it.text;
+    return out;
   }
 
   function getCharName(char: (typeof story.characters)[0]) {

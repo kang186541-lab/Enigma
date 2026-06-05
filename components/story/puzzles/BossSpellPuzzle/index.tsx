@@ -435,7 +435,7 @@ function DoorVisual({
     <View style={styles.doorStage}>
       {doorImage ? (
         <>
-          <Image source={doorImage} style={styles.doorImageBackdrop} resizeMode="cover" />
+          <Image source={doorImage} style={styles.doorImageBackdrop} resizeMode="contain" />
           <Image source={doorImage} style={styles.doorImageFocus} resizeMode="contain" />
         </>
       ) : (
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   doorStage: {
-    height: 300,
+    height: Platform.OS === "web" ? 380 : 340,
     borderRadius: 8,
     overflow: "hidden",
     borderWidth: 1,
@@ -588,15 +588,14 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: "100%",
     height: "100%",
-    opacity: 0.38,
-    transform: [{ scale: 1.08 }],
+    opacity: 0.18,
   },
   doorImageFocus: {
     position: "absolute",
-    top: 10,
-    bottom: 10,
-    left: 10,
-    right: 10,
+    top: 12,
+    bottom: 12,
+    left: 12,
+    right: 12,
   },
   doorCompletionOverlay: {
     ...StyleSheet.absoluteFillObject,

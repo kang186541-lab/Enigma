@@ -4,6 +4,7 @@ import { join } from "node:path";
 import * as ts from "typescript";
 
 const storySceneSource = readFileSync("app/story-scene.tsx", "utf8");
+const bossSpellPuzzleSource = readFileSync("components/story/puzzles/BossSpellPuzzle/index.tsx", "utf8");
 const storySceneAst = ts.createSourceFile(
   "app/story-scene.tsx",
   storySceneSource,
@@ -22,6 +23,52 @@ function countIncludes(needle: string): number {
 
 function assertAssetExists(assetPath: string): void {
   assert.ok(existsSync(assetPath), `${assetPath} must exist`);
+}
+
+function readPngSize(assetPath: string): { width: number; height: number } {
+  const buffer = readFileSync(assetPath);
+  assert.equal(buffer.toString("ascii", 1, 4), "PNG", `${assetPath} must be a PNG`);
+  return {
+    width: buffer.readUInt32BE(16),
+    height: buffer.readUInt32BE(20),
+  };
+}
+
+function readJpegSize(assetPath: string): { width: number; height: number } {
+  const buffer = readFileSync(assetPath);
+  assert.ok(buffer[0] === 0xff && buffer[1] === 0xd8, `${assetPath} must be a JPEG`);
+
+  let offset = 2;
+  while (offset + 9 < buffer.length) {
+    while (offset < buffer.length && buffer[offset] !== 0xff) offset += 1;
+    const marker = buffer[offset + 1];
+    offset += 2;
+
+    if (marker === 0xd9 || marker === 0xda) break;
+    const length = buffer.readUInt16BE(offset);
+    const isStartOfFrame =
+      (marker >= 0xc0 && marker <= 0xc3) ||
+      (marker >= 0xc5 && marker <= 0xc7) ||
+      (marker >= 0xc9 && marker <= 0xcb) ||
+      (marker >= 0xcd && marker <= 0xcf);
+
+    if (isStartOfFrame) {
+      return {
+        height: buffer.readUInt16BE(offset + 3),
+        width: buffer.readUInt16BE(offset + 5),
+      };
+    }
+
+    offset += length;
+  }
+
+  assert.fail(`${assetPath} must expose JPEG dimensions`);
+}
+
+function readImageSize(assetPath: string): { width: number; height: number } {
+  return assetPath.toLowerCase().endsWith(".jpg") || assetPath.toLowerCase().endsWith(".jpeg")
+    ? readJpegSize(assetPath)
+    : readPngSize(assetPath);
 }
 
 function collectRequiredAssets(prefix: string): string[] {
@@ -131,6 +178,13 @@ function collectActiveStories(storiesObject: ts.ObjectLiteralExpression): Map<st
 
 const dialogueBackgrounds = collectRequiredAssets("assets/story/dialogue_backgrounds/");
 const dialogueSprites = collectRequiredAssets("assets/story/dialogue_sprites/");
+const bossQuizPlates = [
+  "assets/story/chapter1_motion_comic/ch1_boss_door_quiz_plate.jpg",
+  "assets/story/chapter2_motion_comic/ch2_boss_stage_quiz_plate.jpg",
+  "assets/story/chapter3_motion_comic/ch3_boss_palace_quiz_plate.jpg",
+  "assets/story/chapter4_motion_comic/ch4_boss_archive_quiz_plate.jpg",
+  "assets/story/chapter5_motion_comic/ch5_boss_core_quiz_plate.jpg",
+];
 const storiesObject = findTopLevelObjectVariable("STORIES");
 const activeStories = collectActiveStories(storiesObject);
 const validBackdrops = collectBackdropIds();
@@ -141,6 +195,16 @@ assert.ok(dialogueSprites.length >= 16, "Story stage should keep authored dialog
 
 for (const assetPath of [...dialogueBackgrounds, ...dialogueSprites]) {
   assertAssetExists(assetPath);
+}
+
+for (const assetPath of bossQuizPlates) {
+  assertAssetExists(assetPath);
+  const { width, height } = readImageSize(assetPath);
+  assert.ok(
+    width > height && width / height >= 1.6,
+    `${assetPath} must stay a landscape quiz plate so web boss-spell art fills the card without cropping`,
+  );
+  assert.ok(readFileSync(assetPath).byteLength < 350 * 1024, `${assetPath} should stay compressed for web delivery`);
 }
 
 let storyCount = 0;
@@ -234,6 +298,18 @@ assertIncludes(
   "function getSceneText(it: SeqScene)",
   "Dialogue/narration copy must keep a centralized localized text resolver",
 );
+assertIncludes(
+  'out.includes("{IDIOM}")',
+  "Idiom placeholder dialogue must be detected before rendering",
+);
+assertIncludes(
+  'out.replace(/\\{IDIOM\\}/g, expr)',
+  "Idiom placeholder dialogue must be substituted at runtime instead of leaking {IDIOM}",
+);
+assertIncludes(
+  'learningLang === "arabic" ? "ar"',
+  "Idiom substitution must keep Arabic learning-language support",
+);
 assert.ok(
   countIncludes("text={getSceneText(item)}") >= 2,
   "Narration and dialogue scenes must render copy through localized Typewriter text, not baked image text",
@@ -248,6 +324,29 @@ assertIncludes("sceneStageGround: {", "Stage ground style must stay defined");
 assertIncludes("bottom: 126", "Stage ground should sit above the dialogue box");
 assertIncludes('backgroundColor: "rgba(8,8,10,0.28)"', "Stage ground should remain subtle");
 assertIncludes('transform: [{ skewY: "-2deg" }]', "Stage ground should keep slight visual-novel perspective");
+
+assert.ok(
+  bossSpellPuzzleSource.includes('<Image source={doorImage} style={styles.doorImageBackdrop} resizeMode="contain" />') &&
+    bossSpellPuzzleSource.includes('<Image source={doorImage} style={styles.doorImageFocus} resizeMode="contain" />'),
+  "Boss-spell door art must use contain on visible image layers so portrait boss plates are not cropped inside quiz cards",
+);
+assert.ok(
+  bossSpellPuzzleSource.includes('height: Platform.OS === "web" ? 380 : 340'),
+  "Boss-spell stage must keep a portrait-aware height for the authored 941x1672 boss plates",
+);
+assert.doesNotMatch(
+  bossSpellPuzzleSource,
+  /style=\{styles\.doorImageBackdrop\}\s+resizeMode="cover"/,
+  "Boss-spell backdrop must not use cover because it visibly crops the door art",
+);
+assert.ok(
+  storySceneSource.includes('const ch1BossDoorImg = Platform.OS === "web" ? ch1BossDoorQuizPlateImg : ch1BossDoorPortraitImg') &&
+    storySceneSource.includes('const ch2BossStageImg = Platform.OS === "web" ? ch2BossStageQuizPlateImg : ch2BossStagePortraitImg') &&
+    storySceneSource.includes('const ch3BossPalaceImg = Platform.OS === "web" ? ch3BossPalaceQuizPlateImg : ch3BossPalacePortraitImg') &&
+    storySceneSource.includes('const ch4BossArchiveImg = Platform.OS === "web" ? ch4BossArchiveQuizPlateImg : ch4BossArchivePortraitImg') &&
+    storySceneSource.includes('const ch5BossCoreImg = Platform.OS === "web" ? ch5BossCoreQuizPlateImg : ch5BossCorePortraitImg'),
+  "Story scenes must use landscape boss quiz plates on web while preserving portrait boss art for native",
+);
 
 const codeScope = ["components/story/MotionComicPrologue.tsx", "lib/storyAssetManifest.ts"];
 for (const removedPath of codeScope) {
