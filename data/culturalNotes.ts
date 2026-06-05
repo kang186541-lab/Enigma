@@ -2,7 +2,7 @@ export interface CulturalNote {
   id: string;
   category: "culture" | "idiom" | "etiquette";
   icon: string;
-  language: "ko" | "en" | "es";
+  language: "ko" | "en" | "es" | "ar";
   country?: string;
   title: { ko: string; en: string; es: string; id: string };
   content: { ko: string; en: string; es: string; id: string };
@@ -888,10 +888,204 @@ export const CULTURAL_NOTES: CulturalNote[] = [
       id: "Bahasa Korea punya angka asli Korea (하나, 둘, 셋) dan angka Sino-Korea (일, 이, 삼). Umur pakai angka asli, nomor telepon pakai Sino-Korea. Kamu butuh dua-duanya!",
     },
   },
+
+  // ════════════════════════════════════════════
+  // ARABIC LEARNERS (language: "ar") — Egyptian culture, ~10 notes
+  // ════════════════════════════════════════════
+  {
+    id: "cn46",
+    category: "etiquette",
+    icon: "💵",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "박시시: 어디서나 팁 문화",
+      en: "Baksheesh: tipping is everywhere",
+      es: "Baksheesh: las propinas están por todas partes",
+      id: "Baksheesh: tip ada di mana-mana",
+    },
+    content: {
+      ko: "이집트에서는 작은 팁(박시시)이 일상이에요. 주차 도우미, 화장실 안내원, 짐꾼에게요. 잔돈을 챙겨두세요. 몇 파운드면 충분하고 늘 고마워해요.",
+      en: "In Egypt, small tips (baksheesh) are part of daily life — for the parking helper, the restroom attendant, the porter. Keep small bills handy; a few pounds is enough and always appreciated.",
+      es: "En Egipto, las pequeñas propinas (baksheesh) son parte de la vida diaria: para el del parking, el del baño, el maletero. Lleva billetes pequeños; unas libras bastan y siempre se agradecen.",
+      id: "Di Mesir, tip kecil (baksheesh) adalah bagian dari keseharian — untuk tukang parkir, penjaga toilet, porter. Siapkan uang receh; beberapa pound sudah cukup dan selalu dihargai.",
+    },
+  },
+  {
+    id: "cn47",
+    category: "culture",
+    icon: "☕",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "아흐와: 이집트의 사랑방",
+      en: "The ahwa: Egypt's living room",
+      es: "El ahwa: la sala de estar de Egipto",
+      id: "Ahwa: ruang tamu Mesir",
+    },
+    content: {
+      ko: "동네 커피하우스(아흐와)는 차(샤이), 도미노, 축구로 모이는 곳이에요. '샤이(차)'를 주문해 보세요. 보통 아주 달아요. 차를 받아들이는 건 우정을 받아들이는 거예요.",
+      en: "The local coffeehouse (ahwa) is where people gather for tea (shai), dominoes, and football. Order 'shai' — often very sweet. Saying yes to tea is saying yes to friendship.",
+      es: "La cafetería local (ahwa) es donde la gente se reúne para tomar té (shai), jugar al dominó y ver fútbol. Pide 'shai', suele ser muy dulce. Aceptar el té es aceptar la amistad.",
+      id: "Kedai kopi lokal (ahwa) adalah tempat orang berkumpul untuk minum teh (shai), main domino, dan nonton bola. Pesan 'shai' — biasanya sangat manis. Menerima teh berarti menerima persahabatan.",
+    },
+  },
+  {
+    id: "cn48",
+    category: "etiquette",
+    icon: "🍽️",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "무조건 더 먹으라고 권해요",
+      en: "They will insist you eat",
+      es: "Insistirán en que comas",
+      id: "Mereka akan memaksamu makan",
+    },
+    content: {
+      ko: "이집트의 환대(카람)는 유명해요. 주인은 더 먹으라고 권하고, 한 번 사양하는 건 예의일 뿐이라 또 권해요. '에트파달!'은 '드세요, 어서요'라는 뜻이에요.",
+      en: "Egyptian hospitality (karam) is legendary. A host presses you to eat more, and refusing once is just politeness — they will offer again. 'Etfaddal!' means 'please, help yourself.'",
+      es: "La hospitalidad egipcia (karam) es legendaria. El anfitrión insiste en que comas más, y rechazar una vez es solo cortesía: volverá a ofrecer. '¡Etfaddal!' significa 'por favor, sírvete'.",
+      id: "Keramahan Mesir (karam) sangat terkenal. Tuan rumah akan mendesakmu makan lebih banyak, dan menolak sekali hanya basa-basi — mereka akan menawarkan lagi. 'Etfaddal!' berarti 'silakan, ambil sendiri'.",
+    },
+  },
+  {
+    id: "cn49",
+    category: "culture",
+    icon: "🕰️",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "인샤알라, 부크라, 말레시",
+      en: "Inshallah, bukra, maalesh",
+      es: "Inshallah, bukra, maalesh",
+      id: "Inshallah, bukra, maalesh",
+    },
+    content: {
+      ko: "매일 듣게 될 세 단어: 인샤알라(신의 뜻이라면), 부크라(내일), 말레시(괜찮아요). 이집트에서 시간은 유연해요. 인내와 미소가 시계보다 더 통해요.",
+      en: "Three words you will hear daily: inshallah (God willing), bukra (tomorrow), maalesh (never mind / it's okay). Time is flexible in Egypt — patience and a smile go further than a clock.",
+      es: "Tres palabras que oirás a diario: inshallah (si Dios quiere), bukra (mañana), maalesh (no pasa nada). El tiempo es flexible en Egipto: la paciencia y una sonrisa valen más que el reloj.",
+      id: "Tiga kata yang akan kamu dengar tiap hari: inshallah (jika Tuhan mengizinkan), bukra (besok), maalesh (tidak apa-apa). Waktu itu lentur di Mesir — kesabaran dan senyum lebih ampuh daripada jam.",
+    },
+  },
+  {
+    id: "cn50",
+    category: "etiquette",
+    icon: "🤝",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "인사는 천천히, 충분히",
+      en: "Greetings take their time",
+      es: "Los saludos llevan su tiempo",
+      id: "Salam butuh waktu",
+    },
+    content: {
+      ko: "이집트 사람들은 따뜻하게 인사해요. '이자이약?'(잘 지내요?), 같은 성별끼리는 볼 키스도 해요. 일 이야기 전에 가족과 안부를 먼저 물어요. 인사를 서두르면 차갑게 느껴져요.",
+      en: "Egyptians greet warmly: 'Izzayyak?' (how are you?), often with cheek kisses between the same gender. Ask about family and health before business — rushing a greeting feels cold.",
+      es: "Los egipcios saludan con calidez: '¿Izzayyak?' (¿cómo estás?), a menudo con besos en la mejilla entre el mismo género. Pregunta por la familia y la salud antes de los negocios: apurar el saludo parece frío.",
+      id: "Orang Mesir menyapa dengan hangat: 'Izzayyak?' (apa kabar?), sering dengan cium pipi antar sesama jenis. Tanyakan keluarga dan kesehatan sebelum urusan bisnis — menyapa terburu-buru terasa dingin.",
+    },
+  },
+  {
+    id: "cn51",
+    category: "etiquette",
+    icon: "🛍️",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "흥정은 당연한 일",
+      en: "Bargaining is expected",
+      es: "Regatear es lo normal",
+      id: "Menawar itu wajar",
+    },
+    content: {
+      ko: "시장(수크)과 바자르에서는 흥정(파살)이 자연스럽고 친근한 일이에요. 웃으며 절반쯤 부르고 중간에서 만나요. 슈퍼마켓과 정찰제 가게는 예외예요.",
+      en: "In markets (souq) and bazaars, haggling (fesaal) is normal and friendly. Smile, offer about half, and meet in the middle. Supermarkets and fixed-price shops are the exception.",
+      es: "En los mercados (souq) y bazares, regatear (fesaal) es normal y amistoso. Sonríe, ofrece la mitad y encontraos a medio camino. Los supermercados y tiendas de precio fijo son la excepción.",
+      id: "Di pasar (souq) dan bazar, menawar (fesaal) itu wajar dan akrab. Tersenyumlah, tawar sekitar setengah harga, lalu temukan titik tengah. Supermarket dan toko harga pas adalah pengecualian.",
+    },
+  },
+  {
+    id: "cn52",
+    category: "culture",
+    icon: "🥖",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "아이시는 '생명'이라는 뜻",
+      en: "Aish means 'life'",
+      es: "Aish significa 'vida'",
+      id: "Aish berarti 'kehidupan'",
+    },
+    content: {
+      ko: "이집트 사람들은 빵을 '아이시'라고 불러요. '생명'과 똑같은 단어예요. 빵은 신성하게 여겨서 낭비하거나 바닥에 떨어뜨리지 않아요. 떨어지면 주워서 이마에 갖다 대요.",
+      en: "Egyptians call bread 'aish' — the very same word as 'life'. Bread is treated as sacred: never waste it or drop it on the ground. If it falls, people pick it up and touch it to the forehead.",
+      es: "Los egipcios llaman al pan 'aish', la misma palabra que 'vida'. El pan se trata como algo sagrado: nunca lo desperdicies ni lo tires al suelo. Si cae, la gente lo recoge y lo toca con la frente.",
+      id: "Orang Mesir menyebut roti 'aish' — sama persis dengan kata 'kehidupan'. Roti dianggap suci: jangan disia-siakan atau dijatuhkan ke tanah. Kalau jatuh, orang memungutnya dan menyentuhkannya ke dahi.",
+    },
+  },
+  {
+    id: "cn53",
+    category: "culture",
+    icon: "🕌",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "금요일이 거룩한 날",
+      en: "Friday is the holy day",
+      es: "El viernes es el día sagrado",
+      id: "Jumat adalah hari suci",
+    },
+    content: {
+      ko: "이집트의 주말은 금요일~토요일이에요. 금요일(엘곰아)은 정오 기도와 큰 가족 점심을 위한 날이라 많은 가게가 늦게 열어요. 금요 기도 시간을 고려해 일정을 짜세요.",
+      en: "The Egyptian weekend is Friday–Saturday. Friday (el-Gomaa) is for midday prayer and a big family lunch; many shops open later that day. Plan errands around the Friday prayer time.",
+      es: "El fin de semana egipcio es viernes y sábado. El viernes (el-Gomaa) es para la oración del mediodía y un gran almuerzo familiar; muchas tiendas abren más tarde. Planifica tus recados según la hora del rezo del viernes.",
+      id: "Akhir pekan Mesir adalah Jumat–Sabtu. Jumat (el-Gomaa) untuk salat tengah hari dan makan siang keluarga besar; banyak toko buka lebih siang. Atur urusanmu seputar waktu salat Jumat.",
+    },
+  },
+  {
+    id: "cn54",
+    category: "etiquette",
+    icon: "✋",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "먹고 건넬 땐 오른손으로",
+      en: "Eat and give with the right hand",
+      es: "Come y da con la mano derecha",
+      id: "Makan dan memberi dengan tangan kanan",
+    },
+    content: {
+      ko: "먹고, 주고, 받을 때는 오른손을 쓰세요. 왼손은 이런 일에 부정하게 여겨져요. 함께 먹는 접시에서는 가운데가 아니라 자기 쪽에서 덜어요.",
+      en: "Use your right hand for eating, giving, and receiving; the left is considered unclean for these. When sharing a communal dish, take from the side nearest you, not the middle.",
+      es: "Usa la mano derecha para comer, dar y recibir; la izquierda se considera impura para esto. Al compartir un plato común, toma del lado más cercano a ti, no del centro.",
+      id: "Gunakan tangan kanan untuk makan, memberi, dan menerima; tangan kiri dianggap kurang pantas untuk ini. Saat berbagi piring bersama, ambil dari sisi terdekatmu, bukan dari tengah.",
+    },
+  },
+  {
+    id: "cn55",
+    category: "culture",
+    icon: "🧿",
+    language: "ar",
+    country: "EG",
+    title: {
+      ko: "흉안과 '마샤알라'",
+      en: "The evil eye and 'ma sha Allah'",
+      es: "El mal de ojo y 'ma sha Allah'",
+      id: "Mata jahat dan 'ma sha Allah'",
+    },
+    content: {
+      ko: "칭찬 뒤에는 흉안(엘아인)을 막으려고 '마샤알라'를 자주 붙여요. 파란 '캄사'(파티마의 손) 부적이 그것을 막아줘요. 아기나 새 차를 칭찬할 땐 '마샤알라'를 덧붙이세요.",
+      en: "A compliment is often followed by 'ma sha Allah' to ward off the evil eye (el-ain). The blue 'khamsa' (hand of Fatima) charm guards against it. Praising a baby or a new car? Add 'ma sha Allah'.",
+      es: "Un cumplido suele ir seguido de 'ma sha Allah' para alejar el mal de ojo (el-ain). El amuleto azul 'khamsa' (mano de Fátima) protege contra él. ¿Elogias a un bebé o un coche nuevo? Añade 'ma sha Allah'.",
+      id: "Pujian sering diikuti 'ma sha Allah' untuk menangkal mata jahat (el-ain). Jimat biru 'khamsa' (tangan Fatimah) melindungi darinya. Memuji bayi atau mobil baru? Tambahkan 'ma sha Allah'.",
+    },
+  },
 ];
 
 /** Get today's cultural note for a specific learning language (cycles daily) */
-export function getTodayNote(learningLang: "ko" | "en" | "es"): CulturalNote {
+export function getTodayNote(learningLang: "ko" | "en" | "es" | "ar"): CulturalNote {
   const filtered = getNotesForLanguage(learningLang);
   const dayOfYear = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
@@ -900,6 +1094,6 @@ export function getTodayNote(learningLang: "ko" | "en" | "es"): CulturalNote {
 }
 
 /** Get notes for a specific learning language */
-export function getNotesForLanguage(lang: "ko" | "en" | "es"): CulturalNote[] {
+export function getNotesForLanguage(lang: "ko" | "en" | "es" | "ar"): CulturalNote[] {
   return CULTURAL_NOTES.filter((n) => n.language === lang);
 }

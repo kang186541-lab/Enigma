@@ -1090,7 +1090,7 @@ export default function HomeScreen() {
 
 // ── CulturalNoteSection ──────────────────────────────────────────────────────
 function CulturalNoteSection({ nativeLang, learningLang }: { nativeLang: string; learningLang: string }) {
-  const learningCode = learningLang === "korean" ? "ko" : learningLang === "spanish" ? "es" : "en";
+  const learningCode = learningLang === "korean" ? "ko" : learningLang === "spanish" ? "es" : learningLang === "arabic" ? "ar" : "en";
   const note = getTodayNote(learningCode);
   const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
   const sectionLabel = nativeLang === "korean" ? "오늘의 문화 노트" : nativeLang === "spanish" ? "NOTA CULTURAL" : nativeLang === "indonesian" ? "CATATAN BUDAYA" : "CULTURAL NOTE";

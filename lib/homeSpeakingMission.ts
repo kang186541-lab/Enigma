@@ -62,7 +62,7 @@ export function getTodaySpeakingMission(
   // Beginner-ordered (survival first) + day-progressing: a returning learner
   // meets new phrases each day instead of re-opening with the same greeting.
   const missionPhrase = getProgressiveMissionPhrase(learningLang as DailySpeakingLanguage, goal, spokenCount, dayOffset);
-  const phrase = missionPhrase?.phrase ?? (learningLang === "korean" ? "안녕하세요" : learningLang === "spanish" ? "Hola" : "Hello");
+  const phrase = missionPhrase?.phrase ?? (learningLang === "korean" ? "안녕하세요" : learningLang === "spanish" ? "Hola" : learningLang === "arabic" ? "أهلاً" : "Hello");
   // nativeLang CAN be indonesian; meanings only carry 3 langs, so cast + fall
   // back through English to the phrase itself.
   const meaning = missionPhrase?.meanings[nativeLang as DailySpeakingLanguage] ?? missionPhrase?.meanings.english ?? phrase;
