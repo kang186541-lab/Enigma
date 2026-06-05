@@ -3773,12 +3773,12 @@ const MADRID_V21_STORY: Story = {
       },
       pType: "word-match",
       tprsStage: 1,
-      targetExpressions: ["red", "color", "I am happy", "It is beautiful"],
+      targetExpressions: ["red", "color"],
       previouslyLearned: ["Hello", "Thank you", "Goodbye"],
       speakAfter: true,
       storyReason: "Color words let the plaza resist the broadcast's flattening effect.",
       storyConsequence: "A single red flag starts to return above Plaza Mayor.",
-      onFail: { addToWeakExpressions: ["red", "color", "I am happy", "It is beautiful"], reviewInDailyCourse: true, reviewDays: 3 },
+      onFail: { addToWeakExpressions: ["red", "color"], reviewInDailyCourse: true, reviewDays: 3 },
       questions: [
         {
           word: { en: "red", ko: "빨간색", es: "rojo", id: "merah", ar: "أَحْمَر" },
@@ -3798,29 +3798,11 @@ const MADRID_V21_STORY: Story = {
             { en: "a locked door", ko: "잠긴 문", es: "una puerta cerrada", id: "pintu terkunci", ar: "بَاب مِقْفُول" },
           ],
         },
-        {
-          word: { en: "I am happy", ko: "나는 행복해요", es: "Estoy feliz", id: "Saya bahagia", ar: "أَنَا مَبْسُوط" },
-          meaning: { en: "a feeling of joy", ko: "기쁜 감정", es: "un sentimiento de alegría", id: "perasaan gembira", ar: "إِحْسَاس بِالفَرَح" },
-          wrong: [
-            { en: "asking for a location", ko: "위치 묻기", es: "preguntar por un lugar", id: "menanyakan lokasi", ar: "سُؤَال عَنْ مَكَان" },
-            { en: "asking a price", ko: "가격 묻기", es: "preguntar un precio", id: "menanyakan harga", ar: "سُؤَال عَنْ سِعْر" },
-            { en: "saying sorry", ko: "사과하기", es: "pedir perdón", id: "meminta maaf", ar: "إِنَّك تِعْتِذِر" },
-          ],
-        },
-        {
-          word: { en: "It is beautiful", ko: "그것은 아름다워요", es: "Es hermoso", id: "Itu indah", ar: "ده جَمِيل" },
-          meaning: { en: "a simple description of something you admire", ko: "감탄하는 것을 묘사하는 쉬운 말", es: "una descripción sencilla de algo que admiras", id: "deskripsi sederhana tentang sesuatu yang kamu kagumi", ar: "وَصْف بَسِيط لِحَاجَة بِتِعْجِبَك" },
-          wrong: [
-            { en: "an emergency request", ko: "긴급 도움 요청", es: "una petición urgente", id: "permintaan darurat", ar: "طَلَب طَوَارِئ" },
-            { en: "a family title", ko: "가족 호칭", es: "un título familiar", id: "sebutan keluarga", ar: "لَقَب عَائِلِي" },
-            { en: "a warning about danger", ko: "위험 경고", es: "una advertencia de peligro", id: "peringatan akan bahaya", ar: "تَحْذِير مِنْ خَطَر" },
-          ],
-        },
       ],
       hints: {
         h1: { ko: "이번 장은 색과 감정이 핵심이에요.", en: "This chapter is about color and feeling.", es: "Este capítulo trata de color y emoción.", id: "Bab ini berkisah tentang warna dan perasaan.", ar: "الفَصْل ده عَنِ اللَّوْن وَالإِحْسَاس." },
         h2: { ko: "red와 color는 광장의 시각 단서와 연결돼요.", en: "red and color connect to what you see in the plaza.", es: "red y color conectan con lo que ves en la plaza.", id: "red dan color berkaitan dengan apa yang kamu lihat di plaza.", ar: "red وَ color مَرْبُوطِين بِاللِّي إِنْتَ شَايْفُه فِي المِيدَان.", byLearning: { english: { ko: "red, color 같은 단어는 광장의 시각 단서와 연결돼요.", en: "red and color connect to what you see in the plaza.", es: "red y color conectan con lo que ves en la plaza.", id: "red dan color berkaitan dengan apa yang kamu lihat di plaza.", ar: "red وَ color مَرْبُوطِين بِاللِّي إِنْتَ شَايْفُه فِي المِيدَان." }, korean: { ko: "빨간색, 색 같은 단어는 광장의 시각 단서와 연결돼요.", en: "Words like 빨간색 and 색 connect to what you see in the plaza.", es: "Palabras como 빨간색 y 색 conectan con lo que ves en la plaza.", id: "Kata seperti 빨간색 dan 색 berkaitan dengan apa yang kamu lihat di plaza.", ar: "كَلِمَات زَيّ 빨간색 وَ 색 مَرْبُوطَة بِاللِّي إِنْتَ شَايْفُه فِي المِيدَان." }, spanish: { ko: "rojo, color 같은 단어는 광장의 시각 단서와 연결돼요.", en: "rojo and color connect to what you see in the plaza.", es: "rojo y color conectan con lo que ves en la plaza.", id: "rojo dan color berkaitan dengan apa yang kamu lihat di plaza.", ar: "rojo وَ color مَرْبُوطِين بِاللِّي إِنْتَ شَايْفُه فِي المِيدَان." }, indonesian: { ko: "merah, warna 같은 단어는 광장의 시각 단서와 연결돼요.", en: "merah and warna connect to what you see in the plaza.", es: "merah y warna conectan con lo que ves en la plaza.", id: "merah dan warna berkaitan dengan apa yang kamu lihat di plaza.", ar: "merah وَ warna مَرْبُوطِين بِاللِّي إِنْتَ شَايْفُه فِي المِيدَان." } } },
-        h3: { ko: "happy는 감정, beautiful은 묘사예요.", en: "happy is a feeling; beautiful is a description.", es: "happy es un sentimiento; beautiful es una descripción.", id: "happy adalah perasaan; beautiful adalah deskripsi.", ar: "happy إِحْسَاس؛ beautiful وَصْف.", byLearning: { english: { ko: "감정: happy / 묘사: beautiful", en: "feeling: happy / description: beautiful", es: "sentimiento: happy / descripción: beautiful", id: "perasaan: happy / deskripsi: beautiful", ar: "إِحْسَاس: happy / وَصْف: beautiful" }, korean: { ko: "감정: 나는 행복해요 / 묘사: 그것은 아름다워요", en: "feeling: 나는 행복해요 / description: 그것은 아름다워요", es: "sentimiento: 나는 행복해요 / descripción: 그것은 아름다워요", id: "perasaan: 나는 행복해요 / deskripsi: 그것은 아름다워요", ar: "إِحْسَاس: 나는 행복해요 / وَصْف: 그것은 아름다워요" }, spanish: { ko: "감정: Estoy feliz / 묘사: Es hermoso", en: "feeling: Estoy feliz / description: Es hermoso", es: "sentimiento: Estoy feliz / descripción: Es hermoso", id: "perasaan: Estoy feliz / deskripsi: Es hermoso", ar: "إِحْسَاس: Estoy feliz / وَصْف: Es hermoso" }, indonesian: { ko: "감정: Saya bahagia / 묘사: Itu indah", en: "feeling: Saya bahagia / description: Itu indah", es: "sentimiento: Saya bahagia / descripción: Itu indah", id: "perasaan: Saya bahagia / deskripsi: Itu indah", ar: "إِحْسَاس: Saya bahagia / وَصْف: Itu indah" } } },
+        h3: { ko: "red는 빨간색, color는 광장이 잃어가는 색이에요.", en: "red is the warm color; color is what the plaza is losing.", es: "red es el color cálido; color es lo que la plaza pierde.", id: "red itu warna hangat; color itu yang hilang dari plaza.", ar: "red هُوَّ اللَّوْن الدَّافِي؛ color هُوَّ اللِّي المِيدَان بِيِخْسَرُه." },
       },
     },
     {
@@ -8332,7 +8314,7 @@ export default function StoryScene() {
                   <WritingMissionPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "boss-spell" && (
-                  <BossSpellPuzzle key={seqIdx} puzzle={item} lang={lang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <BossSpellPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "word-puzzle" && (
                   <WordPuzzlePuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />

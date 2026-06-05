@@ -25,10 +25,11 @@ type Tri = {
   ar?: string;
 };
 
+type HintTri = Tri & { byLearning?: Partial<Record<string, Tri>> };
 type BossSpellHint = {
-  h1: Tri;
-  h2: Tri;
-  h3: Tri;
+  h1: HintTri;
+  h2: HintTri;
+  h3: HintTri;
 };
 
 export interface BossSpellQuestion {
@@ -45,6 +46,7 @@ export interface BossSpellQuestion {
 interface BossSpellPuzzleProps {
   puzzle: { pType: "boss-spell"; questions: [BossSpellQuestion] };
   lang: string;
+  learningLang: string;
   onSolved: () => void;
   onResetHints?: () => void;
 }
@@ -67,6 +69,21 @@ function tri(value: Tri, lang: string): string {
   return value.en;
 }
 
+/**
+ * UI-language resolver with an optional per-learning-language override.
+ * Mirrors resolveHint() in app/story-scene.tsx so boss-spell hints take part in
+ * the same learning-aware hint system as the shared puzzles (no longer excluded).
+ * With no byLearning entry (current data) this equals tri() plus an `en` fallback.
+ */
+function resolveHint(h: HintTri, uiLang: string, learningLang: string): string {
+  const src: Tri = h.byLearning?.[learningLang] ?? h;
+  if (uiLang === "korean") return src.ko ?? src.en;
+  if (uiLang === "spanish") return src.es ?? src.en;
+  if (uiLang === "indonesian") return src.id ?? src.en;
+  if (uiLang === "arabic") return src.ar ?? src.en;
+  return src.en;
+}
+
 function buildSpell(chunks: string[], separators: string[]): string {
   return chunks
     .map((chunk, index) => {
@@ -78,7 +95,7 @@ function buildSpell(chunks: string[], separators: string[]): string {
     .trim();
 }
 
-export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }: BossSpellPuzzleProps) {
+export default function BossSpellPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: BossSpellPuzzleProps) {
   const question = puzzle.questions[0];
   const [filled, setFilled] = useState<string[]>([]);
   const [mistakes, setMistakes] = useState(0);
@@ -305,8 +322,8 @@ export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }
         : `Answer sentence: ${spellText}`;
       return frame;
     }
-    if (mistakes >= 2) return tri(question.hints.h2, lang);
-    if (mistakes >= 1) return tri(question.hints.h1, lang);
+    if (mistakes >= 2) return resolveHint(question.hints.h2, lang, learningLang);
+    if (mistakes >= 1) return resolveHint(question.hints.h1, lang, learningLang);
     return lang === "korean"
       ? "문이 네 목소리를 기다리고 있어요."
       : lang === "spanish"
@@ -314,7 +331,7 @@ export default function BossSpellPuzzle({ puzzle, lang, onSolved, onResetHints }
         : lang === "indonesian"
         ? "Pintu sedang menunggu suaramu."
         : "The door is waiting for your voice.";
-  }, [lang, mistakes, question.hints, spellText]);
+  }, [lang, learningLang, mistakes, question.hints, spellText]);
 
   const header = lang === "korean"
     ? "보스 주문"
