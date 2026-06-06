@@ -417,6 +417,8 @@ type SeqClue = {
 };
 type TPRSMeta = {
   tprsStage?: 1 | 2 | 3 | 4;
+  /** The TARGET-language contract for this puzzle; "deduction" puzzles never seed mastery/SRS. */
+  quizContract?: "language" | "deduction";
   targetExpressions?: string[];
   previouslyLearned?: string[];
   speakAfter?: boolean;
@@ -965,12 +967,12 @@ const STORIES: Record<string, Story> = {
         puzzleNum: 1,
         pType: "word-match",
         tprsStage: 1,
-        targetExpressions: ["Hello", "Help me", "Where is ___?", "My name is ___", "Thank you", "Goodbye"],
+        targetExpressions: ["Hello", "My name is ___", "Help me", "Thank you"],
         previouslyLearned: [],
         speakAfter: true,
         storyReason: "Tom is testing whether you understand basic phrases before letting you into the crime scene.",
         storyConsequence: "Tom lets you through. The investigation begins.",
-        onFail: { addToWeakExpressions: ["Hello", "Help me", "Thank you", "Goodbye"], reviewInDailyCourse: true, reviewDays: 3 },
+        onFail: { addToWeakExpressions: ["Hello", "Help me", "My name is ___", "Thank you"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
             word: { en: "Hello", ko: "안녕하세요", es: "Hola", id: "Halo", ar: "أَهْلاً" },
@@ -991,15 +993,6 @@ const STORIES: Record<string, Story> = {
             ],
           },
           {
-            word: { en: "Where is...?", ko: "어디에 있어요...?", es: "¿Dónde está...?", id: "Di mana...?", ar: "فِين...؟" },
-            meaning: { en: "asking about a location or place", ko: "장소나 위치를 묻는 표현", es: "preguntar sobre un lugar o ubicación", id: "menanyakan lokasi atau tempat", ar: "إِنَّك تِسْأَل عَنْ مَكَان" },
-            wrong: [
-              { en: "asking about someone's name", ko: "누군가의 이름을 묻는 것", es: "preguntar el nombre de alguien", id: "menanyakan nama seseorang", ar: "إِنَّك تِسْأَل عَنِ اسْم حَدّ" },
-              { en: "asking about the time", ko: "시간을 묻는 것", es: "preguntar la hora", id: "menanyakan waktu", ar: "إِنَّك تِسْأَل عَنِ السَّاعَة" },
-              { en: "asking about someone's job", ko: "직업을 묻는 것", es: "preguntar el trabajo de alguien", id: "menanyakan pekerjaan seseorang", ar: "إِنَّك تِسْأَل عَنْ شُغْل حَدّ" },
-            ],
-          },
-          {
             word: { en: "My name is...", ko: "제 이름은...입니다", es: "Mi nombre es...", id: "Nama saya...", ar: "اِسْمِي..." },
             meaning: { en: "telling someone your name", ko: "자기 이름을 말하는 표현", es: "decirle tu nombre a alguien", id: "memberi tahu seseorang namamu", ar: "إِنَّك تِقُول لِحَدّ اسْمَك" },
             wrong: [
@@ -1017,20 +1010,11 @@ const STORIES: Record<string, Story> = {
               { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi", ar: "تَوْدِيع لَمَّا تِمْشِي" },
             ],
           },
-          {
-            word: { en: "Goodbye", ko: "안녕히 계세요", es: "Adiós", id: "Selamat tinggal", ar: "مَعَ السَّلَامَة" },
-            meaning: { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi", ar: "تَوْدِيع لَمَّا تِمْشِي" },
-            wrong: [
-              { en: "a greeting when arriving", ko: "도착할 때 하는 인사", es: "un saludo al llegar", id: "sapaan saat tiba", ar: "تَحِيَّة لَمَّا تُوصَل" },
-              { en: "asking for help", ko: "도움을 요청하는 것", es: "pedir ayuda", id: "meminta bantuan", ar: "إِنَّك تِطْلُب مُسَاعْدَة" },
-              { en: "an expression of thanks", ko: "감사 표현", es: "una expresión de agradecimiento", id: "ungkapan terima kasih", ar: "تَعْبِير عَنِ الشُّكْر" },
-            ],
-          },
         ],
         hints: {
-          h1: { ko: "프롤로그와 입구에서 이미 본 말들이야 — 인사, 도움 요청, 위치, 이름, 감사, 작별", en: "These are words from the prologue and the museum gate — greeting, help, location, name, thanks, farewell", es: "Son palabras del prólogo y la entrada del museo — saludo, ayuda, lugar, nombre, gracias, despedida", id: "Ini kata-kata dari prolog dan gerbang museum — sapaan, bantuan, lokasi, nama, terima kasih, perpisahan", ar: "دِي كَلِمَات شُفْتَهَا قَبْل كِدَه فِي المُقَدِّمَة وَفِي بَوَّابِة المَتْحَف — تَحِيَّة، طَلَب مُسَاعْدَة، مَكَان، اسْم، شُكْر، تَوْدِيع" },
+          h1: { ko: "프롤로그와 입구에서 이미 본 말들이야 — 인사, 도움 요청, 이름, 감사", en: "These are words from the prologue and the museum gate — greeting, help, name, thanks", es: "Son palabras del prólogo y la entrada del museo — saludo, ayuda, nombre, gracias", id: "Ini kata-kata dari prolog dan gerbang museum — sapaan, bantuan, nama, terima kasih", ar: "دِي كَلِمَات شُفْتَهَا قَبْل كِدَه فِي المُقَدِّمَة وَفِي بَوَّابِة المَتْحَف — تَحِيَّة، طَلَب مُسَاعْدَة، اسْم، شُكْر" },
           h2: { ko: "Tom에게 말하려면 먼저 자신을 밝히고, 왜 왔는지 말해야 해", en: "To talk to Tom, first show who you are and why you came", es: "Para hablar con Tom, primero muestra quién eres y por qué viniste", id: "Untuk bicara dengan Tom, tunjukkan dulu siapa kamu dan mengapa kamu datang", ar: "عَشَان تِكَلِّم تُوم، الأَوِّل وَرِّيه إِنْتَ مِين وَجَايّ لِيه" },
-          h3: { ko: "Hello=인사 / Help me=도움 요청 / Where is=장소 질문 / My name is=이름 / Thank you=감사 / Goodbye=작별", en: "Hello=greeting / Help me=requesting help / Where is=location question / My name is=name / Thank you=thanks / Goodbye=farewell", es: "Hola=saludo / Ayúdame=pedir ayuda / Dónde está=lugar / Mi nombre es=nombre / Gracias=gracias / Adiós=despedida", id: "Hello=sapaan / Help me=meminta bantuan / Where is=pertanyaan lokasi / My name is=nama / Thank you=terima kasih / Goodbye=perpisahan", ar: "Hello=تَحِيَّة / Help me=طَلَب مُسَاعْدَة / Where is=سُؤَال عَنْ مَكَان / My name is=اسْم / Thank you=شُكْر / Goodbye=تَوْدِيع", byLearning: { english: { ko: "Hello=인사 / Help me=도움 요청 / Where is...?=장소 질문 / My name is...=이름 / Thank you=감사 / Goodbye=작별", en: "Hello=greeting / Help me=requesting help / Where is...?=location question / My name is...=name / Thank you=thanks / Goodbye=farewell", es: "Hello=saludo / Help me=pedir ayuda / Where is...?=lugar / My name is...=nombre / Thank you=gracias / Goodbye=despedida", id: "Hello=sapaan / Help me=meminta bantuan / Where is...?=pertanyaan lokasi / My name is...=nama / Thank you=terima kasih / Goodbye=perpisahan", ar: "Hello=تَحِيَّة / Help me=طَلَب مُسَاعْدَة / Where is...?=سُؤَال عَنْ مَكَان / My name is...=اسْم / Thank you=شُكْر / Goodbye=تَوْدِيع" }, korean: { ko: "안녕하세요=인사 / 도와주세요=도움 요청 / 어디에 있어요...?=장소 질문 / 제 이름은...입니다=이름 / 감사합니다=감사 / 안녕히 계세요=작별", en: "안녕하세요=greeting / 도와주세요=requesting help / 어디에 있어요...?=location question / 제 이름은...입니다=name / 감사합니다=thanks / 안녕히 계세요=farewell", es: "안녕하세요=saludo / 도와주세요=pedir ayuda / 어디에 있어요...?=lugar / 제 이름은...입니다=nombre / 감사합니다=gracias / 안녕히 계세요=despedida", id: "안녕하세요=sapaan / 도와주세요=meminta bantuan / 어디에 있어요...?=pertanyaan lokasi / 제 이름은...입니다=nama / 감사합니다=terima kasih / 안녕히 계세요=perpisahan", ar: "안녕하세요=تَحِيَّة / 도와주세요=طَلَب مُسَاعْدَة / 어디에 있어요...?=سُؤَال عَنْ مَكَان / 제 이름은...입니다=اسْم / 감사합니다=شُكْر / 안녕히 계세요=تَوْدِيع" }, spanish: { ko: "Hola=인사 / Ayúdame=도움 요청 / ¿Dónde está...?=장소 질문 / Mi nombre es...=이름 / Gracias=감사 / Adiós=작별", en: "Hola=greeting / Ayúdame=requesting help / ¿Dónde está...?=location question / Mi nombre es...=name / Gracias=thanks / Adiós=farewell", es: "Hola=saludo / Ayúdame=pedir ayuda / ¿Dónde está...?=lugar / Mi nombre es...=nombre / Gracias=gracias / Adiós=despedida", id: "Hola=sapaan / Ayúdame=meminta bantuan / ¿Dónde está...?=pertanyaan lokasi / Mi nombre es...=nama / Gracias=terima kasih / Adiós=perpisahan", ar: "Hola=تَحِيَّة / Ayúdame=طَلَب مُسَاعْدَة / ¿Dónde está...?=سُؤَال عَنْ مَكَان / Mi nombre es...=اسْم / Gracias=شُكْر / Adiós=تَوْدِيع" }, indonesian: { ko: "Halo=인사 / Tolong saya=도움 요청 / Di mana...?=장소 질문 / Nama saya...=이름 / Terima kasih=감사 / Selamat tinggal=작별", en: "Halo=greeting / Tolong saya=requesting help / Di mana...?=location question / Nama saya...=name / Terima kasih=thanks / Selamat tinggal=farewell", es: "Halo=saludo / Tolong saya=pedir ayuda / Di mana...?=lugar / Nama saya...=nombre / Terima kasih=gracias / Selamat tinggal=despedida", id: "Halo=sapaan / Tolong saya=meminta bantuan / Di mana...?=pertanyaan lokasi / Nama saya...=nama / Terima kasih=terima kasih / Selamat tinggal=perpisahan", ar: "Halo=تَحِيَّة / Tolong saya=طَلَب مُسَاعْدَة / Di mana...?=سُؤَال عَنْ مَكَان / Nama saya...=اسْم / Terima kasih=شُكْر / Selamat tinggal=تَوْدِيع" } } },
+          h3: { ko: "Hello=인사 / Help me=도움 요청 / My name is=이름 / Thank you=감사", en: "Hello=greeting / Help me=requesting help / My name is=name / Thank you=thanks", es: "Hola=saludo / Ayúdame=pedir ayuda / Mi nombre es=nombre / Gracias=gracias", id: "Hello=sapaan / Help me=meminta bantuan / My name is=nama / Thank you=terima kasih", ar: "Hello=تَحِيَّة / Help me=طَلَب مُسَاعْدَة / My name is=اسْم / Thank you=شُكْر", byLearning: { english: { ko: "Hello=인사 / Help me=도움 요청 / My name is...=이름 / Thank you=감사", en: "Hello=greeting / Help me=requesting help / My name is...=name / Thank you=thanks", es: "Hello=saludo / Help me=pedir ayuda / My name is...=nombre / Thank you=gracias", id: "Hello=sapaan / Help me=meminta bantuan / My name is...=nama / Thank you=terima kasih", ar: "Hello=تَحِيَّة / Help me=طَلَب مُسَاعْدَة / My name is...=اسْم / Thank you=شُكْر" }, korean: { ko: "안녕하세요=인사 / 도와주세요=도움 요청 / 제 이름은...입니다=이름 / 감사합니다=감사", en: "안녕하세요=greeting / 도와주세요=requesting help / 제 이름은...입니다=name / 감사합니다=thanks", es: "안녕하세요=saludo / 도와주세요=pedir ayuda / 제 이름은...입니다=nombre / 감사합니다=gracias", id: "안녕하세요=sapaan / 도와주세요=meminta bantuan / 제 이름은...입니다=nama / 감사합니다=terima kasih", ar: "안녕하세요=تَحِيَّة / 도와주세요=طَلَب مُسَاعْدَة / 제 이름은...입니다=اسْم / 감사합니다=شُكْر" }, spanish: { ko: "Hola=인사 / Ayúdame=도움 요청 / Mi nombre es...=이름 / Gracias=감사", en: "Hola=greeting / Ayúdame=requesting help / Mi nombre es...=name / Gracias=thanks", es: "Hola=saludo / Ayúdame=pedir ayuda / Mi nombre es...=nombre / Gracias=gracias", id: "Hola=sapaan / Ayúdame=meminta bantuan / Mi nombre es...=nama / Gracias=terima kasih", ar: "Hola=تَحِيَّة / Ayúdame=طَلَب مُسَاعْدَة / Mi nombre es...=اسْم / Gracias=شُكْر" }, indonesian: { ko: "Halo=인사 / Tolong saya=도움 요청 / Nama saya...=이름 / Terima kasih=감사", en: "Halo=greeting / Tolong saya=requesting help / Nama saya...=name / Terima kasih=thanks", es: "Halo=saludo / Tolong saya=pedir ayuda / Nama saya...=nombre / Terima kasih=gracias", id: "Halo=sapaan / Tolong saya=meminta bantuan / Nama saya...=nama / Terima kasih=terima kasih", ar: "Halo=تَحِيَّة / Tolong saya=طَلَب مُسَاعْدَة / Nama saya...=اسْم / Terima kasih=شُكْر" } } },
         },
       },
       {
@@ -1175,6 +1159,7 @@ const STORIES: Record<string, Story> = {
         kind: "puzzle",
         puzzleNum: 3,
         pType: "investigation",
+        quizContract: "deduction",
         tprsStage: 3,
         targetExpressions: ["FIND", "Where is ___?", "Help me"],
         previouslyLearned: ["Hello", "Help me", "Where is ___?", "My name is ___", "Thank you", "Goodbye"],
@@ -3908,6 +3893,7 @@ const MADRID_V21_STORY: Story = {
         ar: "مَسْرَح المُولِد فِيه تَلَات أَدِلَّة. وَاحِد مِنْهُم بِيِثْبِت كَارْلُوس اِخْتَفَى فِين.",
       },
       pType: "investigation",
+      quizContract: "deduction",
       tprsStage: 3,
       targetExpressions: ["Where is the festival?", "color", "red"],
       previouslyLearned: ["Hello", "Thank you", "I am happy", "It is beautiful"],
@@ -4168,12 +4154,12 @@ const SEOUL_V21_STORY: Story = {
       },
       pType: "word-match",
       tprsStage: 1,
-      targetExpressions: ["안녕하세요", "감사합니다", "도와주세요", "실례합니다"],
-      previouslyLearned: ["Hello", "Thank you", "Goodbye"],
+      targetExpressions: ["안녕하세요", "감사합니다"],
+      previouslyLearned: ["Hello", "Goodbye", "안녕하세요"],
       speakAfter: true,
       storyReason: "Restore the polite phrases needed to move through Seoul without flattening anyone's voice.",
       storyConsequence: "The airport exit sign steadies long enough for Minho to guide you toward the market.",
-      onFail: { addToWeakExpressions: ["안녕하세요", "감사합니다", "도와주세요", "실례합니다"], reviewInDailyCourse: true, reviewDays: 3 },
+      onFail: { addToWeakExpressions: ["안녕하세요", "감사합니다"], reviewInDailyCourse: true, reviewDays: 3 },
       questions: [
         {
           word: { en: "안녕하세요", ko: "안녕하세요", es: "안녕하세요", id: "안녕하세요", ar: "안녕하세요" },
@@ -4193,29 +4179,11 @@ const SEOUL_V21_STORY: Story = {
             { en: "a color", ko: "색깔", es: "un color", id: "sebuah warna", ar: "لَوْن" },
           ],
         },
-        {
-          word: { en: "도와주세요", ko: "도와주세요", es: "도와주세요", id: "도와주세요", ar: "도와주세요" },
-          meaning: { en: "please help me", ko: "정중한 도움 요청", es: "por favor ayúdame", id: "tolong bantu saya", ar: "سَاعِدْنِي مِنْ فَضْلَك" },
-          wrong: [
-            { en: "informal hey", ko: "반말 인사", es: "oye informal", id: "sapaan santai", ar: "نِدَا عَادِي" },
-            { en: "a food order", ko: "음식 주문", es: "pedido de comida", id: "pesanan makanan", ar: "طَلَب أَكْل" },
-            { en: "a goodbye", ko: "작별 인사", es: "despedida", id: "ucapan perpisahan", ar: "كِلْمِة وَدَاع" },
-          ],
-        },
-        {
-          word: { en: "실례합니다", ko: "실례합니다", es: "실례합니다", id: "실례합니다", ar: "실례합니다" },
-          meaning: { en: "excuse me, politely", ko: "정중한 실례 표현", es: "disculpe, formal", id: "permisi, dengan sopan", ar: "لَوْ سَمَحْت، بِأَدَب" },
-          wrong: [
-            { en: "where is", ko: "어디예요", es: "dónde está", id: "di mana", ar: "فِين" },
-            { en: "red", ko: "빨간색", es: "rojo", id: "merah", ar: "أَحْمَر" },
-            { en: "informal thanks", ko: "반말 감사", es: "gracias informal", id: "terima kasih yang santai", ar: "شُكْر عَادِي" },
-          ],
-        },
       ],
       hints: {
         h1: { ko: "끝에 -요 또는 -합니다가 있으면 보통 더 정중해요.", en: "Words ending in -요 or -합니다 usually sound more polite.", es: "Las formas que terminan en -요 o -합니다 suelen sonar más formales.", id: "Kata yang berakhiran -요 atau -합니다 biasanya terdengar lebih sopan.", ar: "الكَلِمَات اللِّي بِتِخْلَص بِـ -요 أَوْ -합니다 غَالِباً بِتْبَان أَكْثَر أَدَباً." },
         h2: { ko: "안녕, 고마워, 도와줘는 가까운 사이의 반말이에요.", en: "안녕, 고마워, and 도와줘 are casual forms.", es: "안녕, 고마워 y 도와줘 son formas casuales.", id: "안녕, 고마워, dan 도와줘 adalah bentuk santai.", ar: "안녕، 고마워، 도와줘 دِي صِيَغ عَادِيَّة بِين النَّاس القُرَيِّبِين." },
-        h3: { ko: "정중한 네 표현: 안녕하세요 / 감사합니다 / 도와주세요 / 실례합니다", en: "The four polite forms: 안녕하세요 / 감사합니다 / 도와주세요 / 실례합니다", es: "Las cuatro formas formales: 안녕하세요 / 감사합니다 / 도와주세요 / 실례합니다", id: "Empat bentuk sopan: 안녕하세요 / 감사합니다 / 도와주세요 / 실례합니다", ar: "الأَرْبَع صِيَغ المُؤَدَّبَة: 안녕하세요 / 감사합니다 / 도와주세요 / 실례합니다" },
+        h3: { ko: "정중한 두 표현: 안녕하세요 / 감사합니다", en: "The two polite forms: 안녕하세요 / 감사합니다", es: "Las dos formas formales: 안녕하세요 / 감사합니다", id: "Dua bentuk sopan: 안녕하세요 / 감사합니다", ar: "الصِّيغْتِين المُؤَدَّبْتِين: 안녕하세요 / 감사합니다" },
       },
     },
     {
@@ -4380,6 +4348,7 @@ const SEOUL_V21_STORY: Story = {
         ar: "تَلَات أَدِلَّة لِسَّه فَاضْلِين جَنْب بَوَّابِة القَصْر. وَاحِد بَسّ مِنْهُم مِحَافِظ عَلَى تَرْتِيب الجُمْلَة سَلِيم.",
       },
       pType: "investigation",
+      quizContract: "deduction",
       tprsStage: 3,
       targetExpressions: ["박물관은 어디예요?", "순서", "도와주세요"],
       previouslyLearned: ["안녕하세요", "실례합니다"],
@@ -4727,9 +4696,9 @@ const CAIRO_V21_STORY: Story = {
         },
         {
           word: { en: "wrote", ko: "썼다", es: "escribió", id: "menulis (lampau)", ar: "كَتَب" },
-          meaning: { en: "past tense of write", ko: "write의 과거형", es: "pasado de write", id: "bentuk lampau dari write", ar: "صِيغِة المَاضِي مِنْ write" },
+          meaning: { en: "put words on paper, in the past", ko: "예전에 종이에 글을 남긴 것", es: "puso palabras en papel, en el pasado", id: "menaruh kata di atas kertas, di masa lalu", ar: "كَتَب كَلِمَات عَلَى وَرَق، فِي المَاضِي" },
           wrong: [
-            { en: "present tense of write", ko: "write의 현재형", es: "presente de write", id: "bentuk kini dari write", ar: "صِيغِة المُضَارِع مِنْ write" },
+            { en: "erased the page", ko: "페이지를 지운 것", es: "borró la página", id: "menghapus halaman", ar: "مَسَح الصَّفْحَة" },
             { en: "a place in Seoul", ko: "서울의 장소", es: "un lugar en Seúl", id: "sebuah tempat di Seoul", ar: "مَكَان فِي سِيُول" },
             { en: "a type of food", ko: "음식 종류", es: "un tipo de comida", id: "jenis makanan", ar: "نُوع مِنِ الأَكْل" },
           ],
@@ -4746,7 +4715,7 @@ const CAIRO_V21_STORY: Story = {
       ],
       hints: {
         h1: { ko: "이번 장은 기록과 과거 시제예요.", en: "This chapter is about records and past tense.", es: "Este capítulo trata de registros y pasado.", id: "Bab ini berkisah tentang catatan dan bentuk lampau.", ar: "الفَصْل ده عَنِ السِّجِلَّات وَصِيغِة المَاضِي." },
-        h2: { ko: "wrote는 write의 과거형이에요.", en: "wrote is the past tense of write.", es: "wrote es el pasado de write.", id: "wrote adalah bentuk lampau dari write.", ar: "كِلْمِة wrote هِيَّ المَاضِي مِنْ write." },
+        h2: { ko: "Ellis가 이미 적어 두었어요 — 이미 일어난 일이에요.", en: "Ellis already wrote it down — it already happened.", es: "Ellis ya lo escribió — ya ocurrió.", id: "Ellis sudah menuliskannya — itu sudah terjadi.", ar: "إِلِيس كَتَبِتْهَا خَلَاص — الحَاجَة دِي حَصَلِت بِالفِعْل." },
         h3: { ko: "핵심 단어: record / remember / wrote / lullaby", en: "Key words: record / remember / wrote / lullaby", es: "Palabras clave: record / remember / wrote / lullaby", id: "Kata kunci: record / remember / wrote / lullaby", ar: "الكَلِمَات المُهِمَّة: record / remember / wrote / lullaby" },
       },
     },
@@ -4845,6 +4814,7 @@ const CAIRO_V21_STORY: Story = {
         ar: "فِضِل تَلَات حَاجَات فِي الأَرْشِيف. وَاحْدَة بَسّ مِنْهُم هِيَّ صَفْحِة يُومِيَّات إِلِيس الحَقِيقِيَّة.",
       },
       pType: "investigation",
+      quizContract: "deduction",
       tprsStage: 3,
       targetExpressions: ["I was here", "She wrote", "Where is the record?"],
       previouslyLearned: ["record", "remember", "wrote", "lullaby", "It was beautiful"],
@@ -4934,11 +4904,12 @@ const CAIRO_V21_STORY: Story = {
       onFail: { addToWeakExpressions: ["I remember", "She wrote", "Where is the record?"], reviewInDailyCourse: true, reviewDays: 3 },
       questions: [
         {
-          spellChunks: ["I remember", "She wrote", "the lullaby", "Where is the record?"],
           // Renders: "I remember. She wrote the lullaby. Where is the record?"
-          //                ^period   ^space     ^period after lullaby (was missing — caused mismatch with hint h3)
-          separators: [".", " ", ".", ""],
-          wordPool: ["I remember", "She wrote", "the lullaby", "Where is the record?", "I forget", "She writes", "the song"],
+          // Hand-split into 5 DISTINCT chunks (BossSpellPuzzle ignores taps for
+          // already-used chunks, so every chunk must be unique) — rendered byte-identical.
+          spellChunks: ["I remember", "She wrote", "the lullaby", "Where is", "the record?"],
+          separators: [". ", " ", ". ", " ", ""],
+          wordPool: ["I remember", "She wrote", "the lullaby", "Where is", "the record?", "I forget", "She writes", "the song"],
           instruction: {
             en: "Use Ellis's words to restore what was lost.",
             ko: "엘리스의 말로 잃어버린 것을 복원하세요.",
@@ -5347,6 +5318,7 @@ const BABEL_V21_STORY: Story = {
         ar: "تَلَات ذِكْرَيَات بِتِترَدِّد فِي الأُوضَة. وَاحْدَة بَسّ مِنْهُم بِتْحَوِّل الحُزْن لِحَقِيقَة، مِشْ لِسَيْطَرَة.",
       },
       pType: "investigation",
+      quizContract: "deduction",
       tprsStage: 3,
       targetExpressions: ["I remember", "She wrote", "Mae'r iaith yn fyw"],
       previouslyLearned: ["I remember", "She wrote", "the lullaby", "I see you"],
@@ -5446,16 +5418,21 @@ const BABEL_V21_STORY: Story = {
       onFail: { addToWeakExpressions: ["You translated", "You couldn't translate"], reviewInDailyCourse: true, reviewDays: 3 },
       questions: [
         {
-          spellChunks: ["You translated", "the words", "You couldn't translate", "why she said them"],
-          separators: ["", ".", "", "."],
+          // Renders: "You translated the words. You couldn't translate why she said them."
+          // Hand-split into 6 DISTINCT chunks (BossSpellPuzzle ignores taps for
+          // already-used chunks, so every chunk must be unique) — rendered byte-identical.
+          spellChunks: ["You translated", "the words", "You couldn't", "translate", "why she", "said them"],
+          separators: [" ", ". ", " ", " ", " ", "."],
           wordPool: [
             "You translated",
             "the words",
-            "You couldn't translate",
-            "why she said them",
+            "You couldn't",
+            "translate",
+            "why she",
+            "said them",
             "You stopped",
             "the meanings",
-            "You translated her",
+            "You whispered",
           ],
           instruction: {
             en: "Speak what Universal Code could never carry.",
@@ -7721,7 +7698,8 @@ export default function StoryScene() {
       const chapter = story.id === "london" ? "ch1" : story.id === "madrid" ? "ch2" : story.id === "seoul" ? "ch3" : story.id === "cairo" ? "ch4" : "ch5";
       const targetExpressions = puzzleItem.targetExpressions;
 
-      if (puzzleItem.pType !== "investigation" && targetExpressions?.length) {
+      const isLanguageQuiz = puzzleItem.quizContract !== "deduction";
+      if (isLanguageQuiz && targetExpressions?.length) {
         addToExpressionBook(targetExpressions, chapter, puzzleItem.tprsStage).catch((e: unknown) => console.warn('[Story] addToExpressionBook failed:', e));
         if (puzzleItem.tprsStage === 4) markExpressionsMastered(targetExpressions).catch((e: unknown) => console.warn('[Story] markExpressionsMastered failed:', e));
 

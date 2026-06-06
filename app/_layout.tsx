@@ -133,6 +133,7 @@ function RootLayoutNav() {
       <Stack.Screen name="expression-book"   options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="daily-lesson"      options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="story-scene"       options={{ headerShown: false, gestureEnabled: false }} />
+      <Stack.Screen name="escape-room"        options={{ headerShown: false }} />
       <Stack.Screen name="settings"          options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="stats-dashboard"   options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="writing-practice"  options={{ headerShown: false, presentation: "card" }} />

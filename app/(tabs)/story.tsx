@@ -352,6 +352,15 @@ export default function StoryTab() {
             {lang === "korean" ? "NPC 미션" : lang === "spanish" ? "Misiones NPC" : lang === "indonesian" ? "Misi NPC" : "NPC Missions"}
           </Text>
         </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.7 }]}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/escape-room?id=sealed-archive" as any); }}
+        >
+          <Ionicons name="key-outline" size={16} color={C.gold} />
+          <Text style={styles.quickBtnText}>
+            {lang === "korean" ? "방 탈출" : lang === "spanish" ? "Sala de Escape" : lang === "indonesian" ? "Ruang Teka-teki" : "Escape Room"}
+          </Text>
+        </Pressable>
       </View>
 
       {/* Camp → Story sequencing hint */}
