@@ -72,6 +72,47 @@ function logProviderError(scope: string, status: number, body: string | undefine
   }
 }
 
+function normalizeLanguageKey(value: string | undefined | null): "ko" | "en" | "es" | "id" | "ar" | null {
+  const v = String(value ?? "").trim().toLowerCase();
+  if (!v) return null;
+  if (v === "ko" || v === "ko-kr" || v.startsWith("korean")) return "ko";
+  if (v === "en" || v.startsWith("en-") || v.startsWith("english")) return "en";
+  if (v === "es" || v.startsWith("es-") || v.startsWith("spanish")) return "es";
+  if (v === "id" || v === "id-id" || v.startsWith("indo")) return "id";
+  if (v === "ar" || v === "ar-eg" || v.startsWith("arabic")) return "ar";
+  return null;
+}
+
+function languageLabel(value: string | undefined | null, fallback = "English"): string {
+  const key = normalizeLanguageKey(value);
+  if (key === "ko") return "Korean";
+  if (key === "en") return "English";
+  if (key === "es") return "Spanish";
+  if (key === "id") return "Indonesian";
+  if (key === "ar") return "Arabic (Egyptian Arabic, ar-EG)";
+  return fallback;
+}
+
+function nativeLanguageLabel(value: string | undefined | null, fallback = "English"): string {
+  const key = normalizeLanguageKey(value);
+  if (key === "ko") return "Korean";
+  if (key === "en") return "English";
+  if (key === "es") return "Spanish";
+  if (key === "id") return "Indonesian";
+  return fallback;
+}
+
+function nativeFeedback(
+  nativeLang: string | undefined | null,
+  copy: { ko: string; en: string; es: string; id: string },
+): string {
+  const key = normalizeLanguageKey(nativeLang);
+  if (key === "ko") return copy.ko;
+  if (key === "es") return copy.es;
+  if (key === "id") return copy.id;
+  return copy.en;
+}
+
 async function translateTextForFeature(taskLabel: string, text: string, targetLanguage: string): Promise<string> {
   const source = text.trim();
   if (!source || !targetLanguage.trim()) return "";
@@ -730,7 +771,7 @@ Never emit any block inside your conversational reply. Never emit a block that w
         exerciseType: "translate" | "complete" | "free";
         promptText: string;
         userAnswer: string;
-        learningLang: "ko" | "en" | "es" | "id" | "korean" | "english" | "spanish" | "indonesian";
+        learningLang: "ko" | "en" | "es" | "id" | "ar" | "korean" | "english" | "spanish" | "indonesian" | "arabic";
         nativeLang?: "ko" | "en" | "es" | "id";
       };
 
@@ -738,14 +779,8 @@ Never emit any block inside your conversational reply. Never emit a block that w
         return res.status(400).json({ error: "promptText and userAnswer are required" });
       }
 
-      const nativeName = ({ ko: "Korean", en: "English", es: "Spanish", id: "Indonesian" } as const)[(nativeLang ?? "ko") as "ko" | "en" | "es" | "id"] ?? "English";
-      const learnName = (() => {
-        const ll = String(learningLang ?? "").toLowerCase();
-        if (ll.startsWith("ko")) return "Korean";
-        if (ll.startsWith("es") || ll.startsWith("sp")) return "Spanish";
-        if (ll.startsWith("id") || ll.startsWith("indo")) return "Indonesian";
-        return "English";
-      })();
+      const nativeName = nativeLanguageLabel(nativeLang, "English");
+      const learnName = languageLabel(learningLang, "English");
 
       const systemPrompt = (() => {
         const base = `You are a patient ${learnName} language tutor evaluating a student whose native language is ${nativeName}.

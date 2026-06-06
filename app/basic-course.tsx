@@ -494,6 +494,14 @@ function buildBasicCourseTtsUrl(text: string, courseLang: string, voice?: string
     url.searchParams.set("text", getBasicCourseTtsText(text, courseLang));
     url.searchParams.set("lang", courseLang);
     if (voice) url.searchParams.set("voice", voice);
+    // Azure ar-EG returns EMPTY audio for a plain isolated Arabic glyph (e.g. "ا"),
+    // but say-as interpret-as="characters" (mode=letter) makes it voice the letter
+    // NAME (verified live: 0 bytes plain → 15.5 KB with mode=letter). en/ko/es send a
+    // multi-char phonetic name (getBasicCourseTtsText), so for a single-glyph Arabic
+    // letter the raw glyph reaches Azure — route those through mode=letter.
+    if (text.length === 1 && courseLang.toLowerCase().startsWith("ar")) {
+      url.searchParams.set("mode", "letter");
+    }
     return url;
   } catch (e) {
     console.warn('[BasicCourse] Failed to construct TTS URL:', e);
