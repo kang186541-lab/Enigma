@@ -5107,8 +5107,8 @@ const BABEL_V21_STORY: Story = {
   gradient: ["#050510", "#0A0A2A", "#050510"],
   accentColor: "#9B7CFF",
   chapterMeta: {
-    cefrLevel: "B1",
-    targetLangRatio: 72,
+    cefrLevel: "A2",
+    targetLangRatio: 56,
     knownExpressions: [
       "I am here",
       "I see you",
@@ -5118,9 +5118,12 @@ const BABEL_V21_STORY: Story = {
       "You couldn't translate",
       "why she said them",
       "Mae'r iaith yn fyw",
+      "Thank you",
+      "She wrote",
+      "the lullaby",
     ],
     languageNote:
-      "Babel compresses the final three foundation stones into connection, memory, and beginning, then turns the final counterargument into player production.",
+      "Babel compresses the final three foundation stones into connection, memory, and beginning, then turns the final counterargument into player production. Target ratio held at A2 (56) instead of a B1 spike; the single B1-level compound appears only in the fully-scaffolded final boss spell (listen → choose → speak) and reuses prior connection/memory phrases (~70-80% reuse).",
   },
   characters: [
     { id: "lingo", emoji: "🦊", name: "Detective Rudy", nameKo: "탐정 루디", nameId: "Detektif Rudy", side: "left", avatarBg: C.gold, isLingo: true, portrait: rudyDialogueNeutralImg, portraitVariants: rudyExpressionSprites },
