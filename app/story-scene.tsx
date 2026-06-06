@@ -7012,14 +7012,14 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>
           {lang === "korean"
-            ? `'${displayWord}'을(를) ${learningLang === "spanish" ? "스페인어" : learningLang === "korean" ? "한국어" : "영어"}로 써보세요`
+            ? `'${displayWord}'을(를) ${learningLang === "spanish" ? "스페인어" : learningLang === "korean" ? "한국어" : learningLang === "indonesian" ? "인도네시아어" : learningLang === "arabic" ? "아랍어" : "영어"}로 써보세요`
             : lang === "spanish"
-            ? `Escribe '${displayWord}' en ${learningLang === "spanish" ? "español" : learningLang === "korean" ? "coreano" : "inglés"}`
+            ? `Escribe '${displayWord}' en ${learningLang === "spanish" ? "español" : learningLang === "korean" ? "coreano" : learningLang === "indonesian" ? "indonesio" : learningLang === "arabic" ? "árabe" : "inglés"}`
             : lang === "indonesian"
-            ? `Tulis '${displayWord}' dalam ${learningLang === "spanish" ? "bahasa Spanyol" : learningLang === "korean" ? "bahasa Korea" : "bahasa Inggris"}`
+            ? `Tulis '${displayWord}' dalam ${learningLang === "spanish" ? "bahasa Spanyol" : learningLang === "korean" ? "bahasa Korea" : learningLang === "indonesian" ? "bahasa Indonesia" : learningLang === "arabic" ? "bahasa Arab" : "bahasa Inggris"}`
             : lang === "arabic"
-            ? `اكتب '${displayWord}' بـ${learningLang === "spanish" ? "الإسبانية" : learningLang === "korean" ? "الكورية" : "الإنجليزية"}`
-            : `Type '${displayWord}' in ${learningLang === "spanish" ? "Spanish" : learningLang === "korean" ? "Korean" : "English"}`}
+            ? `اكتب '${displayWord}' بـ${learningLang === "spanish" ? "الإسبانية" : learningLang === "korean" ? "الكورية" : learningLang === "indonesian" ? "الإندونيسية" : learningLang === "arabic" ? "العربية" : "الإنجليزية"}`
+            : `Type '${displayWord}' in ${learningLang === "spanish" ? "Spanish" : learningLang === "korean" ? "Korean" : learningLang === "indonesian" ? "Indonesian" : learningLang === "arabic" ? "Arabic" : "English"}`}
         </Text>
         <Text style={styles.puzzleWordMain}>{displayWord}</Text>
         {hintText && <EmojiText style={styles.puzzleChooseHint}>{hintText}</EmojiText>}

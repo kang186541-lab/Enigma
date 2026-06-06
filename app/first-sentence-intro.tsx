@@ -369,13 +369,15 @@ export default function FirstSentenceIntroScreen() {
   const [revealedChunks, setRevealedChunks] = useState<Set<number>>(new Set());
   const [basicNudgeDismissed, setBasicNudgeDismissed] = useState(false);
 
-  // The full-alphabet course (/basic-course) only has data for these four
-  // learning targets. normalizeLearn already restricts learnCode to them, so a
-  // non-null learnCode is sufficient — but we keep the explicit set so the
-  // nudge never points an unfamiliar-script beginner at an empty course.
+  // The full-alphabet course (/basic-course) has data for these five learning
+  // targets (incl. the Egyptian-Arabic alphabet). normalizeLearn already
+  // restricts learnCode to them, so a non-null learnCode is sufficient — but we
+  // keep the explicit set so the nudge never points an unfamiliar-script
+  // beginner at an empty course.
   const learnHasBasicCourse =
     learnCode === "korean" || learnCode === "english" ||
-    learnCode === "spanish" || learnCode === "indonesian";
+    learnCode === "spanish" || learnCode === "indonesian" ||
+    learnCode === "arabic";
 
   const chunks = useMemo(
     () => (phrase ? buildChunks(phrase.phrase, phrase.ipa) : []),

@@ -280,6 +280,13 @@ export const RUDY_BRIEFINGS: Record<string, string[]> = {
     "¡Hora de subir de nivel! ¡Afrontemos el entrenamiento de hoy!",
     "¡Cada día que practicas, te acercas más a la fluidez!",
   ],
+  indonesian: [
+    "Selamat pagi, partner! Ayo latihan bareng hari ini!",
+    "Selamat datang kembali! Siap memulai misi hari ini?",
+    "Kamu pasti bisa, partner! Ayo buat hari ini berarti!",
+    "Waktunya naik level! Ayo taklukkan latihan hari ini!",
+    "Setiap hari kamu berlatih, kamu makin dekat ke lancar!",
+  ],
 };
 
 export function getRandomBriefing(nativeLang: string): string {
@@ -295,6 +302,7 @@ export const STEP_LABELS: Record<string, [string, string, string, string]> = {
   korean:  ["보기", "만들기", "뱉기", "복습"],
   english: ["See", "Build", "Speak", "Review"],
   spanish: ["Ver", "Construir", "Hablar", "Repasar"],
+  indonesian: ["Lihat", "Susun", "Bicara", "Ulas"],
 };
 
 /**

@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLanguage, getLevel, getLevelProgress, getLevelName, getEffectiveLearningLanguage, toNativeLearning, NativeLanguage } from "@/context/LanguageContext";
+import { useLanguage, getLevel, getLevelProgress, getLevelName, getEffectiveLearningLanguage, NativeLanguage } from "@/context/LanguageContext";
 import { RudyMascot } from "@/components/LingoMascot";
 import { LevelUpModal } from "@/components/LevelUpModal";
 import { LanguageChangeModal } from "@/components/LanguageChangeModal";
@@ -213,10 +213,15 @@ export default function HomeScreen() {
   const [showMorePractice, setShowMorePractice] = React.useState(false);
   const [showMoreTools, setShowMoreTools] = React.useState(false);
   const targetLearningLang = getEffectiveLearningLanguage(nativeLang, learningLanguage);
-  // Home preview/chrome (speaking-mission card, language chip) has no Arabic
-  // copy yet, so coerce an "arabic" target to a native default for those surfaces.
-  // The real Arabic speak-first flow lives in the Speak tab and daily-lesson.
-  const effectiveLearningLang = toNativeLearning(nativeLang, targetLearningLang);
+  // Preserve the real learning target (INCLUDING "arabic") on Home. The speaking-
+  // mission card, the CTA targetLang, the per-language speaking count, card-practice,
+  // and basic-course completion all key off this. Arabic now has full content
+  // (daily-speaking packs, ar-EG pronunciation, basic-course alphabet), so degrading
+  // it to a native default here was the bug that showed Arabic learners an English
+  // first mission. (The Speak tab self-corrects, but the Home hero + CTA did not.)
+  const effectiveLearningLang = targetLearningLang;
+  // LANG_FLAGS is native-only by convention; Arabic carries its 🇪🇬 flag locally.
+  const learnFlag = effectiveLearningLang === "arabic" ? "🇪🇬" : LANG_FLAGS[effectiveLearningLang];
 
   const xpAnim    = useRef(new Animated.Value(progress)).current;
   const shimmerX  = useRef(new Animated.Value(-200)).current;
@@ -586,7 +591,7 @@ export default function HomeScreen() {
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowLangModal(true); }}
           >
             <Text style={styles.langChipText}>
-              {LANG_FLAGS[nativeLang]} → {LANG_FLAGS[effectiveLearningLang]}
+              {LANG_FLAGS[nativeLang]} → {learnFlag}
             </Text>
             <Text style={styles.langChipEdit}>
               {nativeLang === "korean" ? "변경" : nativeLang === "spanish" ? "Cambiar" : nativeLang === "indonesian" ? "Ubah" : "Change"}

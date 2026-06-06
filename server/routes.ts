@@ -2521,9 +2521,9 @@ Student's ${learnName} answer: ${userAnswer}`;
       }
 
       const LANG_FULL: Record<string, string> = {
-        english: "English", spanish: "Spanish", korean: "Korean", indonesian: "Indonesian",
-        "en-US": "English", "es-ES": "Spanish", "ko-KR": "Korean", "id": "Indonesian",
-        "en": "English", "es": "Spanish", "ko": "Korean",
+        english: "English", spanish: "Spanish", korean: "Korean", indonesian: "Indonesian", arabic: "Arabic",
+        "en-US": "English", "es-ES": "Spanish", "ko-KR": "Korean", "id": "Indonesian", "ar-EG": "Arabic",
+        "en": "English", "es": "Spanish", "ko": "Korean", "ar": "Arabic",
       };
       const langName = LANG_FULL[targetLang] ?? "English";
       const nativeName = nativeLang ? (LANG_FULL[nativeLang] ?? "English") : "English";

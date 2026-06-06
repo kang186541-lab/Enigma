@@ -1692,7 +1692,7 @@ export default function CardsScreen() {
         // they'll see the rest tomorrow as their box-1/2 cards keep
         // returning to due.
         const dueSrs = await getDueCards(DAILY_GOAL);
-        picked = srsCardsToFlashCards(dueSrs, nativeLang as NativeLanguage, lang) as FlashCard[];
+        picked = srsCardsToFlashCards(dueSrs, nativeLang as NativeLanguage, deckLang) as FlashCard[];
         setSrsQueueEmpty(picked.length === 0);
       } else {
         picked = pickSessionCards(allCards, DAILY_GOAL, lastSeen);

@@ -8,7 +8,7 @@ import type { LearningGoal } from "@/lib/learnerProfile";
 import { SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 
 export type HomeSpeakingMission = {
-  targetLanguage: NativeLanguage;
+  targetLanguage: DailySpeakingLanguage;
   goal: LearningGoal | null;
   dailyGoalMet: boolean;
   phrase: string;
@@ -54,7 +54,7 @@ export function getHomeLearningGoalOptions(lang: NativeLanguage): { key: Learnin
 
 export function getTodaySpeakingMission(
   nativeLang: NativeLanguage,
-  learningLang: NativeLanguage,
+  learningLang: DailySpeakingLanguage,
   goal: LearningGoal | null,
   spokenCount: number,
   dayOffset: number = 0,
@@ -67,11 +67,11 @@ export function getTodaySpeakingMission(
   // back through English to the phrase itself.
   const meaning = missionPhrase?.meanings[nativeLang as DailySpeakingLanguage] ?? missionPhrase?.meanings.english ?? phrase;
   const dailyGoalMet = spokenCount >= SPEAKING_DAILY_GOAL;
-  const targetName: Record<NativeLanguage, Record<NativeLanguage, string>> = {
-    korean: { korean: "한국어", english: "영어", spanish: "스페인어", indonesian: "인도네시아어" },
-    english: { korean: "Korean", english: "English", spanish: "Spanish", indonesian: "Indonesian" },
-    spanish: { korean: "coreano", english: "inglés", spanish: "español", indonesian: "indonesio" },
-    indonesian: { korean: "bahasa Korea", english: "bahasa Inggris", spanish: "bahasa Spanyol", indonesian: "bahasa Indonesia" },
+  const targetName: Record<NativeLanguage, Record<DailySpeakingLanguage, string>> = {
+    korean: { korean: "한국어", english: "영어", spanish: "스페인어", indonesian: "인도네시아어", arabic: "아랍어" },
+    english: { korean: "Korean", english: "English", spanish: "Spanish", indonesian: "Indonesian", arabic: "Arabic" },
+    spanish: { korean: "coreano", english: "inglés", spanish: "español", indonesian: "indonesio", arabic: "árabe" },
+    indonesian: { korean: "bahasa Korea", english: "bahasa Inggris", spanish: "bahasa Spanyol", indonesian: "bahasa Indonesia", arabic: "bahasa Arab" },
   };
   const goalLabel = getGoalLabel(goal, nativeLang);
   const localizedContextTip = getGoalContextTip(

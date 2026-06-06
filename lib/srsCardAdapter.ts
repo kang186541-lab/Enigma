@@ -23,7 +23,7 @@
  */
 
 import type { SrsCard } from "./srsManager";
-import type { NativeLanguage } from "@/context/LanguageContext";
+import type { NativeLanguage, LearningTargetLanguage } from "@/context/LanguageContext";
 
 // Re-declare the Cards-tab FlashCard shape here so we don't pull a cycle
 // through app/(tabs)/cards.tsx. Keep in sync with cards.tsx:23-31.
@@ -37,11 +37,12 @@ export interface FlashCardLike {
   speechLang: string;
 }
 
-const LEARNING_TO_BCP47: Record<NativeLanguage, string> = {
+const LEARNING_TO_BCP47: Record<LearningTargetLanguage, string> = {
   korean: "ko-KR",
   english: "en-US",
   spanish: "es-ES",
   indonesian: "id-ID",
+  arabic: "ar-EG",
 };
 
 /** Default emoji for SRS phrases that didn't carry one. The book glyph is
@@ -58,7 +59,7 @@ const SRS_DEFAULT_EMOJI = "📖";
 export function srsCardToFlashCard(
   srs: SrsCard,
   nativeLang: NativeLanguage,
-  learningLang: NativeLanguage,
+  learningLang: LearningTargetLanguage,
 ): FlashCardLike {
   const meaning = srs.meaning ?? "";
   // Fan the single stored meaning into all three slots. The native slot is
@@ -94,7 +95,7 @@ export function srsCardToFlashCard(
 export function srsCardsToFlashCards(
   srsCards: SrsCard[],
   nativeLang: NativeLanguage,
-  learningLang: NativeLanguage,
+  learningLang: LearningTargetLanguage,
 ): FlashCardLike[] {
   return srsCards.map((c) => srsCardToFlashCard(c, nativeLang, learningLang));
 }
