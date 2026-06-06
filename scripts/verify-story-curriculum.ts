@@ -76,4 +76,18 @@ for (const r of REQUIRED) {
   assert(story.includes(r), `expected localized quiz answer is missing: ${r}`);
 }
 
+// Completeness scan: no dialogue/fill-blank `answer` may duplicate ASCII-English
+// into the Korean slot (the "English-stuck" bug) across ANY active chapter.
+// Seoul answers carry Korean in the `en` slot too (en === ko but not ASCII), so
+// they are correctly NOT flagged; a genuine English answer cloned into ko is.
+const ANSWER_RE = /answer:\s*\{\s*en:\s*"((?:[^"\\]|\\.)*)",\s*ko:\s*"((?:[^"\\]|\\.)*)"/g;
+for (let mm = ANSWER_RE.exec(story); mm; mm = ANSWER_RE.exec(story)) {
+  const en = mm[1];
+  const ko = mm[2];
+  assert(
+    !(en === ko && /[A-Za-z]/.test(en)),
+    `English-stuck dialogue answer (ko slot duplicates the English en): "${en}"`,
+  );
+}
+
 console.log("story curriculum verification passed");

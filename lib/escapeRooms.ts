@@ -220,12 +220,14 @@ const SEALED_ARCHIVE: EscapeRoom = {
         // Per-language: a Korean/Arabic learner must type the TARGET form, not
         // English. (Was a flat all-language array → English "free" unlocked any
         // learner's lock, breaking the learn-the-target contract.)
+        // Keys are the FULL learningLang names (WritingLock indexes by
+        // learningLang, e.g. "korean" — short codes like "ko" silently miss).
         acceptableAnswers: {
-          en: ["free", "liberate", "set free"],
-          es: ["liberar", "libera"],
-          id: ["bebaskan", "membebaskan"],
-          ko: ["자유롭게 하다", "자유", "풀다", "풀어요"],
-          ar: ["حرّر", "حَرِّر", "حرر"],
+          english: ["free", "liberate", "set free"],
+          spanish: ["liberar", "libera"],
+          indonesian: ["bebaskan", "membebaskan"],
+          korean: ["자유롭게 하다", "자유", "풀다", "풀어요"],
+          arabic: ["حرّر", "حَرِّر", "حرر"],
         },
       },
       hints: {

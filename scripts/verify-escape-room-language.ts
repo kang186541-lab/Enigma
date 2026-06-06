@@ -32,7 +32,15 @@ assert(
 );
 const EN_WORDS = ["free", "liberate", "set free", "open", "key"];
 for (const lang of ["korean", "arabic"]) {
-  for (const w of (acc as Record<string, string[]>)[lang] ?? []) {
+  const list = (acc as Record<string, string[]>)[lang];
+  // Must use the FULL-name key — runtime (WritingLock) indexes acceptableAnswers
+  // by learningLang ("korean"/"arabic"...). A short code ("ko"/"ar") would make
+  // this undefined and silently drop the variants, so require a non-empty array.
+  assert(
+    Array.isArray(list) && list.length > 0,
+    `lockC acceptableAnswers must use the full-name key "${lang}" with target variants (not a short code like "${lang.slice(0, 2)}")`,
+  );
+  for (const w of list) {
     assert(
       !EN_WORDS.includes(String(w).toLowerCase()),
       `lockC ${lang} must not accept the English form "${w}"`,

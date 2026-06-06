@@ -93,7 +93,7 @@ export default function StorySpeakAfterCard({
   const ar = nativeLang === "arabic";
 
   const playTTS = useCallback(async () => {
-    if (phase === "recording" || phase === "assessing") return;
+    if (phase === "recording" || phase === "assessing" || phase === "playing") return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     const prev = phase;
     setPhase("playing");
@@ -115,8 +115,12 @@ export default function StorySpeakAfterCard({
         const objUrl = URL.createObjectURL(blob);
         const audio = new (window as any).Audio(objUrl) as HTMLAudioElement;
         registerGlobalWebAudio(audio);
-        audio.onended = () => setPhase((p) => (p === "playing" ? prev === "done" ? "done" : "idle" : p));
-        audio.onerror = () => setPhase((p) => (p === "playing" ? prev === "done" ? "done" : "idle" : p));
+        const endPlay = () => {
+          URL.revokeObjectURL(objUrl);
+          setPhase((p) => (p === "playing" ? (prev === "done" ? "done" : "idle") : p));
+        };
+        audio.onended = endPlay;
+        audio.onerror = endPlay;
         await audio.play();
       } else {
         const { sound } = await Audio.Sound.createAsync({ uri: url.toString() }, { shouldPlay: true });
@@ -228,7 +232,7 @@ export default function StorySpeakAfterCard({
         <Pressable
           style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.8 }, busy && phase !== "playing" && { opacity: 0.5 }]}
           onPress={playTTS}
-          disabled={phase === "recording" || phase === "assessing"}
+          disabled={phase === "recording" || phase === "assessing" || phase === "playing"}
         >
           {phase === "playing" ? (
             <ActivityIndicator size="small" color={C.gold} />
