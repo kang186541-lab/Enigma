@@ -973,8 +973,16 @@ Student's ${learnName} answer: ${userAnswer}`;
     "ko-KR-InJoonNeural": "ko-KR-Neural2-C",
     "ko-KR-HyunsuNeural": "ko-KR-Neural2-C",
   };
+  const GOOGLE_AR_LANGUAGE_CODE = "ar-XA";
+  const GOOGLE_AR_PRIMARY_VOICE = "ar-XA-Wavenet-B";
+  const GOOGLE_AR_FALLBACK_VOICE = "ar-XA-Standard-A";
 
-  async function googleTTS(text: string, voiceName: string, speakingRate: number = 1.0): Promise<Buffer> {
+  async function googleTTS(
+    text: string,
+    voiceName: string,
+    speakingRate: number = 1.0,
+    languageCode: string = "ko-KR",
+  ): Promise<Buffer> {
     const apiKey = process.env.GOOGLE_TTS_API_KEY?.trim();
     if (!apiKey) throw new Error("GOOGLE_TTS_API_KEY not configured");
 
@@ -988,7 +996,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           input: { text },
-          voice: { languageCode: "ko-KR", name: voiceName },
+          voice: { languageCode, name: voiceName },
           audioConfig: { audioEncoding: "MP3", speakingRate },
         }),
         signal: controller.signal,
@@ -1003,6 +1011,30 @@ Student's ${learnName} answer: ${userAnswer}`;
 
     const data = (await res.json()) as { audioContent: string };
     return Buffer.from(data.audioContent, "base64");
+  }
+
+  async function googleTTSWithFallback(
+    text: string,
+    primaryVoice: string,
+    fallbackVoice: string,
+    languageCode: string,
+    speakingRate: number,
+  ): Promise<{ buffer: Buffer; voiceName: string }> {
+    try {
+      const primaryBuffer = await googleTTS(text, primaryVoice, speakingRate, languageCode);
+      if (primaryBuffer.length > 0) {
+        return { buffer: primaryBuffer, voiceName: primaryVoice };
+      }
+      console.warn(`Google TTS returned empty audio for ${primaryVoice}; retrying ${fallbackVoice}`);
+    } catch {
+      console.warn(`Google TTS primary voice failed for ${primaryVoice}; retrying ${fallbackVoice}`);
+    }
+
+    const fallbackBuffer = await googleTTS(text, fallbackVoice, speakingRate, languageCode);
+    if (fallbackBuffer.length === 0) {
+      throw new Error(`Google TTS returned empty audio for ${fallbackVoice}`);
+    }
+    return { buffer: fallbackBuffer, voiceName: fallbackVoice };
   }
 
   app.get("/api/tts", async (req: Request, res: Response) => {
@@ -1195,6 +1227,22 @@ Student's ${learnName} answer: ${userAnswer}`;
         const gRate = mode === "slow" || rate === "-20%" ? 0.7 : 0.95;
         console.log(`Pronunciation TTS [Google] voice=${gVoice} speed=${gRate}`);
         const buf = await googleTTS(text.slice(0, 500), gVoice, gRate);
+        res.set("Content-Type", "audio/mpeg");
+        res.set("Cache-Control", "public, max-age=600");
+        return res.send(buf);
+      }
+
+      // Arabic routed to Google TTS (ar-XA MSA voices) — Azure ar-EG neural returns silent audio for plain text; say-as alphabet path stays on Azure
+      if (lang?.startsWith("ar") && mode !== "letter") {
+        const gRate = mode === "slow" || rate === "-20%" ? 0.7 : 0.95;
+        const { buffer: buf, voiceName: gVoice } = await googleTTSWithFallback(
+          text.slice(0, 500),
+          GOOGLE_AR_PRIMARY_VOICE,
+          GOOGLE_AR_FALLBACK_VOICE,
+          GOOGLE_AR_LANGUAGE_CODE,
+          gRate,
+        );
+        console.log(`Pronunciation TTS [Google] voice=${gVoice} speed=${gRate}`);
         res.set("Content-Type", "audio/mpeg");
         res.set("Cache-Control", "public, max-age=600");
         return res.send(buf);
@@ -2319,6 +2367,21 @@ Student's ${learnName} answer: ${userAnswer}`;
         const gVoice = GOOGLE_KO_VOICES[npcId] || AZURE_KO_TO_GOOGLE[voiceInfo.voice] || "ko-KR-Neural2-A";
         console.log(`NPC TTS [Google] npc=${npcId} voice=${gVoice} speed=${speaking_rate}`);
         const buf = await googleTTS(text.slice(0, 3000), gVoice, speaking_rate);
+        res.set("Content-Type", "audio/mpeg");
+        res.set("Cache-Control", "public, max-age=300");
+        return res.send(buf);
+      }
+
+      // Arabic routed to Google TTS (ar-XA MSA voices) — Azure ar-EG neural returns silent audio for plain text; say-as alphabet path stays on Azure
+      if (voiceInfo.lang.startsWith("ar")) {
+        const { buffer: buf, voiceName: gVoice } = await googleTTSWithFallback(
+          text.slice(0, 3000),
+          GOOGLE_AR_PRIMARY_VOICE,
+          GOOGLE_AR_FALLBACK_VOICE,
+          GOOGLE_AR_LANGUAGE_CODE,
+          speaking_rate,
+        );
+        console.log(`NPC TTS [Google] npc=${npcId} voice=${gVoice} speed=${speaking_rate}`);
         res.set("Content-Type", "audio/mpeg");
         res.set("Cache-Control", "public, max-age=300");
         return res.send(buf);
