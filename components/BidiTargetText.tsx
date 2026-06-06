@@ -20,6 +20,7 @@ import { Text, type TextProps, type TextStyle, type StyleProp } from "react-nati
 // visual chunk inside an RTL paragraph without leaking direction either way.
 export const LRI = "⁦"; // LEFT-TO-RIGHT ISOLATE
 export const PDI = "⁩"; // POP DIRECTIONAL ISOLATE
+export const FSI = "⁨"; // FIRST STRONG ISOLATE (auto-detects the run's direction)
 
 /**
  * True when the given language identifier denotes a right-to-left script.
@@ -58,6 +59,27 @@ export function isolateLtrRuns(text: string): string {
     if (!/[A-Za-z0-9]/.test(run)) return run;
     return `${LRI}${run}${PDI}`;
   });
+}
+
+// Matches a run of Arabic-script text (letters + harakat + intra-run spaces and
+// Arabic punctuation). The opposite case of isolateLtrRuns: used to isolate an
+// embedded RTL (Arabic) run that sits INSIDE an LTR paragraph — e.g. the course
+// tip / common-mistakes / example copy that mixes a Korean/English explanation
+// with Arabic target snippets and parentheses. Without isolation the Arabic run
+// and the neutral punctuation around it (parens, periods) visually scramble.
+const RTL_RUN =
+  /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿ً-ْ ،؛؟]*/g;
+
+/**
+ * Wrap each embedded Arabic-script run in FSI…PDI isolates so it renders as a
+ * self-contained RTL chunk inside an LTR paragraph (the native-language UI text
+ * that embeds Arabic target snippets). Pure string transform; returns the input
+ * unchanged when there is no Arabic-script content, so it is a NO-OP for
+ * ko/en/es/id-only text and cannot affect non-Arabic learners.
+ */
+export function isolateRtlRuns(text: string): string {
+  if (!text) return text;
+  return text.replace(RTL_RUN, (run) => `${FSI}${run.trimEnd()}${PDI}${run.endsWith(" ") ? " " : ""}`);
 }
 
 interface BidiTargetTextProps extends TextProps {

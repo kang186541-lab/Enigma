@@ -14,7 +14,7 @@ import { type Step2Data, type FillBlankQuiz, type GrammarExplanation } from "@/l
 import type { Tri } from "@/lib/dailyCourseData";
 import { registerGlobalSound, registerGlobalWebAudio, stopAllTTSSync } from "@/lib/ttsManager";
 import { PhonemeCoaching } from "./PhonemeCoaching";
-import { BidiTargetText, isRtlLang } from "@/components/BidiTargetText";
+import { BidiTargetText, isRtlLang, isolateRtlRuns } from "@/components/BidiTargetText";
 
 const RUDY_RECORDING_MS = 8000;
 
@@ -45,6 +45,16 @@ function getExplanation(explanation: Tri, lc: "ko" | "en" | "es" | "id"): string
 
 function isRichExplanation(exp: Tri | GrammarExplanation): exp is GrammarExplanation {
   return "pattern" in exp && "examples" in exp;
+}
+
+// Lenient answer comparison for typed (input) quizzes. Strips Arabic harakat
+// (diacritics ً-ْ), the superscript alef, and tatweel so an Arabic learner who
+// types the bare consonants ("شكرا") still matches an answer authored with full
+// harakat ("شُكْراً") — without this, the Arabic input quizzes are effectively
+// unpassable on a normal keyboard and the lesson can't progress. No-op for
+// Latin/Hangul answers (no such characters), so ko/en/es/id are unchanged.
+function normalizeAnswer(s: string): string {
+  return s.trim().toLowerCase().replace(/[ً-ْٰـ]/g, "");
 }
 
 type NativeCopy = {
@@ -179,7 +189,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     setSelected(choice);
     setQuizPhase("checking");
 
-    const correct = choice.trim().toLowerCase() === quiz.answer.trim().toLowerCase();
+    const correct = normalizeAnswer(choice) === normalizeAnswer(quiz.answer);
     if (correct) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setCorrectCount(c => c + 1);
@@ -491,30 +501,30 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
             {/* Pattern */}
             <View style={s.explainCard}>
               <Ionicons name="bulb" size={20} color={C.gold} style={{ marginBottom: 2 }} />
-              <Text style={s.explainText}>{getExplanation(rich.pattern, lc)}</Text>
+              <Text style={s.explainText}>{isolateRtlRuns(getExplanation(rich.pattern, lc))}</Text>
             </View>
 
             {/* Examples */}
             <View style={s.exSection}>
               <EmojiText style={s.exLabel}>{pickNativeCopy(nativeLang, { korean: "📝 실전 예문", spanish: "📝 Ejemplos reales", indonesian: "📝 Contoh nyata", english: "📝 Real examples" })}</EmojiText>
-              <Text style={s.exText}>{getExplanation(rich.examples, lc)}</Text>
+              <Text style={s.exText}>{isolateRtlRuns(getExplanation(rich.examples, lc))}</Text>
             </View>
 
             {/* Mistakes */}
             <View style={s.mistakeSection}>
               <EmojiText style={s.mistakeLabel}>{pickNativeCopy(nativeLang, { korean: "🚫 흔한 실수", spanish: "🚫 Errores comunes", indonesian: "🚫 Kesalahan umum", english: "🚫 Common mistakes" })}</EmojiText>
-              <Text style={s.mistakeText}>{getExplanation(rich.mistakes, lc)}</Text>
+              <Text style={s.mistakeText}>{isolateRtlRuns(getExplanation(rich.mistakes, lc))}</Text>
             </View>
 
             {/* Rudy tip */}
             <View style={s.rudyTipBox}>
-              <EmojiText style={s.rudyTipText}>🦊 {getExplanation(rich.rudyTip, lc)}</EmojiText>
+              <EmojiText style={s.rudyTipText}>🦊 {isolateRtlRuns(getExplanation(rich.rudyTip, lc))}</EmojiText>
             </View>
           </View>
         ) : (
           <View style={s.explainCard}>
             <Ionicons name="bulb" size={22} color={C.gold} style={{ marginBottom: 4 }} />
-            <Text style={s.explainText}>{getExplanation(data.explanation as Tri, lc)}</Text>
+            <Text style={s.explainText}>{isolateRtlRuns(getExplanation(data.explanation as Tri, lc))}</Text>
           </View>
         )}
 
