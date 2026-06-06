@@ -217,7 +217,16 @@ const SEALED_ARCHIVE: EscapeRoom = {
           id: "Lawan kata 'jebak'.",
           ar: "عكس معنى «احبس». حرّر الكلمات.",
         },
-        acceptableAnswers: ["free", "liberate", "set free", "bebaskan", "membebaskan", "liberar", "자유", "자유롭게 하다", "حرّر", "حرر"],
+        // Per-language: a Korean/Arabic learner must type the TARGET form, not
+        // English. (Was a flat all-language array → English "free" unlocked any
+        // learner's lock, breaking the learn-the-target contract.)
+        acceptableAnswers: {
+          en: ["free", "liberate", "set free"],
+          es: ["liberar", "libera"],
+          id: ["bebaskan", "membebaskan"],
+          ko: ["자유롭게 하다", "자유", "풀다", "풀어요"],
+          ar: ["حرّر", "حَرِّر", "حرر"],
+        },
       },
       hints: {
         h1: {
@@ -237,11 +246,11 @@ const SEALED_ARCHIVE: EscapeRoom = {
   exit: {
     requireSpoken: true,
     spokenPhrase: {
-      en: "Open the key, free every word",
-      ko: "열쇠를 열어, 모든 단어를 자유롭게 하라",
-      es: "Abre la llave, libera cada palabra",
-      id: "Buka kuncinya, bebaskan setiap kata",
-      ar: "افتح المفتاح، حرّر كل كلمة",
+      en: "Use the key, free every word",
+      ko: "열쇠로 모든 단어를 풀어요",
+      es: "Usa la llave, libera cada palabra",
+      id: "Gunakan kuncinya, bebaskan setiap kata",
+      ar: "اِسْتَعْمِل المُفْتاح، حَرِّر كُل كِلْمة",
     },
     instruction: {
       en: "Now speak the escape spell aloud.",
@@ -254,9 +263,9 @@ const SEALED_ARCHIVE: EscapeRoom = {
       // CORRECTNESS-CRITICAL: every spellChunk is a DISTINCT string.
       //   Open · the · key · free · every · word  → no duplicates.
       // wordPool = the 6 chunks + 3 distinct distractors (close / lock / trap).
-      spellChunks: ["Open", "the", "key", "free", "every", "word"],
+      spellChunks: ["Use", "the", "key", "free", "every", "word"],
       separators: ["", "", ",", "", "", ""],
-      wordPool: ["Open", "the", "key", "free", "every", "word", "close", "lock", "trap"],
+      wordPool: ["Use", "the", "key", "free", "every", "word", "close", "lock", "trap"],
       instruction: {
         en: "Assemble the escape spell, then speak it.",
         ko: "탈출 주문을 맞추고, 소리 내어 말하세요.",
@@ -266,18 +275,18 @@ const SEALED_ARCHIVE: EscapeRoom = {
       },
       hints: {
         h1: {
-          en: "Start with the first lock's word: 'Open'.",
-          ko: "첫 자물쇠의 단어 'Open'으로 시작해요.",
-          es: "Empieza con 'Open'.",
-          id: "Mulai dengan 'Open'.",
-          ar: "ابدأ بكلمة القفل الأول: «افتح».",
+          en: "Put the freed words in order to escape.",
+          ko: "방금 푼 단어들을 순서대로 놓으세요.",
+          es: "Ordena las palabras que liberaste.",
+          id: "Susun kata-kata yang kamu bebaskan.",
+          ar: "رَتِّب الكلمات اللي حررتها بالترتيب.",
         },
         h2: {
-          en: "Open the key, free every word",
-          ko: "Open the key, free every word",
-          es: "Open the key, free every word",
-          id: "Open the key, free every word",
-          ar: "افتح المفتاح، حرّر كل كلمة",
+          en: "Use the key, free every word",
+          ko: "열쇠로 모든 단어를 풀어요",
+          es: "Usa la llave, libera cada palabra",
+          id: "Gunakan kuncinya, bebaskan setiap kata",
+          ar: "اِسْتَعْمِل المُفْتاح، حَرِّر كُل كِلْمة",
         },
         h3: {
           en: "Open the key, free every word",

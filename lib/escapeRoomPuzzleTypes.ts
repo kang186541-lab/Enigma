@@ -45,5 +45,11 @@ export interface SentenceBuilderQ {
 export interface WritingMissionQ {
   word: Tri;
   hint?: Tri;
-  acceptableAnswers?: string[];
+  /**
+   * Extra accepted spellings. A flat `string[]` applies to every language
+   * (legacy); a per-language map `{ ko: [...], es: [...] }` is resolved against
+   * the learner's language so a Korean/Arabic learner CANNOT escape by typing
+   * the English form (the lock's learn-the-target contract).
+   */
+  acceptableAnswers?: string[] | Partial<Record<string, string[]>>;
 }

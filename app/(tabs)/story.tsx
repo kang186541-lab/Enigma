@@ -358,7 +358,7 @@ export default function StoryTab() {
         >
           <Ionicons name="key-outline" size={16} color={C.gold} />
           <Text style={styles.quickBtnText}>
-            {lang === "korean" ? "방 탈출" : lang === "spanish" ? "Sala de Escape" : lang === "indonesian" ? "Ruang Teka-teki" : "Escape Room"}
+            {lang === "korean" ? "방 탈출 (베타)" : lang === "spanish" ? "Sala de Escape (Beta)" : lang === "indonesian" ? "Ruang Teka-teki (Beta)" : "Escape Room (Beta)"}
           </Text>
         </Pressable>
       </View>

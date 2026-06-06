@@ -48,7 +48,13 @@ export default function WritingLock({ lang, learningLang, question, onUnlocked }
 
   function handleConfirm() {
     if (!answer.trim()) return;
-    const r = checkAnswer(answer, targetWord, { acceptableAnswers: question.acceptableAnswers, learningLang });
+    // Resolve acceptable spellings for THIS learner's language only — a flat
+    // array applies to all langs (legacy), a per-language map is keyed by
+    // learningLang so English forms don't unlock a Korean/Arabic lesson.
+    const accept = Array.isArray(question.acceptableAnswers)
+      ? question.acceptableAnswers
+      : question.acceptableAnswers?.[learningLang] ?? [];
+    const r = checkAnswer(answer, targetWord, { acceptableAnswers: accept, learningLang });
     setResult(r);
     setConfirmed(true);
     if (r.correct) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});

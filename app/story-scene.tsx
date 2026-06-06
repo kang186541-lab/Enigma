@@ -32,6 +32,8 @@ import { apiRequest } from "@/lib/query-client";
 import { queueProgressPush } from "@/lib/progressSync";
 import { addToExpressionBook, trackQuizIO, markExpressionsMastered } from "@/lib/storyUtils";
 import { addPhrases as addSrsPhrases } from "@/lib/srsManager";
+import { localizeStoryBoss } from "@/lib/storyBossSpellLocalized";
+import StorySpeakAfterCard from "@/components/story/StorySpeakAfterCard";
 import { checkAnswer, AnswerResult } from "@/lib/answerUtils";
 import { Svg, Path } from "react-native-svg";
 import Typewriter, { TypewriterHandle } from "@/components/story/Typewriter";
@@ -467,6 +469,53 @@ function tri(t: Tri, lang: string) {
   if (lang === "indonesian") return t.id ?? t.en;
   if (lang === "arabic") return t.ar ?? t.en;
   return t.en;
+}
+
+/** Azure assess/TTS lang code for a learning language (mirror of escape-room.tsx). */
+function speechLangForLearning(learningLang: string): string {
+  switch (learningLang) {
+    case "korean": return "ko-KR";
+    case "spanish": return "es-ES";
+    case "indonesian": return "id-ID";
+    case "arabic": return "ar-EG";
+    default: return "en-US";
+  }
+}
+
+/**
+ * The target-language sentence a learner should SPEAK after solving a language
+ * quiz that carries `speakAfter: true`. Derived per puzzle type from the data
+ * the learner just produced (the localized answer / assembled boss spell), so a
+ * Spanish learner says the Spanish line, etc. Returns null when no clean
+ * sentence can be derived — the caller then just advances (speak-after must
+ * never block progress).
+ */
+function getSpeakAfterSentence(
+  item: SeqPuzzle,
+  learningLang: string,
+  uiLang: string,
+  storyId: string,
+): { phrase: string; meaning?: string } | null {
+  const q: any = (item as any).questions?.[0];
+  const fromTri = (t: any): { phrase: string; meaning?: string } | null => {
+    if (!t || typeof t !== "object") return null;
+    const phrase = (tri(t, learningLang) ?? "").trim();
+    if (!phrase) return null;
+    const meaning = (tri(t, uiLang) ?? "").trim();
+    return { phrase, meaning: meaning && meaning !== phrase ? meaning : undefined };
+  };
+  if (item.pType === "dialogue-choice" || item.pType === "fill-blank") return fromTri(q?.answer);
+  if (item.pType === "word-match") return fromTri(q?.word);
+  if (item.pType === "boss-spell") {
+    const bq = localizeStoryBoss(item, storyId, learningLang).questions[0];
+    const phrase = bq.spellChunks.join(" ").replace(/\s+/g, " ").trim();
+    return phrase ? { phrase } : null;
+  }
+  if (Array.isArray(q?.words) && Array.isArray(q?.answerOrder)) {
+    const phrase = (q.answerOrder as number[]).map((i) => tri(q.words[i], learningLang)).join(" ").trim();
+    return phrase ? { phrase } : null;
+  }
+  return null;
 }
 
 function getAdventureBackdropById(backdrop: StoryBackdropId): ImageSourcePropType {
@@ -7521,6 +7570,8 @@ export default function StoryScene() {
   // entry and cleared when seqIdx changes (i.e., after the new scene mounts
   // and the badge is no longer on screen).
   const puzzleSolvingRef = useRef(false);
+  const [speakAfter, setSpeakAfter] = useState<{ phrase: string; meaning?: string } | null>(null);
+  const speakAfterShownRef = useRef(false);
 
   // Reset typing-done flag whenever we move to a new scene; the Typewriter
   // component itself resets internally via its `text` prop change, but the
@@ -7691,6 +7742,7 @@ export default function StoryScene() {
 
     await awardXp(20, "handlePuzzleSolved");
 
+    let deferAdvance = false;
     // Track expressions and I/O ratio for inline puzzles
     const currentItem = seq[seqIdx];
     if (currentItem?.kind === "puzzle") {
@@ -7738,9 +7790,23 @@ export default function StoryScene() {
       }
 
       trackQuizIO(chapter, puzzleItem.pType).catch((e: unknown) => console.warn('[Story] trackQuizIO failed:', e));
+
+      // speakAfter: surface a "say it once" card before advancing, so the
+      // speak-first contract actually fires in story mode (the flag was dead
+      // data). Throttled to the first speakAfter language-quiz per chapter plus
+      // every boss spell — reinforces speaking without nagging. Never blocks: if
+      // no clean target sentence can be derived, we just advance.
+      if (isLanguageQuiz && puzzleItem.speakAfter === true && (puzzleItem.pType === "boss-spell" || !speakAfterShownRef.current)) {
+        const sentence = getSpeakAfterSentence(puzzleItem, learningLang, lang, story.id);
+        if (sentence) {
+          speakAfterShownRef.current = true;
+          setSpeakAfter(sentence);
+          deferAdvance = true;
+        }
+      }
     }
 
-    advance();
+    if (!deferAdvance) advance();
   }
 
   const item = seq[seqIdx];
@@ -8292,7 +8358,7 @@ export default function StoryScene() {
                   <WritingMissionPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "boss-spell" && (
-                  <BossSpellPuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
+                  <BossSpellPuzzle key={seqIdx} puzzle={localizeStoryBoss(item, story.id, learningLang)} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
                 )}
                 {item.pType === "word-puzzle" && (
                   <WordPuzzlePuzzle key={seqIdx} puzzle={item} lang={lang} learningLang={learningLang} onSolved={handlePuzzleSolved} onResetHints={resetSharedHints} />
@@ -8314,6 +8380,20 @@ export default function StoryScene() {
                   </Pressable>
                 )}
               </ScrollView>
+
+              {speakAfter && (
+                <Modal visible transparent animationType="fade" onRequestClose={() => { setSpeakAfter(null); advance(); }}>
+                  <View style={{ flex: 1, justifyContent: "center", padding: 20, backgroundColor: "rgba(0,0,0,0.78)" }}>
+                    <StorySpeakAfterCard
+                      phrase={speakAfter.phrase}
+                      meaning={speakAfter.meaning}
+                      speechLang={speechLangForLearning(learningLang)}
+                      nativeLang={lang}
+                      onDone={() => { setSpeakAfter(null); advance(); }}
+                    />
+                  </View>
+                </Modal>
+              )}
 
               {hasSharedHints && (
                 <Modal visible={sharedHintVisible} transparent animationType="fade" onRequestClose={() => setSharedHintVisible(false)}>

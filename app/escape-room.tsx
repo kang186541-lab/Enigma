@@ -54,14 +54,38 @@ function speechLangFor(learningLang: string): string {
   }
 }
 
-function bossSpellForLearning(question: BossSpellQuestion, learningLang: string): BossSpellQuestion {
-  if (learningLang !== "arabic") return question;
-  return {
-    ...question,
-    spellChunks: ["افتح", "المفتاح", "حرّر", "كل", "كلمة"],
+// Per-learning-language exit boss-spell (assembles to the natural escape
+// sentence "Use the key, free every word" in each language). EN is the
+// data-file default; ko/es/id/ar are swapped in so a non-English learner
+// assembles + speaks their OWN language at the exit. (Was Arabic-only — every
+// other learner assembled the English spell, breaking the contract — and the
+// Arabic spell used the old broken "Open the key / افتح المفتاح" wording.)
+const ESCAPE_BOSS_BY_LANG: Record<string, Pick<BossSpellQuestion, "spellChunks" | "separators" | "wordPool">> = {
+  korean: {
+    spellChunks: ["열쇠로", "모든", "단어를", "풀어요"],
+    separators: ["", "", "", ""],
+    wordPool: ["열쇠로", "모든", "단어를", "풀어요", "닫아요", "자물쇠", "가둬요"],
+  },
+  spanish: {
+    spellChunks: ["Usa", "la", "llave", "libera", "cada", "palabra"],
+    separators: ["", "", ",", "", "", ""],
+    wordPool: ["Usa", "la", "llave", "libera", "cada", "palabra", "cierra", "candado", "atrapa"],
+  },
+  indonesian: {
+    spellChunks: ["Gunakan", "kuncinya", "bebaskan", "setiap", "kata"],
+    separators: ["", ",", "", "", ""],
+    wordPool: ["Gunakan", "kuncinya", "bebaskan", "setiap", "kata", "tutup", "segel", "jebak"],
+  },
+  arabic: {
+    spellChunks: ["اِسْتَعْمِل", "المُفْتاح", "حَرِّر", "كُل", "كِلْمة"],
     separators: ["", "،", "", "", ""],
-    wordPool: ["افتح", "المفتاح", "حرّر", "كل", "كلمة", "اقفل", "قفل", "فخ"],
-  };
+    wordPool: ["اِسْتَعْمِل", "المُفْتاح", "حَرِّر", "كُل", "كِلْمة", "اِقْفِل", "القُفْل", "اِحْبِس"],
+  },
+};
+
+function bossSpellForLearning(question: BossSpellQuestion, learningLang: string): BossSpellQuestion {
+  const ov = ESCAPE_BOSS_BY_LANG[learningLang];
+  return ov ? { ...question, ...ov } : question;
 }
 
 function mmss(totalSeconds: number): string {
@@ -390,7 +414,7 @@ function LockBody({
         question={{
           word: lock.clue.word,
           hint: lock.hints.h1,
-          acceptableAnswers: [lock.clue.word.en, lock.clue.word.ko, lock.clue.word.es, lock.clue.word.id ?? "", lock.clue.word.ar ?? ""].filter(Boolean),
+          acceptableAnswers: { [learningLang]: [tri(lock.clue.word, learningLang)] },
         }}
         onUnlocked={onSolved}
       />
