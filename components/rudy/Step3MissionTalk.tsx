@@ -56,7 +56,11 @@ type RudyLineResult = {
 // ── STT language mapping ──────────────────────────────────────────────────────
 
 const STT_LANG: Record<string, string> = {
-  english: "en-US", spanish: "es-ES", korean: "ko-KR", indonesian: "id-ID",
+  english: "en-US",
+  spanish: "es-ES",
+  korean: "ko-KR",
+  indonesian: "id-ID",
+  arabic: "ar-EG",
 };
 
 // ── Rudy male voice mapping ───────────────────────────────────────────────────
@@ -66,6 +70,7 @@ const RUDY_VOICE: Record<string, string> = {
   spanish: "es-ES-AlvaroNeural",
   korean:  "ko-KR-InJoonNeural",
   indonesian: "id-ID-ArdiNeural",
+  arabic: "ar-EG-ShakirNeural",
 };
 
 const STT_TIMEOUT_MS = 22000;

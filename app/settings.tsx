@@ -81,8 +81,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { nativeLanguage: nativeLang } = useLanguage();
   const lc: LangKey = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
-  // Daily-reminder notifications only ship ko/en/es copy; Indonesian natives fall back to English here.
-  const notifLc: "ko" | "en" | "es" = lc === "id" ? "en" : lc;
+  const notifLc: "ko" | "en" | "es" | "id" = lc;
 
   const [notifOn, setNotifOn] = useState(true);
   const [notifHour, setNotifHour] = useState(9);
@@ -127,6 +126,7 @@ export default function SettingsScreen() {
       const msg = (e as Error)?.message === "FLUSH_FAILED"
         ? (lc === "ko" ? "오프라인이라 진행 상황 동기화에 실패했어요. 연결 후 다시 시도해 주세요."
           : lc === "es" ? "Sin conexión, no se pudo sincronizar tu progreso. Intenta de nuevo cuando estés en línea."
+          : lc === "id" ? "Sedang offline, jadi progres belum bisa disinkronkan. Coba lagi setelah tersambung."
           : "Offline — couldn't sync progress. Try again when you're online.")
         : ((e as Error)?.message ?? "Sign-out failed");
       setSignInError(msg);

@@ -1488,8 +1488,9 @@ Student's ${learnName} answer: ${userAnswer}`;
     word: string;
     audio: string;
     mimeType?: string;
+    nativeLang?: string;
   }): Promise<Response> {
-    const { res, key, region, word, audio, mimeType } = args;
+    const { res, key, region, word, audio, mimeType, nativeLang } = args;
     const sttLang = "id-ID";
 
     const rawBuffer = Buffer.from(audio, "base64");
@@ -1504,7 +1505,12 @@ Student's ${learnName} answer: ${userAnswer}`;
       fluencyScore: 0,
       completenessScore: 0,
       recognizedText,
-      feedback: `Suara tidak terdeteksi (${status}). Coba bicara lebih keras dan jelas.`,
+      feedback: nativeFeedback(nativeLang, {
+        ko: `음성이 인식되지 않았어요 (${status}). 조금 더 크고 또렷하게 말해 주세요.`,
+        en: `Speech was not detected (${status}). Please speak louder and more clearly.`,
+        es: `No se detectó la voz (${status}). Habla un poco más fuerte y claro.`,
+        id: `Suara tidak terdeteksi (${status}). Coba bicara lebih keras dan jelas.`,
+      }),
       words: [] as Array<{ word: string; score: number; errorType: string }>,
     });
 
@@ -1588,16 +1594,36 @@ Student's ${learnName} answer: ${userAnswer}`;
       return { word: t, score: clamp01to100(tokenScore * 100), errorType: present ? "None" : "Omission" };
     });
 
-    // Templated Indonesian feedback by band (used directly, or when GPT is skipped/fails).
-    function templatedFeedbackId(s: number): string {
-      if (s >= 90) return "Pengucapan sempurna! Kerja bagus!";
-      if (s >= 75) return `Bagus! Sedikit latihan lagi dan kamu akan menguasainya. (akurasi: ${s})`;
-      if (s >= 50) return `Perlu latihan. Ucapkan setiap suku kata perlahan dan jelas. (akurasi: ${s})`;
-      return "Coba lagi! Dengarkan dulu pengucapan asli dengan tombol suara.";
+    // Native-language feedback by band (used directly, or when GPT is skipped/fails).
+    function templatedFeedback(s: number): string {
+      if (s >= 90) return nativeFeedback(nativeLang, {
+        ko: "발음이 완벽해요! 정말 잘했어요!",
+        en: "Perfect pronunciation! Great job!",
+        es: "¡Pronunciación perfecta! ¡Muy bien!",
+        id: "Pengucapan sempurna! Kerja bagus!",
+      });
+      if (s >= 75) return nativeFeedback(nativeLang, {
+        ko: `좋아요! 조금만 더 연습하면 완전히 익힐 수 있어요. (정확도: ${s})`,
+        en: `Good! A little more practice and you'll nail it. (accuracy: ${s})`,
+        es: `¡Bien! Con un poco más de práctica lo dominarás. (precisión: ${s})`,
+        id: `Bagus! Sedikit latihan lagi dan kamu akan menguasainya. (akurasi: ${s})`,
+      });
+      if (s >= 50) return nativeFeedback(nativeLang, {
+        ko: `연습이 필요해요. 각 음절을 천천히 또렷하게 말해 보세요. (정확도: ${s})`,
+        en: `Needs practice. Say each syllable slowly and clearly. (accuracy: ${s})`,
+        es: `Necesita práctica. Pronuncia cada sílaba despacio y con claridad. (precisión: ${s})`,
+        id: `Perlu latihan. Ucapkan setiap suku kata perlahan dan jelas. (akurasi: ${s})`,
+      });
+      return nativeFeedback(nativeLang, {
+        ko: "다시 해봐요! 먼저 듣기 버튼으로 원어민 발음을 들어보세요.",
+        en: "Try again! Listen to the native pronunciation first with the speaker button.",
+        es: "¡Inténtalo de nuevo! Primero escucha la pronunciación nativa con el botón de audio.",
+        id: "Coba lagi! Dengarkan dulu pengucapan asli dengan tombol suara.",
+      });
     }
 
     let accuracyScore = score;
-    let feedback = templatedFeedbackId(score);
+    let feedback = templatedFeedback(score);
 
     // ── Optional GPT intelligibility judgment for borderline results ─────────
     // Skip when clearly pass (>0.85) or clearly fail (<0.4) to keep latency sane.
@@ -1616,7 +1642,7 @@ Student's ${learnName} answer: ${userAnswer}`;
                 `Target Indonesian phrase: "${word}". ` +
                 `Learner said (STT): "${recognizedText}". ` +
                 `Rate intelligibility 0-100 (did they produce the target words?). ` +
-                `Reply ONLY JSON {"score":N,"note":"<short Indonesian tip>"}.`,
+                `Reply ONLY JSON {"score":N,"note":"<short ${nativeLanguageLabel(nativeLang, "English")} tip>"}.`,
             },
           ],
         });
@@ -1626,7 +1652,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         if (gptScore !== null) {
           score = clamp01to100(0.5 * score + 0.5 * gptScore);
           accuracyScore = score;
-          feedback = note || templatedFeedbackId(score);
+          feedback = note || templatedFeedback(score);
         }
       } catch (e) {
         console.warn("[assess-id] GPT judgment failed, using formula score:", summarizeAiProviderFailure(e));
@@ -1652,11 +1678,12 @@ Student's ${learnName} answer: ${userAnswer}`;
   // Accepts { word, lang, audio (base64), mimeType } and returns detailed pronunciation scores.
   app.post("/api/pronunciation-assess", gptLimiter, async (req: Request, res: Response) => {
     try {
-      const { word, lang, audio, mimeType } = req.body as {
+      const { word, lang, audio, mimeType, nativeLang } = req.body as {
         word?: string;
         lang?: string;
         audio?: string;
         mimeType?: string;
+        nativeLang?: string;
       };
       if (!word || !lang || !audio) {
         return res.status(400).json({ error: "word, lang, and audio are required" });
@@ -1675,7 +1702,7 @@ Student's ${learnName} answer: ${userAnswer}`;
       // optionally refining a borderline result with a GPT intelligibility check.
       // Returns the EXACT same response shape the ko/en/es path returns.
       if (lang === "id-ID" || lang.toLowerCase().startsWith("id")) {
-        return await assessViaStt({ res, key, region, word, audio, mimeType });
+        return await assessViaStt({ res, key, region, word, audio, mimeType, nativeLang });
       }
 
       const { detectAudioFormat } = await import("./replit_integrations/audio/client");
@@ -1808,11 +1835,11 @@ Student's ${learnName} answer: ${userAnswer}`;
         console.log(`[assess] Azure status=${data.RecognitionStatus}  display=${redactTranscript(data.DisplayText)}  hasPronScore=${hasPronScore}  PronScore=${pronScoreRaw}`);
       }
 
-      // Localized feedback helper based on sttLang
-      const isKo = sttLang.startsWith("ko");
-      const isEs = sttLang.startsWith("es");
-      function localFeedback(ko: string, en: string, es: string) {
-        return isKo ? ko : isEs ? es : en;
+      // Localized feedback helper based on the learner's native UI language.
+      // If older clients omit nativeLang, fall back to the target STT language.
+      const feedbackLang = nativeLang ?? sttLang;
+      function localFeedback(ko: string, en: string, es: string, id: string) {
+        return nativeFeedback(feedbackLang, { ko, en, es, id });
       }
 
       if (data.RecognitionStatus !== "Success" || !hasPronScore) {
@@ -1826,7 +1853,8 @@ Student's ${learnName} answer: ${userAnswer}`;
           feedback: localFeedback(
             `음성 인식 실패 (${data.RecognitionStatus}). 더 크고 명확하게 말해 주세요.`,
             `Speech recognition failed (${data.RecognitionStatus}). Please speak louder and more clearly.`,
-            `Reconocimiento de voz fallido (${data.RecognitionStatus}). Habla más fuerte y claro.`
+            `Reconocimiento de voz fallido (${data.RecognitionStatus}). Habla más fuerte y claro.`,
+            `Pengenalan suara gagal (${data.RecognitionStatus}). Coba bicara lebih keras dan jelas.`
           ),
           words: [],
         });
@@ -1842,25 +1870,29 @@ Student's ${learnName} answer: ${userAnswer}`;
         feedback = localFeedback(
           "완벽한 발음이에요! 정말 훌륭합니다!",
           "Perfect pronunciation! Excellent!",
-          "Pronunciación perfecta. Excelente!"
+          "¡Pronunciación perfecta! ¡Excelente!",
+          "Pengucapan sempurna! Luar biasa!"
         );
       } else if (pronScore >= 75) {
         feedback = localFeedback(
           `좋아요! 정확도 ${accuracyScore}점. 조금만 더 연습하면 완벽해질 거예요!`,
           `Good! Accuracy ${accuracyScore}. A little more practice and you'll nail it!`,
-          `Bien! Precisión ${accuracyScore}. Un poco más de práctica y lo dominarás!`
+          `¡Bien! Precisión ${accuracyScore}. ¡Con un poco más de práctica lo dominarás!`,
+          `Bagus! Akurasi ${accuracyScore}. Sedikit latihan lagi dan kamu akan menguasainya!`
         );
       } else if (pronScore >= 50) {
         feedback = localFeedback(
           `연습이 필요해요. 각 음절을 천천히 또렷하게 발음해 보세요. (정확도: ${accuracyScore}점)`,
           `Needs practice. Try pronouncing each syllable slowly and clearly. (Accuracy: ${accuracyScore})`,
-          `Necesita práctica. Pronuncia cada sílaba lenta y claramente. (Precisión: ${accuracyScore})`
+          `Necesita práctica. Pronuncia cada sílaba lenta y claramente. (precisión: ${accuracyScore})`,
+          `Perlu latihan. Ucapkan setiap suku kata perlahan dan jelas. (akurasi: ${accuracyScore})`
         );
       } else {
         feedback = localFeedback(
           `다시 도전해 봐요! 먼저 듣기 버튼으로 원어민 발음을 들어보세요.`,
           `Try again! Listen to the native pronunciation first using the speaker button.`,
-          `Inténtalo de nuevo! Escucha la pronunciación nativa primero con el botón de altavoz.`
+          `¡Inténtalo de nuevo! Escucha primero la pronunciación nativa con el botón de audio.`,
+          `Coba lagi! Dengarkan dulu pengucapan asli dengan tombol suara.`
         );
       }
 
@@ -2030,8 +2062,8 @@ Student's ${learnName} answer: ${userAnswer}`;
       // Build the prompt. We ask for all UI languages so the same cache entry
       // serves Korean/English/Spanish/Indonesian readers — the cost is higher
       // output tokens but the hit rate is much higher.
-      const langLabel = lang.startsWith("ko") ? "Korean" : lang.startsWith("es") ? "Spanish" : lang.startsWith("id") ? "Indonesian" : "English";
-      const nativeLabel = nativeLang === "korean" ? "Korean" : nativeLang === "spanish" ? "Spanish" : nativeLang === "indonesian" || nativeLang === "id" ? "Indonesian" : "English";
+      const langLabel = languageLabel(lang, "English");
+      const nativeLabel = nativeLanguageLabel(nativeLang, "English");
       const recognizedNote = recognizedText && recognizedText.trim() && recognizedText.trim().toLowerCase() !== trimmedWord.toLowerCase()
         ? `Speech recogniser heard: "${recognizedText.slice(0, 80)}"`
         : "Recogniser heard the word correctly";
@@ -2119,13 +2151,14 @@ Student's ${learnName} answer: ${userAnswer}`;
     }
   });
 
-  // GPT to give a 0-100 score and short Korean feedback (legacy, kept as fallback).
+  // GPT to give a 0-100 score and short native-language feedback (legacy fallback).
   app.post("/api/gpt-score", gptLimiter, async (req: Request, res: Response) => {
     try {
-      const { word, recognized } = req.body as { word?: string; recognized?: string };
+      const { word, recognized, nativeLang } = req.body as { word?: string; recognized?: string; nativeLang?: string };
       if (!word || recognized === undefined) {
         return res.status(400).json({ error: "word and recognized are required" });
       }
+      const feedbackLanguage = nativeLanguageLabel(nativeLang, "English");
 
       const raw = await completeText({
         taskLabel: "/api/gpt-score",
@@ -2141,7 +2174,7 @@ Student's ${learnName} answer: ${userAnswer}`;
               'The user will give you a target word and what a speech recogniser heard. ' +
               'Reply ONLY with a JSON object with two keys: ' +
               '"score" (integer 0-100 reflecting pronunciation accuracy) ' +
-              'and "feedback" (one short encouraging sentence in Korean with a specific tip). ' +
+              `and "feedback" (one short encouraging sentence in ${feedbackLanguage} with a specific tip). ` +
               'Do not copy the example; evaluate the actual input.',
           },
           {
@@ -2149,7 +2182,7 @@ Student's ${learnName} answer: ${userAnswer}`;
             content:
               `Target word: "${word}"\n` +
               `Speech recogniser heard: "${recognized}"\n` +
-              'Give your score and Korean feedback.',
+              `Give your score and ${feedbackLanguage} feedback.`,
           },
         ],
       }) || "{}";
@@ -2656,10 +2689,20 @@ Student's ${learnName} answer: ${userAnswer}`;
       }
 
       const langLabel: Record<string, string> = {
-        english: "English", korean: "Korean", spanish: "Spanish", indonesian: "Indonesian",
+        english: "English",
+        en: "English",
+        korean: "Korean",
+        ko: "Korean",
+        spanish: "Spanish",
+        es: "Spanish",
+        indonesian: "Indonesian",
+        id: "Indonesian",
+        arabic: "Arabic (Egyptian Arabic, ar-EG)",
+        ar: "Arabic (Egyptian Arabic, ar-EG)",
+        "ar-eg": "Arabic (Egyptian Arabic, ar-EG)",
       };
-      const tl = langLabel[targetLanguage] ?? targetLanguage;
-      const nl = langLabel[nativeLanguage] ?? nativeLanguage;
+      const tl = langLabel[targetLanguage?.toLowerCase?.() ?? ""] ?? languageLabel(targetLanguage, targetLanguage);
+      const nl = langLabel[nativeLanguage?.toLowerCase?.() ?? ""] ?? nativeLanguageLabel(nativeLanguage, nativeLanguage);
 
       const hasSentence = !!(sentence && sentence.trim());
 
@@ -2724,9 +2767,19 @@ Student's ${learnName} answer: ${userAnswer}`;
       if (!imageBase64) return res.status(400).json({ error: "Missing imageBase64" });
 
       const langLabel: Record<string, string> = {
-        english: "English", korean: "Korean", spanish: "Spanish", indonesian: "Indonesian",
+        english: "English",
+        en: "English",
+        korean: "Korean",
+        ko: "Korean",
+        spanish: "Spanish",
+        es: "Spanish",
+        indonesian: "Indonesian",
+        id: "Indonesian",
+        arabic: "Arabic (Egyptian Arabic, ar-EG)",
+        ar: "Arabic (Egyptian Arabic, ar-EG)",
+        "ar-eg": "Arabic (Egyptian Arabic, ar-EG)",
       };
-      const langName = langLabel[lang] ?? "English";
+      const langName = langLabel[lang?.toLowerCase?.() ?? ""] ?? languageLabel(lang, "English");
 
       const recognized = await completeImageText({
         taskLabel: "/api/handwriting-recognize",

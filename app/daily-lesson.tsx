@@ -52,6 +52,7 @@ const FALLBACK_SENTENCE: Record<LearningLangKey, LessonSentence> = {
       ko: "안녕하세요. 제 이름은 Rudy예요.",
       en: "Hello, my name is Rudy.",
       es: "Hola, me llamo Rudy.",
+      id: "Halo, nama saya Rudy.",
     },
   },
   spanish: {
@@ -61,6 +62,7 @@ const FALLBACK_SENTENCE: Record<LearningLangKey, LessonSentence> = {
       ko: "안녕하세요. 제 이름은 Rudy예요.",
       en: "Hello, my name is Rudy.",
       es: "Hola, me llamo Rudy.",
+      id: "Halo, nama saya Rudy.",
     },
   },
   korean: {
@@ -70,6 +72,7 @@ const FALLBACK_SENTENCE: Record<LearningLangKey, LessonSentence> = {
       ko: "안녕하세요. 저는 Rudy예요.",
       en: "Hello, I am Rudy.",
       es: "Hola, soy Rudy.",
+      id: "Halo, saya Rudy.",
     },
   },
   // Indonesian (BETA): the 30-day course content is a follow-on, so a missing
@@ -81,6 +84,7 @@ const FALLBACK_SENTENCE: Record<LearningLangKey, LessonSentence> = {
       ko: "안녕하세요. 제 이름은 Rudy예요.",
       en: "Hello, my name is Rudy.",
       es: "Hola, me llamo Rudy.",
+      id: "Halo, nama saya Rudy.",
     },
   },
   // Arabic (BETA, Egyptian colloquial): the 30-day course content is a follow-on,
@@ -93,6 +97,7 @@ const FALLBACK_SENTENCE: Record<LearningLangKey, LessonSentence> = {
       ko: "안녕하세요. 제 이름은 Rudy예요.",
       en: "Hello, my name is Rudy.",
       es: "Hola, me llamo Rudy.",
+      id: "Halo, nama saya Rudy.",
     },
   },
 };

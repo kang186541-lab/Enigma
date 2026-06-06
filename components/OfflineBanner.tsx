@@ -39,7 +39,7 @@ export function OfflineBanner() {
     >
       <Ionicons name="cloud-offline" size={16} color={C.parchment} />
       <Text style={styles.text}>
-        {nativeLang === "korean" ? "오프라인 모드" : nativeLang === "spanish" ? "Modo sin conexión" : "Offline Mode"}
+        {nativeLang === "korean" ? "오프라인 모드" : nativeLang === "spanish" ? "Modo sin conexión" : nativeLang === "indonesian" ? "Mode offline" : "Offline Mode"}
       </Text>
     </Animated.View>
   );

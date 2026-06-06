@@ -22,7 +22,7 @@ import { EmojiText } from "@/components/EmojiText";
 import { useLanguage } from "@/context/LanguageContext";
 import { getEscapeRoom, type EscapeRoom, type LockData, type Tri } from "@/lib/escapeRooms";
 import { awardEscapeRewards } from "@/lib/escapeRewards";
-import BossSpellPuzzle from "@/components/story/puzzles/BossSpellPuzzle";
+import BossSpellPuzzle, { type BossSpellQuestion } from "@/components/story/puzzles/BossSpellPuzzle";
 import SpeakingLock from "@/components/escape/SpeakingLock";
 import SentenceLock from "@/components/escape/SentenceLock";
 import WritingLock from "@/components/escape/WritingLock";
@@ -52,6 +52,16 @@ function speechLangFor(learningLang: string): string {
     default:
       return "en-US";
   }
+}
+
+function bossSpellForLearning(question: BossSpellQuestion, learningLang: string): BossSpellQuestion {
+  if (learningLang !== "arabic") return question;
+  return {
+    ...question,
+    spellChunks: ["افتح", "المفتاح", "حرّر", "كل", "كلمة"],
+    separators: ["", "،", "", "", ""],
+    wordPool: ["افتح", "المفتاح", "حرّر", "كل", "كلمة", "اقفل", "قفل", "فخ"],
+  };
 }
 
 function mmss(totalSeconds: number): string {
@@ -285,7 +295,7 @@ function RoomView({
             {!spelled ? (
               <BossSpellPuzzle
                 key="exit-spell"
-                puzzle={{ pType: "boss-spell", questions: [room.exit.bossSpell] }}
+                puzzle={{ pType: "boss-spell", questions: [bossSpellForLearning(room.exit.bossSpell, learningLang)] }}
                 lang={lang}
                 learningLang={learningLang}
                 onSolved={() => {
@@ -301,6 +311,7 @@ function RoomView({
                 instruction={room.exit.instruction}
                 phrase={room.exit.spokenPhrase}
                 speechLang={speechLang}
+                nativeLang={lang}
                 hints={room.exit.bossSpell.hints}
                 onUnlocked={(score) => escapeNow(score)}
               />
@@ -356,6 +367,7 @@ function LockBody({
         instruction={lock.instruction}
         phrase={lock.phrase}
         speechLang={speechLang}
+        nativeLang={lang}
         hints={lock.hints}
         minScore={lock.minScore}
         onUnlocked={() => onSolved()}

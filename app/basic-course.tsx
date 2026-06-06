@@ -525,7 +525,8 @@ function getCharTip(char: string, learning: string, native: string): string {
     if (!d) return `'${char.toLowerCase()}' — ${char}`;
     if (native === "korean")  return `'${d.ko}' — ${d.enWord} ${d.emoji} 의 첫 글자`;
     if (native === "spanish") return `'${d.es}' — como en ${d.enWord} ${d.emoji}`;
-    return `'${d.es}' — as in ${d.enWord} ${d.emoji}`;          // native english
+    if (native === "indonesian") return `'${char.toLowerCase()}' — seperti pada ${d.enWord} ${d.emoji}`;
+    return `'${char.toLowerCase()}' — as in ${d.enWord} ${d.emoji}`;          // native english
   }
 
   if (learning === "spanish") {
@@ -533,6 +534,7 @@ function getCharTip(char: string, learning: string, native: string): string {
     if (!d) return `'${char.toLowerCase()}' — ${char}`;
     if (native === "korean")  return `'${d.ko}' — ${d.word} ${d.emoji} 의 첫 글자`;
     if (native === "english") return `'${d.en}' — similar to English '${d.en}', as in ${d.word} ${d.emoji}`;
+    if (native === "indonesian") return `'${char.toLowerCase()}' — seperti pada ${d.word} ${d.emoji}`;
     return `'${char.toLowerCase()}' — como en ${d.word} ${d.emoji}`; // native spanish
   }
 
@@ -541,6 +543,7 @@ function getCharTip(char: string, learning: string, native: string): string {
     if (!d) return char;
     if (native === "english") return `'${d.name}' — sounds like '${d.enSound}' in ${d.enWord} ${d.emoji}`;
     if (native === "spanish") return `'${d.name}' — suena como '${d.esSound}' en ${d.esWord} ${d.emoji}`;
+    if (native === "indonesian") return `${d.name} · bunyinya mirip '${d.enSound}' dalam ${d.enWord} ${d.emoji}`;
     return `${d.name} · 영어의 '${d.enSound}'처럼 발음해요`; // native korean
   }
 
@@ -1046,7 +1049,7 @@ export default function BasicCourseScreen() {
       const res = await apiFetchWithAuth(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: getPhoneticName(greetItem.phrase, course.lang), lang: course.lang, audio: base64, mimeType }),
+        body: JSON.stringify({ word: getPhoneticName(greetItem.phrase, course.lang), lang: course.lang, audio: base64, mimeType, nativeLang: native }),
       });
       const data = res.ok ? await res.json() : null;
       if (!isAcceptedPronunciationResult(data)) {

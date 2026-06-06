@@ -383,7 +383,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       const res = await apiFetchWithAuth(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: quiz.fullSentence, lang: speechLang, audio: base64, mimeType }),
+        body: JSON.stringify({ word: quiz.fullSentence, lang: speechLang, audio: base64, mimeType, nativeLang }),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);

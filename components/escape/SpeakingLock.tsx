@@ -65,6 +65,7 @@ export interface SpeakingLockProps {
   phrase: Tri;
   /** Azure assess lang code, e.g. ko-KR / es-ES / en-US / id-ID / ar-EG. */
   speechLang: string;
+  nativeLang?: string;
   hints: { h1: HintTri; h2: HintTri; h3?: HintTri };
   minScore?: number;
   /** Called once on accept. `null` = accepted-unscored (provider unavailable). */
@@ -96,7 +97,7 @@ export default function SpeakingLock(props: SpeakingLockProps) {
       const res = await apiFetchWithAuth(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: target, lang: props.speechLang, audio: base64, mimeType }),
+        body: JSON.stringify({ word: target, lang: props.speechLang, audio: base64, mimeType, nativeLang: props.nativeLang ?? props.lang }),
       });
       const data = res.ok ? ((await res.json()) as Record<string, any>) : null;
       const next = attempts + 1;

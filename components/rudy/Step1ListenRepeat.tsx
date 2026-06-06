@@ -414,7 +414,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       const res = await apiFetchWithAuth(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: sentence.text, lang: sentence.speechLang, audio: base64, mimeType }),
+        body: JSON.stringify({ word: sentence.text, lang: sentence.speechLang, audio: base64, mimeType, nativeLang }),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -494,15 +494,15 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
 
   // ── Labels ────────────────────────────────────────────────────────────────────
 
-  const slowLabel   = nativeLang === "korean" ? "느리게 듣기" : nativeLang === "spanish" ? "Escuchar despacio" : "Listen slow";
-  const normalLabel = nativeLang === "korean" ? "자연 속도 듣기" : nativeLang === "spanish" ? "Velocidad normal" : "Normal speed";
+  const slowLabel   = nativeLang === "korean" ? "느리게 듣기" : nativeLang === "spanish" ? "Escuchar despacio" : nativeLang === "indonesian" ? "Dengar pelan" : "Listen slow";
+  const normalLabel = nativeLang === "korean" ? "자연 속도 듣기" : nativeLang === "spanish" ? "Velocidad normal" : nativeLang === "indonesian" ? "Kecepatan normal" : "Normal speed";
   const micLabel    = phase === "recording"
-    ? (nativeLang === "korean" ? "탭하여 중지 ■" : nativeLang === "spanish" ? "Toca para parar ■" : "Tap to stop ■")
+    ? (nativeLang === "korean" ? "탭하여 중지 ■" : nativeLang === "spanish" ? "Toca para parar ■" : nativeLang === "indonesian" ? "Ketuk untuk berhenti ■" : "Tap to stop ■")
     : isAudioOnlyRound
-      ? (nativeLang === "korean" ? "기억해서 말하기 🧠" : nativeLang === "spanish" ? "Di de memoria 🧠" : "Say from memory 🧠")
+      ? (nativeLang === "korean" ? "기억해서 말하기 🧠" : nativeLang === "spanish" ? "Di de memoria 🧠" : nativeLang === "indonesian" ? "Ucapkan dari ingatan 🧠" : "Say from memory 🧠")
     : round === 0
-      ? (nativeLang === "korean" ? "따라 말하기 🎤" : nativeLang === "spanish" ? "Repetir 🎤" : "Repeat 🎤")
-      : (nativeLang === "korean" ? "한번 더 말하기 🔄" : nativeLang === "spanish" ? "Repetir una vez más 🔄" : "Say it again 🔄");
+      ? (nativeLang === "korean" ? "따라 말하기 🎤" : nativeLang === "spanish" ? "Repetir 🎤" : nativeLang === "indonesian" ? "Ulangi 🎤" : "Repeat 🎤")
+      : (nativeLang === "korean" ? "한번 더 말하기 🔄" : nativeLang === "spanish" ? "Repetir una vez más 🔄" : nativeLang === "indonesian" ? "Ucapkan lagi 🔄" : "Say it again 🔄");
 
   // Determine whether "next" advances to next round of same sentence, or to a new sentence
   const TOTAL_ROUNDS_FOR_SENT = totalRoundsForSentence(sentIdx);
@@ -510,15 +510,15 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
   const isLastSentence = sentIdx >= sentences.length - 1;
   const nextLabel = isLastRound
     ? (isLastSentence
-        ? (nativeLang === "korean" ? "완료 ✓" : nativeLang === "spanish" ? "Completar ✓" : "Finish ✓")
-        : (nativeLang === "korean" ? "다음 문장 →" : nativeLang === "spanish" ? "Siguiente frase →" : "Next sentence →"))
-    : (nativeLang === "korean" ? "다음 →" : nativeLang === "spanish" ? "Siguiente →" : "Next →");
-  const retryLabel  = nativeLang === "korean" ? "한번 더 🔄" : nativeLang === "spanish" ? "Otro intento 🔄" : "Try again 🔄";
+        ? (nativeLang === "korean" ? "완료 ✓" : nativeLang === "spanish" ? "Completar ✓" : nativeLang === "indonesian" ? "Selesai ✓" : "Finish ✓")
+        : (nativeLang === "korean" ? "다음 문장 →" : nativeLang === "spanish" ? "Siguiente frase →" : nativeLang === "indonesian" ? "Kalimat berikutnya →" : "Next sentence →"))
+    : (nativeLang === "korean" ? "다음 →" : nativeLang === "spanish" ? "Siguiente →" : nativeLang === "indonesian" ? "Lanjut →" : "Next →");
+  const retryLabel  = nativeLang === "korean" ? "한번 더 🔄" : nativeLang === "spanish" ? "Otro intento 🔄" : nativeLang === "indonesian" ? "Coba lagi 🔄" : "Try again 🔄";
   const roundLabel  = round === 0
-    ? (nativeLang === "korean" ? "느린 속도로 따라하기" : nativeLang === "spanish" ? "Repite despacio" : "Repeat at slow speed")
+    ? (nativeLang === "korean" ? "느린 속도로 따라하기" : nativeLang === "spanish" ? "Repite despacio" : nativeLang === "indonesian" ? "Ulangi dengan pelan" : "Repeat at slow speed")
     : round === 1
-    ? (nativeLang === "korean" ? "자연 속도로 따라하기" : nativeLang === "spanish" ? "Repite a velocidad normal" : "Repeat at normal speed")
-    : (nativeLang === "korean" ? "기억해서 말하기" : nativeLang === "spanish" ? "Di de memoria" : "Say from memory");
+    ? (nativeLang === "korean" ? "자연 속도로 따라하기" : nativeLang === "spanish" ? "Repite a velocidad normal" : nativeLang === "indonesian" ? "Ulangi dengan kecepatan normal" : "Repeat at normal speed")
+    : (nativeLang === "korean" ? "기억해서 말하기" : nativeLang === "spanish" ? "Di de memoria" : nativeLang === "indonesian" ? "Ucapkan dari ingatan" : "Say from memory");
 
   const totalUtterances = sentences.reduce((sum, _, i) => sum + totalRoundsForSentence(i), 0);
   const doneUtterances  = sentences.slice(0, sentIdx).reduce((sum, _, i) => sum + totalRoundsForSentence(i), 0)

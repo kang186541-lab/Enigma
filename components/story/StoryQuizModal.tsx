@@ -1386,7 +1386,7 @@ function PronunciationQuizView({
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: sentence?.text ?? "", lang: speechLang, audio: base64, mimeType: nativeMime }),
+        body: JSON.stringify({ word: sentence?.text ?? "", lang: speechLang, audio: base64, mimeType: nativeMime, nativeLang: quiz.nativeLang }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -1488,7 +1488,7 @@ function PronunciationQuizView({
           const res = await fetch(apiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ word: sentence?.text ?? "", lang: speechLang, audio: base64, mimeType: recorder.mimeType || "audio/webm" }),
+            body: JSON.stringify({ word: sentence?.text ?? "", lang: speechLang, audio: base64, mimeType: recorder.mimeType || "audio/webm", nativeLang: quiz.nativeLang }),
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
@@ -1705,7 +1705,7 @@ function VoicePowerQuizView({
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: sentence?.sentence ?? "", lang: speechLang, audio: base64, mimeType: nativeMime }),
+        body: JSON.stringify({ word: sentence?.sentence ?? "", lang: speechLang, audio: base64, mimeType: nativeMime, nativeLang: quiz.nativeLang }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -1798,7 +1798,7 @@ function VoicePowerQuizView({
           const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
           const res = await fetch(apiUrl, {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ word: sentence?.sentence ?? "", lang: speechLang, audio: base64, mimeType: recorder.mimeType || "audio/webm" }),
+            body: JSON.stringify({ word: sentence?.sentence ?? "", lang: speechLang, audio: base64, mimeType: recorder.mimeType || "audio/webm", nativeLang: quiz.nativeLang }),
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
@@ -2115,7 +2115,7 @@ function NpcRescueQuizView({
       const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
       const res = await fetch(apiUrl, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: stage?.targetPhrase ?? "", lang: speechLang, audio: base64, mimeType: nativeMime }),
+        body: JSON.stringify({ word: stage?.targetPhrase ?? "", lang: speechLang, audio: base64, mimeType: nativeMime, nativeLang: quiz.nativeLang }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -2201,7 +2201,7 @@ function NpcRescueQuizView({
           const apiUrl = new URL("/api/pronunciation-assess", getApiUrl()).toString();
           const res = await fetch(apiUrl, {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ word: stage?.targetPhrase ?? "", lang: speechLang, audio: base64, mimeType: recorder.mimeType || "audio/webm" }),
+            body: JSON.stringify({ word: stage?.targetPhrase ?? "", lang: speechLang, audio: base64, mimeType: recorder.mimeType || "audio/webm", nativeLang: quiz.nativeLang }),
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();

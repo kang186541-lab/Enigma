@@ -14,18 +14,23 @@ const MESSAGES = {
     ko: "루디가 기다리고 있어요! 오늘도 10분만 같이 할까요?",
     en: "Rudy is waiting! Just 10 minutes with us today?",
     es: "Rudy te espera! ¿10 minutos juntos hoy?",
+    id: "Rudy menunggu! Hari ini latihan 10 menit saja, yuk?",
   },
   streak: {
     ko: "스트릭이 끊어질 위험! 10분 연습으로 오늘도 지켜봐요",
     en: "Your streak is at risk — 10 minutes today keeps it alive",
     es: "Tu racha está en riesgo — 10 minutos hoy la mantienen viva",
+    id: "Streak-mu hampir putus — latihan 10 menit hari ini menjaganya tetap hidup",
   },
   srs: {
     ko: (n: number) => `잊기 직전이에요. 복습 카드 ${n}장이 기다려요`,
     en: (n: number) => `Right before you forget — ${n} review card${n > 1 ? "s" : ""} ready`,
     es: (n: number) => `Justo antes de olvidar — ${n} tarjeta${n > 1 ? "s" : ""} de repaso lista${n > 1 ? "s" : ""}`,
+    id: (n: number) => `Tepat sebelum lupa — ${n} kartu ulasan sudah siap`,
   },
 };
+
+type ReminderLang = "ko" | "en" | "es" | "id";
 
 // ── Web: no-op stubs ──
 if (Platform.OS === "web") {
@@ -72,7 +77,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
 export async function scheduleDailyReminder(
   hour: number,
   minute: number,
-  lang: "ko" | "en" | "es" = "ko"
+  lang: ReminderLang = "ko"
 ): Promise<void> {
   if (Platform.OS === "web" || !Notifications) return;
 
@@ -96,7 +101,7 @@ export async function scheduleDailyReminder(
 }
 
 /** Schedule streak warning for 8PM if user hasn't practiced */
-export async function scheduleStreakWarning(lang: "ko" | "en" | "es" = "ko"): Promise<void> {
+export async function scheduleStreakWarning(lang: ReminderLang = "ko"): Promise<void> {
   if (Platform.OS === "web" || !Notifications) return;
 
   await Notifications.cancelScheduledNotificationAsync("streak-warning").catch((e: unknown) => console.warn('[Notif] cancel streak-warning failed:', e));
@@ -120,7 +125,7 @@ export async function scheduleStreakWarning(lang: "ko" | "en" | "es" = "ko"): Pr
 /** Schedule SRS due card reminder */
 export async function scheduleSrsReminder(
   dueCount: number,
-  lang: "ko" | "en" | "es" = "ko"
+  lang: ReminderLang = "ko"
 ): Promise<void> {
   if (Platform.OS === "web" || !Notifications || dueCount <= 0) return;
 

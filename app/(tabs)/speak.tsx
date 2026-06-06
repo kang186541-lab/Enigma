@@ -1683,6 +1683,7 @@ export default function SpeakScreen() {
           lang: phrase?.speechLang ?? "en-US",
           audio: base64,
           mimeType: nativeMime,
+          nativeLang,
         }),
       });
       if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);
@@ -1933,6 +1934,7 @@ export default function SpeakScreen() {
               lang: phrase.speechLang,
               audio: base64,
               mimeType: recorder.mimeType || "audio/webm",
+              nativeLang,
             }),
           });
           if (!apiRes.ok) throw new Error(`HTTP ${apiRes.status}`);

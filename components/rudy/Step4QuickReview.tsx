@@ -433,7 +433,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
         const res = await apiFetchWithAuth(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word, lang, audio: base64, mimeType }),
+          body: JSON.stringify({ word, lang, audio: base64, mimeType, nativeLang }),
           signal: abortCtrl.signal,
         });
         clearTimeout(timeoutId);

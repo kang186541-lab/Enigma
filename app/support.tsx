@@ -153,10 +153,10 @@ const FAQS: FaqItem[] = [
       id: "Bahasa apa saja yang bisa kupelajari?",
     },
     a: {
-      ko: "현재는 한국어, 영어, 스페인어, 인도네시아어를 지원해요. 각 언어는 말하기·듣기·기초 문장·스토리/복습 흐름에 맞춰 단계적으로 보강하고 있습니다.",
-      en: "Today LinguaAI supports Korean, English, Spanish, and Indonesian. We keep improving speaking, listening, beginner sentences, story mode, and review flows for each supported language.",
-      es: "Hoy LinguaAI admite coreano, inglés, español e indonesio. Seguimos mejorando habla, escucha, frases básicas, modo historia y repasos para cada idioma compatible.",
-      id: "Saat ini LinguaAI mendukung bahasa Korea, Inggris, Spanyol, dan Indonesia. Kami terus memperbaiki latihan bicara, menyimak, kalimat dasar, mode cerita, dan alur ulasan untuk tiap bahasa.",
+      ko: "현재는 한국어, 영어, 스페인어, 인도네시아어를 지원하고, 이집트식 아랍어(ar-EG)는 베타로 지원해요. 각 언어는 말하기·듣기·기초 문장·스토리/복습 흐름에 맞춰 단계적으로 보강하고 있습니다.",
+      en: "Today LinguaAI supports Korean, English, Spanish, and Indonesian, with Egyptian Arabic (ar-EG) in beta. We keep improving speaking, listening, beginner sentences, story mode, and review flows for each supported language.",
+      es: "Hoy LinguaAI admite coreano, inglés, español e indonesio, con árabe egipcio (ar-EG) en beta. Seguimos mejorando habla, escucha, frases básicas, modo historia y repasos para cada idioma compatible.",
+      id: "Saat ini LinguaAI mendukung bahasa Korea, Inggris, Spanyol, dan Indonesia, dengan bahasa Arab Mesir (ar-EG) dalam beta. Kami terus memperbaiki latihan bicara, menyimak, kalimat dasar, mode cerita, dan alur ulasan untuk tiap bahasa.",
     },
   },
   {

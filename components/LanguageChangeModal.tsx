@@ -10,13 +10,13 @@ import { EmojiText } from "@/components/EmojiText";
 // ── Language metadata ──────────────────────────────────────────────────────────
 // Keyed by LearningTargetLanguage so the learning picker can offer Arabic (a
 // target-only language, never a native UI option). Arabic (Egyptian, ar-EG)
-// uses the 🇪🇬 flag; its name reuses the en string for Spanish-native users.
-const LANG_META: Record<LearningTargetLanguage, { flag: string; ko: string; en: string; es: string }> = {
-  korean:  { flag: "🇰🇷", ko: "한국어",    en: "Korean",  es: "Coreano" },
-  english: { flag: "🇬🇧", ko: "영어",      en: "English", es: "Inglés"  },
-  spanish: { flag: "🇪🇸", ko: "스페인어",  en: "Español", es: "Español" },
-  indonesian: { flag: "🇮🇩", ko: "인도네시아어", en: "Indonesian", es: "Indonesio" },
-  arabic: { flag: "🇪🇬", ko: "아랍어", en: "Arabic", es: "Árabe" },
+// uses the 🇪🇬 flag and is labelled in every native UI language.
+const LANG_META: Record<LearningTargetLanguage, { flag: string; ko: string; en: string; es: string; id: string }> = {
+  korean:  { flag: "🇰🇷", ko: "한국어",    en: "Korean",  es: "Coreano", id: "Korea" },
+  english: { flag: "🇬🇧", ko: "영어",      en: "English", es: "Inglés",  id: "Inggris" },
+  spanish: { flag: "🇪🇸", ko: "스페인어",  en: "Español", es: "Español", id: "Spanyol" },
+  indonesian: { flag: "🇮🇩", ko: "인도네시아어", en: "Indonesian", es: "Indonesio", id: "Indonesia" },
+  arabic: { flag: "🇪🇬", ko: "아랍어", en: "Arabic", es: "Árabe", id: "Arab" },
 };
 
 // Native picker shows only the four NATIVE UI languages (Arabic is never a
@@ -29,6 +29,7 @@ function getLangName(lang: LearningTargetLanguage, nativeLang: NativeLanguage): 
   const m = LANG_META[lang];
   if (nativeLang === "korean")  return m.ko;
   if (nativeLang === "spanish") return m.es;
+  if (nativeLang === "indonesian") return m.id;
   return m.en;
 }
 

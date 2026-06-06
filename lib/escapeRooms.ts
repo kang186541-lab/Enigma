@@ -7,8 +7,8 @@
  * behind a final spoken assembly.
  *
  * Localization: `en` + `id` are authored fully (Indonesian is a primary learning
- * target); `ko`/`es` are authored best-effort; `ar` falls back to `en` per the
- * Tri contract where natural authoring isn't available in v1.
+ * target); `ko`/`es` are authored best-effort. Arabic is beta but must never be
+ * mislabeled with English text in `ar` fields.
  */
 
 import type { BossSpellQuestion } from "@/components/story/puzzles/BossSpellPuzzle";
@@ -117,7 +117,7 @@ const SEALED_ARCHIVE: EscapeRoom = {
     ko: "세 개의 자물쇠가 이 방을 봉인했어요. 말하고, 만들고, 써서 단어를 풀고 — 마지막엔 탈출 문장을 소리 내어 말하세요.",
     es: "Tres cerraduras sellan esta sala. Habla, construye y escribe las palabras para liberarlas, luego di la frase de escape en voz alta.",
     id: "Tiga gembok menyegel ruangan ini. Ucapkan, susun, dan tulis katanya untuk membukanya — lalu ucapkan kalimat pelarian dengan lantang.",
-    ar: "Three locks seal this room. Speak, build, and write the words to free them — then say the escape phrase aloud.",
+    ar: "ثلاثة أقفال قافلة الأوضة. اتكلم، ركّب، واكتب الكلمات عشان تحررها — وبعدين قول جملة الهروب بصوت عالي.",
   },
   expressionChapter: "escape-archive",
   xpOnEscape: 60,
@@ -142,14 +142,14 @@ const SEALED_ARCHIVE: EscapeRoom = {
           ko: "'열다'로 시작하는 명령이에요.",
           es: "Es una orden que empieza con 'Abre'.",
           id: "Perintah yang diawali 'Buka'.",
-          ar: "It's a command starting with 'Open'.",
+          ar: "ده أمر بيبدأ بمعنى «افتح».",
         },
         h2: {
           en: "Open + the + door.",
           ko: "Open + the + door 구조예요.",
           es: "Abre + la + puerta.",
           id: "Buka + pintu + nya.",
-          ar: "Open + the + door.",
+          ar: "افتح + الباب.",
         },
         h3: { en: "Open the door", ko: "Open the door", es: "Abre la puerta", id: "Buka pintunya", ar: "افتح الباب" },
       },
@@ -170,15 +170,15 @@ const SEALED_ARCHIVE: EscapeRoom = {
           ko: '문장을 만드세요: "열쇠가 필요해요."',
           es: 'Construye: "Necesito la llave."',
           id: 'Susun: "Saya butuh kuncinya."',
-          ar: 'Build: "I need the key."',
+          ar: 'ركّب الجملة: "أنا محتاج مفتاح الباب."',
         },
         // words are Tri[]; answerOrder indexes into this array (resolved per learningLang at render).
         // Index order below is correct for EN / ES / ID (SVO, article before noun).
         words: [
-          { en: "I", ko: "나는", es: "Yo", id: "Saya", ar: "I" },
-          { en: "need", ko: "필요해요", es: "necesito", id: "butuh", ar: "need" },
-          { en: "the", ko: "그", es: "la", id: "kunci", ar: "the" },
-          { en: "key", ko: "열쇠", es: "llave", id: "itu", ar: "key" },
+          { en: "I", ko: "나는", es: "Yo", id: "Saya", ar: "أنا" },
+          { en: "need", ko: "필요해요", es: "necesito", id: "butuh", ar: "محتاج" },
+          { en: "the", ko: "그", es: "la", id: "kunci", ar: "مفتاح" },
+          { en: "key", ko: "열쇠", es: "llave", id: "itu", ar: "الباب" },
         ],
         // EN: I need the key. ES: Yo necesito la llave. ID: Saya butuh kunci itu.
         answerOrder: [0, 1, 2, 3],
@@ -189,14 +189,14 @@ const SEALED_ARCHIVE: EscapeRoom = {
           ko: "주어 '나는'으로 시작해요.",
           es: "Empieza con el sujeto 'Yo'.",
           id: "Mulai dengan subjek 'Saya'.",
-          ar: "Start with 'I'.",
+          ar: "ابدأ بـ «أنا».",
         },
         h2: {
           en: "I · need · the · key",
           ko: "나는 · 열쇠가 · 필요해요",
           es: "Yo · necesito · la · llave",
           id: "Saya · butuh · kunci · itu",
-          ar: "I · need · the · key",
+          ar: "أنا · محتاج · مفتاح · الباب",
         },
       },
       clue: { id: "clue2", word: { en: "key", ko: "열쇠", es: "llave", id: "kunci", ar: "مفتاح" } },
@@ -215,7 +215,7 @@ const SEALED_ARCHIVE: EscapeRoom = {
           ko: "'가두다'의 반대말이에요.",
           es: "Antónimo de 'atrapar'.",
           id: "Lawan kata 'jebak'.",
-          ar: "Antonym of 'trap'.",
+          ar: "عكس معنى «احبس». حرّر الكلمات.",
         },
         acceptableAnswers: ["free", "liberate", "set free", "bebaskan", "membebaskan", "liberar", "자유", "자유롭게 하다", "حرّر", "حرر"],
       },
@@ -225,9 +225,9 @@ const SEALED_ARCHIVE: EscapeRoom = {
           ko: "탈출을 끝내는 단어: 단어들을 ___ 하라.",
           es: "La palabra que termina el escape: libera las palabras.",
           id: "Kata yang mengakhiri pelarian: bebaskan kata-katanya.",
-          ar: "Free the words.",
+          ar: "حرّر الكلمات.",
         },
-        h2: { en: "f _ _ e", ko: "정답: free", es: "l-i-b-e-r-a-r", id: "b-e-b-a-s-k-a-n", ar: "free" },
+        h2: { en: "f _ _ e", ko: "정답: free", es: "l-i-b-e-r-a-r", id: "b-e-b-a-s-k-a-n", ar: "ح-ر-ر" },
       },
       clue: { id: "clue3", word: { en: "free", ko: "자유", es: "libre", id: "bebas", ar: "حر" } },
     },
@@ -241,14 +241,14 @@ const SEALED_ARCHIVE: EscapeRoom = {
       ko: "열쇠를 열어, 모든 단어를 자유롭게 하라",
       es: "Abre la llave, libera cada palabra",
       id: "Buka kuncinya, bebaskan setiap kata",
-      ar: "Open the key, free every word",
+      ar: "افتح المفتاح، حرّر كل كلمة",
     },
     instruction: {
       en: "Now speak the escape spell aloud.",
       ko: "이제 탈출 주문을 소리 내어 말하세요.",
       es: "Ahora di el hechizo de escape en voz alta.",
       id: "Sekarang ucapkan mantra pelarian dengan lantang.",
-      ar: "Now speak the escape spell aloud.",
+      ar: "دلوقتي قول تعويذة الهروب بصوت عالي.",
     },
     bossSpell: {
       // CORRECTNESS-CRITICAL: every spellChunk is a DISTINCT string.
@@ -262,7 +262,7 @@ const SEALED_ARCHIVE: EscapeRoom = {
         ko: "탈출 주문을 맞추고, 소리 내어 말하세요.",
         es: "Arma el hechizo de escape y dilo.",
         id: "Susun mantra pelarian, lalu ucapkan.",
-        ar: "Assemble the escape spell, then speak it.",
+        ar: "ركّب تعويذة الهروب، وبعدين قولها.",
       },
       hints: {
         h1: {
@@ -270,21 +270,21 @@ const SEALED_ARCHIVE: EscapeRoom = {
           ko: "첫 자물쇠의 단어 'Open'으로 시작해요.",
           es: "Empieza con 'Open'.",
           id: "Mulai dengan 'Open'.",
-          ar: "Start with 'Open'.",
+          ar: "ابدأ بكلمة القفل الأول: «افتح».",
         },
         h2: {
           en: "Open the key, free every word",
           ko: "Open the key, free every word",
           es: "Open the key, free every word",
           id: "Open the key, free every word",
-          ar: "Open the key, free every word",
+          ar: "افتح المفتاح، حرّر كل كلمة",
         },
         h3: {
           en: "Open the key, free every word",
           ko: "Open the key, free every word",
           es: "Open the key, free every word",
           id: "Open the key, free every word",
-          ar: "Open the key, free every word",
+          ar: "افتح المفتاح، حرّر كل كلمة",
         },
       },
       storyReason: {
@@ -292,7 +292,7 @@ const SEALED_ARCHIVE: EscapeRoom = {
         ko: "단어들이 세상으로 쏟아져 돌아와요.",
         es: "Las palabras regresan al mundo.",
         id: "Kata-kata mengalir kembali ke dunia.",
-        ar: "The words rush back into the world.",
+        ar: "الكلمات بترجع للعالم من جديد.",
       },
     },
   },
