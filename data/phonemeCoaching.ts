@@ -408,7 +408,7 @@ const INDONESIAN_PHONEMES: PhonemeMap = {
   },
 };
 
-// ── Arabic phonemes — Egyptian colloquial (for learners of Arabic) ───────────
+// ── Arabic phonemes — Modern Standard Arabic / MSA (for learners of Arabic) ──
 // Keyed for Azure ar-EG Pronunciation Assessment phoneme output. Azure emits
 // IPA-style symbols, so each emphatic/guttural is keyed by its IPA token AND by
 // the Arabic letter as a fallback (the lookup also tries lowercase + stripped).
@@ -436,11 +436,11 @@ const ARABIC_PHONEMES: PhonemeMap = {
     es: "ط es una 't' enfática. Más grave que la ت normal: aplana la lengua y añade resonancia desde la garganta.",
     id: "ط adalah t 'berat'. Lebih berat dan gelap daripada ت biasa — lebarkan lidah dan beri resonansi dari tenggorokan.",
   },
-  "ðˤ": { // ظ — emphatic dh/z (Egyptian often a heavy z)
-    ko: "ظ는 묵직한 'ð/z'예요. 이집트 구어에서는 무거운 'z'에 가까워요. 혀 뒤쪽을 당기며 두껍게 내요.",
-    en: "ظ is a 'heavy' dh/z. In Egyptian it often sounds like a dark, emphatic z. Pull the tongue back and keep it thick.",
-    es: "ظ es una 'dh/z' enfática. En egipcio suena como una z grave y enfática. Tira la lengua atrás y mantenla densa.",
-    id: "ظ adalah dh/z 'berat'. Dalam dialek Mesir sering terdengar seperti z yang gelap dan tegas. Tarik lidah ke belakang.",
+  "ðˤ": { // ظ — emphatic dh (MSA: emphatic counterpart of ذ)
+    ko: "ظ는 묵직한(강세) 'ð(this의 th)'예요. 표준 아랍어에서는 혀를 이 사이로 내밀고 성대를 울리며 묵직하게 내는 ذ의 강세 버전이에요.",
+    en: "ظ is the emphatic (heavy) voiced 'th' (as in 'this'). In MSA it's the emphatic counterpart of ذ (dh) — tongue between the teeth, voiced, pulled dark.",
+    es: "ظ es la 'th' sonora enfática (como en 'this'), grave. En árabe estándar es la versión enfática de ذ (dh): lengua entre los dientes, con vibración.",
+    id: "ظ adalah 'th' bersuara yang emfatik (seperti 'this'), berat. Dalam bahasa Arab standar, ini versi emfatik dari ذ (dh): lidah di antara gigi, bersuara.",
   },
   // ── Gutturals (pharyngeal / uvular / velar) ────
   "ʕ": { // ع — voiced pharyngeal
@@ -456,10 +456,10 @@ const ARABIC_PHONEMES: PhonemeMap = {
     id: "ح adalah h yang kuat dan berdesah dari dalam tenggorokan — jauh lebih kasar daripada ه (h).",
   },
   "q": { // ق — voiceless uvular stop
-    ko: "ق는 'ㅋ'보다 훨씬 뒤, 목젖 근처에서 막았다 터뜨려요. 이집트 구어에서는 성문 정지음(ʔ)으로 바뀌기도 해요.",
-    en: "ق is a 'k' made far back at the uvula. In Egyptian colloquial it's often replaced by a glottal stop (ʔ).",
-    es: "ق es una 'k' producida muy atrás, en la úvula. En árabe egipcio suele sustituirse por un golpe glotal (ʔ).",
-    id: "ق adalah 'k' yang dibuat jauh di belakang, di anak tekak. Dalam dialek Mesir sering diganti hentian glotal (ʔ).",
+    ko: "ق는 'ㅋ'보다 훨씬 뒤, 목젖에서 막았다 터뜨려요. 표준 아랍어에서는 또렷한 'q'로 발음해요(구어 방언처럼 ʔ로 바꾸지 않아요).",
+    en: "ق is a 'k' made far back at the uvula. In Modern Standard Arabic it's pronounced as a clear uvular q (not a glottal stop).",
+    es: "ق es una 'k' producida muy atrás, en la úvula. En árabe estándar se pronuncia como una q uvular clara (no como golpe glotal).",
+    id: "ق adalah 'k' yang dibuat jauh di belakang, di anak tekak. Dalam bahasa Arab standar diucapkan sebagai q yang jelas (bukan hentian glotal).",
   },
   "x": { // خ — voiceless velar fricative
     ko: "خ는 목 뒤에서 거칠게 긁는 소리예요. 스페인어 'j(jota)'나 독일어 'Bach'의 'ch'와 같아요.",
@@ -474,11 +474,11 @@ const ARABIC_PHONEMES: PhonemeMap = {
     id: "غ adalah versi bersuara dari خ — bunyi seperti berkumur di belakang tenggorokan, mirip 'r' Prancis.",
   },
   // ── Other consonants beginners need ────────────
-  "ʔ": { // ء / همزة — glottal stop (also Egyptian ق)
-    ko: "ء(함자)는 성문 정지음이에요. '아_아'처럼 목을 순간적으로 막았다 여는 소리예요. 이집트에서는 ق도 이 소리로 나요.",
-    en: "ء (hamza) is a glottal stop — the catch in the middle of 'uh-oh'. In Egyptian, ق is pronounced this way too.",
-    es: "ء (hamza) es un golpe glotal — el corte en medio de 'uh-oh'. En egipcio, la ق también se pronuncia así.",
-    id: "ء (hamzah) adalah hentian glotal — jeda di tengah 'uh-oh'. Dalam dialek Mesir, ق juga diucapkan begini.",
+  "ʔ": { // ء / همزة — glottal stop
+    ko: "ء(함자)는 성문 정지음이에요. '아_아'처럼 목을 순간적으로 막았다 여는 소리예요.",
+    en: "ء (hamza) is a glottal stop — the catch in the middle of 'uh-oh'.",
+    es: "ء (hamza) es un golpe glotal — el corte en medio de 'uh-oh'.",
+    id: "ء (hamzah) adalah hentian glotal — jeda di tengah 'uh-oh'.",
   },
   "r": { // ر — alveolar tap/trill
     ko: "ر는 혀끝을 잇몸에 가볍게 한 번 튕기거나 굴려요. 스페인어 'r'와 비슷하고 영어 'r'처럼 당기지 않아요.",
@@ -525,10 +525,10 @@ const ARABIC_PHONEMES: PhonemeMap = {
     id: "ط adalah t 'berat' (emfatik) — lebih berat daripada ت biasa.",
   },
   "ظ": {
-    ko: "ظ는 묵직한 'z/ð'예요. 이집트 구어에서는 무거운 'z'에 가까워요.",
-    en: "ظ is a 'heavy' (emphatic) dh/z — in Egyptian, close to a dark z.",
-    es: "ظ es una 'dh/z' enfática — en egipcio, cercana a una z grave.",
-    id: "ظ adalah dh/z 'berat' (emfatik) — dalam dialek Mesir mirip z yang gelap.",
+    ko: "ظ는 묵직한(강세) 'ð'예요. 표준 아랍어에서는 ذ(this의 th)의 강세 버전이에요.",
+    en: "ظ is the emphatic voiced 'th' — in MSA, the emphatic counterpart of ذ (dh).",
+    es: "ظ es la 'th' sonora enfática — en árabe estándar, la versión enfática de ذ (dh).",
+    id: "ظ adalah 'th' bersuara emfatik — dalam bahasa Arab standar, versi emfatik dari ذ (dh).",
   },
   "ع": {
     ko: "ع는 목구멍 깊은 곳을 조이며 울리는 소리예요. 한국어에 없어요.",
@@ -543,10 +543,10 @@ const ARABIC_PHONEMES: PhonemeMap = {
     id: "ح adalah h faring yang kuat dan berdesah — jauh lebih kasar daripada ه.",
   },
   "ق": {
-    ko: "ق는 목젖 근처에서 막았다 터뜨리는 'ㅋ'이에요. 이집트 구어에서는 ʔ(성문 정지음)로 바뀌기도 해요.",
-    en: "ق is a uvular k. In Egyptian colloquial it's often a glottal stop (ʔ).",
-    es: "ق es una 'k' uvular. En egipcio suele ser un golpe glotal (ʔ).",
-    id: "ق adalah 'k' uvular. Dalam dialek Mesir sering jadi hentian glotal (ʔ).",
+    ko: "ق는 목젖에서 막았다 터뜨리는 'ㅋ'이에요. 표준 아랍어에서는 또렷한 'q'로 발음해요(ʔ로 바꾸지 않아요).",
+    en: "ق is a uvular k. In Modern Standard Arabic it's pronounced as a clear uvular q (not a glottal stop).",
+    es: "ق es una 'k' uvular. En árabe estándar se pronuncia como una q clara (no un golpe glotal).",
+    id: "ق adalah 'k' uvular. Dalam bahasa Arab standar diucapkan sebagai q yang jelas (bukan hentian glotal).",
   },
   "خ": {
     ko: "خ는 목 뒤에서 거칠게 긁는 소리예요. 스페인어 'j'나 'Bach'의 'ch'와 같아요.",

@@ -225,6 +225,35 @@ const IPA_READABLE_BY_LANG: Record<string, ReadableMap> = {
     l: { display: "l", example: "lagi" },
     h: { display: "h", example: "halo" },
   },
+  // Arabic (MSA) — Azure ar phoneme tokens + Arabic-letter fallbacks. Display
+  // the letter with a short romanization so a non-Arabic reader can still
+  // identify the sound; example is an MSA word.
+  arabic: {
+    "sˤ": { display: "ص (ṣ)", example: "صَباح" },
+    "dˤ": { display: "ض (ḍ)", example: "ضَيف" },
+    "tˤ": { display: "ط (ṭ)", example: "طالِب" },
+    "ðˤ": { display: "ظ (ẓ)", example: "ظُهر" },
+    "ʕ": { display: "ع (ʿ)", example: "عَين" },
+    "ħ": { display: "ح (ḥ)", example: "حُبّ" },
+    q: { display: "ق (q)", example: "قَلب" },
+    x: { display: "خ (kh)", example: "خَير" },
+    "ɣ": { display: "غ (gh)", example: "غُرفة" },
+    "ʔ": { display: "ء (ʾ)", example: "سَأَل" },
+    r: { display: "ر (r)", example: "رَجُل" },
+    "aː": { display: "ا (ā)", example: "باب" },
+    "iː": { display: "ي (ī)", example: "كَبير" },
+    "uː": { display: "و (ū)", example: "نور" },
+    // Arabic-letter fallbacks (if a consumer passes the letter)
+    ص: { display: "ص (ṣ)", example: "صَباح" },
+    ض: { display: "ض (ḍ)", example: "ضَيف" },
+    ط: { display: "ط (ṭ)", example: "طالِب" },
+    ظ: { display: "ظ (ẓ)", example: "ظُهر" },
+    ع: { display: "ع (ʿ)", example: "عَين" },
+    ح: { display: "ح (ḥ)", example: "حُبّ" },
+    ق: { display: "ق (q)", example: "قَلب" },
+    خ: { display: "خ (kh)", example: "خَير" },
+    غ: { display: "غ (gh)", example: "غُرفة" },
+  },
 };
 
 function getReadable(targetLang: string, phoneme: string): ReadableEntry | undefined {

@@ -145,26 +145,26 @@ const dayOneToSixSurvivalFamilies: Partial<Record<LearningLangKey, Record<string
     help: ["도와주세요", "도움"],
     name: ["제 이름"],
   },
-  // Arabic (Egyptian colloquial) is now first-class: it's in the `languages`
-  // array, so the day 1-6 survival-phrase loop DOES assert these families
-  // against the Arabic course content. Variants use the EXACT Egyptian spelling
-  // (incl. harakat) as written in the day1-6 lessons/missions
-  // (data/dailyCourse/day1_6_improved.ts) so the substring match holds.
+  // Arabic is first-class: it's in the `languages` array, so the day 1-6
+  // survival-phrase loop DOES assert these families against the Arabic course
+  // content. Day1-6 was migrated to Modern Standard Arabic (MSA, pausal), so
+  // variants use the EXACT MSA spelling (incl. harakat) as written in
+  // data/dailyCourse/day1_6_improved.ts so the substring match holds.
   arabic: {
-    greeting: ["أهلاً"],
-    goodbye: ["مع السَّلامة", "أشوفَك بَعْدين"],
-    thanks: ["شُكْراً"],
+    greeting: ["أَهْلًا"],
+    goodbye: ["مَعَ السَّلامة", "أَراك لاحِقًا"],
+    thanks: ["شُكْرًا"],
     sorry: ["آسِف"],
-    dont_understand: ["مِش فاهِم"],
-    repeat: ["مُمْكِن تِقول تاني", "تاني"],
-    slow_speech: ["بِراحة"],
-    bridge_language: ["بِتِتْكَلِّم إنجِليزي"],
-    where: ["فين الحَمّام", "فين"],
-    how_much: ["بِكام ده", "بِكام"],
-    yes: ["آه"],
-    no: ["لأ"],
-    help: ["النَّجْدة", "ساعِدني", "مُساعْدة"],
-    name: ["أنا اسمي", "اسمي"],
+    dont_understand: ["لا أَفْهَم"],
+    repeat: ["مَرّة ثانِية"],
+    slow_speech: ["بِبُطْء"],
+    bridge_language: ["تَتَكَلَّم الإنْجِليزِيّة"],
+    where: ["أَيْنَ الحَمّام", "أَيْنَ"],
+    how_much: ["بِكَمْ هٰذَا", "بِكَمْ"],
+    yes: ["نَعَم"],
+    no: ["لا"],
+    help: ["النَّجْدة", "ساعِدْني", "مُساعَدة"],
+    name: ["أَنَا اسْمِي", "اسْمِي"],
   },
 };
 
