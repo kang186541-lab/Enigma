@@ -61,7 +61,7 @@ const BOSS_MARKERS: Record<string, string> = {
   korean: '"열쇠로"',
   spanish: '"Usa"',
   indonesian: '"Gunakan"',
-  arabic: '"اِسْتَعْمِل"',
+  arabic: '"اِسْتَخْدِم"',
 };
 for (const [lang, marker] of Object.entries(BOSS_MARKERS)) {
   assert(src.includes(marker), `ESCAPE_BOSS_BY_LANG is missing the ${lang} boss chunks (${marker})`);

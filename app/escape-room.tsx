@@ -77,9 +77,9 @@ const ESCAPE_BOSS_BY_LANG: Record<string, Pick<BossSpellQuestion, "spellChunks" 
     wordPool: ["Gunakan", "kuncinya", "bebaskan", "setiap", "kata", "tutup", "segel", "jebak"],
   },
   arabic: {
-    spellChunks: ["اِسْتَعْمِل", "المُفْتاح", "حَرِّر", "كُل", "كِلْمة"],
+    spellChunks: ["اِسْتَخْدِم", "المِفْتاح", "حَرِّر", "كُلّ", "كَلِمة"],
     separators: ["", "،", "", "", ""],
-    wordPool: ["اِسْتَعْمِل", "المُفْتاح", "حَرِّر", "كُل", "كِلْمة", "اِقْفِل", "القُفْل", "اِحْبِس"],
+    wordPool: ["اِسْتَخْدِم", "المِفْتاح", "حَرِّر", "كُلّ", "كَلِمة", "أَغْلِق", "القُفْل", "اِحْبِس"],
   },
 };
 

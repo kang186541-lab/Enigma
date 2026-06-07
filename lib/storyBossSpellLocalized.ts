@@ -56,9 +56,9 @@ export const STORY_BOSS_SPELL_LOCALIZED: Record<string, Partial<Record<string, B
       wordPool: ["Saya senang", "Di mana", "festivalnya", "Itu indah", "Berapa harganya", "Terima kasih", "Tolong rotinya"],
     },
     arabic: {
-      spellChunks: ["أَنَا مَبْسُوط", "فِين", "المُولِد", "ده جَمِيل"],
+      spellChunks: ["أَنَا سَعِيد", "أَيْنَ", "المِهْرَجَان", "هٰذَا جَمِيل"],
       separators: [".", " ", "؟", "."],
-      wordPool: ["أَنَا مَبْسُوط", "فِين", "المُولِد", "ده جَمِيل", "بِكَام", "شُكْرًا", "عَيْش لَو سَمَحْت"],
+      wordPool: ["أَنَا سَعِيد", "أَيْنَ", "المِهْرَجَان", "هٰذَا جَمِيل", "بِكَمْ", "شُكْرًا", "خُبْز مِنْ فَضْلِك"],
     },
   },
 
@@ -80,9 +80,9 @@ export const STORY_BOSS_SPELL_LOCALIZED: Record<string, Partial<Record<string, B
       wordPool: ["Saya ingat", "Dia menulis", "nina bobo itu", "Di mana", "piringannya?", "Saya lupa", "Dia menyanyikan", "lagunya"],
     },
     arabic: {
-      spellChunks: ["أَنَا فَاكِر", "هِيَّ كَتَبِت", "التَّهْلِيلَة", "فِين", "السِّجِلّ؟"],
+      spellChunks: ["أَنَا أَتَذَكَّر", "هِيَ كَتَبَتْ", "التَّهْوِيدَة", "أَيْنَ", "السِّجِلّ؟"],
       separators: [". ", " ", ". ", " ", ""],
-      wordPool: ["أَنَا فَاكِر", "هِيَّ كَتَبِت", "التَّهْلِيلَة", "فِين", "السِّجِلّ؟", "أَنَا نِسِيت", "هِيَّ بِتِكْتِب", "الأُغْنِيَّة"],
+      wordPool: ["أَنَا أَتَذَكَّر", "هِيَ كَتَبَتْ", "التَّهْوِيدَة", "أَيْنَ", "السِّجِلّ؟", "أَنَا نَسِيت", "هِيَ تَكْتُب", "الأُغْنِيَة"],
     },
   },
 
@@ -104,9 +104,9 @@ export const STORY_BOSS_SPELL_LOCALIZED: Record<string, Partial<Record<string, B
       wordPool: ["Kamu menerjemahkan", "kata-katanya", "Kamu tak bisa", "menerjemahkan", "mengapa dia", "mengucapkannya", "Kamu menghentikan", "maknanya", "Kamu membisikkan"],
     },
     arabic: {
-      spellChunks: ["إِنْتَ تَرْجِمْت", "الكَلِمَات", "مَا قِدِرْتِش", "تِتَرْجِم", "لِيه هِيَّ", "قَالِتْهَا"],
+      spellChunks: ["أَنْتَ تَرْجَمْتَ", "الكَلِمَات", "لَمْ تَسْتَطِعْ", "أَنْ تُتَرْجِمَ", "لِمَاذَا", "قَالَتْهَا"],
       separators: [" ", ". ", " ", " ", " ", "."],
-      wordPool: ["إِنْتَ تَرْجِمْت", "الكَلِمَات", "مَا قِدِرْتِش", "تِتَرْجِم", "لِيه هِيَّ", "قَالِتْهَا", "إِنْتَ وَقَّفْت", "المَعَانِي", "إِنْتَ هَمِسْت"],
+      wordPool: ["أَنْتَ تَرْجَمْتَ", "الكَلِمَات", "لَمْ تَسْتَطِعْ", "أَنْ تُتَرْجِمَ", "لِمَاذَا", "قَالَتْهَا", "أَنْتَ أَوْقَفْتَ", "المَعَانِي", "أَنْتَ هَمَسْتَ"],
     },
   },
 };
