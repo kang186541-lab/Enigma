@@ -21,7 +21,7 @@ import type { LearningGoal, SpeakingProgress } from "../lib/learnerProfile";
 import { RUDY_GUIDE_CARDS } from "../lib/rudyGuideCards";
 
 // All five learning targets now run through the content-count loops.
-// Indonesian (id-ID) and Arabic / Egyptian colloquial (ar-EG) are lock-covered
+// Indonesian (id-ID) and Arabic / MSA (ar-EG locale) are lock-covered
 // for what these loops actually check: per-goal daily-speaking content (>=5
 // unique A1 phrases with ko/en/es meanings, the target speechLang, and a goal
 // context tip) and Mission-Talk native situation text. (The days 7-30 course
@@ -977,7 +977,7 @@ assert.equal(getDailySpeakingSentenceLoop("korean", "exam")[0]?.phrase, "시험�
 assert.equal(getDailySpeakingSentenceLoop("english", "exam")[0]?.phrase, "When is the exam?");
 assert.equal(getDailySpeakingSentenceLoop("spanish", "exam")[0]?.phrase, "¿Cuándo es el examen?");
 
-// Arabic (Egyptian colloquial, ar-EG) is a LEARNING TARGET, mirrored on the
+// Arabic (Modern Standard Arabic on the ar-EG locale) is a LEARNING TARGET, mirrored on the
 // Indonesian daily-speaking playbook. These anchors lock that the Arabic daily
 // speaking content actually exists and stays on the real ar-EG phoneme path
 // (NOT the id-ID similarity fallback): the per-goal loops + day 1-6 lessons.
@@ -985,7 +985,7 @@ assert.equal(getDailySpeakingSentenceLoop("spanish", "exam")[0]?.phrase, "¿Cuá
 // is now asserted too, via the generic per-language loops above.
 const arabicExamLoop = getDailySpeakingSentenceLoop("arabic", "exam");
 assert.ok(arabicExamLoop.length >= SPEAKING_DAILY_GOAL, "Arabic exam loop should have a full day of speakable sentences");
-assert.equal(arabicExamLoop[0]?.phrase, "الاِمْتِحان إِمْتى؟", "Arabic exam loop should lead with the Egyptian colloquial exam question");
+assert.equal(arabicExamLoop[0]?.phrase, "مَتى الاِمْتِحان؟", "Arabic exam loop should lead with the MSA exam question");
 assert.ok(
   arabicExamLoop.every((phrase) => phrase.speechLang === "ar-EG"),
   "Every Arabic daily-speaking phrase must stay on the ar-EG locale so Azure uses the real phoneme assessment path, not the id-ID similarity fallback",
@@ -1000,7 +1000,7 @@ assert.equal(
   arabicExamLoop[0].phrase,
   "Arabic mission phrase should wrap back to the loop opener after a full cycle",
 );
-assert.equal(getDailySpeakingSentenceLoop("arabic", null)[0]?.phrase, "أَهْلاً", "Arabic first-day (no-goal) loop should open with the everyday Egyptian hello");
+assert.equal(getDailySpeakingSentenceLoop("arabic", null)[0]?.phrase, "أَهْلًا", "Arabic first-day (no-goal) loop should open with the everyday MSA hello");
 // Arabic day 1-6 course content must exist on the real ar-EG locale.
 for (let day = 1; day <= 6; day += 1) {
   const arabicLesson = LESSON_CONTENT[`day_${day}`]?.arabic;
