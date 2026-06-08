@@ -16,8 +16,9 @@ import { useFonts as useIconFonts } from "expo-font";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Animated, StyleSheet, Dimensions } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -42,10 +43,28 @@ const rudySplashImg = require("@/assets/rudy_splash.png");
 const { width: SCREEN_W } = Dimensions.get("window");
 const IMG_SIZE = Math.min(SCREEN_W - 40, 360);
 
+// Splash subtitle copy. The splash renders BEFORE LanguageProvider mounts, so
+// we read @lingua_language straight from AsyncStorage (best-effort, defaults to
+// English) — same approach as ErrorFallback.tsx. The title "Enigma Language
+// Adventure" is the brand name and stays untranslated.
+const SPLASH_SUB: Record<"korean" | "english" | "spanish" | "indonesian", string> = {
+  korean:     "단서 하나씩, 언어의 비밀을 풀어가요...",
+  english:    "Unravelling languages, one clue at a time...",
+  spanish:    "Descifrando idiomas, una pista a la vez...",
+  indonesian: "Mengungkap bahasa, satu petunjuk demi satu...",
+};
+
 function LoadingScreen() {
   const fadeAnim    = useRef(new Animated.Value(0)).current;
   const flickerAnim = useRef(new Animated.Value(1)).current;
   const floatAnim   = useRef(new Animated.Value(0)).current;
+
+  const [lang, setLang] = useState<"korean" | "english" | "spanish" | "indonesian">("english");
+  useEffect(() => {
+    AsyncStorage.getItem("@lingua_language").then((v) => {
+      if (v === "korean" || v === "spanish" || v === "english" || v === "indonesian") setLang(v);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
@@ -73,7 +92,7 @@ function LoadingScreen() {
         resizeMode="contain"
       />
       <Text style={ls.title}>Enigma Language Adventure</Text>
-      <Text style={ls.sub}>Unravelling languages, one clue at a time...</Text>
+      <Text style={ls.sub}>{SPLASH_SUB[lang]}</Text>
       <View style={ls.dots}>
         {[0, 1, 2].map((i) => (
           <Animated.View key={i} style={[ls.dot, { opacity: flickerAnim }]} />

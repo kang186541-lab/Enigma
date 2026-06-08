@@ -60,10 +60,10 @@ function L(nl: string, ko: string, es: string, en: string, id = en): string {
 
 // ── IPA → Readable mapping ───────────────────────────────────────────────────
 
-type ReadableEntry = { display: string; example: string };
+export type ReadableEntry = { display: string; example: string };
 type ReadableMap = Record<string, ReadableEntry>;
 
-const IPA_READABLE_BY_LANG: Record<string, ReadableMap> = {
+export const IPA_READABLE_BY_LANG: Record<string, ReadableMap> = {
   english: {
     θ: { display: "th", example: "think" },
     ð: { display: "th", example: "this" },
@@ -229,6 +229,7 @@ const IPA_READABLE_BY_LANG: Record<string, ReadableMap> = {
   // the letter with a short romanization so a non-Arabic reader can still
   // identify the sound; example is an MSA word.
   arabic: {
+    // Emphatics / gutturals
     "sˤ": { display: "ص (ṣ)", example: "صَباح" },
     "dˤ": { display: "ض (ḍ)", example: "ضَيف" },
     "tˤ": { display: "ط (ṭ)", example: "طالِب" },
@@ -239,10 +240,39 @@ const IPA_READABLE_BY_LANG: Record<string, ReadableMap> = {
     x: { display: "خ (kh)", example: "خَير" },
     "ɣ": { display: "غ (gh)", example: "غُرفة" },
     "ʔ": { display: "ء (ʾ)", example: "سَأَل" },
+    // Common MSA consonants
+    θ: { display: "ث (th)", example: "ثَلاثة" },
+    ð: { display: "ذ (dh)", example: "ذَهَب" },
+    ʃ: { display: "ش (sh)", example: "شَمس" },
+    dʒ: { display: "ج (j)", example: "جَميل" },
+    "d͡ʒ": { display: "ج (j)", example: "جَميل" },
+    "ʒ": { display: "ج (j)", example: "جَميل" },
+    j: { display: "ي (y)", example: "يَوم" },
+    w: { display: "و (w)", example: "وَرد" },
+    h: { display: "ه (h)", example: "هُنا" },
+    k: { display: "ك (k)", example: "كِتاب" },
+    b: { display: "ب (b)", example: "بَيت" },
+    t: { display: "ت (t)", example: "تَمر" },
+    d: { display: "د (d)", example: "دَرس" },
+    s: { display: "س (s)", example: "سَلام" },
+    z: { display: "ز (z)", example: "زَيت" },
+    f: { display: "ف (f)", example: "فَوق" },
+    l: { display: "ل (l)", example: "لَيل" },
+    m: { display: "م (m)", example: "ماء" },
+    n: { display: "ن (n)", example: "نور" },
+    ŋ: { display: "ن (n)", example: "نور" },
     r: { display: "ر (r)", example: "رَجُل" },
+    // Long vowels
     "aː": { display: "ا (ā)", example: "باب" },
     "iː": { display: "ي (ī)", example: "كَبير" },
     "uː": { display: "و (ū)", example: "نور" },
+    // Short vowels (Azure may emit bare a/i/u or with diacritics)
+    a: { display: "ـَ (a)", example: "كَتَب" },
+    i: { display: "ـِ (i)", example: "مِن" },
+    u: { display: "ـُ (u)", example: "كُتُب" },
+    "æ": { display: "ـَ (a)", example: "كَتَب" },
+    "ɪ": { display: "ـِ (i)", example: "مِن" },
+    "ʊ": { display: "ـُ (u)", example: "كُتُب" },
     // Arabic-letter fallbacks (if a consumer passes the letter)
     ص: { display: "ص (ṣ)", example: "صَباح" },
     ض: { display: "ض (ḍ)", example: "ضَيف" },
@@ -253,10 +283,14 @@ const IPA_READABLE_BY_LANG: Record<string, ReadableMap> = {
     ق: { display: "ق (q)", example: "قَلب" },
     خ: { display: "خ (kh)", example: "خَير" },
     غ: { display: "غ (gh)", example: "غُرفة" },
+    ث: { display: "ث (th)", example: "ثَلاثة" },
+    ذ: { display: "ذ (dh)", example: "ذَهَب" },
+    ش: { display: "ش (sh)", example: "شَمس" },
+    ج: { display: "ج (j)", example: "جَميل" },
   },
 };
 
-function getReadable(targetLang: string, phoneme: string): ReadableEntry | undefined {
+export function getReadable(targetLang: string, phoneme: string): ReadableEntry | undefined {
   const langMap = IPA_READABLE_BY_LANG[targetLang.toLowerCase()];
   if (!langMap) return undefined;
   return langMap[phoneme] ?? langMap[phoneme.toLowerCase()];

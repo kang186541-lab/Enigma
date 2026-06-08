@@ -1395,7 +1395,7 @@ function PronunciationQuizView({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (e) {
       console.warn('[API] pronunciation assessment failed:', e);
-      setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : nl === "es" ? "Error al evaluar." : "Evaluation error.");
+      setError(qt("evaluationError", nl));
     } finally {
       setRecordState("done");
     }
@@ -1421,7 +1421,7 @@ function PronunciationQuizView({
         try {
           const { granted } = await Audio.requestPermissionsAsync();
           if (!granted) {
-            setError(nl === "ko" ? "마이크 권한을 허용해주세요." : nl === "es" ? "Permite el micrófono." : "Microphone permission required.");
+            setError(qt("micPermission", nl));
             return;
           }
           await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
@@ -1449,14 +1449,14 @@ function PronunciationQuizView({
           autoStopRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
         } catch (e) {
           console.warn('[Speech] microphone start failed:', e);
-          setError(nl === "ko" ? "마이크를 시작할 수 없습니다." : nl === "es" ? "No se puede iniciar el micrófono." : "Cannot start microphone.");
+          setError(qt("micStartFailed", nl));
         }
       })();
       return;
     }
 
     if (!navigator?.mediaDevices?.getUserMedia) {
-      setError(nl === "ko" ? "이 브라우저는 마이크를 지원하지 않습니다." : "Microphone not supported.");
+      setError(qt("micUnsupported", nl));
       return;
     }
 
@@ -1716,7 +1716,7 @@ function VoicePowerQuizView({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (e) {
       console.warn('[API] pronunciation assessment failed:', e);
-      setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : nl === "es" ? "Error al evaluar." : "Evaluation error.");
+      setError(qt("evaluationError", nl));
     } finally {
       setRecordState("done");
     }
@@ -1743,7 +1743,7 @@ function VoicePowerQuizView({
         try {
           const { granted } = await Audio.requestPermissionsAsync();
           if (!granted) {
-            setError(nl === "ko" ? "마이크 권한을 허용해주세요." : "Microphone permission required.");
+            setError(qt("micPermission", nl));
             return;
           }
           await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
@@ -1765,7 +1765,7 @@ function VoicePowerQuizView({
           autoStopRef.current = setTimeout(() => { stopNativeRecording(); }, 8000);
         } catch (e) {
           console.warn('[Speech] microphone start failed:', e);
-          setError(nl === "ko" ? "마이크를 시작할 수 없습니다." : "Cannot start microphone.");
+          setError(qt("micStartFailed", nl));
         }
       })();
       return;
@@ -1773,7 +1773,7 @@ function VoicePowerQuizView({
 
     // Web recording
     if (!navigator?.mediaDevices?.getUserMedia) {
-      setError(nl === "ko" ? "이 브라우저는 마이크를 지원하지 않습니다." : "Microphone not supported.");
+      setError(qt("micUnsupported", nl));
       return;
     }
 
@@ -1809,7 +1809,7 @@ function VoicePowerQuizView({
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         } catch (e) {
           console.warn('[API] pronunciation assessment failed:', e);
-          setError(nl === "ko" ? "채점 중 오류가 발생했습니다." : "Evaluation error.");
+          setError(qt("evaluationError", nl));
         } finally { setRecordState("done"); }
       };
       recorder.start();
@@ -1817,7 +1817,7 @@ function VoicePowerQuizView({
       autoStopRef.current = setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 8000);
     }).catch((e) => {
       console.warn('[Speech] microphone permission denied:', e);
-      setError(nl === "ko" ? "마이크 권한을 허용해주세요." : "Microphone permission required.");
+      setError(qt("micPermission", nl));
     });
   }
 
@@ -1958,11 +1958,14 @@ Score 0-100. Check if student used required expressions naturally. Respond ONLY 
       let parsed: { score?: number; feedback?: string } = {};
       try { parsed = JSON.parse(resultText); } catch (e) { console.warn('[API] debate result parse failed:', e); parsed = { score: 50, feedback: resultText?.slice?.(0, 200) ?? "" }; }
       const won = (parsed.score ?? 0) >= 60;
-      setFeedback({ text: parsed.feedback ?? (won ? "Good argument!" : "Try harder."), won });
+      const fallbackFeedback = won
+        ? (nl === "ko" ? "좋은 주장이에요!" : nl === "es" ? "¡Buen argumento!" : nl === "id" ? "Argumen bagus!" : "Good argument!")
+        : (nl === "ko" ? "조금 더 노력해요." : nl === "es" ? "Inténtalo con más fuerza." : nl === "id" ? "Coba lebih keras." : "Try harder.");
+      setFeedback({ text: parsed.feedback ?? fallbackFeedback, won });
       if (won) setWonRounds((w) => w + 1);
     } catch (e) {
       console.warn('[API] debate evaluation failed:', e);
-      setFeedback({ text: nl === "ko" ? "평가 중 오류 발생" : "Evaluation error", won: false });
+      setFeedback({ text: qt("evaluationError", nl), won: false });
     } finally {
       setLoading(false);
     }
@@ -2124,7 +2127,7 @@ function NpcRescueQuizView({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (e) {
       console.warn('[API] pronunciation assessment failed:', e);
-      setError(nl === "ko" ? "채점 오류" : "Evaluation error.");
+      setError(qt("evaluationError", nl));
     } finally {
       setRecordState("done");
     }
@@ -2149,7 +2152,7 @@ function NpcRescueQuizView({
       (async () => {
         try {
           const { granted } = await Audio.requestPermissionsAsync();
-          if (!granted) { setError(nl === "ko" ? "마이크 권한 필요" : "Microphone permission required."); return; }
+          if (!granted) { setError(qt("micPermission", nl)); return; }
           await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
           const recording = new Audio.Recording();
           const recOptions: Audio.RecordingOptions = Platform.OS === "ios" ? {

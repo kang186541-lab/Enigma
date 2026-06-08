@@ -155,14 +155,16 @@ export function LevelUpModal({ visible, level, lang, onClose }: LevelUpModalProp
     };
   }, [visible]);
 
-  const title   = lang === "korean" ? "레벨 업! 🎉" : lang === "spanish" ? "¡Nivel arriba! 🎉" : "Level Up! 🎉";
+  const title   = lang === "korean" ? "레벨 업! 🎉" : lang === "spanish" ? "¡Nivel arriba! 🎉" : lang === "indonesian" ? "Naik Level! 🎉" : "Level Up! 🎉";
   const lName   = getLevelName(level, lang as NativeLanguage);
-  const sub     = lang === "korean" ? `${lName} 달성!` : lang === "spanish" ? `¡Nivel ${lName} alcanzado!` : `You reached ${lName}!`;
-  const btnText = lang === "korean" ? "계속하기 →" : lang === "spanish" ? "¡Continuar! →" : "Keep going! →";
+  const sub     = lang === "korean" ? `${lName} 달성!` : lang === "spanish" ? `¡Nivel ${lName} alcanzado!` : lang === "indonesian" ? `Mencapai ${lName}!` : `You reached ${lName}!`;
+  const btnText = lang === "korean" ? "계속하기 →" : lang === "spanish" ? "¡Continuar! →" : lang === "indonesian" ? "Lanjut! →" : "Keep going! →";
   const lingoLine = lang === "korean"
     ? "축하해요! 계속 열심히 하면 더 잘할 수 있어요! 🦊"
     : lang === "spanish"
     ? "¡Felicidades! ¡Sigue así y llegarás lejos! 🦊"
+    : lang === "indonesian"
+    ? "Selamat! Terus belajar dan kamu akan maju jauh! 🦊"
     : "Congrats! Keep learning and you'll go far! 🦊";
 
   const emojiPieces = Array.from({ length: 40 }, (_, i) => ({

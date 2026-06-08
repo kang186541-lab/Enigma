@@ -836,7 +836,7 @@ function CompleteScreen({
           {/* Total XP badge */}
           <View style={completeStyles.totalXPBadge}>
             <Text style={completeStyles.totalXPLabel}>
-              {nativeLang === "korean" ? "총 획득 XP" : nativeLang === "spanish" ? "XP Total" : "Total XP"}
+              {nativeLang === "korean" ? "총 획득 XP" : nativeLang === "spanish" ? "XP Total" : nativeLang === "indonesian" ? "Total XP" : "Total XP"}
             </Text>
             <Text style={completeStyles.totalXPValue}>+{totalXP} XP</Text>
           </View>

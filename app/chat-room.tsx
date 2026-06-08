@@ -1773,7 +1773,7 @@ export default function ChatRoomScreen() {
               style={styles.input}
               value={inputText}
               onChangeText={setInputText}
-              placeholder={isRecording ? "Listening…" : t("type_message")}
+              placeholder={isRecording ? t("listening") : t("type_message")}
               placeholderTextColor={isRecording ? C.gold : C.goldDark}
               multiline
               maxLength={500}

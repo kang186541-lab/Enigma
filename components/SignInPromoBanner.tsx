@@ -29,8 +29,6 @@ const STREAK_THRESHOLD = 3;
 
 type Copy = { title: string; cta: string };
 function pickCopy(
-  // Accepts indonesian (Phase 1 native/UI language). It has no bespoke banner
-  // copy yet, so it falls back to the English variant below.
   lang: "korean" | "english" | "spanish" | "indonesian" | null,
   xp: number,
   streak: number,
@@ -48,7 +46,18 @@ function pickCopy(
           cta: "Guardar progreso",
         };
   }
-  if (lang === "english" || lang === "indonesian") {
+  if (lang === "indonesian") {
+    return useStreak
+      ? {
+          title: `🦊 ${streak} hari beruntun! Simpan agar tidak hilang saat ganti perangkat →`,
+          cta: "Simpan progres",
+        }
+      : {
+          title: `🦊 ${xp} XP terkumpul! Simpan agar tidak hilang saat ganti perangkat →`,
+          cta: "Simpan progres",
+        };
+  }
+  if (lang === "english") {
     return useStreak
       ? {
           title: `🦊 ${streak}-day streak! Save it so you don't lose it on a new device →`,
@@ -114,6 +123,11 @@ export function SignInPromoBanner() {
 
   if (!eligible) return null;
   const copy = pickCopy(nativeLanguage, stats.xp, stats.streak);
+  const closeLabel =
+    nativeLanguage === "korean" ? "닫기"
+    : nativeLanguage === "spanish" ? "descartar"
+    : nativeLanguage === "indonesian" ? "tutup"
+    : "dismiss";
 
   return (
     <View style={styles.wrap}>
@@ -127,7 +141,7 @@ export function SignInPromoBanner() {
       </Pressable>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="dismiss"
+        accessibilityLabel={closeLabel}
         onPress={onDismiss}
         hitSlop={8}
         style={({ pressed }) => [styles.close, pressed && { opacity: 0.5 }]}

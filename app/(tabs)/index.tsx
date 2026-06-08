@@ -1171,9 +1171,14 @@ function RudyTrainingCard({
   const tierLabel = getCefrTierLabel(currentUnit.level, nativeLang);
   const levelLabel = `${tierLabel} · ${getTri(currentUnit.title, lc)}`;
 
-  const dayLabel = nativeLang === "korean"
-    ? `Day ${currentDay.dayNumber}: ${getTri(currentDay.topic, lc)}`
-    : `Day ${currentDay.dayNumber}: ${getTri(currentDay.topic, lc)}`;
+  const dayPrefix = nativeLang === "korean"
+    ? `${currentDay.dayNumber}일차`
+    : nativeLang === "spanish"
+    ? `Día ${currentDay.dayNumber}`
+    : nativeLang === "indonesian"
+    ? `Hari ${currentDay.dayNumber}`
+    : `Day ${currentDay.dayNumber}`;
+  const dayLabel = `${dayPrefix}: ${getTri(currentDay.topic, lc)}`;
 
   // progress bar blocks
   const blocks = Array.from({ length: totalSteps }, (_, i) => i < stepsCompleted);

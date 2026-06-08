@@ -32,45 +32,51 @@ import {
   type CheckoutResult,
 } from "@/lib/billing";
 
-type LangKey = "ko" | "en" | "es";
+type LangKey = "ko" | "en" | "es" | "id";
 
 const T = {
   // Header
-  proBadge:       { ko: "Pro 멤버",                 en: "Pro member",                 es: "Miembro Pro" },
-  upgradeTitle:   { ko: "Pro로 업그레이드",          en: "Upgrade to Pro",             es: "Mejora a Pro" },
+  proBadge:       { ko: "Pro 멤버",                 en: "Pro member",                 es: "Miembro Pro",          id: "Anggota Pro" },
+  upgradeTitle:   { ko: "Pro로 업그레이드",          en: "Upgrade to Pro",             es: "Mejora a Pro",         id: "Tingkatkan ke Pro" },
   upgradeTagline: { ko: "더 깊이, 더 오래, 더 똑똑하게.",
                     en: "Go deeper, longer, smarter.",
-                    es: "Más profundo, más tiempo, más inteligente." },
+                    es: "Más profundo, más tiempo, más inteligente.",
+                    id: "Lebih dalam, lebih lama, lebih cerdas." },
 
   // Pricing
   priceLine:      { ko: "월 5,900원 (또는 $4.99)",
                     en: "$4.99 / month",
-                    es: "$4.99 / mes" },
+                    es: "$4.99 / mes",
+                    id: "$4.99 / bulan" },
 
   // Benefits — kept tight so the card stays one viewport tall.
   benefit1:       { ko: "무제한 발음 평가 (무료: 일 30회)",
                     en: "Unlimited pronunciation assessments (free: 30/day)",
-                    es: "Evaluaciones de pronunciación ilimitadas (gratis: 30/día)" },
+                    es: "Evaluaciones de pronunciación ilimitadas (gratis: 30/día)",
+                    id: "Penilaian pelafalan tanpa batas (gratis: 30/hari)" },
   benefit2:       { ko: "모든 점수에 GPT 코칭 (무료: 약한 부분만)",
                     en: "GPT coaching on every score (free: weak band only)",
-                    es: "Coaching GPT en cada puntuación (gratis: solo banda débil)" },
+                    es: "Coaching GPT en cada puntuación (gratis: solo banda débil)",
+                    id: "Pelatihan GPT di setiap skor (gratis: hanya bagian lemah)" },
   benefit3:       { ko: "기록을 더 오래 보관",
                     en: "Deeper data retention",
-                    es: "Historial conservado más tiempo" },
+                    es: "Historial conservado más tiempo",
+                    id: "Riwayat disimpan lebih lama" },
   benefit4:       { ko: "프로필에 Pro 배지",
                     en: "Pro badge on your profile",
-                    es: "Insignia Pro en tu perfil" },
+                    es: "Insignia Pro en tu perfil",
+                    id: "Lencana Pro di profilmu" },
 
   // CTAs
-  cta:            { ko: "Pro로 업그레이드",          en: "Upgrade to Pro",             es: "Mejora a Pro" },
-  ctaBusy:        { ko: "결제 페이지 여는 중…",       en: "Opening checkout…",          es: "Abriendo el pago…" },
-  manage:         { ko: "구독 관리",                en: "Manage subscription",        es: "Administrar suscripción" },
+  cta:            { ko: "Pro로 업그레이드",          en: "Upgrade to Pro",             es: "Mejora a Pro",         id: "Tingkatkan ke Pro" },
+  ctaBusy:        { ko: "결제 페이지 여는 중…",       en: "Opening checkout…",          es: "Abriendo el pago…",    id: "Membuka pembayaran…" },
+  manage:         { ko: "구독 관리",                en: "Manage subscription",        es: "Administrar suscripción", id: "Kelola langganan" },
 
   // Status messages
-  notConfigured:  { ko: "결제 시스템 준비 중",       en: "Billing coming soon",        es: "Sistema de pago en preparación" },
-  signInFirst:    { ko: "먼저 로그인하세요",         en: "Sign in first",              es: "Inicia sesión primero" },
-  openFailed:     { ko: "결제 페이지를 열 수 없어요", en: "Couldn't open checkout",    es: "No se pudo abrir el pago" },
-  genericError:   { ko: "오류가 발생했어요",         en: "Something went wrong",       es: "Algo salió mal" },
+  notConfigured:  { ko: "결제 시스템 준비 중",       en: "Billing coming soon",        es: "Sistema de pago en preparación", id: "Sistem pembayaran segera hadir" },
+  signInFirst:    { ko: "먼저 로그인하세요",         en: "Sign in first",              es: "Inicia sesión primero", id: "Masuk dulu" },
+  openFailed:     { ko: "결제 페이지를 열 수 없어요", en: "Couldn't open checkout",    es: "No se pudo abrir el pago", id: "Tidak bisa membuka pembayaran" },
+  genericError:   { ko: "오류가 발생했어요",         en: "Something went wrong",       es: "Algo salió mal",        id: "Terjadi kesalahan" },
 } as const;
 
 function t(obj: Record<string, string>, lang: LangKey): string {
@@ -116,7 +122,7 @@ export interface PaywallCardProps {
 export default function PaywallCard({ returnUrl }: PaywallCardProps): React.JSX.Element | null {
   const { nativeLanguage } = useLanguage();
   const lc: LangKey =
-    nativeLanguage === "korean" ? "ko" : nativeLanguage === "spanish" ? "es" : "en";
+    nativeLanguage === "korean" ? "ko" : nativeLanguage === "spanish" ? "es" : nativeLanguage === "indonesian" ? "id" : "en";
   const { user } = useAuth();
   const { tier, loading, refresh } = useSubscriptionStatus();
 

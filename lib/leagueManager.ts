@@ -37,13 +37,13 @@ export function getLeagueTier(weeklyXP: number): LeagueTier {
 /** Get league tier display info */
 export function getTierInfo(tier: LeagueTier): {
   emoji: string;
-  name: { ko: string; en: string; es: string };
+  name: { ko: string; en: string; es: string; id: string };
   color: string;
 } {
   switch (tier) {
-    case "gold":   return { emoji: "🥇", name: { ko: "골드", en: "Gold", es: "Oro" },     color: "#FFD700" };
-    case "silver": return { emoji: "🥈", name: { ko: "실버", en: "Silver", es: "Plata" }, color: "#C0C0C0" };
-    case "bronze": return { emoji: "🥉", name: { ko: "브론즈", en: "Bronze", es: "Bronce" }, color: "#CD7F32" };
+    case "gold":   return { emoji: "🥇", name: { ko: "골드", en: "Gold", es: "Oro", id: "Emas" },     color: "#FFD700" };
+    case "silver": return { emoji: "🥈", name: { ko: "실버", en: "Silver", es: "Plata", id: "Perak" }, color: "#C0C0C0" };
+    case "bronze": return { emoji: "🥉", name: { ko: "브론즈", en: "Bronze", es: "Bronce", id: "Perunggu" }, color: "#CD7F32" };
   }
 }
 

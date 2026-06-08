@@ -6053,8 +6053,8 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
         {confirmed && (
           <Text style={[styles.sbFeedback, { color: isCorrect ? "#5a9" : "#e55" }]}>
             {isCorrect
-              ? (lang === "korean" ? "정답이에요!" : lang === "indonesian" ? "Benar!" : lang === "arabic" ? "صح!" : "Correct!")
-              : (lang === "korean" ? "다시 시도해요" : lang === "indonesian" ? "Coba lagi" : lang === "arabic" ? "حاوِل مَرّة أُخْرى" : "Try again")}
+              ? (lang === "korean" ? "정답이에요!" : lang === "spanish" ? "¡Correcto!" : lang === "indonesian" ? "Benar!" : lang === "arabic" ? "صح!" : "Correct!")
+              : (lang === "korean" ? "다시 시도해요" : lang === "spanish" ? "Inténtalo de nuevo" : lang === "indonesian" ? "Coba lagi" : lang === "arabic" ? "حاوِل مَرّة أُخْرى" : "Try again")}
           </Text>
         )}
       </View>

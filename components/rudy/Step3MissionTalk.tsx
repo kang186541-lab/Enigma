@@ -835,6 +835,10 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
           <View key={i} style={[s.bubble, msg.role === "rudy" ? s.rudyBubble : s.userBubble, (msg.sttError || msg.connectionError) && s.errorBubble]}>
             {msg.role === "rudy" && (
               <EmojiText style={[s.rudyLabel, (msg.sttError || msg.connectionError) && s.errorLabel]}>
+                {/* "Rudy" is a proper noun: the brand label is the Latin "🦊 RUDY"
+                    for every UI language (incl. es/id) — matching the unconditional
+                    "🦊 RUDY" processing bubble below — and only Korean localizes it
+                    to its native script "루디". No es/id-specific arm is needed. */}
                 {(msg.sttError || msg.connectionError) && nativeLang === "korean" ? "🦊 루디" : "🦊 RUDY"}
               </EmojiText>
             )}

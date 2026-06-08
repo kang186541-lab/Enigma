@@ -205,7 +205,7 @@ export function RudyGuideModal({
   };
 
   const btnText =
-    lang === "korean" ? "알겠어!" : lang === "spanish" ? "¡Entendido!" : "Got it!";
+    lang === "korean" ? "알겠어!" : lang === "spanish" ? "¡Entendido!" : lang === "indonesian" ? "Mengerti!" : "Got it!";
 
   return (
     <Modal transparent animationType="none" visible={visible}>

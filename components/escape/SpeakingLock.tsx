@@ -161,7 +161,7 @@ export default function SpeakingLock(props: SpeakingLockProps) {
         onPress={onRecord}
         disabled={busy}
         accessibilityRole="button"
-        accessibilityLabel={lang === "korean" ? "말하기" : "Speak"}
+        accessibilityLabel={lang === "korean" ? "말하기" : lang === "spanish" ? "Hablar" : lang === "indonesian" ? "Bicara" : "Speak"}
       >
         {phase === "processing" ? (
           <ActivityIndicator color={C.bg1} />
@@ -178,7 +178,11 @@ export default function SpeakingLock(props: SpeakingLockProps) {
               : phase === "unlocked"
                 ? lang === "korean"
                   ? "열림 ✓"
-                  : "Unlocked ✓"
+                  : lang === "spanish"
+                    ? "Desbloqueado ✓"
+                    : lang === "indonesian"
+                      ? "Terbuka ✓"
+                      : "Unlocked ✓"
                 : lang === "korean"
                   ? "🎙 말하기"
                   : lang === "spanish"

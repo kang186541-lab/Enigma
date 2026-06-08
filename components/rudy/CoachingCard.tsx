@@ -24,6 +24,7 @@ import { Audio } from "expo-av";
 import { C, F } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
 import { registerGlobalSound, registerGlobalWebAudio } from "@/lib/ttsManager";
+import { getReadable } from "@/components/rudy/PhonemeCoaching";
 
 const rudyBadge = require("@/assets/rudy_badge.png");
 
@@ -45,6 +46,19 @@ interface Props extends CoachRequest {
   /** When this number changes, the card resets and re-fetches. Use it to
    *  invalidate after a new recording attempt. */
   attemptId: number;
+  /** Learning/target language ("english" | "korean" | "spanish" |
+   *  "indonesian" | "arabic"). Used purely for display — to convert raw Azure
+   *  IPA tokens into a learner-readable label via getReadable(). NOT sent in
+   *  the coach request payload. */
+  targetLang: string;
+}
+
+// Convert a raw Azure IPA token into a learner-readable label for the given
+// target language (e.g. Arabic /sˤ/ → "ص (ṣ)", English /θ/ → "th"). Falls back
+// to the bare /symbol/ when the language map has no entry (PRON-02 / L6).
+function readablePhoneme(targetLang: string, phoneme: string): string {
+  const readable = getReadable(targetLang, phoneme);
+  return readable ? readable.display : `/${phoneme}/`;
 }
 
 // All copy lives here so each locale string is auditable in one place.
@@ -92,12 +106,15 @@ function bandShadow(score: number): string {
 
 // Deterministic placeholder so the user sees something useful immediately,
 // not a spinner. The GPT comment fades over this when it arrives.
-function fallbackText(word: string, score: number, nl: NativeLang, weak: string[]): string {
+function fallbackText(word: string, score: number, nl: NativeLang, weak: string[], targetLang: string): string {
   const band = score >= 90 ? "great" : score >= 75 ? "good" : score >= 50 ? "fair" : "weak";
-  const wKo = weak.length > 0 ? ` (특히 ${weak.join(", ")} 소리.)` : "";
-  const wEn = weak.length > 0 ? ` Watch out for: ${weak.join(", ")}.` : "";
-  const wEs = weak.length > 0 ? ` Atento a: ${weak.join(", ")}.` : "";
-  const wId = weak.length > 0 ? ` Perhatikan: ${weak.join(", ")}.` : "";
+  // Convert raw IPA tokens to learner-readable labels before embedding in
+  // native prose (PRON-03) — otherwise e.g. Korean reads "(특히 ʕ, sˤ 소리.)".
+  const readableWeak = weak.map((p) => readablePhoneme(targetLang, p)).join(", ");
+  const wKo = weak.length > 0 ? ` (특히 ${readableWeak} 소리.)` : "";
+  const wEn = weak.length > 0 ? ` Watch out for: ${readableWeak}.` : "";
+  const wEs = weak.length > 0 ? ` Atento a: ${readableWeak}.` : "";
+  const wId = weak.length > 0 ? ` Perhatikan: ${readableWeak}.` : "";
   if (nl === "korean") {
     if (band === "great") return `"${word}" 정말 자연스러웠어요! 🎉`;
     if (band === "good") return `"${word}" 거의 다 왔어요. 한 번만 더 따라 해볼까요?${wKo}`;
@@ -123,12 +140,12 @@ function fallbackText(word: string, score: number, nl: NativeLang, weak: string[
 }
 
 export function CoachingCard(props: Props) {
-  const { word, lang, nativeLang, score, accuracyScore, fluencyScore, completenessScore, recognizedText, weakPhonemes, attemptId } = props;
+  const { word, lang, nativeLang, score, accuracyScore, fluencyScore, completenessScore, recognizedText, weakPhonemes, attemptId, targetLang } = props;
   // Two layers of text: the deterministic placeholder painted immediately,
   // and the GPT version that cross-fades in when it arrives.
   const placeholder = React.useMemo(
-    () => fallbackText(word, score, nativeLang, weakPhonemes ?? []),
-    [word, score, nativeLang, weakPhonemes],
+    () => fallbackText(word, score, nativeLang, weakPhonemes ?? [], targetLang),
+    [word, score, nativeLang, weakPhonemes, targetLang],
   );
   const [gptComment, setGptComment] = useState<string | null>(null);
   const [error, setError] = useState(false);
@@ -272,7 +289,7 @@ export function CoachingCard(props: Props) {
               <View style={styles.pillRow} accessibilityLabel={labels.weakLabel}>
                 {weakPhonemes.slice(0, 3).map((p, i) => (
                   <View key={`${p}-${i}`} style={styles.phonemePill}>
-                    <Text style={styles.phonemePillText} numberOfLines={1}>/{p}/</Text>
+                    <Text style={styles.phonemePillText} numberOfLines={1}>{readablePhoneme(targetLang, p)}</Text>
                   </View>
                 ))}
               </View>

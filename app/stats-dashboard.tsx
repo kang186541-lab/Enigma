@@ -29,6 +29,7 @@ const T = {
 const DAYS_KO = ["월", "화", "수", "목", "금", "토", "일"];
 const DAYS_EN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const DAYS_ES = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"];
+const DAYS_ID = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
 function t(obj: Record<string, string>, lang: string) { return obj[lang] || obj.en; }
 function formatMs(ms: number): string {
@@ -43,7 +44,7 @@ export default function StatsDashboard() {
   const insets = useSafeAreaInsets();
   const { nativeLanguage: nativeLang, stats } = useLanguage();
   const lc = nativeLang === "korean" ? "ko" : nativeLang === "spanish" ? "es" : nativeLang === "indonesian" ? "id" : "en";
-  const dayNames = lc === "ko" ? DAYS_KO : lc === "es" ? DAYS_ES : DAYS_EN;
+  const dayNames = lc === "ko" ? DAYS_KO : lc === "es" ? DAYS_ES : lc === "id" ? DAYS_ID : DAYS_EN;
 
   const [weekData, setWeekData] = useState<{ date: string; totalXP: number }[]>([]);
   const [monthData, setMonthData] = useState<{ date: string; sessions: number }[]>([]);

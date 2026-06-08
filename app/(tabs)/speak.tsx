@@ -2658,6 +2658,7 @@ export default function SpeakScreen() {
                       word={phrase.word}
                       lang={phrase.speechLang}
                       nativeLang={nativeLang}
+                      targetLang={activeLang}
                       score={score}
                       accuracyScore={accuracyScore}
                       fluencyScore={fluencyScore}

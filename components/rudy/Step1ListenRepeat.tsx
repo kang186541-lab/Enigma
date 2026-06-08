@@ -644,7 +644,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
                 : <Ionicons name="volume-medium-outline" size={15} color={C.gold} />
               }
               <Text style={[s.playbackBtnText, { color: C.gold }]}>
-                {nativeLang === "korean" ? "원어민 발음" : nativeLang === "spanish" ? "Nativo" : "Native"}
+                {nativeLang === "korean" ? "원어민 발음" : nativeLang === "spanish" ? "Nativo" : nativeLang === "indonesian" ? "Penutur asli" : "Native"}
               </Text>
             </Pressable>
           </View>
@@ -675,7 +675,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
       <View style={s.progressRow}>
         <Text style={s.progressText}>
           {doneUtterances}/{totalUtterances}{" "}
-          {nativeLang === "korean" ? "문장 완료" : nativeLang === "spanish" ? "frases completadas" : "sentences done"}
+          {nativeLang === "korean" ? "문장 완료" : nativeLang === "spanish" ? "frases completadas" : nativeLang === "indonesian" ? "kalimat selesai" : "sentences done"}
         </Text>
         <View style={s.progressDots}>
           {Array.from({ length: totalUtterances }, (_, i) => (

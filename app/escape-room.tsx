@@ -240,7 +240,7 @@ function RoomView({
             router.back();
           }}
           accessibilityRole="button"
-          accessibilityLabel={lang === "korean" ? "뒤로" : "Back"}
+          accessibilityLabel={lang === "korean" ? "뒤로" : lang === "spanish" ? "Volver" : lang === "indonesian" ? "Kembali" : "Back"}
         >
           <Ionicons name="chevron-back" size={22} color={C.gold} />
         </Pressable>
@@ -301,7 +301,21 @@ function RoomView({
                     />
                     <Text style={styles.lockTileTitle}>{tri(l.title, lang)}</Text>
                     <EmojiText style={styles.lockTileStatus}>
-                      {got ? (lang === "korean" ? "해제됨 ✓" : "Solved ✓") : lang === "korean" ? "잠김 🔒" : "Locked 🔒"}
+                      {got
+                        ? lang === "korean"
+                          ? "해제됨 ✓"
+                          : lang === "spanish"
+                            ? "Resuelto ✓"
+                            : lang === "indonesian"
+                              ? "Terpecahkan ✓"
+                              : "Solved ✓"
+                        : lang === "korean"
+                          ? "잠김 🔒"
+                          : lang === "spanish"
+                            ? "Bloqueado 🔒"
+                            : lang === "indonesian"
+                              ? "Terkunci 🔒"
+                              : "Locked 🔒"}
                     </EmojiText>
                   </Pressable>
                 );
@@ -354,7 +368,7 @@ function RoomView({
         <View style={styles.modalScrim}>
           <View style={[styles.modalSheet, { paddingBottom: bottomPad }]}>
             <View style={styles.modalHandleRow}>
-              <Pressable style={styles.modalClose} onPress={() => dispatch({ t: "CLOSE" })} accessibilityRole="button" accessibilityLabel={lang === "korean" ? "닫기" : "Close"}>
+              <Pressable style={styles.modalClose} onPress={() => dispatch({ t: "CLOSE" })} accessibilityRole="button" accessibilityLabel={lang === "korean" ? "닫기" : lang === "spanish" ? "Cerrar" : lang === "indonesian" ? "Tutup" : "Close"}>
                 <Ionicons name="close" size={22} color={C.gold} />
               </Pressable>
             </View>
@@ -494,7 +508,7 @@ function NotFound({ lang, insets }: { lang: string; insets: { top: number } }) {
         {lang === "korean" ? "방을 찾을 수 없어요." : lang === "spanish" ? "Sala no encontrada." : lang === "indonesian" ? "Ruangan tidak ditemukan." : "Room not found."}
       </Text>
       <Pressable style={styles.winBtn} onPress={() => router.back()}>
-        <Text style={styles.winBtnText}>{lang === "korean" ? "뒤로" : "Back"}</Text>
+        <Text style={styles.winBtnText}>{lang === "korean" ? "뒤로" : lang === "spanish" ? "Volver" : lang === "indonesian" ? "Kembali" : "Back"}</Text>
       </Pressable>
     </View>
   );

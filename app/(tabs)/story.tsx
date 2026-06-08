@@ -520,7 +520,7 @@ export default function StoryTab() {
                     <EmojiText style={styles.arcText}>🎭 {getArc(ch)}</EmojiText>
                     <View style={styles.langRatioPill}>
                       <Text style={styles.langRatioText}>
-                        {lang === "korean" ? "목표어" : lang === "indonesian" ? "Bahasa target" : "Target"} {Math.round(ch.npcLangRatio * 100)}%
+                        {lang === "korean" ? "목표어" : lang === "indonesian" ? "Bahasa target" : lang === "spanish" ? "Objetivo" : "Target"} {Math.round(ch.npcLangRatio * 100)}%
                       </Text>
                     </View>
                   </View>

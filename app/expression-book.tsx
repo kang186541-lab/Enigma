@@ -169,7 +169,7 @@ export default function ExpressionBookScreen() {
                   <View style={styles.chapterInfo}>
                     <Text style={styles.chapterName}>{info.name[nl]}</Text>
                     <Text style={styles.chapterCount}>
-                      {chapterMastered}/{expressions.length} {native === "korean" ? "마스터" : "mastered"}
+                      {chapterMastered}/{expressions.length} {native === "korean" ? "마스터" : native === "spanish" ? "Dominado" : native === "indonesian" ? "Dikuasai" : "mastered"}
                     </Text>
                   </View>
                   {/* Progress ring (simple bar) */}
