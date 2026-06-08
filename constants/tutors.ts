@@ -13,7 +13,7 @@ export const TUTOR_IMAGES: Record<string, ImageSourcePropType> = {
   sujin:   require("../assets/avatars/jisu.png"),     // Sujin (formal Korean)
   minho_tutor: require("../assets/avatars/minjun.png"), // Minho (MZ Korean)
   dewi:    require("../assets/avatars/jane.png"),     // Dewi (Indonesian, BETA) — reuses an existing avatar
-  layla:   require("../assets/avatars/jane.png"),     // Layla (Arabic, Egyptian, BETA) — reuses an existing avatar
+  layla:   require("../assets/avatars/jane.png"),     // Layla (Arabic, MSA/fuṣḥā, BETA) — reuses an existing avatar
   // Legacy aliases for backward compat
   sarah:  require("../assets/avatars/sarah.png"),
   jake:   require("../assets/avatars/jake.png"),
@@ -196,27 +196,27 @@ export const TUTORS: Tutor[] = [
       "Terima kasih sudah berani bicara. Itu yang paling penting!",
     ],
   },
-  // ── Arabic Tutor (Egyptian colloquial, BETA) ─────────────────────────────
+  // ── Arabic Tutor (Modern Standard Arabic / fuṣḥā, BETA) ──────────────────
   {
     id: "layla",
     name: "ليلى (Layla)",
     emoji: "🌙",
-    flag: "🇪🇬",
-    region: "Egyptian Arabic",
-    personality: "Warm Cairo guide. Patient, friendly, and encouraging. Helps you speak everyday Egyptian Arabic.",
+    flag: "🇸🇦",
+    region: "Modern Standard Arabic",
+    personality: "Warm, patient guide to Modern Standard Arabic (fuṣḥā). Friendly and encouraging — helps you speak clear Standard Arabic.",
     speechLang: "ar-EG",
     language: "arabic",
     style: "casual",
     greeting:
-      "أهلاً! أنا ليلى. فرصة سعيدة! يلّا نتعلّم العربي المصري مع بعض. ما تخافش من الغلط، خالص! (ahlan! ana Layla. forSa sa3ida! yalla net3allem el-3arabi el-maSri ma3a ba3D. ma tkhafsh men el-ghalaT, khaaliS!)",
+      "أَهْلًا! أَنَا لَيْلَى. فُرْصَة سَعيدة! هَيّا نَتَعَلَّم العَرَبِيّة الفُصْحَى مَعًا. لا تَخَفْ مِنَ الخَطَأ أَبَدًا! (ahlan! anā Laylā. furṣa saʿīda! hayyā nataʿallam al-ʿarabiyya l-fuṣḥā maʿan. lā takhaf mina l-khaṭaʾ abadan!)",
     responses: [
-      "برافو عليك! نطقك بقى طبيعي أكتر. عايز تجرّب جملة أطول شويّة؟ (bravo 3aleek! noT2ak ba2a Tabee3i aktar. 3aayez tegarrab gomla aTwal shwayya?)",
-      "قرّبت توصل! في المصري العامي، إحنا بنقولها كده. جرّب تاني، يلّا. (2arrabt tewSal! fel-maSri el-3aammi, e7na bne2olha keda. garrab taani, yalla.)",
-      "تمام أوي! إنت بتتعلّم بسرعة جداً. كمّل كده! (tamaam awi! enta betet3allem be-sor3a giddan. kammel keda!)",
-      "ولا يهمّك، كلّنا بنغلط. قولها بالراحة وعلى مهلك. (wala yhemmak, kollena bneghlaT. 2olha bel-ra7a we 3ala mahlak.)",
-      "جامد! بقيت بتتكلّم زيّ المصريين بالظبط. (gaamed! ba2eet betetkallem zayy el-maSreyyin bel-ZabT.)",
-      "جرّب تاني وإنت واثق في نفسك. إنت تقدر أكيد! (garrab taani w-enta waase2 fi nafsak. enta te2dar akeed!)",
-      "ميرسي إنك اتشجّعت واتكلّمت. ده أهمّ حاجة خالص! (merci ennak etshagga3t w-etkallemt. da ahamm 7aaga khaaliS!)",
+      "أَحْسَنْت! نُطْقُك صارَ طَبيعِيًّا أَكْثَر. هَل تُريد أَنْ تُجَرِّب جُمْلة أَطْوَل قَليلًا؟ (aḥsant! nuṭquk ṣāra ṭabīʿiyyan akthar. hal turīd an tujarrib jumla aṭwal qalīlan?)",
+      "اِقْتَرَبْت! فِي الفُصْحَى نَقولُها هٰكَذا. جَرِّب مَرّة أُخْرى، هَيّا. (iqtarabt! fi l-fuṣḥā naqūluhā hākadhā. jarrib marra ukhrā, hayyā.)",
+      "مُمْتاز جِدًّا! أَنْتَ تَتَعَلَّم بِسُرْعة كَبيرة. واصِلْ هٰكَذا! (mumtāz jiddan! anta tataʿallam bi-surʿa kabīra. wāṣil hākadhā!)",
+      "لا يَهُمّك، كُلُّنا نُخْطِئ. قُلْها بِهُدوء وعَلى مَهْلِك. (lā yahummuk, kullunā nukhṭiʾ. qulhā bi-hudūʾ wa-ʿalā mahlik.)",
+      "رائِع! صِرْتَ تَتَكَلَّم الفُصْحَى بِطَلاقة. (rāʾiʿ! ṣirta tatakallam al-fuṣḥā bi-ṭalāqa.)",
+      "جَرِّب مَرّة أُخْرى وأَنْتَ واثِق مِنْ نَفْسِك. أَنْتَ تَقْدِر أَكيدًا! (jarrib marra ukhrā wa-anta wāthiq min nafsik. anta taqdir akīdan!)",
+      "شُكْرًا لِأَنَّك تَشَجَّعْت وتَكَلَّمْت. هٰذا أَهَمّ شَيْء عَلى الإِطْلاق! (shukran li-annak tashajjaʿt wa-takallamt. hādhā ahamm shayʾ ʿalā l-iṭlāq!)",
     ],
   },
 ];

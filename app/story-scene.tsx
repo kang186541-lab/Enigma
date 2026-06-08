@@ -1034,35 +1034,35 @@ const STORIES: Record<string, Story> = {
           },
           {
             word: { en: "Help me", ko: "도와주세요", es: "Ayúdame", id: "Tolong saya", ar: "سَاعِدْنِي" },
-            meaning: { en: "asking someone to help you", ko: "누군가에게 도움을 요청하는 표현", es: "pedirle ayuda a alguien", id: "meminta seseorang membantumu", ar: "إِنَّك تِطْلُب مِنْ حَدّ يِسَاعْدَك" },
+            meaning: { en: "asking someone to help you", ko: "누군가에게 도움을 요청하는 표현", es: "pedirle ayuda a alguien", id: "meminta seseorang membantumu", ar: "أَنْ تَطْلُب مِنْ أَحَد أَنْ يُسَاعِدَك" },
             wrong: [
-              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi", ar: "تَوْدِيع لَمَّا تِمْشِي" },
+              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi", ar: "تَوْدِيع عِنْدَ المُغَادَرَة" },
               { en: "an expression of thanks", ko: "감사 표현", es: "una expresión de agradecimiento", id: "ungkapan terima kasih", ar: "تَعْبِير عَنِ الشُّكْر" },
-              { en: "asking for directions", ko: "길을 묻는 것", es: "pedir direcciones", id: "menanyakan arah jalan", ar: "إِنَّك تِسْأَل عَنِ الطَّرِيق" },
+              { en: "asking for directions", ko: "길을 묻는 것", es: "pedir direcciones", id: "menanyakan arah jalan", ar: "أَنْ تَسْأَل عَنِ الطَّرِيق" },
             ],
           },
           {
             word: { en: "My name is...", ko: "제 이름은...입니다", es: "Mi nombre es...", id: "Nama saya...", ar: "اِسْمِي..." },
-            meaning: { en: "telling someone your name", ko: "자기 이름을 말하는 표현", es: "decirle tu nombre a alguien", id: "memberi tahu seseorang namamu", ar: "إِنَّك تِقُول لِحَدّ اسْمَك" },
+            meaning: { en: "telling someone your name", ko: "자기 이름을 말하는 표현", es: "decirle tu nombre a alguien", id: "memberi tahu seseorang namamu", ar: "أَنْ تَقُول لِأَحَدٍ اسْمَك" },
             wrong: [
-              { en: "saying where you live", ko: "사는 곳을 말하는 것", es: "decir dónde vives", id: "mengatakan tempat tinggalmu", ar: "إِنَّك تِقُول إِنْتَ سَاكِن فِين" },
-              { en: "asking how someone is feeling", ko: "누군가의 기분을 묻는 것", es: "preguntar cómo se siente alguien", id: "menanyakan perasaan seseorang", ar: "إِنَّك تِسْأَل حَدّ حَاسِس بِإِيه" },
-              { en: "saying thank you", ko: "감사하다고 말하는 것", es: "dar las gracias", id: "mengucapkan terima kasih", ar: "إِنَّك تِقُول شُكْراً" },
+              { en: "saying where you live", ko: "사는 곳을 말하는 것", es: "decir dónde vives", id: "mengatakan tempat tinggalmu", ar: "أَنْ تَقُول أَيْنَ تَسْكُن" },
+              { en: "asking how someone is feeling", ko: "누군가의 기분을 묻는 것", es: "preguntar cómo se siente alguien", id: "menanyakan perasaan seseorang", ar: "أَنْ تَسْأَل أَحَدًا كَيْفَ يَشْعُر" },
+              { en: "saying thank you", ko: "감사하다고 말하는 것", es: "dar las gracias", id: "mengucapkan terima kasih", ar: "أَنْ تَقُول شُكْرًا" },
             ],
           },
           {
             word: { en: "Thank you", ko: "감사합니다", es: "Gracias", id: "Terima kasih", ar: "شُكْراً" },
-            meaning: { en: "thanking someone for help", ko: "도움을 준 사람에게 감사하는 표현", es: "dar las gracias por la ayuda", id: "berterima kasih kepada seseorang atas bantuannya", ar: "إِنَّك تِشْكُر حَدّ عَلَى مُسَاعْدِتُه" },
+            meaning: { en: "thanking someone for help", ko: "도움을 준 사람에게 감사하는 표현", es: "dar las gracias por la ayuda", id: "berterima kasih kepada seseorang atas bantuannya", ar: "أَنْ تَشْكُر أَحَدًا عَلَى مُسَاعَدَتِه" },
             wrong: [
-              { en: "asking where something is", ko: "어디 있는지 묻는 것", es: "preguntar dónde está algo", id: "menanyakan letak sesuatu", ar: "إِنَّك تِسْأَل عَنْ مَكَان حَاجَة" },
-              { en: "telling someone your name", ko: "자기 이름을 말하는 것", es: "decir tu nombre", id: "menyebutkan namamu", ar: "إِنَّك تِقُول اسْمَك" },
-              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi", ar: "تَوْدِيع لَمَّا تِمْشِي" },
+              { en: "asking where something is", ko: "어디 있는지 묻는 것", es: "preguntar dónde está algo", id: "menanyakan letak sesuatu", ar: "أَنْ تَسْأَل عَنْ مَكَان شَيْء" },
+              { en: "telling someone your name", ko: "자기 이름을 말하는 것", es: "decir tu nombre", id: "menyebutkan namamu", ar: "أَنْ تَقُول اسْمَك" },
+              { en: "a farewell when leaving", ko: "떠날 때 하는 작별 인사", es: "una despedida al irse", id: "ucapan perpisahan saat pergi", ar: "تَوْدِيع عِنْدَ المُغَادَرَة" },
             ],
           },
         ],
         hints: {
           h1: { ko: "프롤로그와 입구에서 이미 본 말들이야 — 인사, 도움 요청, 이름, 감사", en: "These are words from the prologue and the museum gate — greeting, help, name, thanks", es: "Son palabras del prólogo y la entrada del museo — saludo, ayuda, nombre, gracias", id: "Ini kata-kata dari prolog dan gerbang museum — sapaan, bantuan, nama, terima kasih", ar: "دِي كَلِمَات شُفْتَهَا قَبْل كِدَه فِي المُقَدِّمَة وَفِي بَوَّابِة المَتْحَف — تَحِيَّة، طَلَب مُسَاعْدَة، اسْم، شُكْر" },
-          h2: { ko: "Tom에게 말하려면 먼저 자신을 밝히고, 왜 왔는지 말해야 해", en: "To talk to Tom, first show who you are and why you came", es: "Para hablar con Tom, primero muestra quién eres y por qué viniste", id: "Untuk bicara dengan Tom, tunjukkan dulu siapa kamu dan mengapa kamu datang", ar: "عَشَان تِكَلِّم تُوم، الأَوِّل وَرِّيه إِنْتَ مِين وَجَايّ لِيه" },
+          h2: { ko: "Tom에게 말하려면 먼저 자신을 밝히고, 왜 왔는지 말해야 해", en: "To talk to Tom, first show who you are and why you came", es: "Para hablar con Tom, primero muestra quién eres y por qué viniste", id: "Untuk bicara dengan Tom, tunjukkan dulu siapa kamu dan mengapa kamu datang", ar: "كَيْ تُكَلِّم تُوم، أَوَّلًا أَرِهِ مَنْ أَنْتَ وَلِمَاذَا أَتَيْت" },
           h3: { ko: "Hello=인사 / Help me=도움 요청 / My name is=이름 / Thank you=감사", en: "Hello=greeting / Help me=requesting help / My name is=name / Thank you=thanks", es: "Hola=saludo / Ayúdame=pedir ayuda / Mi nombre es=nombre / Gracias=gracias", id: "Hello=sapaan / Help me=meminta bantuan / My name is=nama / Thank you=terima kasih", ar: "Hello=تَحِيَّة / Help me=طَلَب مُسَاعْدَة / My name is=اسْم / Thank you=شُكْر", byLearning: { english: { ko: "Hello=인사 / Help me=도움 요청 / My name is...=이름 / Thank you=감사", en: "Hello=greeting / Help me=requesting help / My name is...=name / Thank you=thanks", es: "Hello=saludo / Help me=pedir ayuda / My name is...=nombre / Thank you=gracias", id: "Hello=sapaan / Help me=meminta bantuan / My name is...=nama / Thank you=terima kasih", ar: "Hello=تَحِيَّة / Help me=طَلَب مُسَاعْدَة / My name is...=اسْم / Thank you=شُكْر" }, korean: { ko: "안녕하세요=인사 / 도와주세요=도움 요청 / 제 이름은...입니다=이름 / 감사합니다=감사", en: "안녕하세요=greeting / 도와주세요=requesting help / 제 이름은...입니다=name / 감사합니다=thanks", es: "안녕하세요=saludo / 도와주세요=pedir ayuda / 제 이름은...입니다=nombre / 감사합니다=gracias", id: "안녕하세요=sapaan / 도와주세요=meminta bantuan / 제 이름은...입니다=nama / 감사합니다=terima kasih", ar: "안녕하세요=تَحِيَّة / 도와주세요=طَلَب مُسَاعْدَة / 제 이름은...입니다=اسْم / 감사합니다=شُكْر" }, spanish: { ko: "Hola=인사 / Ayúdame=도움 요청 / Mi nombre es...=이름 / Gracias=감사", en: "Hola=greeting / Ayúdame=requesting help / Mi nombre es...=name / Gracias=thanks", es: "Hola=saludo / Ayúdame=pedir ayuda / Mi nombre es...=nombre / Gracias=gracias", id: "Hola=sapaan / Ayúdame=meminta bantuan / Mi nombre es...=nama / Gracias=terima kasih", ar: "Hola=تَحِيَّة / Ayúdame=طَلَب مُسَاعْدَة / Mi nombre es...=اسْم / Gracias=شُكْر" }, indonesian: { ko: "Halo=인사 / Tolong saya=도움 요청 / Nama saya...=이름 / Terima kasih=감사", en: "Halo=greeting / Tolong saya=requesting help / Nama saya...=name / Terima kasih=thanks", es: "Halo=saludo / Tolong saya=pedir ayuda / Nama saya...=nombre / Terima kasih=gracias", id: "Halo=sapaan / Tolong saya=meminta bantuan / Nama saya...=nama / Terima kasih=terima kasih", ar: "Halo=تَحِيَّة / Tolong saya=طَلَب مُسَاعْدَة / Nama saya...=اسْم / Terima kasih=شُكْر" } } },
         },
       },
@@ -1088,35 +1088,35 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Hello", "My name is ___", "Help me", "Thank you", "Goodbye"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            prompt: { en: "Tom asks: 'Who are you?' How do you greet him?", ko: "톰이 묻는다: '넌 누구야?' 어떻게 인사할까?", es: "Tom pregunta: '¿Quién eres?' ¿Cómo lo saludas?", id: "Tom bertanya: 'Siapa kamu?' Bagaimana kamu menyapanya?", ar: "تُوم بِيِسْأَل: 'إِنْتَ مِين؟' هَتِسَلِّم عَلِيه إِزَّاي؟" },
-            context: { en: "You need to make a good first impression on the guard.", ko: "경비원에게 좋은 첫인상을 남겨야 한다.", es: "Necesitas causar una buena primera impresión al guardia.", id: "Kamu harus memberi kesan pertama yang baik pada penjaga itu.", ar: "لَازِم تِسِيب اِنْطِبَاع أَوَّلَانِي كُوَيِّس عِنْد الحَارِس." },
+            prompt: { en: "Tom asks: 'Who are you?' How do you greet him?", ko: "톰이 묻는다: '넌 누구야?' 어떻게 인사할까?", es: "Tom pregunta: '¿Quién eres?' ¿Cómo lo saludas?", id: "Tom bertanya: 'Siapa kamu?' Bagaimana kamu menyapanya?", ar: "تُوم يَسْأَل: 'مَنْ أَنْتَ؟' كَيْفَ تُسَلِّم عَلَيْه؟" },
+            context: { en: "You need to make a good first impression on the guard.", ko: "경비원에게 좋은 첫인상을 남겨야 한다.", es: "Necesitas causar una buena primera impresión al guardia.", id: "Kamu harus memberi kesan pertama yang baik pada penjaga itu.", ar: "يَجِب أَنْ تَتْرُك اِنْطِبَاعًا أَوَّلِيًّا جَيِّدًا عِنْدَ الحَارِس." },
             answer: { en: "Hello! My name is...", ko: "안녕하세요! 제 이름은...입니다.", es: "¡Hola! Mi nombre es...", id: "Halo! Nama saya...", ar: "أَهْلاً! اِسْمِي..." },
             wrong: [
-              { en: "Goodbye! I don't understand!", ko: "안녕히 계세요! 이해 못 해요!", es: "¡Adiós! ¡No entiendo!", id: "Selamat tinggal! Saya tidak mengerti!", ar: "مَعَ السَّلَامَة! أَنَا مِش فَاهِم!" },
-              { en: "Sorry! Where is the exit?", ko: "죄송합니다! 출구가 어디예요?", es: "¡Perdón! ¿Dónde está la salida?", id: "Maaf! Di mana pintu keluar?", ar: "آسِف! فِين بَاب الخُرُوج؟" },
+              { en: "Goodbye! I don't understand!", ko: "안녕히 계세요! 이해 못 해요!", es: "¡Adiós! ¡No entiendo!", id: "Selamat tinggal! Saya tidak mengerti!", ar: "مَعَ السَّلَامَة! أَنَا لَا أَفْهَم!" },
+              { en: "Sorry! Where is the exit?", ko: "죄송합니다! 출구가 어디예요?", es: "¡Perdón! ¿Dónde está la salida?", id: "Maaf! Di mana pintu keluar?", ar: "آسِف! أَيْنَ بَاب الخُرُوج؟" },
             ],
           },
           {
-            prompt: { en: "Tom asks: 'Why are you here?'", ko: "톰이 묻는다: '왜 여기 온 거야?'", es: "Tom pregunta: '¿Por qué estás aquí?'", id: "Tom bertanya: 'Mengapa kamu di sini?'", ar: "تُوم بِيِسْأَل: 'إِنْتَ جَايّ هِنَا لِيه؟'" },
+            prompt: { en: "Tom asks: 'Why are you here?'", ko: "톰이 묻는다: '왜 여기 온 거야?'", es: "Tom pregunta: '¿Por qué estás aquí?'", id: "Tom bertanya: 'Mengapa kamu di sini?'", ar: "تُوم يَسْأَل: 'لِمَاذَا أَتَيْتَ إِلَى هُنَا؟'" },
             context: { en: "You need to connect your words to the case.", ko: "네 말이 사건과 연결되어 있다는 걸 보여줘야 한다.", es: "Necesitas conectar tus palabras con el caso.", id: "Kamu harus menghubungkan kata-katamu dengan kasus ini.", ar: "لَازِم تِرْبُط كَلَامَك بِالقَضِيَّة." },
-            answer: { en: "I am here to help. Where is Dr. Ellis?", ko: "도우러 왔습니다. 엘리스 박사는 어디에 있나요?", es: "Estoy aquí para ayudar. ¿Dónde está la Dra. Ellis?", id: "Saya di sini untuk membantu. Di mana Dr. Ellis?", ar: "أَنَا جَايّ أُسَاعِد. فِين الدُّكْتُورَة إِلِيس؟" },
+            answer: { en: "I am here to help. Where is Dr. Ellis?", ko: "도우러 왔습니다. 엘리스 박사는 어디에 있나요?", es: "Estoy aquí para ayudar. ¿Dónde está la Dra. Ellis?", id: "Saya di sini untuk membantu. Di mana Dr. Ellis?", ar: "أَنَا هُنَا لِلمُسَاعَدَة. أَيْنَ الدُّكْتُورَة إِلِيس؟" },
             wrong: [
-              { en: "I'm fine, thank you. How are you?", ko: "잘 지내요, 감사합니다. 어떻게 지내세요?", es: "Estoy bien, gracias. ¿Cómo estás?", id: "Saya baik, terima kasih. Apa kabar?", ar: "أَنَا كُوَيِّس، شُكْراً. إِنْتَ عَامِل إِيه؟" },
+              { en: "I'm fine, thank you. How are you?", ko: "잘 지내요, 감사합니다. 어떻게 지내세요?", es: "Estoy bien, gracias. ¿Cómo estás?", id: "Saya baik, terima kasih. Apa kabar?", ar: "أَنَا بِخَيْر، شُكْرًا. كَيْفَ حَالُك؟" },
               { en: "Goodbye! See you tomorrow!", ko: "안녕히 계세요! 내일 봐요!", es: "¡Adiós! ¡Nos vemos mañana!", id: "Selamat tinggal! Sampai jumpa besok!", ar: "مَعَ السَّلَامَة! أَشُوفَك بُكْرَة!" },
             ],
           },
           {
-            prompt: { en: "Tom sighs: 'Fine. If I let you in, what do you say?'", ko: "톰이 한숨 쉰다: '좋아. 들여보내주면 뭐라고 해야 하지?'", es: "Tom suspira: 'Bien. Si te dejo entrar, ¿qué dices?'", id: "Tom mendesah: 'Baiklah. Kalau aku biarkan kau masuk, apa yang kau ucapkan?'", ar: "تُوم بِيِتْنَهَّد: 'طَيِّب. لَوْ خَلَّيْتَك تِدْخُل، هَتِقُول إِيه؟'" },
-            context: { en: "Use the polite word that proves you understand the favor.", ko: "도움을 받았다는 걸 아는 예의 바른 표현을 써야 한다.", es: "Usa la palabra cortés que demuestra que entiendes el favor.", id: "Gunakan ungkapan sopan yang menunjukkan kamu memahami bantuan itu.", ar: "اِسْتَخْدِم الكِلْمَة المُؤَدَّبَة اللِّي تِوَرِّي إِنَّك فَاهِم المَعْرُوف ده." },
+            prompt: { en: "Tom sighs: 'Fine. If I let you in, what do you say?'", ko: "톰이 한숨 쉰다: '좋아. 들여보내주면 뭐라고 해야 하지?'", es: "Tom suspira: 'Bien. Si te dejo entrar, ¿qué dices?'", id: "Tom mendesah: 'Baiklah. Kalau aku biarkan kau masuk, apa yang kau ucapkan?'", ar: "تُوم يَتَنَهَّد: 'حَسَنًا. لَوْ سَمَحْتُ لَكَ بِالدُّخُول، مَاذَا سَتَقُول؟'" },
+            context: { en: "Use the polite word that proves you understand the favor.", ko: "도움을 받았다는 걸 아는 예의 바른 표현을 써야 한다.", es: "Usa la palabra cortés que demuestra que entiendes el favor.", id: "Gunakan ungkapan sopan yang menunjukkan kamu memahami bantuan itu.", ar: "اِسْتَخْدِم الكَلِمَة المُؤَدَّبَة الَّتِي تُظْهِر أَنَّكَ تَفْهَم هٰذا المَعْرُوف." },
             answer: { en: "Thank you. Goodbye later, Tom.", ko: "감사합니다. 작별 인사는 나중에 할게요, 톰.", es: "Gracias. Adiós más tarde, Tom.", id: "Terima kasih. Selamat tinggal nanti, Tom.", ar: "شُكْراً. مَعَ السَّلَامَة بَعْدِين، يَا تُوم." },
             wrong: [
-              { en: "I am a tourist. Where is the gift shop?", ko: "저는 관광객이에요. 기념품 가게가 어디예요?", es: "Soy turista. ¿Dónde está la tienda de regalos?", id: "Saya turis. Di mana toko suvenir?", ar: "أَنَا سَائِح. فِين مَحَلّ الهَدَايَا؟" },
-              { en: "I don't understand. Please help.", ko: "이해 못 해요. 도와주세요.", es: "No entiendo. Por favor ayuda.", id: "Saya tidak mengerti. Tolong saya.", ar: "أَنَا مِش فَاهِم. سَاعِدْنِي مِنْ فَضْلَك." },
+              { en: "I am a tourist. Where is the gift shop?", ko: "저는 관광객이에요. 기념품 가게가 어디예요?", es: "Soy turista. ¿Dónde está la tienda de regalos?", id: "Saya turis. Di mana toko suvenir?", ar: "أَنَا سَائِح. أَيْنَ مَحَلّ الهَدَايَا؟" },
+              { en: "I don't understand. Please help.", ko: "이해 못 해요. 도와주세요.", es: "No entiendo. Por favor ayuda.", id: "Saya tidak mengerti. Tolong saya.", ar: "أَنَا لَا أَفْهَم. سَاعِدْنِي مِنْ فَضْلِك." },
             ],
           },
         ],
         hints: {
-          h1: { ko: "Tom에게는 세 가지가 필요해 — 인사, 이름, 도우러 온 이유", en: "Tom needs three things — a greeting, your name, and why you came to help", es: "Tom necesita tres cosas — saludo, nombre y por qué viniste a ayudar", id: "Tom butuh tiga hal — sapaan, namamu, dan alasan kamu datang membantu", ar: "تُوم مِحْتَاج تَلَات حَاجَات — تَحِيَّة، اسْمَك، وَإِنْتَ جَايّ تِسَاعِد لِيه" },
+          h1: { ko: "Tom에게는 세 가지가 필요해 — 인사, 이름, 도우러 온 이유", en: "Tom needs three things — a greeting, your name, and why you came to help", es: "Tom necesita tres cosas — saludo, nombre y por qué viniste a ayudar", id: "Tom butuh tiga hal — sapaan, namamu, dan alasan kamu datang membantu", ar: "تُوم يَحْتَاج ثَلَاثَة أَشْيَاء — تَحِيَّة، وَاسْمَك، وَلِمَاذَا أَتَيْتَ لِلمُسَاعَدَة" },
           h2: { ko: "Hello로 시작하고, My name is로 밝히고, Help/Where is로 사건에 연결해", en: "Start with Hello, use My name is, then connect it to Help and Where is", es: "Empieza con Hola, usa Mi nombre es, y conéctalo con ayuda y dónde está", id: "Mulai dengan Hello, gunakan My name is, lalu hubungkan dengan Help dan Where is", ar: "اِبْدَأ بِـ Hello، اِسْتَخْدِم My name is، وَبَعْدِين اِرْبُط بِـ Help وَ Where is" },
           h3: { ko: "Q1: Hello + My name is / Q2: Help + Where is / Q3: Thank you + Goodbye", en: "Q1: Hello + My name is / Q2: Help + Where is / Q3: Thank you + Goodbye", es: "P1: Hola + Mi nombre es / P2: ayuda + dónde está / P3: Gracias + Adiós", id: "S1: Hello + My name is / S2: Help + Where is / S3: Thank you + Goodbye", ar: "س١: Hello + My name is / س٢: Help + Where is / س٣: Thank you + Goodbye" },
         },
@@ -1218,19 +1218,19 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Where is ___?", "Help me"], reviewInDailyCourse: true, reviewDays: 2 },
         questions: [
           {
-            prompt: { en: "Which clue answers Dr. Ellis's final word: FIND?", ko: "엘리스 박사의 마지막 단어 FIND에 답하는 단서는 무엇일까?", es: "¿Qué pista responde a la última palabra de Ellis: FIND?", id: "Petunjuk mana yang menjawab kata terakhir Dr. Ellis: FIND?", ar: "أَنْهِي دَلِيل بِيَرُدّ عَلَى آخِر كِلْمَة قَالِتْهَا الدُّكْتُورَة إِلِيس: FIND؟" },
+            prompt: { en: "Which clue answers Dr. Ellis's final word: FIND?", ko: "엘리스 박사의 마지막 단어 FIND에 답하는 단서는 무엇일까?", es: "¿Qué pista responde a la última palabra de Ellis: FIND?", id: "Petunjuk mana yang menjawab kata terakhir Dr. Ellis: FIND?", ar: "أَيُّ دَلِيل يَرُدّ عَلَى آخِر كَلِمَة قَالَتْهَا الدُّكْتُورَة إِلِيس: FIND؟" },
             clues: [
-              { en: "The Madrid card: a taunt pointing to the next city.", ko: "마드리드 카드: 다음 도시를 가리키는 도발.", es: "La carta de Madrid: una provocación que señala la siguiente ciudad.", id: "Kartu Madrid: ejekan yang menunjuk ke kota berikutnya.", ar: "كَارْت مَدْرِيد: اِسْتِفْزَاز بِيْشَاوِر عَلَى المَدِينَة اللِّي جَايَّة." },
-              { en: "The gold dust: a shard of the London Stone resisting the theft.", ko: "금빛 먼지: 도난에 저항한 London Stone의 파편.", es: "El polvo dorado: un fragmento de la London Stone resistiendo el robo.", id: "Debu emas: pecahan London Stone yang melawan pencurian.", ar: "التُّرَاب الدَّهَبِي: شَظِيَّة مِنْ حَجَر لَنْدَن كَانِتْ بِتْقَاوِم السَّرِقَة." },
+              { en: "The Madrid card: a taunt pointing to the next city.", ko: "마드리드 카드: 다음 도시를 가리키는 도발.", es: "La carta de Madrid: una provocación que señala la siguiente ciudad.", id: "Kartu Madrid: ejekan yang menunjuk ke kota berikutnya.", ar: "بِطَاقَة مَدْرِيد: اِسْتِفْزَاز يُشِير إِلَى المَدِينَة القَادِمَة." },
+              { en: "The gold dust: a shard of the London Stone resisting the theft.", ko: "금빛 먼지: 도난에 저항한 London Stone의 파편.", es: "El polvo dorado: un fragmento de la London Stone resistiendo el robo.", id: "Debu emas: pecahan London Stone yang melawan pencurian.", ar: "الغُبَار الذَّهَبِيّ: شَظِيَّة مِنْ حَجَر لَنْدَن كَانَتْ تُقَاوِم السَّرِقَة." },
               { en: "Ellis's hidden note: 'Hello. Help me. Where is the door?'", ko: "엘리스의 숨겨진 메모: 'Hello. Help me. Where is the door?'", es: "La nota oculta de Ellis: 'Hello. Help me. Where is the door?'", id: "Catatan tersembunyi Ellis: 'Hello. Help me. Where is the door?'", ar: "وَرَقِة إِلِيس المَخْبِيَّة: 'Hello. Help me. Where is the door?'" },
             ],
             answerIdx: 2,
           },
         ],
         hints: {
-          h1: { ko: "FIND는 장소 단서가 아니라 문장 단서를 찾으라는 말이었어", en: "FIND was not asking for a place first, but for a sentence clue", es: "FIND no pedía primero un lugar, sino una pista de frase", id: "FIND bukan meminta tempat lebih dulu, melainkan petunjuk berupa kalimat", ar: "FIND مَكَانِتْش بِتِطْلُب مَكَان الأَوِّل، دِي كَانِتْ بِتِطْلُب دَلِيل عِبَارَة عَنْ جُمْلَة" },
-          h2: { ko: "Boss Spell에 필요한 말이 남아 있는 단서를 골라", en: "Choose the clue that still has the words needed for the Boss Spell", es: "Elige la pista que aún tiene las palabras para el Boss Spell", id: "Pilih petunjuk yang masih memuat kata-kata untuk Boss Spell", ar: "اِخْتَار الدَّلِيل اللِّي لِسَّه فِيه الكَلِمَات اللَّازِمَة لِتَعْوِيذِة المُوَاجَهَة" },
-          h3: { ko: "문장이 적힌 메모가 정답이야", en: "The note with the sentence is the answer", es: "La nota con la frase es la respuesta", id: "Catatan berisi kalimat itulah jawabannya", ar: "الوَرَقَة اللِّي فِيهَا الجُمْلَة هِيَّ الإِجَابَة" },
+          h1: { ko: "FIND는 장소 단서가 아니라 문장 단서를 찾으라는 말이었어", en: "FIND was not asking for a place first, but for a sentence clue", es: "FIND no pedía primero un lugar, sino una pista de frase", id: "FIND bukan meminta tempat lebih dulu, melainkan petunjuk berupa kalimat", ar: "FIND لَمْ تَكُنْ تَطْلُب مَكَانًا أَوَّلًا، بَلْ كَانَتْ تَطْلُب دَلِيلًا عِبَارَةً عَنْ جُمْلَة" },
+          h2: { ko: "Boss Spell에 필요한 말이 남아 있는 단서를 골라", en: "Choose the clue that still has the words needed for the Boss Spell", es: "Elige la pista que aún tiene las palabras para el Boss Spell", id: "Pilih petunjuk yang masih memuat kata-kata untuk Boss Spell", ar: "اِخْتَر الدَّلِيل الَّذِي مَا زَالَتْ فِيهِ الكَلِمَات اللَّازِمَة لِتَعْوِيذَة المُوَاجَهَة" },
+          h3: { ko: "문장이 적힌 메모가 정답이야", en: "The note with the sentence is the answer", es: "La nota con la frase es la respuesta", id: "Catatan berisi kalimat itulah jawabannya", ar: "الوَرَقَة الَّتِي فِيهَا الجُمْلَة هِيَ الإِجَابَة" },
         },
       },
       // ── Scene 5: The Sealed Door ──────────────────────────────────────────
@@ -1303,7 +1303,7 @@ const STORIES: Record<string, Story> = {
               ko: "말 조각을 문 위에 순서대로 올려놓으세요.",
               es: "Coloca cada pieza de palabra en la puerta.",
               id: "Letakkan setiap potongan kata pada pintu.",
-              ar: "حُطّ كُلّ قِطْعِة كِلْمَة عَلَى البَاب.",
+              ar: "ضَعْ كُلّ قِطْعَة كَلِمَة عَلَى البَاب.",
             },
             hints: {
               h1: {
@@ -1318,7 +1318,7 @@ const STORIES: Record<string, Story> = {
                 en: "The first piece is Hello. The next piece asks for help.",
                 es: "La primera pieza es Hello. La siguiente pide ayuda.",
                 id: "Potongan pertama adalah Hello. Potongan berikutnya meminta bantuan.",
-                ar: "أَوِّل قِطْعَة هِيَّ Hello. القِطْعَة اللِّي بَعْدَهَا بِتِطْلُب مُسَاعْدَة.",
+                ar: "أَوَّل قِطْعَة هِيَ Hello. القِطْعَة الَّتِي بَعْدَهَا تَطْلُب مُسَاعَدَة.",
               },
               h3: {
                 ko: "정답 문장: Hello. Help me. Where is Dr. Ellis?",
@@ -1333,7 +1333,7 @@ const STORIES: Record<string, Story> = {
               ko: "봉인된 문을 열어 돌의 파편에 닿으세요.",
               es: "Abre la puerta sellada para alcanzar el fragmento de piedra.",
               id: "Buka pintu tersegel untuk mencapai pecahan batu itu.",
-              ar: "اِفْتَح البَاب المَخْتُوم عَشَان تُوصَل لِشَظِيِّة الحَجَر.",
+              ar: "اِفْتَح البَاب المَخْتُوم كَيْ تَصِل إِلَى شَظِيَّة الحَجَر.",
             },
             storyConsequence: {
               en: "The stone fragment falls into Rudy's light.",
@@ -1597,28 +1597,28 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["How much?", "Delicious!"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            word: { en: "How much is this?", ko: "이거 얼마예요?", es: "¿Cuánto cuesta esto?", id: "Berapa harganya?", ar: "بِكَام ده؟" },
-            meaning: { en: "asking the price of something", ko: "무언가의 가격을 묻는 것", es: "preguntar el precio de algo", id: "menanyakan harga sesuatu", ar: "إِنَّك تِسْأَل عَنْ سِعْر حَاجَة" },
+            word: { en: "How much is this?", ko: "이거 얼마예요?", es: "¿Cuánto cuesta esto?", id: "Berapa harganya?", ar: "بِكَمْ هٰذا؟" },
+            meaning: { en: "asking the price of something", ko: "무언가의 가격을 묻는 것", es: "preguntar el precio de algo", id: "menanyakan harga sesuatu", ar: "أَنْ تَسْأَل عَنْ سِعْر شَيْء" },
             wrong: [
-              { en: "asking where someone is from", ko: "출신을 묻는 것", es: "preguntar de dónde es alguien", id: "menanyakan asal seseorang", ar: "إِنَّك تِسْأَل حَدّ مِنِين" },
-              { en: "ordering food at a restaurant", ko: "식당에서 음식을 주문하는 것", es: "pedir comida en un restaurante", id: "memesan makanan di restoran", ar: "إِنَّك تِطْلُب أَكْل فِي مَطْعَم" },
-              { en: "saying hello to a friend", ko: "친구에게 인사하는 것", es: "saludar a un amigo", id: "menyapa seorang teman", ar: "إِنَّك تِسَلِّم عَلَى صَاحِب" },
+              { en: "asking where someone is from", ko: "출신을 묻는 것", es: "preguntar de dónde es alguien", id: "menanyakan asal seseorang", ar: "أَنْ تَسْأَل أَحَدًا مِنْ أَيْنَ هُوَ" },
+              { en: "ordering food at a restaurant", ko: "식당에서 음식을 주문하는 것", es: "pedir comida en un restaurante", id: "memesan makanan di restoran", ar: "أَنْ تَطْلُب طَعَامًا فِي مَطْعَم" },
+              { en: "saying hello to a friend", ko: "친구에게 인사하는 것", es: "saludar a un amigo", id: "menyapa seorang teman", ar: "أَنْ تُسَلِّم عَلَى صَدِيق" },
             ],
           },
           {
             word: { en: "delicious", ko: "맛있는", es: "delicioso", id: "lezat", ar: "لَذِيذ" },
-            meaning: { en: "very good tasting food", ko: "음식 맛이 매우 좋은", es: "comida de muy buen sabor", id: "makanan yang rasanya sangat enak", ar: "أَكْل طَعْمُه حِلْو أَوِي" },
+            meaning: { en: "very good tasting food", ko: "음식 맛이 매우 좋은", es: "comida de muy buen sabor", id: "makanan yang rasanya sangat enak", ar: "طَعَام مَذَاقُه جَيِّد جِدًّا" },
             wrong: [
               { en: "a type of language", ko: "언어의 종류", es: "un tipo de idioma", id: "salah satu jenis bahasa", ar: "نَوْع مِنِ اللُّغَات" },
-              { en: "very expensive", ko: "매우 비싼", es: "muy caro", id: "sangat mahal", ar: "غَالِي أَوِي" },
+              { en: "very expensive", ko: "매우 비싼", es: "muy caro", id: "sangat mahal", ar: "غَالٍ جِدًّا" },
               { en: "a notebook page", ko: "노트 한 페이지", es: "una página de cuaderno", id: "selembar halaman buku catatan", ar: "صَفْحَة مِنْ كَشْكُول" },
             ],
           },
           {
             word: { en: "goodbye", ko: "안녕히 계세요", es: "adiós", id: "selamat tinggal", ar: "مَعَ السَّلَامَة" },
-            meaning: { en: "what you say when you are leaving", ko: "떠날 때 하는 말", es: "lo que dices cuando te vas", id: "ucapan saat kamu pergi", ar: "اللِّي بِتْقُولُه لَمَّا تِمْشِي" },
+            meaning: { en: "what you say when you are leaving", ko: "떠날 때 하는 말", es: "lo que dices cuando te vas", id: "ucapan saat kamu pergi", ar: "مَا تَقُولُه عِنْدَ المُغَادَرَة" },
             wrong: [
-              { en: "what you say when you arrive", ko: "도착할 때 하는 말", es: "lo que dices cuando llegas", id: "ucapan saat kamu tiba", ar: "اللِّي بِتْقُولُه لَمَّا تُوصَل" },
+              { en: "what you say when you arrive", ko: "도착할 때 하는 말", es: "lo que dices cuando llegas", id: "ucapan saat kamu tiba", ar: "مَا تَقُولُه عِنْدَ الوُصُول" },
               { en: "a question about location", ko: "위치에 관한 질문", es: "una pregunta sobre ubicación", id: "pertanyaan tentang lokasi", ar: "سُؤَال عَنِ المَكَان" },
               { en: "an apology", ko: "사과", es: "una disculpa", id: "permintaan maaf", ar: "اِعْتِذَار" },
             ],
@@ -1630,7 +1630,7 @@ const STORIES: Record<string, Story> = {
             en: "These are the words Carlos screamed — think about basic market expressions",
             es: "Estas son las palabras que Carlos gritó — piensa en expresiones básicas del mercado",
             id: "Ini kata-kata yang Carlos teriakkan — pikirkan ungkapan dasar di pasar",
-            ar: "دِي الكَلِمَات اللِّي كَارْلُوس كَانْ بِيِزْعَقْهَا — فَكَّر فِي التَّعْبِيرَات الأَسَاسِيَّة بِتَاعِة السُّوق",
+            ar: "هٰذِهِ الكَلِمَات الَّتِي كَانَ كَارْلُوس يَصْرُخ بِهَا — فَكِّر فِي التَّعْبِيرَات الأَسَاسِيَّة لِلسُّوق",
             byLearning: {
               spanish: { ko: "스페인어 시장 표현: ¿Cuánto cuesta?, delicioso, adiós", en: "Spanish market phrases: ¿Cuánto cuesta?, delicioso, adiós", es: "Frases del mercado en español: ¿Cuánto cuesta?, delicioso, adiós", id: "Frasa pasar dalam bahasa Spanyol: ¿Cuánto cuesta?, delicioso, adiós", ar: "تَعْبِيرَات السُّوق بِالإِسْبَانِي: ¿Cuánto cuesta?, delicioso, adiós" },
               korean:  { ko: "한국어 기본 표현: 얼마예요?, 맛있는, 안녕히 계세요", en: "Korean basic phrases: 얼마예요?, 맛있는, 안녕히 계세요", es: "Frases básicas en coreano: 얼마예요?, 맛있는, 안녕히 계세요", id: "Frasa dasar dalam bahasa Korea: 얼마예요?, 맛있는, 안녕히 계세요", ar: "تَعْبِيرَات أَسَاسِيَّة بِالكُورِي: 얼마예요?, 맛있는, 안녕히 계세요" },
@@ -1643,7 +1643,7 @@ const STORIES: Record<string, Story> = {
             en: "Expressions for asking prices, describing food taste, and saying farewell",
             es: "Expresiones para preguntar precios, describir sabor y despedirse",
             id: "Ungkapan untuk menanyakan harga, menggambarkan rasa makanan, dan mengucapkan perpisahan",
-            ar: "تَعْبِيرَات عَشَان تِسْأَل عَنِ السِّعْر، وَتِوْصِف طَعْم الأَكْل، وَتِوَدَّع",
+            ar: "تَعْبِيرَات كَيْ تَسْأَل عَنِ السِّعْر، وَتَصِف مَذَاق الطَّعَام، وَتُوَدِّع",
             byLearning: {
               spanish: { ko: "'¿Cuánto cuesta?'=가격 묻기, 'delicioso'=맛있는, 'adiós'=작별", en: "'¿Cuánto cuesta?'=asking price, 'delicioso'=tasty, 'adiós'=farewell", es: "'¿Cuánto cuesta?'=precio, 'delicioso'=sabroso, 'adiós'=despedida", id: "'¿Cuánto cuesta?'=menanyakan harga, 'delicioso'=lezat, 'adiós'=perpisahan", ar: "'¿Cuánto cuesta?'=تِسْأَل عَنِ السِّعْر، 'delicioso'=لَذِيذ، 'adiós'=وَدَاع" },
               korean:  { ko: "'얼마예요?'=가격 묻기, '맛있는'=delicious, '안녕히 계세요'=작별", en: "'얼마예요?'=asking price, '맛있는'=tasty, '안녕히 계세요'=farewell", es: "'얼마예요?'=precio, '맛있는'=sabroso, '안녕히 계세요'=despedida", id: "'얼마예요?'=menanyakan harga, '맛있는'=lezat, '안녕히 계세요'=perpisahan", ar: "'얼마예요?'=تِسْأَل عَنِ السِّعْر، '맛있는'=لَذِيذ، '안녕히 계세요'=وَدَاع" },
@@ -1742,21 +1742,21 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Please", "Thank you"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            prompt: { en: "Don Miguel is waiting. How do you greet him and order?", ko: "돈 미겔이 기다리고 있어. 어떻게 인사하고 주문할까?", es: "Don Miguel espera. ¿Cómo le saludas y pides?", id: "Don Miguel sedang menunggu. Bagaimana kamu menyapanya dan memesan?", ar: "دُون مِيجِيل مِسْتَنِّي. هَتِسَلِّم عَلِيه وَتِطْلُب إِزَّاي؟" },
-            context: { en: "Don Miguel: 'What would you like? I have bread, ham, and the best coffee in Madrid.'", ko: "돈 미겔: '뭐 드릴까요? 빵, 하몽, 마드리드 최고의 커피가 있어요.'", es: "Don Miguel: '¿Qué le pongo? Tengo pan, jamón y el mejor café de Madrid.'", id: "Don Miguel: 'Mau pesan apa? Saya punya roti, ham, dan kopi terbaik di Madrid.'", ar: "دُون مِيجِيل: 'تِحِبّ إِيه؟ عَنْدِي عِيش، وَلَحْمَة، وَأَحْسَن قَهْوَة فِي مَدْرِيد.'" },
-            answer: { en: "Good morning! I would like coffee, please. How much is it?", ko: "좋은 아침이에요! 커피 주세요. 얼마예요?", es: "¡Buenos días! Me pone un café, por favor. ¿Cuánto es?", id: "Selamat pagi! Saya mau kopi, tolong. Berapa harganya?", ar: "صَبَاح الخِير! عَايِز قَهْوَة، مِنْ فَضْلَك. بِكَام؟" },
+            prompt: { en: "Don Miguel is waiting. How do you greet him and order?", ko: "돈 미겔이 기다리고 있어. 어떻게 인사하고 주문할까?", es: "Don Miguel espera. ¿Cómo le saludas y pides?", id: "Don Miguel sedang menunggu. Bagaimana kamu menyapanya dan memesan?", ar: "دُون مِيجِيل يَنْتَظِر. كَيْفَ تُسَلِّم عَلَيْه وَتَطْلُب؟" },
+            context: { en: "Don Miguel: 'What would you like? I have bread, ham, and the best coffee in Madrid.'", ko: "돈 미겔: '뭐 드릴까요? 빵, 하몽, 마드리드 최고의 커피가 있어요.'", es: "Don Miguel: '¿Qué le pongo? Tengo pan, jamón y el mejor café de Madrid.'", id: "Don Miguel: 'Mau pesan apa? Saya punya roti, ham, dan kopi terbaik di Madrid.'", ar: "دُون مِيجِيل: 'مَاذَا تُحِبّ؟ لَدَيَّ خُبْز، وَلَحْم، وَأَفْضَل قَهْوَة فِي مَدْرِيد.'" },
+            answer: { en: "Good morning! I would like coffee, please. How much is it?", ko: "좋은 아침이에요! 커피 주세요. 얼마예요?", es: "¡Buenos días! Me pone un café, por favor. ¿Cuánto es?", id: "Selamat pagi! Saya mau kopi, tolong. Berapa harganya?", ar: "صَبَاح الخَيْر! أُرِيد قَهْوَة، مِنْ فَضْلِك. بِكَمْ؟" },
             wrong: [
-              { en: "Hello. I don't want food. Tell me about Carlos.", ko: "안녕하세요. 음식은 필요없어요. 카를로스에 대해 말해줘요.", es: "Hola. No quiero comida. Cuénteme sobre Carlos.", id: "Halo. Saya tidak mau makanan. Ceritakan soal Carlos.", ar: "أَهْلاً. أَنَا مِش عَايِز أَكْل. قُلِّي عَنْ كَارْلُوس." },
-              { en: "Sorry, I'm not hungry. Can we talk now?", ko: "죄송해요, 배가 안 고파요. 지금 얘기할 수 있을까요?", es: "Lo siento, no tengo hambre. ¿Podemos hablar ahora?", id: "Maaf, saya tidak lapar. Bisakah kita bicara sekarang?", ar: "آسِف، أَنَا مِش جِعَان. مُمْكِن نِتْكَلِّم دِلْوَقْتِي؟" },
+              { en: "Hello. I don't want food. Tell me about Carlos.", ko: "안녕하세요. 음식은 필요없어요. 카를로스에 대해 말해줘요.", es: "Hola. No quiero comida. Cuénteme sobre Carlos.", id: "Halo. Saya tidak mau makanan. Ceritakan soal Carlos.", ar: "مَرْحَبًا. أَنَا لَا أُرِيد طَعَامًا. أَخْبِرْنِي عَنْ كَارْلُوس." },
+              { en: "Sorry, I'm not hungry. Can we talk now?", ko: "죄송해요, 배가 안 고파요. 지금 얘기할 수 있을까요?", es: "Lo siento, no tengo hambre. ¿Podemos hablar ahora?", id: "Maaf, saya tidak lapar. Bisakah kita bicara sekarang?", ar: "آسِف، لَسْتُ جَائِعًا. هَلْ يُمْكِن أَنْ نَتَكَلَّم الآن؟" },
             ],
           },
           {
-            prompt: { en: "Don Miguel looks pleased. He offers food too.", ko: "돈 미겔이 흡족해한다. 음식도 권한다.", es: "Don Miguel parece complacido. También ofrece comida.", id: "Don Miguel tampak senang. Dia juga menawarkan makanan.", ar: "دُون مِيجِيل مَبْسُوط. وَكَمَان بِيِعْرِض عَلِيك أَكْل." },
-            context: { en: "Don Miguel: 'Good! And food? You need to eat something. Yes or no?'", ko: "돈 미겔: '좋아! 음식은 어때? 뭐 좀 먹어야지. 어때, 먹을래?'", es: "Don Miguel: '¡Bien! ¿Y comida? Necesitas comer algo. ¿Sí o no?'", id: "Don Miguel: 'Bagus! Dan makanan? Kamu perlu makan sesuatu. Mau atau tidak?'", ar: "دُون مِيجِيل: 'حِلْو! وَالأَكْل؟ لَازِم تَاكُل حَاجَة. آه وَلَّا لَأ؟'" },
-            answer: { en: "Yes, please! The bread with ham. It looks delicious. Thank you!", ko: "네, 주세요! 하몽 빵. 맛있어 보여요. 감사합니다!", es: "¡Sí, por favor! El pan con jamón. Tiene muy buena pinta. ¡Gracias!", id: "Ya, tolong! Roti dengan ham. Kelihatannya lezat. Terima kasih!", ar: "آه، مِنْ فَضْلَك! العِيش بِاللَّحْمَة. شَكْلُه لَذِيذ. شُكْراً!" },
+            prompt: { en: "Don Miguel looks pleased. He offers food too.", ko: "돈 미겔이 흡족해한다. 음식도 권한다.", es: "Don Miguel parece complacido. También ofrece comida.", id: "Don Miguel tampak senang. Dia juga menawarkan makanan.", ar: "دُون مِيجِيل سَعِيد. وَأَيْضًا يَعْرِض عَلَيْكَ طَعَامًا." },
+            context: { en: "Don Miguel: 'Good! And food? You need to eat something. Yes or no?'", ko: "돈 미겔: '좋아! 음식은 어때? 뭐 좀 먹어야지. 어때, 먹을래?'", es: "Don Miguel: '¡Bien! ¿Y comida? Necesitas comer algo. ¿Sí o no?'", id: "Don Miguel: 'Bagus! Dan makanan? Kamu perlu makan sesuatu. Mau atau tidak?'", ar: "دُون مِيجِيل: 'رَائِع! وَالطَّعَام؟ يَجِب أَنْ تَأْكُل شَيْئًا. نَعَم أَمْ لا؟'" },
+            answer: { en: "Yes, please! The bread with ham. It looks delicious. Thank you!", ko: "네, 주세요! 하몽 빵. 맛있어 보여요. 감사합니다!", es: "¡Sí, por favor! El pan con jamón. Tiene muy buena pinta. ¡Gracias!", id: "Ya, tolong! Roti dengan ham. Kelihatannya lezat. Terima kasih!", ar: "نَعَم، مِنْ فَضْلِك! الخُبْز بِاللَّحْم. يَبْدُو لَذِيذًا. شُكْرًا!" },
             wrong: [
-              { en: "No thank you. I'm in a hurry.", ko: "아니요 괜찮아요. 급해요.", es: "No gracias. Tengo prisa.", id: "Tidak, terima kasih. Saya sedang buru-buru.", ar: "لَأ شُكْراً. أَنَا مِسْتَعْجِل." },
-              { en: "How much is the food? Is it expensive?", ko: "음식이 얼마예요? 비싸요?", es: "¿Cuánto cuesta la comida? ¿Es cara?", id: "Berapa harga makanannya? Apakah mahal?", ar: "الأَكْل بِكَام؟ غَالِي؟" },
+              { en: "No thank you. I'm in a hurry.", ko: "아니요 괜찮아요. 급해요.", es: "No gracias. Tengo prisa.", id: "Tidak, terima kasih. Saya sedang buru-buru.", ar: "لا شُكْرًا. أَنَا مُسْتَعْجِل." },
+              { en: "How much is the food? Is it expensive?", ko: "음식이 얼마예요? 비싸요?", es: "¿Cuánto cuesta la comida? ¿Es cara?", id: "Berapa harga makanannya? Apakah mahal?", ar: "بِكَمِ الطَّعَام؟ هَلْ هُوَ غَالٍ؟" },
             ],
           },
         ],
@@ -1766,7 +1766,7 @@ const STORIES: Record<string, Story> = {
             en: "To get information you must follow his rule — greet and order properly first",
             es: "Para obtener información debes seguir su regla — saluda y pide correctamente primero",
             id: "Untuk mendapat informasi kamu harus mengikuti aturannya — sapa dan pesan dengan benar dulu",
-            ar: "عَشَان تِاخُد مَعْلُومَات لَازِم تِمْشِي عَلَى قَاعْدِتُه — سَلِّم وَاطْلُب صَحّ الأَوِّل",
+            ar: "كَيْ تَحْصُل عَلَى مَعْلُومَات يَجِب أَنْ تَتَّبِع قَاعِدَتَه — سَلِّم وَاطْلُب بِشَكْل صَحِيح أَوَّلًا",
             byLearning: {
               spanish: { ko: "'Buenos días'로 인사하고 'por favor'로 주문해봐", en: "Greet with 'Buenos días' and order with 'por favor'", es: "Saluda con 'Buenos días' y pide con 'por favor'", id: "Sapa dengan 'Buenos días' dan pesan dengan 'por favor'", ar: "سَلِّم بِـ 'Buenos días' وَاطْلُب بِـ 'por favor'" },
               korean:  { ko: "'좋은 아침이에요'로 인사하고 '주세요'로 주문해봐", en: "Greet with '좋은 아침이에요' and order with '주세요'", es: "Saluda con '좋은 아침이에요' y pide con '주세요'", id: "Sapa dengan '좋은 아침이에요' dan pesan dengan '주세요'", ar: "سَلِّم بِـ '좋은 아침이에요' وَاطْلُب بِـ '주세요'" },
@@ -1779,12 +1779,12 @@ const STORIES: Record<string, Story> = {
             en: "Be polite: greeting + please + thank you are key",
             es: "Sé educado: greeting + please + thank you son clave",
             id: "Bersikap sopan: sapaan + please + thank you adalah kuncinya",
-            ar: "خَلِّيك مُؤَدَّب: التَّحِيَّة + please + thank you دُول السِّرّ",
+            ar: "كُنْ مُؤَدَّبًا: التَّحِيَّة + please + thank you هِيَ السِّرّ",
             byLearning: {
-              spanish: { ko: "Buenos días + por favor + gracias가 핵심이야", en: "Buenos días + por favor + gracias are key", es: "Buenos días + por favor + gracias son clave", id: "Buenos días + por favor + gracias adalah kuncinya", ar: "Buenos días + por favor + gracias دُول السِّرّ" },
-              korean:  { ko: "좋은 아침 + 주세요 + 감사합니다가 핵심이야", en: "좋은 아침 + 주세요 + 감사합니다 are key", es: "좋은 아침 + 주세요 + 감사합니다 son clave", id: "좋은 아침 + 주세요 + 감사합니다 adalah kuncinya", ar: "좋은 아침 + 주세요 + 감사합니다 دُول السِّرّ" },
-              english: { ko: "Good morning + please + thank you가 핵심이야", en: "Good morning + please + thank you are key", es: "Good morning + please + thank you son clave", id: "Good morning + please + thank you adalah kuncinya", ar: "Good morning + please + thank you دُول السِّرّ" },
-              indonesian: { ko: "Selamat pagi + tolong + terima kasih가 핵심이야", en: "Selamat pagi + tolong + terima kasih are key", es: "Selamat pagi + tolong + terima kasih son clave", id: "Selamat pagi + tolong + terima kasih adalah kuncinya", ar: "Selamat pagi + tolong + terima kasih دُول السِّرّ" },
+              spanish: { ko: "Buenos días + por favor + gracias가 핵심이야", en: "Buenos días + por favor + gracias are key", es: "Buenos días + por favor + gracias son clave", id: "Buenos días + por favor + gracias adalah kuncinya", ar: "Buenos días + por favor + gracias هِيَ السِّرّ" },
+              korean:  { ko: "좋은 아침 + 주세요 + 감사합니다가 핵심이야", en: "좋은 아침 + 주세요 + 감사합니다 are key", es: "좋은 아침 + 주세요 + 감사합니다 son clave", id: "좋은 아침 + 주세요 + 감사합니다 adalah kuncinya", ar: "좋은 아침 + 주세요 + 감사합니다 هِيَ السِّرّ" },
+              english: { ko: "Good morning + please + thank you가 핵심이야", en: "Good morning + please + thank you are key", es: "Good morning + please + thank you son clave", id: "Good morning + please + thank you adalah kuncinya", ar: "Good morning + please + thank you هِيَ السِّرّ" },
+              indonesian: { ko: "Selamat pagi + tolong + terima kasih가 핵심이야", en: "Selamat pagi + tolong + terima kasih are key", es: "Selamat pagi + tolong + terima kasih son clave", id: "Selamat pagi + tolong + terima kasih adalah kuncinya", ar: "Selamat pagi + tolong + terima kasih هِيَ السِّرّ" },
             },
           },
           h3: {
@@ -1825,10 +1825,10 @@ const STORIES: Record<string, Story> = {
         storyConsequence: "Don Miguel slips you a map hidden in the bread wrapper.",
         onFail: { addToWeakExpressions: ["Bread, please", "How much?"], reviewInDailyCourse: true, reviewDays: 3 },
         title: { en: "Order from Don Miguel", ko: "Don Miguel에게 주문하기", es: "Pedir a Don Miguel", id: "Memesan dari Don Miguel", ar: "اطْلُب مِنْ دُون مِيجِيل" },
-        context: { en: "Don Miguel won't share information until you order properly. Speak your order!", ko: "Don Miguel은 제대로 주문하기 전에는 정보를 공유하지 않아요. 주문을 말하세요!", es: "Don Miguel no compartirá información hasta que pidas correctamente. ¡Haz tu pedido!", id: "Don Miguel tidak akan berbagi informasi sampai kamu memesan dengan benar. Ucapkan pesananmu!", ar: "دُون مِيجِيل مِش هَيِقُولّك حَاجَة لَحَدّ مَا تِطْلُب صَحّ. قُول طَلَبَك!" },
+        context: { en: "Don Miguel won't share information until you order properly. Speak your order!", ko: "Don Miguel은 제대로 주문하기 전에는 정보를 공유하지 않아요. 주문을 말하세요!", es: "Don Miguel no compartirá información hasta que pidas correctamente. ¡Haz tu pedido!", id: "Don Miguel tidak akan berbagi informasi sampai kamu memesan dengan benar. Ucapkan pesananmu!", ar: "دُون مِيجِيل لَنْ يَقُولَ لَكَ شَيْئًا حَتَّى تَطْلُب بِشَكْل صَحِيح. قُلْ طَلَبَك!" },
         questions: [
-          { word: { en: "Bread, please.", ko: "빵 주세요.", es: "Pan, por favor.", id: "Roti, tolong.", ar: "عِيش، مِنْ فَضْلَك." }, hint: { en: "Order bread politely", ko: "빵을 정중하게 주문하세요", es: "Pide pan con educación", id: "Pesan roti dengan sopan", ar: "اطْلُب العِيش بِأَدَب" }, acceptableAnswers: ["bread please"] },
-          { word: { en: "How much?", ko: "얼마예요?", es: "¿Cuánto?", id: "Berapa harganya?", ar: "بِكَام؟" }, hint: { en: "Ask the price", ko: "가격을 물어보세요", es: "Pregunta el precio", id: "Tanyakan harganya", ar: "اِسْأَل عَنِ السِّعْر" }, acceptableAnswers: ["how much is it", "how much is this"] },
+          { word: { en: "Bread, please.", ko: "빵 주세요.", es: "Pan, por favor.", id: "Roti, tolong.", ar: "خُبْز، مِنْ فَضْلِك." }, hint: { en: "Order bread politely", ko: "빵을 정중하게 주문하세요", es: "Pide pan con educación", id: "Pesan roti dengan sopan", ar: "اُطْلُب الخُبْز بِأَدَب" }, acceptableAnswers: ["bread please"] },
+          { word: { en: "How much?", ko: "얼마예요?", es: "¿Cuánto?", id: "Berapa harganya?", ar: "بِكَمْ؟" }, hint: { en: "Ask the price", ko: "가격을 물어보세요", es: "Pregunta el precio", id: "Tanyakan harganya", ar: "اِسْأَل عَنِ السِّعْر" }, acceptableAnswers: ["how much is it", "how much is this"] },
           { word: { en: "Thank you!", ko: "감사합니다!", es: "¡Gracias!", id: "Terima kasih!", ar: "شُكْراً!" }, hint: { en: "Say thanks", ko: "감사 인사를 하세요", es: "Da las gracias", id: "Ucapkan terima kasih", ar: "قُول شُكْراً" }, acceptableAnswers: ["thank you", "thanks", "thank you very much"] },
         ],
       },
@@ -2003,19 +2003,19 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["I need to find ___", "Where is ___?"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            instruction: { en: "Carlos's first cry — put the words in order:", ko: "카를로스의 첫 번째 외침 — 단어를 순서대로 배열하세요:", es: "El primer grito de Carlos — pon las palabras en orden:", id: "Teriakan pertama Carlos — susun kata-katanya secara berurutan:", ar: "أَوِّل زَعِيق لِكَارْلُوس — رَتِّب الكَلِمَات:" },
+            instruction: { en: "Carlos's first cry — put the words in order:", ko: "카를로스의 첫 번째 외침 — 단어를 순서대로 배열하세요:", es: "El primer grito de Carlos — pon las palabras en orden:", id: "Teriakan pertama Carlos — susun kata-katanya secara berurutan:", ar: "أَوَّل صَرْخَة لِكَارْلُوس — رَتِّب الكَلِمَات:" },
             words: [
               { en: "Hello", ko: "안녕하세요", es: "Hola", id: "Halo", ar: "أَهْلاً" },
-              { en: "I need", ko: "필요해요", es: "Necesito", id: "Saya butuh", ar: "أَنَا مِحْتَاج" },
-              { en: "help", ko: "도움이", es: "ayuda", id: "bantuan", ar: "مُسَاعْدَة" },
+              { en: "I need", ko: "필요해요", es: "Necesito", id: "Saya butuh", ar: "أَحْتَاج" },
+              { en: "help", ko: "도움이", es: "ayuda", id: "bantuan", ar: "مُسَاعَدَة" },
             ],
             answerOrder: [0, 1, 2],
           },
           {
-            instruction: { en: "Carlos's second cry:", ko: "카를로스의 두 번째 외침:", es: "El segundo grito de Carlos:", id: "Teriakan kedua Carlos:", ar: "تَانِي زَعِيق لِكَارْلُوس:" },
+            instruction: { en: "Carlos's second cry:", ko: "카를로스의 두 번째 외침:", es: "El segundo grito de Carlos:", id: "Teriakan kedua Carlos:", ar: "ثَانِي صَرْخَة لِكَارْلُوس:" },
             words: [
-              { en: "Where", ko: "어디", es: "Dónde", id: "Di mana", ar: "فِين" },
-              { en: "is", ko: "에요", es: "está", id: "letak", ar: "هُوَّ" },
+              { en: "Where", ko: "어디", es: "Dónde", id: "Di mana", ar: "أَيْنَ" },
+              { en: "is", ko: "에요", es: "está", id: "letak", ar: "هُوَ" },
               { en: "the bathroom", ko: "화장실이", es: "el baño", id: "kamar mandi", ar: "الحَمَّام" },
             ],
             answerOrder: [0, 1, 2],
@@ -2036,7 +2036,7 @@ const STORIES: Record<string, Story> = {
             en: "Carlos was shouting basic survival phrases — greeting, location, help",
             es: "Carlos gritaba frases de supervivencia — saludo, lugar, ayuda",
             id: "Carlos meneriakkan frasa bertahan hidup yang mendasar — sapaan, lokasi, permintaan tolong",
-            ar: "كَارْلُوس كَانْ بِيِزْعَق تَعْبِيرَات بَقَاء أَسَاسِيَّة — تَحِيَّة، مَكَان، طَلَب مُسَاعْدَة",
+            ar: "كَانَ كَارْلُوس يَصْرُخ بِتَعْبِيرَات بَقَاء أَسَاسِيَّة — تَحِيَّة، وَمَكَان، وَطَلَب مُسَاعَدَة",
             byLearning: {
               spanish: { ko: "카를로스의 외침: Hola, Necesito ayuda, ¿Dónde está el baño?", en: "Carlos's cries: Hola, Necesito ayuda, ¿Dónde está el baño?", es: "Los gritos de Carlos: Hola, Necesito ayuda, ¿Dónde está el baño?", id: "Teriakan Carlos: Hola, Necesito ayuda, ¿Dónde está el baño?", ar: "زَعِيق كَارْلُوس: Hola, Necesito ayuda, ¿Dónde está el baño?" },
               korean:  { ko: "카를로스의 외침: 안녕하세요, 도움이 필요해요, 화장실이 어디에요?", en: "Carlos's cries: 안녕하세요, 도움이 필요해요, 화장실이 어디에요?", es: "Los gritos de Carlos: 안녕하세요, 도움이 필요해요, 화장실이 어디에요?", id: "Teriakan Carlos: 안녕하세요, 도움이 필요해요, 화장실이 어디에요?", ar: "زَعِيق كَارْلُوس: 안녕하세요, 도움이 필요해요, 화장실이 어디에요?" },
@@ -2137,22 +2137,22 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["How much?", "Where is ___?"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            prompt: { en: "The machine has a price display. Carlos was screaming numbers. How do you say a price in English?", ko: "기계에 가격 표시가 있어. 카를로스가 숫자를 소리쳤어. 영어로 가격을 어떻게 말해?", es: "La máquina tiene una pantalla de precios. Carlos gritaba números. ¿Cómo dices un precio en inglés?", id: "Mesin itu punya layar harga. Carlos meneriakkan angka-angka. Bagaimana cara menyebut harga dalam bahasa Inggris?", ar: "المَكَنَة فِيهَا شَاشِة سِعْر. كَارْلُوس كَانْ بِيِزْعَق أَرْقَام. تِقُول السِّعْر بِالإِنْجِلِيزِي إِزَّاي؟" },
+            prompt: { en: "The machine has a price display. Carlos was screaming numbers. How do you say a price in English?", ko: "기계에 가격 표시가 있어. 카를로스가 숫자를 소리쳤어. 영어로 가격을 어떻게 말해?", es: "La máquina tiene una pantalla de precios. Carlos gritaba números. ¿Cómo dices un precio en inglés?", id: "Mesin itu punya layar harga. Carlos meneriakkan angka-angka. Bagaimana cara menyebut harga dalam bahasa Inggris?", ar: "الآلَة فِيهَا شَاشِة سِعْر. كَانَ كَارْلُوس يَصْرُخ بِأَرْقَام. كَيْفَ تَقُول السِّعْر بِالإِنْجِلِيزِيَّة؟" },
             clues: [
-              { en: "That's fifteen dollars — stating a price with the number and currency", ko: "15달러입니다 — 숫자와 통화로 가격을 말하는 것", es: "Son quince dólares — indicar un precio con número y moneda", id: "Harganya lima belas dolar — menyebut harga dengan angka dan mata uang", ar: "ده بِخَمَسْتَاشَر دُولَار — تِقُول السِّعْر بِالرَّقَم وَالعُمْلَة" },
-              { en: "What day is it today? — asking about the day of the week", ko: "오늘 무슨 요일이에요? — 요일을 묻는 것", es: "¿Qué día es hoy? — preguntar por el día de la semana", id: "Hari ini hari apa? — menanyakan hari dalam seminggu", ar: "النَّهَارْدَه إِيه؟ — تِسْأَل عَنْ يَوْم الأُسْبُوع" },
-              { en: "How are you today? — asking about someone's well-being", ko: "오늘 어떠세요? — 누군가의 안부를 묻는 것", es: "¿Cómo estás hoy? — preguntar por el bienestar de alguien", id: "Apa kabar hari ini? — menanyakan keadaan seseorang", ar: "عَامِل إِيه النَّهَارْدَه؟ — تِسْأَل عَنْ أَحْوَال حَدّ" },
-              { en: "That's too expensive! — saying the price is too high", ko: "너무 비싸요! — 가격이 너무 높다고 말하는 것", es: "¡Eso es muy caro! — decir que el precio es demasiado alto", id: "Itu terlalu mahal! — mengatakan harganya terlalu tinggi", ar: "ده غَالِي أَوِي! — تِقُول إِنِّ السِّعْر عَالِي قَوِي" },
+              { en: "That's fifteen dollars — stating a price with the number and currency", ko: "15달러입니다 — 숫자와 통화로 가격을 말하는 것", es: "Son quince dólares — indicar un precio con número y moneda", id: "Harganya lima belas dolar — menyebut harga dengan angka dan mata uang", ar: "هٰذا بِخَمْسَةَ عَشَرَ دُولَارًا — تَقُول السِّعْر بِالرَّقَم وَالعُمْلَة" },
+              { en: "What day is it today? — asking about the day of the week", ko: "오늘 무슨 요일이에요? — 요일을 묻는 것", es: "¿Qué día es hoy? — preguntar por el día de la semana", id: "Hari ini hari apa? — menanyakan hari dalam seminggu", ar: "مَا اليَوْم؟ — تَسْأَل عَنْ يَوْم الأُسْبُوع" },
+              { en: "How are you today? — asking about someone's well-being", ko: "오늘 어떠세요? — 누군가의 안부를 묻는 것", es: "¿Cómo estás hoy? — preguntar por el bienestar de alguien", id: "Apa kabar hari ini? — menanyakan keadaan seseorang", ar: "كَيْفَ حَالُكَ اليَوْم؟ — تَسْأَل عَنْ أَحْوَال أَحَد" },
+              { en: "That's too expensive! — saying the price is too high", ko: "너무 비싸요! — 가격이 너무 높다고 말하는 것", es: "¡Eso es muy caro! — decir que el precio es demasiado alto", id: "Itu terlalu mahal! — mengatakan harganya terlalu tinggi", ar: "هٰذا غَالٍ جِدًّا! — تَقُول إِنَّ السِّعْر مُرْتَفِع جِدًّا" },
             ],
             answerIdx: 0,
           },
           {
-            prompt: { en: "Second lock: Carlos only had basic words left. Which phrase would he use to ask for help at a restaurant?", ko: "두 번째 잠금: 카를로스에게 기본 단어만 남았어. 식당에서 도움을 요청하려면 어떤 표현을 쓸까?", es: "Segunda cerradura: A Carlos solo le quedaban palabras básicas. ¿Qué frase usaría para pedir ayuda en un restaurante?", id: "Kunci kedua: Carlos hanya menyisakan kata-kata dasar. Frasa mana yang akan dia pakai untuk meminta bantuan di restoran?", ar: "القُفْل التَّانِي: كَارْلُوس مَا فَضِلْشِي مَعَاه غِير كَلِمَات أَسَاسِيَّة. أَنْهِي عِبَارَة هَيِسْتَخْدِمْهَا عَشَان يِطْلُب مُسَاعْدَة فِي مَطْعَم؟" },
+            prompt: { en: "Second lock: Carlos only had basic words left. Which phrase would he use to ask for help at a restaurant?", ko: "두 번째 잠금: 카를로스에게 기본 단어만 남았어. 식당에서 도움을 요청하려면 어떤 표현을 쓸까?", es: "Segunda cerradura: A Carlos solo le quedaban palabras básicas. ¿Qué frase usaría para pedir ayuda en un restaurante?", id: "Kunci kedua: Carlos hanya menyisakan kata-kata dasar. Frasa mana yang akan dia pakai untuk meminta bantuan di restoran?", ar: "القُفْل الثَّانِي: لَمْ يَبْقَ مَعَ كَارْلُوس سِوَى كَلِمَات أَسَاسِيَّة. أَيُّ عِبَارَة سَيَسْتَخْدِمُهَا كَيْ يَطْلُب مُسَاعَدَة فِي مَطْعَم؟" },
             clues: [
-              { en: "Can I have the menu, please? — politely asking for the menu", ko: "메뉴판 좀 주시겠어요? — 정중하게 메뉴를 요청하는 것", es: "¿Puedo ver el menú, por favor? — pedir el menú amablemente", id: "Boleh minta menunya? — meminta menu dengan sopan", ar: "مُمْكِن المِنْيُو، مِنْ فَضْلَك؟ — تِطْلُب المِنْيُو بِأَدَب" },
-              { en: "Can I have water, please? — asking for the most basic need", ko: "물 좀 주세요 — 가장 기본적인 필요를 요청하는 것", es: "¿Puedo tener agua, por favor? — pedir la necesidad más básica", id: "Boleh minta air? — meminta kebutuhan yang paling mendasar", ar: "مُمْكِن مَيَّة، مِنْ فَضْلَك؟ — تِطْلُب أَهَمّ حَاجَة أَسَاسِيَّة" },
-              { en: "This is delicious! — complimenting the food", ko: "이거 맛있어요! — 음식을 칭찬하는 것", es: "¡Esto está delicioso! — elogiar la comida", id: "Ini lezat! — memuji makanan", ar: "ده لَذِيذ! — تِمْدَح الأَكْل" },
-              { en: "The bill, please. — asking to pay", ko: "계산서 주세요 — 계산을 요청하는 것", es: "La cuenta, por favor. — pedir pagar", id: "Minta bonnya. — meminta untuk membayar", ar: "الحِسَاب، مِنْ فَضْلَك. — تِطْلُب تِدْفَع" },
+              { en: "Can I have the menu, please? — politely asking for the menu", ko: "메뉴판 좀 주시겠어요? — 정중하게 메뉴를 요청하는 것", es: "¿Puedo ver el menú, por favor? — pedir el menú amablemente", id: "Boleh minta menunya? — meminta menu dengan sopan", ar: "هَلْ يُمْكِن قَائِمَة الطَّعَام، مِنْ فَضْلِك؟ — تَطْلُب القَائِمَة بِأَدَب" },
+              { en: "Can I have water, please? — asking for the most basic need", ko: "물 좀 주세요 — 가장 기본적인 필요를 요청하는 것", es: "¿Puedo tener agua, por favor? — pedir la necesidad más básica", id: "Boleh minta air? — meminta kebutuhan yang paling mendasar", ar: "هَلْ يُمْكِن مَاء، مِنْ فَضْلِك؟ — تَطْلُب أَهَمّ شَيْء أَسَاسِيّ" },
+              { en: "This is delicious! — complimenting the food", ko: "이거 맛있어요! — 음식을 칭찬하는 것", es: "¡Esto está delicioso! — elogiar la comida", id: "Ini lezat! — memuji makanan", ar: "هٰذا لَذِيذ! — تَمْدَح الطَّعَام" },
+              { en: "The bill, please. — asking to pay", ko: "계산서 주세요 — 계산을 요청하는 것", es: "La cuenta, por favor. — pedir pagar", id: "Minta bonnya. — meminta untuk membayar", ar: "الحِسَاب، مِنْ فَضْلِك. — تَطْلُب أَنْ تَدْفَع" },
             ],
             answerIdx: 1,
           },
@@ -2163,12 +2163,12 @@ const STORIES: Record<string, Story> = {
             en: "Think about what words Carlos had left — only basic survival phrases remained",
             es: "Piensa en qué palabras le quedaban a Carlos — solo frases básicas de supervivencia",
             id: "Pikirkan kata-kata apa yang tersisa pada Carlos — hanya frasa bertahan hidup yang mendasar",
-            ar: "فَكَّر فِي الكَلِمَات اللِّي فَضِلِتْ مَعَ كَارْلُوس — مَا فَضِلْشِي غِير تَعْبِيرَات البَقَاء الأَسَاسِيَّة",
+            ar: "فَكِّر فِي الكَلِمَات الَّتِي بَقِيَتْ مَعَ كَارْلُوس — لَمْ يَبْقَ سِوَى تَعْبِيرَات البَقَاء الأَسَاسِيَّة",
             byLearning: {
-              spanish: { ko: "카를로스에게 남은 스페인어 표현: Hola, Ayuda, ¿Dónde está la puerta?", en: "Carlos's remaining Spanish phrases: Hola, Ayuda, ¿Dónde está la puerta?", es: "Las frases en español que le quedaron a Carlos: Hola, Ayuda, ¿Dónde está la puerta?", id: "Frasa bahasa Spanyol yang tersisa pada Carlos: Hola, Ayuda, ¿Dónde está la puerta?", ar: "تَعْبِيرَات كَارْلُوس الإِسْبَانِي اللِّي فَضِلِتْ: Hola, Ayuda, ¿Dónde está la puerta?" },
-              korean:  { ko: "카를로스에게 남은 한국어 표현: 안녕하세요, 도와주세요, 문이 어디예요?", en: "Carlos's remaining Korean phrases: 안녕하세요, 도와주세요, 문이 어디예요?", es: "Las frases en coreano que le quedaron a Carlos: 안녕하세요, 도와주세요, 문이 어디예요?", id: "Frasa bahasa Korea yang tersisa pada Carlos: 안녕하세요, 도와주세요, 문이 어디예요?", ar: "تَعْبِيرَات كَارْلُوس الكُورِي اللِّي فَضِلِتْ: 안녕하세요, 도와주세요, 문이 어디예요?" },
-              english: { ko: "카를로스에게 남은 영어 표현: Hello, Help, Where is the door?", en: "Carlos's remaining English phrases: Hello, Help, Where is the door?", es: "Las frases en inglés que le quedaron a Carlos: Hello, Help, Where is the door?", id: "Frasa bahasa Inggris yang tersisa pada Carlos: Hello, Help, Where is the door?", ar: "تَعْبِيرَات كَارْلُوس الإِنْجِلِيزِي اللِّي فَضِلِتْ: Hello, Help, Where is the door?" },
-              indonesian: { ko: "카를로스에게 남은 인도네시아어 표현: Halo, Tolong, Di mana pintunya?", en: "Carlos's remaining Indonesian phrases: Halo, Tolong, Di mana pintunya?", es: "Las frases en indonesio que le quedaron a Carlos: Halo, Tolong, Di mana pintunya?", id: "Frasa bahasa Indonesia yang tersisa pada Carlos: Halo, Tolong, Di mana pintunya?", ar: "تَعْبِيرَات كَارْلُوس الإِنْدُونِيسِي اللِّي فَضِلِتْ: Halo, Tolong, Di mana pintunya?" },
+              spanish: { ko: "카를로스에게 남은 스페인어 표현: Hola, Ayuda, ¿Dónde está la puerta?", en: "Carlos's remaining Spanish phrases: Hola, Ayuda, ¿Dónde está la puerta?", es: "Las frases en español que le quedaron a Carlos: Hola, Ayuda, ¿Dónde está la puerta?", id: "Frasa bahasa Spanyol yang tersisa pada Carlos: Hola, Ayuda, ¿Dónde está la puerta?", ar: "تَعْبِيرَات كَارْلُوس الإِسْبَانِيَّة الَّتِي بَقِيَتْ: Hola, Ayuda, ¿Dónde está la puerta?" },
+              korean:  { ko: "카를로스에게 남은 한국어 표현: 안녕하세요, 도와주세요, 문이 어디예요?", en: "Carlos's remaining Korean phrases: 안녕하세요, 도와주세요, 문이 어디예요?", es: "Las frases en coreano que le quedaron a Carlos: 안녕하세요, 도와주세요, 문이 어디예요?", id: "Frasa bahasa Korea yang tersisa pada Carlos: 안녕하세요, 도와주세요, 문이 어디예요?", ar: "تَعْبِيرَات كَارْلُوس الكُورِيَّة الَّتِي بَقِيَتْ: 안녕하세요, 도와주세요, 문이 어디예요?" },
+              english: { ko: "카를로스에게 남은 영어 표현: Hello, Help, Where is the door?", en: "Carlos's remaining English phrases: Hello, Help, Where is the door?", es: "Las frases en inglés que le quedaron a Carlos: Hello, Help, Where is the door?", id: "Frasa bahasa Inggris yang tersisa pada Carlos: Hello, Help, Where is the door?", ar: "تَعْبِيرَات كَارْلُوس الإِنْجِلِيزِيَّة الَّتِي بَقِيَتْ: Hello, Help, Where is the door?" },
+              indonesian: { ko: "카를로스에게 남은 인도네시아어 표현: Halo, Tolong, Di mana pintunya?", en: "Carlos's remaining Indonesian phrases: Halo, Tolong, Di mana pintunya?", es: "Las frases en indonesio que le quedaron a Carlos: Halo, Tolong, Di mana pintunya?", id: "Frasa bahasa Indonesia yang tersisa pada Carlos: Halo, Tolong, Di mana pintunya?", ar: "تَعْبِيرَات كَارْلُوس الإِنْدُونِيسِيَّة الَّتِي بَقِيَتْ: Halo, Tolong, Di mana pintunya?" },
             },
           },
           h2: {
@@ -2176,12 +2176,12 @@ const STORIES: Record<string, Story> = {
             en: "Carlos was screaming 'Hello. Help. Where is the door.' — only the most basic words remained",
             es: "Carlos gritaba 'Hello. Help. Where is the door.' — solo quedaban las palabras más básicas",
             id: "Carlos meneriakkan 'Hello. Help. Where is the door.' — hanya kata-kata yang paling mendasar yang tersisa",
-            ar: "كَارْلُوس كَانْ بِيِزْعَق 'Hello. Help. Where is the door.' — مَا فَضِلْشِي غِير أَبْسَط الكَلِمَات",
+            ar: "كَانَ كَارْلُوس يَصْرُخ 'Hello. Help. Where is the door.' — لَمْ يَبْقَ سِوَى أَبْسَط الكَلِمَات",
             byLearning: {
-              spanish: { ko: "카를로스의 비명: 'Hola. Ayuda. ¿Dónde está la puerta?' — 기초 스페인어만 남았어", en: "Carlos screamed: 'Hola. Ayuda. ¿Dónde está la puerta?' — only basic Spanish remained", es: "Carlos gritó: 'Hola. Ayuda. ¿Dónde está la puerta?' — solo quedaba español básico", id: "Carlos berteriak: 'Hola. Ayuda. ¿Dónde está la puerta?' — hanya bahasa Spanyol dasar yang tersisa", ar: "كَارْلُوس زَعَّق: 'Hola. Ayuda. ¿Dónde está la puerta?' — مَا فَضِلْشِي غِير إِسْبَانِي أَسَاسِي" },
-              korean:  { ko: "카를로스의 비명: '안녕하세요. 도와주세요. 문이 어디예요?' — 기초 한국어만 남았어", en: "Carlos screamed: '안녕하세요. 도와주세요. 문이 어디예요?' — only basic Korean remained", es: "Carlos gritó: '안녕하세요. 도와주세요. 문이 어디예요?' — solo quedaba coreano básico", id: "Carlos berteriak: '안녕하세요. 도와주세요. 문이 어디예요?' — hanya bahasa Korea dasar yang tersisa", ar: "كَارْلُوس زَعَّق: '안녕하세요. 도와주세요. 문이 어디예요?' — مَا فَضِلْشِي غِير كُورِي أَسَاسِي" },
-              english: { ko: "카를로스의 비명: 'Hello. Help. Where is the door?' — 기초 영어만 남았어", en: "Carlos screamed: 'Hello. Help. Where is the door?' — only basic English remained", es: "Carlos gritó: 'Hello. Help. Where is the door?' — solo quedaba inglés básico", id: "Carlos berteriak: 'Hello. Help. Where is the door?' — hanya bahasa Inggris dasar yang tersisa", ar: "كَارْلُوس زَعَّق: 'Hello. Help. Where is the door?' — مَا فَضِلْشِي غِير إِنْجِلِيزِي أَسَاسِي" },
-              indonesian: { ko: "카를로스의 비명: 'Halo. Tolong. Di mana pintunya?' — 기초 인도네시아어만 남았어", en: "Carlos screamed: 'Halo. Tolong. Di mana pintunya?' — only basic Indonesian remained", es: "Carlos gritó: 'Halo. Tolong. Di mana pintunya?' — solo quedaba indonesio básico", id: "Carlos berteriak: 'Halo. Tolong. Di mana pintunya?' — hanya bahasa Indonesia dasar yang tersisa", ar: "كَارْلُوس زَعَّق: 'Halo. Tolong. Di mana pintunya?' — مَا فَضِلْشِي غِير إِنْدُونِيسِي أَسَاسِي" },
+              spanish: { ko: "카를로스의 비명: 'Hola. Ayuda. ¿Dónde está la puerta?' — 기초 스페인어만 남았어", en: "Carlos screamed: 'Hola. Ayuda. ¿Dónde está la puerta?' — only basic Spanish remained", es: "Carlos gritó: 'Hola. Ayuda. ¿Dónde está la puerta?' — solo quedaba español básico", id: "Carlos berteriak: 'Hola. Ayuda. ¿Dónde está la puerta?' — hanya bahasa Spanyol dasar yang tersisa", ar: "صَرَخَ كَارْلُوس: 'Hola. Ayuda. ¿Dónde está la puerta?' — لَمْ يَبْقَ سِوَى إِسْبَانِيَّة أَسَاسِيَّة" },
+              korean:  { ko: "카를로스의 비명: '안녕하세요. 도와주세요. 문이 어디예요?' — 기초 한국어만 남았어", en: "Carlos screamed: '안녕하세요. 도와주세요. 문이 어디예요?' — only basic Korean remained", es: "Carlos gritó: '안녕하세요. 도와주세요. 문이 어디예요?' — solo quedaba coreano básico", id: "Carlos berteriak: '안녕하세요. 도와주세요. 문이 어디예요?' — hanya bahasa Korea dasar yang tersisa", ar: "صَرَخَ كَارْلُوس: '안녕하세요. 도와주세요. 문이 어디예요?' — لَمْ يَبْقَ سِوَى كُورِيَّة أَسَاسِيَّة" },
+              english: { ko: "카를로스의 비명: 'Hello. Help. Where is the door?' — 기초 영어만 남았어", en: "Carlos screamed: 'Hello. Help. Where is the door?' — only basic English remained", es: "Carlos gritó: 'Hello. Help. Where is the door?' — solo quedaba inglés básico", id: "Carlos berteriak: 'Hello. Help. Where is the door?' — hanya bahasa Inggris dasar yang tersisa", ar: "صَرَخَ كَارْلُوس: 'Hello. Help. Where is the door?' — لَمْ يَبْقَ سِوَى إِنْجِلِيزِيَّة أَسَاسِيَّة" },
+              indonesian: { ko: "카를로스의 비명: 'Halo. Tolong. Di mana pintunya?' — 기초 인도네시아어만 남았어", en: "Carlos screamed: 'Halo. Tolong. Di mana pintunya?' — only basic Indonesian remained", es: "Carlos gritó: 'Halo. Tolong. Di mana pintunya?' — solo quedaba indonesio básico", id: "Carlos berteriak: 'Halo. Tolong. Di mana pintunya?' — hanya bahasa Indonesia dasar yang tersisa", ar: "صَرَخَ كَارْلُوس: 'Halo. Tolong. Di mana pintunya?' — لَمْ يَبْقَ سِوَى إِنْدُونِيسِيَّة أَسَاسِيَّة" },
             },
           },
           h3: {
@@ -2189,12 +2189,12 @@ const STORIES: Record<string, Story> = {
             en: "First: stating a price (fifteen dollars) / Second: water please — the most basic survival request",
             es: "Primero: decir un precio (fifteen dollars) / Segundo: water please — la petición de supervivencia más básica",
             id: "Pertama: menyebut harga (lima belas dolar) / Kedua: minta air — permintaan bertahan hidup yang paling mendasar",
-            ar: "الأَوِّل: تِقُول السِّعْر (خَمَسْتَاشَر دُولَار) / التَّانِي: مَيَّة مِنْ فَضْلَك — أَبْسَط طَلَب بَقَاء",
+            ar: "الأَوَّل: تَقُول السِّعْر (خَمْسَةَ عَشَرَ دُولَارًا) / الثَّانِي: مَاء مِنْ فَضْلِك — أَبْسَط طَلَب بَقَاء",
             byLearning: {
-              spanish: { ko: "첫 번째: 'Son quince dólares' (가격) / 두 번째: '¿Puedo tener agua, por favor?' (생존 요청)", en: "First: 'Son quince dólares' (price) / Second: '¿Puedo tener agua, por favor?' (survival request)", es: "Primero: 'Son quince dólares' (precio) / Segundo: '¿Puedo tener agua, por favor?' (petición de supervivencia)", id: "Pertama: 'Son quince dólares' (harga) / Kedua: '¿Puedo tener agua, por favor?' (permintaan bertahan hidup)", ar: "الأَوِّل: 'Son quince dólares' (سِعْر) / التَّانِي: '¿Puedo tener agua, por favor?' (طَلَب بَقَاء)" },
-              korean:  { ko: "첫 번째: '15달러입니다' (가격) / 두 번째: '물 좀 주세요' (생존 요청)", en: "First: '15달러입니다' (price) / Second: '물 좀 주세요' (survival request)", es: "Primero: '15달러입니다' (precio) / Segundo: '물 좀 주세요' (petición de supervivencia)", id: "Pertama: '15달러입니다' (harga) / Kedua: '물 좀 주세요' (permintaan bertahan hidup)", ar: "الأَوِّل: '15달러입니다' (سِعْر) / التَّانِي: '물 좀 주세요' (طَلَب بَقَاء)" },
-              english: { ko: "첫 번째: 'That's fifteen dollars' (가격) / 두 번째: 'Can I have water, please?' (생존 요청)", en: "First: 'That's fifteen dollars' (price) / Second: 'Can I have water, please?' (survival request)", es: "Primero: 'That's fifteen dollars' (precio) / Segundo: 'Can I have water, please?' (petición de supervivencia)", id: "Pertama: 'That's fifteen dollars' (harga) / Kedua: 'Can I have water, please?' (permintaan bertahan hidup)", ar: "الأَوِّل: 'That's fifteen dollars' (سِعْر) / التَّانِي: 'Can I have water, please?' (طَلَب بَقَاء)" },
-              indonesian: { ko: "첫 번째: 'Harganya lima belas dolar' (가격) / 두 번째: 'Boleh minta air?' (생존 요청)", en: "First: 'Harganya lima belas dolar' (price) / Second: 'Boleh minta air?' (survival request)", es: "Primero: 'Harganya lima belas dolar' (precio) / Segundo: 'Boleh minta air?' (petición de supervivencia)", id: "Pertama: 'Harganya lima belas dolar' (harga) / Kedua: 'Boleh minta air?' (permintaan bertahan hidup)", ar: "الأَوِّل: 'Harganya lima belas dolar' (سِعْر) / التَّانِي: 'Boleh minta air?' (طَلَب بَقَاء)" },
+              spanish: { ko: "첫 번째: 'Son quince dólares' (가격) / 두 번째: '¿Puedo tener agua, por favor?' (생존 요청)", en: "First: 'Son quince dólares' (price) / Second: '¿Puedo tener agua, por favor?' (survival request)", es: "Primero: 'Son quince dólares' (precio) / Segundo: '¿Puedo tener agua, por favor?' (petición de supervivencia)", id: "Pertama: 'Son quince dólares' (harga) / Kedua: '¿Puedo tener agua, por favor?' (permintaan bertahan hidup)", ar: "الأَوَّل: 'Son quince dólares' (سِعْر) / الثَّانِي: '¿Puedo tener agua, por favor?' (طَلَب بَقَاء)" },
+              korean:  { ko: "첫 번째: '15달러입니다' (가격) / 두 번째: '물 좀 주세요' (생존 요청)", en: "First: '15달러입니다' (price) / Second: '물 좀 주세요' (survival request)", es: "Primero: '15달러입니다' (precio) / Segundo: '물 좀 주세요' (petición de supervivencia)", id: "Pertama: '15달러입니다' (harga) / Kedua: '물 좀 주세요' (permintaan bertahan hidup)", ar: "الأَوَّل: '15달러입니다' (سِعْر) / الثَّانِي: '물 좀 주세요' (طَلَب بَقَاء)" },
+              english: { ko: "첫 번째: 'That's fifteen dollars' (가격) / 두 번째: 'Can I have water, please?' (생존 요청)", en: "First: 'That's fifteen dollars' (price) / Second: 'Can I have water, please?' (survival request)", es: "Primero: 'That's fifteen dollars' (precio) / Segundo: 'Can I have water, please?' (petición de supervivencia)", id: "Pertama: 'That's fifteen dollars' (harga) / Kedua: 'Can I have water, please?' (permintaan bertahan hidup)", ar: "الأَوَّل: 'That's fifteen dollars' (سِعْر) / الثَّانِي: 'Can I have water, please?' (طَلَب بَقَاء)" },
+              indonesian: { ko: "첫 번째: 'Harganya lima belas dolar' (가격) / 두 번째: 'Boleh minta air?' (생존 요청)", en: "First: 'Harganya lima belas dolar' (price) / Second: 'Boleh minta air?' (survival request)", es: "Primero: 'Harganya lima belas dolar' (precio) / Segundo: 'Boleh minta air?' (petición de supervivencia)", id: "Pertama: 'Harganya lima belas dolar' (harga) / Kedua: 'Boleh minta air?' (permintaan bertahan hidup)", ar: "الأَوَّل: 'Harganya lima belas dolar' (سِعْر) / الثَّانِي: 'Boleh minta air?' (طَلَب بَقَاء)" },
             },
           },
         },
@@ -2427,16 +2427,16 @@ const STORIES: Record<string, Story> = {
         questions: [
           {
             word: { en: "exit", ko: "출구", es: "salida", id: "pintu keluar", ar: "بَاب الخُرُوج" },
-            meaning: { en: "the way out of a building", ko: "건물에서 나가는 길", es: "el camino para salir de un edificio", id: "jalan keluar dari sebuah gedung", ar: "الطَّرِيق اللِّي تِخْرُج بِيهَا مِنِ المَكَان" },
+            meaning: { en: "the way out of a building", ko: "건물에서 나가는 길", es: "el camino para salir de un edificio", id: "jalan keluar dari sebuah gedung", ar: "الطَّرِيق الَّذِي تَخْرُج مِنْهُ مِنَ المَكَان" },
             wrong: [
-              { en: "a place to eat food", ko: "음식을 먹는 장소", es: "un lugar para comer", id: "tempat untuk makan", ar: "مَكَان عَشَان تَاكُل فِيه" },
-              { en: "an office for work", ko: "일하는 사무실", es: "una oficina para trabajar", id: "kantor untuk bekerja", ar: "مَكْتَب لِلشُّغْل" },
-              { en: "a place to sleep", ko: "잠을 자는 곳", es: "un lugar para dormir", id: "tempat untuk tidur", ar: "مَكَان عَشَان تَنَام فِيه" },
+              { en: "a place to eat food", ko: "음식을 먹는 장소", es: "un lugar para comer", id: "tempat untuk makan", ar: "مَكَان كَيْ تَأْكُل فِيه" },
+              { en: "an office for work", ko: "일하는 사무실", es: "una oficina para trabajar", id: "kantor untuk bekerja", ar: "مَكْتَب لِلعَمَل" },
+              { en: "a place to sleep", ko: "잠을 자는 곳", es: "un lugar para dormir", id: "tempat untuk tidur", ar: "مَكَان كَيْ تَنَام فِيه" },
             ],
           },
           {
-            word: { en: "subway station", ko: "지하철역", es: "estación de metro", id: "stasiun kereta bawah tanah", ar: "مَحَطِّة المِتْرُو" },
-            meaning: { en: "an underground train stop in the city", ko: "도시의 지하 기차 정거장", es: "una parada de tren subterráneo en la ciudad", id: "perhentian kereta bawah tanah di kota", ar: "مَحَطِّة قَطْر تَحْت الأَرْض فِي المَدِينَة" },
+            word: { en: "subway station", ko: "지하철역", es: "estación de metro", id: "stasiun kereta bawah tanah", ar: "مَحَطَّة المِتْرُو" },
+            meaning: { en: "an underground train stop in the city", ko: "도시의 지하 기차 정거장", es: "una parada de tren subterráneo en la ciudad", id: "perhentian kereta bawah tanah di kota", ar: "مَحَطَّة قِطَار تَحْتَ الأَرْض فِي المَدِينَة" },
             wrong: [
               { en: "a type of restaurant", ko: "식당의 종류", es: "un tipo de restaurante", id: "jenis restoran", ar: "نُوع مِنِ المَطَاعِم" },
               { en: "a secret laboratory", ko: "비밀 연구실", es: "un laboratorio secreto", id: "laboratorium rahasia", ar: "مَعْمَل سِرِّي" },
@@ -2445,36 +2445,36 @@ const STORIES: Record<string, Story> = {
           },
           {
             word: { en: "taxi", ko: "택시", es: "taxi", id: "taksi", ar: "تَاكْسِي" },
-            meaning: { en: "a car you pay to take you somewhere", ko: "어딘가에 데려다 주는 대가로 돈을 내는 차", es: "un coche que pagas para que te lleve a algún lugar", id: "mobil yang kamu bayar untuk mengantarmu ke suatu tempat", ar: "عَرَبِيَّة بِتِدْفَع فِيهَا فُلُوس عَشَان تِوَدِّيك مَكَان" },
+            meaning: { en: "a car you pay to take you somewhere", ko: "어딘가에 데려다 주는 대가로 돈을 내는 차", es: "un coche que pagas para que te lleve a algún lugar", id: "mobil yang kamu bayar untuk mengantarmu ke suatu tempat", ar: "سَيَّارَة تَدْفَع فِيهَا مَالًا كَيْ تُوصِلَكَ إِلَى مَكَان" },
             wrong: [
-              { en: "a type of food", ko: "음식의 종류", es: "un tipo de comida", id: "jenis makanan", ar: "نُوع مِنِ الأَكْل" },
+              { en: "a type of food", ko: "음식의 종류", es: "un tipo de comida", id: "jenis makanan", ar: "نَوْع مِنَ الطَّعَام" },
               { en: "a walking path", ko: "산책로", es: "un camino para caminar", id: "jalur untuk berjalan kaki", ar: "مَمَرّ لِلْمَشْي" },
-              { en: "a meeting room", ko: "회의실", es: "una sala de reuniones", id: "ruang rapat", ar: "أُوضِة اِجْتِمَاعَات" },
+              { en: "a meeting room", ko: "회의실", es: "una sala de reuniones", id: "ruang rapat", ar: "غُرْفَة اِجْتِمَاعَات" },
             ],
           },
           {
             word: { en: "excuse me", ko: "실례합니다", es: "disculpe", id: "permisi", ar: "لَوْ سَمَحْت" },
-            meaning: { en: "a polite way to get someone's attention", ko: "정중하게 누군가의 관심을 끄는 말", es: "una forma educada de llamar la atención de alguien", id: "cara sopan untuk menarik perhatian seseorang", ar: "طَرِيقَة مُؤَدَّبَة عَشَان تِلْفِت اِنْتِبَاه حَدّ" },
+            meaning: { en: "a polite way to get someone's attention", ko: "정중하게 누군가의 관심을 끄는 말", es: "una forma educada de llamar la atención de alguien", id: "cara sopan untuk menarik perhatian seseorang", ar: "طَرِيقَة مُؤَدَّبَة كَيْ تَلْفِت اِنْتِبَاه أَحَد" },
             wrong: [
-              { en: "a way to say goodbye", ko: "작별 인사", es: "una forma de despedirse", id: "ucapan perpisahan", ar: "طَرِيقَة عَشَان تِقُول مَعَ السَّلَامَة" },
+              { en: "a way to say goodbye", ko: "작별 인사", es: "una forma de despedirse", id: "ucapan perpisahan", ar: "طَرِيقَة كَيْ تَقُول مَعَ السَّلَامَة" },
               { en: "an expression of anger", ko: "화를 내는 표현", es: "una expresión de enfado", id: "ungkapan kemarahan", ar: "تَعْبِير عَنِ الغَضَب" },
-              { en: "a word meaning delicious", ko: "맛있다는 뜻의 단어", es: "una palabra que significa delicioso", id: "kata yang berarti lezat", ar: "كِلْمَة مَعْنَاهَا لَذِيذ" },
+              { en: "a word meaning delicious", ko: "맛있다는 뜻의 단어", es: "una palabra que significa delicioso", id: "kata yang berarti lezat", ar: "كَلِمَة مَعْنَاهَا لَذِيذ" },
             ],
           },
         ],
         hints: {
-          h1: { ko: "공항 표지판을 읽어야 해 — 출구, 교통, 예의 표현을 생각해봐", en: "You need to read airport signs — think about exits, transport, and polite phrases", es: "Necesitas leer carteles del aeropuerto — piensa en salidas, transporte y frases de cortesía", id: "Kamu harus membaca papan tanda bandara — pikirkan pintu keluar, transportasi, dan ungkapan sopan", ar: "لَازِم تِقْرَا لَافْتَات المَطَار — فَكَّر فِي أَبْوَاب الخُرُوج وَالمُوَاصْلَات وَالعِبَارَات المُؤَدَّبَة" },
+          h1: { ko: "공항 표지판을 읽어야 해 — 출구, 교통, 예의 표현을 생각해봐", en: "You need to read airport signs — think about exits, transport, and polite phrases", es: "Necesitas leer carteles del aeropuerto — piensa en salidas, transporte y frases de cortesía", id: "Kamu harus membaca papan tanda bandara — pikirkan pintu keluar, transportasi, dan ungkapan sopan", ar: "يَجِب أَنْ تَقْرَأ لَافِتَات المَطَار — فَكِّر فِي أَبْوَاب الخُرُوج وَالمُوَاصَلَات وَالعِبَارَات المُؤَدَّبَة" },
           h2: {
             ko: "exit은 나가는 곳, subway station은 기차 정거장, taxi는 유료 차, excuse me는 정중한 표현",
             en: "Exit is the way out, subway station is a train stop, taxi is a paid car, excuse me is polite",
             es: "Exit es la salida, subway station es parada de tren, taxi es coche de pago, excuse me es educado",
             id: "Exit adalah jalan keluar, subway station adalah perhentian kereta, taxi adalah mobil berbayar, excuse me itu sopan",
-            ar: "exit بَاب الخُرُوج، subway station مَحَطِّة المِتْرُو، taxi عَرَبِيَّة بِأُجْرَة، excuse me عِبَارَة مُؤَدَّبَة",
+            ar: "exit بَاب الخُرُوج، subway station مَحَطَّة المِتْرُو، taxi سَيَّارَة أُجْرَة، excuse me عِبَارَة مُؤَدَّبَة",
             byLearning: {
-              korean: { ko: "출구는 나가는 곳, 지하철역은 기차 정거장, 택시는 유료 차, 실례합니다는 정중한 표현", en: "'출구' is the way out, '지하철역' is a train stop, '택시' is a paid car, '실례합니다' is polite", es: "'출구' es la salida, '지하철역' es parada de tren, '택시' es coche de pago, '실례합니다' es educado", id: "'출구' adalah jalan keluar, '지하철역' adalah perhentian kereta, '택시' adalah mobil berbayar, '실례합니다' itu sopan", ar: "'출구' بَاب الخُرُوج، '지하철역' مَحَطِّة المِتْرُو، '택시' عَرَبِيَّة بِأُجْرَة، '실례합니다' عِبَارَة مُؤَدَّبَة" },
-              spanish: { ko: "salida는 나가는 곳, estación de metro는 기차 정거장, taxi는 유료 차, disculpe는 정중한 표현", en: "'Salida' is the way out, 'estación de metro' is a train stop, 'taxi' is a paid car, 'disculpe' is polite", es: "Salida es la salida, estación de metro es parada de tren, taxi es coche de pago, disculpe es educado", id: "'salida' adalah jalan keluar, 'estación de metro' adalah perhentian kereta, 'taxi' adalah mobil berbayar, 'disculpe' itu sopan", ar: "'salida' بَاب الخُرُوج، 'estación de metro' مَحَطِّة المِتْرُو، 'taxi' عَرَبِيَّة بِأُجْرَة، 'disculpe' عِبَارَة مُؤَدَّبَة" },
-              english: { ko: "exit은 나가는 곳, subway station은 기차 정거장, taxi는 유료 차, excuse me는 정중한 표현", en: "'Exit' is the way out, 'subway station' is a train stop, 'taxi' is a paid car, 'excuse me' is polite", es: "'Exit' es la salida, 'subway station' es parada de tren, 'taxi' es coche de pago, 'excuse me' es educado", id: "'Exit' adalah jalan keluar, 'subway station' adalah perhentian kereta, 'taxi' adalah mobil berbayar, 'excuse me' itu sopan", ar: "'Exit' بَاب الخُرُوج، 'subway station' مَحَطِّة المِتْرُو، 'taxi' عَرَبِيَّة بِأُجْرَة، 'excuse me' عِبَارَة مُؤَدَّبَة" },
-              indonesian: { ko: "pintu keluar는 나가는 곳, stasiun kereta bawah tanah는 기차 정거장, taksi는 유료 차, permisi는 정중한 표현", en: "'Pintu keluar' is the way out, 'stasiun kereta bawah tanah' is a train stop, 'taksi' is a paid car, 'permisi' is polite", es: "'Pintu keluar' es la salida, 'stasiun kereta bawah tanah' es parada de tren, 'taksi' es coche de pago, 'permisi' es educado", id: "'Pintu keluar' adalah jalan keluar, 'stasiun kereta bawah tanah' adalah perhentian kereta, 'taksi' adalah mobil berbayar, 'permisi' itu sopan", ar: "'Pintu keluar' بَاب الخُرُوج، 'stasiun kereta bawah tanah' مَحَطِّة المِتْرُو، 'taksi' عَرَبِيَّة بِأُجْرَة، 'permisi' عِبَارَة مُؤَدَّبَة" },
+              korean: { ko: "출구는 나가는 곳, 지하철역은 기차 정거장, 택시는 유료 차, 실례합니다는 정중한 표현", en: "'출구' is the way out, '지하철역' is a train stop, '택시' is a paid car, '실례합니다' is polite", es: "'출구' es la salida, '지하철역' es parada de tren, '택시' es coche de pago, '실례합니다' es educado", id: "'출구' adalah jalan keluar, '지하철역' adalah perhentian kereta, '택시' adalah mobil berbayar, '실례합니다' itu sopan", ar: "'출구' بَاب الخُرُوج، '지하철역' مَحَطَّة المِتْرُو، '택시' سَيَّارَة أُجْرَة، '실례합니다' عِبَارَة مُؤَدَّبَة" },
+              spanish: { ko: "salida는 나가는 곳, estación de metro는 기차 정거장, taxi는 유료 차, disculpe는 정중한 표현", en: "'Salida' is the way out, 'estación de metro' is a train stop, 'taxi' is a paid car, 'disculpe' is polite", es: "Salida es la salida, estación de metro es parada de tren, taxi es coche de pago, disculpe es educado", id: "'salida' adalah jalan keluar, 'estación de metro' adalah perhentian kereta, 'taxi' adalah mobil berbayar, 'disculpe' itu sopan", ar: "'salida' بَاب الخُرُوج، 'estación de metro' مَحَطَّة المِتْرُو، 'taxi' سَيَّارَة أُجْرَة، 'disculpe' عِبَارَة مُؤَدَّبَة" },
+              english: { ko: "exit은 나가는 곳, subway station은 기차 정거장, taxi는 유료 차, excuse me는 정중한 표현", en: "'Exit' is the way out, 'subway station' is a train stop, 'taxi' is a paid car, 'excuse me' is polite", es: "'Exit' es la salida, 'subway station' es parada de tren, 'taxi' es coche de pago, 'excuse me' es educado", id: "'Exit' adalah jalan keluar, 'subway station' adalah perhentian kereta, 'taxi' adalah mobil berbayar, 'excuse me' itu sopan", ar: "'Exit' بَاب الخُرُوج، 'subway station' مَحَطَّة المِتْرُو، 'taxi' سَيَّارَة أُجْرَة، 'excuse me' عِبَارَة مُؤَدَّبَة" },
+              indonesian: { ko: "pintu keluar는 나가는 곳, stasiun kereta bawah tanah는 기차 정거장, taksi는 유료 차, permisi는 정중한 표현", en: "'Pintu keluar' is the way out, 'stasiun kereta bawah tanah' is a train stop, 'taksi' is a paid car, 'permisi' is polite", es: "'Pintu keluar' es la salida, 'stasiun kereta bawah tanah' es parada de tren, 'taksi' es coche de pago, 'permisi' es educado", id: "'Pintu keluar' adalah jalan keluar, 'stasiun kereta bawah tanah' adalah perhentian kereta, 'taksi' adalah mobil berbayar, 'permisi' itu sopan", ar: "'Pintu keluar' بَاب الخُرُوج، 'stasiun kereta bawah tanah' مَحَطَّة المِتْرُو، 'taksi' سَيَّارَة أُجْرَة، 'permisi' عِبَارَة مُؤَدَّبَة" },
             },
           },
           h3: {
@@ -2482,12 +2482,12 @@ const STORIES: Record<string, Story> = {
             en: "exit=way out / subway station=underground train / taxi=car for hire / excuse me=polite attention",
             es: "exit=salida / subway station=tren subterráneo / taxi=coche de alquiler / excuse me=atención educada",
             id: "exit=jalan keluar / subway station=kereta bawah tanah / taxi=mobil sewaan / excuse me=perhatian sopan",
-            ar: "exit=بَاب الخُرُوج / subway station=قَطْر تَحْت الأَرْض / taxi=عَرَبِيَّة بِأُجْرَة / excuse me=طَلَب اِنْتِبَاه بِأَدَب",
+            ar: "exit=بَاب الخُرُوج / subway station=قِطَار تَحْتَ الأَرْض / taxi=سَيَّارَة أُجْرَة / excuse me=طَلَب اِنْتِبَاه بِأَدَب",
             byLearning: {
-              korean: { ko: "출구=나가는 곳 / 지하철역=기차 정거장 / 택시=유료 차 / 실례합니다=정중한 표현", en: "출구=way out / 지하철역=underground train / 택시=car for hire / 실례합니다=polite attention", es: "출구=salida / 지하철역=tren subterráneo / 택시=coche de alquiler / 실례합니다=atención educada", id: "출구=jalan keluar / 지하철역=kereta bawah tanah / 택시=mobil sewaan / 실례합니다=perhatian sopan", ar: "출구=بَاب الخُرُوج / 지하철역=قَطْر تَحْت الأَرْض / 택시=عَرَبِيَّة بِأُجْرَة / 실례합니다=طَلَب اِنْتِبَاه بِأَدَب" },
-              spanish: { ko: "salida=나가는 곳 / estación de metro=기차 정거장 / taxi=유료 차 / disculpe=정중한 표현", en: "salida=way out / estación de metro=underground train / taxi=car for hire / disculpe=polite attention", es: "salida=salida / estación de metro=tren subterráneo / taxi=coche de alquiler / disculpe=atención educada", id: "salida=jalan keluar / estación de metro=kereta bawah tanah / taxi=mobil sewaan / disculpe=perhatian sopan", ar: "salida=بَاب الخُرُوج / estación de metro=قَطْر تَحْت الأَرْض / taxi=عَرَبِيَّة بِأُجْرَة / disculpe=طَلَب اِنْتِبَاه بِأَدَب" },
-              english: { ko: "exit=나가는 곳 / subway station=기차 정거장 / taxi=유료 차 / excuse me=정중한 표현", en: "exit=way out / subway station=underground train / taxi=car for hire / excuse me=polite attention", es: "exit=salida / subway station=tren subterráneo / taxi=coche de alquiler / excuse me=atención educada", id: "exit=jalan keluar / subway station=kereta bawah tanah / taxi=mobil sewaan / excuse me=perhatian sopan", ar: "exit=بَاب الخُرُوج / subway station=قَطْر تَحْت الأَرْض / taxi=عَرَبِيَّة بِأُجْرَة / excuse me=طَلَب اِنْتِبَاه بِأَدَب" },
-              indonesian: { ko: "pintu keluar=나가는 곳 / stasiun kereta bawah tanah=기차 정거장 / taksi=유료 차 / permisi=정중한 표현", en: "pintu keluar=way out / stasiun kereta bawah tanah=underground train / taksi=car for hire / permisi=polite attention", es: "pintu keluar=salida / stasiun kereta bawah tanah=tren subterráneo / taksi=coche de alquiler / permisi=atención educada", id: "pintu keluar=jalan keluar / stasiun kereta bawah tanah=kereta bawah tanah / taksi=mobil sewaan / permisi=perhatian sopan", ar: "pintu keluar=بَاب الخُرُوج / stasiun kereta bawah tanah=قَطْر تَحْت الأَرْض / taksi=عَرَبِيَّة بِأُجْرَة / permisi=طَلَب اِنْتِبَاه بِأَدَب" },
+              korean: { ko: "출구=나가는 곳 / 지하철역=기차 정거장 / 택시=유료 차 / 실례합니다=정중한 표현", en: "출구=way out / 지하철역=underground train / 택시=car for hire / 실례합니다=polite attention", es: "출구=salida / 지하철역=tren subterráneo / 택시=coche de alquiler / 실례합니다=atención educada", id: "출구=jalan keluar / 지하철역=kereta bawah tanah / 택시=mobil sewaan / 실례합니다=perhatian sopan", ar: "출구=بَاب الخُرُوج / 지하철역=قِطَار تَحْتَ الأَرْض / 택시=سَيَّارَة أُجْرَة / 실례합니다=طَلَب اِنْتِبَاه بِأَدَب" },
+              spanish: { ko: "salida=나가는 곳 / estación de metro=기차 정거장 / taxi=유료 차 / disculpe=정중한 표현", en: "salida=way out / estación de metro=underground train / taxi=car for hire / disculpe=polite attention", es: "salida=salida / estación de metro=tren subterráneo / taxi=coche de alquiler / disculpe=atención educada", id: "salida=jalan keluar / estación de metro=kereta bawah tanah / taxi=mobil sewaan / disculpe=perhatian sopan", ar: "salida=بَاب الخُرُوج / estación de metro=قِطَار تَحْتَ الأَرْض / taxi=سَيَّارَة أُجْرَة / disculpe=طَلَب اِنْتِبَاه بِأَدَب" },
+              english: { ko: "exit=나가는 곳 / subway station=기차 정거장 / taxi=유료 차 / excuse me=정중한 표현", en: "exit=way out / subway station=underground train / taxi=car for hire / excuse me=polite attention", es: "exit=salida / subway station=tren subterráneo / taxi=coche de alquiler / excuse me=atención educada", id: "exit=jalan keluar / subway station=kereta bawah tanah / taxi=mobil sewaan / excuse me=perhatian sopan", ar: "exit=بَاب الخُرُوج / subway station=قِطَار تَحْتَ الأَرْض / taxi=سَيَّارَة أُجْرَة / excuse me=طَلَب اِنْتِبَاه بِأَدَب" },
+              indonesian: { ko: "pintu keluar=나가는 곳 / stasiun kereta bawah tanah=기차 정거장 / taksi=유료 차 / permisi=정중한 표현", en: "pintu keluar=way out / stasiun kereta bawah tanah=underground train / taksi=car for hire / permisi=polite attention", es: "pintu keluar=salida / stasiun kereta bawah tanah=tren subterráneo / taksi=coche de alquiler / permisi=atención educada", id: "pintu keluar=jalan keluar / stasiun kereta bawah tanah=kereta bawah tanah / taksi=mobil sewaan / permisi=perhatian sopan", ar: "pintu keluar=بَاب الخُرُوج / stasiun kereta bawah tanah=قِطَار تَحْتَ الأَرْض / taksi=سَيَّارَة أُجْرَة / permisi=طَلَب اِنْتِبَاه بِأَدَب" },
             },
           },
         },
@@ -2557,21 +2557,21 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Where is ___?", "I don't understand"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            prompt: { en: "Minho asks: 'You want to find Sujin, right? How do you ask a taxi driver to go somewhere?'", ko: "민호가 묻는다: '수진 누나 찾으려고? 택시 기사한테 어디 간다고 어떻게 말해?'", es: "Minho pregunta: '¿Quieres encontrar a Sujin, verdad? ¿Cómo le dices a un taxista que te lleve a algún sitio?'", id: "Minho bertanya: 'Mau cari Kak Sujin, kan? Bagaimana kamu minta sopir taksi mengantarmu ke suatu tempat?'", ar: "مِينْهُو بِيِسْأَل: 'عَايِز تِلَاقِي سُوجِين، صَحّ؟ بِتِطْلُب مِنْ سَوَّاق التَّاكْسِي يِوَدِّيك مَكَان إِزَّاي؟'" },
-            context: { en: "Minho: 'In Seoul, you don't just point. You speak. Try it.'", ko: "민호: '서울에서는 가리키기만 하면 안 돼. 말해야 해. 해봐.'", es: "Minho: 'En Seúl, no solo señales. Hablas. Inténtalo.'", id: "Minho: 'Di Seoul, jangan cuma menunjuk. Kamu harus bicara. Coba.'", ar: "مِينْهُو: 'فِي سِيُول، مِش هَتْأَشِّر بِإِيدَك وَبَسّ. لَازِم تِتْكَلِّم. جَرَّب.'" },
-            answer: { en: "Excuse me. Please go to Namsan, please. How much is it?", ko: "실례합니다. 남산으로 가 주세요. 얼마예요?", es: "Disculpe. Lléveme a Namsan, por favor. ¿Cuánto cuesta?", id: "Permisi. Tolong antar ke Namsan. Berapa harganya?", ar: "لَوْ سَمَحْت. وَدِّينِي نَامْسَان مِنْ فَضْلَك. بِكَام؟" },
+            prompt: { en: "Minho asks: 'You want to find Sujin, right? How do you ask a taxi driver to go somewhere?'", ko: "민호가 묻는다: '수진 누나 찾으려고? 택시 기사한테 어디 간다고 어떻게 말해?'", es: "Minho pregunta: '¿Quieres encontrar a Sujin, verdad? ¿Cómo le dices a un taxista que te lleve a algún sitio?'", id: "Minho bertanya: 'Mau cari Kak Sujin, kan? Bagaimana kamu minta sopir taksi mengantarmu ke suatu tempat?'", ar: "مِينْهُو يَسْأَل: 'أَتُرِيد أَنْ تَجِد سُوجِين، صَحِيح؟ كَيْفَ تَطْلُب مِنْ سَائِق التَّاكْسِي أَنْ يُوصِلَكَ إِلَى مَكَان؟'" },
+            context: { en: "Minho: 'In Seoul, you don't just point. You speak. Try it.'", ko: "민호: '서울에서는 가리키기만 하면 안 돼. 말해야 해. 해봐.'", es: "Minho: 'En Seúl, no solo señales. Hablas. Inténtalo.'", id: "Minho: 'Di Seoul, jangan cuma menunjuk. Kamu harus bicara. Coba.'", ar: "مِينْهُو: 'فِي سِيُول، لَنْ تُشِير بِيَدِكَ فَقَط. يَجِب أَنْ تَتَكَلَّم. جَرِّب.'" },
+            answer: { en: "Excuse me. Please go to Namsan, please. How much is it?", ko: "실례합니다. 남산으로 가 주세요. 얼마예요?", es: "Disculpe. Lléveme a Namsan, por favor. ¿Cuánto cuesta?", id: "Permisi. Tolong antar ke Namsan. Berapa harganya?", ar: "لَوْ سَمَحْت. أَوْصِلْنِي إِلَى نَامْسَان مِنْ فَضْلِك. بِكَمْ؟" },
             wrong: [
               { en: "Goodbye! Namsan! Fast! Sorry!", ko: "안녕히 계세요! 남산! 빨리! 죄송합니다!", es: "¡Adiós! ¡Namsan! ¡Rápido! ¡Perdón!", id: "Selamat tinggal! Namsan! Cepat! Maaf!", ar: "مَعَ السَّلَامَة! نَامْسَان! بِسُرْعَة! آسِف!" },
-              { en: "Hello, my name is Rudy. Where is Namsan?", ko: "안녕하세요, 제 이름은 루디예요. 남산이 어디예요?", es: "Hola, me llamo Rudy. ¿Dónde está Namsan?", id: "Halo, nama saya Rudy. Di mana Namsan?", ar: "أَهْلاً، اِسْمِي رُودِي. فِين نَامْسَان؟" },
+              { en: "Hello, my name is Rudy. Where is Namsan?", ko: "안녕하세요, 제 이름은 루디예요. 남산이 어디예요?", es: "Hola, me llamo Rudy. ¿Dónde está Namsan?", id: "Halo, nama saya Rudy. Di mana Namsan?", ar: "مَرْحَبًا، اِسْمِي رُودِي. أَيْنَ نَامْسَان؟" },
             ],
           },
           {
-            prompt: { en: "Minho tests you: 'OK, we arrive. Sujin's building has a code. The guard asks who you are. What do you say?'", ko: "민호가 테스트한다: 'OK, 도착했어. 수진 누나 건물에 비밀번호가 있어. 경비원이 누구냐고 물어. 뭐라고 해?'", es: "Minho te prueba: 'OK, llegamos. El edificio de Sujin tiene código. El guardia pregunta quién eres. ¿Qué dices?'", id: "Minho mengujimu: 'OK, kita sampai. Gedung Kak Sujin punya kode. Penjaga bertanya kamu siapa. Apa jawabanmu?'", ar: "مِينْهُو بِيِخْتَبِرَك: 'طَيِّب، وِصِلْنَا. مَبْنَى سُوجِين عَلِيه كُود. الحَارِس بِيِسْأَلَك إِنْتَ مِين. هَتِقُول إِيه؟'" },
-            context: { en: "Minho: 'The guard speaks zero English. Full Korean mode. Go.'", ko: "민호: '경비 아저씨 영어 하나도 몰라. 풀 한국어 모드. 가.'", es: "Minho: 'El guardia no habla nada de inglés. Modo coreano total. Vamos.'", id: "Minho: 'Pak penjaga tidak bisa bahasa Inggris sama sekali. Mode bahasa Korea penuh. Ayo.'", ar: "مِينْهُو: 'الحَارِس مِبْيِعْرَفْش إِنْجِلِيزِي خَالِص. كُورِي بَحْت. يَلَّا.'" },
-            answer: { en: "Hello. My name is Rudy. I am looking for Sujin. I am her friend.", ko: "안녕하세요. 제 이름은 루디예요. 수진을 찾고 있어요. 친구예요.", es: "Hola. Me llamo Rudy. Busco a Sujin. Soy su amigo.", id: "Halo. Nama saya Rudy. Saya mencari Sujin. Saya temannya.", ar: "أَهْلاً. اِسْمِي رُودِي. بَدَوَّر عَلَى سُوجِين. أَنَا صَاحِبْهَا." },
+            prompt: { en: "Minho tests you: 'OK, we arrive. Sujin's building has a code. The guard asks who you are. What do you say?'", ko: "민호가 테스트한다: 'OK, 도착했어. 수진 누나 건물에 비밀번호가 있어. 경비원이 누구냐고 물어. 뭐라고 해?'", es: "Minho te prueba: 'OK, llegamos. El edificio de Sujin tiene código. El guardia pregunta quién eres. ¿Qué dices?'", id: "Minho mengujimu: 'OK, kita sampai. Gedung Kak Sujin punya kode. Penjaga bertanya kamu siapa. Apa jawabanmu?'", ar: "مِينْهُو يَخْتَبِرُك: 'حَسَنًا، وَصَلْنَا. مَبْنَى سُوجِين عَلَيْهِ رَمْز. الحَارِس يَسْأَلُكَ مَنْ أَنْتَ. مَاذَا سَتَقُول؟'" },
+            context: { en: "Minho: 'The guard speaks zero English. Full Korean mode. Go.'", ko: "민호: '경비 아저씨 영어 하나도 몰라. 풀 한국어 모드. 가.'", es: "Minho: 'El guardia no habla nada de inglés. Modo coreano total. Vamos.'", id: "Minho: 'Pak penjaga tidak bisa bahasa Inggris sama sekali. Mode bahasa Korea penuh. Ayo.'", ar: "مِينْهُو: 'الحَارِس لَا يَعْرِف الإِنْجِلِيزِيَّة إِطْلَاقًا. كُورِيَّة خَالِصَة. هَيَّا.'" },
+            answer: { en: "Hello. My name is Rudy. I am looking for Sujin. I am her friend.", ko: "안녕하세요. 제 이름은 루디예요. 수진을 찾고 있어요. 친구예요.", es: "Hola. Me llamo Rudy. Busco a Sujin. Soy su amigo.", id: "Halo. Nama saya Rudy. Saya mencari Sujin. Saya temannya.", ar: "مَرْحَبًا. اِسْمِي رُودِي. أَبْحَث عَنْ سُوجِين. أَنَا صَدِيقُهَا." },
             wrong: [
-              { en: "Open the door! I need help! Where is the exit?", ko: "문 열어요! 도와주세요! 출구가 어디예요?", es: "¡Abra la puerta! ¡Necesito ayuda! ¿Dónde está la salida?", id: "Buka pintunya! Tolong saya! Di mana pintu keluar?", ar: "اِفْتَح البَاب! سَاعِدْنِي! فِين بَاب الخُرُوج؟" },
-              { en: "Goodbye. Thank you. See you tomorrow.", ko: "안녕히 계세요. 감사합니다. 내일 봐요.", es: "Adiós. Gracias. Hasta mañana.", id: "Selamat tinggal. Terima kasih. Sampai jumpa besok.", ar: "مَعَ السَّلَامَة. شُكْراً. أَشُوفَك بُكْرَة." },
+              { en: "Open the door! I need help! Where is the exit?", ko: "문 열어요! 도와주세요! 출구가 어디예요?", es: "¡Abra la puerta! ¡Necesito ayuda! ¿Dónde está la salida?", id: "Buka pintunya! Tolong saya! Di mana pintu keluar?", ar: "اِفْتَحِ البَاب! سَاعِدْنِي! أَيْنَ بَاب الخُرُوج؟" },
+              { en: "Goodbye. Thank you. See you tomorrow.", ko: "안녕히 계세요. 감사합니다. 내일 봐요.", es: "Adiós. Gracias. Hasta mañana.", id: "Selamat tinggal. Terima kasih. Sampai jumpa besok.", ar: "مَعَ السَّلَامَة. شُكْرًا. أَرَاكَ غَدًا." },
             ],
           },
         ],
@@ -2594,12 +2594,12 @@ const STORIES: Record<string, Story> = {
             en: "Start with Excuse me, place + please go, and How much? / Hello + name + person you seek",
             es: "Empieza con Excuse me, lugar + please go, y How much? / Hello + nombre + a quién buscas",
             id: "Mulai dengan Excuse me, tempat + please go, lalu How much? / Hello + nama + orang yang dicari",
-            ar: "اِبْدَأ بِـ Excuse me، المَكَان + please go، وَبَعْدِين How much? / Hello + الاسْم + الشَّخْص اللِّي بِتْدَوَّر عَلِيه",
+            ar: "اِبْدَأ بِـ Excuse me، المَكَان + please go، ثُمَّ How much? / Hello + الاسْم + الشَّخْص الَّذِي تَبْحَث عَنْه",
             byLearning: {
-              korean: { ko: "실례합니다로 시작, 장소 + 가 주세요, 그리고 얼마예요? / 안녕하세요 + 이름 + 찾는 사람", en: "Start with 실례합니다, place + 가 주세요, and 얼마예요? / 안녕하세요 + name + person you seek", es: "Empieza con 실례합니다, lugar + 가 주세요, y 얼마예요? / 안녕하세요 + nombre + a quién buscas", id: "Mulai dengan 실례합니다, tempat + 가 주세요, lalu 얼마예요? / 안녕하세요 + nama + orang yang dicari", ar: "اِبْدَأ بِـ 실례합니다، المَكَان + 가 주세요، وَبَعْدِين 얼마예요? / 안녕하세요 + الاسْم + الشَّخْص اللِّي بِتْدَوَّر عَلِيه" },
-              spanish: { ko: "Disculpe로 시작, 장소 + por favor, 그리고 ¿Cuánto cuesta? / Hola + 이름 + 찾는 사람", en: "Start with Disculpe, place + por favor, and ¿Cuánto cuesta? / Hola + name + person you seek", es: "Empieza con Disculpe, lugar + por favor, y ¿Cuánto cuesta? / Hola + nombre + a quién buscas", id: "Mulai dengan Disculpe, tempat + por favor, lalu ¿Cuánto cuesta? / Hola + nama + orang yang dicari", ar: "اِبْدَأ بِـ Disculpe، المَكَان + por favor، وَبَعْدِين ¿Cuánto cuesta? / Hola + الاسْم + الشَّخْص اللِّي بِتْدَوَّر عَلِيه" },
+              korean: { ko: "실례합니다로 시작, 장소 + 가 주세요, 그리고 얼마예요? / 안녕하세요 + 이름 + 찾는 사람", en: "Start with 실례합니다, place + 가 주세요, and 얼마예요? / 안녕하세요 + name + person you seek", es: "Empieza con 실례합니다, lugar + 가 주세요, y 얼마예요? / 안녕하세요 + nombre + a quién buscas", id: "Mulai dengan 실례합니다, tempat + 가 주세요, lalu 얼마예요? / 안녕하세요 + nama + orang yang dicari", ar: "اِبْدَأ بِـ 실례합니다، المَكَان + 가 주세요، ثُمَّ 얼마예요? / 안녕하세요 + الاسْم + الشَّخْص الَّذِي تَبْحَث عَنْه" },
+              spanish: { ko: "Disculpe로 시작, 장소 + por favor, 그리고 ¿Cuánto cuesta? / Hola + 이름 + 찾는 사람", en: "Start with Disculpe, place + por favor, and ¿Cuánto cuesta? / Hola + name + person you seek", es: "Empieza con Disculpe, lugar + por favor, y ¿Cuánto cuesta? / Hola + nombre + a quién buscas", id: "Mulai dengan Disculpe, tempat + por favor, lalu ¿Cuánto cuesta? / Hola + nama + orang yang dicari", ar: "اِبْدَأ بِـ Disculpe، المَكَان + por favor، ثُمَّ ¿Cuánto cuesta? / Hola + الاسْم + الشَّخْص الَّذِي تَبْحَث عَنْه" },
               english: { ko: "Excuse me로 시작, 장소 + please go, 그리고 How much? / Hello + 이름 + 찾는 사람", en: "Start with Excuse me, place + please go, and How much? / Hello + name + person you seek", es: "Empieza con Excuse me, lugar + please go, y How much? / Hello + nombre + a quién buscas", id: "Mulai dengan Excuse me, tempat + please go, lalu How much? / Hello + nama + orang yang dicari", ar: "اِبْدَأ بِـ Excuse me، المَكَان + please go، وَبَعْدِين How much? / Hello + الاسْم + الشَّخْص اللِّي بِتْدَوَّر عَلِيه" },
-              indonesian: { ko: "Permisi로 시작, 장소 + tolong antar, 그리고 Berapa harganya? / Halo + 이름 + 찾는 사람", en: "Start with Permisi, place + tolong antar, and Berapa harganya? / Halo + name + person you seek", es: "Empieza con Permisi, lugar + tolong antar, y Berapa harganya? / Halo + nombre + a quién buscas", id: "Mulai dengan Permisi, tempat + tolong antar, lalu Berapa harganya? / Halo + nama + orang yang dicari", ar: "اِبْدَأ بِـ Permisi، المَكَان + tolong antar، وَبَعْدِين Berapa harganya? / Halo + الاسْم + الشَّخْص اللِّي بِتْدَوَّر عَلِيه" },
+              indonesian: { ko: "Permisi로 시작, 장소 + tolong antar, 그리고 Berapa harganya? / Halo + 이름 + 찾는 사람", en: "Start with Permisi, place + tolong antar, and Berapa harganya? / Halo + name + person you seek", es: "Empieza con Permisi, lugar + tolong antar, y Berapa harganya? / Halo + nombre + a quién buscas", id: "Mulai dengan Permisi, tempat + tolong antar, lalu Berapa harganya? / Halo + nama + orang yang dicari", ar: "اِبْدَأ بِـ Permisi، المَكَان + tolong antar، ثُمَّ Berapa harganya? / Halo + الاسْم + الشَّخْص الَّذِي تَبْحَث عَنْه" },
             },
           },
           h3: {
@@ -2607,12 +2607,12 @@ const STORIES: Record<string, Story> = {
             en: "Q1: Excuse me + go to Namsan please + how much / Q2: Hello + name + looking for Sujin + friend",
             es: "P1: Excuse me + go to Namsan please + how much / P2: Hello + nombre + looking for Sujin + friend",
             id: "S1: Excuse me + go to Namsan please + how much / S2: Hello + name + looking for Sujin + friend",
-            ar: "س١: Excuse me + وَدِّينِي نَامْسَان + بِكَام / س٢: Hello + الاسْم + بَدَوَّر عَلَى سُوجِين + صَاحِبْهَا",
+            ar: "س١: Excuse me + أَوْصِلْنِي إِلَى نَامْسَان + بِكَمْ / س٢: Hello + الاسْم + أَبْحَث عَنْ سُوجِين + صَدِيقُهَا",
             byLearning: {
               korean: { ko: "Q1: 실례합니다 + 남산으로 가 주세요 + 얼마예요 / Q2: 안녕하세요 + 이름 + 수진 + 친구", en: "Q1: 실례합니다 + 남산으로 가 주세요 + 얼마예요 / Q2: 안녕하세요 + name + 수진 + 친구", es: "P1: 실례합니다 + 남산 주세요 + 얼마예요 / P2: 안녕하세요 + nombre + 수진 + 친구", id: "S1: 실례합니다 + 남산으로 가 주세요 + 얼마예요 / S2: 안녕하세요 + nama + 수진 + teman", ar: "س١: 실례합니다 + 남산으로 가 주세요 + 얼마예요 / س٢: 안녕하세요 + الاسْم + 수진 + صَاحِبْهَا" },
-              spanish: { ko: "Q1: Disculpe + Namsan por favor + cuánto / Q2: Hola + 이름 + Sujin + amigo", en: "Q1: Disculpe + Namsan por favor + cuánto / Q2: Hola + name + Sujin + amigo", es: "P1: Disculpe + Namsan por favor + cuánto / P2: Hola + nombre + busco Sujin + amigo", id: "S1: Disculpe + Namsan por favor + cuánto / S2: Hola + nama + Sujin + teman", ar: "س١: Disculpe + نَامْسَان مِنْ فَضْلَك + بِكَام / س٢: Hola + الاسْم + سُوجِين + صَاحِبْهَا" },
-              english: { ko: "Q1: Excuse me + go to Namsan please + how much / Q2: Hello + 이름 + looking for Sujin + friend", en: "Q1: Excuse me + go to Namsan please + how much / Q2: Hello + name + looking for Sujin + friend", es: "P1: Excuse me + go to Namsan please + how much / P2: Hello + nombre + looking for Sujin + friend", id: "S1: Excuse me + go to Namsan please + how much / S2: Hello + nama + looking for Sujin + friend", ar: "س١: Excuse me + وَدِّينِي نَامْسَان + بِكَام / س٢: Hello + الاسْم + بَدَوَّر عَلَى سُوجِين + صَاحِبْهَا" },
-              indonesian: { ko: "Q1: Permisi + tolong antar ke Namsan + berapa harganya / Q2: Halo + 이름 + mencari Sujin + teman", en: "Q1: Permisi + tolong antar ke Namsan + berapa harganya / Q2: Halo + name + mencari Sujin + teman", es: "P1: Permisi + tolong antar ke Namsan + berapa harganya / P2: Halo + nombre + mencari Sujin + teman", id: "S1: Permisi + tolong antar ke Namsan + berapa harganya / S2: Halo + nama + mencari Sujin + teman", ar: "س١: Permisi + وَدِّينِي نَامْسَان + بِكَام / س٢: Halo + الاسْم + بَدَوَّر عَلَى سُوجِين + صَاحِبْهَا" },
+              spanish: { ko: "Q1: Disculpe + Namsan por favor + cuánto / Q2: Hola + 이름 + Sujin + amigo", en: "Q1: Disculpe + Namsan por favor + cuánto / Q2: Hola + name + Sujin + amigo", es: "P1: Disculpe + Namsan por favor + cuánto / P2: Hola + nombre + busco Sujin + amigo", id: "S1: Disculpe + Namsan por favor + cuánto / S2: Hola + nama + Sujin + teman", ar: "س١: Disculpe + نَامْسَان مِنْ فَضْلِك + بِكَمْ / س٢: Hola + الاسْم + سُوجِين + صَدِيقُهَا" },
+              english: { ko: "Q1: Excuse me + go to Namsan please + how much / Q2: Hello + 이름 + looking for Sujin + friend", en: "Q1: Excuse me + go to Namsan please + how much / Q2: Hello + name + looking for Sujin + friend", es: "P1: Excuse me + go to Namsan please + how much / P2: Hello + nombre + looking for Sujin + friend", id: "S1: Excuse me + go to Namsan please + how much / S2: Hello + nama + looking for Sujin + friend", ar: "س١: Excuse me + أَوْصِلْنِي إِلَى نَامْسَان + بِكَمْ / س٢: Hello + الاسْم + أَبْحَث عَنْ سُوجِين + صَدِيقُهَا" },
+              indonesian: { ko: "Q1: Permisi + tolong antar ke Namsan + berapa harganya / Q2: Halo + 이름 + mencari Sujin + teman", en: "Q1: Permisi + tolong antar ke Namsan + berapa harganya / Q2: Halo + name + mencari Sujin + teman", es: "P1: Permisi + tolong antar ke Namsan + berapa harganya / P2: Halo + nombre + mencari Sujin + teman", id: "S1: Permisi + tolong antar ke Namsan + berapa harganya / S2: Halo + nama + mencari Sujin + teman", ar: "س١: Permisi + أَوْصِلْنِي إِلَى نَامْسَان + بِكَمْ / س٢: Halo + الاسْم + أَبْحَث عَنْ سُوجِين + صَدِيقُهَا" },
             },
           },
         },
@@ -2718,11 +2718,11 @@ const STORIES: Record<string, Story> = {
         storyConsequence: "Grandma Youngsook is impressed and offers to help.",
         onFail: { addToWeakExpressions: ["Excuse me", "Where is the subway?"], reviewInDailyCourse: true, reviewDays: 3 },
         title: { en: "Survive the Airport and Market", ko: "공항과 시장에서 살아남기", es: "Sobrevivir en el Aeropuerto y el Mercado", id: "Bertahan Hidup di Bandara dan Pasar", ar: "اِنْجُو مِنِ المَطَار وَالسُّوق" },
-        context: { en: "Phone is dead. No translator. Speak Korean to survive — Youngsook is watching!", ko: "전화가 꺼졌어요. 번역기도 없어요. 살아남으려면 한국어로 말하세요 — 영숙 할머니가 보고 있어요!", es: "El teléfono está muerto. Sin traductor. ¡Habla coreano para sobrevivir — la Abuela Youngsook está mirando!", id: "Ponsel mati. Tidak ada penerjemah. Bicaralah bahasa Korea untuk bertahan — Nenek Youngsook sedang mengawasi!", ar: "المُوبَايْل فَصَل. مَفِيش مُتَرْجِم. اِتْكَلِّم كُورِي عَشَان تِعِيش — تِيتَة يُونْغْسُوك بِتِتْفَرَّج عَلِيك!" },
+        context: { en: "Phone is dead. No translator. Speak Korean to survive — Youngsook is watching!", ko: "전화가 꺼졌어요. 번역기도 없어요. 살아남으려면 한국어로 말하세요 — 영숙 할머니가 보고 있어요!", es: "El teléfono está muerto. Sin traductor. ¡Habla coreano para sobrevivir — la Abuela Youngsook está mirando!", id: "Ponsel mati. Tidak ada penerjemah. Bicaralah bahasa Korea untuk bertahan — Nenek Youngsook sedang mengawasi!", ar: "الهَاتِف مُغْلَق. لَا يُوجَد مُتَرْجِم. تَكَلَّم بِالكُورِيَّة كَيْ تَنْجُو — الجَدَّة يُونْغْسُوك تُرَاقِبُك!" },
         questions: [
-          { word: { en: "Excuse me. Do you speak English?", ko: "실례합니다. 영어 할 줄 아세요?", es: "Disculpe. ¿Habla inglés?", id: "Permisi. Apakah Anda bisa bahasa Inggris?", ar: "لَوْ سَمَحْت. بِتِتْكَلِّم إِنْجِلِيزِي؟" }, hint: { en: "First check if they speak English", ko: "먼저 영어를 할 줄 아는지 확인하세요", es: "Primero verifica si hablan inglés", id: "Pertama periksa apakah mereka bisa bahasa Inggris", ar: "الأَوِّل اِتْأَكِّد لَوْ بِيِتْكَلِّمُوا إِنْجِلِيزِي" }, acceptableAnswers: ["excuse me do you speak english", "do you speak english", "excuse me. do you speak english"] },
+          { word: { en: "Excuse me. Do you speak English?", ko: "실례합니다. 영어 할 줄 아세요?", es: "Disculpe. ¿Habla inglés?", id: "Permisi. Apakah Anda bisa bahasa Inggris?", ar: "لَوْ سَمَحْت. هَلْ تَتَكَلَّم الإِنْجِلِيزِيَّة؟" }, hint: { en: "First check if they speak English", ko: "먼저 영어를 할 줄 아는지 확인하세요", es: "Primero verifica si hablan inglés", id: "Pertama periksa apakah mereka bisa bahasa Inggris", ar: "أَوَّلًا تَأَكَّد إِنْ كَانُوا يَتَكَلَّمُونَ الإِنْجِلِيزِيَّة" }, acceptableAnswers: ["excuse me do you speak english", "do you speak english", "excuse me. do you speak english"] },
           { word: { en: "This is delicious. Thank you!", ko: "이거 맛있어요. 감사합니다!", es: "¡Esto está delicioso! ¡Gracias!", id: "Ini lezat. Terima kasih!", ar: "ده لَذِيذ. شُكْراً!" }, hint: { en: "Compliment Youngsook's cooking", ko: "영숙 할머니의 요리를 칭찬하세요", es: "Elogia la cocina de Youngsook", id: "Pujilah masakan Nenek Youngsook", ar: "اِمْدَح أَكْل تِيتَة يُونْغْسُوك" }, acceptableAnswers: ["this is delicious thank you", "delicious thank you", "this is delicious thanks"] },
-          { word: { en: "Where is the subway?", ko: "지하철이 어디예요?", es: "¿Dónde está el metro?", id: "Di mana kereta bawah tanahnya?", ar: "فِين المِتْرُو؟" }, hint: { en: "Find your way to Namsan", ko: "남산으로 가는 길을 찾으세요", es: "Encuentra tu camino a Namsan", id: "Temukan jalanmu ke Namsan", ar: "لَاقِي طَرِيقَك لِنَامْسَان" }, acceptableAnswers: ["where is the subway", "where's the subway", "where is the subway station"] },
+          { word: { en: "Where is the subway?", ko: "지하철이 어디예요?", es: "¿Dónde está el metro?", id: "Di mana kereta bawah tanahnya?", ar: "أَيْنَ المِتْرُو؟" }, hint: { en: "Find your way to Namsan", ko: "남산으로 가는 길을 찾으세요", es: "Encuentra tu camino a Namsan", id: "Temukan jalanmu ke Namsan", ar: "جِد طَرِيقَك إِلَى نَامْسَان" }, acceptableAnswers: ["where is the subway", "where's the subway", "where is the subway station"] },
         ],
       },
       // ── Scene 4: Meeting Sujin ─────────────────────────────────────────────
@@ -2792,14 +2792,14 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["I need to go to ___", "Is it far?"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            instruction: { en: "Arrange the words to form the directions to the Guardian Stone inside Namsan Tower:", ko: "단어를 배열해서 남산타워 안 수호석으로 가는 길을 만드세요:", es: "Ordena las palabras para formar las direcciones a la Piedra Guardiana dentro de la Torre Namsan:", id: "Susun kata-kata untuk membentuk arah menuju Batu Penjaga di dalam Menara Namsan:", ar: "رَتِّب الكَلِمَات عَشَان تِكَوِّن الطَّرِيق لِحَجَر الحِرَاسَة جُوَّه بُرْج نَامْسَان:" },
+            instruction: { en: "Arrange the words to form the directions to the Guardian Stone inside Namsan Tower:", ko: "단어를 배열해서 남산타워 안 수호석으로 가는 길을 만드세요:", es: "Ordena las palabras para formar las direcciones a la Piedra Guardiana dentro de la Torre Namsan:", id: "Susun kata-kata untuk membentuk arah menuju Batu Penjaga di dalam Menara Namsan:", ar: "رَتِّب الكَلِمَات كَيْ تُكَوِّن الطَّرِيق إِلَى حَجَر الحِرَاسَة دَاخِل بُرْج نَامْسَان:" },
             words: [
               { en: "Excuse me", ko: "실례합니다", es: "Disculpe", id: "permisi", ar: "لَوْ سَمَحْت" },
-              { en: "where is", ko: "어디에", es: "dónde está", id: "di mana", ar: "فِين" },
+              { en: "where is", ko: "어디에", es: "dónde está", id: "di mana", ar: "أَيْنَ" },
               { en: "the old", ko: "오래된", es: "la vieja", id: "yang tua", ar: "القَدِيم" },
               { en: "door", ko: "문이", es: "puerta", id: "pintu", ar: "البَاب" },
-              { en: "turn left", ko: "왼쪽으로", es: "gire a", id: "belok", ar: "خُشّ شِمَال" },
-              { en: "please", ko: "주세요", es: "la izquierda", id: "kiri tolong", ar: "مِنْ فَضْلَك" },
+              { en: "turn left", ko: "왼쪽으로", es: "gire a", id: "belok", ar: "اِنْعَطِف يَسَارًا" },
+              { en: "please", ko: "주세요", es: "la izquierda", id: "kiri tolong", ar: "مِنْ فَضْلِك" },
             ],
             answerOrder: [0, 1, 2, 3, 4, 5],
           },
@@ -2810,12 +2810,12 @@ const STORIES: Record<string, Story> = {
             en: "The sentence starts with 'Excuse me' — the first thing you say when asking for directions",
             es: "La frase empieza con 'Excuse me' — lo primero que dices al pedir direcciones",
             id: "Kalimat dimulai dengan 'Excuse me' — hal pertama yang kamu ucapkan saat menanyakan arah",
-            ar: "الجُمْلَة بِتِبْدَأ بِـ 'Excuse me' — أَوِّل حَاجَة بِتْقُولْهَا لَمَّا تِسْأَل عَنِ الطَّرِيق",
+            ar: "الجُمْلَة تَبْدَأ بِـ 'Excuse me' — أَوَّل شَيْء تَقُولُه عِنْدَمَا تَسْأَل عَنِ الطَّرِيق",
             byLearning: {
-              spanish: { ko: "문장은 'Disculpe'로 시작해", en: "The sentence starts with 'Disculpe'", es: "La frase empieza con 'Disculpe'", id: "Kalimat dimulai dengan 'Disculpe'", ar: "الجُمْلَة بِتِبْدَأ بِـ 'Disculpe'" },
-              korean:  { ko: "문장은 '실례합니다'로 시작해", en: "The sentence starts with '실례합니다'", es: "La frase empieza con '실례합니다'", id: "Kalimat dimulai dengan '실례합니다'", ar: "الجُمْلَة بِتِبْدَأ بِـ '실례합니다'" },
-              english: { ko: "문장은 'Excuse me'로 시작해", en: "The sentence starts with 'Excuse me'", es: "La frase empieza con 'Excuse me'", id: "Kalimat dimulai dengan 'Excuse me'", ar: "الجُمْلَة بِتِبْدَأ بِـ 'Excuse me'" },
-              indonesian: { ko: "문장은 'Permisi'로 시작해", en: "The sentence starts with 'Permisi'", es: "La frase empieza con 'Permisi'", id: "Kalimat dimulai dengan 'Permisi'", ar: "الجُمْلَة بِتِبْدَأ بِـ 'Permisi'" },
+              spanish: { ko: "문장은 'Disculpe'로 시작해", en: "The sentence starts with 'Disculpe'", es: "La frase empieza con 'Disculpe'", id: "Kalimat dimulai dengan 'Disculpe'", ar: "الجُمْلَة تَبْدَأ بِـ 'Disculpe'" },
+              korean:  { ko: "문장은 '실례합니다'로 시작해", en: "The sentence starts with '실례합니다'", es: "La frase empieza con '실례합니다'", id: "Kalimat dimulai dengan '실례합니다'", ar: "الجُمْلَة تَبْدَأ بِـ '실례합니다'" },
+              english: { ko: "문장은 'Excuse me'로 시작해", en: "The sentence starts with 'Excuse me'", es: "La frase empieza con 'Excuse me'", id: "Kalimat dimulai dengan 'Excuse me'", ar: "الجُمْلَة تَبْدَأ بِـ 'Excuse me'" },
+              indonesian: { ko: "문장은 'Permisi'로 시작해", en: "The sentence starts with 'Permisi'", es: "La frase empieza con 'Permisi'", id: "Kalimat dimulai dengan 'Permisi'", ar: "الجُمْلَة تَبْدَأ بِـ 'Permisi'" },
             },
           },
           h2: {
@@ -2823,12 +2823,12 @@ const STORIES: Record<string, Story> = {
             en: "First ask for the place (where is the old door), then give the direction (turn left please)",
             es: "Primero pregunta por el lugar (where is the old door), luego la dirección (turn left please)",
             id: "Pertama tanyakan tempatnya (where is the old door), lalu beri arahnya (turn left please)",
-            ar: "الأَوِّل اِسْأَل عَنِ المَكَان (where is the old door)، وَبَعْدِين قُول الاِتِّجَاه (turn left please)",
+            ar: "أَوَّلًا اِسْأَل عَنِ المَكَان (where is the old door)، ثُمَّ قُلِ الاِتِّجَاه (turn left please)",
             byLearning: {
-              spanish: { ko: "먼저 장소를 물어 (dónde está la vieja puerta), 그다음 방향 (gire a la izquierda)", en: "First the place (dónde está la vieja puerta), then direction (gire a la izquierda)", es: "Primero el lugar (dónde está la vieja puerta), luego dirección (gire a la izquierda)", id: "Pertama tanyakan tempatnya (dónde está la vieja puerta), lalu arahnya (gire a la izquierda)", ar: "الأَوِّل اِسْأَل عَنِ المَكَان (dónde está la vieja puerta)، وَبَعْدِين الاِتِّجَاه (gire a la izquierda)" },
-              korean:  { ko: "먼저 장소를 물어 (오래된 문이 어디에), 그다음 방향 (왼쪽으로 주세요)", en: "First the place (오래된 문이 어디에), then direction (왼쪽으로 주세요)", es: "Primero el lugar (오래된 문이 어디에), luego dirección (왼쪽으로 주세요)", id: "Pertama tanyakan tempatnya (오래된 문이 어디에), lalu arahnya (왼쪽으로 주세요)", ar: "الأَوِّل اِسْأَل عَنِ المَكَان (오래된 문이 어디에)، وَبَعْدِين الاِتِّجَاه (왼쪽으로 주세요)" },
-              english: { ko: "먼저 장소를 물어 (where is the old door), 그다음 방향 (turn left please)", en: "First the place (where is the old door), then direction (turn left please)", es: "Primero el lugar (where is the old door), luego dirección (turn left please)", id: "Pertama tanyakan tempatnya (where is the old door), lalu arahnya (turn left please)", ar: "الأَوِّل اِسْأَل عَنِ المَكَان (where is the old door)، وَبَعْدِين الاِتِّجَاه (turn left please)" },
-              indonesian: { ko: "먼저 장소를 물어 (di mana pintu yang tua), 그다음 방향 (belok kiri tolong)", en: "First the place (di mana pintu yang tua), then direction (belok kiri tolong)", es: "Primero el lugar (di mana pintu yang tua), luego dirección (belok kiri tolong)", id: "Pertama tanyakan tempatnya (di mana pintu yang tua), lalu arahnya (belok kiri tolong)", ar: "الأَوِّل اِسْأَل عَنِ المَكَان (di mana pintu yang tua)، وَبَعْدِين الاِتِّجَاه (belok kiri tolong)" },
+              spanish: { ko: "먼저 장소를 물어 (dónde está la vieja puerta), 그다음 방향 (gire a la izquierda)", en: "First the place (dónde está la vieja puerta), then direction (gire a la izquierda)", es: "Primero el lugar (dónde está la vieja puerta), luego dirección (gire a la izquierda)", id: "Pertama tanyakan tempatnya (dónde está la vieja puerta), lalu arahnya (gire a la izquierda)", ar: "أَوَّلًا اِسْأَل عَنِ المَكَان (dónde está la vieja puerta)، ثُمَّ الاِتِّجَاه (gire a la izquierda)" },
+              korean:  { ko: "먼저 장소를 물어 (오래된 문이 어디에), 그다음 방향 (왼쪽으로 주세요)", en: "First the place (오래된 문이 어디에), then direction (왼쪽으로 주세요)", es: "Primero el lugar (오래된 문이 어디에), luego dirección (왼쪽으로 주세요)", id: "Pertama tanyakan tempatnya (오래된 문이 어디에), lalu arahnya (왼쪽으로 주세요)", ar: "أَوَّلًا اِسْأَل عَنِ المَكَان (오래된 문이 어디에)، ثُمَّ الاِتِّجَاه (왼쪽으로 주세요)" },
+              english: { ko: "먼저 장소를 물어 (where is the old door), 그다음 방향 (turn left please)", en: "First the place (where is the old door), then direction (turn left please)", es: "Primero el lugar (where is the old door), luego dirección (turn left please)", id: "Pertama tanyakan tempatnya (where is the old door), lalu arahnya (turn left please)", ar: "أَوَّلًا اِسْأَل عَنِ المَكَان (where is the old door)، ثُمَّ الاِتِّجَاه (turn left please)" },
+              indonesian: { ko: "먼저 장소를 물어 (di mana pintu yang tua), 그다음 방향 (belok kiri tolong)", en: "First the place (di mana pintu yang tua), then direction (belok kiri tolong)", es: "Primero el lugar (di mana pintu yang tua), luego dirección (belok kiri tolong)", id: "Pertama tanyakan tempatnya (di mana pintu yang tua), lalu arahnya (belok kiri tolong)", ar: "أَوَّلًا اِسْأَل عَنِ المَكَان (di mana pintu yang tua)، ثُمَّ الاِتِّجَاه (belok kiri tolong)" },
             },
           },
           h3: {
@@ -2911,7 +2911,7 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Where is ___?", "Excuse me"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            prompt: { en: "Mr. Black's note is in Korean only. Which line reveals where he is going next?", ko: "미스터 블랙의 메모가 한국어로만 되어 있어. 어느 줄이 다음 행선지를 알려줄까?", es: "La nota de Mr. Black está solo en coreano. ¿Qué línea revela adónde va después?", id: "Catatan Mr. Black hanya berbahasa Korea. Baris mana yang mengungkap ke mana ia pergi berikutnya?", ar: "وَرَقِة مِسْتَر بْلَاك مَكْتُوبَة بِالكُورِي بَسّ. أَنْهِي سَطْر بِيِكْشِف هَيْرُوح فِين بَعْد كِدَه؟" },
+            prompt: { en: "Mr. Black's note is in Korean only. Which line reveals where he is going next?", ko: "미스터 블랙의 메모가 한국어로만 되어 있어. 어느 줄이 다음 행선지를 알려줄까?", es: "La nota de Mr. Black está solo en coreano. ¿Qué línea revela adónde va después?", id: "Catatan Mr. Black hanya berbahasa Korea. Baris mana yang mengungkap ke mana ia pergi berikutnya?", ar: "وَرَقَة مِسْتَر بْلَاك مَكْتُوبَة بِالكُورِيَّة فَقَط. أَيُّ سَطْر يَكْشِف إِلَى أَيْنَ سَيَذْهَب بَعْدَ ذٰلِك؟" },
             clues: [
               { en: "'감사합니다, 탐정' — 'Thank you, detective'", ko: "'감사합니다, 탐정' — 감사 인사", es: "'감사합니다, 탐정' — 'Gracias, detective'", id: "'감사합니다, 탐정' — ucapan terima kasih", ar: "'감사합니다, 탐정' — كِلْمِة شُكْر" },
               { en: "'잘했어요. 다음은 카이로예요.' — 'Well done. Next is Cairo.'", ko: "'잘했어요. 다음은 카이로예요.' — 다음 목적지", es: "'잘했어요. 다음은 카이로예요.' — 'Bien hecho. El siguiente es El Cairo.'", id: "'잘했어요. 다음은 카이로예요.' — tujuan berikutnya", ar: "'잘했어요. 다음은 카이로예요.' — الوِجْهَة الجَّايَّة" },
@@ -2922,9 +2922,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "어느 줄에 장소 이름이 있는지 찾아봐 — 미스터 블랙은 항상 다음 목적지를 남겨", en: "Look for which line contains a place name — Mr. Black always leaves his next destination", es: "Busca qué línea contiene un nombre de lugar — Mr. Black siempre deja su próximo destino", id: "Cari baris mana yang memuat nama tempat — Mr. Black selalu meninggalkan tujuan berikutnya", ar: "دَوَّر عَلَى السَّطْر اللِّي فِيه اِسْم مَكَان — مِسْتَر بْلَاك دَايْماً بِيِسِيب وِجْهِتُه الجَّايَّة" },
-          h2: { ko: "카이로는 도시 이름이야 — 그 단어가 포함된 줄이 다음 행선지야", en: "Cairo is a city name — the line containing that word reveals the next destination", es: "El Cairo es el nombre de una ciudad — la línea que contiene esa palabra revela el próximo destino", id: "Kairo adalah nama kota — baris yang memuat kata itu mengungkap tujuan berikutnya", ar: "القَاهْرَة اِسْم مَدِينَة — السَّطْر اللِّي فِيه الكِلْمَة دِي بِيِكْشِف الوِجْهَة الجَّايَّة" },
-          h3: { ko: "'잘했어요. 다음은 카이로예요.' — 잘했어요=well done, 다음=next, 카이로=Cairo", en: "'잘했어요. 다음은 카이로예요.' — 잘했어요=well done, 다음=next, 카이로=Cairo", es: "'잘했어요. 다음은 카이로예요.' — 잘했어요=bien hecho, 다음=siguiente, 카이로=El Cairo", id: "'잘했어요. 다음은 카이로예요.' — 잘했어요=bagus sekali, 다음=berikutnya, 카이로=Kairo", ar: "'잘했어요. 다음은 카이로예요.' — 잘했어요=أَحْسَنْت، 다음=اللِّي بَعْدُه، 카이로=القَاهْرَة" },
+          h1: { ko: "어느 줄에 장소 이름이 있는지 찾아봐 — 미스터 블랙은 항상 다음 목적지를 남겨", en: "Look for which line contains a place name — Mr. Black always leaves his next destination", es: "Busca qué línea contiene un nombre de lugar — Mr. Black siempre deja su próximo destino", id: "Cari baris mana yang memuat nama tempat — Mr. Black selalu meninggalkan tujuan berikutnya", ar: "اِبْحَثْ عَنِ السَّطْر الَّذِي فِيهِ اِسْم مَكَان — مِسْتَر بْلَاك دَائِمًا يَتْرُك وِجْهَتَهُ القَادِمَة" },
+          h2: { ko: "카이로는 도시 이름이야 — 그 단어가 포함된 줄이 다음 행선지야", en: "Cairo is a city name — the line containing that word reveals the next destination", es: "El Cairo es el nombre de una ciudad — la línea que contiene esa palabra revela el próximo destino", id: "Kairo adalah nama kota — baris yang memuat kata itu mengungkap tujuan berikutnya", ar: "القَاهِرَة اِسْم مَدِينَة — السَّطْر الَّذِي فِيهِ هٰذِهِ الكَلِمَة يَكْشِف الوِجْهَة القَادِمَة" },
+          h3: { ko: "'잘했어요. 다음은 카이로예요.' — 잘했어요=well done, 다음=next, 카이로=Cairo", en: "'잘했어요. 다음은 카이로예요.' — 잘했어요=well done, 다음=next, 카이로=Cairo", es: "'잘했어요. 다음은 카이로예요.' — 잘했어요=bien hecho, 다음=siguiente, 카이로=El Cairo", id: "'잘했어요. 다음은 카이로예요.' — 잘했어요=bagus sekali, 다음=berikutnya, 카이로=Kairo", ar: "'잘했어요. 다음은 카이로예요.' — 잘했어요=أَحْسَنْت، 다음=التَّالِي، 카이로=القَاهِرَة" },
         },
       },
       // ── Scene 6: The Emotional Payoff — Reading Korean ─────────────────────
@@ -3101,7 +3101,7 @@ const STORIES: Record<string, Story> = {
         questions: [
           {
             word: { en: "map", ko: "지도", es: "mapa", id: "peta", ar: "خَرِيطَة" },
-            meaning: { en: "a drawing that shows roads and places", ko: "길과 장소를 보여주는 그림", es: "un dibujo que muestra calles y lugares", id: "gambar yang menunjukkan jalan dan tempat", ar: "رَسْمَة بِتْوَرِّي الشَّوَارِع وَالأَمَاكِن" },
+            meaning: { en: "a drawing that shows roads and places", ko: "길과 장소를 보여주는 그림", es: "un dibujo que muestra calles y lugares", id: "gambar yang menunjukkan jalan dan tempat", ar: "رَسْمَة تُظْهِر الشَّوَارِع وَالأَمَاكِن" },
             wrong: [
               { en: "a type of food", ko: "음식 종류", es: "un tipo de comida", id: "sejenis makanan", ar: "نُوع مِنِ الأَكْل" },
               { en: "a musical instrument", ko: "악기", es: "un instrumento musical", id: "alat musik", ar: "آلَة مُوسِيقِيَّة" },
@@ -3110,7 +3110,7 @@ const STORIES: Record<string, Story> = {
           },
           {
             word: { en: "key", ko: "열쇠", es: "llave", id: "kunci", ar: "مُفْتَاح" },
-            meaning: { en: "a small object used to open a lock", ko: "잠금장치를 여는 작은 물건", es: "un pequeño objeto para abrir una cerradura", id: "benda kecil untuk membuka gembok", ar: "حَاجَة صُغَيَّرَة بِتِفْتَح بِيهَا القُفْل" },
+            meaning: { en: "a small object used to open a lock", ko: "잠금장치를 여는 작은 물건", es: "un pequeño objeto para abrir una cerradura", id: "benda kecil untuk membuka gembok", ar: "شَيْء صَغِير تَفْتَح بِهِ القُفْل" },
             wrong: [
               { en: "a secret document", ko: "비밀 문서", es: "un documento secreto", id: "dokumen rahasia", ar: "وَرَقَة سِرِّيَّة" },
               { en: "a type of weather", ko: "날씨 종류", es: "un tipo de clima", id: "sejenis cuaca", ar: "نُوع مِنِ الجَوّ" },
@@ -3118,8 +3118,8 @@ const STORIES: Record<string, Story> = {
             ],
           },
           {
-            word: { en: "water", ko: "물", es: "agua", id: "air", ar: "مَيَّة" },
-            meaning: { en: "a clear liquid you drink", ko: "마시는 투명한 액체", es: "un líquido claro que bebes", id: "cairan bening yang kamu minum", ar: "سَائِل شَفَّاف بِتِشْرَبُه" },
+            word: { en: "water", ko: "물", es: "agua", id: "air", ar: "مَاء" },
+            meaning: { en: "a clear liquid you drink", ko: "마시는 투명한 액체", es: "un líquido claro que bebes", id: "cairan bening yang kamu minum", ar: "سَائِل شَفَّاف تَشْرَبُه" },
             wrong: [
               { en: "a type of stone", ko: "돌의 종류", es: "un tipo de piedra", id: "sejenis batu", ar: "نُوع مِنِ الحَجَر" },
               { en: "a city district", ko: "도시 구역", es: "un distrito de la ciudad", id: "sebuah distrik kota", ar: "حِتَّة فِي المَدِينَة" },
@@ -3128,9 +3128,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "이 세 단어는 기초 단어야 — 일상에서 가장 자주 쓰이는 것들", en: "These three words are basics — the most frequently used in everyday life", es: "Estas tres palabras son básicas — las más usadas en la vida cotidiana", id: "Tiga kata ini adalah kata dasar — yang paling sering dipakai sehari-hari", ar: "التَّلَات كَلِمَات دُول أَسَاسِيَّة — مِنْ أَكْتَر حَاجَات بِتِتْقَال فِي اليُوم" },
-          h2: { ko: "루디가 이미 배웠어: 지도는 길 찾기, 열쇠는 잠금/열기, 물은 마시기", en: "Rudy already learned these: map for navigation, key for locks, water for drinking", es: "Rudy ya aprendió: mapa para navegar, llave para cerraduras, agua para beber", id: "Rudy sudah mempelajarinya: peta untuk mencari arah, kunci untuk gembok, air untuk diminum", ar: "رُودِي اِتْعَلِّمْهُم خَلَاص: الخَرِيطَة عَشَان الطَّرِيق، وَالمُفْتَاح عَشَان القُفْل، وَالمَيَّة عَشَان الشُّرْب" },
-          h3: { ko: "영어: map / key / water — 스페인어: mapa / llave / agua — 한국어: 지도 / 열쇠 / 물", en: "English: map / key / water — Spanish: mapa / llave / agua — Korean: 지도 / 열쇠 / 물", es: "Inglés: map / key / water — Español: mapa / llave / agua — Coreano: 지도 / 열쇠 / 물", id: "Inggris: map / key / water — Spanyol: mapa / llave / agua — Korea: 지도 / 열쇠 / 물", ar: "إِنْجِلِيزِي: map / key / water — مَصْرِي: خَرِيطَة / مُفْتَاح / مَيَّة" },
+          h1: { ko: "이 세 단어는 기초 단어야 — 일상에서 가장 자주 쓰이는 것들", en: "These three words are basics — the most frequently used in everyday life", es: "Estas tres palabras son básicas — las más usadas en la vida cotidiana", id: "Tiga kata ini adalah kata dasar — yang paling sering dipakai sehari-hari", ar: "هٰذِهِ الكَلِمَات الثَّلَاث أَسَاسِيَّة — مِنْ أَكْثَر الأَشْيَاء الَّتِي تُقَال فِي اليَوْم" },
+          h2: { ko: "루디가 이미 배웠어: 지도는 길 찾기, 열쇠는 잠금/열기, 물은 마시기", en: "Rudy already learned these: map for navigation, key for locks, water for drinking", es: "Rudy ya aprendió: mapa para navegar, llave para cerraduras, agua para beber", id: "Rudy sudah mempelajarinya: peta untuk mencari arah, kunci untuk gembok, air untuk diminum", ar: "رُودِي تَعَلَّمَهَا بِالفِعْل: الخَرِيطَة لِلطَّرِيق، وَالمِفْتَاح لِلقُفْل، وَالمَاء لِلشُّرْب" },
+          h3: { ko: "영어: map / key / water — 스페인어: mapa / llave / agua — 한국어: 지도 / 열쇠 / 물", en: "English: map / key / water — Spanish: mapa / llave / agua — Korean: 지도 / 열쇠 / 물", es: "Inglés: map / key / water — Español: mapa / llave / agua — Coreano: 지도 / 열쇠 / 물", id: "Inggris: map / key / water — Spanyol: mapa / llave / agua — Korea: 지도 / 열쇠 / 물", ar: "إِنْجِلِيزِي: map / key / water — عَرَبِي: خَرِيطَة / مِفْتَاح / مَاء" },
         },
       },
       {
@@ -3168,27 +3168,27 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["I need help", "Be careful"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            prompt: { en: "Hassan keeps mixing clues with sales pitches. How do you get him to focus?", ko: "하산이 단서와 판매 권유를 계속 섞고 있어. 어떻게 집중하게 해?", es: "Hassan mezcla pistas con ventas. ¿Cómo lo concentras?", id: "Hassan terus mencampur petunjuk dengan rayuan dagang. Bagaimana kamu membuatnya fokus?", ar: "حَسَن فَضِل يِخْلَط بِين الأَدِلَّة وَكَلَام البِيع. تِخَلِّيه يِرَكِّز إِزَّاي؟" },
-            context: { en: "Hassan: 'The man in black, very serious, very pale, he bought nothing! Can you believe? Not even a small carpet. Then he asked me: where is the stone that does not move? Very strange question.'", ko: "하산: '검은 남자, 아주 심각하고, 아주 창백해, 아무것도 안 샀어요! 믿을 수 있어요? 작은 카펫도 아니고. 그러더니 물어보더라고요: 움직이지 않는 돌이 어디 있냐고? 아주 이상한 질문.'", es: "Hassan: 'El hombre de negro, muy serio, muy pálido, ¡no compró nada! ¿Puedes creerlo? Ni siquiera una pequeña alfombra. Luego me preguntó: ¿dónde está la piedra que no se mueve? Pregunta muy extraña.'", id: "Hassan: 'Pria berbaju hitam itu, sangat serius, sangat pucat, dia tidak membeli apa pun! Bisa kamu percaya? Karpet kecil pun tidak. Lalu dia bertanya padaku: di mana batu yang tidak bergerak? Pertanyaan yang sangat aneh.'", ar: "حَسَن: 'الرَّاجِل اللِّي لَابِس إِسْوِد، جَامِد أَوِي وَوِشُّه مِصْفَرّ، مِشْتَرَاش حَاجَة خَالِص! تِتْخَيِّل؟ وَلَا حَتَّى سَجَّادَة صُغَيَّرَة. وَبَعْدِين سَأَلْنِي: فِين الحَجَر اللِّي مَا بِيِتْحَرَّكْش؟ سُؤَال غَرِيب أَوِي.'" },
-            answer: { en: "'The stone that does not move', that's an ancient guardian name. Hassan, did he say anything about where he was going next?", ko: "'움직이지 않는 돌', 그건 고대 수호자의 이름이야. 하산, 그 다음에 어디 간다고 말했어?", es: "'La piedra que no se mueve', ese es un nombre guardián antiguo. Hassan, ¿dijo algo sobre adónde iba después?", id: "'Batu yang tidak bergerak', itu nama penjaga kuno. Hassan, apakah dia mengatakan sesuatu tentang ke mana dia akan pergi berikutnya?", ar: "'الحَجَر اللِّي مَا بِيِتْحَرَّكْش'، ده اِسْم حَارِس قَدِيم. يَا حَسَن، قَال حَاجَة عَنْ هُوَّ رَايِح فِين بَعْد كِده؟" },
+            prompt: { en: "Hassan keeps mixing clues with sales pitches. How do you get him to focus?", ko: "하산이 단서와 판매 권유를 계속 섞고 있어. 어떻게 집중하게 해?", es: "Hassan mezcla pistas con ventas. ¿Cómo lo concentras?", id: "Hassan terus mencampur petunjuk dengan rayuan dagang. Bagaimana kamu membuatnya fokus?", ar: "حَسَن مَا زَالَ يَخْلِط بَيْنَ الأَدِلَّة وَكَلَام البَيْع. كَيْفَ تَجْعَلُه يُرَكِّز؟" },
+            context: { en: "Hassan: 'The man in black, very serious, very pale, he bought nothing! Can you believe? Not even a small carpet. Then he asked me: where is the stone that does not move? Very strange question.'", ko: "하산: '검은 남자, 아주 심각하고, 아주 창백해, 아무것도 안 샀어요! 믿을 수 있어요? 작은 카펫도 아니고. 그러더니 물어보더라고요: 움직이지 않는 돌이 어디 있냐고? 아주 이상한 질문.'", es: "Hassan: 'El hombre de negro, muy serio, muy pálido, ¡no compró nada! ¿Puedes creerlo? Ni siquiera una pequeña alfombra. Luego me preguntó: ¿dónde está la piedra que no se mueve? Pregunta muy extraña.'", id: "Hassan: 'Pria berbaju hitam itu, sangat serius, sangat pucat, dia tidak membeli apa pun! Bisa kamu percaya? Karpet kecil pun tidak. Lalu dia bertanya padaku: di mana batu yang tidak bergerak? Pertanyaan yang sangat aneh.'", ar: "حَسَن: 'الرَّجُل الَّذِي يَرْتَدِي السَّوَاد، صَارِم جِدًّا وَوَجْهُه شَاحِب، لَمْ يَشْتَرِ شَيْئًا إِطْلَاقًا! أَتَتَخَيَّل؟ وَلَا حَتَّى سَجَّادَة صَغِيرَة. ثُمَّ سَأَلَنِي: أَيْنَ الحَجَر الَّذِي لَا يَتَحَرَّك؟ سُؤَال غَرِيب جِدًّا.'" },
+            answer: { en: "'The stone that does not move', that's an ancient guardian name. Hassan, did he say anything about where he was going next?", ko: "'움직이지 않는 돌', 그건 고대 수호자의 이름이야. 하산, 그 다음에 어디 간다고 말했어?", es: "'La piedra que no se mueve', ese es un nombre guardián antiguo. Hassan, ¿dijo algo sobre adónde iba después?", id: "'Batu yang tidak bergerak', itu nama penjaga kuno. Hassan, apakah dia mengatakan sesuatu tentang ke mana dia akan pergi berikutnya?", ar: "'الحَجَر الَّذِي لَا يَتَحَرَّك'، هٰذا اِسْم حَارِس قَدِيم. يَا حَسَن، هَلْ قَالَ شَيْئًا عَنْ إِلَى أَيْنَ سَيَذْهَب بَعْدَ ذٰلِك؟" },
             wrong: [
               { en: "Please just answer the question and stop selling things.", ko: "제발 질문에만 답하고 물건 팔지 마.", es: "Por favor solo responde la pregunta y deja de vender cosas.", id: "Tolong jawab saja pertanyaannya dan berhenti berjualan.", ar: "مِنْ فَضْلَك رُدّ عَلَى السُّؤَال بَسّ وَبَطَّل بِيع حَاجَات." },
               { en: "I'll buy a carpet if you tell me more.", ko: "더 말해주면 카펫 살게.", es: "Compro una alfombra si me cuentas más.", id: "Aku akan membeli karpet kalau kamu cerita lebih banyak.", ar: "هَشْتِرِي سَجَّادَة لَوْ قُلْتِ لِي أَكْتَر." },
             ],
           },
           {
-            prompt: { en: "Hassan mentions 'the dig at Saqqara.' Amira goes silent. What do you ask?", ko: "하산이 '사카라 발굴지'를 언급해. 아미라가 침묵한다. 뭘 물어봐?", es: "Hassan menciona 'la excavación de Saqqara.' Amira queda en silencio. ¿Qué preguntas?", id: "Hassan menyebut 'penggalian di Saqqara.' Amira terdiam. Apa yang kamu tanyakan?", ar: "حَسَن قَال 'حَفْرِيَّة سَقَّارَة'. أَمِيرَة سَكْتِت. تِسْأَل إِيه؟" },
-            context: { en: "Hassan: 'The stone, it's not at the museum. It's at Saqqara. The old dig site. My cousin knows.' *Amira turns pale*", ko: "하산: '돌, 박물관에 없어요. 사카라에 있어요. 옛날 발굴 현장. 사촌이 알아요.' *아미라가 창백해진다*", es: "Hassan: 'La piedra, no está en el museo. Está en Saqqara. El viejo sitio de excavación. Mi prima lo sabe.' *Amira se pone pálida*", id: "Hassan: 'Batu itu, tidak ada di museum. Ada di Saqqara. Situs penggalian tua itu. Sepupuku tahu.' *Amira memucat*", ar: "حَسَن: 'الحَجَر، مِش فِي المَتْحَف. هُوَّ فِي سَقَّارَة. مَوْقِع الحَفْر القَدِيم. بِنْت عَمِّي عَارْفَة.' *وِشّ أَمِيرَة يِصْفَرّ*" },
-            answer: { en: "Amira. You knew where it was all along. That's why Mr. Black came to you first.", ko: "아미라. 처음부터 어디 있는지 알고 있었어. 그래서 미스터 블랙이 먼저 너한테 온 거야.", es: "Amira. Sabías dónde estaba todo el tiempo. Por eso Mr. Black vino a ti primero.", id: "Amira. Kamu tahu di mana batu itu selama ini. Itu sebabnya Mr. Black mendatangimu lebih dulu.", ar: "يَا أَمِيرَة. إِنْتِ عَارْفَة هُوَّ فِين مِنِ الأَوِّل. عَشَان كِده مِسْتَر بْلَاك جَه لِكِ الأَوِّل." },
+            prompt: { en: "Hassan mentions 'the dig at Saqqara.' Amira goes silent. What do you ask?", ko: "하산이 '사카라 발굴지'를 언급해. 아미라가 침묵한다. 뭘 물어봐?", es: "Hassan menciona 'la excavación de Saqqara.' Amira queda en silencio. ¿Qué preguntas?", id: "Hassan menyebut 'penggalian di Saqqara.' Amira terdiam. Apa yang kamu tanyakan?", ar: "قَالَ حَسَن 'حَفْرِيَّة سَقَّارَة'. صَمَتَتْ أَمِيرَة. مَاذَا تَسْأَل؟" },
+            context: { en: "Hassan: 'The stone, it's not at the museum. It's at Saqqara. The old dig site. My cousin knows.' *Amira turns pale*", ko: "하산: '돌, 박물관에 없어요. 사카라에 있어요. 옛날 발굴 현장. 사촌이 알아요.' *아미라가 창백해진다*", es: "Hassan: 'La piedra, no está en el museo. Está en Saqqara. El viejo sitio de excavación. Mi prima lo sabe.' *Amira se pone pálida*", id: "Hassan: 'Batu itu, tidak ada di museum. Ada di Saqqara. Situs penggalian tua itu. Sepupuku tahu.' *Amira memucat*", ar: "حَسَن: 'الحَجَر، لَيْسَ فِي المَتْحَف. إِنَّهُ فِي سَقَّارَة. مَوْقِع الحَفْر القَدِيم. اِبْنَة عَمِّي تَعْرِف.' *وَجْه أَمِيرَة يَشْحَب*" },
+            answer: { en: "Amira. You knew where it was all along. That's why Mr. Black came to you first.", ko: "아미라. 처음부터 어디 있는지 알고 있었어. 그래서 미스터 블랙이 먼저 너한테 온 거야.", es: "Amira. Sabías dónde estaba todo el tiempo. Por eso Mr. Black vino a ti primero.", id: "Amira. Kamu tahu di mana batu itu selama ini. Itu sebabnya Mr. Black mendatangimu lebih dulu.", ar: "يَا أَمِيرَة. أَنْتِ تَعْرِفِينَ أَيْنَ هُوَ مِنَ البِدَايَة. لِهٰذا جَاءَ مِسْتَر بْلَاك إِلَيْكِ أَوَّلًا." },
             wrong: [
               { en: "Hassan, stop revealing family secrets in a market.", ko: "하산, 시장에서 가족 비밀 그만 폭로해.", es: "Hassan, deja de revelar secretos familiares en el mercado.", id: "Hassan, berhenti membongkar rahasia keluarga di pasar.", ar: "يَا حَسَن، بَطَّل تِفْضَح أَسْرَار العِيلَة فِي السُّوق." },
-              { en: "The dig site is too dangerous. We should call the police.", ko: "발굴 현장은 너무 위험해. 경찰을 불러야 해.", es: "El sitio de excavación es muy peligroso. Deberíamos llamar a la policía.", id: "Situs penggalian itu terlalu berbahaya. Kita harus memanggil polisi.", ar: "مَوْقِع الحَفْر خَطِير أَوِي. لَازِم نِتَّصِل بِالبُولِيس." },
+              { en: "The dig site is too dangerous. We should call the police.", ko: "발굴 현장은 너무 위험해. 경찰을 불러야 해.", es: "El sitio de excavación es muy peligroso. Deberíamos llamar a la policía.", id: "Situs penggalian itu terlalu berbahaya. Kita harus memanggil polisi.", ar: "مَوْقِع الحَفْر خَطِير جِدًّا. يَجِب أَنْ نَتَّصِل بِالشُّرْطَة." },
             ],
           },
         ],
         hints: {
           h1: { ko: "탐정의 역할은 정보를 수집하는 거야 — 대화를 통제하고 핵심 단서에 집중해", en: "A detective's job is to collect information — control the conversation and focus on key clues", es: "El trabajo del detective es recopilar información — controla la conversación y céntrate en las pistas clave", id: "Tugas seorang detektif adalah mengumpulkan informasi — kendalikan percakapan dan fokus pada petunjuk kunci", ar: "شُغْل المُحَقِّق إِنُّه يِجَمَّع مَعْلُومَات — سَيْطَر عَلَى الكَلَام وَرَكِّز فِي الأَدِلَّة المُهِمَّة" },
-          h2: { ko: "하산의 말 중 의미 있는 부분은 '움직이지 않는 돌'과 '사카라'야 — 이것들을 연결해봐", en: "The meaningful parts of Hassan's speech are 'the stone that does not move' and 'Saqqara' — connect them", es: "Las partes significativas del discurso de Hassan son 'la piedra que no se mueve' y 'Saqqara' — conéctalas", id: "Bagian penting dari ucapan Hassan adalah 'batu yang tidak bergerak' dan 'Saqqara' — hubungkan keduanya", ar: "أَهَمّ حِتَّة فِي كَلَام حَسَن هِيَّ 'الحَجَر اللِّي مَا بِيِتْحَرَّكْش' وَ'سَقَّارَة' — اِرْبُط بِينْهُم" },
+          h2: { ko: "하산의 말 중 의미 있는 부분은 '움직이지 않는 돌'과 '사카라'야 — 이것들을 연결해봐", en: "The meaningful parts of Hassan's speech are 'the stone that does not move' and 'Saqqara' — connect them", es: "Las partes significativas del discurso de Hassan son 'la piedra que no se mueve' y 'Saqqara' — conéctalas", id: "Bagian penting dari ucapan Hassan adalah 'batu yang tidak bergerak' dan 'Saqqara' — hubungkan keduanya", ar: "أَهَمّ جُزْء فِي كَلَام حَسَن هُوَ 'الحَجَر الَّذِي لَا يَتَحَرَّك' وَ'سَقَّارَة' — اِرْبُطْ بَيْنَهُمَا" },
           h3: { ko: "아미라의 반응이 단서야 — 그녀가 침묵하는 이유를 물어봐", en: "Amira's reaction is the clue — ask her why she went silent", es: "La reacción de Amira es la pista — pregúntale por qué se quedó en silencio", id: "Reaksi Amira adalah petunjuknya — tanyakan mengapa dia terdiam", ar: "رَدّ فِعْل أَمِيرَة هُوَّ الدَّلِيل — اِسْأَلْهَا سَكْتِت لِيه" },
         },
       },
@@ -3215,10 +3215,10 @@ const STORIES: Record<string, Story> = {
         storyConsequence: "A local helps you find the hidden entrance to the pyramid.",
         onFail: { addToWeakExpressions: ["Where is the market?", "How far is it?"], reviewInDailyCourse: true, reviewDays: 3 },
         title: { en: "Navigate Cairo", ko: "카이로에서 길 찾기", es: "Navegar El Cairo", id: "Menyusuri Kairo", ar: "اِلْقَى طَرِيقَك فِي القَاهِرَة" },
-        context: { en: "Your phrasebook is blank. Ask for directions using only what you remember!", ko: "회화집이 비었어요. 기억나는 것만으로 길을 물어보세요!", es: "Tu libro de frases está en blanco. ¡Pide direcciones usando solo lo que recuerdas!", id: "Buku percakapanmu kosong. Tanyakan arah hanya dengan apa yang kamu ingat!", ar: "كِتَاب العِبَارَات بَتَاعَك فَاضِي. اِسْأَل عَنِ الطَّرِيق بِاللِّي فَاكْرُه بَسّ!" },
+        context: { en: "Your phrasebook is blank. Ask for directions using only what you remember!", ko: "회화집이 비었어요. 기억나는 것만으로 길을 물어보세요!", es: "Tu libro de frases está en blanco. ¡Pide direcciones usando solo lo que recuerdas!", id: "Buku percakapanmu kosong. Tanyakan arah hanya dengan apa yang kamu ingat!", ar: "كِتَاب العِبَارَات الخَاصّ بِكَ فَارِغ. اِسْأَل عَنِ الطَّرِيق بِمَا تَتَذَكَّرُه فَقَط!" },
         questions: [
-          { word: { en: "Excuse me, where is the market?", ko: "실례합니다, 시장이 어디에 있나요?", es: "Disculpe, ¿dónde está el mercado?", id: "Permisi, di mana pasarnya?", ar: "لَوْ سَمَحْت، فِين السُّوق؟" }, hint: { en: "Ask for the market location", ko: "시장 위치를 물어보세요", es: "Pregunta por la ubicación del mercado", id: "Tanyakan lokasi pasar", ar: "اِسْأَل عَنْ مَكَان السُّوق" }, acceptableAnswers: ["excuse me where is the market", "where is the market", "where's the market"] },
-          { word: { en: "How far is it from here?", ko: "여기서 얼마나 멀어요?", es: "¿Qué tan lejos está de aquí?", id: "Seberapa jauh dari sini?", ar: "هُوَّ بِعِيد قَدّ إِيه مِنْ هِنَا؟" }, hint: { en: "Ask about the distance", ko: "거리를 물어보세요", es: "Pregunta la distancia", id: "Tanyakan jaraknya", ar: "اِسْأَل عَنِ المَسَافَة" }, acceptableAnswers: ["how far is it from here", "how far is it", "how far from here"] },
+          { word: { en: "Excuse me, where is the market?", ko: "실례합니다, 시장이 어디에 있나요?", es: "Disculpe, ¿dónde está el mercado?", id: "Permisi, di mana pasarnya?", ar: "لَوْ سَمَحْت، أَيْنَ السُّوق؟" }, hint: { en: "Ask for the market location", ko: "시장 위치를 물어보세요", es: "Pregunta por la ubicación del mercado", id: "Tanyakan lokasi pasar", ar: "اِسْأَل عَنْ مَكَان السُّوق" }, acceptableAnswers: ["excuse me where is the market", "where is the market", "where's the market"] },
+          { word: { en: "How far is it from here?", ko: "여기서 얼마나 멀어요?", es: "¿Qué tan lejos está de aquí?", id: "Seberapa jauh dari sini?", ar: "كَمْ يَبْعُد مِنْ هُنَا؟" }, hint: { en: "Ask about the distance", ko: "거리를 물어보세요", es: "Pregunta la distancia", id: "Tanyakan jaraknya", ar: "اِسْأَل عَنِ المَسَافَة" }, acceptableAnswers: ["how far is it from here", "how far is it", "how far from here"] },
           { word: { en: "Thank you for your help.", ko: "도움 감사합니다.", es: "Gracias por su ayuda.", id: "Terima kasih atas bantuannya.", ar: "شُكْرًا عَلَى مُسَاعْدِتَك." }, hint: { en: "Thank the local", ko: "현지인에게 감사하세요", es: "Agradece al local", id: "Berterima kasihlah kepada warga setempat", ar: "اِشْكُر اِبْن البَلَد" }, acceptableAnswers: ["thank you for your help", "thanks for your help", "thank you for helping"] },
         ],
       },
@@ -3247,29 +3247,29 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Near the ___", "The key is ___"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            sentence: { en: "Miss Penny's encoded message: 'The stone is ___ the pyramid, where pharaohs first climbed toward the sky.'", ko: "미스 페니의 암호 메시지: '수호석은 파라오가 처음으로 하늘을 향해 올라간 곳, 피라미드 ___ 있어요.'", es: "El mensaje codificado de Miss Penny: 'La piedra está ___ la pirámide, donde los faraones subían por primera vez hacia el cielo.'", id: "Pesan tersandi Miss Penny: 'Batu itu ___ piramida, tempat para firaun pertama kali mendaki menuju langit.'", ar: "رِسَالِة مِيس بِينِي المُشَفَّرَة: 'الحَجَر ___ الهَرَم، المَكَان اللِّي الفَرَاعْنَة طِلْعُوا مِنُّه لِأَوِّل مَرَّة نَاحْيِة السَّمَا.'" },
+            sentence: { en: "Miss Penny's encoded message: 'The stone is ___ the pyramid, where pharaohs first climbed toward the sky.'", ko: "미스 페니의 암호 메시지: '수호석은 파라오가 처음으로 하늘을 향해 올라간 곳, 피라미드 ___ 있어요.'", es: "El mensaje codificado de Miss Penny: 'La piedra está ___ la pirámide, donde los faraones subían por primera vez hacia el cielo.'", id: "Pesan tersandi Miss Penny: 'Batu itu ___ piramida, tempat para firaun pertama kali mendaki menuju langit.'", ar: "رِسَالَة مِيس بِينِي المُشَفَّرَة: 'الحَجَر ___ الهَرَم، المَكَان الَّذِي صَعِدَ مِنْهُ الفَرَاعِنَة لِأَوَّل مَرَّة نَحْوَ السَّمَاء.'" },
             answer: { en: "near", ko: "근처에", es: "cerca de", id: "dekat", ar: "جَنْب" },
             opts: [
               { en: "far from", ko: "멀리", es: "lejos de", id: "jauh dari", ar: "بِعِيد عَنْ" },
               { en: "on your left", ko: "왼쪽에", es: "a tu izquierda", id: "di sebelah kirimu", ar: "عَلَى شِمَالَك" },
             ],
             hints: {
-              h1: { ko: "파라오가 '하늘을 향해 올라가는' 장소는 무엇일까? 수호석은 그 장소 가까이에 숨겨져 있어", en: "What place has pharaohs 'climbing toward the sky'? The stone is hidden close to that place", es: "¿Qué lugar tiene a los faraones 'subiendo hacia el cielo'? La piedra está escondida cerca de ese lugar", id: "Tempat apa yang menggambarkan para firaun 'mendaki menuju langit'? Batu itu tersembunyi dekat tempat tersebut", ar: "أَنْهِي مَكَان فِيه الفَرَاعْنَة 'بِيِطْلَعُوا نَاحْيِة السَّمَا'؟ الحَجَر مُخَبَّى جَنْب المَكَان ده" },
-              h2: { ko: "사카라 계단 피라미드 — 수호석은 멀리 있는 게 아니라 바로 근처에 있어", en: "Saqqara step pyramid — the stone isn't far away, it's right nearby", es: "Pirámide escalonada de Saqqara — la piedra no está lejos, está justo cerca", id: "Piramida tangga Saqqara — batu itu tidak jauh, justru ada di dekatnya", ar: "هَرَم سَقَّارَة المُدَرَّج — الحَجَر مِش بِعِيد، هُوَّ جَنْبَك عَلَى طُول" },
+              h1: { ko: "파라오가 '하늘을 향해 올라가는' 장소는 무엇일까? 수호석은 그 장소 가까이에 숨겨져 있어", en: "What place has pharaohs 'climbing toward the sky'? The stone is hidden close to that place", es: "¿Qué lugar tiene a los faraones 'subiendo hacia el cielo'? La piedra está escondida cerca de ese lugar", id: "Tempat apa yang menggambarkan para firaun 'mendaki menuju langit'? Batu itu tersembunyi dekat tempat tersebut", ar: "أَيُّ مَكَان فِيهِ الفَرَاعِنَة 'يَصْعَدُونَ نَحْوَ السَّمَاء'؟ الحَجَر مُخَبَّأ بِجَانِب هٰذا المَكَان" },
+              h2: { ko: "사카라 계단 피라미드 — 수호석은 멀리 있는 게 아니라 바로 근처에 있어", en: "Saqqara step pyramid — the stone isn't far away, it's right nearby", es: "Pirámide escalonada de Saqqara — la piedra no está lejos, está justo cerca", id: "Piramida tangga Saqqara — batu itu tidak jauh, justru ada di dekatnya", ar: "هَرَم سَقَّارَة المُدَرَّج — الحَجَر لَيْسَ بَعِيدًا، إِنَّهُ بِجَانِبِكَ تَمَامًا" },
               h3: { ko: "답: near (근처에). 수호석은 사카라 피라미드 근처에 숨겨져 있어", en: "Answer: near. The stone is hidden near Saqqara's pyramid", es: "Respuesta: near (cerca de). La piedra está escondida cerca de la pirámide de Saqqara", id: "Jawaban: near (dekat). Batu itu tersembunyi dekat piramida Saqqara", ar: "الإِجَابَة: near (جَنْب). الحَجَر مُخَبَّى جَنْب هَرَم سَقَّارَة", byLearning: { korean: { ko: "답: 근처에. 수호석은 사카라 피라미드 근처에 숨겨져 있어", en: "Answer: 근처에 (near). The stone is hidden near Saqqara's pyramid", es: "Respuesta: 근처에 (cerca de). La piedra está escondida cerca de la pirámide de Saqqara", id: "Jawaban: 근처에 (dekat). Batu itu tersembunyi dekat piramida Saqqara", ar: "الإِجَابَة: 근처에 (جَنْب). الحَجَر مُخَبَّى جَنْب هَرَم سَقَّارَة" }, spanish: { ko: "답: cerca de (근처에). 수호석은 사카라 피라미드 근처에 숨겨져 있어", en: "Answer: cerca de. The stone is hidden near Saqqara's pyramid", es: "Respuesta: cerca de. La piedra está escondida cerca de la pirámide de Saqqara", id: "Jawaban: cerca de (dekat). Batu itu tersembunyi dekat piramida Saqqara", ar: "الإِجَابَة: cerca de (جَنْب). الحَجَر مُخَبَّى جَنْب هَرَم سَقَّارَة" }, indonesian: { ko: "답: dekat (근처에). 수호석은 사카라 피라미드 근처에 숨겨져 있어", en: "Answer: dekat. The stone is hidden near Saqqara's pyramid", es: "Respuesta: dekat (cerca de). La piedra está escondida cerca de la pirámide de Saqqara", id: "Jawaban: dekat. Batu itu tersembunyi dekat piramida Saqqara", ar: "الإِجَابَة: dekat (جَنْب). الحَجَر مُخَبَّى جَنْب هَرَم سَقَّارَة" } } },
             },
           },
           {
             sentence: { en: "Penny's warning: 'He plans to use all seven stones at ___. After that, the Universal Code cannot be reversed.'", ko: "페니의 경고: '그는 ___에 7개의 수호석 모두를 사용할 계획이야. 그 후에는 유니버설 코드를 되돌릴 수 없어.'", es: "El aviso de Penny: 'Planea usar las siete piedras a ___. Después de eso, el Código Universal no puede revertirse.'", id: "Peringatan Penny: 'Dia berencana menggunakan ketujuh batu pada ___. Setelah itu, Universal Code tidak bisa dibalikkan.'", ar: "تَحْذِير بِينِي: 'هُوَّ نَاوِي يِسْتَخْدِم السَّبَع أَحْجَار كُلُّهَا فِي ___. بَعْد كِده، الكُود العَالَمِي مَا يِنْفَعْش يِتْرَجَّع.'" },
-            answer: { en: "midnight", ko: "자정", es: "medianoche", id: "tengah malam", ar: "نُصّ اللِّيل" },
+            answer: { en: "midnight", ko: "자정", es: "medianoche", id: "tengah malam", ar: "مُنْتَصَف اللَّيْل" },
             opts: [
               { en: "three o'clock", ko: "세 시", es: "las tres", id: "pukul tiga", ar: "السَّاعَة تَلَاتَة" },
               { en: "half past seven", ko: "일곱 시 반", es: "las siete y media", id: "pukul setengah delapan", ar: "السَّاعَة سَبْعَة وَنُصّ" },
             ],
             hints: {
-              h1: { ko: "미스터 블랙은 모두가 잠든 시간에 계획을 실행하려 해 — 가장 늦은 시간을 생각해봐", en: "Mr. Black plans to act when everyone is asleep — think of the latest time", es: "Mr. Black planea actuar cuando todos duermen — piensa en la hora más tarde", id: "Mr. Black berencana bertindak saat semua orang tidur — pikirkan waktu paling larut", ar: "مِسْتَر بْلَاك نَاوِي يِنَفِّذ خُطِّتُه وَالكُلّ نَايِم — فَكَّر فِي أَوْخَر وَقْت فِي اللِّيل" },
-              h2: { ko: "밤 12시, 하루가 끝나고 새로운 날이 시작되는 시간", en: "12 AM, when the day ends and a new day begins", es: "Las 12 de la noche, cuando el día termina y uno nuevo empieza", id: "Pukul 12 malam, saat hari berakhir dan hari baru dimulai", ar: "السَّاعَة ١٢ بِاللِّيل، لَمَّا اليُوم يِخْلَص وَيُومّ جِدِيد يِبْتِدِي" },
-              h3: { ko: "답: midnight (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: midnight. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: midnight (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: midnight (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam", ar: "الإِجَابَة: midnight (نُصّ اللِّيل). مِسْتَر بْلَاك نَاوِي يِشَغَّل الكُود العَالَمِي فِي نُصّ اللِّيل", byLearning: { korean: { ko: "답: 자정. 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: 자정 (midnight). Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: 자정 (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: 자정 (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam", ar: "الإِجَابَة: 자정 (نُصّ اللِّيل). مِسْتَر بْلَاك نَاوِي يِشَغَّل الكُود العَالَمِي فِي نُصّ اللِّيل" }, spanish: { ko: "답: medianoche (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: medianoche. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: medianoche. Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: medianoche (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam", ar: "الإِجَابَة: medianoche (نُصّ اللِّيل). مِسْتَر بْلَاك نَاوِي يِشَغَّل الكُود العَالَمِي فِي نُصّ اللِّيل" }, indonesian: { ko: "답: tengah malam (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: tengah malam. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: tengah malam (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: tengah malam. Mr. Black berencana mengaktifkan Universal Code pada tengah malam", ar: "الإِجَابَة: tengah malam (نُصّ اللِّيل). مِسْتَر بْلَاك نَاوِي يِشَغَّل الكُود العَالَمِي فِي نُصّ اللِّيل" } } },
+              h1: { ko: "미스터 블랙은 모두가 잠든 시간에 계획을 실행하려 해 — 가장 늦은 시간을 생각해봐", en: "Mr. Black plans to act when everyone is asleep — think of the latest time", es: "Mr. Black planea actuar cuando todos duermen — piensa en la hora más tarde", id: "Mr. Black berencana bertindak saat semua orang tidur — pikirkan waktu paling larut", ar: "مِسْتَر بْلَاك يَنْوِي تَنْفِيذ خُطَّتِهِ وَالكُلّ نَائِم — فَكِّر فِي آخِر وَقْت فِي اللَّيْل" },
+              h2: { ko: "밤 12시, 하루가 끝나고 새로운 날이 시작되는 시간", en: "12 AM, when the day ends and a new day begins", es: "Las 12 de la noche, cuando el día termina y uno nuevo empieza", id: "Pukul 12 malam, saat hari berakhir dan hari baru dimulai", ar: "السَّاعَة ١٢ لَيْلًا، عِنْدَمَا يَنْتَهِي اليَوْم وَيَبْدَأ يَوْم جَدِيد" },
+              h3: { ko: "답: midnight (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: midnight. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: midnight (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: midnight (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam", ar: "الإِجَابَة: midnight (مُنْتَصَف اللَّيْل). مِسْتَر بْلَاك يَنْوِي تَشْغِيل الكُود العَالَمِي فِي مُنْتَصَف اللَّيْل", byLearning: { korean: { ko: "답: 자정. 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: 자정 (midnight). Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: 자정 (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: 자정 (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam", ar: "الإِجَابَة: 자정 (مُنْتَصَف اللَّيْل). مِسْتَر بْلَاك يَنْوِي تَشْغِيل الكُود العَالَمِي فِي مُنْتَصَف اللَّيْل" }, spanish: { ko: "답: medianoche (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: medianoche. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: medianoche. Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: medianoche (tengah malam). Mr. Black berencana mengaktifkan Universal Code pada tengah malam", ar: "الإِجَابَة: medianoche (مُنْتَصَف اللَّيْل). مِسْتَر بْلَاك يَنْوِي تَشْغِيل الكُود العَالَمِي فِي مُنْتَصَف اللَّيْل" }, indonesian: { ko: "답: tengah malam (자정). 미스터 블랙은 자정에 유니버설 코드를 작동시킬 계획이야", en: "Answer: tengah malam. Mr. Black plans to launch the Universal Code at midnight", es: "Respuesta: tengah malam (medianoche). Mr. Black planea lanzar el Código Universal a medianoche", id: "Jawaban: tengah malam. Mr. Black berencana mengaktifkan Universal Code pada tengah malam", ar: "الإِجَابَة: tengah malam (مُنْتَصَف اللَّيْل). مِسْتَر بْلَاك يَنْوِي تَشْغِيل الكُود العَالَمِي فِي مُنْتَصَف اللَّيْل" } } },
             },
           },
         ],
@@ -3330,20 +3330,20 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Where is ___?", "Near the ___"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            prompt: { en: "Mr. Black's logic has a fatal flaw. Which evidence shows his plan would cause MORE harm than it prevents?", ko: "미스터 블랙의 논리에는 치명적인 결함이 있어. 어떤 증거가 그의 계획이 예방하는 것보다 더 큰 해를 끼친다는 걸 보여줘?", es: "La lógica de Mr. Black tiene un defecto fatal. ¿Qué evidencia muestra que su plan causaría MÁS daño del que previene?", id: "Logika Mr. Black punya cacat fatal. Bukti mana yang menunjukkan rencananya akan menyebabkan LEBIH banyak kerusakan daripada yang dicegahnya?", ar: "مَنْطِق مِسْتَر بْلَاك فِيه عِيب قَاتِل. أَنْهِي دَلِيل بِيِوَرِّي إِنّ خُطِّتُه هَتْعْمِل ضَرَر أَكْتَر مِنِ اللِّي بِتْمْنَعُه؟" },
+            prompt: { en: "Mr. Black's logic has a fatal flaw. Which evidence shows his plan would cause MORE harm than it prevents?", ko: "미스터 블랙의 논리에는 치명적인 결함이 있어. 어떤 증거가 그의 계획이 예방하는 것보다 더 큰 해를 끼친다는 걸 보여줘?", es: "La lógica de Mr. Black tiene un defecto fatal. ¿Qué evidencia muestra que su plan causaría MÁS daño del que previene?", id: "Logika Mr. Black punya cacat fatal. Bukti mana yang menunjukkan rencananya akan menyebabkan LEBIH banyak kerusakan daripada yang dicegahnya?", ar: "مَنْطِق مِسْتَر بْلَاك فِيهِ عَيْب قَاتِل. أَيُّ دَلِيل يُظْهِر أَنَّ خُطَّتَهُ سَتُسَبِّب ضَرَرًا أَكْثَر مِمَّا تَمْنَعُه؟" },
             clues: [
-              { en: "Carlos only lost his language temporarily. He recovered it. But under Universal Code, loss would be permanent for all 8 billion people.", ko: "카를로스는 일시적으로만 언어를 잃었어. 회복했어. 하지만 유니버설 코드 하에서 80억 명 모두에게 그 상실은 영구적이야.", es: "Carlos solo perdió su idioma temporalmente. Se recuperó. Pero bajo el Código Universal, la pérdida sería permanente para los 8 mil millones de personas.", id: "Carlos hanya kehilangan bahasanya sementara. Ia memulihkannya. Tapi di bawah Universal Code, kehilangan itu akan permanen bagi seluruh 8 miliar orang.", ar: "كَارْلُوس خِسِر لُغْتُه مُؤَقَّتًا بَسّ. وَرِجِعِتْلُه تَانِي. لَكِنْ تَحْت الكُود العَالَمِي، الخَسَارَة هَتِبْقَى دَائِمَة لِكُلّ التَّمَن مِلْيَار وَاحِد." },
-              { en: "Mr. Black's mother would have been saved if ONE nurse had learned Welsh. The Code would delete Welsh instead of teaching it.", ko: "미스터 블랙의 어머니는 간호사 한 명이 웨일스어를 배웠다면 살 수 있었어. 유니버설 코드는 웨일스어를 가르치는 대신 지울 거야.", es: "La madre de Mr. Black podría haberse salvado si UNA enfermera hubiera aprendido galés. El Código borraría el galés en lugar de enseñarlo.", id: "Ibu Mr. Black bisa terselamatkan andai SATU perawat belajar bahasa Wales. Code itu justru akan menghapus bahasa Wales alih-alih mengajarkannya.", ar: "أُمّ مِسْتَر بْلَاك كَانِتْ هَتِتْنِقِذ لَوْ مُمَرِّضَة وَاحْدَة بَسّ اِتْعَلِّمِت الوِيلْزِي. الكُود هَيِمْسَح الوِيلْزِي بَدَل مَا يِعَلِّمُه." },
-              { en: "The Universal Code eliminates all grandmother's lullabies, all first words of every child, all poetry ever written.", ko: "유니버설 코드는 모든 할머니의 자장가, 모든 아이의 첫 마디, 쓰여진 모든 시를 없애.", es: "El Código Universal elimina todas las canciones de cuna de las abuelas, todas las primeras palabras de cada niño, toda la poesía jamás escrita.", id: "Universal Code menghapus semua lagu nina bobo para nenek, semua kata pertama setiap anak, semua puisi yang pernah ditulis.", ar: "الكُود العَالَمِي بِيِمْحِي كُلّ تَهَالِيل السِّتَّات، وَكُلّ أَوِّل كِلْمَة لِكُلّ طِفْل، وَكُلّ شِعْر اِتْكَتَب فِي التَّارِيخ." },
-              { en: "Mr. Black wants coffee from the vending machine on floor 3.", ko: "미스터 블랙은 3층 자판기에서 커피를 원한다.", es: "Mr. Black quiere café de la máquina expendedora del piso 3.", id: "Mr. Black ingin kopi dari mesin penjual otomatis di lantai 3.", ar: "مِسْتَر بْلَاك عَايِز قَهْوَة مِنْ مَكَنِة المَشْرُوبَات فِي الدُّور التَّالِت." },
+              { en: "Carlos only lost his language temporarily. He recovered it. But under Universal Code, loss would be permanent for all 8 billion people.", ko: "카를로스는 일시적으로만 언어를 잃었어. 회복했어. 하지만 유니버설 코드 하에서 80억 명 모두에게 그 상실은 영구적이야.", es: "Carlos solo perdió su idioma temporalmente. Se recuperó. Pero bajo el Código Universal, la pérdida sería permanente para los 8 mil millones de personas.", id: "Carlos hanya kehilangan bahasanya sementara. Ia memulihkannya. Tapi di bawah Universal Code, kehilangan itu akan permanen bagi seluruh 8 miliar orang.", ar: "كَارْلُوس فَقَدَ لُغَتَهُ مُؤَقَّتًا فَقَط. ثُمَّ عَادَتْ إِلَيْه. لَكِنْ تَحْتَ الكُود العَالَمِي، سَتَكُون الخَسَارَة دَائِمَة لِكُلّ الثَّمَانِيَة مِلْيَارَات إِنْسَان." },
+              { en: "Mr. Black's mother would have been saved if ONE nurse had learned Welsh. The Code would delete Welsh instead of teaching it.", ko: "미스터 블랙의 어머니는 간호사 한 명이 웨일스어를 배웠다면 살 수 있었어. 유니버설 코드는 웨일스어를 가르치는 대신 지울 거야.", es: "La madre de Mr. Black podría haberse salvado si UNA enfermera hubiera aprendido galés. El Código borraría el galés en lugar de enseñarlo.", id: "Ibu Mr. Black bisa terselamatkan andai SATU perawat belajar bahasa Wales. Code itu justru akan menghapus bahasa Wales alih-alih mengajarkannya.", ar: "أُمّ مِسْتَر بْلَاك كَانَتْ سَتُنْقَذ لَوْ تَعَلَّمَتْ مُمَرِّضَة وَاحِدَة فَقَط الوِيلْزِيَّة. الكُود سَيَمْحُو الوِيلْزِيَّة بَدَلًا مِنْ أَنْ يُعَلِّمَهَا." },
+              { en: "The Universal Code eliminates all grandmother's lullabies, all first words of every child, all poetry ever written.", ko: "유니버설 코드는 모든 할머니의 자장가, 모든 아이의 첫 마디, 쓰여진 모든 시를 없애.", es: "El Código Universal elimina todas las canciones de cuna de las abuelas, todas las primeras palabras de cada niño, toda la poesía jamás escrita.", id: "Universal Code menghapus semua lagu nina bobo para nenek, semua kata pertama setiap anak, semua puisi yang pernah ditulis.", ar: "الكُود العَالَمِي يَمْحُو كُلّ تَهَالِيل الجَدَّات، وَكُلّ أَوَّل كَلِمَة لِكُلّ طِفْل، وَكُلّ شِعْر كُتِبَ فِي التَّارِيخ." },
+              { en: "Mr. Black wants coffee from the vending machine on floor 3.", ko: "미스터 블랙은 3층 자판기에서 커피를 원한다.", es: "Mr. Black quiere café de la máquina expendedora del piso 3.", id: "Mr. Black ingin kopi dari mesin penjual otomatis di lantai 3.", ar: "مِسْتَر بْلَاك يُرِيد قَهْوَة مِنْ آلَة المَشْرُوبَات فِي الطَّابِق الثَّالِث." },
             ],
             answerIdx: 1,
           },
         ],
         hints: {
-          h1: { ko: "미스터 블랙의 어머니를 구할 수 있었던 방법을 생각해봐 — 언어를 지우는 것보다 더 나은 해결책이 있었어", en: "Think about what could have saved Mr. Black's mother — there was a better solution than erasing language", es: "Piensa en qué podría haber salvado a la madre de Mr. Black — había una solución mejor que borrar idiomas", id: "Pikirkan apa yang bisa menyelamatkan ibu Mr. Black — ada solusi yang lebih baik daripada menghapus bahasa", ar: "فَكَّر فِي إِيه اللِّي كَانْ مُمْكِن يِنْقِذ أُمّ مِسْتَر بْلَاك — كَانْ فِيه حَلّ أَحْسَن مِنْ إِنُّه يِمْحِي اللُّغَة" },
-          h2: { ko: "그의 어머니의 문제는 언어가 너무 많아서가 아니야 — 문제는 웨일스어를 아는 사람이 '없었다'는 거야. 해결책은 지우는 게 아니라 가르치는 거야", en: "His mother's problem wasn't that there were too many languages — the problem was that NO ONE knew Welsh. The solution is teaching, not erasing", es: "El problema de su madre no era que hubiera demasiados idiomas — el problema era que NADIE sabía galés. La solución es enseñar, no borrar", id: "Masalah ibunya bukan karena terlalu banyak bahasa — masalahnya TAK ADA yang tahu bahasa Wales. Solusinya adalah mengajarkan, bukan menghapus", ar: "مُشْكِلِة أُمُّه مَكَانِتْش إِنّ فِيه لُغَات كِتِير أَوِي — المُشْكِلَة إِنّ مَحَدِّش كَانْ عَارِف الوِيلْزِي. الحَلّ إِنَّك تِعَلِّم، مِش إِنَّك تِمْحِي" },
-          h3: { ko: "답: 두 번째. 진짜 해결책은 웨일스어를 없애는 게 아니라, 더 많은 사람들이 웨일스어를 배우는 거야", en: "Answer: the second one. The real solution is not to delete Welsh, but to teach more people Welsh", es: "Respuesta: la segunda. La solución real no es borrar el galés, sino enseñar más galés", id: "Jawaban: yang kedua. Solusi sebenarnya bukan menghapus bahasa Wales, melainkan mengajarkannya kepada lebih banyak orang", ar: "الإِجَابَة: التَّانِي. الحَلّ الحَقِيقِي مِش إِنَّك تِمْحِي الوِيلْزِي، لَكِنْ إِنّ نَاس أَكْتَر تِتْعَلِّم الوِيلْزِي" },
+          h1: { ko: "미스터 블랙의 어머니를 구할 수 있었던 방법을 생각해봐 — 언어를 지우는 것보다 더 나은 해결책이 있었어", en: "Think about what could have saved Mr. Black's mother — there was a better solution than erasing language", es: "Piensa en qué podría haber salvado a la madre de Mr. Black — había una solución mejor que borrar idiomas", id: "Pikirkan apa yang bisa menyelamatkan ibu Mr. Black — ada solusi yang lebih baik daripada menghapus bahasa", ar: "فَكِّر فِيمَا كَانَ يُمْكِن أَنْ يُنْقِذ أُمّ مِسْتَر بْلَاك — كَانَ هُنَاكَ حَلّ أَفْضَل مِنْ مَحْو اللُّغَة" },
+          h2: { ko: "그의 어머니의 문제는 언어가 너무 많아서가 아니야 — 문제는 웨일스어를 아는 사람이 '없었다'는 거야. 해결책은 지우는 게 아니라 가르치는 거야", en: "His mother's problem wasn't that there were too many languages — the problem was that NO ONE knew Welsh. The solution is teaching, not erasing", es: "El problema de su madre no era que hubiera demasiados idiomas — el problema era que NADIE sabía galés. La solución es enseñar, no borrar", id: "Masalah ibunya bukan karena terlalu banyak bahasa — masalahnya TAK ADA yang tahu bahasa Wales. Solusinya adalah mengajarkan, bukan menghapus", ar: "مُشْكِلَة أُمِّهِ لَمْ تَكُنْ أَنَّ هُنَاكَ لُغَات كَثِيرَة جِدًّا — المُشْكِلَة أَنَّهُ لَا أَحَد كَانَ يَعْرِف الوِيلْزِيَّة. الحَلّ أَنْ تُعَلِّم، لَا أَنْ تَمْحُو" },
+          h3: { ko: "답: 두 번째. 진짜 해결책은 웨일스어를 없애는 게 아니라, 더 많은 사람들이 웨일스어를 배우는 거야", en: "Answer: the second one. The real solution is not to delete Welsh, but to teach more people Welsh", es: "Respuesta: la segunda. La solución real no es borrar el galés, sino enseñar más galés", id: "Jawaban: yang kedua. Solusi sebenarnya bukan menghapus bahasa Wales, melainkan mengajarkannya kepada lebih banyak orang", ar: "الإِجَابَة: الثَّانِي. الحَلّ الحَقِيقِي لَيْسَ مَحْو الوِيلْزِيَّة، بَلْ أَنْ يَتَعَلَّم نَاس أَكْثَر الوِيلْزِيَّة" },
         },
       },
       {
@@ -3486,35 +3486,35 @@ const STORIES: Record<string, Story> = {
         questions: [
           {
             word: { en: "Hello", ko: "안녕하세요", es: "Hola", id: "Halo", ar: "أَهْلاً" },
-            meaning: { en: "the first word you learn — the beginning of every conversation", ko: "가장 먼저 배우는 단어 — 모든 대화의 시작", es: "la primera palabra que aprendes — el inicio de cada conversación", id: "kata pertama yang kamu pelajari — awal dari setiap percakapan", ar: "أَوِّل كِلْمَة بِتِتْعَلِّمْهَا — بِدَايِة أَيّ كَلَام" },
+            meaning: { en: "the first word you learn — the beginning of every conversation", ko: "가장 먼저 배우는 단어 — 모든 대화의 시작", es: "la primera palabra que aprendes — el inicio de cada conversación", id: "kata pertama yang kamu pelajari — awal dari setiap percakapan", ar: "أَوَّل كَلِمَة تَتَعَلَّمُهَا — بِدَايَة أَيّ حَدِيث" },
             wrong: [
-              { en: "a word you use only when angry", ko: "화날 때만 쓰는 단어", es: "una palabra que usas solo cuando estás enojado", id: "kata yang hanya dipakai saat marah", ar: "كِلْمَة بِتِسْتَخْدِمْهَا بَسّ لَمَّا تِزْعَل" },
+              { en: "a word you use only when angry", ko: "화날 때만 쓰는 단어", es: "una palabra que usas solo cuando estás enojado", id: "kata yang hanya dipakai saat marah", ar: "كَلِمَة تَسْتَخْدِمُهَا فَقَط عِنْدَمَا تَغْضَب" },
               { en: "a formal document greeting", ko: "공식 문서 인사", es: "un saludo formal de documentos", id: "salam pembuka dokumen resmi", ar: "تَحِيَّة رَسْمِيَّة فِي وَرَقَة" },
-              { en: "a word with no meaning", ko: "의미 없는 단어", es: "una palabra sin significado", id: "kata tanpa makna", ar: "كِلْمَة مَلْهَاش مَعْنَى" },
+              { en: "a word with no meaning", ko: "의미 없는 단어", es: "una palabra sin significado", id: "kata tanpa makna", ar: "كَلِمَة بِلَا مَعْنَى" },
             ],
           },
           {
             word: { en: "Thank you", ko: "감사합니다", es: "Gracias", id: "Terima kasih", ar: "شُكْراً" },
-            meaning: { en: "what you say when someone helps you — gratitude in any language", ko: "누군가 도와줄 때 하는 말 — 어떤 언어에서든 감사의 표현", es: "lo que dices cuando alguien te ayuda — gratitud en cualquier idioma", id: "yang kamu ucapkan saat seseorang menolongmu — rasa terima kasih dalam bahasa apa pun", ar: "اللِّي بِتْقُولُه لَمَّا حَدّ يِسَاعْدَك — شُكْر بِأَيّ لُغَة" },
+            meaning: { en: "what you say when someone helps you — gratitude in any language", ko: "누군가 도와줄 때 하는 말 — 어떤 언어에서든 감사의 표현", es: "lo que dices cuando alguien te ayuda — gratitud en cualquier idioma", id: "yang kamu ucapkan saat seseorang menolongmu — rasa terima kasih dalam bahasa apa pun", ar: "مَا تَقُولُه عِنْدَمَا يُسَاعِدُكَ أَحَد — شُكْر بِأَيّ لُغَة" },
             wrong: [
               { en: "a question about directions", ko: "방향에 대한 질문", es: "una pregunta sobre direcciones", id: "pertanyaan tentang arah", ar: "سُؤَال عَنِ الطَّرِيق" },
-              { en: "a way to say goodbye", ko: "작별 인사하는 방법", es: "una forma de despedirse", id: "cara mengucapkan selamat tinggal", ar: "طَرِيقَة عَشَان تِوَدَّع" },
+              { en: "a way to say goodbye", ko: "작별 인사하는 방법", es: "una forma de despedirse", id: "cara mengucapkan selamat tinggal", ar: "طَرِيقَة كَيْ تُوَدِّع" },
               { en: "a request for food", ko: "음식 요청", es: "una petición de comida", id: "permintaan makanan", ar: "طَلَب أَكْل" },
             ],
           },
           {
-            word: { en: "Are you okay?", ko: "괜찮으세요?", es: "¿Estás bien?", id: "Kamu baik-baik saja?", ar: "إِنْتَ كُوَيِّس؟" },
-            meaning: { en: "asking if someone is well — showing you care about them", ko: "누군가의 안부를 묻는 것 — 관심을 보여주는 것", es: "preguntar si alguien está bien — mostrar que te importa", id: "menanyakan keadaan seseorang — menunjukkan bahwa kamu peduli", ar: "إِنَّك تِسْأَل عَنْ حَدّ كُوَيِّس وَلَّا لَأ — تِوَرِّيه إِنَّك مِهْتَمّ بِيه" },
+            word: { en: "Are you okay?", ko: "괜찮으세요?", es: "¿Estás bien?", id: "Kamu baik-baik saja?", ar: "هَلْ أَنْتَ بِخَيْر؟" },
+            meaning: { en: "asking if someone is well — showing you care about them", ko: "누군가의 안부를 묻는 것 — 관심을 보여주는 것", es: "preguntar si alguien está bien — mostrar que te importa", id: "menanyakan keadaan seseorang — menunjukkan bahwa kamu peduli", ar: "أَنْ تَسْأَل عَنْ أَحَد هَلْ هُوَ بِخَيْر أَمْ لا — تُظْهِر لَهُ أَنَّكَ مُهْتَمّ بِهِ" },
             wrong: [
-              { en: "asking for the time", ko: "시간을 묻는 것", es: "preguntar la hora", id: "menanyakan waktu", ar: "إِنَّك تِسْأَل عَنِ السَّاعَة" },
-              { en: "ordering food at a restaurant", ko: "식당에서 주문하는 것", es: "pedir comida en un restaurante", id: "memesan makanan di restoran", ar: "إِنَّك تِطْلُب أَكْل فِي مَطْعَم" },
-              { en: "asking for directions to the subway", ko: "지하철 방향을 묻는 것", es: "pedir direcciones al metro", id: "menanyakan arah ke stasiun kereta bawah tanah", ar: "إِنَّك تِسْأَل عَنِ الطَّرِيق لِلمِتْرُو" },
+              { en: "asking for the time", ko: "시간을 묻는 것", es: "preguntar la hora", id: "menanyakan waktu", ar: "أَنْ تَسْأَل عَنِ السَّاعَة" },
+              { en: "ordering food at a restaurant", ko: "식당에서 주문하는 것", es: "pedir comida en un restaurante", id: "memesan makanan di restoran", ar: "أَنْ تَطْلُب طَعَامًا فِي مَطْعَم" },
+              { en: "asking for directions to the subway", ko: "지하철 방향을 묻는 것", es: "pedir direcciones al metro", id: "menanyakan arah ke stasiun kereta bawah tanah", ar: "أَنْ تَسْأَل عَنِ الطَّرِيق إِلَى المِتْرُو" },
             ],
           },
         ],
         hints: {
-          h1: { ko: "루디가 이 여정에서 배운 가장 중요한 단어들을 생각해봐 — Unit 1부터 지금까지", en: "Think about the most important words Rudy learned on this journey — from Unit 1 until now", es: "Piensa en las palabras más importantes que Rudy aprendió — desde la Unidad 1 hasta ahora", id: "Pikirkan kata-kata terpenting yang Rudy pelajari dalam perjalanan ini — dari Unit 1 sampai sekarang", ar: "فَكَّر فِي أَهَمّ الكَلِمَات اللِّي رُودِي اِتْعَلِّمْهَا فِي الرِّحْلَة دِي — مِنِ الوِحْدَة الأُولَى لِحَدّ دِلْوَقْتِي" },
-          h2: { ko: "이 단어들은 사람과 사람을 연결하는 기본 표현이야 — 인사, 감사, 걱정", en: "These words are basic expressions that connect people — greeting, gratitude, concern", es: "Estas palabras son expresiones básicas que conectan personas — saludo, gratitud, preocupación", id: "Kata-kata ini adalah ungkapan dasar yang menghubungkan orang — sapaan, terima kasih, perhatian", ar: "الكَلِمَات دِي تَعْبِيرَات أَسَاسِيَّة بِتْرَبُط بِين النَّاس — تَحِيَّة، وَشُكْر، وَاهْتِمَام" },
+          h1: { ko: "루디가 이 여정에서 배운 가장 중요한 단어들을 생각해봐 — Unit 1부터 지금까지", en: "Think about the most important words Rudy learned on this journey — from Unit 1 until now", es: "Piensa en las palabras más importantes que Rudy aprendió — desde la Unidad 1 hasta ahora", id: "Pikirkan kata-kata terpenting yang Rudy pelajari dalam perjalanan ini — dari Unit 1 sampai sekarang", ar: "فَكِّر فِي أَهَمّ الكَلِمَات الَّتِي تَعَلَّمَهَا رُودِي فِي هٰذِهِ الرِّحْلَة — مِنَ الوِحْدَة الأُولَى حَتَّى الآن" },
+          h2: { ko: "이 단어들은 사람과 사람을 연결하는 기본 표현이야 — 인사, 감사, 걱정", en: "These words are basic expressions that connect people — greeting, gratitude, concern", es: "Estas palabras son expresiones básicas que conectan personas — saludo, gratitud, preocupación", id: "Kata-kata ini adalah ungkapan dasar yang menghubungkan orang — sapaan, terima kasih, perhatian", ar: "هٰذِهِ الكَلِمَات تَعْبِيرَات أَسَاسِيَّة تَرْبُط بَيْنَ النَّاس — تَحِيَّة، وَشُكْر، وَاهْتِمَام" },
           h3: {
             ko: "Hello = 모든 대화의 시작 / Thank you = 감사 표현 / Are you okay? = 관심과 걱정",
             en: "Hello = start of every conversation / Thank you = gratitude / Are you okay? = caring and concern",
@@ -3552,28 +3552,28 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["I believe in you", "Don't give up"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            prompt: { en: "Floor 1: English Gate. Tom is on the radio — but the gate speaks only in English riddles. What do you say to open it?", ko: "1층: 영어 관문. 톰이 무선으로 연결되어 있어 — 하지만 관문은 영어 수수께끼로만 말해. 어떻게 열어?", es: "Piso 1: Puerta de inglés. Tom está en el radio — pero la puerta solo habla en acertijos en inglés. ¿Qué dices para abrirla?", id: "Lantai 1: Gerbang Inggris. Tom ada di radio — tapi gerbang itu hanya berbicara dalam teka-teki bahasa Inggris. Apa yang kamu ucapkan untuk membukanya?", ar: "الدُّور الأَوِّل: بَوَّابِة الإِنْجِلِيزِي. تُوم عَلَى اللَّاسِلْكِي — بَسّ البَوَّابَة بِتِتْكَلِّم بِفَوَازِير إِنْجِلِيزِي بَسّ. هَتْقُول إِيه عَشَان تِفْتَحْهَا؟" },
-            context: { en: "Gate: 'I start every conversation, I end every goodbye. What word am I?' Tom: 'Blimey, Rudy! That's the first word we taught you! Think!'", ko: "관문: '나는 모든 대화를 시작하고, 모든 작별 인사를 끝낼 수 있어. 나는 어떤 단어야?' 톰: '이런, 루디! 그게 우리가 처음 가르친 단어야! 생각해!'", es: "Puerta: 'Empiezo cada conversación, termino cada despedida. ¿Qué palabra soy?' Tom: '¡Mira, Rudy! ¡Esa es la primera palabra que te enseñamos! ¡Piensa!'", id: "Gerbang: 'Aku memulai setiap percakapan, aku mengakhiri setiap perpisahan. Kata apakah aku?' Tom: 'Astaga, Rudy! Itu kata pertama yang kami ajarkan padamu! Pikirkan!'", ar: "البَوَّابَة: 'أَنَا بَبْدَأ أَيّ كَلَام، وَبَقْفِل أَيّ وَدَاع. أَنَا كِلْمِة إِيه؟' تُوم: 'يَا لَهْوِي، رُودِي! دِي أَوِّل كِلْمَة عَلِّمْنَاهَالَك! فَكَّر!'" },
-            answer: { en: "Hello. And goodbye. And hello again — because every ending is a new beginning.", ko: "Hello. 그리고 goodbye. 그리고 또 hello — 왜냐하면 모든 끝은 새로운 시작이니까.", es: "Hello. Y goodbye. Y hello otra vez — porque cada final es un nuevo comienzo.", id: "Hello. Dan goodbye. Dan hello lagi — karena setiap akhir adalah awal yang baru.", ar: "Hello. وَكَمَان goodbye. وَتَانِي Hello — عَشَان كُلّ نِهَايَة هِيَّ بِدَايَة جِدِيدَة." },
+            prompt: { en: "Floor 1: English Gate. Tom is on the radio — but the gate speaks only in English riddles. What do you say to open it?", ko: "1층: 영어 관문. 톰이 무선으로 연결되어 있어 — 하지만 관문은 영어 수수께끼로만 말해. 어떻게 열어?", es: "Piso 1: Puerta de inglés. Tom está en el radio — pero la puerta solo habla en acertijos en inglés. ¿Qué dices para abrirla?", id: "Lantai 1: Gerbang Inggris. Tom ada di radio — tapi gerbang itu hanya berbicara dalam teka-teki bahasa Inggris. Apa yang kamu ucapkan untuk membukanya?", ar: "الطَّابِق الأَوَّل: بَوَّابَة الإِنْجِلِيزِيَّة. تُوم عَلَى اللَّاسِلْكِي — لَكِنَّ البَوَّابَة تَتَكَلَّم بِأَلْغَاز إِنْجِلِيزِيَّة فَقَط. مَاذَا سَتَقُول كَيْ تَفْتَحَهَا؟" },
+            context: { en: "Gate: 'I start every conversation, I end every goodbye. What word am I?' Tom: 'Blimey, Rudy! That's the first word we taught you! Think!'", ko: "관문: '나는 모든 대화를 시작하고, 모든 작별 인사를 끝낼 수 있어. 나는 어떤 단어야?' 톰: '이런, 루디! 그게 우리가 처음 가르친 단어야! 생각해!'", es: "Puerta: 'Empiezo cada conversación, termino cada despedida. ¿Qué palabra soy?' Tom: '¡Mira, Rudy! ¡Esa es la primera palabra que te enseñamos! ¡Piensa!'", id: "Gerbang: 'Aku memulai setiap percakapan, aku mengakhiri setiap perpisahan. Kata apakah aku?' Tom: 'Astaga, Rudy! Itu kata pertama yang kami ajarkan padamu! Pikirkan!'", ar: "البَوَّابَة: 'أَنَا أَبْدَأ أَيّ حَدِيث، وَأُنْهِي أَيّ وَدَاع. أَيُّ كَلِمَة أَنَا؟' تُوم: 'يَا إِلٰهِي، رُودِي! هٰذِهِ أَوَّل كَلِمَة عَلَّمْنَاهَا لَكَ! فَكِّر!'" },
+            answer: { en: "Hello. And goodbye. And hello again — because every ending is a new beginning.", ko: "Hello. 그리고 goodbye. 그리고 또 hello — 왜냐하면 모든 끝은 새로운 시작이니까.", es: "Hello. Y goodbye. Y hello otra vez — porque cada final es un nuevo comienzo.", id: "Hello. Dan goodbye. Dan hello lagi — karena setiap akhir adalah awal yang baru.", ar: "Hello. وَأَيْضًا goodbye. وَمَرَّة أُخْرَى Hello — لِأَنَّ كُلّ نِهَايَة هِيَ بِدَايَة جَدِيدَة." },
             wrong: [
-              { en: "I need to think about this more carefully.", ko: "더 신중하게 생각해봐야 해.", es: "Necesito pensar más cuidadosamente en esto.", id: "Aku harus memikirkan ini lebih hati-hati.", ar: "لَازِم أُفَكَّر فِي ده بِتَأَنِّي أَكْتَر." },
-              { en: "Tom, what is the answer?", ko: "톰, 답이 뭐야?", es: "Tom, ¿cuál es la respuesta?", id: "Tom, apa jawabannya?", ar: "تُوم، الإِجَابَة إِيه؟" },
+              { en: "I need to think about this more carefully.", ko: "더 신중하게 생각해봐야 해.", es: "Necesito pensar más cuidadosamente en esto.", id: "Aku harus memikirkan ini lebih hati-hati.", ar: "يَجِب أَنْ أُفَكِّر فِي هٰذا بِتَأَنٍّ أَكْثَر." },
+              { en: "Tom, what is the answer?", ko: "톰, 답이 뭐야?", es: "Tom, ¿cuál es la respuesta?", id: "Tom, apa jawabannya?", ar: "تُوم، مَا الإِجَابَة؟" },
             ],
           },
           {
-            prompt: { en: "Floor 2: Spanish Gate. Isabel is here. The gate requires a genuine greeting — not just words, but meaning.", ko: "2층: 스페인어 관문. 이사벨이 여기 있어. 관문은 진심 어린 인사를 요구해 — 단어만이 아니라 의미도.", es: "Piso 2: Puerta de español. Isabel está aquí. La puerta requiere un saludo genuino — no solo palabras, sino significado.", id: "Lantai 2: Gerbang Spanyol. Isabel ada di sini. Gerbang itu menuntut sapaan yang tulus — bukan sekadar kata, tapi makna.", ar: "الدُّور التَّانِي: بَوَّابِة الإِسْبَانِي. إِيزَابِيل هِنَا. البَوَّابَة عَايْزَة تَحِيَّة مِنِ القَلْب — مِش كَلِمَات وَبَسّ، لَكِنْ مَعْنَى." },
-            context: { en: "Gate: 'Say it like you mean it. In Spanish.' Isabel: '¡Ánimo, detective! You know this — I heard you try it in Madrid!'", ko: "관문: '진심으로 말해봐. 스페인어로.' 이사벨: '힘내요, 탐정님! 알잖아요 — 마드리드에서 해보는 거 들었거든요!'", es: "Puerta: 'Dilo como si lo dijeras en serio. En español.' Isabel: '¡Ánimo, detective! Sabes esto — ¡te escuché intentarlo en Madrid!'", id: "Gerbang: 'Ucapkan dengan sungguh-sungguh. Dalam bahasa Spanyol.' Isabel: '¡Ánimo, detektif! Kamu tahu ini — aku dengar kamu mencobanya di Madrid!'", ar: "البَوَّابَة: 'قُولْهَا وَإِنْتَ حَاسِسْهَا. بِالإِسْبَانِي.' إِيزَابِيل: '¡Ánimo، يَا مُحَقِّق! إِنْتَ عَارِفْهَا — أَنَا سِمِعْتَك بِتِجَرَّبْهَا فِي مَدْرِيد!'" },
-            answer: { en: "Buenos días. Gracias. Lo siento. Adiós. *and everything in between — all the words that connect us*", ko: "Buenos días. Gracias. Lo siento. Adiós. *그리고 그 사이의 모든 것 — 우리를 연결하는 모든 단어*", es: "Buenos días. Gracias. Lo siento. Adiós. *y todo lo que hay en medio — todas las palabras que nos conectan*", id: "Buenos días. Gracias. Lo siento. Adiós. *dan semua yang ada di antaranya — semua kata yang menghubungkan kita*", ar: "Buenos días. Gracias. Lo siento. Adiós. *وَكُلّ اللِّي مَا بِينْهُم — كُلّ الكَلِمَات اللِّي بِتْرَبِطْنَا*" },
+            prompt: { en: "Floor 2: Spanish Gate. Isabel is here. The gate requires a genuine greeting — not just words, but meaning.", ko: "2층: 스페인어 관문. 이사벨이 여기 있어. 관문은 진심 어린 인사를 요구해 — 단어만이 아니라 의미도.", es: "Piso 2: Puerta de español. Isabel está aquí. La puerta requiere un saludo genuino — no solo palabras, sino significado.", id: "Lantai 2: Gerbang Spanyol. Isabel ada di sini. Gerbang itu menuntut sapaan yang tulus — bukan sekadar kata, tapi makna.", ar: "الطَّابِق الثَّانِي: بَوَّابَة الإِسْبَانِيَّة. إِيزَابِيل هُنَا. البَوَّابَة تُرِيد تَحِيَّة مِنَ القَلْب — لَيْسَ كَلِمَات فَقَط، بَلْ مَعْنًى." },
+            context: { en: "Gate: 'Say it like you mean it. In Spanish.' Isabel: '¡Ánimo, detective! You know this — I heard you try it in Madrid!'", ko: "관문: '진심으로 말해봐. 스페인어로.' 이사벨: '힘내요, 탐정님! 알잖아요 — 마드리드에서 해보는 거 들었거든요!'", es: "Puerta: 'Dilo como si lo dijeras en serio. En español.' Isabel: '¡Ánimo, detective! Sabes esto — ¡te escuché intentarlo en Madrid!'", id: "Gerbang: 'Ucapkan dengan sungguh-sungguh. Dalam bahasa Spanyol.' Isabel: '¡Ánimo, detektif! Kamu tahu ini — aku dengar kamu mencobanya di Madrid!'", ar: "البَوَّابَة: 'قُلْهَا وَأَنْتَ تَشْعُر بِهَا. بِالإِسْبَانِيَّة.' إِيزَابِيل: '¡Ánimo، يَا مُحَقِّق! أَنْتَ تَعْرِفُهَا — سَمِعْتُكَ تُجَرِّبُهَا فِي مَدْرِيد!'" },
+            answer: { en: "Buenos días. Gracias. Lo siento. Adiós. *and everything in between — all the words that connect us*", ko: "Buenos días. Gracias. Lo siento. Adiós. *그리고 그 사이의 모든 것 — 우리를 연결하는 모든 단어*", es: "Buenos días. Gracias. Lo siento. Adiós. *y todo lo que hay en medio — todas las palabras que nos conectan*", id: "Buenos días. Gracias. Lo siento. Adiós. *dan semua yang ada di antaranya — semua kata yang menghubungkan kita*", ar: "Buenos días. Gracias. Lo siento. Adiós. *وَكُلّ مَا بَيْنَهُمَا — كُلّ الكَلِمَات الَّتِي تَرْبِطُنَا*" },
             wrong: [
-              { en: "¿Cómo estás? — that's all I know in Spanish.", ko: "¿Cómo estás? — 그게 내가 아는 스페인어 전부야.", es: "¿Cómo estás? — eso es todo lo que sé en español.", id: "¿Cómo estás? — hanya itu yang aku tahu dalam bahasa Spanyol.", ar: "¿Cómo estás? — ده كُلّ اللِّي بَعْرِفُه بِالإِسْبَانِي." },
+              { en: "¿Cómo estás? — that's all I know in Spanish.", ko: "¿Cómo estás? — 그게 내가 아는 스페인어 전부야.", es: "¿Cómo estás? — eso es todo lo que sé en español.", id: "¿Cómo estás? — hanya itu yang aku tahu dalam bahasa Spanyol.", ar: "¿Cómo estás? — هٰذا كُلّ مَا أَعْرِفُه بِالإِسْبَانِيَّة." },
               { en: "Isabel, please do this for me.", ko: "이사벨, 제발 대신 해줘.", es: "Isabel, por favor hazlo tú por mí.", id: "Isabel, tolong lakukan ini untukku.", ar: "إِيزَابِيل، مِنْ فَضْلِك اِعْمِلِيهَا إِنْتِ بَدَالِي." },
             ],
           },
         ],
         hints: {
-          h1: { ko: "각 관문은 당신이 이미 배운 언어를 요구해 — Unit 1부터 지금까지 배운 것들을 기억해봐", en: "Each gate requires languages you already learned — remember everything from Unit 1 until now", es: "Cada puerta requiere idiomas que ya aprendiste — recuerda todo desde la Unidad 1 hasta ahora", id: "Setiap gerbang menuntut bahasa yang sudah kamu pelajari — ingat semuanya dari Unit 1 sampai sekarang", ar: "كُلّ بَوَّابَة بِتِطْلُب لُغَة إِنْتَ خَلَاص اِتْعَلِّمْتَهَا — اِفْتِكِر كُلّ حَاجَة مِنِ الوِحْدَة الأُولَى لِحَدّ دِلْوَقْتِي" },
+          h1: { ko: "각 관문은 당신이 이미 배운 언어를 요구해 — Unit 1부터 지금까지 배운 것들을 기억해봐", en: "Each gate requires languages you already learned — remember everything from Unit 1 until now", es: "Cada puerta requiere idiomas que ya aprendiste — recuerda todo desde la Unidad 1 hasta ahora", id: "Setiap gerbang menuntut bahasa yang sudah kamu pelajari — ingat semuanya dari Unit 1 sampai sekarang", ar: "كُلّ بَوَّابَة تَطْلُب لُغَة تَعَلَّمْتَهَا بِالفِعْل — تَذَكَّر كُلّ شَيْء مِنَ الوِحْدَة الأُولَى حَتَّى الآن" },
           h2: { ko: "진심은 언어보다 중요해 — 완벽하게 말하려 하지 말고, 의미를 담아 말해봐", en: "Sincerity matters more than perfection — don't try to speak perfectly, speak with meaning", es: "La sinceridad importa más que la perfección — no intentes hablar perfectamente, habla con significado", id: "Ketulusan lebih penting daripada kesempurnaan — jangan berusaha bicara sempurna, bicaralah dengan makna", ar: "الصِّدْق أَهَمّ مِنِ الكَمَال — مَتْحَوِلْش تِتْكَلِّم بِشَكْل كَامِل، اِتْكَلِّم بِمَعْنَى" },
-          h3: { ko: "1층 답: 'Hello' (시작과 끝을 모두 담은 단어) / 2층 답: 기초 스페인어 인사들의 조합", en: "Floor 1 answer: 'Hello' (the word that contains both beginning and end) / Floor 2: combine basic Spanish greetings", es: "Piso 1 respuesta: 'Hello' (la palabra que contiene principio y fin) / Piso 2: combina saludos básicos en español", id: "Jawaban lantai 1: 'Hello' (kata yang memuat awal sekaligus akhir) / Lantai 2: gabungkan sapaan dasar bahasa Spanyol", ar: "إِجَابِة الدُّور الأَوِّل: 'Hello' (الكِلْمَة اللِّي فِيهَا البِدَايَة وَالنِّهَايَة) / الدُّور التَّانِي: اِجْمَع تَحِيَّات إِسْبَانِي أَسَاسِيَّة" },
+          h3: { ko: "1층 답: 'Hello' (시작과 끝을 모두 담은 단어) / 2층 답: 기초 스페인어 인사들의 조합", en: "Floor 1 answer: 'Hello' (the word that contains both beginning and end) / Floor 2: combine basic Spanish greetings", es: "Piso 1 respuesta: 'Hello' (la palabra que contiene principio y fin) / Piso 2: combina saludos básicos en español", id: "Jawaban lantai 1: 'Hello' (kata yang memuat awal sekaligus akhir) / Lantai 2: gabungkan sapaan dasar bahasa Spanyol", ar: "إِجَابَة الطَّابِق الأَوَّل: 'Hello' (الكَلِمَة الَّتِي فِيهَا البِدَايَة وَالنِّهَايَة) / الطَّابِق الثَّانِي: اِجْمَع تَحِيَّات إِسْبَانِيَّة أَسَاسِيَّة" },
         },
       },
       {
@@ -3588,10 +3588,10 @@ const STORIES: Record<string, Story> = {
         storyConsequence: "Every ally is inspired. You enter the final chamber together.",
         onFail: { addToWeakExpressions: ["Thank you", "Together we can stop this"], reviewInDailyCourse: true, reviewDays: 3 },
         title: { en: "Rally Your Allies", ko: "동료들을 격려하기", es: "Reunir a tus Aliados", id: "Kobarkan Semangat Sekutumu", ar: "اِشْحَن هِمِّة صُحَابَك" },
-        context: { en: "Before entering the tower, say a word of encouragement to each ally. They came from around the world — speak from the heart!", ko: "탑에 들어가기 전에 동료들에게 격려의 말을 하세요. 전 세계에서 도우러 왔어요 — 진심을 담아 말하세요!", es: "Antes de entrar en la torre, di unas palabras de aliento. ¡Han venido de todo el mundo — habla con el corazón!", id: "Sebelum memasuki menara, ucapkan kata penyemangat kepada setiap sekutu. Mereka datang dari seluruh dunia — bicaralah dari hati!", ar: "قَبْل مَا تُدْخُل البُرْج، قُول كِلْمِة تَشْجِيع لِكُلّ وَاحِد مِنْ صُحَابَك. دُول جُمْ مِنْ كُلّ حِتَّة فِي الدُّنْيَا — اِتْكَلِّم مِنْ قَلْبَك!" },
+        context: { en: "Before entering the tower, say a word of encouragement to each ally. They came from around the world — speak from the heart!", ko: "탑에 들어가기 전에 동료들에게 격려의 말을 하세요. 전 세계에서 도우러 왔어요 — 진심을 담아 말하세요!", es: "Antes de entrar en la torre, di unas palabras de aliento. ¡Han venido de todo el mundo — habla con el corazón!", id: "Sebelum memasuki menara, ucapkan kata penyemangat kepada setiap sekutu. Mereka datang dari seluruh dunia — bicaralah dari hati!", ar: "قَبْلَ أَنْ تَدْخُل البُرْج، قُلْ كَلِمَة تَشْجِيع لِكُلّ وَاحِد مِنْ أَصْدِقَائِك. لَقَدْ جَاءُوا مِنْ كُلّ مَكَان فِي العَالَم — تَكَلَّم مِنْ قَلْبِك!" },
         questions: [
-          { word: { en: "Tom, thank you for believing in us from the start.", ko: "톰, 처음부터 우리를 믿어줘서 고마워.", es: "Tom, gracias por creer en nosotros desde el principio.", id: "Tom, terima kasih sudah memercayai kami sejak awal.", ar: "تُوم، شُكْراً إِنَّك صَدَّقْتِنَا مِنِ الأَوِّل." }, hint: { en: "Thank Tom for his trust", ko: "톰의 신뢰에 감사하세요", es: "Agradece a Tom su confianza", id: "Berterima kasihlah kepada Tom atas kepercayaannya", ar: "اِشْكُر تُوم عَلَى ثِقْتُه" }, acceptableAnswers: ["tom thank you for believing in us", "thank you for believing in us", "tom thanks for believing in us from the start"] },
-          { word: { en: "Isabel, your brother would be proud of you.", ko: "이사벨, 네 동생이 자랑스러워할 거야.", es: "Isabel, tu hermano estaría orgulloso de ti.", id: "Isabel, kakakmu pasti bangga padamu.", ar: "إِيزَابِيل، أَخُوكِ كَانْ هَيِفْتِخِر بِيكِ." }, hint: { en: "Encourage Isabel about Carlos", ko: "카를로스에 대해 이사벨을 격려하세요", es: "Anima a Isabel sobre Carlos", id: "Beri semangat Isabel tentang Carlos", ar: "شَجَّع إِيزَابِيل بِخُصُوص كَارْلُوس" }, acceptableAnswers: ["isabel your brother would be proud of you", "your brother would be proud of you", "isabel your brother would be proud"] },
+          { word: { en: "Tom, thank you for believing in us from the start.", ko: "톰, 처음부터 우리를 믿어줘서 고마워.", es: "Tom, gracias por creer en nosotros desde el principio.", id: "Tom, terima kasih sudah memercayai kami sejak awal.", ar: "تُوم، شُكْرًا لِأَنَّكَ صَدَّقْتَنَا مِنَ البِدَايَة." }, hint: { en: "Thank Tom for his trust", ko: "톰의 신뢰에 감사하세요", es: "Agradece a Tom su confianza", id: "Berterima kasihlah kepada Tom atas kepercayaannya", ar: "اِشْكُر تُوم عَلَى ثِقَتِه" }, acceptableAnswers: ["tom thank you for believing in us", "thank you for believing in us", "tom thanks for believing in us from the start"] },
+          { word: { en: "Isabel, your brother would be proud of you.", ko: "이사벨, 네 동생이 자랑스러워할 거야.", es: "Isabel, tu hermano estaría orgulloso de ti.", id: "Isabel, kakakmu pasti bangga padamu.", ar: "إِيزَابِيل، أَخُوكِ كَانَ سَيَفْتَخِر بِكِ." }, hint: { en: "Encourage Isabel about Carlos", ko: "카를로스에 대해 이사벨을 격려하세요", es: "Anima a Isabel sobre Carlos", id: "Beri semangat Isabel tentang Carlos", ar: "شَجَّع إِيزَابِيل بِخُصُوص كَارْلُوس" }, acceptableAnswers: ["isabel your brother would be proud of you", "your brother would be proud of you", "isabel your brother would be proud"] },
           { word: { en: "Together, we can stop this. Let's go.", ko: "함께라면 이걸 막을 수 있어. 가자.", es: "Juntos podemos detener esto. Vamos.", id: "Bersama, kita bisa menghentikan ini. Ayo.", ar: "مَعَ بَعْض، نِقْدَر نِوَقَّف ده. يَلَّا بِينَا." }, hint: { en: "Rally everyone for the final mission", ko: "최종 미션을 위해 모두를 격려하세요", es: "Reúne a todos para la misión final", id: "Kobarkan semangat semua orang untuk misi terakhir", ar: "اِشْحَن هِمِّة الكُلّ لِلمُهِمَّة الأَخِيرَة" }, acceptableAnswers: ["together we can stop this lets go", "together we can stop this", "we can stop this lets go"] },
         ],
       },
@@ -3625,11 +3625,11 @@ const STORIES: Record<string, Story> = {
         onFail: { addToWeakExpressions: ["Language is power", "Every word matters"], reviewInDailyCourse: true, reviewDays: 3 },
         questions: [
           {
-            instruction: { en: "Floor 3: Korean Gate. Sujin is with you. Build the sentence that opens the gate — in Korean: 'My friend is very kind.'", ko: "3층: 한국어 관문. 수진이 함께 있어. 관문을 여는 문장을 만들어 — 한국어로: '제 친구는 매우 친절해요.'", es: "Piso 3: Puerta de coreano. Sujin está contigo. Construye la frase que abre la puerta — en coreano: '제 친구는 매우 친절해요.'", id: "Lantai 3: Gerbang Korea. Sujin bersamamu. Susun kalimat yang membuka gerbang — dalam bahasa Korea: '제 친구는 매우 친절해요.'", ar: "الدُّور التَّالِت: بَوَّابِة الكُورِي. سُوجِين مَعَاك. كَوِّن الجُمْلَة اللِّي بِتِفْتَح البَوَّابَة — بِالكُورِي: '제 친구는 매우 친절해요.' (صَاحْبِي طَيِّب أَوِي.)" },
+            instruction: { en: "Floor 3: Korean Gate. Sujin is with you. Build the sentence that opens the gate — in Korean: 'My friend is very kind.'", ko: "3층: 한국어 관문. 수진이 함께 있어. 관문을 여는 문장을 만들어 — 한국어로: '제 친구는 매우 친절해요.'", es: "Piso 3: Puerta de coreano. Sujin está contigo. Construye la frase que abre la puerta — en coreano: '제 친구는 매우 친절해요.'", id: "Lantai 3: Gerbang Korea. Sujin bersamamu. Susun kalimat yang membuka gerbang — dalam bahasa Korea: '제 친구는 매우 친절해요.'", ar: "الطَّابِق الثَّالِث: بَوَّابَة الكُورِيَّة. سُوجِين مَعَك. كَوِّن الجُمْلَة الَّتِي تَفْتَح البَوَّابَة — بِالكُورِيَّة: '제 친구는 매우 친절해요.' (صَدِيقِي طَيِّب جِدًّا.)" },
             words: [
-              { en: "my", ko: "제", es: "mi", id: "saya punya", ar: "بِتَاعِي" },
+              { en: "my", ko: "제", es: "mi", id: "saya punya", ar: "خَاصَّتِي" },
               { en: "friend (topic)", ko: "친구는", es: "amigo", id: "teman (topik)", ar: "صَاحِب (مُبْتَدَأ)" },
-              { en: "very", ko: "매우", es: "muy", id: "sangat", ar: "أَوِي" },
+              { en: "very", ko: "매우", es: "muy", id: "sangat", ar: "جِدًّا" },
               { en: "kind", ko: "친절해요", es: "amable", id: "baik hati", ar: "طَيِّب" },
             ],
             answerOrder: [0, 1, 2, 3],
@@ -3637,8 +3637,8 @@ const STORIES: Record<string, Story> = {
         ],
         hints: {
           h1: { ko: "한국어 어순은 영어와 달라: 소유격 → 주어 → 부사 → 형용사 순서야", en: "Korean word order differs from English: Possessive → Subject → Adverb → Adjective", es: "El orden de palabras en coreano difiere del español: Posesivo → Sujeto → Adverbio → Adjetivo", id: "Urutan kata bahasa Korea berbeda dari bahasa Inggris: Posesif → Subjek → Adverbia → Adjektiva", ar: "تَرْتِيب الكَلَام فِي الكُورِي مُخْتَلِف عَنِ الإِنْجِلِيزِي: مِلْكِيَّة ← مُبْتَدَأ ← ظَرْف ← صِفَة" },
-          h2: { ko: "'제'가 먼저 (소유격), '친구는' (주어), '매우' (부사), '친절해요' (형용사)로 끝내", en: "'제' first (my), then '친구는' (friend+topic), '매우' (very), end with '친절해요' (kind)", es: "'제' primero (mi), luego '친구는' (amigo+tema), '매우' (muy), termina con '친절해요' (amable)", id: "'제' dulu (saya punya), lalu '친구는' (teman+topik), '매우' (sangat), akhiri dengan '친절해요' (baik hati)", ar: "'제' الأَوِّل (بِتَاعِي)، بَعْدِين '친구는' (صَاحِب+مُبْتَدَأ)، '매우' (أَوِي)، وَاقْفِل بِـ '친절해요' (طَيِّب)" },
-          h3: { ko: "답: 제 → 친구는 → 매우 → 친절해요 (My friend is very kind)", en: "Answer: 제 → 친구는 → 매우 → 친절해요 (My friend is very kind)", es: "Respuesta: 제 → 친구는 → 매우 → 친절해요 (Mi amigo es muy amable)", id: "Jawaban: 제 → 친구는 → 매우 → 친절해요 (Teman saya sangat baik hati)", ar: "الإِجَابَة: 제 → 친구는 → 매우 → 친절해요 (صَاحْبِي طَيِّب أَوِي)" },
+          h2: { ko: "'제'가 먼저 (소유격), '친구는' (주어), '매우' (부사), '친절해요' (형용사)로 끝내", en: "'제' first (my), then '친구는' (friend+topic), '매우' (very), end with '친절해요' (kind)", es: "'제' primero (mi), luego '친구는' (amigo+tema), '매우' (muy), termina con '친절해요' (amable)", id: "'제' dulu (saya punya), lalu '친구는' (teman+topik), '매우' (sangat), akhiri dengan '친절해요' (baik hati)", ar: "'제' أَوَّلًا (خَاصَّتِي)، ثُمَّ '친구는' (صَدِيق+مُبْتَدَأ)، '매우' (جِدًّا)، وَأَنْهِ بِـ '친절해요' (طَيِّب)" },
+          h3: { ko: "답: 제 → 친구는 → 매우 → 친절해요 (My friend is very kind)", en: "Answer: 제 → 친구는 → 매우 → 친절해요 (My friend is very kind)", es: "Respuesta: 제 → 친구는 → 매우 → 친절해요 (Mi amigo es muy amable)", id: "Jawaban: 제 → 친구는 → 매우 → 친절해요 (Teman saya sangat baik hati)", ar: "الإِجَابَة: 제 → 친구는 → 매우 → 친절해요 (صَدِيقِي طَيِّب جِدًّا)" },
         },
       },
       {
@@ -3672,7 +3672,7 @@ const STORIES: Record<string, Story> = {
           {
             prompt: { en: "The Universal Code can still be stopped. Which action breaks the activation sequence?", ko: "유니버설 코드는 아직 멈출 수 있어. 어떤 행동이 활성화 순서를 끊어?", es: "El Código Universal aún puede detenerse. ¿Qué acción interrumpe la secuencia de activación?", id: "Universal Code masih bisa dihentikan. Tindakan mana yang memutus urutan aktivasi?", ar: "الـ Universal Code لِسَّه يِنْفَع نِوَقَّفُه. أَنْهِي تَصَرُّف يِقْطَع تَسَلْسُل التَّفْعِيل؟" },
             clues: [
-              { en: "Smash the central device with a heavy object.", ko: "무거운 물건으로 중앙 장치를 부수기.", es: "Destrozar el dispositivo central con un objeto pesado.", id: "Menghancurkan perangkat pusat dengan benda berat.", ar: "تِكَسَّر الجِهَاز اللِّي فِي النُّصّ بِحَاجَة تِقِيلَة." },
+              { en: "Smash the central device with a heavy object.", ko: "무거운 물건으로 중앙 장치를 부수기.", es: "Destrozar el dispositivo central con un objeto pesado.", id: "Menghancurkan perangkat pusat dengan benda berat.", ar: "تُحَطِّم الجِهَاز الَّذِي فِي المُنْتَصَف بِشَيْء ثَقِيل." },
               { en: "Remove one Guardian Stone from its pedestal — breaking the circuit of seven.", ko: "받침대에서 수호석 하나를 제거하기 — 7개의 회로를 끊기.", es: "Retirar una Piedra Guardiana de su pedestal — rompiendo el circuito de siete.", id: "Mengangkat satu Batu Penjaga dari tumpuannya — memutus rangkaian tujuh.", ar: "تِشِيل حَجَر حَارِس وَاحِد مِنْ عَلَى قَاعْدِتُه — وَكِدَه تِقْطَع دَايْرِة السَّبْعَة." },
               { en: "Ask Mr. Black to stop voluntarily — he has the override code.", ko: "미스터 블랙에게 자발적으로 멈추라고 부탁하기 — 그에게 재정의 코드가 있어.", es: "Pedirle a Mr. Black que se detenga voluntariamente — él tiene el código de anulación.", id: "Meminta Mr. Black berhenti secara sukarela — dia memegang kode pembatalan.", ar: "تِطْلُب مِنْ مِسْتَر بْلَاك إِنُّه يِوَقَّف بِإِرَادْتُه — هُوَّ مَعَاه كُود الإِلْغَاء." },
               { en: "Wait for the timer to run out on its own.", ko: "타이머가 스스로 끝나길 기다리기.", es: "Esperar a que el temporizador se agote por sí solo.", id: "Menunggu penghitung waktu habis dengan sendirinya.", ar: "تِسْتَنَّى المُؤَقِّت يِخْلَص لِوَحْدُه." },
@@ -3681,9 +3681,9 @@ const STORIES: Record<string, Story> = {
           },
         ],
         hints: {
-          h1: { ko: "파괴적인 행동은 예상치 못한 결과를 낳을 수 있어 — 가장 안전한 방법을 찾아봐", en: "Destructive actions can have unexpected consequences — look for the safest method", es: "Las acciones destructivas pueden tener consecuencias inesperadas — busca el método más seguro", id: "Tindakan yang merusak bisa menimbulkan akibat tak terduga — carilah cara yang paling aman", ar: "التَّصَرُّفَات المُدَمِّرَة مُمْكِن تِجِيب نَتَايِج مِش مُتَوَقَّعَة — دَوَّر عَلَى أَأْمَن طَرِيقَة" },
-          h2: { ko: "미스터 블랙은 방금 돌아가신 어머니에 대해 이야기했어 — 그에게는 아직 양심이 있어", en: "Mr. Black just talked about his late mother — he still has a conscience", es: "Mr. Black acaba de hablar de su madre fallecida — todavía tiene conciencia", id: "Mr. Black baru saja bercerita tentang mendiang ibunya — dia masih punya hati nurani", ar: "مِسْتَر بْلَاك لِسَّه مِتْكَلِّم عَنْ أُمُّه اللِّي اِتْوَفِّت — لِسَّه عَنْدُه ضَمِير" },
-          h3: { ko: "답: 세 번째. 미스터 블랙이 의식적으로 멈추는 게 유일한 완전한 해결책이야 — 그는 재정의 코드를 갖고 있어", en: "Answer: the third one. Mr. Black choosing to stop is the only complete solution — he holds the override code", es: "Respuesta: la tercera. Mr. Black eligiendo detenerse es la única solución completa — él tiene el código de anulación", id: "Jawaban: yang ketiga. Mr. Black memilih berhenti adalah satu-satunya solusi yang utuh — dia memegang kode pembatalan", ar: "الإِجَابَة: التَّالِتَة. إِنّ مِسْتَر بْلَاك يِخْتَار إِنُّه يِوَقَّف هُوَّ الحَلّ الكَامِل الوَحِيد — هُوَّ مَعَاه كُود الإِلْغَاء" },
+          h1: { ko: "파괴적인 행동은 예상치 못한 결과를 낳을 수 있어 — 가장 안전한 방법을 찾아봐", en: "Destructive actions can have unexpected consequences — look for the safest method", es: "Las acciones destructivas pueden tener consecuencias inesperadas — busca el método más seguro", id: "Tindakan yang merusak bisa menimbulkan akibat tak terduga — carilah cara yang paling aman", ar: "التَّصَرُّفَات المُدَمِّرَة قَدْ تَأْتِي بِنَتَائِج غَيْر مُتَوَقَّعَة — اِبْحَثْ عَنْ أَأْمَن طَرِيقَة" },
+          h2: { ko: "미스터 블랙은 방금 돌아가신 어머니에 대해 이야기했어 — 그에게는 아직 양심이 있어", en: "Mr. Black just talked about his late mother — he still has a conscience", es: "Mr. Black acaba de hablar de su madre fallecida — todavía tiene conciencia", id: "Mr. Black baru saja bercerita tentang mendiang ibunya — dia masih punya hati nurani", ar: "مِسْتَر بْلَاك تَكَلَّمَ لِلتَّوّ عَنْ أُمِّهِ الَّتِي تُوُفِّيَتْ — مَا زَالَ لَدَيْهِ ضَمِير" },
+          h3: { ko: "답: 세 번째. 미스터 블랙이 의식적으로 멈추는 게 유일한 완전한 해결책이야 — 그는 재정의 코드를 갖고 있어", en: "Answer: the third one. Mr. Black choosing to stop is the only complete solution — he holds the override code", es: "Respuesta: la tercera. Mr. Black eligiendo detenerse es la única solución completa — él tiene el código de anulación", id: "Jawaban: yang ketiga. Mr. Black memilih berhenti adalah satu-satunya solusi yang utuh — dia memegang kode pembatalan", ar: "الإِجَابَة: الثَّالِثَة. أَنْ يَخْتَار مِسْتَر بْلَاك أَنْ يَتَوَقَّف هُوَ الحَلّ الكَامِل الوَحِيد — هُوَ يَحْمِل كُود الإِلْغَاء" },
         },
       },
       {
@@ -4193,13 +4193,13 @@ const SEOUL_V21_STORY: Story = {
     {
       kind: "puzzle",
       puzzleNum: 1,
-      title: { en: "Polite First Words", ko: "첫 정중 표현", es: "Primeras palabras formales", id: "Kata-Kata Sopan Pertama", ar: "أَوِّل كَلِمَات مُؤَدَّبَة" },
+      title: { en: "Polite First Words", ko: "첫 정중 표현", es: "Primeras palabras formales", id: "Kata-Kata Sopan Pertama", ar: "أَوَّل كَلِمَات مُؤَدَّبَة" },
       context: {
         en: "Minho will help if you can separate polite Korean from casual speech.",
         ko: "정중한 한국어와 반말을 구분하면 민호가 도와줄 거예요.",
         es: "Minho ayudará si puedes separar el coreano formal del habla casual.",
         id: "Minho akan membantu jika kamu bisa membedakan bahasa Korea yang sopan dari bahasa sehari-hari.",
-        ar: "مِينْهُو هَيِسَاعْدَك لَوْ قِدِرْت تِفَرَّق بِين الكُورِي المُؤَدَّب وَالكَلَام العَادِي.",
+        ar: "مِينْهُو سَيُسَاعِدُكَ إِنِ اسْتَطَعْتَ التَّفْرِقَة بَيْنَ الكُورِيَّة المُؤَدَّبَة وَالكَلَام العَادِي.",
       },
       pType: "word-match",
       tprsStage: 1,
@@ -4230,7 +4230,7 @@ const SEOUL_V21_STORY: Story = {
         },
       ],
       hints: {
-        h1: { ko: "끝에 -요 또는 -합니다가 있으면 보통 더 정중해요.", en: "Words ending in -요 or -합니다 usually sound more polite.", es: "Las formas que terminan en -요 o -합니다 suelen sonar más formales.", id: "Kata yang berakhiran -요 atau -합니다 biasanya terdengar lebih sopan.", ar: "الكَلِمَات اللِّي بِتِخْلَص بِـ -요 أَوْ -합니다 غَالِباً بِتْبَان أَكْثَر أَدَباً." },
+        h1: { ko: "끝에 -요 또는 -합니다가 있으면 보통 더 정중해요.", en: "Words ending in -요 or -합니다 usually sound more polite.", es: "Las formas que terminan en -요 o -합니다 suelen sonar más formales.", id: "Kata yang berakhiran -요 atau -합니다 biasanya terdengar lebih sopan.", ar: "الكَلِمَات الَّتِي تَنْتَهِي بِـ -요 أَوْ -합니다 غَالِبًا تَبْدُو أَكْثَر أَدَبًا." },
         h2: { ko: "안녕, 고마워, 도와줘는 가까운 사이의 반말이에요.", en: "안녕, 고마워, and 도와줘 are casual forms.", es: "안녕, 고마워 y 도와줘 son formas casuales.", id: "안녕, 고마워, dan 도와줘 adalah bentuk santai.", ar: "안녕، 고마워، 도와줘 دِي صِيَغ عَادِيَّة بِين النَّاس القُرَيِّبِين." },
         h3: { ko: "정중한 두 표현: 안녕하세요 / 감사합니다", en: "The two polite forms: 안녕하세요 / 감사합니다", es: "Las dos formas formales: 안녕하세요 / 감사합니다", id: "Dua bentuk sopan: 안녕하세요 / 감사합니다", ar: "الصِّيغْتِين المُؤَدَّبْتِين: 안녕하세요 / 감사합니다" },
       },
@@ -4262,7 +4262,7 @@ const SEOUL_V21_STORY: Story = {
         ko: "영숙 할머니가 음식과 길을 내어줍니다. 대화의 온기를 지키는 대답을 고르세요.",
         es: "Youngsook ofrece comida y dirección. Elige la respuesta que conserva la calidez de la conversación.",
         id: "Youngsook menawarkan makanan dan menunjukkan arah. Pilih jawaban yang menjaga kehangatan percakapan.",
-        ar: "يُونْغْسُوك بِتِعْرِض أَكْل وَبِتْوَرِّيك الطَّرِيق. اِخْتَار الرَّدّ اللِّي يِحَافِظ عَلَى دِفْء الكَلَام.",
+        ar: "يُونْغْسُوك تَعْرِض طَعَامًا وَتُرِيكَ الطَّرِيق. اِخْتَر الرَّدّ الَّذِي يُحَافِظ عَلَى دِفْء الحَدِيث.",
       },
       pType: "dialogue-choice",
       tprsStage: 2,
@@ -4274,8 +4274,8 @@ const SEOUL_V21_STORY: Story = {
       onFail: { addToWeakExpressions: ["감사합니다", "도와주세요", "실례합니다"], reviewInDailyCourse: true, reviewDays: 3 },
       questions: [
         {
-          prompt: { en: "Youngsook gives you soup and points toward the station.", ko: "영숙 할머니가 국을 내어주며 역 쪽을 가리킵니다.", es: "Youngsook te da sopa y señala hacia la estación.", id: "Youngsook memberimu sup dan menunjuk ke arah stasiun.", ar: "يُونْغْسُوك بِتِدِّيك شُورْبَة وَبِتْأَشِّر نَاحْيِة المَحَطَّة." },
-          context: { en: "You want to thank her politely.", ko: "정중하게 감사해야 합니다.", es: "Quieres agradecerle de forma formal.", id: "Kamu ingin berterima kasih kepadanya dengan sopan.", ar: "عَايِز تِشْكُرْهَا بِأَدَب." },
+          prompt: { en: "Youngsook gives you soup and points toward the station.", ko: "영숙 할머니가 국을 내어주며 역 쪽을 가리킵니다.", es: "Youngsook te da sopa y señala hacia la estación.", id: "Youngsook memberimu sup dan menunjuk ke arah stasiun.", ar: "يُونْغْسُوك تُعْطِيكَ شُورْبَة وَتُشِير نَحْوَ المَحَطَّة." },
+          context: { en: "You want to thank her politely.", ko: "정중하게 감사해야 합니다.", es: "Quieres agradecerle de forma formal.", id: "Kamu ingin berterima kasih kepadanya dengan sopan.", ar: "تُرِيد أَنْ تَشْكُرَهَا بِأَدَب." },
           answer: { en: "감사합니다", ko: "감사합니다", es: "감사합니다", id: "감사합니다", ar: "감사합니다" },
           wrong: [
             { en: "고마워", ko: "고마워", es: "고마워", id: "고마워", ar: "고마워" },
@@ -4283,7 +4283,7 @@ const SEOUL_V21_STORY: Story = {
           ],
         },
         {
-          prompt: { en: "The market signs flicker and you need help finding Sujin's lab.", ko: "시장 간판이 깜빡이고 수진 박사의 연구실을 찾아야 합니다.", es: "Los letreros del mercado parpadean y necesitas encontrar el laboratorio de Sujin.", id: "Papan-papan pasar berkedip dan kamu butuh bantuan menemukan laboratorium Sujin.", ar: "لَافْتَات السُّوق بِتِنَوَّر وَتِطْفِي وَإِنْتَ مِحْتَاج مُسَاعْدَة عَشَان تِلَاقِي مَعْمَل سُوجِين." },
+          prompt: { en: "The market signs flicker and you need help finding Sujin's lab.", ko: "시장 간판이 깜빡이고 수진 박사의 연구실을 찾아야 합니다.", es: "Los letreros del mercado parpadean y necesitas encontrar el laboratorio de Sujin.", id: "Papan-papan pasar berkedip dan kamu butuh bantuan menemukan laboratorium Sujin.", ar: "لَافِتَات السُّوق تُضِيء وَتَنْطَفِئ وَأَنْتَ بِحَاجَة إِلَى مُسَاعَدَة كَيْ تَجِد مَعْمَل سُوجِين." },
           context: { en: "Ask for help politely.", ko: "정중하게 도움을 요청하세요.", es: "Pide ayuda de forma formal.", id: "Mintalah bantuan dengan sopan.", ar: "اِطْلُب مُسَاعْدَة بِأَدَب." },
           answer: { en: "도와주세요", ko: "도와주세요", es: "도와주세요", id: "도와주세요", ar: "도와주세요" },
           wrong: [
@@ -4293,8 +4293,8 @@ const SEOUL_V21_STORY: Story = {
         },
       ],
       hints: {
-        h1: { ko: "시장에서는 말투가 관계를 만들어요.", en: "In the market, register creates relationship.", es: "En el mercado, el registro crea relación.", id: "Di pasar, gaya bicara membentuk hubungan.", ar: "فِي السُّوق، أُسْلُوب الكَلَام بِيِبْنِي العِلَاقَة." },
-        h2: { ko: "정중함은 -요 / -합니다 쪽을 고르면 돼요.", en: "Choose the -요 / -합니다 forms for politeness.", es: "Elige formas con -요 / -합니다 para sonar formal.", id: "Pilih bentuk -요 / -합니다 untuk terdengar sopan.", ar: "عَشَان الأَدَب، اِخْتَار صِيَغ -요 / -합니다." },
+        h1: { ko: "시장에서는 말투가 관계를 만들어요.", en: "In the market, register creates relationship.", es: "En el mercado, el registro crea relación.", id: "Di pasar, gaya bicara membentuk hubungan.", ar: "فِي السُّوق، أُسْلُوب الكَلَام يَبْنِي العِلَاقَة." },
+        h2: { ko: "정중함은 -요 / -합니다 쪽을 고르면 돼요.", en: "Choose the -요 / -합니다 forms for politeness.", es: "Elige formas con -요 / -합니다 para sonar formal.", id: "Pilih bentuk -요 / -합니다 untuk terdengar sopan.", ar: "لِلأَدَب، اِخْتَر صِيَغ -요 / -합니다." },
         h3: { ko: "정답: 감사합니다, 도와주세요", en: "Answers: 감사합니다, 도와주세요", es: "Respuestas: 감사합니다, 도와주세요", id: "Jawaban: 감사합니다, 도와주세요", ar: "الإِجَابَات: 감사합니다، 도와주세요" },
       },
     },
@@ -4353,7 +4353,7 @@ const SEOUL_V21_STORY: Story = {
           answerOrder: [0, 1, 2],
         },
         {
-          instruction: { en: "Build: Where is the museum?", ko: "문장을 만드세요: 박물관은 어디예요?", es: "Construye: ¿Dónde está el museo?", id: "Susun: Di mana museumnya?", ar: "كَوِّن: فِين المَتْحَف؟" },
+          instruction: { en: "Build: Where is the museum?", ko: "문장을 만드세요: 박물관은 어디예요?", es: "Construye: ¿Dónde está el museo?", id: "Susun: Di mana museumnya?", ar: "كَوِّن: أَيْنَ المَتْحَف؟" },
           words: [
             { en: "박물관은", ko: "박물관은", es: "박물관은", id: "박물관은", ar: "박물관은" },
             { en: "어디예요?", ko: "어디예요?", es: "어디예요?", id: "어디예요?", ar: "어디예요?" },
@@ -4362,7 +4362,7 @@ const SEOUL_V21_STORY: Story = {
         },
       ],
       hints: {
-        h1: { ko: "한국어는 동사가 뒤에 오는 경우가 많아요.", en: "Korean often places the verb near the end.", es: "El coreano suele poner el verbo cerca del final.", id: "Bahasa Korea sering menempatkan kata kerja di dekat akhir.", ar: "الكُورِي غَالِباً بِيِحُطّ الفِعْل قُرَيِّب مِنِ الآخِر." },
+        h1: { ko: "한국어는 동사가 뒤에 오는 경우가 많아요.", en: "Korean often places the verb near the end.", es: "El coreano suele poner el verbo cerca del final.", id: "Bahasa Korea sering menempatkan kata kerja di dekat akhir.", ar: "الكُورِيَّة غَالِبًا تَضَع الفِعْل قَرِيبًا مِنَ الآخِر." },
         h2: { ko: "저는 → 박물관에 → 가요", en: "저는 → 박물관에 → 가요", es: "저는 → 박물관에 → 가요", id: "저는 → 박물관에 → 가요", ar: "저는 → 박물관에 → 가요" },
         h3: { ko: "질문은 박물관은 → 어디예요?", en: "The question is 박물관은 → 어디예요?", es: "La pregunta es 박물관은 → 어디예요?", id: "Pertanyaannya 박물관은 → 어디예요?", ar: "السُّؤَال هُوَّ 박물관은 → 어디예요?" },
       },
@@ -4394,7 +4394,7 @@ const SEOUL_V21_STORY: Story = {
         ko: "궁궐 문 근처에 단서 세 개가 남아 있습니다. 그중 하나만 문장 순서를 온전히 지킵니다.",
         es: "Quedan tres pistas junto a la puerta. Solo una conserva intacto el orden de la frase.",
         id: "Tiga petunjuk tersisa di dekat gerbang istana. Hanya satu yang menjaga tata urutan kalimatnya tetap utuh.",
-        ar: "تَلَات أَدِلَّة لِسَّه فَاضْلِين جَنْب بَوَّابِة القَصْر. وَاحِد بَسّ مِنْهُم مِحَافِظ عَلَى تَرْتِيب الجُمْلَة سَلِيم.",
+        ar: "ثَلَاثَة أَدِلَّة مَا زَالَتْ بِجَانِب بَوَّابَة القَصْر. وَاحِد فَقَط مِنْهَا يُحَافِظ عَلَى تَرْتِيب الجُمْلَة سَلِيمًا.",
       },
       pType: "investigation",
       quizContract: "deduction",
@@ -4409,14 +4409,14 @@ const SEOUL_V21_STORY: Story = {
           prompt: { en: "Which clue still has human order?", ko: "어떤 단서가 아직 사람의 순서를 지키고 있나요?", es: "¿Qué pista conserva todavía el orden humano?", id: "Petunjuk mana yang masih memiliki tata urutan manusiawi?", ar: "أَنْهِي دَلِيل لِسَّه فِيه تَرْتِيب بَنِي آدَمِين؟" },
           clues: [
             { en: "A palace map where every label is alphabetized by machine.", ko: "모든 이름이 기계식 알파벳 순서로 정리된 궁궐 지도", es: "Un mapa del palacio con todas las etiquetas ordenadas por máquina", id: "Peta istana yang setiap labelnya diurutkan secara alfabetis oleh mesin.", ar: "خَرِيطِة قَصْر كُلّ الأَسَامِي فِيهَا مِرَتَّبَة أَبْجَدِي بِالمَكَنَة." },
-            { en: "A note: 실례합니다. 박물관은 어디예요? The handwriting hesitates before 어디예요.", ko: "메모: 실례합니다. 박물관은 어디예요? 어디예요 앞에서 손글씨가 잠시 흔들린다.", es: "Una nota: 실례합니다. 박물관은 어디예요? La letra duda antes de 어디예요.", id: "Sebuah catatan: 실례합니다. 박물관은 어디예요? Tulisan tangannya ragu sejenak sebelum 어디예요.", ar: "وَرَقَة: 실례합니다. 박물관은 어디예요? الخَطّ بِيِتْرَدَّد شْوَيَّة قَبْل 어디예요." },
+            { en: "A note: 실례합니다. 박물관은 어디예요? The handwriting hesitates before 어디예요.", ko: "메모: 실례합니다. 박물관은 어디예요? 어디예요 앞에서 손글씨가 잠시 흔들린다.", es: "Una nota: 실례합니다. 박물관은 어디예요? La letra duda antes de 어디예요.", id: "Sebuah catatan: 실례합니다. 박물관은 어디예요? Tulisan tangannya ragu sejenak sebelum 어디예요.", ar: "وَرَقَة: 실례합니다. 박물관은 어디예요? الخَطّ يَتَرَدَّد قَلِيلًا قَبْلَ 어디예요." },
             { en: "A receipt where every Korean ending has been replaced by one smooth tone.", ko: "모든 한국어 어미가 하나의 매끈한 말투로 바뀐 영수증", es: "Un recibo donde cada final coreano fue reemplazado por un tono liso", id: "Sebuah struk yang setiap akhiran Korea-nya diganti dengan satu nada yang licin.", ar: "إِيصَال كُلّ النِّهَايَات الكُورِيَّة فِيه اِتْغَيِّرِت بِنَبْرَة وَاحْدَة نَاعْمَة." },
           ],
           answerIdx: 1,
         },
       ],
       hints: {
-        h1: { ko: "사람의 말에는 머뭇거림이 남아 있어요.", en: "Human language often leaves hesitation behind.", es: "El lenguaje humano suele dejar dudas.", id: "Bahasa manusia sering meninggalkan keraguan.", ar: "كَلَام البَنِي آدَمِين غَالِباً بِيِسِيب وَرَاه تَرَدُّد." },
+        h1: { ko: "사람의 말에는 머뭇거림이 남아 있어요.", en: "Human language often leaves hesitation behind.", es: "El lenguaje humano suele dejar dudas.", id: "Bahasa manusia sering meninggalkan keraguan.", ar: "كَلَام البَشَر غَالِبًا يَتْرُك وَرَاءَهُ تَرَدُّدًا." },
         h2: { ko: "정중한 질문 형태를 찾으세요.", en: "Look for the polite question form.", es: "Busca la forma formal de pregunta.", id: "Cari bentuk pertanyaan yang sopan.", ar: "دَوَّر عَلَى صِيغِة السُّؤَال المُؤَدَّبَة." },
         h3: { ko: "정답은 손글씨 메모예요: 실례합니다. 박물관은 어디예요?", en: "The answer is the handwritten note: 실례합니다. 박물관은 어디예요?", es: "La respuesta es la nota manuscrita: 실례합니다. 박물관은 어디예요?", id: "Jawabannya adalah catatan tulisan tangan: 실례합니다. 박물관은 어디예요?", ar: "الإِجَابَة هِيَّ الوَرَقَة المَكْتُوبَة بِالإِيد: 실례합니다. 박물관은 어디예요?" },
       },
@@ -4476,7 +4476,7 @@ const SEOUL_V21_STORY: Story = {
         ko: "정중한 한국어로 궁궐 문을 열어요.",
         es: "Usa coreano formal para abrir la puerta del palacio.",
         id: "Gunakan bahasa Korea yang sopan untuk membuka gerbang istana.",
-        ar: "اِسْتَخْدِم كُورِي مُؤَدَّب عَشَان تِفْتَح بَوَّابِة القَصْر.",
+        ar: "اِسْتَخْدِم كُورِيَّة مُؤَدَّبَة كَيْ تَفْتَح بَوَّابَة القَصْر.",
       },
       pType: "boss-spell",
       tprsStage: 4,
@@ -4496,7 +4496,7 @@ const SEOUL_V21_STORY: Story = {
             ko: "정중한 한국어로 궁궐 문을 열어요.",
             es: "Usa coreano formal para abrir la puerta del palacio.",
             id: "Gunakan bahasa Korea yang sopan untuk membuka gerbang istana.",
-            ar: "اِسْتَخْدِم كُورِي مُؤَدَّب عَشَان تِفْتَح بَوَّابِة القَصْر.",
+            ar: "اِسْتَخْدِم كُورِيَّة مُؤَدَّبَة كَيْ تَفْتَح بَوَّابَة القَصْر.",
           },
           hints: {
             h1: {
@@ -4526,14 +4526,14 @@ const SEOUL_V21_STORY: Story = {
             ko: "궁궐 문이 봉인되어 있어요. 정중한 한국어만이 열 수 있어요.",
             es: "La puerta del palacio está sellada. Solo el coreano formal puede abrirla.",
             id: "Gerbang istana tersegel. Hanya bahasa Korea yang sopan yang bisa membukanya.",
-            ar: "بَوَّابِة القَصْر مَخْتُومَة. الكُورِي المُؤَدَّب بَسّ هُوَّ اللِّي يِقْدَر يِفْتَحْهَا.",
+            ar: "بَوَّابَة القَصْر مَخْتُومَة. الكُورِيَّة المُؤَدَّبَة وَحْدَهَا هِيَ القَادِرَة عَلَى فَتْحِهَا.",
           },
           storyConsequence: {
             en: "The palace reassembles. Each chunk restores one wing.",
             ko: "궁궐이 재조립돼요. 각 조각이 한 채씩 복구해요.",
             es: "El palacio se reconstruye. Cada pieza restaura una sección.",
             id: "Istana itu tersusun kembali. Tiap potongan memulihkan satu sayap bangunan.",
-            ar: "القَصْر بِيِتْرَكِّب تَانِي. كُلّ قِطْعَة بِتْرَجَّع جَنَاح.",
+            ar: "القَصْر يُعَاد تَرْكِيبُه. كُلّ قِطْعَة تُعِيد جَنَاحًا.",
           },
           doorImage: ch3BossPalaceImg,
         },
@@ -5693,10 +5693,10 @@ function PuzzleSolvedBadge({ onNext, lang }: { onNext: () => void; lang: string 
   return (
     <Animated.View style={[styles.solvedBadge, { transform: [{ scale }] }]}>
       <Image source={rudyStoryImg} style={styles.solvedPortrait} resizeMode="cover" />
-      <Text style={styles.solvedTitle}>{lang === "korean" ? "퍼즐 해결!" : lang === "spanish" ? "¡Puzzle Resuelto!" : lang === "indonesian" ? "Teka-teki selesai!" : lang === "arabic" ? "حلّيت اللغز!" : "Puzzle Solved!"}</Text>
+      <Text style={styles.solvedTitle}>{lang === "korean" ? "퍼즐 해결!" : lang === "spanish" ? "¡Puzzle Resuelto!" : lang === "indonesian" ? "Teka-teki selesai!" : lang === "arabic" ? "حُلَّ اللُّغْز!" : "Puzzle Solved!"}</Text>
       <Text style={styles.solvedXp}>+20 XP</Text>
       <Pressable style={styles.solvedBtn} onPress={onNext}>
-        <Text style={styles.solvedBtnText}>{lang === "korean" ? "계속" : lang === "spanish" ? "Continuar" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "كمّل" : "Continue"}</Text>
+        <Text style={styles.solvedBtnText}>{lang === "korean" ? "계속" : lang === "spanish" ? "Continuar" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "تابِع" : "Continue"}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -5857,7 +5857,7 @@ function FillBlankPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }:
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
-          <Text style={styles.puzzleConfirmText}>{idx < puzzle.questions.length - 1 ? (ko ? "다음" : id ? "Lanjut" : ar ? "التالي" : "Next") : (ko ? "완료" : es ? "Listo" : id ? "Selesai" : ar ? "خلاص" : "Done")}</Text>
+          <Text style={styles.puzzleConfirmText}>{idx < puzzle.questions.length - 1 ? (ko ? "다음" : id ? "Lanjut" : ar ? "التالي" : "Next") : (ko ? "완료" : es ? "Listo" : id ? "Selesai" : ar ? "تَمّ" : "Done")}</Text>
         </Pressable>
       )}
       {hasQHints && (
@@ -5982,7 +5982,7 @@ function DialogueChoicePuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
           <Text style={styles.puzzleConfirmText}>{
             idx < puzzle.questions.length - 1
               ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "التالي" : "Next")
-              : (lang === "korean" ? "완료" : lang === "spanish" ? "Hecho" : lang === "indonesian" ? "Selesai" : lang === "arabic" ? "خلاص" : "Done")
+              : (lang === "korean" ? "완료" : lang === "spanish" ? "Hecho" : lang === "indonesian" ? "Selesai" : lang === "arabic" ? "تَمّ" : "Done")
           }</Text>
         </Pressable>
       )}
@@ -6042,7 +6042,7 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
         <Text style={styles.puzzleWordLabel}>{tri(q.instruction, lang)}</Text>
         <View style={styles.sbAnswerRow}>
           {placed.length === 0
-            ? <Text style={styles.sbAnswerPlaceholder}>{lang === "korean" ? "단어를 탭하세요..." : lang === "spanish" ? "Toca las palabras..." : lang === "indonesian" ? "Ketuk kata di bawah..." : lang === "arabic" ? "دوس على الكلمات تحت..." : "Tap words below..."}</Text>
+            ? <Text style={styles.sbAnswerPlaceholder}>{lang === "korean" ? "단어를 탭하세요..." : lang === "spanish" ? "Toca las palabras..." : lang === "indonesian" ? "Ketuk kata di bawah..." : lang === "arabic" ? "اُنْقُر على الكَلِمات بالأَسْفَل..." : "Tap words below..."}</Text>
             : placed.map((originalIdx, i) => (
                 <Pressable key={i} style={styles.sbAnswerChip} onPress={() => tapWord(originalIdx)}>
                   <Text style={styles.sbAnswerChipText}>{tri(q.words[originalIdx], learningLang)}</Text>
@@ -6054,7 +6054,7 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
           <Text style={[styles.sbFeedback, { color: isCorrect ? "#5a9" : "#e55" }]}>
             {isCorrect
               ? (lang === "korean" ? "정답이에요!" : lang === "indonesian" ? "Benar!" : lang === "arabic" ? "صح!" : "Correct!")
-              : (lang === "korean" ? "다시 시도해요" : lang === "indonesian" ? "Coba lagi" : lang === "arabic" ? "جرّب تاني" : "Try again")}
+              : (lang === "korean" ? "다시 시도해요" : lang === "indonesian" ? "Coba lagi" : lang === "arabic" ? "حاوِل مَرّة أُخْرى" : "Try again")}
           </Text>
         )}
       </View>
@@ -6076,14 +6076,14 @@ function SentenceBuilderPuzzle({ puzzle, lang, learningLang, onSolved, onResetHi
       </View>
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: placed.length > 0 ? 1 : 0.5 }]} onPress={handleCheck} disabled={placed.length === 0}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인" : lang === "spanish" ? "Verificar" : lang === "indonesian" ? "Periksa" : lang === "arabic" ? "شوف" : "Check"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인" : lang === "spanish" ? "Verificar" : lang === "indonesian" ? "Periksa" : lang === "arabic" ? "تَحَقَّق" : "Check"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={isCorrect ? handleNext : () => { setPlaced([]); setConfirmed(false); setIsCorrect(false); }}>
           <Text style={styles.puzzleConfirmText}>{
             isCorrect
               ? (lang === "korean" ? "다음" : lang === "spanish" ? "Siguiente" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "التالي" : "Next")
-              : (lang === "korean" ? "다시 시도" : lang === "spanish" ? "Reintentar" : lang === "indonesian" ? "Coba lagi" : lang === "arabic" ? "جرّب تاني" : "Try Again")
+              : (lang === "korean" ? "다시 시도" : lang === "spanish" ? "Reintentar" : lang === "indonesian" ? "Coba lagi" : lang === "arabic" ? "حاوِل مَرّة أُخْرى" : "Try Again")
           }</Text>
         </Pressable>
       )}
@@ -6165,7 +6165,7 @@ function InvestigationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
           <Text style={styles.puzzleConfirmText}>
             {selected === q.answerIdx
-              ? (lang === "korean" ? "계속" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "كمّل" : "Continue")
+              ? (lang === "korean" ? "계속" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "تابِع" : "Continue")
               : (lang === "korean" ? "다시 선택하기" : lang === "spanish" ? "Elegir otra vez" : lang === "indonesian" ? "Pilih lagi" : lang === "arabic" ? "اختار تاني" : "Choose again")}
           </Text>
         </Pressable>
@@ -6284,7 +6284,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
       ko ? "각 글자를 알파벳에서 한 칸 앞 글자로 바꿔보세요."
         : es ? "Cambia cada letra por la que está una posición antes en el alfabeto."
         : id ? "Ganti tiap huruf dengan huruf satu langkah sebelumnya di alfabet."
-        : ar ? "بدّل كل حرف بالحرف اللي قبله في الأبجدية الإنجليزية."
+        : ar ? "بَدِّل كُلّ حَرْف بِالحَرْف الَّذي قَبْلَه في الأَبْجَدِيّة الإِنْجِليزِيّة."
         : "Replace each letter with the one that comes one step before it in the alphabet.",
       ko ? `예: ${firstLetter} → ${decodedFirst}`
         : es ? `Ejemplo: ${firstLetter} → ${decodedFirst}`
@@ -6294,7 +6294,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
       ko ? `단어의 앞부분: ${decodedHalf}. 나머지 글자도 같은 방법으로 풀어봐`
         : es ? `Primeras letras descifradas: ${decodedHalf}. Descifra el resto con el mismo método`
         : id ? `Huruf awal terpecahkan: ${decodedHalf}. Pakai pergeseran yang sama untuk sisanya`
-        : ar ? `أول حروف اتحلّت: ${decodedHalf}. كمّل الباقي بنفس الطريقة`
+        : ar ? `أَوَّل الحُروف حُلَّت: ${decodedHalf}. أَكْمِل الباقي بِنَفْس الطَّريقة`
         : `First letters decoded: ${decodedHalf}. Apply the same shift to the rest`,
     ];
   }
@@ -6322,7 +6322,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
           {/* Error banner — NO answer reveal */}
           <View style={styles.cipherResultWrong}>
             <Text style={styles.cipherResultTitle}>
-              {ko ? "틀렸어요" : es ? "Incorrecto" : id ? "Salah!" : ar ? "غلط!" : "Wrong!"}
+              {ko ? "틀렸어요" : es ? "Incorrecto" : id ? "Salah!" : ar ? "خَطَأ!" : "Wrong!"}
             </Text>
           </View>
 
@@ -6331,19 +6331,19 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
             <Image source={rudyDialogueNeutralImg} style={styles.cipherLingoPortrait} resizeMode="cover" />
             <View style={styles.cipherLingoBubble}>
               <Text style={styles.cipherLingoBubbleText}>
-                {ko ? "흠... 뭔가 조금 다른 것 같군요, 파트너." : es ? "Hmm... algo no está bien, compañero." : id ? "Hmm... ada yang kurang pas, partner." : ar ? "همم... في حاجة مش مظبوطة، يا صاحبي." : "Hmm... something's not quite right, partner."}
+                {ko ? "흠... 뭔가 조금 다른 것 같군요, 파트너." : es ? "Hmm... algo no está bien, compañero." : id ? "Hmm... ada yang kurang pas, partner." : ar ? "همم... هُناك شَيْء غَيْر صَحيح، يا صَديقي." : "Hmm... something's not quite right, partner."}
               </Text>
             </View>
           </View>
           <Text style={styles.cipherRetryHint}>
-            {ko ? "조금만 더 생각해보세요." : es ? "Piénsalo un poco más." : id ? "Pikirkan sedikit lagi." : ar ? "فكّر شوية كمان." : "Think it over a bit more."}
+            {ko ? "조금만 더 생각해보세요." : es ? "Piénsalo un poco más." : id ? "Pikirkan sedikit lagi." : ar ? "فَكِّر قَليلًا أَكْثَر." : "Think it over a bit more."}
           </Text>
 
           {/* Buttons: Retry + Hint */}
           <View style={styles.cipherBtnRow}>
             <Pressable style={[styles.puzzleConfirmBtn, styles.cipherRetryBtn]} onPress={handleRetry}>
               <Text style={[styles.puzzleConfirmText, { color: C.gold }]}>
-                {ko ? "다시 시도" : es ? "Reintentar" : id ? "Coba lagi" : ar ? "جرّب تاني" : "Retry"}
+                {ko ? "다시 시도" : es ? "Reintentar" : id ? "Coba lagi" : ar ? "حاوِل مَرّة أُخْرى" : "Retry"}
               </Text>
             </Pressable>
             <Pressable
@@ -6351,7 +6351,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
               onPress={() => { setShowHintModal(true); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
             >
               <Text style={styles.puzzleConfirmText}>
-                {ko ? "힌트 보기" : es ? "Ver pistas" : id ? "Lihat petunjuk" : ar ? "شوف التلميحات" : "Show Hints"}
+                {ko ? "힌트 보기" : es ? "Ver pistas" : id ? "Lihat petunjuk" : ar ? "أَظْهِر التَّلْميحات" : "Show Hints"}
               </Text>
             </Pressable>
           </View>
@@ -6409,7 +6409,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
 
         {/* Success banner */}
         <View style={styles.cipherResultCorrect}>
-          <EmojiText style={styles.cipherResultTitle}>{ko ? "퍼즐 해결!" : es ? "¡Puzzle resuelto!" : id ? "Teka-teki selesai!" : ar ? "حلّيت اللغز!" : "Puzzle Solved!"}</EmojiText>
+          <EmojiText style={styles.cipherResultTitle}>{ko ? "퍼즐 해결!" : es ? "¡Puzzle resuelto!" : id ? "Teka-teki selesai!" : ar ? "حُلَّ اللُّغْز!" : "Puzzle Solved!"}</EmojiText>
         </View>
 
         {/* Fox celebration */}
@@ -6417,7 +6417,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
           <Image source={rudyDialogueNeutralImg} style={styles.cipherLingoPortrait} resizeMode="cover" />
           <View style={styles.cipherLingoBubble}>
             <Text style={styles.cipherLingoBubbleText}>
-              {ko ? "훌륭하군요, 파트너! 암호를 완벽히 해독했어요." : es ? "¡Brillante, compañero! Has descifrado el código perfectamente." : id ? "Hebat, partner! Kamu memecahkan sandinya dengan sempurna." : ar ? "برافو، يا صاحبي! فكيت الشيفرة صح تمام." : "Brilliant, partner! You've decoded the cipher perfectly."}
+              {ko ? "훌륭하군요, 파트너! 암호를 완벽히 해독했어요." : es ? "¡Brillante, compañero! Has descifrado el código perfectamente." : id ? "Hebat, partner! Kamu memecahkan sandinya dengan sempurna." : ar ? "أَحْسَنْت، يا صَديقي! فَكَكْتَ الشِّفْرة بِشَكْل صَحيح تَمامًا." : "Brilliant, partner! You've decoded the cipher perfectly."}
             </Text>
           </View>
         </View>
@@ -6445,7 +6445,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
         {/* Continue button */}
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleContinue}>
           <Text style={styles.puzzleConfirmText}>
-            {ko ? "다음 퍼즐" : es ? "Siguiente" : id ? "Teka-teki berikutnya" : ar ? "اللغز اللي بعده" : "Next Puzzle"}
+            {ko ? "다음 퍼즐" : es ? "Siguiente" : id ? "Teka-teki berikutnya" : ar ? "اللُّغْز التّالي" : "Next Puzzle"}
           </Text>
         </Pressable>
       </View>
@@ -6465,7 +6465,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
         <Image source={rudyDialogueNeutralImg} style={styles.cipherLingoPortrait} resizeMode="cover" />
         <View style={styles.cipherLingoBubble}>
           <Text style={styles.cipherLingoBubbleText}>
-            {lang === "korean" ? "이 암호를 해독해봐, 파트너!" : lang === "spanish" ? "¡Descifra este código, compañero!" : lang === "indonesian" ? "Pecahkan sandi ini, partner!" : lang === "arabic" ? "فُكّ الشيفرة دي، يا صاحبي!" : "Decode this cipher, partner!"}
+            {lang === "korean" ? "이 암호를 해독해봐, 파트너!" : lang === "spanish" ? "¡Descifra este código, compañero!" : lang === "indonesian" ? "Pecahkan sandi ini, partner!" : lang === "arabic" ? "فُكَّ هٰذِهِ الشِّفْرة، يا صَديقي!" : "Decode this cipher, partner!"}
           </Text>
         </View>
       </View>
@@ -6489,7 +6489,7 @@ function CipherPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }: {
         onPress={() => { setShowHintModal(true); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
       >
         <Text style={styles.hintBtnText}>
-          {lang === "korean" ? "힌트 보기" : lang === "spanish" ? "Ver pistas" : lang === "indonesian" ? "Lihat petunjuk" : lang === "arabic" ? "شوف التلميحات" : "Show Hints"}
+          {lang === "korean" ? "힌트 보기" : lang === "spanish" ? "Ver pistas" : lang === "indonesian" ? "Lihat petunjuk" : lang === "arabic" ? "أَظْهِر التَّلْميحات" : "Show Hints"}
           {unlockedHints > 0 && (
             <Text style={styles.hintBtnCount}> ({unlockedHints}/3)</Text>
           )}
@@ -6676,7 +6676,7 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
 
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>
-          {lang === "korean" ? `이 뜻에 맞는 ${targetLangLabel} 단어를 입력하세요` : lang === "spanish" ? `Escribe la palabra en ${targetLangLabel} que significa:` : lang === "indonesian" ? `Ketik kata ${targetLangLabel} yang berarti:` : lang === "arabic" ? `اكتب كلمة ${targetLangLabel} اللي معناها:` : `Type the ${targetLangLabel} word that means:`}
+          {lang === "korean" ? `이 뜻에 맞는 ${targetLangLabel} 단어를 입력하세요` : lang === "spanish" ? `Escribe la palabra en ${targetLangLabel} que significa:` : lang === "indonesian" ? `Ketik kata ${targetLangLabel} yang berarti:` : lang === "arabic" ? `اُكْتُب كَلِمة ${targetLangLabel} الَّتي مَعْناها:` : `Type the ${targetLangLabel} word that means:`}
         </Text>
         <Text style={[styles.puzzleWordMain, { fontSize: 17, textTransform: "none", lineHeight: 26 }]}>{meaning}</Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginTop: 10, gap: 5 }}>
@@ -6713,11 +6713,11 @@ function WordTypingPuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
 
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: answer.trim() ? 1 : 0.5 }]} onPress={handleConfirm} disabled={!answer.trim()}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인" : lang === "spanish" ? "Confirmar" : lang === "indonesian" ? "Periksa" : lang === "arabic" ? "شوف" : "Check"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인" : lang === "spanish" ? "Confirmar" : lang === "indonesian" ? "Periksa" : lang === "arabic" ? "تَحَقَّق" : "Check"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속" : lang === "spanish" ? "Continuar" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "كمّل" : "Continue"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속" : lang === "spanish" ? "Continuar" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "تابِع" : "Continue"}</Text>
         </Pressable>
       )}
     </View>
@@ -6939,7 +6939,7 @@ function PronunciationPuzzle({ puzzle, lang, learningLang, onSolved, onResetHint
       {recognizedText ? (
         <View style={styles.hwRecognized}>
           <Text style={styles.hwRecognizedLabel}>
-            {ko ? "인식된 텍스트:" : es ? "Texto reconocido:" : id ? "Dikenali:" : ar ? "اللي اتقرا:" : "Recognized:"}
+            {ko ? "인식된 텍스트:" : es ? "Texto reconocido:" : id ? "Dikenali:" : ar ? "النَّصّ المَقْروء:" : "Recognized:"}
           </Text>
           <Text style={styles.hwRecognizedText}>{recognizedText}</Text>
         </View>
@@ -7095,11 +7095,11 @@ function WritingMissionPuzzle({ puzzle, lang, learningLang, onSolved, onResetHin
       )}
       {!confirmed ? (
         <Pressable style={[styles.puzzleConfirmBtn, { opacity: answer.trim() ? 1 : 0.5 }]} onPress={handleConfirm} disabled={!answer.trim()}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인" : lang === "spanish" ? "Confirmar" : lang === "indonesian" ? "Periksa" : lang === "arabic" ? "شوف" : "Check"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "확인" : lang === "spanish" ? "Confirmar" : lang === "indonesian" ? "Periksa" : lang === "arabic" ? "تَحَقَّق" : "Check"}</Text>
         </Pressable>
       ) : (
         <Pressable style={styles.puzzleConfirmBtn} onPress={handleNext}>
-          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속" : lang === "spanish" ? "Continuar" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "كمّل" : "Continue"}</Text>
+          <Text style={styles.puzzleConfirmText}>{lang === "korean" ? "계속" : lang === "spanish" ? "Continuar" : lang === "indonesian" ? "Lanjut" : lang === "arabic" ? "تابِع" : "Continue"}</Text>
         </Pressable>
       )}
     </View>
@@ -7155,7 +7155,7 @@ function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
       </View>
       <View style={styles.puzzleWordCard}>
         <Text style={styles.puzzleWordLabel}>
-          {lang === "korean" ? "글자를 순서대로 탭해서 단어를 완성하세요" : lang === "spanish" ? "Toca las letras en orden para formar la palabra" : lang === "indonesian" ? "Ketuk huruf secara berurutan untuk membentuk kata" : lang === "arabic" ? "دوس على الحروف بالترتيب علشان تكوّن الكلمة" : "Tap letters in order to form the word"}
+          {lang === "korean" ? "글자를 순서대로 탭해서 단어를 완성하세요" : lang === "spanish" ? "Toca las letras en orden para formar la palabra" : lang === "indonesian" ? "Ketuk huruf secara berurutan untuk membentuk kata" : lang === "arabic" ? "اُنْقُر على الحُروف بالتَّرتيب لِتُكَوِّن الكَلِمة" : "Tap letters in order to form the word"}
         </Text>
         <View style={styles.wordPuzzleAnswerRow}>
           {correctWord.split("").map((_, i) => (
@@ -7183,7 +7183,7 @@ function WordPuzzlePuzzle({ puzzle, lang, learningLang, onSolved, onResetHints }
       {tapped.length > 0 && !isCorrect && (
         <Pressable style={[styles.puzzleConfirmBtn, { backgroundColor: "rgba(201,162,39,0.2)" }]} onPress={handleReset}>
           <Text style={[styles.puzzleConfirmText, { color: C.gold }]}>
-            {lang === "korean" ? "다시 시작" : lang === "spanish" ? "Reiniciar" : lang === "indonesian" ? "Ulang" : lang === "arabic" ? "من الأول" : "Reset"}
+            {lang === "korean" ? "다시 시작" : lang === "spanish" ? "Reiniciar" : lang === "indonesian" ? "Ulang" : lang === "arabic" ? "إِعادة" : "Reset"}
           </Text>
         </Pressable>
       )}
@@ -7268,7 +7268,7 @@ function ClueReveal({ clue, lang, onNext }: { clue: SeqClue; lang: string; onNex
         <Text style={styles.clueRevealTitle}>{title}</Text>
         <Text style={styles.clueRevealDesc}>{desc}</Text>
         <Pressable style={styles.clueRevealBtn} onPress={onNext}>
-          <Text style={styles.clueRevealBtnText}>{lang === "korean" ? "계속 수사하기" : lang === "spanish" ? "Continuar investigando" : lang === "indonesian" ? "Lanjut menyelidiki" : lang === "arabic" ? "كمّل التحقيق" : "Continue Investigation"}</Text>
+          <Text style={styles.clueRevealBtnText}>{lang === "korean" ? "계속 수사하기" : lang === "spanish" ? "Continuar investigando" : lang === "indonesian" ? "Lanjut menyelidiki" : lang === "arabic" ? "تابِع التَّحقيق" : "Continue Investigation"}</Text>
         </Pressable>
       </Animated.View>
     </View>
@@ -7294,14 +7294,14 @@ function CompletionScreen({ story, lang, xpEarned }: { story: Story; lang: strin
           <Ionicons name="flash" size={22} color={C.bg1} />
           <Text style={styles.xpRewardNum}>+{xpEarned} XP</Text>
         </View>
-        <Text style={styles.completionMsg}>{lang === "korean" ? "훌륭해요! 언어 탐정으로서의 실력이 향상되었어요. 다음 챕터가 기다립니다..." : lang === "spanish" ? "¡Excelente! Tus habilidades como detective lingüístico han mejorado. El próximo capítulo te espera..." : lang === "indonesian" ? "Luar biasa! Kemampuanmu sebagai Detektif Bahasa makin terasah. Bab berikutnya menanti..." : lang === "arabic" ? "رائع! مهاراتك كمحقق لغوي بقت أحسن. الفصل اللي بعده مستنّيك..." : "Excellent! Your skills as a Language Detective have grown. The next chapter awaits..."}</Text>
+        <Text style={styles.completionMsg}>{lang === "korean" ? "훌륭해요! 언어 탐정으로서의 실력이 향상되었어요. 다음 챕터가 기다립니다..." : lang === "spanish" ? "¡Excelente! Tus habilidades como detective lingüístico han mejorado. El próximo capítulo te espera..." : lang === "indonesian" ? "Luar biasa! Kemampuanmu sebagai Detektif Bahasa makin terasah. Bab berikutnya menanti..." : lang === "arabic" ? "رائِع! مَهاراتُك كَمُحَقِّق لُغَوِيّ صارَت أَفْضَل. الفَصْل التّالي يَنْتَظِرُك..." : "Excellent! Your skills as a Language Detective have grown. The next chapter awaits..."}</Text>
         {story.nextChapterId && (
           <Pressable
             style={styles.completionNextBtn}
             onPress={() => router.replace(`/story-scene?id=${story.nextChapterId}` as any)}
           >
             <Ionicons name="arrow-forward" size={18} color={C.bg1} />
-            <Text style={styles.completionNextBtnText}>{lang === "korean" ? "다음 챕터" : lang === "spanish" ? "Próximo Capítulo" : lang === "indonesian" ? "Bab Berikutnya" : lang === "arabic" ? "الفصل اللي بعده" : "Next Chapter"}</Text>
+            <Text style={styles.completionNextBtnText}>{lang === "korean" ? "다음 챕터" : lang === "spanish" ? "Próximo Capítulo" : lang === "indonesian" ? "Bab Berikutnya" : lang === "arabic" ? "الفَصْل التّالي" : "Next Chapter"}</Text>
           </Pressable>
         )}
         <Pressable style={styles.completionHomeBtn} onPress={() => router.replace("/(tabs)/story" as any)}>
@@ -7869,7 +7869,7 @@ export default function StoryScene() {
 
   const titleLabel = lang === "korean" ? story.titleKo : lang === "spanish" ? story.titleEs : lang === "indonesian" ? (story.titleId ?? story.title) : story.title;
   const storyAdvanceAccessibilityLabel = typingDone
-    ? (lang === "korean" ? "다음 스토리 대사" : lang === "spanish" ? "Siguiente linea de historia" : lang === "indonesian" ? "Lanjutkan cerita" : lang === "arabic" ? "السطر اللي بعده" : "Next story line")
+    ? (lang === "korean" ? "다음 스토리 대사" : lang === "spanish" ? "Siguiente linea de historia" : lang === "indonesian" ? "Lanjutkan cerita" : lang === "arabic" ? "السَّطْر التّالي" : "Next story line")
     : (lang === "korean" ? "스토리 대사 전체 보기" : lang === "spanish" ? "Mostrar todo el texto de historia" : lang === "indonesian" ? "Tampilkan semua teks cerita" : lang === "arabic" ? "اعرض كل نص القصة" : "Show full story text");
   const sceneBackdrop = sceneBackdropId ? getAdventureBackdropById(sceneBackdropId) : null;
   const sceneLighting = getBackdropLighting(sceneBackdropId ?? getDefaultAdventureBackdrop(story.id));

@@ -195,22 +195,22 @@ export default function StorySpeakAfterCard({
       : id
         ? "Sekarang coba ucapkan?"
         : ar
-          ? "دلوقتي قولها بصوتك؟"
+          ? "الآن قُلْها بِصَوْتِك؟"
           : "Now say it yourself?";
 
   const listenLabel = ko ? "듣기" : es ? "Escuchar" : id ? "Dengar" : ar ? "اسمع" : "Listen";
   const micLabel =
     phase === "recording"
       ? ko ? "듣는 중…" : es ? "Escuchando…" : id ? "Mendengarkan…" : ar ? "بسمع…" : "Listening…"
-      : ko ? "말하기" : es ? "Hablar" : id ? "Bicara" : ar ? "اتكلم" : "Speak";
-  const continueLabel = ko ? "계속 →" : es ? "Continuar →" : id ? "Lanjut →" : ar ? "كمّل →" : "Continue →";
-  const skipLabel = ko ? "나중에" : es ? "Más tarde" : id ? "Nanti" : ar ? "بعدين" : "Later";
+      : ko ? "말하기" : es ? "Hablar" : id ? "Bicara" : ar ? "تَكَلَّمْ" : "Speak";
+  const continueLabel = ko ? "계속 →" : es ? "Continuar →" : id ? "Lanjut →" : ar ? "تابِع →" : "Continue →";
+  const skipLabel = ko ? "나중에" : es ? "Más tarde" : id ? "Nanti" : ar ? "لاحِقًا" : "Later";
   const tryAgainLabel = ko ? "한번 더" : es ? "Otra vez" : id ? "Coba lagi" : ar ? "تاني" : "Try again";
   const doneMsg = unscored
     ? ko ? "녹음 완료 ✓" : es ? "Grabado ✓" : id ? "Terekam ✓" : ar ? "اتسجّل ✓" : "Recorded ✓"
     : score != null && score >= 70
       ? ko ? "잘했어요!" : es ? "¡Bien hecho!" : id ? "Bagus!" : ar ? "برافو!" : "Nice!"
-      : ko ? "좋아요, 계속 연습해요" : es ? "Bien, sigue practicando" : id ? "Bagus, terus berlatih" : ar ? "حلو، كمّل تمرين" : "Good — keep practicing";
+      : ko ? "좋아요, 계속 연습해요" : es ? "Bien, sigue practicando" : id ? "Bagus, terus berlatih" : ar ? "جَيِّد، واصِل التَّمْرين" : "Good — keep practicing";
 
   const busy = phase === "recording" || phase === "assessing" || phase === "playing";
 
