@@ -134,7 +134,7 @@ export function getTodaySpeakingMission(
       : nativeLang === "spanish"
       ? "Rudy: No la prepares perfecta. Dila primero y la pulimos después."
       : nativeLang === "indonesian"
-      ? `Rudy: ${localizedContextTip ?? missionPhrase?.tip ?? "Ucapkan dulu. Kita perbaiki setelah keluar dari mulutmu."}`
+      ? `Rudy: ${localizedContextTip ?? missionPhrase?.tipId ?? missionPhrase?.tip ?? "Ucapkan dulu. Kita perbaiki setelah keluar dari mulutmu."}`
       : `Rudy: ${localizedContextTip ?? missionPhrase?.tip ?? "Say it first. We can shape it after it is out loud."}`,
     button: nativeLang === "korean" ? "말하기 시작" : nativeLang === "spanish" ? "Empezar a hablar" : nativeLang === "indonesian" ? "Mulai bicara" : "Start speaking",
   };

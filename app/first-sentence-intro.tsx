@@ -389,6 +389,19 @@ export default function FirstSentenceIntroScreen() {
     ? (phrase.meanings[nativeCode] ?? phrase.meanings.english ?? phrase.phrase)
     : "";
 
+  // Localize the tip by native language, mirroring the meaning pattern above.
+  // tipKo/tipEs/tipId are being added to the phrase type concurrently, so read
+  // them optionally and fall back to the English `tip`.
+  const tip = phrase
+    ? (nativeCode === "korean"
+        ? (phrase.tipKo ?? phrase.tip)
+        : nativeCode === "spanish"
+        ? (phrase.tipEs ?? phrase.tip)
+        : nativeCode === "indonesian"
+        ? (phrase.tipId ?? phrase.tip)
+        : phrase.tip)
+    : "";
+
   const apiBase = tryGetApiBase();
   const phraseText = phrase?.phrase;
   const phraseSpeechLang = phrase?.speechLang;
@@ -539,10 +552,10 @@ export default function FirstSentenceIntroScreen() {
                 <Text style={styles.meaningText}>{meaning}</Text>
               </View>
 
-              {phrase.tip ? (
+              {tip ? (
                 <View style={styles.tipBlock}>
                   <Text style={styles.fieldLabel}>{ui.tipLabel}</Text>
-                  <Text style={styles.tipText}>{phrase.tip}</Text>
+                  <Text style={styles.tipText}>{tip}</Text>
                 </View>
               ) : null}
 
