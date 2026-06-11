@@ -3382,6 +3382,39 @@ Student's ${learnName} answer: ${userAnswer}`;
   // async) so this feature stays one self-contained block in the file.
   const { timingSafeEqual } = await import("node:crypto");
 
+  async function proxyTeacherSummaryViaSupabaseFunction(
+    req: Request,
+    res: Response,
+  ): Promise<boolean> {
+    const supabaseUrl = (
+      process.env.SUPABASE_URL ||
+      process.env.EXPO_PUBLIC_SUPABASE_URL ||
+      "https://atydkhvemgsrtjthxkwk.supabase.co"
+    ).replace(/\/+$/, "");
+
+    try {
+      const edgeUrl = new URL("/functions/v1/teacher-cohort-summary", supabaseUrl);
+      const code = typeof req.query.code === "string" ? req.query.code : "";
+      const key = typeof req.query.key === "string" ? req.query.key : "";
+      if (code) edgeUrl.searchParams.set("code", code);
+      if (key) edgeUrl.searchParams.set("key", key);
+
+      const edgeRes = await fetch(edgeUrl, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+      const body = await edgeRes.text();
+      res
+        .status(edgeRes.status)
+        .type(edgeRes.headers.get("content-type") ?? "application/json")
+        .send(body || "{}");
+      return true;
+    } catch (err) {
+      console.error("[teacher cohort-summary] edge fallback failed:", err);
+      return false;
+    }
+  }
+
   app.get(
     "/api/teacher/cohort-summary",
     teacherSummaryLimiter,
@@ -3391,6 +3424,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         // invisible to the anon key. 503 (not 500) — it's a config gap.
         const admin = hasServiceRole() ? getServiceRoleClient() : null;
         if (!admin) {
+          if (await proxyTeacherSummaryViaSupabaseFunction(req, res)) return;
           return res.status(503).json({ error: "service_unavailable" });
         }
 
