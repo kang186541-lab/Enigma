@@ -25,6 +25,7 @@
     "verify:story-quiz-ui": "tsx scripts/verify-story-quiz-ui-localization.ts",
     "verify:story-curriculum": "tsx scripts/verify-story-curriculum.ts",
     "verify:escape-room-language": "tsx scripts/verify-escape-room-language.ts",
+    "verify:teacher-api": "node scripts/verify-teacher-api.mjs",
     "verify:web-export": "node scripts/verify-web-export.js dist",
     "verify:web-emoji": "tsx scripts/verify-web-emoji-safety.ts",
     "audit:story-assets": "node scripts/audit-story-assets.js",
