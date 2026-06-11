@@ -3348,6 +3348,298 @@ Student's ${learnName} answer: ${userAnswer}`;
     },
   );
 
+  // ── Teacher dashboard (institutional pilot) ─────────────────────────────────
+  //
+  // GET /api/teacher/cohort-summary?code=<join_code>&key=<teacher_key>
+  //
+  // Read-only cohort overview for teachers in the institutional pilot.
+  // Teachers are NOT app users, so there is no Supabase JWT here — the
+  // cohort's `teacher_key` (a shared secret handed to the teacher) gates
+  // access instead, compared timing-safely below. Every read goes through
+  // the service-role client: `linguaai_cohorts` is service-role-only and
+  // the member/progress/event reads are cross-user by nature.
+  //
+  // Privacy: student emails are masked ("k***@example.com"); `teacher_key`
+  // and raw emails are NEVER included in the response payload.
+  //
+  // Rate limit mirrors the GDPR endpoints' idiom (express-rate-limit +
+  // keyFromReq). Teachers carry no JWT, so keyFromReq buckets them by IP.
+  const teacherSummaryLimiter: RequestHandler = rateLimit({
+    windowMs: 60_000,
+    limit: 30,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    keyGenerator: keyFromReq,
+    handler: (_req: Request, res: Response) => {
+      res.status(429).json({
+        error: "rate_limited",
+        message: "Too many requests. Please slow down and try again shortly.",
+      });
+    },
+  });
+
+  // node:crypto is loaded once at route-registration time (registerRoutes is
+  // async) so this feature stays one self-contained block in the file.
+  const { timingSafeEqual } = await import("node:crypto");
+
+  app.get(
+    "/api/teacher/cohort-summary",
+    teacherSummaryLimiter,
+    async (req: Request, res: Response) => {
+      try {
+        // Service-role is mandatory: every table this endpoint touches is
+        // invisible to the anon key. 503 (not 500) — it's a config gap.
+        const admin = hasServiceRole() ? getServiceRoleClient() : null;
+        if (!admin) {
+          return res.status(503).json({ error: "service_unavailable" });
+        }
+
+        const code = typeof req.query.code === "string" ? req.query.code.trim() : "";
+        const key = typeof req.query.key === "string" ? req.query.key : "";
+        if (!code) return res.status(404).json({ error: "unknown_code" });
+
+        // Case-insensitive join-code lookup. `%`, `_` and `\` are escaped so
+        // a crafted ?code= can't act as an ILIKE wildcard; the JS re-check
+        // below is defence-in-depth (and picks the row deterministically if
+        // two codes ever differ only by case — a data-entry bug at our scale).
+        const ilikePattern = code.replace(/([\\%_])/g, "\\$1");
+        const { data: cohortRows, error: cohortErr } = await admin
+          .from("linguaai_cohorts")
+          .select("id, name, join_code, teacher_key")
+          .ilike("join_code", ilikePattern)
+          .limit(2);
+        if (cohortErr) throw cohortErr;
+        const codeLower = code.toLowerCase();
+        const cohort = (cohortRows ?? []).find(
+          (c: { join_code?: string | null }) =>
+            typeof c.join_code === "string" && c.join_code.toLowerCase() === codeLower,
+        );
+        if (!cohort) return res.status(404).json({ error: "unknown_code" });
+
+        // Timing-safe key check. timingSafeEqual demands equal-length buffers,
+        // so a length mismatch short-circuits to 401 (this leaks only the key
+        // LENGTH, never its content). An empty stored teacher_key never
+        // matches — a misconfigured cohort stays closed rather than open.
+        const expectedKey = Buffer.from(String(cohort.teacher_key ?? ""), "utf8");
+        const providedKey = Buffer.from(key, "utf8");
+        if (
+          expectedKey.length === 0 ||
+          providedKey.length !== expectedKey.length ||
+          !timingSafeEqual(providedKey, expectedKey)
+        ) {
+          return res.status(401).json({ error: "bad_key" });
+        }
+
+        type MemberRow = { user_id: string; joined_at: string | null };
+        type ProgressRow = {
+          user_id: string;
+          xp: number | null;
+          level: number | null;
+          streak_days: number | null;
+          last_session_at: string | null;
+          learning_lang: string | null;
+        };
+        type EventRow = { user_id: string; event: string; created_at: string };
+
+        const { data: memberRows, error: memberErr } = await admin
+          .from("linguaai_cohort_members")
+          .select("user_id, joined_at")
+          .eq("cohort_id", cohort.id);
+        if (memberErr) throw memberErr;
+        const members: MemberRow[] = ((memberRows ?? []) as MemberRow[]).filter(
+          (m) => typeof m.user_id === "string" && m.user_id.length > 0,
+        );
+        const ids = members.map((m) => m.user_id);
+
+        // Progress + events in parallel. Events are ONE .in() query for the
+        // whole cohort — fine at pilot scale (≤ a few hundred members). NOTE:
+        // PostgREST caps response rows (Supabase db-max-rows, default 1000);
+        // newest-first ordering means any truncation drops the OLDEST events,
+        // keeping lastActiveAt / atRisk / 7-day metrics exact at the cost of
+        // retention precision. Revisit with aggregation before scaling up.
+        const [progressRes, eventsRes] = await Promise.all([
+          admin
+            .from("linguaai_user_progress")
+            .select("user_id, xp, level, streak_days, last_session_at, learning_lang")
+            .in("user_id", ids),
+          admin
+            .from("linguaai_learning_events")
+            .select("user_id, event, created_at")
+            .in("user_id", ids)
+            .order("created_at", { ascending: false })
+            .limit(50_000),
+        ]);
+        if (progressRes.error) throw progressRes.error;
+        if (eventsRes.error) throw eventsRes.error;
+        const progressByUid = new Map<string, ProgressRow>();
+        for (const p of (progressRes.data ?? []) as ProgressRow[]) {
+          progressByUid.set(p.user_id, p);
+        }
+
+        // Masked emails via the auth admin API. Promise.all per fixed-size
+        // chunk keeps concurrency naturally capped (pilot scale, ≤ a few
+        // hundred lookups). Failures degrade to null, never to a 500.
+        const emailByUid = new Map<string, string | null>();
+        const EMAIL_CHUNK = 10;
+        for (let i = 0; i < ids.length; i += EMAIL_CHUNK) {
+          const chunk = ids.slice(i, i + EMAIL_CHUNK);
+          const looked = await Promise.all(
+            chunk.map(async (uid) => {
+              try {
+                const { data } = await admin.auth.admin.getUserById(uid);
+                return [uid, data?.user?.email ?? null] as const;
+              } catch {
+                return [uid, null] as const;
+              }
+            }),
+          );
+          for (const [uid, email] of looked) emailByUid.set(uid, email);
+        }
+        const maskEmail = (email: string | null): string | null => {
+          if (!email) return null;
+          const at = email.indexOf("@");
+          if (at <= 0) return `${email.slice(0, 1)}***`;
+          return `${email.slice(0, 1)}***@${email.slice(at + 1)}`;
+        };
+
+        // ── Per-student metrics from the event stream ──
+        const SPEAKING_EVENTS = new Set([
+          "first_speaking_attempt_completed",
+          "review_sentence_attempt_completed",
+        ]);
+        const DAY_MS = 86_400_000;
+        const nowMs = Date.now();
+        const sevenDaysAgoMs = nowMs - 7 * DAY_MS;
+        const threeDaysAgoMs = nowMs - 3 * DAY_MS;
+        // Epoch-ms → UTC day index (floor(ms / 86.4M) IS the UTC calendar day).
+        const utcDay = (ms: number): number => Math.floor(ms / DAY_MS);
+        const todayUtcDay = utcDay(nowMs);
+
+        type EventAcc = {
+          totalAttempts: number;
+          attempts7d: number;
+          activeDays7d: Set<number>;
+          lastEventMs: number | null;
+          firstEventDay: number | null;
+          lastEventDay: number | null;
+        };
+        const accByUid = new Map<string, EventAcc>();
+        for (const row of (eventsRes.data ?? []) as EventRow[]) {
+          const ms = Date.parse(row.created_at);
+          if (!Number.isFinite(ms)) continue;
+          let acc = accByUid.get(row.user_id);
+          if (!acc) {
+            acc = {
+              totalAttempts: 0,
+              attempts7d: 0,
+              activeDays7d: new Set<number>(),
+              lastEventMs: null,
+              firstEventDay: null,
+              lastEventDay: null,
+            };
+            accByUid.set(row.user_id, acc);
+          }
+          const day = utcDay(ms);
+          if (acc.firstEventDay === null || day < acc.firstEventDay) acc.firstEventDay = day;
+          if (acc.lastEventDay === null || day > acc.lastEventDay) acc.lastEventDay = day;
+          if (acc.lastEventMs === null || ms > acc.lastEventMs) acc.lastEventMs = ms;
+          if (ms >= sevenDaysAgoMs) acc.activeDays7d.add(day);
+          if (SPEAKING_EVENTS.has(row.event)) {
+            acc.totalAttempts += 1;
+            if (ms >= sevenDaysAgoMs) acc.attempts7d += 1;
+          }
+        }
+
+        const students = members.map((m) => {
+          const p = progressByUid.get(m.user_id);
+          const acc = accByUid.get(m.user_id);
+          const lastEventIso =
+            acc?.lastEventMs != null ? new Date(acc.lastEventMs).toISOString() : null;
+          return {
+            maskedEmail: maskEmail(emailByUid.get(m.user_id) ?? null),
+            joinedAt: m.joined_at ?? null,
+            xp: p?.xp ?? 0,
+            level: p?.level ?? 0,
+            streakDays: p?.streak_days ?? 0,
+            learningLang: p?.learning_lang ?? null,
+            lastSessionAt: p?.last_session_at ?? null,
+            totalSpeakingAttempts: acc?.totalAttempts ?? 0,
+            attempts7d: acc?.attempts7d ?? 0,
+            activeDays7d: acc?.activeDays7d.size ?? 0,
+            // Max event timestamp; students with zero events fall back to the
+            // progress row's last_session_at (then null).
+            lastActiveAt: lastEventIso ?? p?.last_session_at ?? null,
+            // At risk: no learning event within the last 3 days — or never.
+            atRisk: acc?.lastEventMs == null || acc.lastEventMs <= threeDaysAgoMs,
+          };
+        });
+        const sortMs = (iso: string | null): number => {
+          if (!iso) return 0;
+          const ms = Date.parse(iso);
+          return Number.isFinite(ms) ? ms : 0;
+        };
+        students.sort((a, b) => sortMs(b.lastActiveAt) - sortMs(a.lastActiveAt));
+
+        // ── Cohort-level metrics ──
+        //
+        // Retention D1/D7/D30 definition:
+        //   eligible_N — members whose FIRST learning event is at least N days
+        //     old (today's UTC date minus the first event's UTC date >= N).
+        //     Members younger than N days can't demonstrate N-day retention
+        //     yet, so they're excluded rather than counted as churned.
+        //   retained_N — eligible members with ANY event dated >= N days after
+        //     their first event's UTC date (day granularity, UTC; equivalent
+        //     to lastEventDay - firstEventDay >= N).
+        //   rate_N — retained_N / eligible_N, or null when eligible_N = 0.
+        const retentionRate = (n: number): number | null => {
+          let eligible = 0;
+          let retained = 0;
+          for (const m of members) {
+            const acc = accByUid.get(m.user_id);
+            if (!acc || acc.firstEventDay === null || acc.lastEventDay === null) continue;
+            if (todayUtcDay - acc.firstEventDay < n) continue;
+            eligible += 1;
+            if (acc.lastEventDay - acc.firstEventDay >= n) retained += 1;
+          }
+          return eligible === 0 ? null : Math.round((retained / eligible) * 1000) / 1000;
+        };
+
+        // Speaking intensity over the trailing 7 days: total speaking attempts
+        // divided by total active student-days (Σ attempts7d / Σ activeDays7d).
+        // Null when the cohort logged no active days in the window.
+        let attempts7dTotal = 0;
+        let activeDays7dTotal = 0;
+        for (const s of students) {
+          attempts7dTotal += s.attempts7d;
+          activeDays7dTotal += s.activeDays7d;
+        }
+        const avgAttemptsPerActiveDay =
+          activeDays7dTotal === 0
+            ? null
+            : Math.round((attempts7dTotal / activeDays7dTotal) * 100) / 100;
+
+        return res.json({
+          cohort: {
+            name: cohort.name ?? null,
+            joinCode: cohort.join_code,
+            memberCount: members.length,
+            avgAttemptsPerActiveDay,
+            retention: {
+              d1: retentionRate(1),
+              d7: retentionRate(7),
+              d30: retentionRate(30),
+            },
+            generatedAt: new Date().toISOString(),
+          },
+          students,
+        });
+      } catch (err) {
+        console.error("[teacher cohort-summary] unexpected error:", err);
+        return res.status(500).json({ error: "internal" });
+      }
+    },
+  );
+
   // hasServiceRole is exported from supabaseAdmin for future health/status
   // endpoints; reference it once to keep the unused-import linter quiet
   // without changing module exports.

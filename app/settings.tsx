@@ -8,12 +8,16 @@ import {
   Switch,
   Platform,
   TextInput,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { C, F } from "@/constants/theme";
+import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
@@ -67,7 +71,23 @@ const T = {
   termsDesc:   { ko: "서비스 이용 조건", en: "Service conditions",      es: "Condiciones del servicio", id: "Syarat penggunaan layanan" },
   myData:      { ko: "내 데이터",       en: "My Data",           es: "Mis datos",          id: "Data Saya" },
   myDataDesc:  { ko: "내려받기·삭제",   en: "Download / delete", es: "Descargar / eliminar", id: "Unduh / hapus" },
+  // ── Class join (BETA)
+  classTitle:  { ko: "수업",           en: "Class",             es: "Clase",              id: "Kelas" },
+  classJoin:   { ko: "수업 코드 입력",  en: "Enter class code",  es: "Código de clase",    id: "Masukkan kode kelas" },
+  classJoinDesc: { ko: "선생님께 받은 코드로 분반에 참여하세요", en: "Join your class with a code from your teacher", es: "Únete a tu clase con el código de tu profesor", id: "Gabung kelas dengan kode dari gurumu" },
+  classJoined: { ko: "참여 중",        en: "Joined",            es: "Inscrito",           id: "Tergabung" },
+  classCodePlaceholder: { ko: "예: ABC123", en: "e.g. ABC123",   es: "ej. ABC123",         id: "mis. ABC123" },
+  classJoinCta: { ko: "참여하기",       en: "Join",              es: "Unirme",             id: "Gabung" },
+  classJoinSuccess: { ko: "참여 완료!",  en: "Joined!",           es: "¡Listo!",            id: "Berhasil gabung!" },
+  classInvalidCode: { ko: "코드를 확인해 주세요", en: "Please check the code", es: "Verifica el código", id: "Periksa kodenya" },
+  classNeedLogin: { ko: "먼저 로그인해 주세요", en: "Please sign in first", es: "Inicia sesión primero", id: "Masuk dulu, ya" },
+  classGenericError: { ko: "참여에 실패했어요. 잠시 후 다시 시도해 주세요", en: "Couldn't join — please try again later", es: "No se pudo unir; inténtalo más tarde", id: "Gagal bergabung — coba lagi nanti" },
+  classClose:  { ko: "닫기",           en: "Close",             es: "Cerrar",             id: "Tutup" },
 } as const;
+
+// Stored cohort (class) name once the learner joins via code — read on mount
+// so the settings row shows the joined state across launches.
+const COHORT_NAME_KEY = "@lingua_cohort_name";
 
 type LangKey = "ko" | "en" | "es" | "id";
 function t(obj: Record<string, string>, lang: LangKey) {
@@ -93,6 +113,68 @@ export default function SettingsScreen() {
   const [signInError, setSignInError] = useState<string | null>(null);
   const [emailInput, setEmailInput] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+
+  // ── Class join (BETA) state ──
+  const [cohortName, setCohortName] = useState<string | null>(null);
+  const [classModalOpen, setClassModalOpen] = useState(false);
+  const [classCodeInput, setClassCodeInput] = useState("");
+  const [classBusy, setClassBusy] = useState(false);
+  const [classError, setClassError] = useState<string | null>(null);
+  const [classJustJoined, setClassJustJoined] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem(COHORT_NAME_KEY)
+      .then((v) => { if (v) setCohortName(v); })
+      .catch(() => {});
+  }, []);
+
+  const openClassModal = () => {
+    setClassError(null);
+    setClassJustJoined(false);
+    setClassCodeInput("");
+    setClassModalOpen(true);
+  };
+
+  const handleJoinClass = async () => {
+    const code = classCodeInput.trim();
+    if (!code || classBusy) return;
+    if (!user) {
+      // Signed out — never call the RPC, just surface the login-required copy.
+      setClassError(t(T.classNeedLogin, lc));
+      return;
+    }
+    setClassBusy(true);
+    setClassError(null);
+    try {
+      const { data, error } = await supabase.rpc("join_cohort", { code });
+      if (error) {
+        const msg = error.message ?? "";
+        if (msg.includes("INVALID_CODE")) setClassError(t(T.classInvalidCode, lc));
+        else if (msg.includes("NOT_AUTHENTICATED")) setClassError(t(T.classNeedLogin, lc));
+        else setClassError(t(T.classGenericError, lc));
+      } else {
+        // RPC returns the class name as a string.
+        const name =
+          typeof data === "string" && data.trim()
+            ? data.trim()
+            : data != null && typeof (data as any).name === "string"
+              ? String((data as any).name)
+              : "";
+        if (name) {
+          setCohortName(name);
+          try { await AsyncStorage.setItem(COHORT_NAME_KEY, name); }
+          catch (e) { console.warn("[Settings] cohort name persist failed:", e); }
+        }
+        setClassJustJoined(true);
+        setClassCodeInput("");
+      }
+    } catch (e) {
+      console.warn("[Settings] join_cohort failed:", e);
+      setClassError(t(T.classGenericError, lc));
+    } finally {
+      setClassBusy(false);
+    }
+  };
 
   const handleSignIn = async () => {
     setSignInBusy(true);
@@ -254,6 +336,31 @@ export default function SettingsScreen() {
           )}
         </View>
 
+        {/* ── Class join (BETA) ── */}
+        <Text style={styles.sectionTitle}>{t(T.classTitle, lc)}</Text>
+        <View style={styles.card}>
+          <Pressable
+            onPress={openClassModal}
+            style={styles.row}
+            accessibilityRole="button"
+          >
+            <View style={{ flex: 1 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <Text style={styles.label}>{t(T.classJoin, lc)}</Text>
+                <View style={styles.betaBadge}>
+                  <Text style={styles.betaBadgeText}>BETA</Text>
+                </View>
+              </View>
+              <Text style={[styles.webNote, { textAlign: "left", paddingVertical: 0, marginTop: 2 }]}>
+                {cohortName
+                  ? `${t(T.classJoined, lc)}: ${cohortName}`
+                  : t(T.classJoinDesc, lc)}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={C.gold} />
+          </Pressable>
+        </View>
+
         {/* ── Privacy / Terms / My Data ── */}
         <Text style={styles.sectionTitle}>{t(T.legalTitle, lc)}</Text>
         <View style={styles.card}>
@@ -407,6 +514,82 @@ export default function SettingsScreen() {
 
         <View style={{ height: 60 }} />
       </ScrollView>
+
+      {/* ── Class code modal (BETA) ── */}
+      <Modal
+        visible={classModalOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setClassModalOpen(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>{t(T.classJoin, lc)}</Text>
+
+            {!user ? (
+              // Signed out — show login-required message, never call the RPC.
+              <Text style={[styles.webNote, { color: "#F2697D" }]}>
+                {t(T.classNeedLogin, lc)}
+              </Text>
+            ) : classJustJoined ? (
+              <>
+                <Text style={[styles.webNote, { color: C.gold }]}>
+                  {t(T.classJoinSuccess, lc)}
+                </Text>
+                {cohortName ? (
+                  <Text style={[styles.label, { textAlign: "center" }]}>
+                    {t(T.classJoined, lc)}: {cohortName}
+                  </Text>
+                ) : null}
+              </>
+            ) : (
+              <>
+                {cohortName ? (
+                  <Text style={[styles.webNote, { paddingVertical: 0, marginBottom: 4 }]}>
+                    {t(T.classJoined, lc)}: {cohortName}
+                  </Text>
+                ) : null}
+                <TextInput
+                  value={classCodeInput}
+                  onChangeText={setClassCodeInput}
+                  placeholder={t(T.classCodePlaceholder, lc)}
+                  placeholderTextColor={C.goldDim}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                  style={styles.emailInput}
+                  editable={!classBusy}
+                />
+                <Pressable
+                  onPress={handleJoinClass}
+                  disabled={classBusy || !classCodeInput.trim()}
+                  style={[
+                    styles.emailBtn,
+                    { marginTop: 10, opacity: classBusy || !classCodeInput.trim() ? 0.5 : 1 },
+                  ]}
+                >
+                  {classBusy ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.googleBtnText}>{t(T.classJoinCta, lc)}</Text>
+                  )}
+                </Pressable>
+                {classError ? (
+                  <Text style={[styles.webNote, { color: "#F2697D", paddingVertical: 0, marginTop: 8 }]}>
+                    {classError}
+                  </Text>
+                ) : null}
+              </>
+            )}
+
+            <Pressable
+              onPress={() => setClassModalOpen(false)}
+              style={styles.modalCloseBtn}
+            >
+              <Text style={styles.modalCloseText}>{t(T.classClose, lc)}</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -569,5 +752,55 @@ const styles = StyleSheet.create({
   },
   pillTextActive: {
     color: C.bg1,
+  },
+  betaBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: C.goldDim,
+    backgroundColor: C.goldFaint,
+  },
+  betaBadgeText: {
+    fontFamily: F.bodySemi,
+    fontSize: 10,
+    color: C.goldDim,
+    letterSpacing: 0.5,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.65)",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 380,
+    backgroundColor: C.bg2,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: C.goldDim,
+    padding: 22,
+    gap: 10,
+  },
+  modalTitle: {
+    fontFamily: F.header,
+    fontSize: 18,
+    color: C.gold,
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  modalCloseBtn: {
+    alignSelf: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginTop: 4,
+  },
+  modalCloseText: {
+    fontFamily: F.bodySemi,
+    fontSize: 14,
+    color: C.goldDim,
+    textDecorationLine: "underline",
   },
 });

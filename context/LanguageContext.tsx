@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
+import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { checkAchievements } from "@/lib/achievementManager";
 import { addWeeklyXP } from "@/lib/leagueManager";
@@ -516,6 +517,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         if (process.env.NODE_ENV !== "production") {
           console.warn("[Analytics] day1_return check failed:", e);
         }
+      }
+    })();
+    // ── daily session ping (Supabase remote metrics) ─────────────────────────
+    // Once per UTC day, mirror a `session_start` row to Supabase so D1/D7/D30
+    // retention can be computed server-side for the institutional pilot.
+    // Lazy import keeps lib/supabase (which throws at module load without env
+    // vars, e.g. under jest) out of this module's static dependency graph for
+    // this feature; fire-and-forget and non-throwing by design.
+    void (async () => {
+      try {
+        const { recordSessionStartOncePerDay } = await import("@/lib/learningMetrics");
+        void recordSessionStartOncePerDay(Platform.OS);
+      } catch {
+        // Best-effort telemetry only.
       }
     })();
     return () => {

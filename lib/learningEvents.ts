@@ -84,4 +84,16 @@ export async function trackLearningEvent(name: LearningEventName, props?: Learni
   if (__DEV__) {
     console.log("[LearningEvents]", event.name, event.props);
   }
+
+  // Dual-write: mirror the sanitized event to the Supabase sink
+  // (fire-and-forget) so retention/utterance metrics can be computed
+  // server-side. Lazy import keeps the module graph test-safe —
+  // lib/supabase (a transitive import of learningMetrics) throws at module
+  // load when env vars are missing (jest/CI).
+  try {
+    const { recordRemoteEvent } = await import("@/lib/learningMetrics");
+    void recordRemoteEvent(name, event.props);
+  } catch {
+    // Remote mirroring is best-effort only; the local write already happened.
+  }
 }
