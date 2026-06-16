@@ -801,14 +801,22 @@ assert.ok(
 );
 assert.ok(
   rudyStep1Source.includes("acceptedSpokenAttempt") &&
-  rudyStep1Source.includes("if (!acceptedSpokenAttempt) return;") &&
-  rudyStep1Source.includes("{acceptedSpokenAttempt && (") &&
+  rudyStep1Source.includes("function advance(force = false)") &&
+  rudyStep1Source.includes("if (!acceptedSpokenAttempt && !force) return;") &&
+  rudyStep1Source.includes("{acceptedSpokenAttempt ? (") &&
   rudyStep1Source.includes("const advancingRef") &&
   rudyStep2Source.includes("speakAccepted") &&
-  rudyStep2Source.includes('if (quizPhase === "speak" && !speakAccepted) return;') &&
+  rudyStep2Source.includes("function advanceQuiz(force = false)") &&
+  rudyStep2Source.includes('if (quizPhase === "speak" && !speakAccepted && !force) return;') &&
   rudyStep2Source.includes('{speakPhase === "done" && speakAccepted && (') &&
   rudyStep2Source.includes("const advancingRef"),
-  "Rudy Step1/Step2 should count and advance only accepted spoken attempts, with rapid-tap guards"
+  // Accepted attempts still count + advance (speak-first core), rapid-tap guarded.
+  // The ONLY way past a non-accepted attempt is an explicit `force` skip; the
+  // companion assertion below proves that skip is reachable only AFTER the attempt
+  // resolves (speakPhase "done" / result), never from idle — so learners must
+  // still attempt to speak. This escape exists because ar-EG often fails to
+  // recognize MSA speech, which previously trapped the learner with no way forward.
+  "Rudy Step1/Step2 should count+advance accepted attempts (rapid-tap guarded), and allow a forced skip only via an explicit force param after a resolved attempt"
 );
 assert.ok(
   rudyStep1Source.includes("const RUDY_RECORDING_MS = 8000;") &&
@@ -821,7 +829,7 @@ assert.ok(
   !rudyStep4Source.includes("}, 7000);"),
   "Rudy spoken practice should give learners the same 8-second recording window as the main Speak flow"
 );
-const rudyStep2SpeakNavStart = rudyStep2Source.indexOf("{/* Next / skip */}");
+const rudyStep2SpeakNavStart = rudyStep2Source.indexOf("{/* Next / skip");
 const rudyStep2SpeakNavEnd = rudyStep2Source.indexOf("</View>", rudyStep2SpeakNavStart);
 const rudyStep2SpeakNav = rudyStep2SpeakNavStart >= 0 && rudyStep2SpeakNavEnd > rudyStep2SpeakNavStart
   ? rudyStep2Source.slice(rudyStep2SpeakNavStart, rudyStep2SpeakNavEnd)
@@ -829,8 +837,10 @@ const rudyStep2SpeakNav = rudyStep2SpeakNavStart >= 0 && rudyStep2SpeakNavEnd > 
 assert.ok(
   rudyStep2SpeakNav &&
   !rudyStep2SpeakNav.includes('speakPhase === "idle"') &&
-  rudyStep2SpeakNav.includes('speakPhase === "done"'),
-  "Rudy Step2 should not show an idle skip path that advances before a spoken attempt"
+  rudyStep2SpeakNav.includes('speakPhase === "done" && speakAccepted && (') &&
+  rudyStep2SpeakNav.includes('speakPhase === "done" && !speakAccepted && (') &&
+  rudyStep2SpeakNav.includes("advanceQuiz(true)"),
+  "Rudy Step2 skip must appear only after a resolved attempt (speakPhase 'done'): accepted advances, not-accepted offers a forced skip — never an idle skip before speaking"
 );
 assert.ok(
   !rudyStep4Source.includes("skipQuestion()") &&

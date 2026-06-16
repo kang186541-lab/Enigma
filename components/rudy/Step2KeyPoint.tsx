@@ -395,6 +395,10 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     }
     try {
       const controller = new AbortController();
+      // 25s window is intentional + locked (verify-speaking-core): long enough
+      // that a cold-start server / Azure round-trip is not cut off and falsely
+      // failed. On timeout → abort → the "Skip" escape below appears so a genuine
+      // hang still never traps the learner.
       const timeoutId = setTimeout(() => controller.abort(), 25000);
       const apiUrl = new URL("/api/pronunciation-assess", apiBase).toString();
       const res = await apiFetchWithAuth(apiUrl, {
@@ -434,8 +438,11 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
 
   function proceedToSpeak() { setQuizPhase("speak"); setSpeakPhase("idle"); setSpeakScore(null); setSpeakAccepted(false); }
 
-  function advanceQuiz() {
-    if (quizPhase === "speak" && !speakAccepted) return;
+  function advanceQuiz(force = false) {
+    // `force` lets a learner move on after they HAVE spoken but the assessment
+    // could not be accepted (no speech recognized / network error / 25s timeout).
+    // Without this, ar-EG failing to recognize MSA speech permanently traps them.
+    if (quizPhase === "speak" && !speakAccepted && !force) return;
     if (advancingRef.current) return;
     advancingRef.current = true;
     if (quizIdx < data.quizzes.length - 1) {
@@ -472,6 +479,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     ? pickNativeCopy(nativeLang, { korean: "탭하여 중지 ■", spanish: "Toca para parar ■", indonesian: "Ketuk untuk berhenti ■", english: "Tap to stop ■" })
     : pickNativeCopy(nativeLang, { korean: "따라 말해봐요 🎤", spanish: "Repite 🎤", indonesian: "Ulangi 🎤", english: "Repeat it 🎤" });
   const nextLabel     = pickNativeCopy(nativeLang, { korean: "다음 →", spanish: "Siguiente →", indonesian: "Lanjut →", english: "Next →" });
+  const skipLabel     = pickNativeCopy(nativeLang, { korean: "건너뛰기 →", spanish: "Saltar →", indonesian: "Lewati →", english: "Skip →" });
   const doneLabel     = pickNativeCopy(nativeLang, { korean: "완료! →", spanish: "¡Listo! →", indonesian: "Selesai! →", english: "Done! →" });
   const retryLabel    = pickNativeCopy(nativeLang, { korean: "다시 시도 🔄", spanish: "Reintentar 🔄", indonesian: "Coba lagi 🔄", english: "Retry 🔄" });
   const checkLabel    = pickNativeCopy(nativeLang, { korean: "확인", spanish: "Comprobar", indonesian: "Periksa", english: "Check" });
@@ -733,11 +741,20 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
             </View>
           )}
 
-          {/* Next / skip */}
+          {/* Next / skip — once an attempt has RESOLVED (done), always offer a way
+              forward. Accepted → "Next"; not accepted (Azure didn't recognize the
+              speech, common for ar-EG on MSA) → "Skip" so the learner is never
+              trapped. The mic above stays available to retry. Mirrors Step4. */}
           <View style={s.speakNav}>
             {speakPhase === "done" && speakAccepted && (
-              <Pressable style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]} onPress={advanceQuiz}>
+              <Pressable style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]} onPress={() => advanceQuiz()}>
                 <Text style={s.nextBtnText}>{isLast ? doneLabel : nextLabel}</Text>
+                <Ionicons name="arrow-forward" size={13} color={C.bg1} />
+              </Pressable>
+            )}
+            {speakPhase === "done" && !speakAccepted && (
+              <Pressable style={({ pressed }) => [s.nextBtn, { opacity: pressed ? 0.7 : 0.85 }]} onPress={() => advanceQuiz(true)}>
+                <Text style={s.nextBtnText}>{isLast ? doneLabel : skipLabel}</Text>
                 <Ionicons name="arrow-forward" size={13} color={C.bg1} />
               </Pressable>
             )}

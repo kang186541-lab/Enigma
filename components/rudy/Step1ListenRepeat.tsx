@@ -409,6 +409,9 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
     }
     try {
       const controller = new AbortController();
+      // 25s window is intentional + locked (verify-speaking-core): long enough that
+      // a cold-start server / Azure round-trip is not cut off and falsely failed.
+      // On timeout → abort → result shows the "Skip" escape so a hang never traps.
       const timeoutId = setTimeout(() => controller.abort(), 25000);
       const apiUrl = new URL("/api/pronunciation-assess", apiBase).toString();
       const res = await apiFetchWithAuth(apiUrl, {
@@ -459,8 +462,11 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
 
   // ── Advance to next sentence / round ────────────────────────────────────────
 
-  function advance() {
-    if (!acceptedSpokenAttempt) return;
+  function advance(force = false) {
+    // `force` = skip after a RESOLVED-but-unaccepted attempt (no speech recognized /
+    // network error / timeout). Without it, ar-EG failing to recognize MSA speech
+    // leaves only the retry button and permanently traps the learner.
+    if (!acceptedSpokenAttempt && !force) return;
     if (advancingRef.current) return;
     advancingRef.current = true;
     const newSpoken = totalSpoken + 1;
@@ -514,6 +520,7 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
         : (nativeLang === "korean" ? "다음 문장 →" : nativeLang === "spanish" ? "Siguiente frase →" : nativeLang === "indonesian" ? "Kalimat berikutnya →" : "Next sentence →"))
     : (nativeLang === "korean" ? "다음 →" : nativeLang === "spanish" ? "Siguiente →" : nativeLang === "indonesian" ? "Lanjut →" : "Next →");
   const retryLabel  = nativeLang === "korean" ? "한번 더 🔄" : nativeLang === "spanish" ? "Otro intento 🔄" : nativeLang === "indonesian" ? "Coba lagi 🔄" : "Try again 🔄";
+  const skipLabel   = nativeLang === "korean" ? "건너뛰기 →" : nativeLang === "spanish" ? "Saltar →" : nativeLang === "indonesian" ? "Lewati →" : "Skip →";
   const roundLabel  = round === 0
     ? (nativeLang === "korean" ? "느린 속도로 따라하기" : nativeLang === "spanish" ? "Repite despacio" : nativeLang === "indonesian" ? "Ulangi dengan pelan" : "Repeat at slow speed")
     : round === 1
@@ -658,12 +665,22 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
                 <Text style={s.retryBtnText}>{retryLabel}</Text>
               </Pressable>
             )}
-            {acceptedSpokenAttempt && (
+            {acceptedSpokenAttempt ? (
               <Pressable
                 style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]}
-                onPress={advance}
+                onPress={() => advance()}
               >
                 <Text style={s.nextBtnText}>{nextLabel}</Text>
+                <Ionicons name="arrow-forward" size={13} color={C.bg1} />
+              </Pressable>
+            ) : (
+              // Attempt resolved but not accepted → never trap: offer a skip
+              // (retry above is still available). Mirrors Step4's skip escape.
+              <Pressable
+                style={({ pressed }) => [s.nextBtn, { opacity: pressed ? 0.7 : 0.85 }]}
+                onPress={() => advance(true)}
+              >
+                <Text style={s.nextBtnText}>{skipLabel}</Text>
                 <Ionicons name="arrow-forward" size={13} color={C.bg1} />
               </Pressable>
             )}
