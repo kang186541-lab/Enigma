@@ -624,8 +624,10 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         )}
       </Animated.View>
 
-      {/* Options (select type) */}
-      {quiz.type === "select" && quizPhase === "question" && (
+      {/* Options (select / fill_blank — both are tap-to-answer; the renderer
+          previously only handled "select", so any "fill_blank" step2 quiz showed
+          no answer UI and the lesson got stuck. fill_blank carries options too. */}
+      {(quiz.type === "select" || quiz.type === "fill_blank") && quizPhase === "question" && (
         <View style={s.optionsGrid}>
           {(quiz.options ?? []).map((opt) => (
             <Pressable
