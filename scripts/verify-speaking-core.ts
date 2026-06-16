@@ -864,6 +864,13 @@ assert.ok(
   rudyLessonSource.includes("stepCompletingRef.current = false;") &&
   rudyLessonSource.includes("if (stepCompletingRef.current) return;") &&
   rudyLessonSource.includes("stepCompletingRef.current = true;") &&
+  // Step2 reports completion from inside its skip useEffect (the last step2 quiz
+  // of every day is a "listening" shape, so this path runs on every Step2
+  // completion). onComplete is in that effect's deps and is an unstable inline
+  // arrow, so without a one-shot guard the effect re-fires onComplete in an
+  // infinite loop and hard-freezes the screen. Lock the guard in.
+  rudyStep2Source.includes("const completedRef = useRef(false);") &&
+  rudyStep2Source.includes("} else if (!completedRef.current) {") &&
   rudyStep3Source.includes("const completeFiredRef = useRef(false);") &&
   rudyStep3Source.includes("const completeMissionTalkOnce = () =>") &&
   rudyStep3Source.includes("onPress={completeMissionTalkOnce}") &&

@@ -104,6 +104,15 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   const pulseLoop    = useRef<Animated.CompositeAnimation | null>(null);
   const spokenAttemptsRef = useRef(0);
   const advancingRef = useRef(false);
+  // One-shot guard so onComplete fires EXACTLY once. The skip effect below calls
+  // onComplete from inside an effect whose deps include `onComplete` (an inline
+  // arrow recreated on every parent render). The LAST step2 quiz of every day is a
+  // "listening" shape the guard treats as unsupported, so this onComplete-from-
+  // effect path runs on every normal Step2 completion — without this guard a
+  // churning onComplete identity re-fires the effect → setState → re-render →
+  // re-fire … an infinite loop that hard-freezes the screen. Mirrors Step3/Step4's
+  // completeFiredRef.
+  const completedRef = useRef(false);
 
   const apiBase    = getApiUrl();
   const currentQuiz: FillBlankQuiz | undefined = data.quizzes[quizIdx];
@@ -147,7 +156,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       setInputError(false);
       setSpeakPhase("idle");
       setSpeakScore(null);
-    } else {
+    } else if (!completedRef.current) {
+      completedRef.current = true;
       onComplete(spokenAttemptsRef.current);
     }
   }, [correctCount, currentQuiz, data.quizzes.length, onComplete, quizIdx, screenPhase, learningLang]);
@@ -455,7 +465,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       setSpeakPhase("idle");
       setSpeakScore(null);
       setSpeakAccepted(false);
-    } else {
+    } else if (!completedRef.current) {
+      completedRef.current = true;
       onComplete(spokenAttemptsRef.current);
     }
   }
