@@ -2527,20 +2527,30 @@ Student's ${learnName} answer: ${userAnswer}`;
       const nativeLangDisplay = LANG_DISPLAY[nativeLanguage ?? "english"] ?? "English";
       const includeTranslation = nativeLangDisplay !== langDisplay;
 
+      // Target-language enforcement: completeText runs on DeepSeek-V3 (primary),
+      // which is weak at following a single buried "respond in X" line inside an
+      // otherwise-English prompt — so the NPC would reply in English. Top-load the
+      // rule, repeat it, and for Arabic demand MSA (fuṣḥā) so it matches the rest
+      // of the app's Standard-Arabic content (not Egyptian dialect).
+      const langInstruction = language === "arabic"
+        ? "Modern Standard Arabic (fuṣḥā / العربية الفصحى), written in Arabic script — NOT Egyptian or any regional dialect"
+        : langDisplay;
+
       const systemPrompt = [
-        `You are ${npcInfo.name}, a character in a language learning roleplay app.`,
+        `CRITICAL LANGUAGE RULE — HIGHEST PRIORITY: Your "reply" and EVERY "choices" entry MUST be written entirely in ${langInstruction}. Do NOT write a single word of English (or any other language) in "reply" or "choices" — the only exception is an untranslatable proper noun. If you are about to produce another language, stop and rewrite it in ${langInstruction}. (Native-language translations belong ONLY in the separate translation fields described below.)`,
+        ``,
+        `You are ${npcInfo.name}, a character in a language-learning roleplay app.`,
         `SCENARIO: ${npcInfo.scenarioDesc}`,
         `YOUR PERSONALITY: ${npcInfo.personality}`,
         ``,
-        `LANGUAGE: You MUST respond ONLY in ${langDisplay}. Never switch languages.`,
         `RELATIONSHIP LEVEL: ${tier} (${Math.round(relationshipScore ?? 0)}/100)`,
         `RELATIONSHIP BEHAVIOR: ${tierInstruction}`,
         ``,
         `RULES:`,
-        `1. Stay completely in character as ${npcInfo.name} in this real-world scenario.`,
+        `1. Stay completely in character as ${npcInfo.name} in this real-world scenario, speaking ${langInstruction}.`,
         `2. If the user makes a grammar mistake, naturally use the correct form in your reply — DO NOT explain or point out the mistake.`,
         `3. No detailed grammar correction — only natural conversation.`,
-        `4. Keep your reply to 1–2 natural sentences, in character.`,
+        `4. Keep your reply to 1–2 natural sentences, in character, written in ${langInstruction}.`,
         `5. Evaluate the user's message:`,
         `   • scoreChange +5 = perfect, natural sentence`,
         `   • scoreChange +3 = polite, conversational (minor errors OK)`,
@@ -2548,7 +2558,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         `   • scoreChange -5 = rude or makes no sense`,
         `   • scoreChange 0 = for the opening greeting (isStart)`,
         `6. Choose one emotion: happy, neutral, confused, annoyed, impressed`,
-        `7. Provide exactly 3 choices the USER could naturally say next (in ${langDisplay}, relevant to this conversation).`,
+        `7. Provide exactly 3 choices the USER could naturally say next, written in ${langInstruction}, relevant to this conversation.`,
         includeTranslation
           ? `   Each choice must include: "text" (${langDisplay}) and "translation" (${nativeLangDisplay}).`
           : `   Each choice is a plain string in ${langDisplay}.`,

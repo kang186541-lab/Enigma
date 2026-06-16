@@ -131,7 +131,13 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   // Skip unsupported quiz types (e.g. "listening" without promptWithBlank)
   useEffect(() => {
     if (screenPhase !== "quiz") return;
-    if (currentQuiz?.promptWithBlank && currentQuiz.answer && currentQuiz.fullSentence) return;
+    // An Arabic learner can't type Arabic on a normal keyboard, so "input"
+    // (free-type) quizzes are unpassable for them and the lesson would stall
+    // mid-day. Treat Arabic input quizzes as unsupported → skip them. The same
+    // sentence is always also drilled via a select/listening quiz that day, so
+    // no unique content is lost. Other learning languages keep input quizzes.
+    if (currentQuiz?.promptWithBlank && currentQuiz.answer && currentQuiz.fullSentence
+        && !(learningLang === "arabic" && currentQuiz.type === "input")) return;
     if (quizIdx < data.quizzes.length - 1) {
       setQuizIdx(i => i + 1);
       setQuizPhase("question");
@@ -144,7 +150,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
     } else {
       onComplete(spokenAttemptsRef.current);
     }
-  }, [correctCount, currentQuiz, data.quizzes.length, onComplete, quizIdx, screenPhase]);
+  }, [correctCount, currentQuiz, data.quizzes.length, onComplete, quizIdx, screenPhase, learningLang]);
 
   // Only enforce the quiz-shape guard when we're actually about to render the
   // quiz. Without this scoping, a lesson whose first quiz is a listening-only
@@ -153,7 +159,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
   // the skip effect only advances in quiz phase. Allowing the explanation
   // render gives the user a path to tap "OK", which transitions to quiz
   // phase and lets the skip effect handle the unsupported quiz.
-  if (screenPhase === "quiz" && (!currentQuiz?.promptWithBlank || !currentQuiz.answer || !currentQuiz.fullSentence)) {
+  if (screenPhase === "quiz" && (!currentQuiz?.promptWithBlank || !currentQuiz.answer || !currentQuiz.fullSentence
+      || (learningLang === "arabic" && currentQuiz.type === "input"))) {
     return null;
   }
 
