@@ -377,7 +377,7 @@ export default function OnboardingScreen() {
                     onPress={() => handleNativePick(lang.id)}
                     accessibilityRole="button"
                     accessibilityState={{ selected: sel }}
-                    accessibilityLabel={lang.nameMap[uiLang]}
+                    accessibilityLabel={lang.id === "indonesian" ? `${lang.nameMap[uiLang]} (BETA)` : lang.nameMap[uiLang]}
                   >
                     <View style={styles.langBadge}>
                       <Text style={styles.langBadgeText}>{lang.badge}</Text>
@@ -385,6 +385,14 @@ export default function OnboardingScreen() {
                     <Text style={[styles.cardName, sel && styles.cardNameSel]}>
                       {lang.nameMap[uiLang]}
                     </Text>
+                    {/* Indonesian native UI is incomplete: lesson meanings fall back
+                        to English on ~18/30 course days, so mark it BETA here too
+                        (the learning-target picker already badges id/ar). */}
+                    {lang.id === "indonesian" && (
+                      <View style={styles.betaBadge}>
+                        <Text style={styles.betaBadgeText}>BETA</Text>
+                      </View>
+                    )}
                     {sel && (
                       <View style={styles.check}>
                         <Ionicons name="checkmark" size={16} color={C.bg1} />

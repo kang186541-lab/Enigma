@@ -383,6 +383,26 @@ export default function StoryTab() {
         </Pressable>
       )}
 
+      {/* Story-narrative localization notice. In-scene dialogue renders in the
+          LEARNING language, but the static story narrative isn't fully translated
+          for the BETA targets (Arabic = English only; Indonesian = partial). Warn
+          so testers read the English as a known gap, not a bug — the daily course,
+          quizzes and pronunciation assessment ARE localized. */}
+      {(learningLanguage === "arabic" || learningLanguage === "indonesian") && (
+        <View style={styles.campHint}>
+          <Ionicons name="construct-outline" size={14} color={C.gold} />
+          <Text style={styles.campHintText}>
+            {lang === "korean"
+              ? `스토리 대사는 아직 ${learningLanguage === "arabic" ? "아랍어 번역 전이라 영어로" : "인도네시아어 번역 중이라 일부 영어로"} 표시돼요. (데일리 코스·퀴즈는 정상)`
+              : lang === "spanish"
+                ? (learningLanguage === "arabic" ? "El guion aún no está en árabe (se muestra en inglés)." : "El guion está parcialmente en indonesio (resto en inglés).")
+                : lang === "indonesian"
+                  ? (learningLanguage === "arabic" ? "Naskah cerita belum berbahasa Arab (ditampilkan dalam bahasa Inggris)." : "Naskah cerita sebagian masih dalam bahasa Inggris.")
+                  : (learningLanguage === "arabic" ? "Story dialogue isn't in Arabic yet (shown in English)." : "Story dialogue is partly still in English.")}
+          </Text>
+        </View>
+      )}
+
       <View style={styles.scroll}>
         {CHAPTERS.map((ch) => {
           const status = getStatus(ch);
