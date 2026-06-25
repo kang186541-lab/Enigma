@@ -371,6 +371,10 @@ function webSpeechRecognize(lang: string, timeoutMs = 15_000): Promise<string> {
   });
 }
 
+// Per-route error isolation: a render-phase throw in this screen is contained
+// here (go-back fallback) instead of unwinding to the root whole-app reload.
+export { RouteErrorBoundary as ErrorBoundary } from "@/components/RouteErrorBoundary";
+
 export default function ChatRoomScreen() {
   const { tutorId } = useLocalSearchParams<{ tutorId: string }>();
   const insets = useSafeAreaInsets();

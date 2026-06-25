@@ -130,6 +130,10 @@ function translationToggleLabel(nativeLang: string, shown: boolean): string {
   return "Translate";
 }
 
+// Per-route error isolation: a render-phase throw in this screen is contained
+// here (go-back fallback) instead of unwinding to the root whole-app reload.
+export { RouteErrorBoundary as ErrorBoundary } from "@/components/RouteErrorBoundary";
+
 export default function NpcMissionScreen() {
   const { npcId } = useLocalSearchParams<{ npcId: string }>();
   const insets = useSafeAreaInsets();

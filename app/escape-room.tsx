@@ -133,6 +133,10 @@ function reducer(st: Board, a: Action): Board {
 
 /* ── screen ───────────────────────────────────────────────────────────────── */
 
+// Per-route error isolation: a render-phase throw in this screen is contained
+// here (go-back fallback) instead of unwinding to the root whole-app reload.
+export { RouteErrorBoundary as ErrorBoundary } from "@/components/RouteErrorBoundary";
+
 export default function EscapeRoomScreen() {
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ id?: string }>();

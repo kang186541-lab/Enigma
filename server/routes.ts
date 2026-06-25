@@ -765,7 +765,7 @@ Never emit any block inside your conversational reply. Never emit a block that w
   // produces more consistent multilingual judgments without needing guards.
   //
   // Fallback: GPT-4o when ANTHROPIC_API_KEY is not set in the environment.
-  app.post("/api/writing-eval", async (req: Request, res: Response) => {
+  app.post("/api/writing-eval", gptLimiter, async (req: Request, res: Response) => {
     try {
       const { exerciseType, promptText, userAnswer, learningLang, nativeLang } = req.body as {
         exerciseType: "translate" | "complete" | "free";
@@ -1037,7 +1037,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     return { buffer: fallbackBuffer, voiceName: fallbackVoice };
   }
 
-  app.get("/api/tts", async (req: Request, res: Response) => {
+  app.get("/api/tts", ttsLimiter, async (req: Request, res: Response) => {
     try {
       // mode is intentionally NOT read here — voice identity is locked to tutorId.
       // See TUTOR_AZURE_VOICES above. Mode belongs only in /api/chat (system prompt).
@@ -2336,7 +2336,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     sayed:        { style: "cheerful",  degree: "1.3" },
   };
 
-  app.get("/api/npc-tts", async (req: Request, res: Response) => {
+  app.get("/api/npc-tts", ttsLimiter, async (req: Request, res: Response) => {
     try {
       const { text, npcId, npcLang, speed } = req.query as {
         text?: string; npcId?: string; npcLang?: string; speed?: string;
@@ -2503,7 +2503,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     english: "English", spanish: "Spanish", korean: "Korean", indonesian: "Indonesian", arabic: "Arabic",
   };
 
-  app.post("/api/npc-chat", async (req: Request, res: Response) => {
+  app.post("/api/npc-chat", gptLimiter, async (req: Request, res: Response) => {
     try {
       const { npcId, language, nativeLanguage, relationshipScore, messages, isStart } = req.body as {
         npcId: string;
@@ -2520,6 +2520,28 @@ Student's ${learnName} answer: ${userAnswer}`;
 
       const npcInfo = NPC_SCENARIOS[npcId];
       if (!npcInfo) return res.status(400).json({ error: "Unknown NPC" });
+
+      // ── Content moderation on the latest user message ────────────────────
+      // The opening greeting (isStart) has no user input, so skip it. Short
+      // Korean bypasses (greetings/noise); fail-open. Mirrors /api/mission-chat.
+      if (!isStart && Array.isArray(messages)) {
+        const latestUserMsg = [...messages].reverse().find((m) => m.role === "user");
+        if (latestUserMsg && typeof latestUserMsg.content === "string" && !shouldSkipModeration(latestUserMsg.content)) {
+          const mod = await moderateText(latestUserMsg.content);
+          if (mod.flagged) {
+            console.log(`[/api/npc-chat] moderation flagged category=${mod.category ?? "unknown"}`);
+            const nativeCode = ({ korean: "ko", english: "en", spanish: "es", indonesian: "id" } as Record<string, string>)[nativeLanguage ?? "english"] ?? "en";
+            return res.json({
+              reply: safeReplyFor(nativeCode),
+              replyTranslation: "",
+              scoreChange: 0,
+              emotion: "neutral",
+              choices: [],
+              moderated: true,
+            });
+          }
+        }
+      }
 
       const tier = getRelTierFromScore(relationshipScore ?? 0);
       const tierInstruction = REL_TIER_INSTRUCTIONS[tier] ?? REL_TIER_INSTRUCTIONS.stranger;
@@ -2834,7 +2856,7 @@ Student's ${learnName} answer: ${userAnswer}`;
     }
   });
 
-  app.post("/api/handwriting-recognize", async (req: Request, res: Response) => {
+  app.post("/api/handwriting-recognize", gptLimiter, async (req: Request, res: Response) => {
     try {
       const { imageBase64, lang } = req.body as { imageBase64: string; lang: string };
       if (!imageBase64) return res.status(400).json({ error: "Missing imageBase64" });
@@ -2869,7 +2891,7 @@ Student's ${learnName} answer: ${userAnswer}`;
   });
 
   // ── Quiz Evaluate (GPT-4o) ──────────────────────────────────────────────────
-  app.post("/api/quiz-evaluate", async (req: Request, res: Response) => {
+  app.post("/api/quiz-evaluate", gptLimiter, async (req: Request, res: Response) => {
     try {
       const { systemPrompt, userMessage } = req.body as {
         systemPrompt: string;
@@ -2896,7 +2918,7 @@ Student's ${learnName} answer: ${userAnswer}`;
   });
 
   // ── Quiz Roleplay Chat (GPT-4o, custom system prompt) ───────────────────────
-  app.post("/api/quiz-roleplay", async (req: Request, res: Response) => {
+  app.post("/api/quiz-roleplay", gptLimiter, async (req: Request, res: Response) => {
     try {
       const { npcSystemPrompt, userMessage, history } = req.body as {
         npcSystemPrompt: string;

@@ -256,12 +256,15 @@ export default function HomeScreen() {
   }, [refreshBasicCourseCompleted]);
 
   const refreshHomeProgress = React.useCallback(() => {
-    loadProgress().then(setDailyProgress);
-    getDueCount().then(setSrsDueCount);
+    // Each load is independently guarded: a single corrupt AsyncStorage value
+    // or quota error must not become an unhandled rejection or wedge the whole
+    // home screen — degrade that one tile and keep the rest of the dashboard live.
+    loadProgress().then(setDailyProgress).catch((e) => console.warn("[Home] loadProgress failed:", e));
+    getDueCount().then(setSrsDueCount).catch((e) => console.warn("[Home] getDueCount failed:", e));
     loadLearnerProfile().then((profile) => {
       setPrimaryGoal(profile.goals.find(isLearningGoal) ?? null);
       void refreshBasicCourseCompleted(profile);
-    });
+    }).catch((e) => console.warn("[Home] loadLearnerProfile failed:", e));
     loadCardPractice(effectiveLearningLang)
       .then((practice) => {
         const today = localDateString();
@@ -271,9 +274,9 @@ export default function HomeScreen() {
         console.warn("[Home] Failed to load card practice:", e);
         setCardReviewToday(0);
       });
-    loadTodaySpeakingProgress().then((day) => setSpokenToday(getSpeakingCountForLanguage(day, effectiveLearningLang)));
-    loadSpokenDayOffset().then(setSpeakingDayOffset);
-    AsyncStorage.getItem("@lingua_last_session_date").then(setLastSessionDate);
+    loadTodaySpeakingProgress().then((day) => setSpokenToday(getSpeakingCountForLanguage(day, effectiveLearningLang))).catch((e) => console.warn("[Home] loadTodaySpeakingProgress failed:", e));
+    loadSpokenDayOffset().then(setSpeakingDayOffset).catch((e) => console.warn("[Home] loadSpokenDayOffset failed:", e));
+    AsyncStorage.getItem("@lingua_last_session_date").then(setLastSessionDate).catch((e) => console.warn("[Home] read last_session_date failed:", e));
   }, [effectiveLearningLang, refreshBasicCourseCompleted]);
 
   useFocusEffect(refreshHomeProgress);

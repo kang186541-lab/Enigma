@@ -87,8 +87,17 @@ export default function SpeakingLock(props: SpeakingLockProps) {
     try {
       const { base64, mimeType } = await recordAudio(RECORDING_MS);
       if (!isValidSpokenAudio(base64)) {
-        // Too short to be a real attempt — don't count it, just ask to retry.
-        setAttempts((a) => a + 1);
+        // Too short to be a real attempt (mic muted/blocked, or nothing said).
+        // Count it and ask to retry — but after 3 such attempts accept unscored
+        // so a broken/blocked mic can't hard-trap the room.
+        const next = attempts + 1;
+        setAttempts(next);
+        if (next >= 3) {
+          setPhase("unlocked");
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+          props.onUnlocked(null);
+          return;
+        }
         setPhase("retry");
         return;
       }
@@ -127,7 +136,19 @@ export default function SpeakingLock(props: SpeakingLockProps) {
       }
       setPhase("retry");
     } catch {
-      setAttempts((a) => a + 1);
+      // Recording itself failed — most commonly a permanently DENIED mic
+      // permission, where every re-tap throws instantly. Without an escape the
+      // learner is trapped on this lock forever (only control is the same failing
+      // mic). After 3 failed attempts accept unscored so the room is never a hard
+      // dead-end (parity with the below-threshold auto-pass above).
+      const next = attempts + 1;
+      setAttempts(next);
+      if (next >= 3) {
+        setPhase("unlocked");
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        props.onUnlocked(null);
+        return;
+      }
       setPhase("retry");
     }
   }, [phase, attempts, target, props]);
