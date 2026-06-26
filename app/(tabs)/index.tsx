@@ -263,7 +263,7 @@ export default function HomeScreen() {
     getDueCount().then(setSrsDueCount).catch((e) => console.warn("[Home] getDueCount failed:", e));
     loadLearnerProfile().then((profile) => {
       setPrimaryGoal(profile.goals.find(isLearningGoal) ?? null);
-      void refreshBasicCourseCompleted(profile);
+      refreshBasicCourseCompleted(profile).catch((e) => console.warn("[Home] refreshBasicCourseCompleted failed:", e));
     }).catch((e) => console.warn("[Home] loadLearnerProfile failed:", e));
     loadCardPractice(effectiveLearningLang)
       .then((practice) => {
