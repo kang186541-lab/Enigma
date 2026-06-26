@@ -53,7 +53,7 @@ export default function AchievementsScreen() {
   return (
     <LinearGradient colors={[C.bg1, C.bg2]} style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
+        <Pressable onPress={() => router.back()} style={styles.backBtn} accessibilityRole="link" accessibilityLabel={t(T.back, lc)}>
           <Ionicons name="arrow-back" size={22} color={C.gold} />
         </Pressable>
         <Text style={styles.title}>{t(T.title, lc)}</Text>
@@ -67,6 +67,9 @@ export default function AchievementsScreen() {
             key={cat}
             onPress={() => setSelectedCat(cat)}
             style={[styles.tab, cat === selectedCat && styles.tabActive]}
+            accessibilityRole="tab"
+            accessibilityLabel={t(catLabels[cat], lc)}
+            accessibilityState={{ selected: cat === selectedCat }}
           >
             <Text style={[styles.tabText, cat === selectedCat && styles.tabTextActive]}>
               {t(catLabels[cat], lc)}

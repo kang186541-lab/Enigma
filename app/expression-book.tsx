@@ -101,6 +101,8 @@ export default function ExpressionBookScreen() {
           onPress={() => router.back()}
           style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.65 }]}
           hitSlop={8}
+          accessibilityRole="link"
+          accessibilityLabel="Go back"
         >
           <Ionicons name="arrow-back" size={20} color={C.gold} />
         </Pressable>
@@ -164,6 +166,9 @@ export default function ExpressionBookScreen() {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     setExpandedChapter(isExpanded ? null : chId);
                   }}
+                  accessibilityRole="button"
+                  accessibilityLabel={info.name[nl]}
+                  accessibilityState={{ selected: isExpanded }}
                 >
                   <EmojiText style={styles.chapterEmoji}>{info.emoji}</EmojiText>
                   <View style={styles.chapterInfo}>

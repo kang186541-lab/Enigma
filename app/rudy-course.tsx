@@ -127,7 +127,12 @@ export default function RudyCourseScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* ── Header ─────────────────────────────────────────── */}
       <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
+        <Pressable
+          style={styles.backBtn}
+          onPress={() => router.back()}
+          accessibilityRole="link"
+          accessibilityLabel="Back"
+        >
           <Ionicons name="arrow-back" size={22} color={C.gold} />
         </Pressable>
         <Text style={styles.headerTitle}>{headerLabel}</Text>
@@ -160,6 +165,8 @@ export default function RudyCourseScreen() {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setUnitDropdownOpen((v) => !v);
           }}
+          accessibilityRole="button"
+          accessibilityLabel={getTri(currentUnit.title, lc)}
         >
           <Text style={styles.dropdownBtnText}>{getTri(currentUnit.title, lc)}</Text>
           <Ionicons name={unitDropdownOpen ? "chevron-up" : "chevron-down"} size={16} color={C.gold} />
@@ -176,6 +183,9 @@ export default function RudyCourseScreen() {
                   setSelectedUnitIdx(i);
                   setUnitDropdownOpen(false);
                 }}
+                accessibilityRole="button"
+                accessibilityLabel={getTri(unit.title, lc)}
+                accessibilityState={{ selected: i === selectedUnitIdx }}
               >
                 <View style={styles.dropdownItemLeft}>
                   <View style={[styles.levelDot, { backgroundColor: i === selectedUnitIdx ? C.gold : C.goldDim }]} />
@@ -214,6 +224,9 @@ export default function RudyCourseScreen() {
                 pressed && !isLocked && { opacity: 0.8, transform: [{ scale: 0.99 }] },
               ]}
               onPress={() => handleDayPress(day)}
+              accessibilityRole="button"
+              accessibilityLabel={`Day ${day.dayNumber}: ${getTri(day.topic, lc)}`}
+              accessibilityState={{ disabled: isLocked, selected: isToday }}
             >
               {/* Status icon */}
               <View style={[styles.dayIcon, isDone && styles.dayIconDone, isActive && styles.dayIconActive, isLocked && styles.dayIconLocked]}>

@@ -165,6 +165,8 @@ export default function NpcListScreen() {
           onPress={() => router.back()}
           style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.65 }]}
           hitSlop={8}
+          accessibilityRole="link"
+          accessibilityLabel="Back"
         >
           <Ionicons name="arrow-back" size={20} color={C.gold} />
         </Pressable>
@@ -219,6 +221,9 @@ export default function NpcListScreen() {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 router.push({ pathname: "/npc-mission", params: { npcId: npc.id } });
               }}
+              accessibilityRole="link"
+              accessibilityLabel={npc.name}
+              accessibilityState={{ disabled: !unlocked }}
             >
               <NpcAvatar
                 npc={npc}
@@ -312,6 +317,9 @@ export default function NpcListScreen() {
                       setExpandedWound(isExpanded ? null : w.npcId);
                     }
                   }}
+                  accessibilityRole="button"
+                  accessibilityLabel={npcName}
+                  accessibilityState={{ disabled: !unlocked, selected: isExpanded }}
                 >
                   <View style={styles.woundHeader}>
                     <EmojiText style={styles.woundEmoji}>{unlocked ? w.emoji : "🔒"}</EmojiText>

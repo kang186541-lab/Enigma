@@ -186,7 +186,12 @@ export default function WritingPractice() {
   return (
     <LinearGradient colors={[C.bg1, C.bg2]} style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.backBtn}
+          accessibilityRole="link"
+          accessibilityLabel={t(T.back, lc)}
+        >
           <Ionicons name="arrow-back" size={22} color={C.gold} />
         </Pressable>
         <Text style={styles.title}>{t(T.title, lc)}</Text>
@@ -231,6 +236,9 @@ export default function WritingPractice() {
             style={[styles.checkBtn, !input.trim() && styles.checkBtnDisabled]}
             onPress={handleCheck}
             disabled={!input.trim()}
+            accessibilityRole="button"
+            accessibilityLabel={t(T.check, lc)}
+            accessibilityState={{ disabled: !input.trim() }}
           >
             <Text style={styles.checkBtnText}>{t(T.check, lc)}</Text>
           </Pressable>
@@ -255,7 +263,12 @@ export default function WritingPractice() {
               </Text>
             </View>
             <Text style={styles.feedbackText}>{feedback}</Text>
-            <Pressable style={styles.nextBtn} onPress={handleNext}>
+            <Pressable
+              style={styles.nextBtn}
+              onPress={handleNext}
+              accessibilityRole="button"
+              accessibilityLabel={t(T.next, lc)}
+            >
               <Text style={styles.nextBtnText}>{t(T.next, lc)}</Text>
               <Ionicons name="arrow-forward" size={18} color={C.bg1} />
             </Pressable>

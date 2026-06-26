@@ -2042,6 +2042,10 @@ export default function CardsScreen() {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 router.push("/rudy-course" as any);
               }}
+              accessibilityRole="link"
+              accessibilityLabel={
+                nativeLang === "korean" ? "🦊 오늘의 훈련 시작" : nativeLang === "spanish" ? "🦊 Comenzar entrenamiento" : nativeLang === "indonesian" ? "🦊 Mulai latihan" : "🦊 Start training"
+              }
             >
               <EmojiText style={{ fontFamily: F.label, color: C.bg1, fontSize: 13 }}>
                 {nativeLang === "korean" ? "🦊 오늘의 훈련 시작" : nativeLang === "spanish" ? "🦊 Comenzar entrenamiento" : nativeLang === "indonesian" ? "🦊 Mulai latihan" : "🦊 Start training"}
@@ -2056,6 +2060,10 @@ export default function CardsScreen() {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 switchDeck("beginner");
               }}
+              accessibilityRole="button"
+              accessibilityLabel={
+                nativeLang === "korean" ? "초급 덱 →" : nativeLang === "spanish" ? "Mazo principiante →" : nativeLang === "indonesian" ? "Dek pemula →" : "Beginner deck →"
+              }
             >
               <Text style={{ fontFamily: F.label, color: C.gold, fontSize: 13 }}>
                 {nativeLang === "korean" ? "초급 덱 →" : nativeLang === "spanish" ? "Mazo principiante →" : nativeLang === "indonesian" ? "Dek pemula →" : "Beginner deck →"}
@@ -2100,6 +2108,10 @@ export default function CardsScreen() {
           <Pressable
             style={({ pressed }) => [styles.resetBtn, pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] }]}
             onPress={resetState}
+            accessibilityRole="button"
+            accessibilityLabel={
+              nativeLang === "korean" ? "더 연습하기" : nativeLang === "spanish" ? "Practicar más" : nativeLang === "indonesian" ? "Latihan Lagi" : "Practice More"
+            }
           >
             <Ionicons name="refresh" size={18} color={C.bg1} />
             <Text style={styles.resetBtnText}>
@@ -2109,6 +2121,16 @@ export default function CardsScreen() {
           <Pressable
             style={({ pressed }) => [styles.switchBtn, pressed && { opacity: 0.85 }]}
             onPress={() => switchDeck(deckType === "beginner" ? "advanced" : "beginner")}
+            accessibilityRole="button"
+            accessibilityLabel={
+              nativeLang === "korean"
+                ? `${deckType === "beginner" ? "고급" : "초급"} 덱 도전 →`
+                : nativeLang === "spanish"
+                ? `Prueba el mazo ${deckType === "beginner" ? "avanzado" : "principiante"} →`
+                : nativeLang === "indonesian"
+                ? `Coba dek ${deckType === "beginner" ? "lanjutan" : "pemula"} →`
+                : `Try ${deckType === "beginner" ? "Advanced" : "Beginner"} deck →`
+            }
           >
             <Text style={styles.switchBtnText}>
               {nativeLang === "korean"
@@ -2264,6 +2286,10 @@ export default function CardsScreen() {
                 style={({ pressed }) => [styles.speakReviewBtn, pressed && { opacity: 0.82 }]}
                 onPress={handleSpeakPractice}
                 hitSlop={12}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  nativeLang === "korean" ? "문장 말하기" : nativeLang === "spanish" ? "Decir frase" : nativeLang === "indonesian" ? "Ucapkan kalimat" : "Say sentence"
+                }
               >
                 <Ionicons name="mic" size={16} color={C.bg1} />
                 <Text style={styles.speakReviewBtnText}>
@@ -2340,6 +2366,10 @@ export default function CardsScreen() {
               <Pressable
                 style={({ pressed }) => [styles.flipPromptBtn, pressed && { opacity: 0.8 }]}
                 onPress={handleFlip}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  nativeLang === "korean" ? "탭해서 뜻 보기" : nativeLang === "spanish" ? "Toca para ver el significado" : nativeLang === "indonesian" ? "Ketuk untuk lihat arti" : "Tap to reveal meaning"
+                }
               >
                 <LinearGradient colors={[C.gold, C.goldDark]} style={styles.flipPromptGradient}>
                   <Ionicons name="sync" size={18} color={C.bg1} />

@@ -819,6 +819,8 @@ export default function NpcMissionScreen() {
                 onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); playNpcTts(item.text, item.id); }}
                 style={({ pressed }) => [styles.replayBtn, pressed && { opacity: 0.65 }]}
                 hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="Replay audio"
               >
                 <Ionicons
                   name={speakingId === item.id ? "volume-high" : "volume-medium-outline"}
@@ -836,6 +838,9 @@ export default function NpcMissionScreen() {
                 onPress={() => toggleMsgTransl(item)}
                 style={({ pressed }) => [styles.msgTranslBtn, pressed && { opacity: 0.7 }]}
                 disabled={isFetching}
+                accessibilityRole="button"
+                accessibilityLabel={btnLabel}
+                accessibilityState={{ disabled: isFetching }}
               >
                 {isFetching ? (
                   <ActivityIndicator size="small" color={C.gold} style={{ marginRight: 4 }} />
@@ -890,6 +895,8 @@ export default function NpcMissionScreen() {
           onPress={() => { stopAudio(); router.back(); }}
           style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.65 }]}
           hitSlop={8}
+          accessibilityRole="link"
+          accessibilityLabel="Go back"
         >
           <Ionicons name="arrow-back" size={20} color={C.gold} />
         </Pressable>
@@ -901,7 +908,7 @@ export default function NpcMissionScreen() {
             <Text style={styles.headerName}>{npc?.name ?? "?"}</Text>
             <EmojiText style={styles.emotionIcon}>{emojiIcon}</EmojiText>
             <View style={styles.headerMuteBtn}>
-              <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); if (!muted) stopAudio(); setMuted(m => !m); }} hitSlop={6}>
+              <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); if (!muted) stopAudio(); setMuted(m => !m); }} hitSlop={6} accessibilityRole="button" accessibilityLabel={muted ? "Unmute voice" : "Mute voice"} accessibilityState={{ selected: muted }}>
                 <Ionicons name={muted ? "volume-mute" : "volume-medium-outline"} size={16} color={muted ? C.goldDark : C.goldDim} />
               </Pressable>
             </View>
@@ -999,6 +1006,9 @@ export default function NpcMissionScreen() {
                     style={({ pressed }) => [styles.choiceBtn, pressed && { opacity: 0.8, transform: [{ scale: 0.97 }] }]}
                     onPress={() => handleChoiceTap(choice.text)}
                     disabled={isTyping}
+                    accessibilityRole="button"
+                    accessibilityLabel={choice.text}
+                    accessibilityState={{ disabled: isTyping }}
                   >
                     <Text style={styles.choiceBtnText}>{choice.text}</Text>
                     <Ionicons name="volume-medium-outline" size={12} color={C.goldDark} style={{ marginLeft: 6 }} />
@@ -1007,6 +1017,11 @@ export default function NpcMissionScreen() {
                     <Pressable
                       style={styles.translToggleBtn}
                       onPress={() => setChoiceTranslVisible(prev => { const n = [...prev]; n[i] = !n[i]; return n; })}
+                      accessibilityRole="button"
+                      accessibilityLabel={choiceTranslVisible[i]
+                        ? (native === "korean" ? "번역 숨기기" : native === "spanish" ? "Ocultar" : native === "indonesian" ? "Sembunyikan terjemahan" : "Hide translation")
+                        : (native === "korean" ? "번역 보기" : native === "spanish" ? "Ver traducción" : native === "indonesian" ? "Lihat terjemahan" : "Show translation")}
+                      accessibilityState={{ selected: choiceTranslVisible[i] }}
                     >
                       <Text style={styles.translToggleText}>
                         {choiceTranslVisible[i]
@@ -1034,6 +1049,9 @@ export default function NpcMissionScreen() {
                         style={({ pressed }) => [styles.familiarChoiceBtn, pressed && { opacity: 0.8 }]}
                         onPress={() => handleChoiceTap(choice.text)}
                         disabled={isTyping}
+                        accessibilityRole="button"
+                        accessibilityLabel={choice.text}
+                        accessibilityState={{ disabled: isTyping }}
                       >
                         <Text style={styles.familiarChoiceBtnText} numberOfLines={3}>{choice.text}</Text>
                       </Pressable>
@@ -1078,6 +1096,9 @@ export default function NpcMissionScreen() {
                   ]}
                   onPress={() => sendMessage(inputText)}
                   disabled={!inputText.trim() || isTyping}
+                  accessibilityRole="button"
+                  accessibilityLabel={sendLabel}
+                  accessibilityState={{ disabled: !inputText.trim() || isTyping }}
                 >
                   <Ionicons name="arrow-forward" size={16} color={C.bg1} />
                 </Pressable>
@@ -1092,6 +1113,9 @@ export default function NpcMissionScreen() {
                 style={({ pressed }) => [styles.micBtn, isRecording && styles.micBtnActive, pressed && { opacity: 0.8 }]}
                 onPress={handleVoiceInput}
                 disabled={isTyping}
+                accessibilityRole="button"
+                accessibilityLabel="Voice input"
+                accessibilityState={{ disabled: isTyping, selected: isRecording }}
               >
                 <Ionicons name={isRecording ? "radio" : "mic-outline"} size={18} color={isRecording ? C.bg1 : C.goldDim} />
               </Pressable>
@@ -1151,6 +1175,8 @@ export default function NpcMissionScreen() {
                   setChoicesError(null);
                   fetchNpcReply(conversationRef.current, true, relationship);
                 }}
+                accessibilityRole="button"
+                accessibilityLabel={native === "korean" ? "다시 시도" : native === "spanish" ? "Reintentar" : native === "indonesian" ? "Coba lagi" : "Retry"}
               >
                 <Ionicons name="refresh" size={14} color={C.bg1} />
                 <Text style={styles.errorRetryText}>
@@ -1200,6 +1226,8 @@ export default function NpcMissionScreen() {
             <Pressable
               style={({ pressed }) => [styles.popupReplayBtn, pressed && { opacity: 0.75 }]}
               onPress={handlePopupReplay}
+              accessibilityRole="button"
+              accessibilityLabel={native === "korean" ? "다시 듣기" : native === "spanish" ? "Reproducir" : native === "indonesian" ? "Putar lagi" : "Replay"}
             >
               <Ionicons name={popupPlaying ? "volume-high" : "volume-medium-outline"} size={18} color={C.gold} />
               <Text style={styles.popupReplayLabel}>
@@ -1211,12 +1239,16 @@ export default function NpcMissionScreen() {
               <Pressable
                 style={({ pressed }) => [styles.popupCancelBtn, pressed && { opacity: 0.8 }]}
                 onPress={handlePopupCancel}
+                accessibilityRole="button"
+                accessibilityLabel={reselectLabel}
               >
                 <EmojiText style={styles.popupCancelLabel}>❌ {reselectLabel}</EmojiText>
               </Pressable>
               <Pressable
                 style={({ pressed }) => [styles.popupSendBtn, pressed && { opacity: 0.8 }]}
                 onPress={handlePopupSend}
+                accessibilityRole="button"
+                accessibilityLabel={sendLabel}
               >
                 <EmojiText style={styles.popupSendLabel}>✅ {sendLabel}</EmojiText>
               </Pressable>
@@ -1235,6 +1267,8 @@ export default function NpcMissionScreen() {
         <Pressable
           style={styles.wordOverlay}
           onPress={() => { setWordPopup(null); setWordLoading(false); setWordExPlaying(false); setWordPronPlaying(false); }}
+          accessibilityRole="button"
+          accessibilityLabel="Close"
         >
           <Pressable style={styles.wordCard} onPress={() => {}}>
             <View style={styles.wordDragHandle} />
@@ -1263,6 +1297,8 @@ export default function NpcMissionScreen() {
                       style={({ pressed }) => [styles.wordPronBtn, pressed && { opacity: 0.7 }]}
                       onPress={() => playWordPronunciation(wordPopup.word)}
                       hitSlop={6}
+                      accessibilityRole="button"
+                      accessibilityLabel="Play pronunciation"
                     >
                       <Ionicons
                         name={wordPronPlaying ? "volume-high" : "volume-medium-outline"}
@@ -1274,6 +1310,8 @@ export default function NpcMissionScreen() {
                       style={({ pressed }) => [styles.wordCloseBtn, pressed && { opacity: 0.65 }]}
                       onPress={() => { setWordPopup(null); setWordExPlaying(false); setWordPronPlaying(false); }}
                       hitSlop={8}
+                      accessibilityRole="button"
+                      accessibilityLabel="Close"
                     >
                       <Ionicons name="close" size={18} color={C.goldDark} />
                     </Pressable>
@@ -1313,6 +1351,8 @@ export default function NpcMissionScreen() {
                     <Pressable
                       style={({ pressed }) => [styles.wordPlayBtn, pressed && { opacity: 0.75 }]}
                       onPress={() => playWordExample(wordPopup.example)}
+                      accessibilityRole="button"
+                      accessibilityLabel={native === "korean" ? "예문 듣기" : native === "spanish" ? "Escuchar" : native === "indonesian" ? "Dengarkan" : "Listen"}
                     >
                       <Ionicons
                         name={wordExPlaying ? "volume-high" : "volume-medium-outline"}

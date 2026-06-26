@@ -1247,6 +1247,8 @@ export default function ChatRoomScreen() {
                   onPress={() => handleReplay(item)}
                   style={({ pressed }) => [styles.bubbleActionBtn, pressed && { opacity: 0.65 }]}
                   hitSlop={6}
+                  accessibilityRole="button"
+                  accessibilityLabel="Replay audio"
                 >
                   <Ionicons
                     name={speakingId === item.id ? "volume-high" : "volume-medium-outline"}
@@ -1271,6 +1273,9 @@ export default function ChatRoomScreen() {
               return (
                 <Pressable
                   style={({ pressed }) => [styles.correctionRecast, pressed && { opacity: 0.85 }]}
+                  accessibilityRole="button"
+                  accessibilityLabel={RECAST_LABEL}
+                  accessibilityState={{ selected: expanded }}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     setExpandedCorrectionIds((prev) => {
@@ -1315,6 +1320,9 @@ export default function ChatRoomScreen() {
                   )}
                   <Pressable
                     style={({ pressed }) => [styles.correctionRevealBtn, pressed && { opacity: 0.8 }]}
+                    accessibilityRole="button"
+                    accessibilityLabel={revealed ? REVEAL_HIDE : REVEAL_SHOW}
+                    accessibilityState={{ selected: revealed }}
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       setExpandedCorrectionIds((prev) => {
@@ -1379,6 +1387,9 @@ export default function ChatRoomScreen() {
                   });
                 }}
                 style={({ pressed }) => [styles.translBubble, pressed && { opacity: 0.75 }]}
+                accessibilityRole="button"
+                accessibilityLabel="Toggle translation"
+                accessibilityState={{ selected: !hiddenTranslationIds.has(item.id) }}
               >
                 <EmojiText style={styles.translGlobe}>🌐</EmojiText>
                 {!hiddenTranslationIds.has(item.id) && (
@@ -1411,7 +1422,12 @@ export default function ChatRoomScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
+        <Pressable
+          style={styles.backBtn}
+          onPress={() => router.back()}
+          accessibilityRole="link"
+          accessibilityLabel="Go back"
+        >
           <Ionicons name="chevron-back" size={22} color={C.gold} />
         </Pressable>
 
@@ -1442,6 +1458,9 @@ export default function ChatRoomScreen() {
         <Pressable
           style={({ pressed }) => [styles.muteBtn, pressed && { opacity: 0.75 }]}
           onPress={toggleMute}
+          accessibilityRole="button"
+          accessibilityLabel={muted ? "Unmute tutor voice" : "Mute tutor voice"}
+          accessibilityState={{ selected: muted }}
         >
           <Ionicons
             name={muted ? "volume-mute" : "volume-medium"}
@@ -1453,6 +1472,8 @@ export default function ChatRoomScreen() {
         <Pressable
           style={({ pressed }) => [styles.muteBtn, pressed && { opacity: 0.75 }]}
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowSettings(true); }}
+          accessibilityRole="button"
+          accessibilityLabel="Open settings"
         >
           <Ionicons name="settings-outline" size={19} color={C.goldDim} />
         </Pressable>
@@ -1532,6 +1553,9 @@ export default function ChatRoomScreen() {
                 pressed && { opacity: 0.75 },
               ]}
               onPress={() => handleSpeedChange(opt.value)}
+              accessibilityRole="button"
+              accessibilityLabel={opt.label}
+              accessibilityState={{ selected: active }}
             >
               <Text style={[styles.speedBtnText, active && styles.speedBtnTextActive]}>
                 {opt.label}
@@ -1649,6 +1673,13 @@ export default function ChatRoomScreen() {
             )}
             <Pressable
               style={({ pressed }) => [styles.lessonReportBtn, pressed && { opacity: 0.85 }]}
+              accessibilityRole="button"
+              accessibilityLabel={
+                userNativeLang === "korean" ? "돌아가기"
+                  : userNativeLang === "spanish" ? "Volver"
+                  : userNativeLang === "indonesian" ? "Kembali ke beranda"
+                  : "Back home"
+              }
               onPress={() => {
                 // Summary already persisted when phase transitioned to "done".
                 stopSpeech();
@@ -1675,13 +1706,23 @@ export default function ChatRoomScreen() {
         animationType="slide"
         onRequestClose={() => setShowSettings(false)}
       >
-        <Pressable style={styles.modalOverlay} onPress={() => setShowSettings(false)}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowSettings(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Close settings"
+        >
           <Pressable style={styles.settingsPanel} onPress={() => {}}>
             <View style={styles.settingsHandle} />
 
             <View style={styles.settingsHeaderRow}>
               <Text style={styles.settingsTitle}>설정</Text>
-              <Pressable onPress={() => setShowSettings(false)} hitSlop={10}>
+              <Pressable
+                onPress={() => setShowSettings(false)}
+                hitSlop={10}
+                accessibilityRole="button"
+                accessibilityLabel="Close settings"
+              >
                 <Ionicons name="close" size={20} color={C.goldDim} />
               </Pressable>
             </View>
@@ -1700,6 +1741,9 @@ export default function ChatRoomScreen() {
                       pressed && { opacity: 0.8 },
                     ]}
                     onPress={() => handleModeChange(m.key)}
+                    accessibilityRole="button"
+                    accessibilityLabel={m.label}
+                    accessibilityState={{ selected: active }}
                   >
                     <EmojiText style={styles.modeBtnEmoji}>{m.emoji}</EmojiText>
                     <Text style={[styles.segmentBtnText, active && styles.segmentBtnTextActive]}>
@@ -1758,6 +1802,9 @@ export default function ChatRoomScreen() {
               <Pressable
                 onPress={handleVoiceInput}
                 disabled={isRecording || isTyping || !!speakingId}
+                accessibilityRole="button"
+                accessibilityLabel={isRecording ? "Recording, listening" : "Record voice message"}
+                accessibilityState={{ disabled: isRecording || isTyping || !!speakingId }}
                 style={({ pressed }) => [
                   styles.micInputBtn,
                   isRecording && styles.micInputBtnActive,
@@ -1794,6 +1841,9 @@ export default function ChatRoomScreen() {
               ]}
               onPress={sendMessage}
               disabled={!inputText.trim() || isRecording}
+              accessibilityRole="button"
+              accessibilityLabel="Send message"
+              accessibilityState={{ disabled: !inputText.trim() || isRecording }}
             >
               <LinearGradient
                 colors={inputText.trim() ? [C.gold, C.goldDark] : [C.bg2, C.bg2]}
