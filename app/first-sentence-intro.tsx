@@ -500,7 +500,7 @@ export default function FirstSentenceIntroScreen() {
         <LinearGradient colors={[C.bg1, C.bg2, C.bg1]} style={StyleSheet.absoluteFill} />
         <View style={[styles.fallback, { paddingTop: topPad, paddingBottom: bottomPad }]}>
           <Text style={styles.fallbackText}>{ui.loadingFallback}</Text>
-          <Pressable style={styles.cta} onPress={goToSpeak}>
+          <Pressable style={styles.cta} onPress={goToSpeak} accessibilityRole="button" accessibilityLabel={ui.sayItCta}>
             <EmojiText style={styles.ctaText}>{ui.sayItCta}</EmojiText>
           </Pressable>
         </View>

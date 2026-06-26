@@ -247,7 +247,12 @@ export default function SettingsScreen() {
   return (
     <LinearGradient colors={[C.bg1, C.bg2]} style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.backBtn}
+          accessibilityRole="link"
+          accessibilityLabel={t(T.back, lc)}
+        >
           <Ionicons name="arrow-back" size={22} color={C.gold} />
           <Text style={styles.backText}>{t(T.back, lc)}</Text>
         </Pressable>
@@ -276,6 +281,9 @@ export default function SettingsScreen() {
                   onPress={handleSignOut}
                   disabled={signInBusy}
                   style={[styles.pill, { opacity: signInBusy ? 0.5 : 1 }]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t(T.signOut, lc)}
+                  accessibilityState={{ disabled: signInBusy }}
                 >
                   <Text style={styles.pillText}>{t(T.signOut, lc)}</Text>
                 </Pressable>
@@ -302,6 +310,9 @@ export default function SettingsScreen() {
                 onPress={handleEmailSignIn}
                 disabled={signInBusy || authLoading || !emailInput.trim()}
                 style={[styles.emailBtn, { opacity: (signInBusy || authLoading || !emailInput.trim()) ? 0.5 : 1, marginTop: 8 }]}
+                accessibilityRole="button"
+                accessibilityLabel={t(T.emailSendLink, lc)}
+                accessibilityState={{ disabled: signInBusy || authLoading || !emailInput.trim() }}
               >
                 <Ionicons name="mail-outline" size={18} color="#FFFFFF" />
                 <Text style={styles.googleBtnText}>{t(T.emailSendLink, lc)}</Text>
@@ -321,6 +332,9 @@ export default function SettingsScreen() {
                 onPress={handleSignIn}
                 disabled={signInBusy || authLoading}
                 style={[styles.googleBtn, { opacity: signInBusy || authLoading ? 0.5 : 1 }]}
+                accessibilityRole="button"
+                accessibilityLabel={t(T.signInWithGoogle, lc)}
+                accessibilityState={{ disabled: signInBusy || authLoading }}
               >
                 <Ionicons name="logo-google" size={18} color="#FFFFFF" />
                 <Text style={styles.googleBtnText}>
@@ -437,6 +451,9 @@ export default function SettingsScreen() {
                           styles.timePill,
                           h === notifHour && styles.timePillActive,
                         ]}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${h.toString().padStart(2, "0")}:00`}
+                        accessibilityState={{ selected: h === notifHour }}
                       >
                         <Text
                           style={[
@@ -469,7 +486,13 @@ export default function SettingsScreen() {
                   hard: T.diffHard,
                 };
                 return (
-                  <Pressable key={d} style={[styles.pill, d === "auto" && styles.pillActive]}>
+                  <Pressable
+                    key={d}
+                    style={[styles.pill, d === "auto" && styles.pillActive]}
+                    accessibilityRole="button"
+                    accessibilityLabel={t(labelMap[d], lc)}
+                    accessibilityState={{ selected: d === "auto" }}
+                  >
                     <Text style={[styles.pillText, d === "auto" && styles.pillTextActive]}>
                       {t(labelMap[d], lc)}
                     </Text>
@@ -493,7 +516,14 @@ export default function SettingsScreen() {
                   system: T.themeSystem,
                 };
                 return (
-                  <Pressable key={th} style={[styles.pill, th === themeMode && styles.pillActive]} onPress={() => setThemeMode(th)}>
+                  <Pressable
+                    key={th}
+                    style={[styles.pill, th === themeMode && styles.pillActive]}
+                    onPress={() => setThemeMode(th)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t(labelMap[th], lc)}
+                    accessibilityState={{ selected: th === themeMode }}
+                  >
                     <Text style={[styles.pillText, th === themeMode && styles.pillTextActive]}>
                       {t(labelMap[th], lc)}
                     </Text>
@@ -566,6 +596,9 @@ export default function SettingsScreen() {
                     styles.emailBtn,
                     { marginTop: 10, opacity: classBusy || !classCodeInput.trim() ? 0.5 : 1 },
                   ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t(T.classJoinCta, lc)}
+                  accessibilityState={{ disabled: classBusy || !classCodeInput.trim() }}
                 >
                   {classBusy ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
@@ -584,6 +617,8 @@ export default function SettingsScreen() {
             <Pressable
               onPress={() => setClassModalOpen(false)}
               style={styles.modalCloseBtn}
+              accessibilityRole="button"
+              accessibilityLabel={t(T.classClose, lc)}
             >
               <Text style={styles.modalCloseText}>{t(T.classClose, lc)}</Text>
             </Pressable>

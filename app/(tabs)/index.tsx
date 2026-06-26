@@ -592,6 +592,8 @@ export default function HomeScreen() {
           <Pressable
             style={({ pressed }) => [styles.langChip, pressed && { opacity: 0.75 }]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setShowLangModal(true); }}
+            accessibilityRole="button"
+            accessibilityLabel={`${LANG_FLAGS[nativeLang]} → ${learnFlag} ${nativeLang === "korean" ? "변경" : nativeLang === "spanish" ? "Cambiar" : nativeLang === "indonesian" ? "Ubah" : "Change"}`}
           >
             <Text style={styles.langChipText}>
               {LANG_FLAGS[nativeLang]} → {learnFlag}
@@ -889,6 +891,14 @@ export default function HomeScreen() {
               // review screen the banner promised.
               router.push({ pathname: "/(tabs)/cards", params: { deck: "srs" } } as any);
             }}
+            accessibilityRole="button"
+            accessibilityLabel={nativeLang === "korean"
+              ? `루디가 복습 카드를 준비했어요! ${srsDueCount}장의 카드가 복습을 기다리고 있어요`
+              : nativeLang === "spanish"
+              ? `¡Rudy preparó tarjetas de repaso! ${srsDueCount} tarjetas esperan tu repaso`
+              : nativeLang === "indonesian"
+              ? `Rudy sudah menyiapkan kartu ulasan untukmu! ${srsDueCount} kartu menunggu untuk diulas`
+              : `Rudy prepared review cards for you! ${srsDueCount} cards are waiting for review`}
           >
             <EmojiText style={styles.srsBannerEmoji}>🦊</EmojiText>
             <View style={styles.srsBannerText}>
@@ -942,6 +952,10 @@ export default function HomeScreen() {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.push((courseCompleted ? "/basic-course?review=1&section=full" : "/basic-course") as any);
             }}
+            accessibilityRole="button"
+            accessibilityLabel={courseCompleted
+              ? (nativeLang === "korean" ? "기초 과정 복습" : nativeLang === "spanish" ? "Repasar curso" : nativeLang === "indonesian" ? "Ulas Kursus" : "Review Course")
+              : (nativeLang === "korean" ? "선택 기초 연습" : nativeLang === "spanish" ? "Base opcional" : nativeLang === "indonesian" ? "Dasar Opsional" : "Optional Basics")}
           >
             <EmojiText style={styles.basicCoursePillText}>
               {courseCompleted
@@ -961,6 +975,8 @@ export default function HomeScreen() {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             router.push("/npc-list" as any);
           }}
+          accessibilityRole="button"
+          accessibilityLabel={`${npcMissionLabel}: ${npcMissionDesc}`}
         >
           <View style={styles.npcMissionContent}>
             <View style={styles.npcMissionTop}>
@@ -1016,6 +1032,8 @@ export default function HomeScreen() {
           <Pressable
             style={({ pressed }) => [styles.featureCard, pressed && { opacity: 0.85 }]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/stats-dashboard" as any); }}
+            accessibilityRole="button"
+            accessibilityLabel={nativeLang === "korean" ? "학습 통계" : nativeLang === "spanish" ? "Estadísticas" : nativeLang === "indonesian" ? "Statistik" : "Stats"}
           >
             <EmojiText style={{ fontSize: 24 }}>📊</EmojiText>
             <Text style={styles.featureLabel}>
@@ -1025,6 +1043,8 @@ export default function HomeScreen() {
           <Pressable
             style={({ pressed }) => [styles.featureCard, pressed && { opacity: 0.85 }]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/achievements" as any); }}
+            accessibilityRole="button"
+            accessibilityLabel={nativeLang === "korean" ? "업적" : nativeLang === "spanish" ? "Logros" : nativeLang === "indonesian" ? "Pencapaian" : "Achievements"}
           >
             <EmojiText style={{ fontSize: 24 }}>🏆</EmojiText>
             <Text style={styles.featureLabel}>
@@ -1034,6 +1054,8 @@ export default function HomeScreen() {
           <Pressable
             style={({ pressed }) => [styles.featureCard, pressed && { opacity: 0.85 }]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/leaderboard" as any); }}
+            accessibilityRole="button"
+            accessibilityLabel={nativeLang === "korean" ? "리더보드" : nativeLang === "spanish" ? "Ranking" : nativeLang === "indonesian" ? "Papan Peringkat" : "Leaderboard"}
           >
             <EmojiText style={{ fontSize: 24 }}>🥇</EmojiText>
             <Text style={styles.featureLabel}>
@@ -1058,6 +1080,8 @@ export default function HomeScreen() {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 router.push(item.route as any);
               }}
+              accessibilityRole="button"
+              accessibilityLabel={`${item.label}. ${item.desc}`}
             >
               <View style={[styles.quickIconWrap, { borderColor: item.color + "88" }]}>
                 <Ionicons name={item.icon as any} size={22} color={item.color} />
@@ -1144,6 +1168,8 @@ function RudyTrainingCard({
       <Pressable
         style={({ pressed }) => [styles.dailyCard, pressed && { transform: [{ scale: 0.985 }] }]}
         onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${trainingLabel}. ${startLabel}`}
       >
         <View style={styles.dailyContent}>
           <View style={styles.dailyTopRow}>
@@ -1190,6 +1216,8 @@ function RudyTrainingCard({
     <Pressable
       style={({ pressed }) => [styles.dailyCard, pressed && { transform: [{ scale: 0.985 }] }]}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${trainingLabel}. ${todayDone ? doneMsg : `${dayLabel}. ${startLabel}`}`}
     >
       <View style={styles.dailyContent}>
         <View style={styles.dailyTopRow}>

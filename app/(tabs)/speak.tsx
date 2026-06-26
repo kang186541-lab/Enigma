@@ -2353,6 +2353,14 @@ export default function SpeakScreen() {
           <Pressable
             style={({ pressed }) => [styles.newSessionBtn, pressed && { opacity: 0.85 }]}
             onPress={isReviewSentenceMission ? returnToReviewCards : isFirstSpeakingMission ? startNextSpeakingStep : () => loadSession(activeLang)}
+            accessibilityRole="button"
+            accessibilityLabel={
+              isReviewSentenceMission
+                ? nativeLang === "korean" ? "카드 복습으로 돌아가기" : nativeLang === "spanish" ? "Volver al repaso" : nativeLang === "indonesian" ? "Kembali ke ulasan kartu" : "Back to review"
+                : isFirstSpeakingMission
+                ? continueSpeakingLabel
+                : nativeLang === "korean" ? "새 세션" : nativeLang === "spanish" ? "Nueva sesión" : nativeLang === "indonesian" ? "Sesi Baru" : "New Session"
+            }
           >
             <LinearGradient colors={[C.gold, C.goldDark]} style={StyleSheet.absoluteFill} />
             <Ionicons name={isGuidedSentenceMission ? "mic" : "refresh"} size={18} color={C.bg1} />
@@ -2397,6 +2405,8 @@ export default function SpeakScreen() {
           <Pressable
             style={styles.levelUpOverlay}
             onPress={() => { setLevelUpShow(false); loadSession(activeLang); }}
+            accessibilityRole="button"
+            accessibilityLabel={nativeLang === "korean" ? "탭해서 계속하기" : nativeLang === "spanish" ? "Toca para continuar" : nativeLang === "indonesian" ? "Ketuk untuk lanjut" : "Tap to continue"}
           >
             <View style={styles.levelUpCard}>
               <EmojiText style={styles.levelUpEmoji}>🎉</EmojiText>
@@ -2463,6 +2473,9 @@ export default function SpeakScreen() {
                         pressed && { opacity: 0.8 },
                       ]}
                       onPress={() => switchLang(tab.key)}
+                      accessibilityRole="button"
+                      accessibilityLabel={tab.label}
+                      accessibilityState={{ selected: active }}
                     >
                       <EmojiText style={styles.langTabFlag}>{tab.flag}</EmojiText>
                     </Pressable>
@@ -2509,6 +2522,8 @@ export default function SpeakScreen() {
                 style={({ pressed }) => [styles.listenBtn, pressed && { opacity: 0.75 }]}
                 onPress={handleListen}
                 testID="listen-button"
+                accessibilityRole="button"
+                accessibilityLabel={t("listen")}
               >
                 <LinearGradient colors={[tabInfo.color, tabInfo.color + "CC"]} style={StyleSheet.absoluteFill} />
                 <Ionicons name="volume-high" size={14} color="#fff" />
@@ -2713,6 +2728,8 @@ export default function SpeakScreen() {
                 style={({ pressed }) => [styles.retryChip, pressed && { opacity: 0.75 }]}
                 onPress={resetPracticeState}
                 testID="retry-button"
+                accessibilityRole="button"
+                accessibilityLabel={nativeLang === "korean" ? "다시 시도" : nativeLang === "spanish" ? "Reintentar" : nativeLang === "indonesian" ? "Coba lagi" : "Retry"}
               >
                 <Ionicons name="refresh" size={13} color={tabInfo.color} />
                 <Text style={[styles.retryChipText, { color: tabInfo.color }]}>{nativeLang === "korean" ? "다시 시도" : nativeLang === "spanish" ? "Reintentar" : nativeLang === "indonesian" ? "Coba lagi" : "Retry"}</Text>
@@ -2767,6 +2784,9 @@ export default function SpeakScreen() {
             onPress={goPrevWord}
             disabled={sessionIdx === 0}
             testID="prev-button"
+            accessibilityRole="button"
+            accessibilityLabel={nativeLang === "korean" ? "이전" : nativeLang === "spanish" ? "Anterior" : nativeLang === "indonesian" ? "Sebelumnya" : "Prev"}
+            accessibilityState={{ disabled: sessionIdx === 0 }}
           >
             <Ionicons name="arrow-back" size={16} color={sessionIdx === 0 ? C.goldDark : C.gold} />
             <Text style={[styles.navBtnText, { color: sessionIdx === 0 ? C.goldDark : C.gold }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
@@ -2783,6 +2803,14 @@ export default function SpeakScreen() {
               style={({ pressed }) => [styles.navBtn, styles.nextBtnActive, { backgroundColor: tabInfo.color }, pressed && { opacity: 0.85 }]}
               onPress={goNextWord}
               testID="next-word-button"
+              accessibilityRole="button"
+              accessibilityLabel={
+                isFirstSpeakingMission && sessionIdx + 1 >= sessionWords.length && shouldContinueDailySpeaking
+                  ? continueSpeakingLabel
+                  : sessionIdx + 1 >= sessionWords.length
+                  ? (nativeLang === "korean" ? "완료" : nativeLang === "spanish" ? "Completar" : nativeLang === "indonesian" ? "Selesai" : "Done")
+                  : (nativeLang === "korean" ? "다음" : nativeLang === "spanish" ? "Siguiente" : nativeLang === "indonesian" ? "Berikutnya" : "Next")
+              }
               accessibilityState={{ disabled: false }}
             >
               <Text style={styles.nextBtnText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.68}>
@@ -2803,6 +2831,8 @@ export default function SpeakScreen() {
               style={({ pressed }) => [styles.navBtn, styles.nextBtnInactive, pressed && { opacity: 0.75 }]}
               disabled
               testID="next-button"
+              accessibilityRole="button"
+              accessibilityLabel={lockedNextLabel}
               accessibilityState={{ disabled: true }}
             >
               <Text style={[styles.navBtnText, { color: C.goldDim }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>

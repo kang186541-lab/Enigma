@@ -269,7 +269,12 @@ export default function DailyLessonBridge() {
   if (!state) {
     return (
       <View style={[styles.container, { paddingTop: topPad }]}>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
+        <Pressable
+          style={styles.backBtn}
+          onPress={() => router.back()}
+          accessibilityRole="link"
+          accessibilityLabel={text.back}
+        >
           <Ionicons name="chevron-back" size={24} color={C.gold} />
           <Text style={styles.backText}>{text.back}</Text>
         </Pressable>
@@ -296,6 +301,7 @@ export default function DailyLessonBridge() {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.back();
             }}
+            accessibilityRole="link"
             accessibilityLabel={text.back}
           >
             <Ionicons name="chevron-back" size={22} color={C.gold} />
@@ -354,6 +360,8 @@ export default function DailyLessonBridge() {
           <Pressable
             style={({ pressed }) => [styles.primaryBtn, pressed && { opacity: 0.86, transform: [{ scale: 0.985 }] }]}
             onPress={startRudyLesson}
+            accessibilityRole="link"
+            accessibilityLabel={text.start}
           >
             <Text style={styles.primaryBtnText}>{text.start}</Text>
             <Ionicons name="arrow-forward" size={18} color={C.bg1} />
@@ -366,6 +374,8 @@ export default function DailyLessonBridge() {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push("/rudy-course" as any);
           }}
+          accessibilityRole="link"
+          accessibilityLabel={text.course}
         >
           <Ionicons name="map-outline" size={17} color={C.goldDim} />
           <Text style={styles.secondaryBtnText}>{text.course}</Text>

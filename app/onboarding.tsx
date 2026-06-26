@@ -408,6 +408,9 @@ export default function OnboardingScreen() {
                 style={({ pressed }) => [styles.cta, !nativeSel && styles.ctaDim, pressed && nativeSel && styles.ctaPress]}
                 onPress={handleNext}
                 disabled={!nativeSel}
+                accessibilityRole="button"
+                accessibilityLabel={ui.cta1}
+                accessibilityState={{ disabled: !nativeSel }}
               >
                 <Text style={styles.ctaText}>{ui.cta1}</Text>
                 <Ionicons name="arrow-forward" size={20} color={C.bg1} />
@@ -529,7 +532,12 @@ export default function OnboardingScreen() {
             </View>
 
             <View style={styles.bottom}>
-              <Pressable style={styles.backBtn} onPress={handleBack}>
+              <Pressable
+                style={styles.backBtn}
+                onPress={handleBack}
+                accessibilityRole="button"
+                accessibilityLabel={ui.back}
+              >
                 <Ionicons name="chevron-back" size={18} color={C.gold} />
                 <Text style={styles.backText}>{ui.back}</Text>
               </Pressable>
@@ -537,6 +545,9 @@ export default function OnboardingScreen() {
                 style={({ pressed }) => [styles.cta, styles.ctaFlex, (!learnSel || !goalSel) && styles.ctaDim, pressed && learnSel && goalSel && styles.ctaPress]}
                 onPress={handleSetupNext}
                 disabled={!learnSel || !goalSel || loading}
+                accessibilityRole="button"
+                accessibilityLabel={setupCtaLabel}
+                accessibilityState={{ disabled: !learnSel || !goalSel || loading }}
               >
                 <Text style={styles.ctaText}>{setupCtaLabel}</Text>
               </Pressable>

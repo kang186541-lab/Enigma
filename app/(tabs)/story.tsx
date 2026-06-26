@@ -337,6 +337,8 @@ export default function StoryTab() {
         <Pressable
           style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.7 }]}
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/expression-book" as any); }}
+          accessibilityRole="button"
+          accessibilityLabel={lang === "korean" ? "표현 도감" : lang === "spanish" ? "Expresiones" : lang === "indonesian" ? "Buku Ekspresi" : "Expression Book"}
         >
           <Ionicons name="book-outline" size={16} color={C.gold} />
           <Text style={styles.quickBtnText}>
@@ -346,6 +348,8 @@ export default function StoryTab() {
         <Pressable
           style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.7 }]}
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/npc-list" as any); }}
+          accessibilityRole="button"
+          accessibilityLabel={lang === "korean" ? "NPC 미션" : lang === "spanish" ? "Misiones NPC" : lang === "indonesian" ? "Misi NPC" : "NPC Missions"}
         >
           <Ionicons name="people-outline" size={16} color={C.gold} />
           <Text style={styles.quickBtnText}>
@@ -355,6 +359,8 @@ export default function StoryTab() {
         <Pressable
           style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.7 }]}
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/escape-room?id=sealed-archive" as any); }}
+          accessibilityRole="button"
+          accessibilityLabel={lang === "korean" ? "방 탈출 (베타)" : lang === "spanish" ? "Sala de Escape (Beta)" : lang === "indonesian" ? "Ruang Teka-teki (Beta)" : "Escape Room (Beta)"}
         >
           <Ionicons name="key-outline" size={16} color={C.gold} />
           <Text style={styles.quickBtnText}>
@@ -412,6 +418,9 @@ export default function StoryTab() {
           return (
             <Pressable
               key={ch.id}
+              accessibilityRole="button"
+              accessibilityLabel={`${chapterLabel} ${ch.num}: ${getTitle(ch)}`}
+              accessibilityState={{ disabled: isLocked }}
               style={({ pressed }) => [
                 styles.card,
                 pressed && !isLocked && {
