@@ -564,6 +564,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
           style={({ pressed }) => [s.ttsBtn, s.ttsBtnSlow, playingMode === "slow" && s.ttsBtnActive, pressed && { opacity: 0.8 }]}
           onPress={() => playTTS("slow")}
           disabled={phase === "recording" || phase === "assessing"}
+          accessibilityRole="button"
+          accessibilityLabel={slowLabel}
         >
           {playingMode === "slow" && phase === "playing"
             ? <ActivityIndicator size="small" color={C.bg1} />
@@ -576,6 +578,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
           style={({ pressed }) => [s.ttsBtn, playingMode === "normal" && s.ttsBtnActive, pressed && { opacity: 0.8 }]}
           onPress={() => playTTS("normal")}
           disabled={phase === "recording" || phase === "assessing"}
+          accessibilityRole="button"
+          accessibilityLabel={normalLabel}
         >
           {playingMode === "normal" && phase === "playing"
             ? <ActivityIndicator size="small" color={C.gold} />
@@ -596,6 +600,9 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
           ]}
           onPress={handleMicPress}
           disabled={phase === "playing" || phase === "assessing"}
+          accessibilityRole="button"
+          accessibilityLabel={micLabel}
+          accessibilityState={{ disabled: phase === "playing" || phase === "assessing" }}
         >
           {phase === "assessing"
             ? <ActivityIndicator color={C.bg1} />
@@ -631,6 +638,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
                 style={({ pressed }) => [s.playbackBtn, pressed && { opacity: 0.8 }]}
                 onPress={playMyRecording}
                 disabled={playingMyRec}
+                accessibilityRole="button"
+                accessibilityLabel={nativeLang === "korean" ? "내 발음" : nativeLang === "spanish" ? "Mi voz" : nativeLang === "indonesian" ? "Suara saya" : "My voice"}
               >
                 {playingMyRec
                   ? <ActivityIndicator size="small" color="#e5a940" />
@@ -645,6 +654,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
               style={({ pressed }) => [s.playbackBtn, s.playbackBtnNative, pressed && { opacity: 0.8 }]}
               onPress={() => playTTS("normal")}
               disabled={playingMode === "normal"}
+              accessibilityRole="button"
+              accessibilityLabel={nativeLang === "korean" ? "원어민 발음" : nativeLang === "spanish" ? "Nativo" : nativeLang === "indonesian" ? "Penutur asli" : "Native"}
             >
               {playingMode === "normal"
                 ? <ActivityIndicator size="small" color={C.gold} />
@@ -661,6 +672,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
               <Pressable
                 style={({ pressed }) => [s.retryBtn, pressed && { opacity: 0.8 }]}
                 onPress={() => { setPhase("idle"); setScore(null); setFeedback(""); setWordScores([]); setAcceptedSpokenAttempt(false); }}
+                accessibilityRole="button"
+                accessibilityLabel={retryLabel}
               >
                 <Text style={s.retryBtnText}>{retryLabel}</Text>
               </Pressable>
@@ -669,6 +682,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
               <Pressable
                 style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]}
                 onPress={() => advance()}
+                accessibilityRole="button"
+                accessibilityLabel={nextLabel}
               >
                 <Text style={s.nextBtnText}>{nextLabel}</Text>
                 <Ionicons name="arrow-forward" size={13} color={C.bg1} />
@@ -679,6 +694,8 @@ export function Step1ListenRepeat({ sentences, step1Config, nativeLang, lc, onCo
               <Pressable
                 style={({ pressed }) => [s.nextBtn, { opacity: pressed ? 0.7 : 0.85 }]}
                 onPress={() => advance(true)}
+                accessibilityRole="button"
+                accessibilityLabel={skipLabel}
               >
                 <Text style={s.nextBtnText}>{skipLabel}</Text>
                 <Ionicons name="arrow-forward" size={13} color={C.bg1} />

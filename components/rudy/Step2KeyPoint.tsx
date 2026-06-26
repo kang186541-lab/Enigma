@@ -555,6 +555,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
         )}
 
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={okLabel}
           style={({ pressed }) => [s.okBtn, pressed && { opacity: 0.85 }]}
           onPress={() => setScreenPhase("quiz")}
         >
@@ -651,6 +653,9 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
           {(quiz.options ?? []).map((opt) => (
             <Pressable
               key={opt}
+              accessibilityRole="button"
+              accessibilityLabel={opt}
+              accessibilityState={{ selected: selected === opt }}
               style={({ pressed }) => [s.optionBtn, pressed && s.optionBtnPressed]}
               onPress={() => submitAnswer(opt)}
             >
@@ -663,6 +668,8 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       {/* Input submit button */}
       {quiz.type === "input" && quizPhase === "question" && (
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={checkLabel}
           style={({ pressed }) => [s.checkBtn, pressed && { opacity: 0.85 }]}
           onPress={() => {
             if (!inputVal.trim()) { setInputError(true); return; }
@@ -676,10 +683,10 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
       {/* Wrong → retry + reveal */}
       {quizPhase === "wrong" && (
         <View style={s.resultBtns}>
-          <Pressable style={({ pressed }) => [s.retryBtn, pressed && { opacity: 0.8 }]} onPress={retryQuiz}>
+          <Pressable accessibilityRole="button" accessibilityLabel={retryLabel} style={({ pressed }) => [s.retryBtn, pressed && { opacity: 0.8 }]} onPress={retryQuiz}>
             <Text style={s.retryBtnText}>{retryLabel}</Text>
           </Pressable>
-          <Pressable style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]} onPress={proceedToSpeak}>
+          <Pressable accessibilityRole="button" accessibilityLabel={nextLabel} style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]} onPress={proceedToSpeak}>
             <Text style={s.nextBtnText}>{nextLabel}</Text>
             <Ionicons name="arrow-forward" size={13} color={C.bg1} />
           </Pressable>
@@ -688,7 +695,7 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
 
       {/* Correct → proceed to speak */}
       {quizPhase === "correct" && (
-        <Pressable style={({ pressed }) => [s.okBtn, pressed && { opacity: 0.85 }]} onPress={proceedToSpeak}>
+        <Pressable accessibilityRole="button" accessibilityLabel={repeatNowLabel} style={({ pressed }) => [s.okBtn, pressed && { opacity: 0.85 }]} onPress={proceedToSpeak}>
           <Text style={s.okBtnText}>
             {repeatNowLabel}
           </Text>
@@ -711,13 +718,16 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
 
           {/* Listen + mic row */}
           <View style={s.speakControls}>
-            <Pressable style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.8 }]} onPress={playSpeakTTS}>
+            <Pressable accessibilityRole="button" accessibilityLabel={listenLabel} style={({ pressed }) => [s.listenBtn, pressed && { opacity: 0.8 }]} onPress={playSpeakTTS}>
               <Ionicons name="volume-high" size={16} color={C.gold} />
               <Text style={s.listenBtnText}>{listenLabel}</Text>
             </Pressable>
 
             <Animated.View style={{ transform: [{ scale: pulseAnim }], flex: 1 }}>
               <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={speakLabel}
+                accessibilityState={{ disabled: speakPhase === "assessing" }}
                 style={({ pressed }) => [
                   s.speakMicBtn,
                   speakPhase === "recording" && s.speakMicActive,
@@ -758,13 +768,13 @@ export function Step2KeyPoint({ data, nativeLang, lc, learningLang, onComplete }
               trapped. The mic above stays available to retry. Mirrors Step4. */}
           <View style={s.speakNav}>
             {speakPhase === "done" && speakAccepted && (
-              <Pressable style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]} onPress={() => advanceQuiz()}>
+              <Pressable accessibilityRole="button" accessibilityLabel={isLast ? doneLabel : nextLabel} style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]} onPress={() => advanceQuiz()}>
                 <Text style={s.nextBtnText}>{isLast ? doneLabel : nextLabel}</Text>
                 <Ionicons name="arrow-forward" size={13} color={C.bg1} />
               </Pressable>
             )}
             {speakPhase === "done" && !speakAccepted && (
-              <Pressable style={({ pressed }) => [s.nextBtn, { opacity: pressed ? 0.7 : 0.85 }]} onPress={() => advanceQuiz(true)}>
+              <Pressable accessibilityRole="button" accessibilityLabel={isLast ? doneLabel : skipLabel} style={({ pressed }) => [s.nextBtn, { opacity: pressed ? 0.7 : 0.85 }]} onPress={() => advanceQuiz(true)}>
                 <Text style={s.nextBtnText}>{isLast ? doneLabel : skipLabel}</Text>
                 <Ionicons name="arrow-forward" size={13} color={C.bg1} />
               </Pressable>

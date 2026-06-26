@@ -199,7 +199,7 @@ export default function RudyLessonScreen() {
     return (
       <View style={[styles.centered, { paddingTop: insets.top + 20 }]}>
         <Text style={styles.errorText}>Day not found</Text>
-        <Pressable style={styles.backHomeBtn} onPress={() => router.back()}>
+        <Pressable style={styles.backHomeBtn} onPress={() => router.back()} accessibilityRole="link" accessibilityLabel="Back">
           <Text style={styles.backHomeBtnText}>← Back</Text>
         </Pressable>
       </View>
@@ -280,7 +280,7 @@ function BriefingScreen({
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <Pressable style={styles.briefingBackBtn} onPress={() => { stopAllTTSSync(); router.back(); }}>
+      <Pressable style={styles.briefingBackBtn} onPress={() => { stopAllTTSSync(); router.back(); }} accessibilityRole="link" accessibilityLabel={nativeLang === "korean" ? "닫기" : nativeLang === "spanish" ? "Cerrar" : nativeLang === "indonesian" ? "Tutup" : "Close"}>
         <Ionicons name="close" size={22} color={C.goldDim} />
       </Pressable>
 
@@ -309,6 +309,8 @@ function BriefingScreen({
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             onStart();
           }}
+          accessibilityRole="button"
+          accessibilityLabel={startLabel}
         >
           <Text style={styles.startMissionBtnText}>{startLabel}</Text>
         </Pressable>
@@ -451,7 +453,7 @@ function LessonScreen({
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* ── Top bar ─────────────────────────────── */}
       <View style={styles.lessonHeader}>
-        <Pressable style={styles.backBtn} onPress={() => { stopAllTTSSync(); router.back(); }}>
+        <Pressable style={styles.backBtn} onPress={() => { stopAllTTSSync(); router.back(); }} accessibilityRole="link" accessibilityLabel={nativeLang === "korean" ? "뒤로" : nativeLang === "spanish" ? "Atrás" : nativeLang === "indonesian" ? "Kembali" : "Back"}>
           <Ionicons name="arrow-back" size={20} color={C.goldDim} />
         </Pressable>
         <View style={styles.lessonHeaderCenter}>
@@ -547,6 +549,8 @@ function LessonScreen({
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 handleNextStep();
               }}
+              accessibilityRole="button"
+              accessibilityLabel={nextStepLabels[currentStep] ?? nextLabel}
             >
               <Text style={styles.stepCompleteBtnText}>{nextStepLabels[currentStep] ?? nextLabel}</Text>
               <Ionicons name="arrow-forward" size={16} color={C.bg1} />
@@ -568,6 +572,8 @@ function LessonScreen({
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               handleStepDone();
             }}
+            accessibilityRole="button"
+            accessibilityLabel={currentStep + 1 >= totalSteps ? completeStepLabel : nextLabel}
           >
             <Text style={styles.nextStepBtnText}>
               {currentStep + 1 >= totalSteps ? completeStepLabel : nextLabel}
@@ -741,6 +747,8 @@ function NoContentCard({
       <Pressable
         style={({ pressed }) => [stepContentStyles.demoBtn, pressed && { opacity: 0.8 }]}
         onPress={onSkip}
+        accessibilityRole="button"
+        accessibilityLabel={skipLabel}
       >
         <Text style={stepContentStyles.demoBtnText}>{skipLabel}</Text>
       </Pressable>
@@ -872,6 +880,8 @@ function CompleteScreen({
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.replace("/(tabs)/" as any);
             }}
+            accessibilityRole="link"
+            accessibilityLabel={homeLabel}
           >
             <Text style={completeStyles.homeBtnText}>{homeLabel}</Text>
           </Pressable>
@@ -881,6 +891,8 @@ function CompleteScreen({
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.replace("/rudy-course" as any);
             }}
+            accessibilityRole="link"
+            accessibilityLabel={courseLabel}
           >
             <Text style={completeStyles.previewBtnText}>{courseLabel}</Text>
             <Ionicons name="arrow-forward" size={14} color={C.bg1} />

@@ -626,6 +626,9 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
                 return (
                   <Pressable
                     key={i}
+                    accessibilityRole="button"
+                    accessibilityLabel={opt}
+                    accessibilityState={{ selected: isSelected, disabled: qPhase !== "ready" }}
                     style={({ pressed }) => [
                       s.optBtn,
                       isCorrect && s.optCorrect,
@@ -656,6 +659,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
                   <Text style={s.fullSentenceMeaning}>{getMeaning(q.fullSentenceMeaning, lc)}</Text>
                 )}
                 <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Play audio"
                   style={({ pressed }) => [s.ttsBtn, pressed && { opacity: 0.8 }]}
                   onPress={() => playTTS(q.fullSentence!, q.speechLang ?? sttLang)}
                 >
@@ -676,7 +681,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
             <BidiTargetText targetLang={speechLang} style={s.resultSentenceText}>
               {sentence}
             </BidiTargetText>
-            <Pressable onPress={() => playTTS(sentence, speechLang)}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Play audio" onPress={() => playTTS(sentence, speechLang)}>
               <Ionicons name="volume-medium" size={14} color={C.gold} />
             </Pressable>
           </View>
@@ -693,6 +698,9 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
       {isSpeakQ && qPhase !== "revealed" ? (
         <Animated.View style={{ transform: [{ scale: pulseAnim }], alignItems: "center" }}>
           <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={qPhase === "assessing" ? L.assessing : qPhase === "recording" ? L.stop : L.speak}
+            accessibilityState={{ disabled: qPhase === "assessing" }}
             style={({ pressed }) => [
               s.micBtn,
               qPhase === "recording" && s.micBtnActive,
@@ -711,7 +719,7 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
             </Text>
           </Pressable>
           {qPhase === "assessing" && canSkipScoring && (
-            <Pressable style={s.skipScoringBtn} onPress={skipScoring}>
+            <Pressable accessibilityRole="button" accessibilityLabel={skipScoringLabel} style={s.skipScoringBtn} onPress={skipScoring}>
               <Text style={s.skipScoringText}>
                 {skipScoringLabel}
               </Text>
@@ -722,6 +730,8 @@ export function Step4QuickReview({ questions, nativeLang, lc, learningLang, onCo
 
       {qPhase === "revealed" && (
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={L.next}
           style={({ pressed }) => [s.nextBtn, pressed && { opacity: 0.85 }]}
           onPress={nextQuestion}
         >

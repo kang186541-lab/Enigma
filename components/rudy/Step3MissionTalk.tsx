@@ -873,6 +873,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 <Pressable
                   style={s.transToggle}
                   onPress={() => setShowTranslation((prev) => ({ ...prev, [i]: !prev[i] }))}
+                  accessibilityRole="button"
+                  accessibilityLabel={showTranslation[i] ? hideTranslationLabel : showTranslationLabel}
                 >
                   <Ionicons name={showTranslation[i] ? "eye-off-outline" : "eye-outline"} size={12} color={C.goldDim} />
                   <Text style={s.transToggleText}>
@@ -914,6 +916,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
             <Pressable
               style={({ pressed }) => [s.inlineDoneBtn, pressed && { opacity: 0.82 }]}
               onPress={completeMissionTalkOnce}
+              accessibilityRole="button"
+              accessibilityLabel={reviewLabel}
             >
               <Text style={s.inlineDoneBtnText}>
                 {reviewLabel}
@@ -933,6 +937,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 key={i}
                 style={({ pressed }) => [s.suggestBtn, pressed && { opacity: 0.75 }]}
                 onPress={() => sendUserMessage(ans, false)}
+                accessibilityRole="button"
+                accessibilityLabel={ans}
               >
                 <BidiTargetText targetLang={learningLang} style={s.suggestBtnText}>{ans}</BidiTargetText>
                 <Ionicons name="mic" size={11} color={C.gold} />
@@ -962,6 +968,9 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 style={({ pressed }) => [s.sendBtn, pressed && { opacity: 0.85 }]}
                 onPress={sendKeyboardMessage}
                 disabled={phase === "processing"}
+                accessibilityRole="button"
+                accessibilityLabel={sendLabel}
+                accessibilityState={{ disabled: phase === "processing" }}
               >
                 <Text style={s.sendBtnText}>{sendLabel}</Text>
               </Pressable>
@@ -979,6 +988,9 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                 ]}
                 onPress={handleMicPress}
                 disabled={phase === "processing" || phase === "loading" || ttsPlaying}
+                accessibilityRole="button"
+                accessibilityLabel={ttsPlaying ? rudySpeakingLabel : micLabel}
+                accessibilityState={{ disabled: phase === "processing" || phase === "loading" || ttsPlaying }}
               >
                 {(phase === "processing" || phase === "loading")
                   ? <ActivityIndicator color={C.bg1} size="small" />
@@ -997,6 +1009,8 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
             <Pressable
               style={({ pressed }) => [s.keyboardToggle, showKeyboard && s.keyboardToggleActive, pressed && { opacity: 0.8 }]}
               onPress={() => setShowKeyboard(!showKeyboard)}
+              accessibilityRole="button"
+              accessibilityLabel="Toggle keyboard input"
             >
               <Ionicons name="keypad-outline" size={16} color={showKeyboard ? C.bg1 : C.goldDim} />
             </Pressable>
@@ -1020,7 +1034,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
 
       {/* Word lookup popup */}
       <Modal visible={wordLoading || !!wordPopup} transparent animationType="fade" onRequestClose={() => setWordPopup(null)}>
-        <Pressable style={s.popupOverlay} onPress={() => setWordPopup(null)}>
+        <Pressable style={s.popupOverlay} onPress={() => setWordPopup(null)} accessibilityRole="button" accessibilityLabel={closeLabel}>
           <Pressable style={s.popupBox} onPress={() => {}}>
             {wordLoading ? (
               <ActivityIndicator size="large" color={C.gold} />
@@ -1041,7 +1055,7 @@ export function Step3MissionTalk({ data, nativeLang, lc, learningLang, onComplet
                     <Text style={s.popupEx}>{wordPopup.sentenceTranslation}</Text>
                   </View>
                 ) : null}
-                <Pressable style={({ pressed }) => [s.popupClose, pressed && { opacity: 0.8 }]} onPress={() => setWordPopup(null)}>
+                <Pressable style={({ pressed }) => [s.popupClose, pressed && { opacity: 0.8 }]} onPress={() => setWordPopup(null)} accessibilityRole="button" accessibilityLabel={closeLabel}>
                   <Text style={s.popupCloseTxt}>{closeLabel}</Text>
                 </Pressable>
               </>
