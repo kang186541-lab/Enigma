@@ -43,12 +43,46 @@ interface CohortRetention {
   d30: number | null;
 }
 
+/** Cohort-wide activity-completed totals, summed across students. */
+interface ActivityTotals {
+  daily: number;
+  npc: number;
+  story: number;
+  escape: number;
+}
+
+/** 6-week PoC weekly-retention rates (0–1 fraction, or null when no eligible students). */
+interface WeeklyRetention {
+  w1: number | null;
+  w2: number | null;
+  w4: number | null;
+  w6: number | null;
+}
+
 interface CohortInfo {
   name: string;
   joinCode: string;
   memberCount: number;
   retention: CohortRetention;
   generatedAt: string;
+  // ── 6-week PoC KPI additions (optional: older servers / edge fallback may omit) ──
+  activityTotals?: ActivityTotals;
+  weeklyRetention?: WeeklyRetention;
+}
+
+/** Per-student activity-completion counts grouped by activityType. */
+interface ActivityCompletions {
+  daily: number;
+  npc: number;
+  story: number;
+  escape: number;
+}
+
+/** Speaking band-index trend: avg of first vs last up-to-3 banded attempts. */
+interface BandIndex {
+  first: number;
+  last: number;
+  delta: number;
 }
 
 interface StudentRow {
@@ -64,6 +98,9 @@ interface StudentRow {
   activeDays7d: number;
   lastActiveAt: string | null;
   atRisk: boolean;
+  // ── 6-week PoC KPI additions (optional: older servers / edge fallback may omit) ──
+  activityCompletions?: ActivityCompletions;
+  bandIndex?: BandIndex | null;
 }
 
 interface CohortSummary {
@@ -119,6 +156,118 @@ function langChip(lang: string | null | undefined): string | null {
   };
   return map[lang.toLowerCase()] ?? lang.slice(0, 2).toUpperCase();
 }
+
+/** activityCompletions → "D{daily} N{npc} S{story} E{escape}", or "—" if absent. */
+function fmtActivity(a: ActivityCompletions | undefined): string {
+  if (!a) return "—";
+  return `D${a.daily ?? 0} N${a.npc ?? 0} S${a.story ?? 0} E${a.escape ?? 0}`;
+}
+
+/** Band-index delta → "+0.5" / "-0.33" with sign, or "—" when missing/null. */
+function fmtBandDelta(bi: BandIndex | null | undefined): string {
+  if (!bi || !Number.isFinite(bi.delta)) return "—";
+  const sign = bi.delta > 0 ? "+" : "";
+  return `${sign}${bi.delta}`;
+}
+
+/** Band-index delta → directional state for arrow/color hints. */
+function bandTrend(bi: BandIndex | null | undefined): "up" | "down" | "flat" | "none" {
+  if (!bi || !Number.isFinite(bi.delta)) return "none";
+  if (bi.delta > 0) return "up";
+  if (bi.delta < 0) return "down";
+  return "flat";
+}
+
+// ─── CSV export ──────────────────────────────────────────────────────────────
+
+const CSV_HEADERS = [
+  "maskedEmail",
+  "joinedAt",
+  "learningLang",
+  "totalSpeakingAttempts",
+  "attempts7d",
+  "activeDays7d",
+  "activityDaily",
+  "activityNpc",
+  "activityStory",
+  "activityEscape",
+  "bandDelta",
+  "lastActiveAt",
+  "atRisk",
+] as const;
+
+/** Quote a single CSV cell per RFC-4180 (wrap + double internal quotes). */
+function csvCell(v: string | number | boolean | null | undefined): string {
+  const s = v === null || v === undefined ? "" : String(v);
+  return `"${s.replace(/"/g, '""')}"`;
+}
+
+/** Build the per-student CSV string (header + one row per student). */
+function buildCohortCsv(rows: StudentRow[]): string {
+  const lines: string[] = [CSV_HEADERS.map(csvCell).join(",")];
+  for (const s of rows) {
+    const a = s.activityCompletions;
+    const delta = s.bandIndex && Number.isFinite(s.bandIndex.delta) ? s.bandIndex.delta : "";
+    lines.push(
+      [
+        csvCell(s.maskedEmail),
+        csvCell(s.joinedAt),
+        csvCell(s.learningLang),
+        csvCell(s.totalSpeakingAttempts),
+        csvCell(s.attempts7d),
+        csvCell(s.activeDays7d),
+        csvCell(a?.daily ?? ""),
+        csvCell(a?.npc ?? ""),
+        csvCell(a?.story ?? ""),
+        csvCell(a?.escape ?? ""),
+        csvCell(delta),
+        csvCell(s.lastActiveAt),
+        csvCell(s.atRisk),
+      ].join(","),
+    );
+  }
+  // CRLF line endings + leading line so Excel opens it cleanly.
+  return lines.join("\r\n");
+}
+
+/**
+ * Trigger a CSV download on web (Blob + <a download> click). No-op on native —
+ * this dashboard is only used on web (web-dist2.vercel.app/teacher-dashboard).
+ */
+function downloadCsv(filename: string, csv: string): void {
+  if (Platform.OS !== "web" || typeof document === "undefined") return;
+  try {
+    // Prepend a BOM so Excel detects UTF-8 (Korean text stays intact).
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // Revoke shortly after to avoid breaking the in-flight download.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (e) {
+    console.warn("[TeacherDash] CSV download failed:", e);
+  }
+}
+
+// ─── Localized labels ────────────────────────────────────────────────────────
+// Korean-primary by design (matches the inline strings elsewhere on this screen);
+// English subtitles kept alongside for the bilingual pilot audience.
+
+const L = {
+  weeklyRetention: "주차 지속",
+  weeklyRetentionEn: "Weekly retention",
+  activity: "활동 완료",
+  activityEn: "Activity",
+  bandDelta: "밴드 변화",
+  exportCsv: "CSV 내보내기",
+  exportCsvEn: "Export CSV",
+  exportCsvA11y: "학생 코호트 데이터를 CSV 파일로 내보내기 (Export cohort data as CSV)",
+} as const;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -212,6 +361,19 @@ export default function TeacherDashboardScreen() {
   const canLoad = !!code.trim() && !!teacherKey.trim() && !loading;
   const cohort = data?.cohort ?? null;
   const students = data?.students ?? [];
+
+  const exportCsv = () => {
+    if (!data || students.length === 0) return;
+    const csv = buildCohortCsv(students);
+    const safeCode = (cohort?.joinCode || "cohort").replace(/[^A-Za-z0-9_-]/g, "");
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadCsv(`cohort-${safeCode}-${stamp}.csv`, csv);
+  };
+  const canExport =
+    !!data &&
+    students.length > 0 &&
+    Platform.OS === "web" &&
+    typeof document !== "undefined";
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
@@ -321,6 +483,65 @@ export default function TeacherDashboardScreen() {
               ))}
             </View>
 
+            {/* ── 6주 PoC: 주차 지속 (weekly retention) ── */}
+            <View style={styles.kpiBlock}>
+              <Text style={styles.kpiHeading}>
+                {L.weeklyRetention} <Text style={styles.kpiHeadingEn}>{L.weeklyRetentionEn}</Text>
+              </Text>
+              <View style={styles.kpiRow}>
+                {([
+                  ["W1", cohort.weeklyRetention?.w1],
+                  ["W2", cohort.weeklyRetention?.w2],
+                  ["W4", cohort.weeklyRetention?.w4],
+                  ["W6", cohort.weeklyRetention?.w6],
+                ] as const).map(([label, v]) => (
+                  <View key={label} style={styles.kpiItem}>
+                    <Text style={styles.kpiNum}>
+                      {cohort.weeklyRetention ? pct(v) : "—"}
+                    </Text>
+                    <Text style={styles.kpiItemLabel}>{label}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {/* ── 6주 PoC: 활동 완료 (activity totals) ── */}
+            <View style={styles.kpiBlock}>
+              <Text style={styles.kpiHeading}>
+                {L.activity} <Text style={styles.kpiHeadingEn}>{L.activityEn}</Text>
+              </Text>
+              <View style={styles.kpiRow}>
+                {([
+                  ["일일", cohort.activityTotals?.daily],
+                  ["NPC", cohort.activityTotals?.npc],
+                  ["스토리", cohort.activityTotals?.story],
+                  ["탈출", cohort.activityTotals?.escape],
+                ] as const).map(([label, v]) => (
+                  <View key={label} style={styles.kpiItem}>
+                    <Text style={styles.kpiNum}>
+                      {cohort.activityTotals && Number.isFinite(v) ? v : "—"}
+                    </Text>
+                    <Text style={styles.kpiItemLabel}>{label}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {/* ── CSV export ── */}
+            {canExport ? (
+              <Pressable
+                onPress={exportCsv}
+                accessibilityRole="button"
+                accessibilityLabel={L.exportCsvA11y}
+                style={({ pressed }) => [styles.exportBtn, pressed && { opacity: 0.85 }]}
+              >
+                <Ionicons name="download-outline" size={16} color={C.gold} />
+                <Text style={styles.exportBtnText}>
+                  {L.exportCsv} <Text style={styles.exportBtnTextEn}>{L.exportCsvEn}</Text>
+                </Text>
+              </Pressable>
+            ) : null}
+
             <Text style={styles.generatedAt}>생성시각 {fmtDateTime(cohort.generatedAt)}</Text>
           </View>
         ) : null}
@@ -364,6 +585,39 @@ export default function TeacherDashboardScreen() {
                     최근 활동 {relTime(s.lastActiveAt)} · 주간 활동 {s.activeDays7d}일
                     {s.joinedAt ? ` · 가입 ${relTime(s.joinedAt)}` : ""}
                   </Text>
+                  {/* ── 6주 PoC: 활동 완료 + 밴드 변화 ── */}
+                  <View style={styles.studentKpiRow}>
+                    <View style={styles.studentKpiChip}>
+                      <Text style={styles.studentKpiLabel}>{L.activity}</Text>
+                      <Text style={styles.studentKpiValue}>
+                        {fmtActivity(s.activityCompletions)}
+                      </Text>
+                    </View>
+                    <View style={styles.studentKpiChip}>
+                      <Text style={styles.studentKpiLabel}>{L.bandDelta}</Text>
+                      {(() => {
+                        const trend = bandTrend(s.bandIndex);
+                        const color =
+                          trend === "up" ? C.gold : trend === "down" ? "#F2697D" : C.textMuted;
+                        const icon =
+                          trend === "up"
+                            ? "arrow-up"
+                            : trend === "down"
+                              ? "arrow-down"
+                              : "remove";
+                        return (
+                          <View style={styles.bandDeltaWrap}>
+                            {trend !== "none" ? (
+                              <Ionicons name={icon as any} size={12} color={color} />
+                            ) : null}
+                            <Text style={[styles.studentKpiValue, { color }]}>
+                              {fmtBandDelta(s.bandIndex)}
+                            </Text>
+                          </View>
+                        );
+                      })()}
+                    </View>
+                  </View>
                 </View>
               ))}
             </>
@@ -569,6 +823,67 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
 
+  // 6-week PoC KPI blocks (weekly retention / activity totals)
+  kpiBlock: {
+    borderTopWidth: 1,
+    borderTopColor: C.border,
+    paddingTop: 12,
+    gap: 8,
+  },
+  kpiHeading: {
+    fontFamily: F.bodySemi,
+    fontSize: 12,
+    color: C.goldDim,
+    letterSpacing: 0.5,
+  },
+  kpiHeadingEn: {
+    fontFamily: F.body,
+    fontSize: 10,
+    color: C.textMuted,
+    fontStyle: "italic",
+  },
+  kpiRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  kpiItem: { alignItems: "center", gap: 2 },
+  kpiNum: {
+    fontFamily: F.label,
+    fontSize: 18,
+    color: C.parchment,
+  },
+  kpiItemLabel: {
+    fontFamily: F.body,
+    fontSize: 10,
+    color: C.textMuted,
+    letterSpacing: 0.5,
+  },
+
+  // CSV export button
+  exportBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    backgroundColor: C.goldFaint,
+    borderWidth: 1,
+    borderColor: C.border,
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  exportBtnText: {
+    fontFamily: F.bodySemi,
+    fontSize: 13,
+    color: C.gold,
+    letterSpacing: 0.5,
+  },
+  exportBtnTextEn: {
+    fontFamily: F.body,
+    fontSize: 11,
+    color: C.goldDim,
+    fontStyle: "italic",
+  },
+
   // Students
   listHeader: {
     flexDirection: "row",
@@ -652,6 +967,41 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: C.textMuted,
     lineHeight: 17,
+  },
+
+  // Per-student 6-week PoC KPI chips (activity completions + band delta)
+  studentKpiRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 4,
+  },
+  studentKpiChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: C.bg3,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: C.border,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+  },
+  studentKpiLabel: {
+    fontFamily: F.body,
+    fontSize: 10,
+    color: C.textMuted,
+    letterSpacing: 0.3,
+  },
+  studentKpiValue: {
+    fontFamily: F.bodySemi,
+    fontSize: 12,
+    color: C.parchment,
+  },
+  bandDeltaWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
   },
 
   // Empty / hint

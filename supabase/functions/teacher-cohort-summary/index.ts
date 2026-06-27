@@ -15,7 +15,12 @@ type ProgressRow = {
   last_session_at: string | null;
   learning_lang: string | null;
 };
-type EventRow = { user_id: string; event: string; created_at: string };
+type EventRow = {
+  user_id: string;
+  event: string;
+  created_at: string;
+  props: Record<string, unknown> | null;
+};
 
 function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
@@ -134,7 +139,7 @@ Deno.serve(async (req: Request) => {
           .in("user_id", ids),
         admin
           .from("linguaai_learning_events")
-          .select("user_id, event, created_at")
+          .select("user_id, event, created_at, props")
           .in("user_id", ids)
           .order("created_at", { ascending: false })
           .limit(50_000),
@@ -168,6 +173,11 @@ Deno.serve(async (req: Request) => {
       "first_speaking_attempt_completed",
       "review_sentence_attempt_completed",
     ]);
+    // scoreBand → band index for the 6-week PoC band-progress KPI.
+    const BAND_VALUE: Record<string, number> = { repair: 0, coach: 1, pass: 2 };
+    // activity_completed props.activityType values we track per student.
+    const ACTIVITY_TYPES = ["daily", "npc", "story", "escape"] as const;
+    type ActivityType = (typeof ACTIVITY_TYPES)[number];
     const DAY_MS = 86_400_000;
     const nowMs = Date.now();
     const sevenDaysAgoMs = nowMs - 7 * DAY_MS;
@@ -182,6 +192,12 @@ Deno.serve(async (req: Request) => {
       lastEventMs: number | null;
       firstEventDay: number | null;
       lastEventDay: number | null;
+      // 6-week PoC KPI accumulators.
+      activityCompletions: Record<ActivityType, number>;
+      // Band values in stream order (newest-first); reversed before use.
+      bandValues: number[];
+      // Every UTC day-index on which this student had any event.
+      eventDays: Set<number>;
     };
 
     const accByUid = new Map<string, EventAcc>();
@@ -197,10 +213,16 @@ Deno.serve(async (req: Request) => {
           lastEventMs: null,
           firstEventDay: null,
           lastEventDay: null,
+          activityCompletions: { daily: 0, npc: 0, story: 0, escape: 0 },
+          bandValues: [],
+          eventDays: new Set<number>(),
         };
         accByUid.set(row.user_id, acc);
       }
+      const at = typeof row.props?.activityType === "string" ? row.props.activityType : null;
+      const sb = typeof row.props?.scoreBand === "string" ? row.props.scoreBand : null;
       const day = utcDay(ms);
+      acc.eventDays.add(day);
       if (acc.firstEventDay === null || day < acc.firstEventDay) acc.firstEventDay = day;
       if (acc.lastEventDay === null || day > acc.lastEventDay) acc.lastEventDay = day;
       if (acc.lastEventMs === null || ms > acc.lastEventMs) acc.lastEventMs = ms;
@@ -208,8 +230,29 @@ Deno.serve(async (req: Request) => {
       if (SPEAKING_EVENTS.has(row.event)) {
         acc.totalAttempts += 1;
         if (ms >= sevenDaysAgoMs) acc.attempts7d += 1;
+        if (sb !== null && sb in BAND_VALUE) acc.bandValues.push(BAND_VALUE[sb]);
+      }
+      if (
+        row.event === "activity_completed" &&
+        at !== null &&
+        at in acc.activityCompletions
+      ) {
+        acc.activityCompletions[at as ActivityType] += 1;
       }
     }
+
+    // bandIndex from a chronological band array: first = avg of first up-to-3,
+    // last = avg of last up-to-3, delta = round(last - first, 2). null if empty.
+    const bandIndexFor = (
+      values: number[],
+    ): { first: number; last: number; delta: number } | null => {
+      if (values.length === 0) return null;
+      const avg = (arr: number[]): number => arr.reduce((sum, v) => sum + v, 0) / arr.length;
+      const first = avg(values.slice(0, 3));
+      const last = avg(values.slice(-3));
+      const delta = Math.round((last - first) * 100) / 100;
+      return { first, last, delta };
+    };
 
     const students = members.map((m) => {
       const p = progressByUid.get(m.user_id);
@@ -227,6 +270,17 @@ Deno.serve(async (req: Request) => {
         totalSpeakingAttempts: acc?.totalAttempts ?? 0,
         attempts7d: acc?.attempts7d ?? 0,
         activeDays7d: acc?.activeDays7d.size ?? 0,
+        // Activity-completed counts grouped by props.activityType (0 default).
+        activityCompletions: acc?.activityCompletions ?? {
+          daily: 0,
+          npc: 0,
+          story: 0,
+          escape: 0,
+        },
+        // Speaking band progress over CHRONOLOGICAL order (bandValues are
+        // newest-first, so reverse before computing first/last). null when the
+        // student has zero banded speaking events.
+        bandIndex: bandIndexFor(acc ? [...acc.bandValues].reverse() : []),
         lastActiveAt: lastEventIso ?? p?.last_session_at ?? null,
         atRisk: acc?.lastEventMs == null || acc.lastEventMs <= threeDaysAgoMs,
       };
@@ -252,6 +306,45 @@ Deno.serve(async (req: Request) => {
       return eligible === 0 ? null : Math.round((retained / eligible) * 1000) / 1000;
     };
 
+    // Weekly retention for the 6-week PoC. For week W (1-indexed):
+    //   eligible — members whose first event is at least 7*W days old
+    //     (todayUtcDay - firstEventDay >= 7*W).
+    //   retained — eligible members with >=1 event on a UTC day in
+    //     [firstEventDay + 7*(W-1), firstEventDay + 7*W).
+    //   rate — round(retained/eligible, 3), or null when eligible = 0.
+    const weeklyRetentionRate = (w: number): number | null => {
+      let eligible = 0;
+      let retained = 0;
+      for (const m of members) {
+        const acc = accByUid.get(m.user_id);
+        if (!acc || acc.firstEventDay === null) continue;
+        if (todayUtcDay - acc.firstEventDay < 7 * w) continue;
+        eligible += 1;
+        const windowStart = acc.firstEventDay + 7 * (w - 1);
+        const windowEnd = acc.firstEventDay + 7 * w;
+        let inWindow = false;
+        for (const d of acc.eventDays) {
+          if (d >= windowStart && d < windowEnd) {
+            inWindow = true;
+            break;
+          }
+        }
+        if (inWindow) retained += 1;
+      }
+      return eligible === 0 ? null : Math.round((retained / eligible) * 1000) / 1000;
+    };
+
+    // Cohort-wide sum of per-student activityCompletions.
+    const activityTotals: Record<ActivityType, number> = {
+      daily: 0,
+      npc: 0,
+      story: 0,
+      escape: 0,
+    };
+    for (const s of students) {
+      for (const t of ACTIVITY_TYPES) activityTotals[t] += s.activityCompletions[t];
+    }
+
     let attempts7dTotal = 0;
     let activeDays7dTotal = 0;
     for (const s of students) {
@@ -273,6 +366,14 @@ Deno.serve(async (req: Request) => {
           d1: retentionRate(1),
           d7: retentionRate(7),
           d30: retentionRate(30),
+        },
+        // 6-week PoC KPIs.
+        activityTotals,
+        weeklyRetention: {
+          w1: weeklyRetentionRate(1),
+          w2: weeklyRetentionRate(2),
+          w4: weeklyRetentionRate(4),
+          w6: weeklyRetentionRate(6),
         },
         generatedAt: new Date().toISOString(),
       },

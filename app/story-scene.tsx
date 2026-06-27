@@ -32,6 +32,7 @@ import { apiRequest } from "@/lib/query-client";
 import { queueProgressPush } from "@/lib/progressSync";
 import { addToExpressionBook, trackQuizIO, markExpressionsMastered } from "@/lib/storyUtils";
 import { addPhrases as addSrsPhrases } from "@/lib/srsManager";
+import { trackLearningEvent } from "@/lib/learningEvents";
 import { localizeStoryBoss } from "@/lib/storyBossSpellLocalized";
 import StorySpeakAfterCard from "@/components/story/StorySpeakAfterCard";
 import { checkAnswer, AnswerResult } from "@/lib/answerUtils";
@@ -7724,9 +7725,23 @@ export default function StoryScene() {
   }, [completed, introStatus, seq, seqIdx]);
 
   const finishingRef = useRef(false);
+  // Pilot sink: a STORY chapter completion is a measured activity. Guarded so
+  // it fires exactly once per chapter (even though finishingRef already blocks
+  // re-entry), landing in the same sink as daily/NPC keyed by
+  // activityType:"story".
+  const storyActivityFiredRef = useRef(false);
   async function finishChapter() {
     if (finishingRef.current) return;
     finishingRef.current = true;
+    if (!storyActivityFiredRef.current) {
+      storyActivityFiredRef.current = true;
+      void trackLearningEvent("activity_completed", {
+        activityType: "story",
+        nativeLanguage: lang,
+        targetLanguage: learningLang,
+        platform: Platform.OS,
+      });
+    }
     const earned = 150;
     setXpEarned(earned);
     setCompleted(true);

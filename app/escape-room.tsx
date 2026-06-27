@@ -12,7 +12,7 @@
  */
 
 import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,6 +22,7 @@ import { EmojiText } from "@/components/EmojiText";
 import { useLanguage } from "@/context/LanguageContext";
 import { getEscapeRoom, type EscapeRoom, type LockData, type Tri } from "@/lib/escapeRooms";
 import { awardEscapeRewards } from "@/lib/escapeRewards";
+import { trackLearningEvent } from "@/lib/learningEvents";
 import BossSpellPuzzle, { type BossSpellQuestion } from "@/components/story/puzzles/BossSpellPuzzle";
 import SpeakingLock from "@/components/escape/SpeakingLock";
 import SentenceLock from "@/components/escape/SentenceLock";
@@ -207,6 +208,15 @@ function RoomView({
     if (wonRef.current) return;
     wonRef.current = true;
     finalTimeRef.current = elapsed;
+    // Pilot sink: escape room win is a measured activity. wonRef above guards
+    // this to fire exactly once per escape, landing in the same sink as
+    // daily/NPC keyed by activityType:"escape".
+    void trackLearningEvent("activity_completed", {
+      activityType: "escape",
+      nativeLanguage: lang,
+      targetLanguage: learningLang,
+      platform: Platform.OS,
+    });
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     dispatch({ t: "WIN" });
     void awardEscapeRewards(room, learningLang, awardXp, score);
