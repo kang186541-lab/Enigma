@@ -21,6 +21,11 @@ type EventRow = {
   created_at: string;
   props: Record<string, unknown> | null;
 };
+type AssignmentRow = {
+  week: number | null;
+  activity_type: string | null;
+  required: boolean | null;
+};
 
 function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
@@ -131,6 +136,16 @@ Deno.serve(async (req: Request) => {
     const events: EventRow[] = [];
     const emailByUid = new Map<string, string | null>();
 
+    // Assignments for this cohort drive the weekly-completion KPI. Queried
+    // unconditionally (independent of member count) so an empty cohort still
+    // reports the configured plan as assignmentWeeks.
+    const { data: assignmentData, error: assignmentErr } = await admin
+      .from("linguaai_assignments")
+      .select("week, activity_type, required")
+      .eq("cohort_id", cohort.id);
+    if (assignmentErr) throw assignmentErr;
+    const assignmentRows: AssignmentRow[] = (assignmentData ?? []) as AssignmentRow[];
+
     if (ids.length > 0) {
       const [progressRes, eventsRes] = await Promise.all([
         admin
@@ -198,7 +213,29 @@ Deno.serve(async (req: Request) => {
       bandValues: number[];
       // Every UTC day-index on which this student had any event.
       eventDays: Set<number>;
+      // activity_completed events that carried a UTC day + known activityType,
+      // kept raw so per-week completed types can be derived once firstEventDay
+      // is known.
+      activityEvents: { day: number; type: ActivityType }[];
     };
+
+    // requiredByWeek — per configured week, the set of required activity types
+    // (required===true). Built from the cohort's assignments.
+    const requiredByWeek = new Map<number, Set<ActivityType>>();
+    for (const a of assignmentRows) {
+      if (a.required !== true) continue;
+      if (typeof a.week !== "number" || !Number.isFinite(a.week)) continue;
+      const t = typeof a.activity_type === "string" ? a.activity_type : null;
+      if (t === null || !(ACTIVITY_TYPES as readonly string[]).includes(t)) continue;
+      let set = requiredByWeek.get(a.week);
+      if (!set) {
+        set = new Set<ActivityType>();
+        requiredByWeek.set(a.week, set);
+      }
+      set.add(t as ActivityType);
+    }
+    // Sorted distinct weeks that have >=1 required assignment ([] if none).
+    const assignmentWeeks = [...requiredByWeek.keys()].sort((a, b) => a - b);
 
     const accByUid = new Map<string, EventAcc>();
     for (const row of events) {
@@ -216,6 +253,7 @@ Deno.serve(async (req: Request) => {
           activityCompletions: { daily: 0, npc: 0, story: 0, escape: 0 },
           bandValues: [],
           eventDays: new Set<number>(),
+          activityEvents: [],
         };
         accByUid.set(row.user_id, acc);
       }
@@ -238,8 +276,52 @@ Deno.serve(async (req: Request) => {
         at in acc.activityCompletions
       ) {
         acc.activityCompletions[at as ActivityType] += 1;
+        acc.activityEvents.push({ day, type: at as ActivityType });
       }
     }
+
+    // ── Per-student weekly completion (assignment-based) ──
+    //
+    // Student-relative week of a UTC day: floor((day - firstEventDay)/7)+1.
+    // A student "completed week W" iff the activity types they completed in week
+    // W are a SUPERSET of requiredByWeek[W]. Eligible for week W iff they've
+    // reached it: todayUtcDay - firstEventDay >= 7*(W-1). Students with no events
+    // (firstEventDay null) are eligible for nothing.
+    const weeklyCompletionFor = (
+      acc: EventAcc | undefined,
+    ): { weeksCompleted: number; weeksEligible: number } => {
+      if (assignmentWeeks.length === 0 || !acc || acc.firstEventDay === null) {
+        return { weeksCompleted: 0, weeksEligible: 0 };
+      }
+      const completedByWeek = new Map<number, Set<ActivityType>>();
+      for (const ev of acc.activityEvents) {
+        const w = Math.floor((ev.day - acc.firstEventDay) / 7) + 1;
+        let set = completedByWeek.get(w);
+        if (!set) {
+          set = new Set<ActivityType>();
+          completedByWeek.set(w, set);
+        }
+        set.add(ev.type);
+      }
+      let weeksCompleted = 0;
+      let weeksEligible = 0;
+      for (const w of assignmentWeeks) {
+        const required = requiredByWeek.get(w);
+        if (!required || required.size === 0) continue; // no required types → skip
+        if (todayUtcDay - acc.firstEventDay < 7 * (w - 1)) continue; // not reached yet
+        weeksEligible += 1;
+        const done = completedByWeek.get(w);
+        let isSuperset = true;
+        for (const t of required) {
+          if (!done || !done.has(t)) {
+            isSuperset = false;
+            break;
+          }
+        }
+        if (isSuperset) weeksCompleted += 1;
+      }
+      return { weeksCompleted, weeksEligible };
+    };
 
     // bandIndex from a chronological band array: first = avg of first up-to-3,
     // last = avg of last up-to-3, delta = round(last - first, 2). null if empty.
@@ -259,6 +341,7 @@ Deno.serve(async (req: Request) => {
       const acc = accByUid.get(m.user_id);
       const lastEventIso =
         acc?.lastEventMs != null ? new Date(acc.lastEventMs).toISOString() : null;
+      const weekly = weeklyCompletionFor(acc);
       return {
         maskedEmail: maskEmail(emailByUid.get(m.user_id) ?? null),
         joinedAt: m.joined_at ?? null,
@@ -277,6 +360,10 @@ Deno.serve(async (req: Request) => {
           story: 0,
           escape: 0,
         },
+        // Assignment-based weekly completion (0/0 when no assignments configured
+        // or the student has no events).
+        weeksCompleted: weekly.weeksCompleted,
+        weeksEligible: weekly.weeksEligible,
         // Speaking band progress over CHRONOLOGICAL order (bandValues are
         // newest-first, so reverse before computing first/last). null when the
         // student has zero banded speaking events.
@@ -345,6 +432,51 @@ Deno.serve(async (req: Request) => {
       for (const t of ACTIVITY_TYPES) activityTotals[t] += s.activityCompletions[t];
     }
 
+    // Cohort weekly completion: per configured week, how many eligible members
+    // completed ALL required activity types that week. {} when no assignments
+    // are configured. rate = round(completed/eligible, 3), or null when
+    // eligible === 0.
+    const weekCompletion: Record<
+      string,
+      { eligible: number; completed: number; rate: number | null }
+    > = {};
+    for (const w of assignmentWeeks) {
+      const required = requiredByWeek.get(w);
+      if (!required || required.size === 0) continue;
+      let eligible = 0;
+      let completed = 0;
+      for (const m of members) {
+        const acc = accByUid.get(m.user_id);
+        if (!acc || acc.firstEventDay === null) continue;
+        if (todayUtcDay - acc.firstEventDay < 7 * (w - 1)) continue;
+        eligible += 1;
+        const completedByWeek = new Map<number, Set<ActivityType>>();
+        for (const ev of acc.activityEvents) {
+          const evWeek = Math.floor((ev.day - acc.firstEventDay) / 7) + 1;
+          let set = completedByWeek.get(evWeek);
+          if (!set) {
+            set = new Set<ActivityType>();
+            completedByWeek.set(evWeek, set);
+          }
+          set.add(ev.type);
+        }
+        const done = completedByWeek.get(w);
+        let isSuperset = true;
+        for (const t of required) {
+          if (!done || !done.has(t)) {
+            isSuperset = false;
+            break;
+          }
+        }
+        if (isSuperset) completed += 1;
+      }
+      weekCompletion[String(w)] = {
+        eligible,
+        completed,
+        rate: eligible === 0 ? null : Math.round((completed / eligible) * 1000) / 1000,
+      };
+    }
+
     let attempts7dTotal = 0;
     let activeDays7dTotal = 0;
     for (const s of students) {
@@ -375,6 +507,10 @@ Deno.serve(async (req: Request) => {
           w4: weeklyRetentionRate(4),
           w6: weeklyRetentionRate(6),
         },
+        // Assignment-based weekly completion (KPI①). assignmentWeeks is [] and
+        // weekCompletion is {} when no assignments are configured.
+        assignmentWeeks,
+        weekCompletion,
         generatedAt: new Date().toISOString(),
       },
       students,

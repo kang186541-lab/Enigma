@@ -59,6 +59,13 @@ interface WeeklyRetention {
   w6: number | null;
 }
 
+/** KPI① per-week completion: eligible/completed counts + rate (0–1 fraction or null when eligible===0). */
+interface WeekCompletion {
+  eligible: number;
+  completed: number;
+  rate: number | null;
+}
+
 interface CohortInfo {
   name: string;
   joinCode: string;
@@ -68,6 +75,11 @@ interface CohortInfo {
   // ── 6-week PoC KPI additions (optional: older servers / edge fallback may omit) ──
   activityTotals?: ActivityTotals;
   weeklyRetention?: WeeklyRetention;
+  // ── KPI① weekly completion (assignments-driven; optional until sibling ships) ──
+  /** Sorted distinct weeks that have ≥1 required assignment ([] if none configured). */
+  assignmentWeeks?: number[];
+  /** Per-configured-week completion stats keyed by week number (as string). {} if no assignments. */
+  weekCompletion?: Record<string, WeekCompletion>;
 }
 
 /** Per-student activity-completion counts grouped by activityType. */
@@ -101,6 +113,11 @@ interface StudentRow {
   // ── 6-week PoC KPI additions (optional: older servers / edge fallback may omit) ──
   activityCompletions?: ActivityCompletions;
   bandIndex?: BandIndex | null;
+  // ── KPI① weekly completion (assignments-driven; optional until sibling ships) ──
+  /** Count of configured weeks (among those the student is eligible for) they completed. */
+  weeksCompleted?: number;
+  /** Count of configured weeks the student is eligible for. */
+  weeksEligible?: number;
 }
 
 interface CohortSummary {
@@ -161,6 +178,23 @@ function langChip(lang: string | null | undefined): string | null {
 function fmtActivity(a: ActivityCompletions | undefined): string {
   if (!a) return "—";
   return `D${a.daily ?? 0} N${a.npc ?? 0} S${a.story ?? 0} E${a.escape ?? 0}`;
+}
+
+/**
+ * Weekly completion → "W1 60% · W2 45% · …" over the configured weeks,
+ * or null when there are no configured assignment weeks.
+ */
+function fmtWeekCompletion(
+  weeks: number[] | undefined,
+  byWeek: Record<string, WeekCompletion> | undefined,
+): string | null {
+  if (!weeks || weeks.length === 0) return null;
+  return weeks
+    .map((w) => {
+      const wc = byWeek?.[String(w)];
+      return `W${w} ${pct(wc?.rate)}`;
+    })
+    .join(" · ");
 }
 
 /** Band-index delta → "+0.5" / "-0.33" with sign, or "—" when missing/null. */
@@ -267,6 +301,17 @@ const L = {
   exportCsv: "CSV 내보내기",
   exportCsvEn: "Export CSV",
   exportCsvA11y: "학생 코호트 데이터를 CSV 파일로 내보내기 (Export cohort data as CSV)",
+  // ── KPI① weekly completion + seed plan ──
+  weekCompletion: "주차 완료율",
+  weekCompletionEn: "Weekly completion",
+  noAssignments: "배정 미설정 — 아래 '기본 플랜 생성'을 누르세요",
+  seedPlan: "기본 6주 플랜 생성",
+  seedPlanEn: "Seed 6-week plan",
+  seedPlanA11y: "표준 6주 학습 플랜을 한 번에 배정 생성 (Seed the standard 6-week assignment plan)",
+  seeding: "생성 중...",
+  seedDone: "6주 플랜이 생성되었어요",
+  seedError: "플랜 생성에 실패했어요 — 다시 시도해 주세요",
+  weeksLabel: "주차",
 } as const;
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -281,6 +326,11 @@ export default function TeacherDashboardScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<CohortSummary | null>(null);
+
+  // ── KPI① "기본 6주 플랜 생성(seed)" state ──
+  const [seeding, setSeeding] = useState(false);
+  const [seedError, setSeedError] = useState<string | null>(null);
+  const [seedOk, setSeedOk] = useState(false);
 
   // Restore last-used code/key for convenience.
   useEffect(() => {
@@ -358,9 +408,49 @@ export default function TeacherDashboardScreen() {
     }
   };
 
+  // ── KPI① one-click seed the standard 6-week plan, then re-fetch the summary ──
+  const seedPlan = async () => {
+    const codeTrim = code.trim();
+    const keyTrim = teacherKey.trim();
+    if (!codeTrim || !keyTrim || seeding || loading) return;
+
+    setSeeding(true);
+    setSeedError(null);
+    setSeedOk(false);
+    try {
+      const url = new URL(
+        `/api/teacher/assignments/seed?code=${encodeURIComponent(codeTrim)}&key=${encodeURIComponent(keyTrim)}`,
+        getApiUrl(),
+      ).toString();
+      const res = await fetch(url, { method: "POST" });
+
+      if (!res.ok) {
+        setSeedError(L.seedError);
+        return;
+      }
+      const json = (await res.json().catch(() => null)) as { ok?: boolean } | null;
+      if (!json || json.ok !== true) {
+        setSeedError(L.seedError);
+        return;
+      }
+      setSeedOk(true);
+      // Re-fetch the cohort summary so weekCompletion populates.
+      await load();
+    } catch (e) {
+      console.warn("[TeacherDash] seed failed:", e);
+      setSeedError(L.seedError);
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   const canLoad = !!code.trim() && !!teacherKey.trim() && !loading;
+  const canSeed = !!code.trim() && !!teacherKey.trim() && !seeding && !loading;
   const cohort = data?.cohort ?? null;
   const students = data?.students ?? [];
+  const weekCompletionStr = cohort
+    ? fmtWeekCompletion(cohort.assignmentWeeks, cohort.weekCompletion)
+    : null;
 
   const exportCsv = () => {
     if (!data || students.length === 0) return;
@@ -470,6 +560,38 @@ export default function TeacherDashboardScreen() {
               </View>
             </View>
 
+            {/* ── KPI①: 기본 6주 플랜 생성(seed) ── */}
+            <Pressable
+              onPress={seedPlan}
+              disabled={!canSeed}
+              accessibilityRole="button"
+              accessibilityLabel={L.seedPlanA11y}
+              style={({ pressed }) => [
+                styles.seedBtn,
+                !canSeed && { opacity: 0.55 },
+                pressed && canSeed && { opacity: 0.85 },
+              ]}
+            >
+              {seeding ? (
+                <>
+                  <ActivityIndicator size="small" color={C.gold} />
+                  <Text style={styles.seedBtnText}>{L.seeding}</Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons name="calendar-outline" size={16} color={C.gold} />
+                  <Text style={styles.seedBtnText}>
+                    {L.seedPlan} <Text style={styles.seedBtnTextEn}>{L.seedPlanEn}</Text>
+                  </Text>
+                </>
+              )}
+            </Pressable>
+            {seedError ? (
+              <Text style={styles.seedMsgError}>{seedError}</Text>
+            ) : seedOk ? (
+              <Text style={styles.seedMsgOk}>{L.seedDone}</Text>
+            ) : null}
+
             <View style={styles.retentionRow}>
               {([
                 ["D1", cohort.retention?.d1],
@@ -503,6 +625,18 @@ export default function TeacherDashboardScreen() {
                   </View>
                 ))}
               </View>
+            </View>
+
+            {/* ── KPI①: 주차 완료율 (weekly completion rate) ── */}
+            <View style={styles.kpiBlock}>
+              <Text style={styles.kpiHeading}>
+                {L.weekCompletion} <Text style={styles.kpiHeadingEn}>{L.weekCompletionEn}</Text>
+              </Text>
+              {weekCompletionStr ? (
+                <Text style={styles.weekCompletionText}>{weekCompletionStr}</Text>
+              ) : (
+                <Text style={styles.weekCompletionHint}>{L.noAssignments}</Text>
+              )}
             </View>
 
             {/* ── 6주 PoC: 활동 완료 (activity totals) ── */}
@@ -584,6 +718,9 @@ export default function TeacherDashboardScreen() {
                   <Text style={styles.studentMetaSub}>
                     최근 활동 {relTime(s.lastActiveAt)} · 주간 활동 {s.activeDays7d}일
                     {s.joinedAt ? ` · 가입 ${relTime(s.joinedAt)}` : ""}
+                    {typeof s.weeksEligible === "number" && s.weeksEligible > 0
+                      ? ` · ${L.weeksLabel} ${s.weeksCompleted ?? 0}/${s.weeksEligible}`
+                      : ""}
                   </Text>
                   {/* ── 6주 PoC: 활동 완료 + 밴드 변화 ── */}
                   <View style={styles.studentKpiRow}>
@@ -857,6 +994,58 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: C.textMuted,
     letterSpacing: 0.5,
+  },
+
+  // KPI① weekly completion (rate string + no-assignments hint)
+  weekCompletionText: {
+    fontFamily: F.bodySemi,
+    fontSize: 14,
+    color: C.parchment,
+    lineHeight: 21,
+  },
+  weekCompletionHint: {
+    fontFamily: F.body,
+    fontSize: 12,
+    color: C.textMuted,
+    fontStyle: "italic",
+    lineHeight: 18,
+  },
+
+  // KPI① "기본 6주 플랜 생성(seed)" button + status messages
+  seedBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    backgroundColor: C.goldFaint,
+    borderWidth: 1,
+    borderColor: C.border,
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  seedBtnText: {
+    fontFamily: F.bodySemi,
+    fontSize: 13,
+    color: C.gold,
+    letterSpacing: 0.5,
+  },
+  seedBtnTextEn: {
+    fontFamily: F.body,
+    fontSize: 11,
+    color: C.goldDim,
+    fontStyle: "italic",
+  },
+  seedMsgError: {
+    fontFamily: F.bodySemi,
+    fontSize: 12,
+    color: "#F2697D",
+    textAlign: "center",
+  },
+  seedMsgOk: {
+    fontFamily: F.bodySemi,
+    fontSize: 12,
+    color: C.gold,
+    textAlign: "center",
   },
 
   // CSV export button

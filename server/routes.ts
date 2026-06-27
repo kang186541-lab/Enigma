@@ -3511,6 +3511,11 @@ Student's ${learnName} answer: ${userAnswer}`;
           created_at: string;
           props: Record<string, unknown> | null;
         };
+        type AssignmentRow = {
+          week: number | null;
+          activity_type: string | null;
+          required: boolean | null;
+        };
 
         const { data: memberRows, error: memberErr } = await admin
           .from("linguaai_cohort_members")
@@ -3528,7 +3533,7 @@ Student's ${learnName} answer: ${userAnswer}`;
         // newest-first ordering means any truncation drops the OLDEST events,
         // keeping lastActiveAt / atRisk / 7-day metrics exact at the cost of
         // retention precision. Revisit with aggregation before scaling up.
-        const [progressRes, eventsRes] = await Promise.all([
+        const [progressRes, eventsRes, assignmentsRes] = await Promise.all([
           admin
             .from("linguaai_user_progress")
             .select("user_id, xp, level, streak_days, last_session_at, learning_lang")
@@ -3539,9 +3544,17 @@ Student's ${learnName} answer: ${userAnswer}`;
             .in("user_id", ids)
             .order("created_at", { ascending: false })
             .limit(50_000),
+          // Assignments for this cohort drive the weekly-completion KPI. Always
+          // queried (not gated on ids) so an empty cohort still reports the
+          // configured plan as assignmentWeeks.
+          admin
+            .from("linguaai_assignments")
+            .select("week, activity_type, required")
+            .eq("cohort_id", cohort.id),
         ]);
         if (progressRes.error) throw progressRes.error;
         if (eventsRes.error) throw eventsRes.error;
+        if (assignmentsRes.error) throw assignmentsRes.error;
         const progressByUid = new Map<string, ProgressRow>();
         for (const p of (progressRes.data ?? []) as ProgressRow[]) {
           progressByUid.set(p.user_id, p);
@@ -3604,7 +3617,31 @@ Student's ${learnName} answer: ${userAnswer}`;
           bandValues: number[];
           // Every UTC day-index on which this student had any event.
           eventDays: Set<number>;
+          // activity_completed events that carried a UTC day + known activityType,
+          // kept raw so per-week completed types can be derived once firstEventDay
+          // is known (a single events pass can't know the student-relative week
+          // until the earliest event has been seen).
+          activityEvents: { day: number; type: ActivityType }[];
         };
+
+        // requiredByWeek — per configured week, the set of activity types that
+        // are required (required===true). Built from the cohort's assignments.
+        const requiredByWeek = new Map<number, Set<ActivityType>>();
+        for (const a of (assignmentsRes.data ?? []) as AssignmentRow[]) {
+          if (a.required !== true) continue;
+          if (typeof a.week !== "number" || !Number.isFinite(a.week)) continue;
+          const t = typeof a.activity_type === "string" ? a.activity_type : null;
+          if (t === null || !(ACTIVITY_TYPES as readonly string[]).includes(t)) continue;
+          let set = requiredByWeek.get(a.week);
+          if (!set) {
+            set = new Set<ActivityType>();
+            requiredByWeek.set(a.week, set);
+          }
+          set.add(t as ActivityType);
+        }
+        // Sorted distinct weeks that have >=1 required assignment ([] if none).
+        const assignmentWeeks = [...requiredByWeek.keys()].sort((a, b) => a - b);
+
         const accByUid = new Map<string, EventAcc>();
         for (const row of (eventsRes.data ?? []) as EventRow[]) {
           const ms = Date.parse(row.created_at);
@@ -3621,6 +3658,7 @@ Student's ${learnName} answer: ${userAnswer}`;
               activityCompletions: { daily: 0, npc: 0, story: 0, escape: 0 },
               bandValues: [],
               eventDays: new Set<number>(),
+              activityEvents: [],
             };
             accByUid.set(row.user_id, acc);
           }
@@ -3645,8 +3683,52 @@ Student's ${learnName} answer: ${userAnswer}`;
             at in acc.activityCompletions
           ) {
             acc.activityCompletions[at as ActivityType] += 1;
+            acc.activityEvents.push({ day, type: at as ActivityType });
           }
         }
+
+        // ── Per-student weekly completion (assignment-based) ──
+        //
+        // Student-relative week of a UTC day: floor((day - firstEventDay)/7)+1.
+        // A student "completed week W" iff the activity types they completed in
+        // week W are a SUPERSET of requiredByWeek[W]. Eligible for week W iff
+        // they've reached it: todayUtcDay - firstEventDay >= 7*(W-1). Students
+        // with no events (firstEventDay null) are eligible for nothing.
+        const weeklyCompletionFor = (
+          acc: EventAcc | undefined,
+        ): { weeksCompleted: number; weeksEligible: number } => {
+          if (assignmentWeeks.length === 0 || !acc || acc.firstEventDay === null) {
+            return { weeksCompleted: 0, weeksEligible: 0 };
+          }
+          const completedByWeek = new Map<number, Set<ActivityType>>();
+          for (const ev of acc.activityEvents) {
+            const w = Math.floor((ev.day - acc.firstEventDay) / 7) + 1;
+            let set = completedByWeek.get(w);
+            if (!set) {
+              set = new Set<ActivityType>();
+              completedByWeek.set(w, set);
+            }
+            set.add(ev.type);
+          }
+          let weeksCompleted = 0;
+          let weeksEligible = 0;
+          for (const w of assignmentWeeks) {
+            const required = requiredByWeek.get(w);
+            if (!required || required.size === 0) continue; // no required types → skip
+            if (todayUtcDay - acc.firstEventDay < 7 * (w - 1)) continue; // not reached yet
+            weeksEligible += 1;
+            const done = completedByWeek.get(w);
+            let isSuperset = true;
+            for (const t of required) {
+              if (!done || !done.has(t)) {
+                isSuperset = false;
+                break;
+              }
+            }
+            if (isSuperset) weeksCompleted += 1;
+          }
+          return { weeksCompleted, weeksEligible };
+        };
 
         // bandIndex from a chronological band array: first = avg of first up-to-3,
         // last = avg of last up-to-3, delta = round(last - first, 2). null if empty.
@@ -3667,6 +3749,7 @@ Student's ${learnName} answer: ${userAnswer}`;
           const acc = accByUid.get(m.user_id);
           const lastEventIso =
             acc?.lastEventMs != null ? new Date(acc.lastEventMs).toISOString() : null;
+          const weekly = weeklyCompletionFor(acc);
           return {
             maskedEmail: maskEmail(emailByUid.get(m.user_id) ?? null),
             joinedAt: m.joined_at ?? null,
@@ -3685,6 +3768,10 @@ Student's ${learnName} answer: ${userAnswer}`;
               story: 0,
               escape: 0,
             },
+            // Assignment-based weekly completion (0/0 when no assignments configured
+            // or the student has no events).
+            weeksCompleted: weekly.weeksCompleted,
+            weeksEligible: weekly.weeksEligible,
             // Speaking band progress over CHRONOLOGICAL order (bandValues are
             // newest-first, so reverse before computing first/last). null when
             // the student has zero banded speaking events.
@@ -3766,6 +3853,51 @@ Student's ${learnName} answer: ${userAnswer}`;
           for (const t of ACTIVITY_TYPES) activityTotals[t] += s.activityCompletions[t];
         }
 
+        // Cohort weekly completion: per configured week, how many eligible
+        // members completed ALL required activity types that week. {} when no
+        // assignments are configured. rate = round(completed/eligible, 3), or
+        // null when eligible === 0.
+        const weekCompletion: Record<
+          string,
+          { eligible: number; completed: number; rate: number | null }
+        > = {};
+        for (const w of assignmentWeeks) {
+          const required = requiredByWeek.get(w);
+          if (!required || required.size === 0) continue;
+          let eligible = 0;
+          let completed = 0;
+          for (const m of members) {
+            const acc = accByUid.get(m.user_id);
+            if (!acc || acc.firstEventDay === null) continue;
+            if (todayUtcDay - acc.firstEventDay < 7 * (w - 1)) continue;
+            eligible += 1;
+            const completedByWeek = new Map<number, Set<ActivityType>>();
+            for (const ev of acc.activityEvents) {
+              const evWeek = Math.floor((ev.day - acc.firstEventDay) / 7) + 1;
+              let set = completedByWeek.get(evWeek);
+              if (!set) {
+                set = new Set<ActivityType>();
+                completedByWeek.set(evWeek, set);
+              }
+              set.add(ev.type);
+            }
+            const done = completedByWeek.get(w);
+            let isSuperset = true;
+            for (const t of required) {
+              if (!done || !done.has(t)) {
+                isSuperset = false;
+                break;
+              }
+            }
+            if (isSuperset) completed += 1;
+          }
+          weekCompletion[String(w)] = {
+            eligible,
+            completed,
+            rate: eligible === 0 ? null : Math.round((completed / eligible) * 1000) / 1000,
+          };
+        }
+
         // Speaking intensity over the trailing 7 days: total speaking attempts
         // divided by total active student-days (Σ attempts7d / Σ activeDays7d).
         // Null when the cohort logged no active days in the window.
@@ -3799,12 +3931,97 @@ Student's ${learnName} answer: ${userAnswer}`;
               w4: weeklyRetentionRate(4),
               w6: weeklyRetentionRate(6),
             },
+            // Assignment-based weekly completion (KPI①). assignmentWeeks is []
+            // and weekCompletion is {} when no assignments are configured.
+            assignmentWeeks,
+            weekCompletion,
             generatedAt: new Date().toISOString(),
           },
           students,
         });
       } catch (err) {
         console.error("[teacher cohort-summary] unexpected error:", err);
+        return res.status(500).json({ error: "internal" });
+      }
+    },
+  );
+
+  // POST /api/teacher/assignments/seed?code=<join_code>&key=<teacher_key>
+  //
+  // One-click idempotent seed of the STANDARD 6-week plan for a cohort. Reuses
+  // the exact teacher-key gate as /api/teacher/cohort-summary (service-role
+  // required → 503; cohort lookup → 404; timing-safe key → 401). The plan marks
+  // "daily" and "npc" as required for each of weeks 1..6 → 12 rows total. Seeding
+  // is idempotent: existing assignments for the cohort are deleted, then the 12
+  // rows are inserted, so repeated calls converge on the same plan.
+  app.post(
+    "/api/teacher/assignments/seed",
+    teacherSummaryLimiter,
+    async (req: Request, res: Response) => {
+      try {
+        const admin = hasServiceRole() ? getServiceRoleClient() : null;
+        if (!admin) {
+          return res.status(503).json({ error: "service_unavailable" });
+        }
+
+        const code = typeof req.query.code === "string" ? req.query.code.trim() : "";
+        const key = typeof req.query.key === "string" ? req.query.key : "";
+        if (!code) return res.status(404).json({ error: "unknown_code" });
+
+        const ilikePattern = code.replace(/([\\%_])/g, "\\$1");
+        const { data: cohortRows, error: cohortErr } = await admin
+          .from("linguaai_cohorts")
+          .select("id, name, join_code, teacher_key")
+          .ilike("join_code", ilikePattern)
+          .limit(2);
+        if (cohortErr) throw cohortErr;
+        const codeLower = code.toLowerCase();
+        const cohort = (cohortRows ?? []).find(
+          (c: { join_code?: string | null }) =>
+            typeof c.join_code === "string" && c.join_code.toLowerCase() === codeLower,
+        );
+        if (!cohort) return res.status(404).json({ error: "unknown_code" });
+
+        const expectedKey = Buffer.from(String(cohort.teacher_key ?? ""), "utf8");
+        const providedKey = Buffer.from(key, "utf8");
+        if (
+          expectedKey.length === 0 ||
+          providedKey.length !== expectedKey.length ||
+          !timingSafeEqual(providedKey, expectedKey)
+        ) {
+          return res.status(401).json({ error: "bad_key" });
+        }
+
+        // Standard 6-week plan: weeks 1..6, each requires {daily, npc}.
+        const SEED_WEEKS = 6;
+        const SEED_TYPES = ["daily", "npc"] as const;
+        const rows: {
+          cohort_id: unknown;
+          week: number;
+          activity_type: string;
+          required: boolean;
+        }[] = [];
+        for (let week = 1; week <= SEED_WEEKS; week += 1) {
+          for (const activity_type of SEED_TYPES) {
+            rows.push({ cohort_id: cohort.id, week, activity_type, required: true });
+          }
+        }
+
+        // Idempotent: clear then insert. Both go through the service-role client
+        // (linguaai_assignments is service-role-only).
+        const { error: delErr } = await admin
+          .from("linguaai_assignments")
+          .delete()
+          .eq("cohort_id", cohort.id);
+        if (delErr) throw delErr;
+        const { error: insErr } = await admin
+          .from("linguaai_assignments")
+          .insert(rows);
+        if (insErr) throw insErr;
+
+        return res.json({ ok: true, weeks: SEED_WEEKS, rowsCreated: rows.length });
+      } catch (err) {
+        console.error("[teacher assignments/seed] unexpected error:", err);
         return res.status(500).json({ error: "internal" });
       }
     },
