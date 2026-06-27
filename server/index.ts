@@ -11,10 +11,12 @@ import * as path from "path";
 // is absent (e.g. minimal CI image).
 type SentryNode = {
   init: (opts: Record<string, unknown>) => void;
-  Handlers: {
+  Handlers?: {
     requestHandler: () => express.RequestHandler;
     errorHandler: () => express.ErrorRequestHandler;
   };
+  setupExpressErrorHandler?: (app: express.Application) => void;
+  expressErrorHandler?: () => express.ErrorRequestHandler;
   captureException: (err: unknown) => void;
 };
 let SentryNS: SentryNode | null = null;
@@ -46,7 +48,10 @@ const log = console.log;
 app.set("trust proxy", 1);
 
 if (SentryNS) {
-  app.use(SentryNS.Handlers.requestHandler());
+  const legacyRequestHandler = SentryNS.Handlers?.requestHandler;
+  if (legacyRequestHandler) {
+    app.use(legacyRequestHandler());
+  }
 }
 
 declare module "http" {
@@ -311,7 +316,13 @@ function setupErrorHandler(app: express.Application) {
   // Sentry's error handler must come AFTER routes and BEFORE the app's own
   // error handler so it captures the exception before we format the response.
   if (SentryNS) {
-    app.use(SentryNS.Handlers.errorHandler());
+    if (SentryNS.setupExpressErrorHandler) {
+      SentryNS.setupExpressErrorHandler(app);
+    } else if (SentryNS.Handlers?.errorHandler) {
+      app.use(SentryNS.Handlers.errorHandler());
+    } else if (SentryNS.expressErrorHandler) {
+      app.use(SentryNS.expressErrorHandler());
+    }
   }
 
   setupErrorHandler(app);
