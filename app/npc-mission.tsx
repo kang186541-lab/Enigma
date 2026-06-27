@@ -25,6 +25,7 @@ import { getEffectiveLearningLanguage, useLanguage, type NativeLanguage } from "
 import { getNPC, NPC, NPC_EMOTIONS, NPC_REL_LEVELS, getRelTier, getRelLabel, RelationshipTier } from "@/constants/npcs";
 import { getNPCVisual } from "@/constants/npcVisuals";
 import { getApiUrl } from "@/lib/query-client";
+import { trackLearningEvent } from "@/lib/learningEvents";
 import { queueProgressPush } from "@/lib/progressSync";
 import { recordAudio } from "@/lib/audio";
 import { EmojiText } from "@/components/EmojiText";
@@ -177,6 +178,10 @@ export default function NpcMissionScreen() {
   const wordCache = useRef<Record<string, { meaning: string; partOfSpeech: string; example: string }>>({});
 
   const conversationRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
+  // Fire the pilot "activity_completed" sink event once per NPC session (on the
+  // learner's first real message) so a required NPC mission can be counted by the
+  // teacher weekly-completion view. NPC has no hard "mission complete" state.
+  const npcActivityFiredRef = useRef(false);
   const inputRef = useRef<TextInput>(null);
 
   const tier: RelationshipTier = getRelTier(relationship);
@@ -396,6 +401,16 @@ export default function NpcMissionScreen() {
     if (!trimmed || !npc || isTyping) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
+    if (!npcActivityFiredRef.current) {
+      npcActivityFiredRef.current = true;
+      void trackLearningEvent("activity_completed", {
+        activityType: "npc",
+        nativeLanguage: native,
+        targetLanguage: language,
+        platform: Platform.OS,
+      });
+    }
+
     const userMsg: NpcMessage = { id: Date.now().toString() + "u", text: trimmed, isUser: true };
     const newHistory = [...conversationRef.current, { role: "user" as const, content: trimmed }];
     conversationRef.current = newHistory;
@@ -406,7 +421,7 @@ export default function NpcMissionScreen() {
     setChoiceTranslVisible([]);
 
     await fetchNpcReply(newHistory, false, relationship);
-  }, [npc, isTyping, relationship, fetchNpcReply]);
+  }, [npc, isTyping, relationship, fetchNpcReply, native, language]);
 
   const handleChoiceTap = useCallback((choice: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);

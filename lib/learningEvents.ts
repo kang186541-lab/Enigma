@@ -13,7 +13,8 @@ export type LearningEventName =
   | "review_sentence_screen_seen"
   | "review_sentence_attempt_completed"
   | "learning_goal_selected"
-  | "onboarding_first_speaking_started";
+  | "onboarding_first_speaking_started"
+  | "activity_completed";
 
 type LearningEventProps = Record<string, string | number | boolean | null | undefined>;
 
@@ -34,6 +35,11 @@ const ALLOWED_PROP_KEYS: Record<LearningEventName, readonly string[]> = {
   review_sentence_attempt_completed: ["surface", "nativeLanguage", "targetLanguage", "scoreBand", "assessmentStatus", "platform", "deckType", "dailySpokenCount", "dailyGoal"],
   learning_goal_selected: ["surface", "nativeLanguage", "targetLanguage", "goal"],
   onboarding_first_speaking_started: ["surface", "nativeLanguage", "targetLanguage", "goal"],
+  // Pilot 6wk PoC: a student completed/engaged an assigned activity. `activityType`
+  // is the discriminator the teacher weekly-completion view groups by. Lets NPC
+  // (and later story/escape) into the same sink so a "required NPC mission" can
+  // actually be counted (Codex GO condition 1) without conflating with daily.
+  activity_completed: ["nativeLanguage", "targetLanguage", "activityType", "platform"],
 };
 
 const ALLOWED_STRING_VALUES: Record<string, readonly string[]> = {
@@ -45,6 +51,7 @@ const ALLOWED_STRING_VALUES: Record<string, readonly string[]> = {
   platform: ["ios", "android", "web", "windows", "macos"],
   goal: ["travel", "work", "study", "hobby", "relationship", "exam", "unknown"],
   deckType: ["srs", "beginner", "advanced"],
+  activityType: ["daily", "npc", "story", "escape"],
 };
 
 const BLOCKED_KEY_PATTERN = /(audio|base64|body|comment|email|message|name|payload|phrase|prompt|raw|recognized|text|transcript|word)/i;

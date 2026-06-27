@@ -6,6 +6,7 @@ import {
   Pressable,
   Animated,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,6 +32,7 @@ import {
   getCompletionMessage, type LearningLangKey,
 } from "@/lib/lessonContent";
 import { addDayPhrases } from "@/lib/srsManager";
+import { trackLearningEvent } from "@/lib/learningEvents";
 import { buildSpeakingPromptKey, recordSpokenSentence, SPEAKING_DAILY_GOAL } from "@/lib/speakingProgress";
 import { Step1ListenRepeat } from "@/components/rudy/Step1ListenRepeat";
 import { Step2KeyPoint } from "@/components/rudy/Step2KeyPoint";
@@ -176,6 +178,15 @@ export default function RudyLessonScreen() {
 
       await saveProgress(now);
       setProgress(now);
+
+      // Pilot sink: the daily course is the primary required activity. Emit on
+      // every completion so the teacher weekly-completion view can count it.
+      void trackLearningEvent("activity_completed", {
+        activityType: "daily",
+        nativeLanguage: nativeLang,
+        targetLanguage: learnLang,
+        platform: Platform.OS,
+      });
 
       // Register today's phrases into the SRS system for spaced repetition
       if (isFirstClear) {
