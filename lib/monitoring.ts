@@ -82,6 +82,11 @@ export function initMonitoring(): void {
       tracesSampleRate: 0.1,
       enableAutoSessionTracking: true,
       sendDefaultPii: false,
+      // Distinguish prod crashes from dev; release groups them per build when
+      // EXPO_PUBLIC_RELEASE is injected at build time (undefined otherwise →
+      // Sentry treats it as no release, harmless).
+      environment: process.env.NODE_ENV === "production" ? "production" : "development",
+      release: process.env.EXPO_PUBLIC_RELEASE || undefined,
       beforeSend: (event: Record<string, unknown>) => {
         return scrubPayload(event) as Record<string, unknown>;
       },

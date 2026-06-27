@@ -29,6 +29,9 @@ if (process.env.SENTRY_DSN) {
       sampleRate: 1.0,
       tracesSampleRate: 0.1,
       environment: process.env.NODE_ENV || "development",
+      // Per-deploy crash grouping. Railway injects RAILWAY_GIT_COMMIT_SHA at
+      // runtime; undefined when unset (Sentry then treats it as no release).
+      release: process.env.RAILWAY_GIT_COMMIT_SHA || process.env.SENTRY_RELEASE || undefined,
     });
   } catch (e) {
     SentryNS = null;
