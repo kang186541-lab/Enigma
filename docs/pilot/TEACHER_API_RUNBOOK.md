@@ -26,6 +26,45 @@ Expected results:
 - wrong teacher key: HTTP 401
 - unknown code: HTTP 404
 
+## Live User Smoke Test
+
+Purpose: prove the last untested link in the pilot spine:
+
+`signed-in learner UI -> activity_completed -> Supabase -> cohort summary -> teacher dashboard`
+
+Use this after the demo class is empty/reset.
+
+1. Open `https://web-dist2.vercel.app/`.
+2. Sign in with a test learner account.
+3. Go to Settings -> Class -> Enter class code.
+4. Join class code `GNU2026`.
+5. Complete one activity that emits `activity_completed`:
+   - Rudy training day -> `activityType: "daily"`
+   - Story chapter -> `activityType: "story"`
+   - NPC mission -> `activityType: "npc"`
+   - Escape room -> `activityType: "escape"`
+6. Open:
+
+```text
+https://web-dist2.vercel.app/teacher-dashboard
+```
+
+Use demo code/key from the Demo section.
+
+Expected:
+
+- API remains HTTP 200.
+- `memberCount` is at least 1.
+- The matching `activityTotals.<type>` increases to at least 1.
+- The dashboard "일일 / NPC / 스토리 / 탈출" KPI row shows the same count.
+
+If the dashboard stays at 0:
+
+- Confirm the learner was signed in before completing the activity.
+- Confirm the learner joined `GNU2026` before completing the activity.
+- Re-check `/api/teacher/cohort-summary?code=GNU2026&key=<teacher-key>`.
+- If the event exists in `linguaai_learning_events` but the dashboard does not move, inspect cohort membership and `props.activityType`.
+
 ## Secrets
 
 `SUPABASE_SERVICE_ROLE_KEY` is still useful on Railway because it keeps the
