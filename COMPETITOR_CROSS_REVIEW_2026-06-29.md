@@ -15,15 +15,15 @@ Limit: competitor lesson internals were not inspected behind login/paywalls. Thi
 
 ## Official Source Notes
 
-- Duolingo Max official blog: AI-backed subscription features, including GPT-backed learning features.  
+- Duolingo Max official blog: AI-backed subscription features, including GPT-backed learning features.
   Source: https://blog.duolingo.com/duolingo-max/
-- Duolingo Video Call official blog: AI-powered realistic conversation practice.  
+- Duolingo Video Call official blog: AI-powered realistic conversation practice.
   Source: https://blog.duolingo.com/video-call/
-- Duolingo for Schools official site: classroom-facing product surface.  
+- Duolingo for Schools official site: classroom-facing product surface.
   Source: https://schools.duolingo.com/
-- Speak official site: positions itself as the language learning app that gets users speaking; its web app metadata emphasizes interactive lessons where users speak out loud with speech-recognition AI.  
+- Speak official site: positions itself as the language learning app that gets users speaking; its web app metadata emphasizes interactive lessons where users speak out loud with speech-recognition AI.
   Source: https://www.speak.com/ and https://app.speak.com/
-- Malhaeboca/Epop official site: positions around words becoming speech, with a vocabulary-first Korean-market promise.  
+- Malhaeboca/Epop official site: positions around words becoming speech, with a vocabulary-first Korean-market promise.
   Source: https://epop.ai/
 
 ## LinguaAI Evidence Checked
@@ -154,4 +154,3 @@ Recommended next implementation sprint:
 2. First-session/first-sentence flow audit: time to first spoken sentence should be under 30 seconds.
 3. Weak-sentence next-day review path.
 4. Teacher dashboard action recommendations.
-
